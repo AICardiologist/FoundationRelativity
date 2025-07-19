@@ -30,3 +30,4 @@ jobs:
           lake exe testFunctors
           lake exe testNonIdMorphisms
           lake exe WitnessTests
+          lake exe Gap2MigrationTests
