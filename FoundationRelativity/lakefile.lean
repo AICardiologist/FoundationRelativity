@@ -25,3 +25,6 @@ lean_exe testNonIdMorphisms where
 
 lean_exe WitnessTests where
   root := `test.WitnessTest
+
+lean_exe AllPathologiesTests where
+  root := `test.AllPathologiesTest

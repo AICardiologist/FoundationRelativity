@@ -1,20 +1,14 @@
-import Found.InterpCore
-import Found.BaseGroupoids
+import Found.WitnessCore
 
-open CategoryTheory Foundation FoundationRelativity
+open CategoryTheory Foundation Found
 
 namespace Gap
 
-/-- Covariant functor Foundation ⥤ Cat -/
-def Gap₂ : Foundation ⥤ Cat where
-  obj := Obj
-  map f := match f with
-  | Interp.id_bish => 𝟭 _
-  | Interp.id_zfc  => 𝟭 _
-  | Interp.forget  => fromEmpty
-  map_id := by intro F; cases F <;> rfl
-  map_comp := by
-    intro _ _ _ f g
-    cases f <;> cases g <;> rfl
+/-- Type representing Gap₂ pathology -/
+structure Gap₂Pathology where
+  data : Unit
+
+/-- Gap₂ functor using the generic witness API -/
+def Gap₂ : Foundation ⥤ Cat := pathologyFunctor Gap₂Pathology
 
 end Gap
