@@ -1,0 +1,32 @@
+name: CI
+on: [push, pull_request]
+
+env:
+  LEAN_ABORT_ON_SORRY: 1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/leanprover/lean4:4.3.0   # hard-pin
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache .lake
+        uses: actions/cache@v3
+        with:
+          path: .lake
+          key: ${{ runner.os }}-lake-${{ hashFiles('lake-manifest.json', 'lean-toolchain', 'lakefile.lean') }}
+
+      - name: Build
+        run: lake build
+
+      - name: Sanity – no 'sorry'
+        run: bash scripts/verify-no-sorry.sh
+
+      - name: Unit tests
+        run: |
+          lake exe PathTests
+          lake exe testFunctors
+          lake exe testNonIdMorphisms
+          lake exe WitnessTests
