@@ -3,6 +3,10 @@
 [![CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml)
 [![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
 [![Lean 4.3.0](https://img.shields.io/badge/Lean-4.3.0-blue)](https://github.com/leanprover/lean4)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
+> **Ready for PR Creation & Merge** 🚀  
+> All 4 Sprint S2 branches are pushed. Infrastructure complete for formal proof development.
 
 A Lean 4 formalization exploring how mathematical pathologies behave differently under various foundational assumptions.
 
@@ -67,17 +71,28 @@ cd FoundationRelativity
 # Build the project
 lake build
 
-# Run tests
+# Run comprehensive test suite
 lake exe testFunctors
 lake exe testNonIdMorphisms
 lake exe AllPathologiesTests
-```
+lake exe WitnessTests
 
-### Verify No Sorry
-
-```bash
+# Verify no sorry in core modules
 bash scripts/verify-no-sorry.sh
 ```
+
+### Current Status: Ready for PR Merge
+
+The repository has **4 feature branches** ready for sequential merge:
+
+1. **[PR-1: feat/witness-core](https://github.com/AICardiologist/FoundationRelativity/pull/new/feat/witness-core)** - Witness API foundation
+2. **[PR-2: feat/gap2-witness-api](https://github.com/AICardiologist/FoundationRelativity/pull/new/feat/gap2-witness-api)** - Gap₂ migration  
+3. **[PR-3: feat/ap-rnp-witness-api](https://github.com/AICardiologist/FoundationRelativity/pull/new/feat/ap-rnp-witness-api)** - AP & RNP migrations
+4. **[PR-4: feat/nightly-ci](https://github.com/AICardiologist/FoundationRelativity/pull/new/feat/nightly-ci)** - CI/CD workflows
+
+**Merge Order**: PR-1 → PR-2 → PR-3 → PR-4 (each depends on the previous)
+
+**After merge**: Tag `v0.3.0-witness` to mark Sprint S2 completion and unblock Sprint S3 proof development.
 
 ## 🔬 Technical Details
 
@@ -112,11 +127,26 @@ def pathologyFunctor (α : Type) : Foundation ⥤ Cat
 
 ## 🎓 Mathematical Background
 
-This formalization is based on the observation that certain mathematical constructions require classical axioms (like the Law of Excluded Middle or the Axiom of Choice) to be well-defined. By formalizing these as functors between categories, we can precisely characterize:
+This formalization targets **four key pathologies** from recent research on foundation-relativity:
 
-1. **What fails**: The witness type is empty in constructive settings
-2. **Why it fails**: Specific classical principles required (WLPO, LPO, etc.)
-3. **How to fix it**: Alternative constructive formulations
+### Paper Targets (ρ-degree hierarchy)
+
+| Pathology | Logic Strength | Status | Description |
+|-----------|---------------|--------|-------------|
+| **Gap₂** | ρ = 1 (WLPO) | 🎯 Sprint S3 | Bidual gap in Banach spaces |
+| **AP_Fail₂** | ρ = 1 (WLPO) | 📅 Sprint S4 | Approximation Property failure |
+| **RNP_Fail₂** | ρ = 2 (DC_ω) | 📅 Sprint S5 | Radon-Nikodým Property failure |
+| **Spectral Gap** | Beyond ρ-scale | 🔮 Future | Gödel-incompleteness connection |
+
+### Foundation-Relativity Principle
+
+The same mathematical construction exhibits different behavior:
+
+1. **BISH setting**: Witness type is `Empty` → pathology cannot be constructed
+2. **ZFC setting**: Witness type is `PUnit` → pathology exists classically  
+3. **Gap analysis**: Requires specific classical principles (WLPO, LPO, DC_ω)
+
+This provides a **constructive diagnostic** for identifying exactly which non-constructive principles a theorem requires.
 
 ## 🛠️ Development
 
@@ -162,11 +192,26 @@ Ensure all tests pass and no `sorry` remains in core modules.
 
 ## 📈 Project Status
 
-- ✅ **Sprint S0**: Core infrastructure
-- ✅ **Sprint S1**: Covariant functors  
-- ✅ **Sprint S2**: Witness API
-- 🚧 **Sprint S3**: Formal proofs (in progress)
-- 📅 **Sprint S4**: Planned
+### Sprint Progress
+
+- ✅ **Sprint S0**: Core infrastructure (`Foundation`, `Interp`, basic functors)
+- ✅ **Sprint S1**: Covariant functors (fixed mathematical impossibility of contravariant approach)  
+- ✅ **Sprint S2**: Witness API (unified `WitnessCore`, migrations, CI/CD) **← COMPLETE**
+- 🎯 **Sprint S3**: Gap₂ WLPO proof (target: `Gap_requires_WLPO : RequiresWLPO Gap₂`)
+- 📅 **Sprint S4**: AP_Fail₂ proof (reuse ρ=1 infrastructure)
+- 📅 **Sprint S5**: RNP_Fail₂ proof (introduce ρ=2 DSL)
+
+### Next Milestone: First Formal Proof
+
+**Sprint S3 Goal**: Prove `Gap₂` requires WLPO with zero `sorry`
+
+```lean
+theorem Gap_requires_WLPO : RequiresWLPO Gap.Pathology := by
+  -- Uses new Witness API + minimal classical lemmas
+  -- Target: complete proof < 200 LoC
+```
+
+**Why Gap₂ first?** Minimal dependencies (elementary Banach spaces), exercises the full pipeline, quick win for proof-of-concept.
 
 ## 📄 License
 
