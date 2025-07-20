@@ -1,0 +1,52 @@
+name: CI Nightly
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Run at 2 AM UTC daily
+  workflow_dispatch:  # Allow manual trigger
+
+env:
+  LEAN_ABORT_ON_SORRY: 1
+
+jobs:
+  build-nightly:
+    runs-on: ubuntu-latest
+    continue-on-error: true  # Don't fail the whole workflow
+    container:
+      image: leanprover/lean4:nightly
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Update mathlib to latest
+        run: |
+          lake update
+          
+      - name: Cache .lake
+        uses: actions/cache@v3
+        with:
+          path: .lake
+          key: ${{ runner.os }}-lake-nightly-${{ hashFiles('lake-manifest.json', 'lean-toolchain', 'lakefile.lean') }}
+
+      - name: Build
+        run: lake build
+
+      - name: Sanity – no 'sorry'
+        run: bash scripts/verify-no-sorry.sh
+
+      - name: Unit tests
+        run: |
+          lake exe PathTests
+          lake exe testFunctors
+          lake exe testNonIdMorphisms
+          
+      - name: Report status
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Nightly build failed',
+              body: 'The nightly build failed. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.',
+              labels: ['ci', 'nightly']
+            })

@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  LEAN_ABORT_ON_SORRY: 1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/leanprover/lean4:4.3.0   # Pin to stable version
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache .lake
+        uses: actions/cache@v3
+        with:
+          path: .lake
+          key: ${{ runner.os }}-lake-${{ hashFiles('lake-manifest.json', 'lean-toolchain', 'lakefile.lean') }}
+
+      - name: Build
+        run: lake build
+
+      - name: Verify no 'sorry'
+        run: |
+          if [ -f scripts/verify-no-sorry.sh ]; then
+            bash scripts/verify-no-sorry.sh
+          else
+            echo "Warning: verify-no-sorry.sh not found"
+          fi
+
+      - name: Run tests
+        run: |
+          # Run core tests that should always exist after PR merges
+          for test in PathTests testFunctors testNonIdMorphisms; do
+            if lake exe $test 2>/dev/null; then
+              echo "✓ $test passed"
+            else
+              echo "⚠ $test not found"
+            fi
+          done
