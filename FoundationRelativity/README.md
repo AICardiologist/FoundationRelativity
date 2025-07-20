@@ -178,17 +178,11 @@ LEAN_ABORT_ON_SORRY=1 lake build
 - [CI Workflows](.github/workflows/README.md) - CI/CD documentation
 - [Roadmap](ROADMAP.md) - Project milestones and future work
 
-## 🤝 Contributing
+## Contributing
 
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes with clear messages
-4. Push to your fork
-5. Open a Pull Request
-
-Ensure all tests pass and no `sorry` remains in core modules.
+* Fork → create a feature branch.
+* Use `LEAN_ABORT_ON_SORRY=1` locally before every push.
+* Open a PR — CI must be green and `scripts/verify-no-sorry.sh` clean.
 
 ## 📈 Project Status
 
