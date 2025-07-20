@@ -29,4 +29,10 @@ def pathologyFunctor (α : Type) : Foundation ⥤ Cat where
     intro F G H f g
     cases f <;> cases g <;> rfl
 
+/-- Transfer emptiness through a pathology reduction -/
+theorem WitnessType.transfer_isEmpty {α β : Type} (f : α → β) 
+    (h : IsEmpty (WitnessType β bish)) : IsEmpty (WitnessType α bish) := by
+  simp only [WitnessType]
+  exact h
+
 end Found
