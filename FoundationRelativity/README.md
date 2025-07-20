@@ -1,247 +1,228 @@
-# Foundation-Relativity Research Program
+# Foundation-Relativity
 
-## Overview
+[![CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml)
+[![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
+[![Lean 4.3.0](https://img.shields.io/badge/Lean-4.3.0-blue)](https://github.com/leanprover/lean4)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-This Lean 4 project formalizes the Foundation-Relativity research program, which studies three key analytic pathologies through the lens of 2-category theory and constructive mathematics. The project implements **covariant functors** that capture the computational complexity (ρ-degrees) of classical analysis theorems when interpreted in constructive foundations.
+> **Ready for PR Creation & Merge** 🚀  
+> All 4 Sprint S2 branches are pushed. Infrastructure complete for formal proof development.
 
-**Important**: The functors are **covariant by design** (`Foundation ⥤ Cat`). Contravariant functors are mathematically impossible with the current object assignment where `bish` maps to empty groupoids and `zfc` maps to singleton groupoids, as there cannot exist a functor from a non-empty to an empty category.
+A Lean 4 formalization exploring how mathematical pathologies behave differently under various foundational assumptions.
 
-## Project Structure
+## 🎯 Overview
+
+This project formalizes the concept of **foundation-relativity** in constructive mathematics, demonstrating how certain mathematical constructions (pathologies) that are well-behaved in classical mathematics (ZFC) become problematic or impossible in constructive settings (BISH).
+
+### Key Insight
+
+The same mathematical object can exhibit fundamentally different properties depending on the foundational system:
+- In **BISH** (Bishop's constructive mathematics): Pathologies manifest as empty witness types
+- In **ZFC** (classical set theory): The same constructions have non-empty witnesses
+
+## 🏗️ Architecture
+
+```
+Foundation ⥤ Cat
+    │
+    ├── Gap₂ : Foundation ⥤ Cat
+    ├── AP_Fail₂ : Foundation ⥤ Cat  
+    └── RNP_Fail₂ : Foundation ⥤ Cat
+```
+
+Each pathology functor maps:
+- `bish ↦ ∅` (empty groupoid)
+- `zfc ↦ ★` (singleton groupoid)
+- `forget : bish → zfc` maps to the unique functor `∅ ⥤ ★`
+
+## 📁 Project Structure
 
 ```
 FoundationRelativity/
-├── lakefile.lean                 # Lake build configuration
-├── README.md                     # This documentation
-├── PathologyTests.lean          # Main test suite
 ├── Found/
-│   └── InterpCore.lean          # Core foundation types and interpretations
+│   ├── InterpCore.lean      # Core foundation definitions
+│   ├── BaseGroupoids.lean   # Shared groupoid constructions
+│   └── WitnessCore.lean     # Generic witness API
 ├── Gap2/
-│   ├── Witness.lean             # Witness types for bidual-gap pathology
-│   └── Functor.lean             # Gap₂ contravariant functor
+│   └── Functor.lean         # Gap₂ pathology
 ├── APFunctor/
-│   ├── Witness.lean             # Witness types for Johnson-Szankowski pathology
-│   └── Functor.lean             # AP_Fail₂ contravariant functor
+│   └── Functor.lean         # Approximate pathology
 ├── RNPFunctor/
-│   ├── Witness.lean             # Witness types for Radon-Nikodym pathology
-│   └── Functor.lean             # RNP_Fail₂ contravariant functor
-├── test/
-│   ├── FunctorTest.lean         # Unit tests for functor imports
-│   └── ContravariantCheck.lean  # Verification of contravariant types
-├── Found.lean                   # Namespace import for Found
-├── Gap2.lean                    # Namespace import for Gap2
-├── APFunctor.lean               # Namespace import for APFunctor
-├── RNPFunctor.lean              # Namespace import for RNPFunctor
-└── old_files/                   # Archived development files (29 files)
-    ├── logs/                    # Historical build logs
-    ├── stubs/                   # Axiom-based placeholder files
-    ├── simplified/              # Simplified test versions
-    ├── incomplete/              # Unfinished implementations
-    └── alternatives/            # Alternative approaches tried
+│   └── Functor.lean         # Real number pathology
+└── test/
+    ├── NonIdMorphisms.lean  # Covariant functor tests
+    └── AllPathologiesTest.lean # Comprehensive validation
 ```
 
-## Core Mathematical Concepts
+## 🚀 Quick Start
 
-### Foundation Types
-- **`bish`**: Constructive mathematics (Bishop-style constructivism)
-- **`zfc`**: Classical mathematics (Zermelo-Fraenkel set theory + Choice)
+### Prerequisites
 
-### Interpretation Morphisms
-- **`forget : bish → zfc`**: The forgetful interpretation from constructive to classical
+- [Lean 4.3.0](https://github.com/leanprover/lean4/releases/tag/v4.3.0)
+- [VS Code](https://code.visualstudio.com/) with [lean4 extension](https://marketplace.visualstudio.com/items?itemName=leanprover.lean4)
 
-### Three Pathologies
+### Building
 
-1. **Gap₂** (Bidual-gap functional)
-   - ρ-degree: 1 (requires WLPO - Weak Limited Principle of Omniscience)
-   - Classical theorem fails constructively without WLPO
-
-2. **AP_Fail₂** (Johnson-Szankowski operator)
-   - ρ-degree: 1 (requires WLPO)
-   - Approximation property fails without WLPO
-
-3. **RNP_Fail₂** (Vector-measure without derivative)
-   - ρ-degree: 2 (requires DC_ω - Dependent Choice for ω)
-   - Radon-Nikodym property fails without DC_ω
-
-### ρ-Degree Theory
-The ρ-degree measures computational complexity:
-- **ρ = 0**: Classical theorems (work in ZFC)
-- **ρ = 1**: Require WLPO in constructive setting
-- **ρ = 2**: Require DC_ω (stronger than WLPO)
-
-## Implementation Details
-
-### Witness Types
-Each pathology defines witness types that encode the complexity:
-
-```lean
-def Witness : Foundation → Type
-  | bish => Empty    -- No constructive witnesses (ρ > 0)
-  | zfc  => PUnit    -- Classical witnesses available (ρ = 0)
-```
-
-### Contravariant Functors
-Each pathology is formalized as a contravariant functor `(Discrete Foundation)ᵒᵖ ⥤ Cat`:
-
-```lean
-def Gap₂ : (Discrete Foundation)ᵒᵖ ⥤ Cat where
-  obj F := obj F.unop.as
-  map {F G} f := by
-    have h : G.unop.as = F.unop.as := Discrete.eq_of_hom f.unop
-    exact eqToHom (congr_arg obj h.symm)
-  map_id := by
-    intro F
-    rfl
-  map_comp := by
-    intro F G H f g
-    simp
-```
-
-## Build Configuration
-
-### Requirements
-- Lean 4.3.0
-- mathlib v4.3.0
-- Lake build system
-
-### Installation
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/AICardiologist/FoundationRelativity.git
 cd FoundationRelativity
 
 # Build the project
 lake build
 
-# Run tests
-lake exe PathTests
-```
-
-### lakefile.lean
-```lean
-package «FoundationRelativity» where
-
-require mathlib from git
-  "https://github.com/leanprover-community/mathlib4"
-  @ "v4.3.0"
-
--- Separate lean_lib for each namespace
-@[default_target] lean_lib Found where srcDir := "."
-@[default_target] lean_lib Gap2 where srcDir := "."
-@[default_target] lean_lib APFunctor where srcDir := "."
-@[default_target] lean_lib RNPFunctor where srcDir := "."
-
--- Test executables
-lean_exe PathTests where
-  root := `PathologyTests
-
-lean_exe testFunctors where
-  root := `test.FunctorTest
-
-lean_exe testContravariant where
-  root := `test.ContravariantCheck
-```
-
-## Verification and Testing
-
-### Running Tests
-```bash
-# Build the project (clean build with no errors)
-lake build
-
-# Run main pathology tests
-lake exe PathTests
-
-# Test functor imports
+# Run comprehensive test suite
 lake exe testFunctors
+lake exe testNonIdMorphisms
+lake exe AllPathologiesTests
+lake exe WitnessTests
 
-# Verify contravariant types
-lake exe testContravariant
+# Verify no sorry in core modules
+bash scripts/verify-no-sorry.sh
 ```
 
-### Test Results
-The tests verify:
-- ✅ All three pathology functors are properly defined as contravariant functors
-- ✅ Foundation types and interpretations work correctly  
-- ✅ Witness types match ρ-degree theory (Empty for bish, PUnit for zfc)
-- ✅ No `sorry` axioms in the implementation
-- ✅ Clean build and authentic compilation with Lean 4.3.0 + mathlib v4.3.0
-- ✅ Project organization with 29 development files archived in `old_files/`
+### Current Status: Ready for PR Merge
 
-### Current Verified Output
-```
-Foundation.bish ≠ Foundation.zfc : true
-Foundation types: bish (constructive) and zfc (classical)
-Checking witness type definitions:
-Gap.Witness Foundation.bish     : Type
-Gap.Witness Foundation.zfc      : Type
-APFail.Witness Foundation.bish  : Type
-APFail.Witness Foundation.zfc   : Type
-RNPFail.Witness Foundation.bish : Type
-RNPFail.Witness Foundation.zfc  : Type
-Interpretation morphism defined:
-Interp.forget : Interp Foundation.bish Foundation.zfc
+The repository has **4 feature branches** ready for sequential merge:
 
-✓ Gap pathology: bidual-gap functional (ρ = 1, needs WLPO)
-✓ AP pathology: Johnson-Szankowski operator (ρ = 1, needs WLPO)
-✓ RNP pathology: vector-measure w/o derivative (ρ = 2, needs DC_ω)
-✓ Foundation types (bish vs zfc) distinguish constructive vs classical
-✓ Witness types encode ρ-degree complexity: Empty (bish) vs PUnit (zfc)
-✓ Foundation-Relativity framework successfully implemented
-✓ Pathology tests completed successfully
-```
+1. **[PR-1: feat/witness-core](https://github.com/AICardiologist/FoundationRelativity/pull/new/feat/witness-core)** - Witness API foundation
+2. **[PR-2: feat/gap2-witness-api](https://github.com/AICardiologist/FoundationRelativity/pull/new/feat/gap2-witness-api)** - Gap₂ migration  
+3. **[PR-3: feat/ap-rnp-witness-api](https://github.com/AICardiologist/FoundationRelativity/pull/new/feat/ap-rnp-witness-api)** - AP & RNP migrations
+4. **[PR-4: feat/nightly-ci](https://github.com/AICardiologist/FoundationRelativity/pull/new/feat/nightly-ci)** - CI/CD workflows
 
-## Implementation Notes
+**Merge Order**: PR-1 → PR-2 → PR-3 → PR-4 (each depends on the previous)
 
-### Covariant Functor Structure
-All pathology functors have the mathematical signature `Foundation ⥤ Cat`, verified by the build system:
+**After merge**: Tag `v0.3.0-witness` to mark Sprint S2 completion and unblock Sprint S3 proof development.
+
+## 🔬 Technical Details
+
+### Foundation Type
 
 ```lean
-Gap.Gap₂ : Foundation ⥤ Cat
-APFail.AP_Fail₂ : Foundation ⥤ Cat
-RNPFail.RNP_Fail₂ : Foundation ⥤ Cat
+inductive Foundation
+  | bish  -- Bishop's constructive mathematics
+  | zfc   -- Classical set theory with choice
 ```
 
-### Key Technical Decisions
-1. **Real Category Structure**: Foundation is a proper small category with `Interp` morphisms (not discrete)
-2. **Covariant Design**: The `forget : bish → zfc` morphism maps to `fromEmpty : ∅ ⥤ ★` functors
-3. **Witness Types**: Encoded complexity through `Empty` (bish) vs `PUnit` (zfc) witness types
-4. **No `sorry` Axioms**: All proofs are complete and verified by the Lean compiler
-5. **Mathlib Compatibility**: Carefully matched mathlib v4.3.0 API requirements
+### Interpretation Morphisms
 
-## Mathematical Significance
+```lean
+inductive Interp : Foundation → Foundation → Type
+  | id_bish : Interp bish bish
+  | id_zfc : Interp zfc zfc
+  | forget : Interp bish zfc
+```
 
-This formalization demonstrates how computational complexity in constructive mathematics can be captured through category-theoretic covariant functors. The empty witness groupoids for the `bish` foundation encode the fact that these classical theorems require nonconstructive principles (WLPO or DC_ω) to be proven constructively.
+### Witness API
 
-The project serves as a foundation for studying the relationship between logical strength and computational content in mathematical analysis, formalized in Lean 4's dependent type theory.
+The project uses a generic witness API to reduce boilerplate:
 
-## Development History
+```lean
+def WitnessType (α : Type) : Foundation → Type
+  | bish => Empty
+  | zfc => PUnit
 
-### Major Corrections Applied
-1. **Covariant Structure**: Corrected functor variance to mathematically sound `Foundation ⥤ Cat`
-2. **Real Category**: Replaced discrete categories with proper `SmallCategory Foundation` structure
-3. **No-Sorry Verification**: Eliminated all `sorry` axioms for genuine mathematical verification
-4. **Mathlib Compatibility**: Ensured full compatibility with mathlib v4.3.0 API
-5. **Authentic Testing**: Implemented proper test suite with verifiable output
+def pathologyFunctor (α : Type) : Foundation ⥤ Cat
+```
 
-This implementation represents a complete, mathematically sound formalization of the Foundation-Relativity research program in Lean 4.
+## 🎓 Mathematical Background
 
-## Project Organization
+This formalization targets **four key pathologies** from recent research on foundation-relativity:
 
-### Current Implementation
-The project has been carefully organized to maintain only the essential, working code:
+### Paper Targets (ρ-degree hierarchy)
 
-- **Core files**: Only the final, working implementations are kept in the main directories
-- **Clean build**: All files compile successfully with Lean 4.3.0 + mathlib v4.3.0
-- **No placeholders**: All `sorry` axioms and stub implementations have been removed
-- **Verified functionality**: All contravariant functors are properly implemented and tested
+| Pathology | Logic Strength | Status | Description |
+|-----------|---------------|--------|-------------|
+| **Gap₂** | ρ = 1 (WLPO) | 🎯 Sprint S3 | Bidual gap in Banach spaces |
+| **AP_Fail₂** | ρ = 1 (WLPO) | 📅 Sprint S4 | Approximation Property failure |
+| **RNP_Fail₂** | ρ = 2 (DC_ω) | 📅 Sprint S5 | Radon-Nikodým Property failure |
+| **Spectral Gap** | Beyond ρ-scale | 🔮 Future | Gödel-incompleteness connection |
 
-### Development History Archive
-The `old_files/` directory contains 29 archived files from the development process:
+### Foundation-Relativity Principle
 
-- **Historical logs**: Previous build outputs and test results
-- **Axiom-based stubs**: Early placeholder implementations using `sorry`
-- **Simplified versions**: Test implementations for debugging mathlib compatibility
-- **Incomplete features**: Advanced functionality that wasn't needed for core research
-- **Alternative approaches**: Different implementation strategies that were tried
+The same mathematical construction exhibits different behavior:
 
-This organization ensures the main project is clean and focused while preserving the development history for reference.
+1. **BISH setting**: Witness type is `Empty` → pathology cannot be constructed
+2. **ZFC setting**: Witness type is `PUnit` → pathology exists classically  
+3. **Gap analysis**: Requires specific classical principles (WLPO, LPO, DC_ω)
+
+This provides a **constructive diagnostic** for identifying exactly which non-constructive principles a theorem requires.
+
+## 🛠️ Development
+
+### Running CI Locally
+
+```bash
+LEAN_ABORT_ON_SORRY=1 lake build
+```
+
+### Adding New Pathologies
+
+1. Create a new pathology type:
+   ```lean
+   structure MyPathology where
+     data : Unit
+   ```
+
+2. Define the functor:
+   ```lean
+   def My_Pathology : Foundation ⥤ Cat := 
+     pathologyFunctor MyPathology
+   ```
+
+3. Add tests to verify behavior
+
+## 📚 Documentation
+
+- [Development Guide](docs/DEV_GUIDE.md) - Detailed development instructions
+- [CI Workflows](.github/workflows/README.md) - CI/CD documentation
+- [Roadmap](ROADMAP.md) - Project milestones and future work
+
+## 🤝 Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes with clear messages
+4. Push to your fork
+5. Open a Pull Request
+
+Ensure all tests pass and no `sorry` remains in core modules.
+
+## 📈 Project Status
+
+### Sprint Progress
+
+- ✅ **Sprint S0**: Core infrastructure (`Foundation`, `Interp`, basic functors)
+- ✅ **Sprint S1**: Covariant functors (fixed mathematical impossibility of contravariant approach)  
+- ✅ **Sprint S2**: Witness API (unified `WitnessCore`, migrations, CI/CD) **← COMPLETE**
+- 🎯 **Sprint S3**: Gap₂ WLPO proof (target: `Gap_requires_WLPO : RequiresWLPO Gap₂`)
+- 📅 **Sprint S4**: AP_Fail₂ proof (reuse ρ=1 infrastructure)
+- 📅 **Sprint S5**: RNP_Fail₂ proof (introduce ρ=2 DSL)
+
+### Next Milestone: First Formal Proof
+
+**Sprint S3 Goal**: Prove `Gap₂` requires WLPO with zero `sorry`
+
+```lean
+theorem Gap_requires_WLPO : RequiresWLPO Gap.Pathology := by
+  -- Uses new Witness API + minimal classical lemmas
+  -- Target: complete proof < 200 LoC
+```
+
+**Why Gap₂ first?** Minimal dependencies (elementary Banach spaces), exercises the full pipeline, quick win for proof-of-concept.
+
+## 📄 License
+
+This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- The Lean 4 development team
+- The mathlib4 community
+- Contributors to constructive mathematics foundations
+
+---
+
+*"Mathematics is not about numbers, equations, computations, or algorithms: it is about understanding."* – William Paul Thurston
