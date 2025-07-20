@@ -28,3 +28,6 @@ lean_exe WitnessTests where
 
 lean_exe AllPathologiesTests where
   root := `test.AllPathologiesTest
+
+lean_exe Gap2ProofTests where
+  root := `test.Gap2ProofTest
