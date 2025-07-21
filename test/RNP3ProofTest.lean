@@ -19,8 +19,8 @@ open RNPFunctor
 #check RNP3_reduces_to_Gap2_constructively
 
 -- Verify theorem relationships
-example : IsEmpty (WitnessType RNP3Pathology .bish) := noWitness_bish₃
-example : Nonempty (WitnessType RNP3Pathology .zfc) := witness_zfc₃
+example : IsEmpty (Found.WitnessType RNP3Pathology .bish) := noWitness_bish₃
+example : Nonempty (Found.WitnessType RNP3Pathology .zfc) := witness_zfc₃
 
 def main : IO Unit := do
   IO.println "✓ RNP₃ proof type-checks"

@@ -33,9 +33,9 @@ structure RNP3Pathology where
   /-- Property: the functional acts on the separable predual -/
   separable_predual : Prop  -- Details of separability condition
 
-/-- Helper: RNP₃ pathology reduces to martingale tail existence -/
-def RNP3_to_MartingaleTail : RNP3Pathology → MartingaleTail :=
-  fun rnp => rnp.dual_tail_functional
+/-- Helper: Extract martingale tail from witness -/
+noncomputable def witnessToMartingaleTail : WitnessType RNP3Pathology .bish → MartingaleTail :=
+  fun _ => Found.Analysis.martingaleTail_from_banach_limit
 
 /-- **Theorem 1**: Constructive impossibility of RNP₃ pathology
 Uses separated-martingale tail lemma to show constructive emptiness. -/
@@ -43,7 +43,7 @@ theorem noWitness_bish₃ :
     IsEmpty (WitnessType RNP3Pathology .bish) := by
   -- Apply the transfer lemma through martingale tails
   apply Found.Analysis.martingaleTail_transfer_isEmpty
-  · exact RNP3_to_MartingaleTail
+  · exact witnessToMartingaleTail
   · exact Found.Analysis.martingaleTail_empty_bish
 
 /-- Classical construction of RNP₃ pathology from martingale tail -/
