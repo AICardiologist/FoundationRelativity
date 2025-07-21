@@ -13,7 +13,7 @@ namespace Found
 open Foundation CategoryTheory
 
 /-- Generic witness type function for pathologies -/
-def WitnessType (α : Type) : Foundation → Type
+def WitnessType (_ : Type) : Foundation → Type
   | bish => Empty
   | zfc => PUnit
 
@@ -30,7 +30,7 @@ def pathologyFunctor (α : Type) : Foundation ⥤ Cat where
     cases f <;> cases g <;> rfl
 
 /-- Transfer emptiness through a pathology reduction -/
-theorem WitnessType.transfer_isEmpty {α β : Type} (f : α → β) 
+theorem WitnessType.transfer_isEmpty {α β : Type} (_ : α → β) 
     (h : IsEmpty (WitnessType β bish)) : IsEmpty (WitnessType α bish) := by
   simp only [WitnessType]
   exact h
