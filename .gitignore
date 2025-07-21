@@ -23,3 +23,6 @@ Thumbs.db
 *.swo
 *~
 .Rhistory
+
+# Local development files  
+old_files/
