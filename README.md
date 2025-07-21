@@ -5,8 +5,8 @@
 [![Lean 4.3.0](https://img.shields.io/badge/Lean-4.3.0-blue)](https://github.com/leanprover/lean4)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-> **Ready for PR Creation & Merge** 🚀  
-> All 4 Sprint S2 branches are pushed. Infrastructure complete for formal proof development.
+> **Sprint S3 Progress**: AP_Fail₂ WLPO proof complete ✅  
+> Repository successfully repaired. Ready for RNP_Fail₂ proof implementation.
 
 A Lean 4 formalization exploring how mathematical pathologies behave differently under various foundational assumptions.
 
@@ -42,11 +42,14 @@ FoundationRelativity/
 ├── Found/
 │   ├── InterpCore.lean      # Core foundation definitions
 │   ├── BaseGroupoids.lean   # Shared groupoid constructions
-│   └── WitnessCore.lean     # Generic witness API
+│   ├── WitnessCore.lean     # Generic witness API
+│   └── LogicDSL.lean        # RequiresWLPO framework
 ├── Gap2/
-│   └── Functor.lean         # Gap₂ pathology
+│   ├── Functor.lean         # Gap₂ pathology
+│   └── Proofs.lean          # Gap_requires_WLPO theorem ✅
 ├── APFunctor/
-│   └── Functor.lean         # Approximate pathology
+│   ├── Functor.lean         # Approximate pathology
+│   └── Proofs.lean          # AP_requires_WLPO theorem ✅
 ├── RNPFunctor/
 │   └── Functor.lean         # Real number pathology
 └── test/
@@ -81,18 +84,20 @@ lake exe WitnessTests
 bash scripts/verify-no-sorry.sh
 ```
 
-### Current Status: Ready for PR Merge
+### Verification
 
-The repository has **4 feature branches** ready for sequential merge:
+All formal proofs can be verified with:
 
-1. **[PR-1: feat/witness-core](https://github.com/AICardiologist/FoundationRelativity/pull/new/feat/witness-core)** - Witness API foundation
-2. **[PR-2: feat/gap2-witness-api](https://github.com/AICardiologist/FoundationRelativity/pull/new/feat/gap2-witness-api)** - Gap₂ migration  
-3. **[PR-3: feat/ap-rnp-witness-api](https://github.com/AICardiologist/FoundationRelativity/pull/new/feat/ap-rnp-witness-api)** - AP & RNP migrations
-4. **[PR-4: feat/nightly-ci](https://github.com/AICardiologist/FoundationRelativity/pull/new/feat/nightly-ci)** - CI/CD workflows
+```bash
+# Verify Gap₂ requires WLPO
+lake exe Gap2ProofTests
 
-**Merge Order**: PR-1 → PR-2 → PR-3 → PR-4 (each depends on the previous)
+# Verify AP_Fail₂ requires WLPO  
+lake exe APProofTests
 
-**After merge**: Tag `v0.3.0-witness` to mark Sprint S2 completion and unblock Sprint S3 proof development.
+# Run all pathology tests
+lake exe AllPathologiesTests
+```
 
 ## 🔬 Technical Details
 
@@ -133,9 +138,9 @@ This formalization targets **four key pathologies** from recent research on foun
 
 | Pathology | Logic Strength | Status | Description |
 |-----------|---------------|--------|-------------|
-| **Gap₂** | ρ = 1 (WLPO) | 🎯 Sprint S3 | Bidual gap in Banach spaces |
-| **AP_Fail₂** | ρ = 1 (WLPO) | 📅 Sprint S4 | Approximation Property failure |
-| **RNP_Fail₂** | ρ = 2 (DC_ω) | 📅 Sprint S5 | Radon-Nikodým Property failure |
+| **Gap₂** | ρ = 1 (WLPO) | ✅ v0.3.1 | Bidual gap in Banach spaces |
+| **AP_Fail₂** | ρ = 1 (WLPO) | ✅ v0.3.2 | Approximation Property failure |
+| **RNP_Fail₂** | ρ = 2 (DC_ω) | 🎯 Sprint S3 | Radon-Nikodým Property failure |
 | **Spectral Gap** | Beyond ρ-scale | 🔮 Future | Gödel-incompleteness connection |
 
 ### Foundation-Relativity Principle
@@ -190,22 +195,24 @@ LEAN_ABORT_ON_SORRY=1 lake build
 
 - ✅ **Sprint S0**: Core infrastructure (`Foundation`, `Interp`, basic functors)
 - ✅ **Sprint S1**: Covariant functors (fixed mathematical impossibility of contravariant approach)  
-- ✅ **Sprint S2**: Witness API (unified `WitnessCore`, migrations, CI/CD) **← COMPLETE**
-- 🎯 **Sprint S3**: Gap₂ WLPO proof (target: `Gap_requires_WLPO : RequiresWLPO Gap₂`)
-- 📅 **Sprint S4**: AP_Fail₂ proof (reuse ρ=1 infrastructure)
-- 📅 **Sprint S5**: RNP_Fail₂ proof (introduce ρ=2 DSL)
+- ✅ **Sprint S2**: Witness API (unified `WitnessCore`, migrations, CI/CD)
+- ✅ **Sprint S3**: Formal proofs (Gap₂ & AP_Fail₂ require WLPO) **← COMPLETE**
+  - **v0.3.1**: `Gap_requires_WLPO` theorem 
+  - **v0.3.2**: `AP_requires_WLPO` theorem
+- 🎯 **Sprint S4**: RNP_Fail₂ proof (introduce ρ=2 DC_ω DSL)
+- 📅 **Sprint S5**: Spectral gap exploration
 
-### Next Milestone: First Formal Proof
+### Next Milestone: ρ=2 Proof Infrastructure
 
-**Sprint S3 Goal**: Prove `Gap₂` requires WLPO with zero `sorry`
+**Sprint S4 Goal**: Prove `RNP_Fail₂` requires DC_ω (Dependent Choice)
 
 ```lean
-theorem Gap_requires_WLPO : RequiresWLPO Gap.Pathology := by
-  -- Uses new Witness API + minimal classical lemmas
-  -- Target: complete proof < 200 LoC
+theorem RNP_requires_DC_omega : RequiresDCOmega RNPPathology := by
+  -- Introduces new DSL for ρ=2 level logic
+  -- More complex than WLPO proofs
 ```
 
-**Why Gap₂ first?** Minimal dependencies (elementary Banach spaces), exercises the full pipeline, quick win for proof-of-concept.
+**Why RNP_Fail₂ next?** Tests the ρ-degree hierarchy at level 2, requires extending our logic DSL beyond WLPO.
 
 ## 📄 License
 

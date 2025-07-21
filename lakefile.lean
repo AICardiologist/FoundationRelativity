@@ -34,3 +34,6 @@ lean_exe Gap2ProofTests where
 
 lean_exe APProofTests where
   root := `test.APProofTest
+
+lean_exe RNPProofTests where
+  root := `test.RNPProofTest

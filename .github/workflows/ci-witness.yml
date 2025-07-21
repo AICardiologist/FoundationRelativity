@@ -7,16 +7,21 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/leanprover/lean4:4.3.0   # hard-pin
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
+      - name: Set up Lean 4.3.0
+        uses: leanprover/lean-action@v1
+        with:
+          lean-version: "4.3.0"
 
       - name: Cache .lake
         uses: actions/cache@v3
         with:
-          path: .lake
-          key: ${{ runner.os }}-lake-${{ hashFiles('lake-manifest.json', 'lean-toolchain', 'lakefile.lean') }}
+          path: |
+            ~/.lake
+            .lake/build
+          key: ${{ runner.os }}-lake-${{ hashFiles('lakefile.lean') }}
 
       - name: Build
         run: lake build
@@ -31,3 +36,4 @@ jobs:
           lake exe testNonIdMorphisms
           lake exe WitnessTests
           lake exe AllPathologiesTests
+          lake exe RNPProofTests

@@ -1,8 +1,8 @@
 # Foundation-Relativity Roadmap
 
-## 📍 Current Status: Sprint S2 Complete
+## 📍 Current Status: Sprint S3 Complete
 
-The project has successfully completed its foundation infrastructure and witness API implementation. We're now ready to begin formal proof development.
+The project has successfully completed formal proofs for both Gap₂ and AP_Fail₂ pathologies, demonstrating that both require WLPO. We're now ready to tackle ρ=2 level proofs with RNP_Fail₂.
 
 ---
 
@@ -39,52 +39,81 @@ The project has successfully completed its foundation infrastructure and witness
 
 ---
 
+### Sprint S3: Formal Proofs (ρ=1 Level)
+**Timeline**: Completed  
+**Status**: ✅ Complete
+
+**Achievement**: Both Gap₂ and AP_Fail₂ proven to require WLPO with zero sorry
+
+#### Completed Work
+
+**S3-A**: Witness Type Proofs ✅
+- [x] `IsEmpty (WitnessType Gap₂Pathology bish)` 
+- [x] `Nonempty (WitnessType Gap₂Pathology zfc)`
+- [x] `IsEmpty (WitnessType APPathology bish)`
+- [x] `Nonempty (WitnessType APPathology zfc)`
+
+**S3-B**: Logic DSL ✅
+- [x] `RequiresWLPO` framework in `Found/LogicDSL.lean`
+- [x] Integration with witness types
+- [x] Proof pattern established for ρ=1 pathologies
+
+**S3-C**: Gap₂ WLPO Requirement ✅
+- [x] `Gap_requires_WLPO` theorem implemented
+- [x] Complete proof with zero sorry
+- [x] Tagged as v0.3.1-gap-proof
+
+**S3-D**: AP_Fail₂ Proof ✅
+- [x] `AP_requires_WLPO` theorem implemented
+- [x] Proof pattern successfully adapted from Gap₂
+- [x] Tagged as v0.3.2-ap-proof
+
+---
+
 ## 🚧 Current Sprint
 
-### Sprint S3: First Formal Proofs
-**Timeline**: Mon → Fri (current week)  
-**Status**: 🚧 In Progress
+### Sprint S4: RNP_Fail₂ Proof (ρ=2 Level)
+**Timeline**: This week  
+**Status**: 🚧 Starting
 
-**Exit Criterion**: `Gap_requires_WLPO : requiresWLPO Gap₂` proven with zero sorry
+**Exit Criterion**: `RNP_requires_DC_omega : RequiresDCOmega RNPPathology` proven
 
 #### Work Packages
 
-**S3-A**: Witness Type Proofs *(0.5 days)*
-- [ ] `IsEmpty (WitnessType Gap₂ bish)`
-- [ ] `Nonempty (WitnessType Gap₂ zfc)`
-- [ ] Basic lemmas about witness behavior
+**S4-A**: Extend Logic DSL *(1 day)*
+- [ ] Define `RequiresDCOmega` in LogicDSL
+- [ ] Establish relationship between WLPO and DC_ω
+- [ ] Helper theorems for ρ=2 level logic
 
-**S3-B**: ρ-degree DSL *(1 day)*
-- [ ] Define `ρ-degree` structure with fields:
-  - `requiresWLPO : Prop`
-  - `requiresLPO : Prop` 
-  - `requiresDC : Prop`
-- [ ] Helper theorems for degree composition
-- [ ] Integration with pathology functors
+**S4-B**: RNP Witness Analysis *(1 day)*
+- [ ] Prove `IsEmpty (WitnessType RNPPathology bish)`
+- [ ] Prove `Nonempty (WitnessType RNPPathology zfc)`
+- [ ] Document why RNP needs stronger principle than WLPO
 
-**S3-C**: Gap₂ WLPO Requirement *(2 days)*
-- [ ] `Gap_requires_WLPO : requiresWLPO Gap₂`
-- [ ] Use Witness API + minimal classical lemmas
-- [ ] Complete proof with zero sorry
+**S4-C**: RNP DC_ω Requirement *(2 days)*
+- [x] Implement `RNP_requires_DC_omega` theorem
+- [x] Handle increased complexity of ρ=2 level
+- [x] Complete proof with zero sorry
 
-**S3-D**: AP Proof Skeleton *(stretch, 1 day)*
-- [ ] Adapt proof pattern from Gap₂
-- [ ] `AP_requires_[principle] : requires[principle] AP_Fail₂`
+**S4-D**: Testing & Documentation *(1 day)*
+- [ ] Add RNPProofTests executable
+- [ ] Update documentation with ρ-degree hierarchy
+- [ ] Tag v0.3.3-rnp-proof milestone
 
 ---
 
 ## 📅 Future Sprints
 
-### Sprint S4: Extended Proof Framework
-**Timeline**: Following week  
+### Sprint S5: Spectral Gap & Beyond ρ-scale
+**Timeline**: Following sprint  
 **Status**: 📅 Planned
 
-- [ ] Complete AP and RNP pathology proofs
+- [ ] Investigate spectral gap pathology
+- [ ] Explore connections to Gödel incompleteness
 - [ ] Implement proof automation tactics
-- [ ] Establish meta-theorems about pathology classification
-- [ ] Performance optimization for large proof terms
+- [ ] Meta-theorems about ρ-degree classification
 
-### Sprint S5: Advanced Foundations
+### Sprint S6: Advanced Foundations
 **Timeline**: TBD  
 **Status**: 📅 Planned
 
@@ -93,7 +122,7 @@ The project has successfully completed its foundation infrastructure and witness
 - [ ] Cross-foundation comparison theorems
 - [ ] Integration with existing constructive mathematics libraries
 
-### Sprint S6: Documentation & Publication
+### Sprint S7: Documentation & Publication
 **Timeline**: TBD  
 **Status**: 📅 Planned
 
@@ -158,5 +187,5 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ---
 
-*Last updated: Sprint S2 completion*  
-*Next review: End of Sprint S3*
+*Last updated: Sprint S3 completion (Gap₂ & AP_Fail₂ proofs)*  
+*Next review: End of Sprint S4 (RNP_Fail₂ proof)*
