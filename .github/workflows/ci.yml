@@ -12,10 +12,15 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: leanprover/lean4:v4.3.0
     steps:
       - uses: actions/checkout@v3
+      
+      - name: Install Lean 4
+        run: |
+          wget https://github.com/leanprover/lean4/releases/download/v4.3.0/lean-4.3.0-linux.tar.gz
+          tar xf lean-4.3.0-linux.tar.gz
+          sudo cp -r lean-4.3.0-linux/* /usr/local/
+          lean --version
 
       - name: Cache .lake
         uses: actions/cache@v3
