@@ -127,10 +127,23 @@ Co-Authored-By: [Your Name] <email@example.com>
 #### Pull Request Process
 1. **Create feature branch** from latest `main`
 2. **Implement changes** following style guidelines
-3. **Add/update tests** to maintain coverage
-4. **Update documentation** if needed
-5. **Verify CI passes**: `lake build && bash scripts/verify-no-sorry.sh`
-6. **Create PR** with clear description and test plan
+3. **Verify code quality** with our tools:
+   ```bash
+   # Required checks before PR
+   lake build                         # Must build successfully
+   LEAN_ABORT_ON_SORRY=1 lake build  # Zero sorry policy
+   bash scripts/verify-no-sorry.sh   # CI verification  
+   bash scripts/check-no-axioms.sh   # Axiom audit
+   ```
+4. **Run relevant tests**:
+   ```bash
+   lake exe AllPathologiesTests      # Integration tests
+   lake exe Gap2ProofTests           # If modifying Gap₂
+   lake exe RNP3ProofTests           # If modifying RNP₃
+   ```
+5. **Add/update tests** to maintain coverage
+6. **Update documentation** if needed
+7. **Create PR** with clear description and test plan
 
 ## 🧪 Testing Your Changes
 

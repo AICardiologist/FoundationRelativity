@@ -13,10 +13,7 @@ require mathlib from git
 @[default_target] lean_lib APFunctor where srcDir := "."
 @[default_target] lean_lib RNPFunctor where srcDir := "."
 
--- Test executable
-lean_exe PathTests where
-  root := `PathologyTests
-
+-- Test executables
 lean_exe testFunctors where
   root := `test.FunctorTest
 

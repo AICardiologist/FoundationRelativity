@@ -40,25 +40,38 @@ Each pathology functor maps:
 
 ```
 FoundationRelativity/
-├── Found/
-│   ├── InterpCore.lean      # Core foundation definitions
-│   ├── WitnessCore.lean     # Generic witness API
-│   ├── LogicDSL.lean        # RequiresWLPO/DCω framework
+├── Found/                   # 🏗️  Core foundation framework
+│   ├── InterpCore.lean      #     Foundation types and morphisms
+│   ├── WitnessCore.lean     #     Unified witness API (post-S2)
+│   ├── LogicDSL.lean        #     Logic strength markers (WLPO, DC_ω, DC_{ω+1})
+│   ├── RelativityIndex.lean #     ρ-degree hierarchy definitions
 │   └── Analysis/
-│       └── Lemmas.lean      # Martingale tail functional proofs
-├── Gap2/
-│   ├── Functor.lean         # Gap₂ pathology
-│   └── Proofs.lean          # Gap_requires_WLPO theorem ✅
-├── APFunctor/
-│   ├── Functor.lean         # Approximate pathology
-│   └── Proofs.lean          # AP_requires_WLPO theorem ✅
-├── RNPFunctor/
-│   ├── Functor.lean         # Real number pathology
-│   ├── Proofs.lean          # RNP_requires_DCω theorem ✅
-│   └── Proofs3.lean         # RNP₃_requires_DCω_plus theorem ✅
-└── test/
-    ├── NonIdMorphisms.lean  # Covariant functor tests
-    └── AllPathologiesTest.lean # Comprehensive validation
+│       └── Lemmas.lean      #     Martingale tail functional proofs
+├── Gap2/                    # 🎯  ρ=1 (WLPO) pathologies
+│   ├── Functor.lean         #     Gap₂ bidual pathology
+│   └── Proofs.lean          #     Gap_requires_WLPO theorem ✅
+├── APFunctor/               # 🎯  ρ=1 (WLPO) pathologies  
+│   ├── Functor.lean         #     AP_Fail₂ approximation pathology
+│   └── Proofs.lean          #     AP_requires_WLPO theorem ✅
+├── RNPFunctor/              # 🎯  ρ=2/2+ (DC_ω/DC_{ω+1}) pathologies
+│   ├── Functor.lean         #     RNP pathology definitions
+│   ├── Proofs.lean          #     RNP_requires_DCω theorem ✅
+│   └── Proofs3.lean         #     RNP₃_requires_DCωPlus theorem ✅
+├── test/                    # 🧪  Comprehensive test suite
+│   ├── FunctorTest.lean     #     Basic functor validation
+│   ├── NonIdMorphisms.lean  #     Covariant functor tests
+│   ├── Gap2ProofTest.lean   #     Gap₂ theorem verification
+│   ├── APProofTest.lean     #     AP_Fail₂ theorem verification  
+│   ├── RNPProofTest.lean    #     RNP_Fail₂ theorem verification
+│   ├── RNP3ProofTest.lean   #     RNP₃ theorem verification
+│   └── AllPathologiesTest.lean # Complete integration tests
+├── scripts/                 # 🔧  Development tools
+│   ├── verify-no-sorry.sh   #     CI sorry-statement checker
+│   ├── check-no-axioms.sh   #     Axiom count verification
+│   └── check-no-axioms.lean #     Lean-based axiom inspector
+└── docs/                    # 📚  Documentation
+    ├── README.md            #     Documentation index
+    └── DEV_GUIDE.md         #     Development setup guide
 ```
 
 ## 🚀 Quick Start
@@ -84,8 +97,9 @@ lake exe testNonIdMorphisms
 lake exe AllPathologiesTests
 lake exe WitnessTests
 
-# Verify no sorry in core modules
-bash scripts/verify-no-sorry.sh
+# Verify code quality
+bash scripts/verify-no-sorry.sh    # Zero sorry statements
+bash scripts/check-no-axioms.sh    # Minimal axiom usage
 ```
 
 ### Verification
@@ -166,10 +180,27 @@ This provides a **constructive diagnostic** for identifying exactly which non-co
 
 ## 🛠️ Development
 
-### Running CI Locally
+### Code Quality Standards
+
+This project maintains **zero sorry** and **minimal axiom** policies:
 
 ```bash
+# Verify no sorry statements (CI enforced)
 LEAN_ABORT_ON_SORRY=1 lake build
+bash scripts/verify-no-sorry.sh
+
+# Check axiom usage in core modules  
+bash scripts/check-no-axioms.sh
+```
+
+### Development Workflow
+
+```bash
+# Standard development cycle
+lake build                          # Build all modules
+lake exe AllPathologiesTests       # Run integration tests
+lake exe Gap2ProofTests            # Verify specific proofs
+bash scripts/verify-no-sorry.sh    # Quality check
 ```
 
 ### Adding New Pathologies
