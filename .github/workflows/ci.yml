@@ -13,20 +13,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Install Lean 4
-        run: |
-          wget https://github.com/leanprover/lean4/releases/download/v4.3.0/lean-4.3.0-linux.tar.gz
-          tar xf lean-4.3.0-linux.tar.gz
-          sudo cp -r lean-4.3.0-linux/* /usr/local/
-          lean --version
+      - uses: actions/checkout@v4
+
+      - name: Set up Lean 4.3.0
+        uses: jroesch/lean-action@v1
+        with:
+          lean-version: "4.3.0"
 
       - name: Cache .lake
         uses: actions/cache@v3
         with:
-          path: .lake
-          key: ${{ runner.os }}-lake-${{ hashFiles('lake-manifest.json', 'lean-toolchain', 'lakefile.lean') }}
+          path: |
+            ~/.lake
+            .lake/build
+          key: ${{ runner.os }}-lake-${{ hashFiles('lakefile.lean') }}
 
       - name: Build
         run: lake build
