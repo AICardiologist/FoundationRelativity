@@ -18,4 +18,9 @@ def RequiresDCωPlus (P : Prop) : Prop := P   -- For now, just an alias like Req
 
 theorem RequiresDCωPlus.intro {P} (h : P) : RequiresDCωPlus P := h
 
+/-- Marker proposition: "This statement requires countable axiom of choice (AC_ω)." -/
+def RequiresACω (P : Prop) : Prop := P   -- For now, just an alias like RequiresDCω
+
+theorem RequiresACω.intro {P} (h : P) : RequiresACω P := h
+
 end Found
