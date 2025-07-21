@@ -2,6 +2,8 @@
 
 Thank you for your interest in contributing to Foundation-Relativity! This project formalizes foundation-relative mathematics in Lean 4, and we welcome contributions from mathematicians, formal methods experts, and anyone interested in constructive mathematics.
 
+**Current Status**: Sprint S5 complete! All core pathology proofs (ρ=1, ρ=2, ρ=2+) now have rigorous theorem statements with zero axioms in core modules.
+
 ## 🚀 Quick Start
 
 1. **Fork** the repository
