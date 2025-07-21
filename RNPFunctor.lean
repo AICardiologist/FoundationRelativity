@@ -1,1 +1,2 @@
 import RNPFunctor.Functor
+import RNPFunctor.Proofs
