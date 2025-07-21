@@ -31,9 +31,12 @@ jobs:
 
       - name: Unit tests
         run: |
-          lake exe PathTests
           lake exe testFunctors
           lake exe testNonIdMorphisms
           lake exe WitnessTests
           lake exe AllPathologiesTests
+          lake exe Gap2ProofTests
+          lake exe APProofTests
           lake exe RNPProofTests
+          lake exe RNP3ProofTests
+          lake exe SpectralGapProofTests
