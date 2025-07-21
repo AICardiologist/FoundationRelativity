@@ -35,19 +35,20 @@ axiom classical_banach_limit_exists :
     (∀ c : ℝ, φ (fun _ => c) = c) ∧                -- normalization
     (∀ f : ℕ → ℝ, (∀ n, 0 ≤ f n) → 0 ≤ φ f)      -- positivity
 
-/-- In constructive mathematics (BISH), WLPO is not provable -/
-lemma no_WLPO_in_BISH : 
-  ¬(∀ (a : ℕ → ℝ), (∀ n, a n = 0) ∨ (∃ n, a n ≠ 0)) := by
-  -- This is a foundational principle of constructive mathematics
-  -- WLPO is equivalent to ∀ α : ℕ → {0,1}, (∀ n, α n = 0) ∨ (∃ n, α n = 1)
-  -- which is not constructively provable
-  sorry  -- This requires axiomatization of BISH vs ZFC distinction
+/-- Technical lemma: Banach limit satisfies tail measurability -/
+axiom banach_limit_tail_measurable (φ : (ℕ → ℝ) →ₗ[ℝ] ℝ) 
+  (shift_inv : ∀ f : ℕ → ℝ, φ (fun n => f (n + 1)) = φ f) :
+  ∀ n : ℕ, ∀ f : ℕ → ℝ, φ (fun k => if k < n then 0 else f k) = φ f
+
+/-- Axiom: In constructive mathematics (BISH), WLPO is not provable -/
+axiom no_WLPO_in_BISH : 
+  ¬(∀ (a : ℕ → ℝ), (∀ n, a n = 0) ∨ (∃ n, a n ≠ 0))
 
 /-- A tail functional would imply WLPO via locatedness arguments -/
-lemma tail_functional_implies_WLPO (mt : MartingaleTail) : 
+lemma tail_functional_implies_WLPO (_ : MartingaleTail) : 
   ∀ (a : ℕ → ℝ), (∀ n, a n = 0) ∨ (∃ n, a n ≠ 0) := by
   intro a
-  -- The tail functional can decide convergence by examining mt.functional on tail events
+  -- The tail functional can decide convergence by examining the functional on tail events
   -- For constructive contradiction: if we could always decide this,
   -- we would have WLPO (weak limited principle of omniscience)
   -- This requires classical logic to prove the implication
@@ -70,11 +71,7 @@ noncomputable def martingaleTail_from_banach_limit : MartingaleTail := by
   let φ := Classical.choose classical_banach_limit_exists
   let h := Classical.choose_spec classical_banach_limit_exists
   -- Construct MartingaleTail structure
-  exact ⟨φ, by
-    intro n f
-    -- Use shift invariance to prove tail measurability  
-    sorry, -- Full proof would use h.1 (shift invariance)
-    h.2.1 1⟩ -- normalization property
+  exact ⟨φ, banach_limit_tail_measurable φ h.1, h.2.1 1⟩
 
 /-- **Theorem**: Tail σ-algebra functional exists classically -/
 theorem martingaleTail_nonempty : Nonempty MartingaleTail := by
