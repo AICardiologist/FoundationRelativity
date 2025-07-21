@@ -1,7 +1,6 @@
 import Mathlib.Analysis.Normed.Field.Basic
 import Mathlib.MeasureTheory.Measure.MeasureSpace
 import Mathlib.Logic.IsEmpty
-import Mathlib.Analysis.NormedSpace.HahnBanach
 import Mathlib.Logic.Unique
 import Found.LogicDSL
 
