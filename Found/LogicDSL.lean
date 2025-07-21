@@ -13,4 +13,9 @@ def RequiresDCω (P : Prop) : Prop := P   -- For now, just an alias like Require
 
 theorem RequiresDCω.intro {P} (h : P) : RequiresDCω P := h
 
+/-- Marker proposition: "This statement requires dependent choice DC_{ω+1}." -/
+def RequiresDCωPlus (P : Prop) : Prop := P   -- For now, just an alias like RequiresDCω
+
+theorem RequiresDCωPlus.intro {P} (h : P) : RequiresDCωPlus P := h
+
 end Found

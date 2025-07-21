@@ -15,6 +15,7 @@ def rho_degree : Lean.Name → Nat
 | `Gap₂             => 1    -- Requires WLPO
 | `AP_Fail₂         => 1    -- Requires WLPO
 | `RNP_Fail₂        => 2    -- Requires DC_ω
+| `RNP_Fail₃        => 2    -- Requires DC_{ω+1} (ρ=2+)
 | _                 => 0    -- Unknown/unclassified
 
 end Found

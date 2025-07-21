@@ -37,3 +37,6 @@ lean_exe APProofTests where
 
 lean_exe RNPProofTests where
   root := `test.RNPProofTest
+
+lean_exe RNP3ProofTests where
+  root := `test.RNP3ProofTest
