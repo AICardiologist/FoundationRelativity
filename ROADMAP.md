@@ -102,9 +102,42 @@ The project has successfully completed formal proofs for both Gap₂ and AP_Fail
 
 ---
 
+## 🚧 Current Sprint
+
+### Sprint S5: Complete RNP₃ Proofs (Replace Axioms)
+**Timeline**: This week  
+**Status**: 🚧 In Progress
+
+**Exit Criterion**: All martingale axioms replaced with full proofs
+
+#### Work Packages
+
+**S5-A**: Martingale Constructive Impossibility *(2 days)*
+- [ ] Replace `axiom martingaleTail_empty_bish` with real proof
+- [ ] Show tail σ-algebra functional requires locatedness + HB ⇒ WLPO
+- [ ] Connect to constructive measure theory limitations
+
+**S5-B**: Classical Martingale Construction *(1 day)*
+- [ ] Replace `axiom martingaleTail_nonempty` with Hahn-Banach construction
+- [ ] Mirror Banach limit proof pattern from literature
+- [ ] Verify separable dual properties
+
+**S5-C**: Complete Transfer Lemma *(1 day)*
+- [ ] Replace `axiom martingaleTail_transfer_isEmpty` with proof
+- [ ] Should be trivial once S5-A is complete
+- [ ] Add comprehensive documentation
+
+**S5-D**: RNP₃ Integration & Polish *(1 day)*
+- [ ] Remove `dummy : Unit` from RNP3Pathology structure
+- [ ] Connect to actual martingale infrastructure
+- [ ] Update documentation with constructive vs classical dichotomy
+- [ ] Tag v0.3.4-rnp3-complete milestone
+
+---
+
 ## 📅 Future Sprints
 
-### Sprint S5: Spectral Gap & Beyond ρ-scale
+### Sprint S6: Spectral Gap & Beyond ρ-scale
 **Timeline**: Following sprint  
 **Status**: 📅 Planned
 
@@ -113,7 +146,7 @@ The project has successfully completed formal proofs for both Gap₂ and AP_Fail
 - [ ] Implement proof automation tactics
 - [ ] Meta-theorems about ρ-degree classification
 
-### Sprint S6: Advanced Foundations
+### Sprint S7: Advanced Foundations
 **Timeline**: TBD  
 **Status**: 📅 Planned
 
