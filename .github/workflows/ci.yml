@@ -1,10 +1,6 @@
 name: CI
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push, pull_request]
 
 env:
   LEAN_ABORT_ON_SORRY: 1
@@ -16,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Lean 4.3.0
-        uses: jroesch/lean-action@v1
+        uses: leanprover/lean-action@v1
         with:
           lean-version: "4.3.0"
 
