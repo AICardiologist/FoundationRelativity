@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+- family-names: "Lee"
+  given-names: "Paul C"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+  affiliation: "AICardiologist"
+title: "Foundation-Relativity"
+version: v0.3.4
+doi: 10.5281/zenodo.1234567
+date-released: 2024-01-01
+url: "https://github.com/AICardiologist/FoundationRelativity"
+repository-code: "https://github.com/AICardiologist/FoundationRelativity"
+abstract: >-
+  A Lean 4 formalization exploring foundation-relativity in constructive 
+  mathematics. Demonstrates how mathematical pathologies behave differently 
+  under BISH vs ZFC foundations, with complete ρ-hierarchy proofs showing 
+  logical strength requirements (WLPO, DC_ω, DC_{ω+1}) for various constructions.
+keywords:
+  - "formal verification"
+  - "constructive mathematics"
+  - "lean4"
+  - "foundation relativity"
+  - "category theory"
+  - "mathematical logic"
+license: Apache-2.0

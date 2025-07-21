@@ -1,3 +1,25 @@
+# Build artifacts
 /.lake/build/
 /.lake/lakefile.*
+/.lake/packages/*/
+
+# Lean artifacts  
+*.olean
+*.ilean
+*.clean
+
+# IDE files
+.vscode/
+*.code-workspace
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+*.swp
+*.swo
+*~
+.Rhistory
