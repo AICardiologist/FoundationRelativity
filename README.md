@@ -156,7 +156,35 @@ def pathologyFunctor (α : Type) : Foundation ⥤ Cat
 
 ## 🎓 Mathematical Background
 
-This formalization targets **four key pathologies** from recent research on foundation-relativity:
+### Theoretical Foundation
+
+This formalization implements formal verification of mathematical results from Paul Lee's research on foundation-relative mathematics, specifically:
+
+**Primary Research Paper**: ["The Bidual Gap Across Foundations: Non-Functoriality, Quantitative Tiers, and a Gödel-Gap Correspondence"](https://www.researchgate.net/publication/393723227_The_Bidual_Gap_Across_Foundations_Non-Functoriality_Quantitative_Tiers_and_a_Godel-Gap_Correspondence_The_Core_Phenomenon)
+
+**Author Profile**: [Paul Lee - ResearchGate](https://www.researchgate.net/profile/Paul-Lee-106?ev=hdr_xprf)
+
+### Key Theoretical Concepts
+
+The underlying mathematical theory establishes several crucial insights:
+
+1. **Foundation-Relativity Principle**: Mathematical objects can exhibit fundamentally different properties across foundational systems (BISH, ZFC, INT, DNS-TT, HoTT)
+
+2. **ρ-Degree Hierarchy**: A quantitative classification system for measuring logical strength requirements:
+   - **ρ = 0**: Classical theorems (work in ZFC)
+   - **ρ = 1**: Require WLPO (Weak Limited Principle of Omniscience) 
+   - **ρ = 2**: Require DC_ω (Dependent Choice for sequences)
+   - **ρ = 2+**: Require DC_{ω+1} (higher-order choice principles)
+
+3. **Bidual Gap Phenomenon**: The failure of natural isomorphisms X ≅ X** across different foundations, serving as a diagnostic tool for detecting non-constructive content
+
+4. **Gödel-Gap Correspondence**: A deep connection between logical incompleteness (Gödel phenomena) and analytical non-reflexivity (bidual gaps), revealing structural relationships between logic and analysis
+
+This Lean 4 formalization provides **constructive formal verification** of these theoretical results, implementing covariant functors `Foundation ⥤ Cat` that capture the foundation-relative behavior of mathematical pathologies.
+
+### Pathology Catalog
+
+This formalization targets **four key pathologies** from the research:
 
 ### Paper Targets (ρ-degree hierarchy)
 
