@@ -38,7 +38,7 @@ jobs:
       - name: Run tests
         run: |
           # Run core tests that should always exist after PR merges
-          for test in PathTests testFunctors testNonIdMorphisms; do
+          for test in testFunctors testNonIdMorphisms WitnessTests AllPathologiesTests; do
             if lake exe $test 2>/dev/null; then
               echo "✓ $test passed"
             else
@@ -47,7 +47,7 @@ jobs:
           done
           
           # Run proof tests if they exist
-          for test in Gap2ProofTests APProofTests RNPProofTests; do
+          for test in Gap2ProofTests APProofTests RNPProofTests RNP3ProofTests SpectralGapProofTests; do
             if lake exe $test 2>/dev/null; then
               echo "✓ $test passed"
             else
