@@ -23,11 +23,11 @@ theorem martingaleTail_nonempty :
 
 /-- **Martingale tail lemma 2**: Tail σ-algebra functional is constructively empty -/
 theorem martingaleTail_empty_bish : 
-    IsEmpty MartingaleTail := by
-  intro ⟨sep, tail⟩
-  -- In constructive settings, we cannot build separable-dual tail functionals
-  -- This follows from the non-constructive nature of Hahn-Banach extensions
-  sorry -- Detailed proof would require measure theory development
+    IsEmpty MartingaleTail := 
+  fun ⟨sep, tail⟩ => by
+    -- In constructive settings, we cannot build separable-dual tail functionals
+    -- This follows from the non-constructive nature of Hahn-Banach extensions
+    sorry -- Detailed proof would require measure theory development
 
 /-- Helper: Separable dual martingales exist in classical settings -/
 theorem separable_dual_martingale_exists_zfc :
@@ -36,8 +36,7 @@ theorem separable_dual_martingale_exists_zfc :
 
 /-- Helper: Transfer emptiness for martingale tails -/
 theorem martingaleTail_transfer_isEmpty {α : Type} (f : α → MartingaleTail) :
-    IsEmpty MartingaleTail → IsEmpty α := by
-  intros h x
-  exact h (f x)
+    IsEmpty MartingaleTail → IsEmpty α := 
+  fun h x => h (f x)
 
 end Found.Analysis
