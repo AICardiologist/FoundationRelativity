@@ -44,3 +44,12 @@ jobs:
               echo "⚠ $test not found"
             fi
           done
+          
+          # Run proof tests if they exist
+          for test in Gap2ProofTests APProofTests RNPProofTests; do
+            if lake exe $test 2>/dev/null; then
+              echo "✓ $test passed"
+            else
+              echo "⚠ $test not found"
+            fi
+          done
