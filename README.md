@@ -173,11 +173,28 @@ def pathologyFunctor (α : Type) : Foundation ⥤ Cat
 
 ### Theoretical Foundation
 
-This formalization implements formal verification of mathematical results from Paul Lee's research on foundation-relative mathematics, specifically:
+This formalization implements formal verification of mathematical results from Paul Lee's research on foundation-relative mathematics. The project is based on the **"Gödel in Four Acts"** research series:
 
-**Primary Research Paper**: ["The Bidual Gap Across Foundations: Non-Functoriality, Quantitative Tiers, and a Gödel-Gap Correspondence"](https://www.researchgate.net/publication/393723227_The_Bidual_Gap_Across_Foundations_Non-Functoriality_Quantitative_Tiers_and_a_Godel-Gap_Correspondence_The_Core_Phenomenon)
+### Research Papers
 
-**Author Profile**: [Paul Lee - ResearchGate](https://www.researchgate.net/profile/Paul-Lee-106?ev=hdr_xprf)
+**Complete Series**: All four papers are available on [Paul Lee's ResearchGate Profile](https://www.researchgate.net/profile/Paul-Lee-106?ev=hdr_xprf)
+
+1. **"The Gödel–Banach Correspondence"** - Shows how Gödel's undecidability can be encoded in functional analysis via rank-one operators
+
+2. **"The Bidual Gap Across Foundations: Non-Functoriality, Quantitative Tiers, and a Gödel-Gap Correspondence"** - The primary theoretical foundation for this formalization, establishing foundation-relativity and the ρ-degree hierarchy
+
+3. **"A 2-Categorical Framework for Foundation-Relativity"** - Develops the categorical theory underlying foundation-relative mathematics
+
+4. **"Undecidability and Foundation-Relativity in Spectral Geometry"** - Extends the theory to geometric settings, connecting spectral gaps to logical consistency
+
+### Implementation Coverage
+
+Our Lean 4 formalization primarily implements results from **Papers 2-3**, with foundations for **Paper 4**:
+
+- **Paper 1** (Gödel-Banach): Future work - encoding undecidability in operators
+- **Paper 2** (Bidual Gap): ✅ **Core implementation** - ρ-degree hierarchy, WLPO/DC_ω equivalences, foundation-relative pathologies  
+- **Paper 3** (2-Categorical): ✅ **Framework implemented** - `Foundation ⥤ Cat` functors, non-functoriality obstructions
+- **Paper 4** (Spectral Geometry): 🛠️ **Infrastructure ready** - `SpectralGap/HilbertSetup.lean` with concrete operators
 
 ### Key Theoretical Concepts
 

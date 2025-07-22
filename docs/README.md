@@ -17,6 +17,11 @@ This directory contains comprehensive documentation for the Foundation-Relativit
 - **[License](../LICENSE)** - Apache 2.0 license details
 - **[CHANGELOG](../CHANGELOG.md)** - Version history and changes
 
+### Research Background
+- **[Paul Lee's ResearchGate](https://www.researchgate.net/profile/Paul-Lee-106?ev=hdr_xprf)** - "Gödel in Four Acts" paper series
+- **Primary Paper**: "The Bidual Gap Across Foundations" - Core theoretical foundation
+- **Implementation Guide**: See [Main README](../README.md#mathematical-background) for detailed paper coverage
+
 ## 🎯 Current Status: Sprint S6 Active - Milestone B Complete
 
 ### ✅ **Major Achievements**
