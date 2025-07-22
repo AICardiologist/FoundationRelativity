@@ -60,16 +60,15 @@ structure SpectralGapOperator where
 open Complex
 
 /-!
-NOTE: **Milestone B – partial implementation**
+NOTE: **Milestone B – partial implementation (Technical Debt)**
 
 * `gap_lt` has a real `norm_num` proof.
-* `gap` is still `True` because mathlib 4.3.0 lacks a convenient
-  `spectrum_zero_eq_singleton` lemma and importing the full spectrum
-  stack causes heavy type‑class time‑outs.
+* `gap` is still `True` because mathlib 4.3.0 lacks the required
+  `spectrum_zero_eq_singleton` lemma and importing spectrum causes
+  type‑class synthesis timeouts.
 
-We will replace `gap` with a real proof once either
-1. mathlib is upgraded, or
-2. we commit a small local spectrum lemma.
+This is documented as technical debt item TD-1 in TECHNICAL_DEBT.md.
+Resolution: implement local spectrum lemma (Math-AI's Route B approach).
 -/
 
 

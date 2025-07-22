@@ -77,6 +77,8 @@ FoundationRelativity/
 └── docs/                    # 📚  Documentation
     ├── README.md            #     Documentation index
     └── DEV_GUIDE.md         #     Development setup guide
+├── TECHNICAL_DEBT.md        # 🔧  Technical debt tracking and resolution plan
+└── CHANGELOG.md             # 📝  Version history and changes
 ```
 
 ## 🚀 Quick Start
@@ -238,6 +240,21 @@ lake exe AllPathologiesTests       # Run integration tests
 lake exe Gap2ProofTests            # Verify specific proofs
 bash scripts/verify-no-sorry.sh    # Quality check
 ```
+
+### Technical Debt Management
+
+This project maintains active technical debt tracking to ensure code quality:
+
+```bash
+# Review current technical debt
+cat TECHNICAL_DEBT.md
+
+# Check for new placeholders or workarounds
+grep -r "True.*TODO" .
+grep -r "sorry" . --exclude-dir=.git
+```
+
+**Current Status**: Milestone B has minimal technical debt (SpectralGap `gap` field placeholder due to mathlib 4.3.0 spectrum limitations). See [TECHNICAL_DEBT.md](TECHNICAL_DEBT.md) for complete tracking and resolution plan.
 
 ### Adding New Pathologies
 

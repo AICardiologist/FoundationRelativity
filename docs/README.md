@@ -13,6 +13,7 @@ This directory contains comprehensive documentation for the Foundation-Relativit
 
 ### Technical References  
 - **[CITATION.cff](../CITATION.cff)** - Academic citation information
+- **[Technical Debt](../TECHNICAL_DEBT.md)** - Active debt tracking and resolution plans
 - **[License](../LICENSE)** - Apache 2.0 license details
 - **[CHANGELOG](../CHANGELOG.md)** - Version history and changes
 
