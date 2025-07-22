@@ -26,7 +26,8 @@ abbrev BoundedOp : Type := L2Space →L[ℂ] L2Space
 abbrev IsCompact (T : BoundedOp) : Prop := True
 
 /-- *Self‑adjoint* (Hermitian) bounded operators. -/
-def IsSelfAdjoint (T : BoundedOp) : Prop := T.adjoint = T
+def IsSelfAdjoint (T : BoundedOp) : Prop :=
+  ContinuousLinearMap.adjoint T = T
 
 /-- **Bundled object with a spectral gap**.
 
@@ -41,13 +42,5 @@ structure SpectralGapOperator where
   b       : ℝ
   gap_lt  : True        -- ← was  `a < b`
   gap     : True        -- placeholder for  `Spectrum ℂ T ⊆ ...`
-
-/-- Identity operator (placeholder) -/
-noncomputable def idOp : BoundedOp := ContinuousLinearMap.id ℂ L2Space
-
-/-- The identity operator is self-adjoint -/
-lemma idOp_selfAdjoint : IsSelfAdjoint idOp := by
-  simp [IsSelfAdjoint, idOp]
-  exact ContinuousLinearMap.adjoint_id
 
 end SpectralGap
