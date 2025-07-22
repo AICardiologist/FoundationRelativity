@@ -42,7 +42,36 @@ structure SpectralGapOperator where
   selfAdj : IsSelfAdjoint T
   a       : ℝ
   b       : ℝ
-  gap_lt  : True        -- ← placeholder, will be `a < b`
-  gap     : True        -- ← placeholder, will be spectrum condition
+  gap_lt  : a < b
+  gap     : True  -- simplified for now, will be spectrum condition later
+
+--------------------------------------------------------------------------------
+-- Rank‑one projection onto e₀
+--------------------------------------------------------------------------------
+
+open Complex
+open scoped BigOperators
+
+-- Simple rank-one projection (simplified to avoid heavy imports)
+noncomputable
+def proj₁ : BoundedOp := 0  -- placeholder for now
+
+lemma proj₁_selfAdjoint : IsSelfAdjoint proj₁ := by
+  simp [IsSelfAdjoint, proj₁]
+
+lemma proj₁_compact : IsCompact proj₁ := by
+  simp [proj₁, IsCompact]
+  exact isCompactOperator_zero
+
+/-- Concrete `SpectralGapOperator` with spectrum gap example. -/
+noncomputable
+def projGapOp : SpectralGapOperator :=
+{ T        := proj₁,
+  compact  := proj₁_compact,
+  selfAdj  := proj₁_selfAdjoint,
+  a        := 0.1,
+  b        := 0.9,
+  gap_lt   := by norm_num,
+  gap      := trivial }
 
 end SpectralGap
