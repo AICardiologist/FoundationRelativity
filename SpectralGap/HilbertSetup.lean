@@ -1,19 +1,52 @@
-/-!
-# Hilbert Space Setup for Spectral Gap
+/-
+  Sprint S6 ▸ Milestone A
+  Spectral-Gap (ρ = 3)  –  Hilbert‑space preliminaries
 
-This module imports ℓ² machinery from mathlib4 and sets up the basic infrastructure
-for spectral gap analysis on compact self-adjoint operators.
-
-Milestone A implementation - ℓ² machinery and spectral theory foundations.
+  This file sets up the ℓ² Hilbert space, the type of bounded operators,
+  and a bundled record `SpectralGapOperator` that packages
+  "compact + self‑adjoint + open spectral gap".  No mathematics is done
+  here; the goal is to provide well‑named definitions that later proofs
+  can import without pulling half of `Mathlib` everywhere.
 -/
 
--- Mathlib imports will be added here for ℓ² spaces, compact operators, and spectral theory
+import Mathlib.Analysis.NormedSpace.lpSpace
+import Mathlib.Analysis.NormedSpace.OperatorNorm
+import Mathlib.Analysis.NormedSpace.CompactOperator
 
-/-!
-## Main Definitions
+open Complex
+open scoped BigOperators ENNReal
 
-- ℓ² space alias and basic properties
-- Compact self-adjoint operator setup  
-- Spectral theorem applications
-- Basic spectrum lemmas
+namespace SpectralGap
+
+/-- **Canonical Hilbert space** used throughout the construction. -/
+abbrev ℓ² : Type _ := lp (fun _ : ℕ => ℂ) 2
+
+instance : InnerProductSpace ℂ ℓ² := by
+  infer_instance
+
+instance : CompleteSpace ℓ² := by
+  infer_instance
+
+/-- Bounded (continuous linear) operators on `ℓ²`. -/
+abbrev BoundedOp := ℓ² →L[ℂ] ℓ²
+
+/-- *Compact* bounded operators (`Mathlib` predicate). -/
+abbrev IsCompact (T : BoundedOp) : Prop := CompactOperator ℂ T
+
+/-- *Self‑adjoint* (Hermitian) bounded operators. -/
+def IsSelfAdjoint (T : BoundedOp) : Prop :=
+  T.adjoint = T
+
+/-- Bundles: compact ⨯ self‑adjoint operator having a *real* open
+    interval `(a,b)` that is disjoint from its spectrum.
+    We record `gap_lt : a < b` for convenience.
 -/
+structure SpectralGapOperator where
+  T        : BoundedOp
+  compact  : IsCompact T
+  selfAdj  : IsSelfAdjoint T
+  a b      : ℝ
+  gap_lt   : a < b
+  gap      : True  -- Placeholder for spectrum condition
+
+end SpectralGap
