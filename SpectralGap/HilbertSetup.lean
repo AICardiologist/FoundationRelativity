@@ -30,6 +30,7 @@ abbrev IsCompact (T : BoundedOp) : Prop := IsCompactOperator T
 def IsSelfAdjoint (T : BoundedOp) : Prop :=
   ContinuousLinearMap.adjoint T = T
 
+
 /-- **Bundled object with a spectral gap**.
 
     *All* five fields already appear in the final API, so later work can
@@ -41,7 +42,7 @@ structure SpectralGapOperator where
   selfAdj : IsSelfAdjoint T
   a       : ℝ
   b       : ℝ
-  gap_lt  : True        -- ← was  `a < b`
-  gap     : True        -- placeholder for  `Spectrum ℂ T ⊆ ...`
+  gap_lt  : True        -- ← placeholder, will be `a < b`
+  gap     : True        -- ← placeholder, will be spectrum condition
 
 end SpectralGap
