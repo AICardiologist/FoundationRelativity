@@ -1,8 +1,8 @@
 # Foundation-Relativity Roadmap
 
-## 📍 Current Status: Sprint S3 Complete
+## 📍 Current Status: Sprint S6 Active - Milestone B Complete
 
-The project has successfully completed formal proofs for both Gap₂ and AP_Fail₂ pathologies, demonstrating that both require WLPO. We're now ready to tackle ρ=2 level proofs with RNP_Fail₂.
+SpectralGap pathology infrastructure is complete with concrete zero operator implementation. All ρ=1 and ρ=2 level pathologies proven. Ready for Milestone C (non-trivial operators).
 
 ---
 
@@ -72,11 +72,11 @@ The project has successfully completed formal proofs for both Gap₂ and AP_Fail
 
 ## 🚧 Current Sprint
 
-### Sprint S4: RNP_Fail₂ Proof (ρ=2 Level)
-**Timeline**: Completed  
-**Status**: ✅ Complete
+### Sprint S6: SpectralGap Pathology (ρ=3 Level)
+**Timeline**: Active - Milestone B Complete  
+**Status**: 🛠️ Milestone B Complete
 
-**Exit Criterion**: `RNP_requires_DC_omega : RequiresDCOmega RNPPathology` proven ✅
+**Exit Criterion**: Full SpectralGap pathology with AC_ω requirement proof
 
 #### Work Packages
 
@@ -133,24 +133,33 @@ The project has successfully completed formal proofs for both Gap₂ and AP_Fail
 - [x] Update documentation with constructive vs classical dichotomy
 - [x] Tag v0.3.4-rnp3-complete milestone
 
-## 🚧 Current Sprint
-
-### Sprint S6: Spectral Gap & Beyond ρ-scale
-**Timeline**: Next sprint  
-**Status**: 📅 Ready to Start
 
 ---
 
 ## 📅 Future Sprints
 
-### Sprint S6: Spectral Gap & Beyond ρ-scale
-**Timeline**: Following sprint  
-**Status**: 📅 Planned
+#### Milestone Progress
 
-- [ ] Investigate spectral gap pathology
-- [ ] Explore connections to Gödel incompleteness
-- [ ] Implement proof automation tactics
-- [ ] Meta-theorems about ρ-degree classification
+**Milestone B**: Core Infrastructure ✅ Complete
+- [x] L² Hilbert space setup (`lp` over ℂ)
+- [x] BoundedOp type for continuous linear maps
+- [x] SpectralGapOperator structure definition
+- [x] Concrete zeroGapOp implementation
+- [x] Real gap_lt proof (a < b using norm_num)
+- [x] CI optimization with mathlib cache
+- [x] Comprehensive documentation
+
+**Milestone C**: Non-trivial Operators 📅 Next
+- [ ] Rank-one projection operators
+- [ ] Finite-rank compact operators  
+- [ ] Local spectrum lemmas
+- [ ] Real spectrum-based gap proofs
+
+**Milestone D**: AC_ω Requirement Proof 📅 Planned
+- [ ] Constructive impossibility of spectral gap witnesses
+- [ ] Connection to ultrafilter construction
+- [ ] AC_ω requirement theorem
+- [ ] Integration with LogicDSL framework
 
 ### Sprint S7: Advanced Foundations
 **Timeline**: TBD  
@@ -226,5 +235,5 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ---
 
-*Last updated: Sprint S3 completion (Gap₂ & AP_Fail₂ proofs)*  
-*Next review: End of Sprint S4 (RNP_Fail₂ proof)*
+*Last updated: Sprint S6 Milestone B completion (SpectralGap infrastructure)*  
+*Next review: Milestone C completion (Non-trivial operators)*
