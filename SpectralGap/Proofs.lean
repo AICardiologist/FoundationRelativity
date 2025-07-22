@@ -1,8 +1,8 @@
 /-
   Sprint S6  ▸  Spectral‑Gap Pathology   (ρ = 3)
 
-  Skeleton file — compile‑clean, zero `sorry` / `axiom`.
-  Will be filled with the real proofs in subsequent commits.
+  Implementation file - ready for real mathematics.
+  Will contain classical witness construction and main theorem.
 -/
 
 import Found.LogicDSL
