@@ -34,9 +34,10 @@ jobs:
 
       - name: Unit tests
         run: |
-          lake exe PathTests
           lake exe testFunctors
           lake exe testNonIdMorphisms
+          lake exe WitnessTests
+          lake exe AllPathologiesTests
           
       - name: Report status
         if: failure()

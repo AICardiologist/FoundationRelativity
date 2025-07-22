@@ -11,7 +11,8 @@
 
 import Mathlib.Analysis.NormedSpace.lpSpace
 import Mathlib.Analysis.NormedSpace.OperatorNorm
-import Mathlib.Analysis.NormedSpace.CompactOperator
+import Mathlib.Analysis.InnerProductSpace.Adjoint
+import Mathlib.Topology.Algebra.Module.FiniteDimension
 
 open Complex
 open scoped BigOperators ENNReal
@@ -31,7 +32,7 @@ instance : CompleteSpace L2Space := by
 abbrev BoundedOp := L2Space →L[ℂ] L2Space
 
 /-- *Compact* bounded operators (`Mathlib` predicate). -/
-abbrev IsCompact (T : BoundedOp) : Prop := CompactOperator ℂ T
+abbrev IsCompact (T : BoundedOp) : Prop := IsCompactOperator T
 
 /-- *Self‑adjoint* (Hermitian) bounded operators. -/
 def IsSelfAdjoint (T : BoundedOp) : Prop :=

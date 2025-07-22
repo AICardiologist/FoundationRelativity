@@ -44,7 +44,7 @@ jobs:
       - name: Run all tests
         run: |
           # Run all test executables if they exist
-          for test in PathTests testFunctors testNonIdMorphisms WitnessTests AllPathologiesTests Gap2MigrationTests; do
+          for test in testFunctors testNonIdMorphisms WitnessTests AllPathologiesTests Gap2ProofTests APProofTests RNPProofTests RNP3ProofTests SpectralGapProofTests; do
             if lake exe $test 2>/dev/null; then
               echo "✓ $test passed"
             else
