@@ -14,7 +14,6 @@ jobs:
       - name: Set up Lean 4.3.0
         uses: leanprover/lean-action@v1
         with:
-          lean-version: "4.3.0"
           use-mathlib-cache: true
           build-args: "-K 400000"
 
