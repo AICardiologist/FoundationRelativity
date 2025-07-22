@@ -40,7 +40,8 @@ structure SpectralGapOperator where
   T       : BoundedOp
   compact : IsCompact T
   selfAdj : IsSelfAdjoint T
-  a b     : ℝ
+  a       : ℝ
+  b       : ℝ
   gap_lt  : True        -- ← was  `a < b`
   gap     : True        -- placeholder for  `Spectrum ℂ T ⊆ ...`
 
