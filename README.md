@@ -74,9 +74,14 @@ FoundationRelativity/
 │   ├── verify-no-sorry.sh   #     CI sorry-statement checker
 │   ├── check-no-axioms.sh   #     Axiom count verification
 │   └── check-no-axioms.lean #     Lean-based axiom inspector
-└── docs/                    # 📚  Documentation
-    ├── README.md            #     Documentation index
-    └── DEV_GUIDE.md         #     Development setup guide
+├── docs/                    # 📚  Documentation
+│   ├── README.md            #     Documentation index
+│   ├── DEV_GUIDE.md         #     Development setup guide
+│   └── papers/              #     Academic papers and LaTeX sources
+├── old_files/               # 🗂️  Archived obsolete files and debugging artifacts
+│   ├── README.md            #     Archive documentation  
+│   ├── sprint_s6_debugging/ #     Math-AI debugging session files
+│   └── obsolete_tests/      #     Superseded test files
 ├── TECHNICAL_DEBT.md        # 🔧  Technical debt tracking and resolution plan
 └── CHANGELOG.md             # 📝  Version history and changes
 ```
