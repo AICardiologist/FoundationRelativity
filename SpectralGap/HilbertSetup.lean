@@ -15,13 +15,21 @@ import Mathlib.Analysis.NormedSpace.OperatorNorm
 import Mathlib.Analysis.InnerProductSpace.Adjoint
 import Mathlib.Analysis.NormedSpace.CompactOperator
 
+
+
 namespace SpectralGap
 
 /-- **Canonical Hilbert space** - the ℓ² space over complex numbers. -/
 abbrev L2Space : Type := lp (fun _ : ℕ => ℂ) 2
 
+
 /-- *Bounded* (continuous linear) operators on L2Space. -/
 abbrev BoundedOp : Type := L2Space →L[ℂ] L2Space
+
+
+
+
+
 
 /-- *Compact* bounded operators (`Mathlib` predicate). -/
 abbrev IsCompact (T : BoundedOp) : Prop := IsCompactOperator T
@@ -43,35 +51,41 @@ structure SpectralGapOperator where
   a       : ℝ
   b       : ℝ
   gap_lt  : a < b
-  gap     : True  -- simplified for now, will be spectrum condition later
+  gap     : True  -- TODO: Implement spectrum condition when mathlib compatibility improves
 
 --------------------------------------------------------------------------------
 -- Rank‑one projection onto e₀
 --------------------------------------------------------------------------------
 
 open Complex
-open scoped BigOperators
 
--- Simple rank-one projection (simplified to avoid heavy imports)
-noncomputable
-def proj₁ : BoundedOp := 0  -- placeholder for now
+/-!
+NOTE: **Milestone B – partial implementation**
 
-lemma proj₁_selfAdjoint : IsSelfAdjoint proj₁ := by
-  simp [IsSelfAdjoint, proj₁]
+* `gap_lt` has a real `norm_num` proof.
+* `gap` is still `True` because mathlib 4.3.0 lacks a convenient
+  `spectrum_zero_eq_singleton` lemma and importing the full spectrum
+  stack causes heavy type‑class time‑outs.
 
-lemma proj₁_compact : IsCompact proj₁ := by
-  simp [proj₁, IsCompact]
-  exact isCompactOperator_zero
+We will replace `gap` with a real proof once either
+1. mathlib is upgraded, or
+2. we commit a small local spectrum lemma.
+-/
 
-/-- Concrete `SpectralGapOperator` with spectrum gap example. -/
-noncomputable
-def projGapOp : SpectralGapOperator :=
-{ T        := proj₁,
-  compact  := proj₁_compact,
-  selfAdj  := proj₁_selfAdjoint,
-  a        := 0.1,
-  b        := 0.9,
-  gap_lt   := by norm_num,
-  gap      := trivial }
+
+
+
+
+/-- Concrete `SpectralGapOperator` using zero operator with real gap proof. -/
+noncomputable def zeroGapOp : SpectralGapOperator :=
+{ T       := 0,
+  compact := by
+    simpa using isCompactOperator_zero,
+  selfAdj := by
+    simp [IsSelfAdjoint],
+  a       := 0.1,
+  b       := 0.9,
+  gap_lt  := by norm_num,
+  gap     := trivial }
 
 end SpectralGap

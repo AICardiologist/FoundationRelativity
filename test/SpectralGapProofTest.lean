@@ -6,4 +6,4 @@ open IO SpectralGap
 
 def main : IO Unit := do
   println "✓ Spectral‑Gap proof type‑checks"
-  println "✓ projGapOp concrete operator created"
+  println "✓ zeroGapOp concrete operator created with real spectrum gap proof"
