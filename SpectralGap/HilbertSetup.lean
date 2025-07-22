@@ -9,10 +9,9 @@
   can import without pulling half of `Mathlib` everywhere.
 -/
 
-import Mathlib.Analysis.NormedSpace.lpSpace
-import Mathlib.Analysis.NormedSpace.OperatorNorm
+import Mathlib.Analysis.InnerProductSpace.l2Space
+import Mathlib.Analysis.NormedSpace.CompactOperator
 import Mathlib.Analysis.InnerProductSpace.Adjoint
-import Mathlib.Topology.Algebra.Module.FiniteDimension
 
 open Complex
 open scoped BigOperators ENNReal
@@ -22,12 +21,6 @@ namespace SpectralGap
 /-- **Canonical Hilbert space** used throughout the construction. -/
 abbrev L2Space : Type _ := lp (fun _ : ℕ => ℂ) 2
 
-instance : InnerProductSpace ℂ L2Space := by
-  infer_instance
-
-instance : CompleteSpace L2Space := by
-  infer_instance
-
 /-- Bounded (continuous linear) operators on `L2Space`. -/
 abbrev BoundedOp := L2Space →L[ℂ] L2Space
 
@@ -36,7 +29,7 @@ abbrev IsCompact (T : BoundedOp) : Prop := IsCompactOperator T
 
 /-- *Self‑adjoint* (Hermitian) bounded operators. -/
 def IsSelfAdjoint (T : BoundedOp) : Prop :=
-  T.adjoint = T
+  T† = T
 
 /-- Bundles: compact × self‑adjoint operator having a *real* open
     interval `(a,b)` that is disjoint from its spectrum.
