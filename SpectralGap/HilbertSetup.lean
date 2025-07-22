@@ -13,6 +13,7 @@ import Mathlib.Algebra.Module.Basic
 import Mathlib.Analysis.InnerProductSpace.l2Space
 import Mathlib.Analysis.NormedSpace.OperatorNorm
 import Mathlib.Analysis.InnerProductSpace.Adjoint
+import Mathlib.Analysis.NormedSpace.CompactOperator
 
 namespace SpectralGap
 
@@ -23,7 +24,7 @@ abbrev L2Space : Type := lp (fun _ : ℕ => ℂ) 2
 abbrev BoundedOp : Type := L2Space →L[ℂ] L2Space
 
 /-- *Compact* bounded operators (`Mathlib` predicate). -/
-abbrev IsCompact (T : BoundedOp) : Prop := True
+abbrev IsCompact (T : BoundedOp) : Prop := IsCompactOperator T
 
 /-- *Self‑adjoint* (Hermitian) bounded operators. -/
 def IsSelfAdjoint (T : BoundedOp) : Prop :=
