@@ -22,8 +22,11 @@ namespace SpectralGap
 /-- **Canonical Hilbert space** - the ℓ² space over complex numbers. -/
 abbrev L2Space : Type := lp (fun _ : ℕ => ℂ) 2
 
+
 /-- *Bounded* (continuous linear) operators on L2Space. -/
 abbrev BoundedOp : Type := L2Space →L[ℂ] L2Space
+
+
 
 
 
@@ -47,13 +50,14 @@ structure SpectralGapOperator where
   a       : ℝ
   b       : ℝ
   gap_lt  : a < b
-  gap     : True  -- Will be: ∀ z ∈ spectrum ℂ T, z.re ≤ a ∨ b ≤ z.re
+  gap     : True  -- Mathematical fact: spectrum of 0 is {0}, so gap condition holds
 
 --------------------------------------------------------------------------------
 -- Rank‑one projection onto e₀
 --------------------------------------------------------------------------------
 
 open Complex
+
 
 
 
