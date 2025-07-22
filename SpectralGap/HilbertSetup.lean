@@ -10,20 +10,16 @@
 -- only tiny, always‑present dependencies
 import Mathlib.Data.Complex.Basic
 import Mathlib.Algebra.Module.Basic
+import Mathlib.Analysis.InnerProductSpace.l2Space
+import Mathlib.Analysis.NormedSpace.OperatorNorm
 
 namespace SpectralGap
 
-/-- **Canonical Hilbert space** placeholder.
+/-- **Canonical Hilbert space** - the ℓ² space over complex numbers. -/
+abbrev L2Space : Type := lp (fun _ : ℕ => ℂ) 2
 
-    *Later* this will be `lp (fun _ : ℕ => ℂ) 2` together with the full
-    inner‑product structure.  For now we just need a type to make the
-    signatures well‑typed. -/
-abbrev L2Space : Type := ℕ → ℂ
-
-/-- *Bounded* (continuous linear) operators placeholder.  Again, the real
-    version will be `L2Space →L[ℂ] L2Space`; here a plain function keeps
-    the file compiling. -/
-abbrev BoundedOp : Type := L2Space → L2Space
+/-- *Bounded* (continuous linear) operators on L2Space. -/
+abbrev BoundedOp : Type := L2Space →L[ℂ] L2Space
 
 /-- Marker: "`T` is compact".  Implementation postponed. -/
 abbrev IsCompact (T : BoundedOp) : Prop := True
@@ -44,5 +40,8 @@ structure SpectralGapOperator where
   b       : ℝ
   gap_lt  : True        -- ← was  `a < b`
   gap     : True        -- placeholder for  `Spectrum ℂ T ⊆ ...`
+
+/-- Identity operator (placeholder) -/
+noncomputable def idOp : BoundedOp := ContinuousLinearMap.id ℂ L2Space
 
 end SpectralGap
