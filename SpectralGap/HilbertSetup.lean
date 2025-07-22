@@ -59,20 +59,18 @@ structure SpectralGapOperator where
 
 open Complex
 
-/-- NOTE: Milestone B Status - Partial Implementation
-    
-    We've implemented gap_lt with a real proof (a < b using norm_num).
-    The gap field remains as True due to mathlib 4.3.0 spectrum compatibility issues:
-    - spectrum_zero_eq_singleton lemma doesn't exist in v4.3.0
-    - Spectrum imports cause type class synthesis timeouts
-    - MulAction ℂ BoundedOp synthesis fails
-    
-    Math-AI confirmed this is acceptable for Milestone B completion.
-    The mathematical content (zero operator has spectrum {0}) is correct,
-    just blocked by tooling limitations.
-    
-    TODO: Implement real spectrum proof when mathlib is upgraded or
-    using a local spectrum definition approach. -/
+/-!
+NOTE: **Milestone B – partial implementation**
+
+* `gap_lt` has a real `norm_num` proof.
+* `gap` is still `True` because mathlib 4.3.0 lacks a convenient
+  `spectrum_zero_eq_singleton` lemma and importing the full spectrum
+  stack causes heavy type‑class time‑outs.
+
+We will replace `gap` with a real proof once either
+1. mathlib is upgraded, or
+2. we commit a small local spectrum lemma.
+-/
 
 
 
