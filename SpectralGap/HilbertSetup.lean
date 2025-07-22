@@ -28,7 +28,7 @@ abbrev L2Space : Type := lp (fun _ : ℕ => ℂ) 2
 abbrev BoundedOp : Type := L2Space →L[ℂ] L2Space
 
 /-- `BoundedOp` is non‑trivial: `0 ≠ 1`. -/
-instance : Nontrivial BoundedOp := ContinuousLinearMap.nontrivial
+instance : Nontrivial BoundedOp := by infer_instance
 
 
 
@@ -65,19 +65,19 @@ open Complex spectrum
 
 lemma spectrum_zero :
     spectrum ℂ (0 : BoundedOp) = {0} := by
-  -- *Step 1*: show that every non‑zero λ is in the resolvent set
-  have hλ : ∀ λ : ℂ, λ ≠ 0 → IsUnit (λ • (1 : BoundedOp) - 0) := by
-    intro λ hλ
+  -- *Step 1*: show that every non‑zero z is in the resolvent set
+  have hz : ∀ z : ℂ, z ≠ 0 → IsUnit (z • (1 : BoundedOp) - 0) := by
+    intro z hz_ne
     simpa [sub_zero] using
-      (isUnit_smul_iff.2 ⟨hλ, isUnit_one⟩)
+      (isUnit_smul_iff.2 ⟨hz_ne, isUnit_one⟩)
   -- *Step 2*: rewrite membership
-  ext z
+  ext w
   constructor
-  · intro hz
-    by_cases hz0 : z = 0
-    · simpa [hz0]
-    · have : IsUnit (z • 1 - (0 : BoundedOp)) := hλ z hz0
-      exact False.elim (hz this)  -- contradicts definition of spectrum
+  · intro hw
+    by_cases hw0 : w = 0
+    · simpa [hw0]
+    · have : IsUnit (w • 1 - (0 : BoundedOp)) := hz w hw0
+      exact False.elim (hw this)  -- contradicts definition of spectrum
   · rintro rfl
     exact spectrum_zero_mem _
 
