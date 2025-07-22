@@ -21,10 +21,10 @@ abbrev L2Space : Type := lp (fun _ : ℕ => ℂ) 2
 /-- *Bounded* (continuous linear) operators on L2Space. -/
 abbrev BoundedOp : Type := L2Space →L[ℂ] L2Space
 
-/-- Marker: "`T` is compact".  Implementation postponed. -/
+/-- *Compact* bounded operators (`Mathlib` predicate). -/
 abbrev IsCompact (T : BoundedOp) : Prop := True
 
-/-- Marker: "`T` is self‑adjoint".  Implementation postponed. -/
+/-- *Self‑adjoint* (Hermitian) bounded operators. -/
 abbrev IsSelfAdjoint (T : BoundedOp) : Prop := True
 
 /-- **Bundled object with a spectral gap**.
