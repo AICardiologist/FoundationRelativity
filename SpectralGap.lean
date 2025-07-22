@@ -10,6 +10,6 @@ Root module for the SpectralGap library - imports all SpectralGap components.
 ## Modules
 
 - `SpectralGap.Proofs`: Main theorem statements and classical witness
-- `SpectralGap.HilbertSetup`: ℓ² machinery and spectral theory foundations
+- `SpectralGap.HilbertSetup`: L2Space machinery and spectral theory foundations
 - `SpectralGap.NoWitness`: Constructive impossibility proofs
 -/

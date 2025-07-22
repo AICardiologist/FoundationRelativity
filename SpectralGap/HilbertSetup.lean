@@ -19,16 +19,16 @@ open scoped BigOperators ENNReal
 namespace SpectralGap
 
 /-- **Canonical Hilbert space** used throughout the construction. -/
-abbrev ℓ² : Type _ := lp (fun _ : ℕ => ℂ) 2
+abbrev L2Space : Type _ := lp (fun _ : ℕ => ℂ) 2
 
-instance : InnerProductSpace ℂ ℓ² := by
+instance : InnerProductSpace ℂ L2Space := by
   infer_instance
 
-instance : CompleteSpace ℓ² := by
+instance : CompleteSpace L2Space := by
   infer_instance
 
-/-- Bounded (continuous linear) operators on `ℓ²`. -/
-abbrev BoundedOp := ℓ² →L[ℂ] ℓ²
+/-- Bounded (continuous linear) operators on `L2Space`. -/
+abbrev BoundedOp := L2Space →L[ℂ] L2Space
 
 /-- *Compact* bounded operators (`Mathlib` predicate). -/
 abbrev IsCompact (T : BoundedOp) : Prop := CompactOperator ℂ T
@@ -37,7 +37,7 @@ abbrev IsCompact (T : BoundedOp) : Prop := CompactOperator ℂ T
 def IsSelfAdjoint (T : BoundedOp) : Prop :=
   T.adjoint = T
 
-/-- Bundles: compact ⨯ self‑adjoint operator having a *real* open
+/-- Bundles: compact × self‑adjoint operator having a *real* open
     interval `(a,b)` that is disjoint from its spectrum.
     We record `gap_lt : a < b` for convenience.
 -/
