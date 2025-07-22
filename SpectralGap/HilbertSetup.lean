@@ -10,15 +10,12 @@
 -- only tiny, always‑present dependencies
 import Mathlib.Data.Complex.Basic
 import Mathlib.Algebra.Module.Basic
+import Mathlib.Analysis.InnerProductSpace.l2Space
 
 namespace SpectralGap
 
-/-- **Canonical Hilbert space** placeholder.
-
-    *Later* this will be `lp (fun _ : ℕ => ℂ) 2` together with the full
-    inner‑product structure.  For now we just need a type to make the
-    signatures well‑typed. -/
-abbrev L2Space : Type := ℕ → ℂ
+/-- **Canonical Hilbert space** - the ℓ² space over complex numbers. -/
+abbrev L2Space : Type := lp (fun _ : ℕ => ℂ) 2
 
 /-- *Bounded* (continuous linear) operators placeholder.  Again, the real
     version will be `L2Space →L[ℂ] L2Space`; here a plain function keeps
