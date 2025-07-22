@@ -42,6 +42,6 @@ structure SpectralGapOperator where
   gap     : True        -- placeholder for  `Spectrum ℂ T ⊆ ...`
 
 /-- Identity operator (placeholder) -/
-def idOp : BoundedOp := ContinuousLinearMap.id ℂ L2Space
+noncomputable def idOp : BoundedOp := ContinuousLinearMap.id ℂ L2Space
 
 end SpectralGap
