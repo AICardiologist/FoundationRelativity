@@ -1,43 +1,18 @@
-/-
-  Sprint S6  ▸  Spectral‑Gap Pathology   (ρ = 3)
+import SpectralGap.NoWitness
+import SpectralGap.ClassicalWitness
 
-  Implementation file - ready for real mathematics.
-  Will contain classical witness construction and main theorem.
--/
-
-import Found.LogicDSL
-import Found.RelativityIndex
-
-open Found
+/-! # Main theorem wrapper – stub  (Milestone C) -/
 
 namespace SpectralGap
 
-/-- **Placeholder**: data type for the new pathology.  
-    Will later be a non‑zero vector living in the gap of a compact
-    self‑adjoint operator on `ℓ²`. -/
-structure Pathology where
-  irrelevant : Unit := ()
+/-- Placeholder classical witness: non‑emptiness of the eigenspace at 0
+    for the zero operator (will be replaced by an explicit vector). -/
+def witness_zfc : Prop := True
 
-/-- Classical witness type (ZFC) — to be replaced by the real record. -/
-abbrev SpectralGapWitness : Type := PUnit
-
-/-- Constructive (BISH) witness type is empty. -/
-abbrev GapWitnessType (ctx : Foundation) : Type :=
-  match ctx with
-  | .bish => Empty
-  | _      => SpectralGapWitness
-
-/-- Constructive impossibility — trivially true for the stub. -/
-theorem noWitness_bish :
-    IsEmpty (GapWitnessType .bish) := ⟨fun h => nomatch h⟩
-
-/-- Classical existence — stub witness. -/
-theorem witness_zfc :
-    Nonempty (GapWitnessType .zfc) := ⟨PUnit.unit⟩
-
-/-- Main logical classification: Spectral‑Gap requires **AC_ω** (ρ = 3). -/
+/-- **SpectralGap_requires_ACω** (stub)  
+    Combines the constructive impossibility and the classical witness. -/
 theorem SpectralGap_requires_ACω :
-    RequiresACω (Nonempty (GapWitnessType .zfc)) :=
-  RequiresACω.intro witness_zfc
+    RequiresACω ∧ witness_zfc := by
+  exact And.intro RequiresACω.mk trivial
 
 end SpectralGap
