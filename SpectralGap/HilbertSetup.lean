@@ -85,6 +85,9 @@ noncomputable def zeroGapOp : SpectralGapOperator :=
   a       := 0.1,
   b       := 0.9,
   gap_lt  := by norm_num,
-  gap     := trivial }
+  gap     := by
+    -- TODO(TD-B-001): replace with a real proof once mathlib ≥ 4.4 exposes
+    -- `spectrum_zero_eq_singleton`.  For now we carry a transparent debt item.
+    trivial }
 
 end SpectralGap

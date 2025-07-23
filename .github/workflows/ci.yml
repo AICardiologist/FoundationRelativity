@@ -15,7 +15,7 @@ jobs:
         uses: leanprover/lean-action@v1
         with:
           use-mathlib-cache: true
-          build-args: "-K 400000"
+          auto-config: true
 
       - name: Cache .lake
         uses: actions/cache@v3
@@ -35,6 +35,9 @@ jobs:
           else
             echo "Warning: verify-no-sorry.sh not found"
           fi
+
+      - name: Check no axioms
+        run: scripts/check-no-axioms.sh
 
       - name: Run tests
         run: |

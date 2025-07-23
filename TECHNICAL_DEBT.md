@@ -80,6 +80,14 @@ structure SpectralGapOperator where
 **Issue**: Mixed comment styles (some use `/-!`, others use `--`)  
 **Resolution**: Standardize on `/-!` for block comments, `--` for line comments
 
+#### 6. TD-B-001: Formal spectrum proof for `zeroGapOp`
+**File**: `SpectralGap/HilbertSetup.lean` (`gap` placeholder)  
+**Issue**: Missing Lean proof that `spectrum 0 = {0}` due to absent lemmas in mathlib 4.3.0  
+**Root Cause**: Mathlib 4.3.0 lacks `spectrum_zero_eq_singleton` lemma  
+**Resolution**: Sprint 34, after mathlib 4.4 upgrade (or local back-port)  
+**Owner**: Spectral-Gap Task Force  
+**Risk if unaddressed**: Low – placeholder unused until Milestone D  
+
 ## 📋 Resolution Plan
 
 ### Sprint S6 Cleanup (Immediate)
