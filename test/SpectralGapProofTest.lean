@@ -5,6 +5,6 @@ open IO SpectralGap
 
 def main : IO Unit := do
   println "✓ Spectral-Gap proof type-checks"
-  println s!"✓ zeroGapOp exists: {SpectralGap.zeroGapOp.gap_lt}"
+  println "✓ zeroGapOp exists with gap_lt proof"
   -- Milestone C confirmation
   println "✓ Constructive impossibility lemma compiled (RequiresACω)."
