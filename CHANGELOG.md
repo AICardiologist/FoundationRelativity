@@ -9,7 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - feat: Milestone C groundwork - RequiresACω logic DSL for SpectralGap impossibility proofs
+- feat: ACω definition for countable choice in SpectralGap/LogicDSL
+- feat: zeroGap_requiresACω theorem skeleton for constructive impossibility
 - feat: formal proof that RNP_Fail₂ requires DC_ω (ρ = 2)
+- docs: Mathlib 4.4 upgrade spike retrospective
+
+### Fixed
+- fix: Use ASCII Nat instead of Unicode ℕ in LogicDSL for compatibility
+- fix: Replace classical tactic with placeholder proof for Milestone C
 
 ## [0.3.2] - 2025-01-20
 
