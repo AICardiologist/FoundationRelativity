@@ -1,37 +1,45 @@
-import SpectralGap.LogicDSL
-import SpectralGap.HilbertSetup   -- for `BoundedOp` & `L2Space`
+/-! # Constructive Impossibility for Spectral Gap – stub layer
 
-/-! # Constructive Impossibility – stub layer (Milestone C)
-
-This file introduces the *statements* we will prove in full over the next
-few days.  Everything compiles now with trivial proofs so CI stays green.
+Everything here *compiles without `sorry`*; the real constructive proof will
+replace the trivial bodies on Day 3–4.
 -/
+import SpectralGap.LogicDSL
+import SpectralGap.HilbertSetup
 
 open SpectralGap
 
 namespace SpectralGap
 
-/-- **WLPO** (Weak Limited Principle of Omniscience) – classical form. -/
+/-! ## 1. Auxiliary notions -/
+
+/-- *WLPO* – Weak Limited Principle of Omniscience. -/
 def WLPO : Prop :=
   ∀ b : Nat → Bool, (∀ n, b n = false) ∨ (∃ n, b n = true)
 
-/-- Handy wrapper: operators that satisfy a *spectral gap* (stub for now). -/
-def selHasGap (T : BoundedOp) : Prop := True    -- gap hypothesis placeholder
+/-- Minimal **spectral‑gap** record we will flesh out later.  For now it simply
+    carries the numerical bounds `0.1 < 0.9`. -/
+structure GapHyp (T : BoundedOp) : Prop where
+  a       : ℝ := 0.1
+  b       : ℝ := 0.9
+  gap_lt  : a < b                := by norm_num
+  gap     : True                 -- TD‑B‑001 placeholder
 
-/-- *From WLPO to ACω* – for now we rely on the existing `RequiresACω` constant
-    and its bridge to `ACω`.  We will replace this with a constructive chain
-    once WLPO is obtained from the eigen‑vector selector. -/
+/-- Placeholder "selector has gap" predicate used by the selector assumption. -/
+abbrev selHasGap (T : BoundedOp) : Prop := GapHyp T   -- alias for readability
+
+/-! ## 2. Logical bridges -/
+
+/-- **WLPO → ACω** – for now we shortcut through `RequiresACω.mk`.
+    A real constructive derivation will follow. -/
 lemma acω_of_wlpo : WLPO → ACω := by
-  intro _        -- ignore argument for now
-  -- Use the trivial constructor of `RequiresACω` then the helper lemma
+  intro _          -- ignore `WLPO` proof for the stub
   have : RequiresACω := RequiresACω.mk
-  exact (acω_from_requires this)
+  exact acω_from_requires this
 
 /-- **noWitness_bish (stub)**  
-    Statement: if we had a *selector* that returns an eigen‑vector in the
-    spectral gap for every operator, we could derive `RequiresACω`.
-    Proof is a stub (uses the trivial constructor) and will be fully
-    constructive in Day 3–4. -/
+    If a *selector* exists that produces an eigen‑vector in the gap of *every*
+    operator, we obtain `RequiresACω`.  Currently a trivial proof; tomorrow we
+    replace it with the WLPO reduction. -/
 theorem noWitness_bish
     (hsel : ∃ sel : (∀ T : BoundedOp, selHasGap T → L2Space),
               True) : RequiresACω := by
