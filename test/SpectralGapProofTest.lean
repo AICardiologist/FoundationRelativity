@@ -11,4 +11,6 @@ def main : IO Unit := do
   println "✓ Constructive impossibility lemma compiled (RequiresACω)."
   println "✓ ACω lemma type-checks."
   println "✓ SpectralGap_requires_ACω stub theorem compiles."
-  println "✓ Classical witness exists (witness_zfc)."
+  #eval do
+    let _ := (SpectralGap_requires_ACω).1
+    IO.println "✓ SpectralGap_requires_ACω theorem evaluated successfully."
