@@ -1,9 +1,9 @@
 import SpectralGap.LogicDSL
-import SpectralGap.HilbertSetup
+import SpectralGap.HilbertSetup   -- for `BoundedOp`, `L2Space`, `e`
 
 /-! # Constructive Impossibility for Spectral Gap – stub layer
 
-Everything here *compiles without `sorry`*; the real constructive proof will
+Everything here **compiles without `sorry`**; the real constructive proof will
 replace the trivial bodies on Day 3–4.
 -/
 
@@ -11,7 +11,7 @@ open SpectralGap
 
 namespace SpectralGap
 
-/-! ## 1. Auxiliary notions -/
+/-! ## 1 Auxiliary notions -/
 
 /-- *WLPO* – Weak Limited Principle of Omniscience. -/
 def WLPO : Prop :=
@@ -28,7 +28,7 @@ structure GapHyp (T : BoundedOp) : Prop where
 /-- Placeholder "selector has gap" predicate used by the selector assumption. -/
 abbrev selHasGap (T : BoundedOp) : Prop := GapHyp T   -- alias for readability
 
-/-! ## 2. Logical bridges -/
+/-! ## 2 Logical bridges -/
 
 /-- **WLPO → ACω** – for now we shortcut through `RequiresACω.mk`.
     A real constructive derivation will follow. -/
