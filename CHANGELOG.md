@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- feat: Milestone C groundwork - RequiresACω logic DSL for SpectralGap impossibility proofs
 - feat: formal proof that RNP_Fail₂ requires DC_ω (ρ = 2)
 
 ## [0.3.2] - 2025-01-20
