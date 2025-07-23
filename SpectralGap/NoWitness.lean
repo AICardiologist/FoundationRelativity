@@ -1,10 +1,11 @@
+import SpectralGap.LogicDSL
+import SpectralGap.HilbertSetup
+
 /-! # Constructive Impossibility for Spectral Gap – stub layer
 
 Everything here *compiles without `sorry`*; the real constructive proof will
 replace the trivial bodies on Day 3–4.
 -/
-import SpectralGap.LogicDSL
-import SpectralGap.HilbertSetup
 
 open SpectralGap
 

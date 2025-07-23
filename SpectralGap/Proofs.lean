@@ -1,6 +1,7 @@
-/-! # Main Spectral‑Gap ⇒ ACω wrapper – stub (Milestone C) -/
 import SpectralGap.NoWitness
 import SpectralGap.ClassicalWitness
+
+/-! # Main Spectral‑Gap ⇒ ACω wrapper – stub (Milestone C) -/
 
 namespace SpectralGap
 
