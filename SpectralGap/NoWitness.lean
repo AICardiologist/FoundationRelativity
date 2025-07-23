@@ -1,10 +1,11 @@
+import SpectralGap.LogicDSL
+import SpectralGap.HilbertSetup   -- for `BoundedOp` & `L2Space`
+
 /-! # Constructive Impossibility – stub layer (Milestone C)
 
 This file introduces the *statements* we will prove in full over the next
 few days.  Everything compiles now with trivial proofs so CI stays green.
 -/
-import SpectralGap.LogicDSL
-import SpectralGap.HilbertSetup   -- for `BoundedOp` & `L2Space`
 
 open SpectralGap
 

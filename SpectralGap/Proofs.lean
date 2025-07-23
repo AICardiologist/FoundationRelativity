@@ -1,6 +1,7 @@
-/-! # Main theorem wrapper – stub  (Milestone C) -/
 import SpectralGap.NoWitness
 import SpectralGap.ClassicalWitness
+
+/-! # Main theorem wrapper – stub  (Milestone C) -/
 
 namespace SpectralGap
 
