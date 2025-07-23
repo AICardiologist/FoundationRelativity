@@ -1,4 +1,5 @@
 import SpectralGap.NoWitness
+import SpectralGap.Proofs
 import Lean
 
 open IO SpectralGap
@@ -9,3 +10,4 @@ def main : IO Unit := do
   -- Milestone C confirmation
   println "✓ Constructive impossibility lemma compiled (RequiresACω)."
   println "✓ ACω lemma type-checks."
+  println "✓ SpectralGap_requires_ACω stub theorem compiles."
