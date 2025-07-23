@@ -16,7 +16,7 @@ attribute [simp] RequiresACω.mk
 
 /-- **ACω** – every family of inhabited types indexed by `Nat` admits a choice function. -/
 def ACω : Prop :=
-  ∀ (α : Nat → Type) (h : ∀ n, Nonempty (α n)), Nonempty (∀ n, α n)
+  ∀ (α : Nat → Type) (_ : ∀ n, Nonempty (α n)), Nonempty (∀ n, α n)
 
 /-- `RequiresACω` is strong enough to give **ACω**.
 
@@ -25,7 +25,6 @@ def ACω : Prop :=
     an element in each fibre and bundle them into a function. -/
 theorem acω_from_requires : RequiresACω → ACω := by
   intro _ α hα
-  haveI : ∀ n, Nonempty (α n) := hα
   exact ⟨fun n ↦ Classical.choice (hα n)⟩  -- no `sorry`, no tactics
 
 end SpectralGap
