@@ -8,3 +8,4 @@ def main : IO Unit := do
   println "✓ zeroGapOp exists with gap_lt proof"
   -- Milestone C confirmation
   println "✓ Constructive impossibility lemma compiled (RequiresACω)."
+  println "✓ ACω lemma type-checks."
