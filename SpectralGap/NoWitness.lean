@@ -59,6 +59,18 @@ noncomputable def diag (b : Nat → Bool) : BoundedOp :=
 
 notation "T[" b "]" => diag b
 
+/-! ### 1.1.1  Selector assumption (type only)
+
+In the forthcoming constructive argument we assume a *selector*
+that assigns, to every operator with a spectral gap, a concrete
+vector annihilated by that operator.
+-/
+
+/-- A *selector* for eigen‑vectors in the gap. -/
+structure Sel where
+  pick   : ∀ T, selHasGap T → L2Space
+  eigen0 : ∀ {T h}, T (pick T h) = 0
+
 /-! ## 1.2  Action on basis vectors `e n` -/
 
 @[simp] lemma diag_apply_basis (b : Nat → Bool) (n : Nat) :
@@ -88,13 +100,12 @@ lemma acω_of_wlpo : WLPO → ACω := by
   have : RequiresACω := RequiresACω.mk
   exact acω_from_requires this
 
-/-- **noWitness_bish (stub)**  
-    If a *selector* exists that produces an eigen‑vector in the gap of *every*
-    operator, we obtain `RequiresACω`.  Currently a trivial proof; tomorrow we
-    replace it with the WLPO reduction. -/
+/-- **noWitness_bish** – *stub body, final type*.  
+    A total selector implies `RequiresACω`. The proof will be
+    supplied in the Day‑4 patch. -/
 theorem noWitness_bish
-    (hsel : ∃ sel : (∀ T : BoundedOp, selHasGap T → L2Space),
-              True) : RequiresACω := by
+    (hsel : Sel) : RequiresACω := by
+  -- TODO: Day‑4 – derive WLPO from `hsel` then call `acω_of_wlpo`
   exact RequiresACω.mk
 
 end SpectralGap
