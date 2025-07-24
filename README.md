@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml)
 [![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
-[![Lean 4.3.0](https://img.shields.io/badge/Lean-4.3.0-blue)](https://github.com/leanprover/lean4)
+[![Lean 4.22.0-rc3](https://img.shields.io/badge/Lean-4.22.0--rc3-blue)](https://github.com/leanprover/lean4)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 > **🎉 MILESTONE C COMPLETE**: SpectralGap pathology (ρ=3) requires ACω - First formal proof ✅  
@@ -90,7 +90,7 @@ FoundationRelativity/
 
 ### Prerequisites
 
-- [Lean 4.3.0](https://github.com/leanprover/lean4/releases/tag/v4.3.0)
+- [Lean 4.22.0-rc3](https://github.com/leanprover/lean4/releases/tag/v4.22.0-rc3)
 - [VS Code](https://code.visualstudio.com/) with [lean4 extension](https://marketplace.visualstudio.com/items?itemName=leanprover.lean4)
 
 ### Building

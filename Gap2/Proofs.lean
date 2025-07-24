@@ -10,7 +10,7 @@ namespace Gap.Proofs
 theorem noWitness_bish : IsEmpty (WitnessType Gap₂Pathology bish) := by
   -- by definition WitnessType … bish = Empty
   simp [WitnessType, Gap₂Pathology]
-  exact instIsEmptyEmpty
+  exact inferInstance
 
 /-- The classical (zfc) witness type for Gap₂ is inhabited (has ⟨⟩). -/
 theorem witness_zfc : Nonempty (WitnessType Gap₂Pathology zfc) := by

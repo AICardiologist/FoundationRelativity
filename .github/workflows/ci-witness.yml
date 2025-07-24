@@ -10,10 +10,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Lean 4.3.0
+      - name: Set up Lean
         uses: leanprover/lean-action@v1
-        with:
-          lean-version: "4.3.0"
 
       - name: Cache .lake
         uses: actions/cache@v3

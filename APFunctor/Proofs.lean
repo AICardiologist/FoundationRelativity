@@ -10,7 +10,7 @@ namespace APFail.Proofs
 theorem noWitness_bish : IsEmpty (WitnessType APPathology bish) := by
   -- by definition WitnessType … bish = Empty
   simp [WitnessType, APPathology]
-  exact instIsEmptyEmpty
+  exact inferInstance
 
 /-- The classical (zfc) witness type for AP_Fail₂ is inhabited (has ⟨⟩). -/
 theorem witness_zfc : Nonempty (WitnessType APPathology zfc) := by
