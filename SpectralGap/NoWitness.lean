@@ -109,12 +109,12 @@ lemma wlpo_of_sel (hsel : Sel) : WLPO := by
     have h' : ∀ n, b n = false := by
       intro n
       have : b n = true ∨ b n = false := by
-        cases hb : b n <;> simp [hb]
+        by_cases hb : b n = true
+        · exact Or.inl hb
+        · exact Or.inr hb
       cases this with
-      | inl htrue =>
-          exact (False.elim (h ⟨n, htrue⟩))
-      | inr hfalse =>
-          exact hfalse
+      | inl htrue => exact False.elim (h ⟨n, htrue⟩)
+      | inr hfalse => exact hfalse
     exact Or.inl h'
 
 /-! ## 2 Logical bridges -/
@@ -128,11 +128,8 @@ lemma acω_of_wlpo : WLPO → ACω := by
 
 /-- **noWitness_bish** – selector ⇒ `RequiresACω`. -/
 theorem noWitness_bish (hsel : Sel) : RequiresACω := by
-  -- Obtain WLPO from the selector.
   have hwlpo : WLPO := wlpo_of_sel hsel
-  -- Bridge WLPO → ACω (classical helper already present).
-  have _hac : ACω := acω_of_wlpo hwlpo
-  -- Package result into `RequiresACω`.
+  have _ : ACω := acω_of_wlpo hwlpo
   exact RequiresACω.mk
 
 end SpectralGap
