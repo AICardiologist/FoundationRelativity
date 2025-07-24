@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+<
 - **Sprint 35 Complete**: Cheeger-Bottleneck pathology (ρ ≈ 3½) - New intermediate hierarchy level
   - **Mathematical Achievement**: Extended Foundation-Relativity hierarchy with spectral gap pathology requiring ACω constructively while admitting explicit classical witnesses
   - **Operator Implementation**: `cheeger (β : ℝ) (b : ℕ → Bool) : BoundedOp` using diagonal construction with boolean parameterization
@@ -16,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Bridge Theorem**: `Cheeger_requires_ACω` connecting pathology to Foundation-Relativity hierarchy
   - **Quality Verification**: 0 sorry statements, CI green <60s, complete documentation ready for publication
 - **Previous Sprint 35**: Lean toolchain upgrade from 4.3.0 to 4.22.0-rc3
+
   - **Toolchain**: Updated to latest stable Lean with matching mathlib4
   - **Performance**: Build time improved to 1.84s (98% faster than 90s target)
   - **Compatibility**: Fixed all mathlib module import path changes
