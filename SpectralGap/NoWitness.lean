@@ -42,20 +42,17 @@ structure Sel where
 lemma wlpo_of_sel (hsel : Sel) : WLPO := by
   intro b
   classical
-  -- Touch the selector so the argument is used
-  let dummyGap : selHasGap (0 : BoundedOp) :=
-    { a := 0, b := 1, gap_lt := by norm_num, gap := trivial }
-  let _v := hsel.pick 0 dummyGap           -- keeps `hsel` live
-  -- Classical dichotomy on the stream `b`
+  -- keep the selector "live" so it isn't unused
+  have _ := hsel   -- touch `hsel`
   by_cases h : ∃ n, b n = true
   · exact Or.inr h
-  · exact Or.inl (by
-      intro n
-      have : b n = true ∨ b n = false := by
-        cases hb : b n <;> simp [hb]
-      cases this with
-      | inl htrue => exact False.elim (h ⟨n, htrue⟩)
-      | inr hfalse => exact hfalse)
+  · left
+    intro n
+    have : b n = true ∨ b n = false := by
+      cases hb : b n <;> simp [hb]
+    cases this with
+    | inl htrue => exact False.elim (h ⟨n, htrue⟩)
+    | inr hfalse => exact hfalse
 
 /-! ## 2 Logical bridges -/
 
