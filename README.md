@@ -5,8 +5,8 @@
 [![Lean 4.3.0](https://img.shields.io/badge/Lean-4.3.0-blue)](https://github.com/leanprover/lean4)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-> **Sprint S6 Active**: SpectralGap pathology - Milestone B complete ✅  
-> Core SpectralGap infrastructure ready with concrete zero operator implementation.
+> **🎉 MILESTONE C COMPLETE**: SpectralGap pathology (ρ=3) requires ACω - First formal proof ✅  
+> **Major Achievement**: Proved that SpectralGap pathology constructively requires countable choice, yet classically admits explicit witness.
 
 A Lean 4 formalization exploring how mathematical pathologies behave differently under various foundational assumptions.
 

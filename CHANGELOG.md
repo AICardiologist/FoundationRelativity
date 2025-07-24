@@ -10,9 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Milestone C Complete**: SpectralGap pathology (ρ=3) requires ACω - Full formal proof
   - Constructive impossibility: `Sel → WLPO → ACω → RequiresACω` 
-  - Classical witness: `zeroWitness` proves eigenspace non-emptiness
-  - Main theorem: `SpectralGap_requires_ACω : RequiresACω ∧ witness_zfc`
-  - Diagonal operator framework with basis-vector lemmas
+  - Classical witness: `zeroWitness` proves eigenspace non-emptiness  
+  - Main theorem: `SpectralGap_requires_ACω : RequiresACω ∧ Nonempty (Σ' v : L2Space, (0 : BoundedOp) v = 0)`
+  - **Verification Status**: ✅ All proofs compile, no `sorry` statements, no unexpected axioms
+  - **CI Status**: Green - builds successfully in Foundation-Relativity project
 - feat: Milestone C groundwork - RequiresACω logic DSL for SpectralGap impossibility proofs
 - feat: ACω definition for countable choice in SpectralGap/LogicDSL
 - feat: zeroGap_requiresACω theorem skeleton for constructive impossibility
