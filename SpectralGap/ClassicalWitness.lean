@@ -16,7 +16,7 @@ noncomputable def zeroWitness : L2Space := e 0
   simp [zeroWitness]
 
 /-- **witness_zfc** – the eigenspace at 0 for the zero operator is non‑empty. -/
-def witness_zfc : Nonempty (Σ v : L2Space, (0 : BoundedOp) v = 0) :=
+def witness_zfc : Nonempty (Σ' v : L2Space, (0 : BoundedOp) v = 0) :=
   ⟨⟨zeroWitness, zeroWitness_eigen⟩⟩
 
 end SpectralGap
