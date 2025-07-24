@@ -1,6 +1,6 @@
-/-! # Classical witness for the zero operator (Milestone C) -/
-
 import SpectralGap.HilbertSetup
+
+/-! # Classical witness for the zero operator (Milestone C) -/
 
 open SpectralGap
 
