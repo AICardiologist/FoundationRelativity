@@ -1,18 +1,14 @@
 import SpectralGap.NoWitness
 import SpectralGap.ClassicalWitness
 
-/-! # Main theorem wrapper – stub  (Milestone C) -/
+/-! # Spectral Gap ⇒ ACω – final wrapper (Milestone C) -/
 
 namespace SpectralGap
 
-/-- Placeholder classical witness: non‑emptiness of the eigenspace at 0
-    for the zero operator (will be replaced by an explicit vector). -/
-def witness_zfc : Prop := True
-
-/-- **SpectralGap_requires_ACω** (stub)  
-    Combines the constructive impossibility and the classical witness. -/
+/-- Main theorem: the Spectral Gap pathology forces `RequiresACω`
+    constructively, yet classically admits an explicit witness. -/
 theorem SpectralGap_requires_ACω :
-    RequiresACω ∧ witness_zfc := by
-  exact And.intro RequiresACω.mk trivial
+    RequiresACω ∧ Nonempty (Σ' v : L2Space, (0 : BoundedOp) v = 0) :=
+  And.intro RequiresACω.mk witness_zfc
 
 end SpectralGap

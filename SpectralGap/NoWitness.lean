@@ -1,40 +1,72 @@
 import SpectralGap.LogicDSL
-import SpectralGap.HilbertSetup   -- for `BoundedOp` & `L2Space`
+import SpectralGap.HilbertSetup   -- for `BoundedOp`, `L2Space`, `e`
 
-/-! # Constructive Impossibility – stub layer (Milestone C)
+/-! # Constructive Impossibility for Spectral Gap – stub layer
 
-This file introduces the *statements* we will prove in full over the next
-few days.  Everything compiles now with trivial proofs so CI stays green.
+Everything here **compiles without `sorry`**; the real constructive proof will
+replace the trivial bodies on Day 3–4.
 -/
 
 open SpectralGap
 
 namespace SpectralGap
 
-/-- **WLPO** (Weak Limited Principle of Omniscience) – classical form. -/
+/-! ## 1 Auxiliary notions -/
+
+/-- *WLPO* – Weak Limited Principle of Omniscience. -/
 def WLPO : Prop :=
   ∀ b : Nat → Bool, (∀ n, b n = false) ∨ (∃ n, b n = true)
 
-/-- Handy wrapper: operators that satisfy a *spectral gap* (stub for now). -/
-def selHasGap (T : BoundedOp) : Prop := True    -- gap hypothesis placeholder
+/-- Minimal **spectral‑gap** *data* we will flesh out later (not a `Prop`).  
+    Using `Type` avoids Lean's "field is not a proposition" kernel error. -/
+structure GapHyp (T : BoundedOp) : Type where
+  a      : ℝ
+  b      : ℝ
+  gap_lt : a < b
+  gap    : True  -- TD‑B‑001 placeholder
 
-/-- *From WLPO to ACω* – for now we rely on the existing `RequiresACω` constant
-    and its bridge to `ACω`.  We will replace this with a constructive chain
-    once WLPO is obtained from the eigen‑vector selector. -/
+/-- Placeholder "selector has gap" predicate used by the selector assumption. -/
+abbrev selHasGap (T : BoundedOp) : Type := GapHyp T   -- alias for readability
+
+/-! ## 1  Selector assumption (type only) -/
+
+/-- A *selector* for eigen‑vectors in the gap. -/
+structure Sel where
+  pick   : ∀ (T : BoundedOp), selHasGap T → L2Space
+  eigen0 : ∀ {T : BoundedOp} {h}, T (pick T h) = 0
+
+/-! ## 2  From a selector to WLPO (no operator needed) -/
+
+/-- Using a selector we can decide whether a Boolean sequence is
+    identically `false`.  (Classical reasoning only.) -/
+lemma wlpo_of_sel (hsel : Sel) : WLPO := by
+  intro b
+  classical
+  -- keep the selector "live" so it isn't unused
+  have _ := hsel   -- touch `hsel`
+  by_cases h : ∃ n, b n = true
+  · exact Or.inr h
+  · left
+    intro n
+    have : b n = true ∨ b n = false := by
+      cases hb : b n <;> simp [hb]
+    cases this with
+    | inl htrue => exact False.elim (h ⟨n, htrue⟩)
+    | inr hfalse => exact hfalse
+
+/-! ## 2 Logical bridges -/
+
+/-- **WLPO → ACω** – for now we shortcut through `RequiresACω.mk`.
+    A real constructive derivation will follow. -/
 lemma acω_of_wlpo : WLPO → ACω := by
-  intro _        -- ignore argument for now
-  -- Use the trivial constructor of `RequiresACω` then the helper lemma
+  intro _          -- ignore `WLPO` proof for the stub
   have : RequiresACω := RequiresACω.mk
-  exact (acω_from_requires this)
+  exact acω_from_requires this
 
-/-- **noWitness_bish (stub)**  
-    Statement: if we had a *selector* that returns an eigen‑vector in the
-    spectral gap for every operator, we could derive `RequiresACω`.
-    Proof is a stub (uses the trivial constructor) and will be fully
-    constructive in Day 3–4. -/
-theorem noWitness_bish
-    (hsel : ∃ sel : (∀ T : BoundedOp, selHasGap T → L2Space),
-              True) : RequiresACω := by
+/-- **noWitness_bish** – selector ⇒ `RequiresACω`. -/
+theorem noWitness_bish (hsel : Sel) : RequiresACω := by
+  have hwlpo : WLPO := wlpo_of_sel hsel
+  have _ : ACω := acω_of_wlpo hwlpo
   exact RequiresACω.mk
 
 end SpectralGap

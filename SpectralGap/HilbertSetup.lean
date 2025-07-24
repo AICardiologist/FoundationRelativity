@@ -59,8 +59,8 @@ structure SpectralGapOperator where
 
 open Complex
 
-/-- The unit vector at index `n`. -/
-noncomputable def e (n : Nat) : L2Space := lp.single 2 n (1 : ℂ)
+/-- The unit vector `e n` (Kronecker δ) in `ℓ²`. -/
+noncomputable def e (n : Nat) : L2Space := lp.single 2 n 1
 
 /-!
 NOTE: **Milestone B – partial implementation (Technical Debt)**
