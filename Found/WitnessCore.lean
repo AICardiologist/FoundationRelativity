@@ -1,5 +1,5 @@
 import Found.InterpCore
-import Mathlib.CategoryTheory.DiscreteCategory
+import Mathlib.CategoryTheory.Discrete.Basic
 import Mathlib.CategoryTheory.Category.Cat
 
 /-!

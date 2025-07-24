@@ -11,9 +11,9 @@
 import Mathlib.Data.Complex.Basic
 import Mathlib.Algebra.Module.Basic
 import Mathlib.Analysis.InnerProductSpace.l2Space
-import Mathlib.Analysis.NormedSpace.OperatorNorm
+import Mathlib.Analysis.NormedSpace.OperatorNorm.Basic
 import Mathlib.Analysis.InnerProductSpace.Adjoint
-import Mathlib.Analysis.NormedSpace.CompactOperator
+import Mathlib.Analysis.Normed.Operator.Compact
 
 
 
