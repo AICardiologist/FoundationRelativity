@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Classical witness: `zeroWitness` proves eigenspace non-emptiness  
   - Main theorem: `SpectralGap_requires_ACω : RequiresACω ∧ Nonempty (Σ' v : L2Space, (0 : BoundedOp) v = 0)`
   - **Verification Status**: ✅ All proofs compile, no `sorry` statements, no unexpected axioms
-  - **CI Status**: Green - builds successfully with Lean 4.22.0-rc3
+- **CI Status**: Green - builds successfully with Lean 4.22.0-rc3
 - feat: Milestone C groundwork - RequiresACω logic DSL for SpectralGap impossibility proofs
 - feat: ACω definition for countable choice in SpectralGap/LogicDSL
 - feat: zeroGap_requiresACω theorem skeleton for constructive impossibility
