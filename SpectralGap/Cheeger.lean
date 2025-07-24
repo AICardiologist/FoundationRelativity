@@ -137,14 +137,19 @@ lemma wlpo_of_sel_cheeger (hsel : Sel) : WLPO := by
 -- § 4. Classical witness for zero operator
 ------------------------------------------------------------------------
 
+/-- Boolean stream constantly `true`. -/
+def bTrue : ℕ → Bool := fun _ ↦ true
+
+/-- The Kronecker delta vector at index 0. -/
 noncomputable def chiWitness : L2Space := e 0
 
-lemma chiWitness_eigen (β : ℝ) :
-    cheeger β (fun _ ↦ false) chiWitness = 0 := by
-  sorry
+@[simp] lemma chiWitness_eigen :
+    cheeger 0 bTrue chiWitness = 0 := by
+  -- diagonal entry at 0 is 0 ⇒ 0•e₀ = 0
+  simp [bTrue, chiWitness, cheeger_apply_basis]
 
 abbrev witness_cheeger : Prop :=
-  Nonempty (Σ' v : L2Space, cheeger 1 (fun _ ↦ false) v = 0)
+  Nonempty (Σ' v : L2Space, cheeger 0 bTrue v = 0)
 
 def witness_cheeger_zfc : witness_cheeger :=
   ⟨⟨chiWitness, by
