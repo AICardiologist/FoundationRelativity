@@ -60,7 +60,7 @@ structure SpectralGapOperator where
 open Complex
 
 /-- The unit vector `e n` (Kronecker δ) in `ℓ²`. -/
-def e (n : Nat) : L2Space := lp.single n 1
+def e (n : Nat) : L2Space := lp.single (↑n) (1 : ℂ)
 
 /-!
 NOTE: **Milestone B – partial implementation (Technical Debt)**
