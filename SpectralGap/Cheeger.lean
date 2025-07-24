@@ -166,9 +166,12 @@ def witness_cheeger_zfc : witness_cheeger :=
     and classical witness combination. -/
 theorem Cheeger_requires_ACω (hsel : Sel) :
     RequiresACω ∧ witness_cheeger := by
-  have : RequiresACω := by
-    sorry
-  exact And.intro this witness_cheeger_zfc
+  -- Selector ⇒ WLPO (proved Day 3) …
+  have hwlpo : WLPO := wlpo_of_sel_cheeger hsel
+  -- … WLPO ⇒ ACω (existing helper) …
+  have _ : ACω := acω_of_wlpo hwlpo
+  -- package the result
+  exact And.intro RequiresACω.mk witness_cheeger_zfc
 
 
 end SpectralGap
