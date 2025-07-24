@@ -33,7 +33,7 @@ abbrev selHasGap (T : BoundedOp) : Type := GapHyp T   -- alias for readability
 /-- A *selector* for eigen‑vectors in the gap. -/
 structure Sel where
   pick   : ∀ T, selHasGap T → L2Space
-  eigen0 : ∀ {T h}, T (pick T h) = 0
+  eigen0 : ∀ {T} {h}, T (pick T h) = 0
 
 /-! ## 2  From a selector to WLPO (no operator needed) -/
 
