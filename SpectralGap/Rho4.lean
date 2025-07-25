@@ -1,34 +1,91 @@
 /-
-  Rho4.lean
-  ----------
+  Rho4.lean  (Sprint 36 – ρ = 4 pathology)
 
-  Sprint 36 – ρ = 4 pathology ("Borel‑Selector / Double‑Gap" operator).
-
-  Day 1 stub: introduces namespace, imports and a placeholder definition.
-  All proofs are `by` `sorry` and will be completed Day 2‑5.
+  Day 2  — analytic scaffolding:
+  • full operator definition  (diagonal + rank‑one bump)
+  • lemmas: self‑adjoint, bounded, double gap, basis action
+  Each proof is `sorry` for now; we will discharge them Day 3‑5.
 -/
 import SpectralGap.HilbertSetup
 import Mathlib.Analysis.NormedSpace.LpSpace
+import Mathlib.Analysis.OperatorNorm
 import Mathlib.Topology.Algebra.Module.Basic
+import Mathlib.Analysis.NormedSpace.InnerProduct
+import Mathlib.Analysis.NormedSpace.Adjoint
 
-open scoped ComplexReal
-open Complex
+open scoped ComplexReal BigOperators
+open Complex Finset
 
 namespace SpectralGap
 
---  Auxiliary Boolean indicator (ℝ‑valued) reused from Cheeger file
-noncomputable def χ (b : ℕ → Bool) (n : ℕ) : ℝ :=
-  if b n then (0 : ℝ) else (1 : ℝ)
+/-! ### 0 Parameters fixed for the whole file -/
+-- Low / middle / high eigenvalues (β₀ < β₁ < β₂)
+def β₀ : ℝ := 0
+def β₁ : ℝ := (1 : ℝ) / 2
+def β₂ : ℝ := 1
 
-/-- **ρ4** – diagonal + compact rank‑one "shaft" operator.
-    Parameters β₀ β₁ β₂ fixed in later sections;
-    here we keep them explicit for flexibility. -/
+lemma β₀_lt_β₁ : β₀ < β₁ := by norm_num
+lemma β₁_lt_β₂ : β₁ < β₂ := by norm_num
+
+/-! ### 1 Helper functions -/
+
+/-- Boolean‐controlled real weights (low vs high). -/
+noncomputable def ρ4Weight (b : ℕ → Bool) (n : ℕ) : ℝ :=
+  if b n then β₀ else β₂
+
+/-- Rank‑one bump vector `u` with square‑summable coefficients `2^{-(n+1)}`. -/
 noncomputable
-def rho4 (β₀ β₁ β₂ : ℝ) (b : ℕ → Bool) : BoundedOp := by
-  -- Day 1 stub: zero operator placeholder to keep file compiling
-  exact 0
+def u : L2Space :=
+by
+  -- quick construction with `lp.single` + `summable_pow_2`
+  refine
+    ⟨fun n ↦ (2 : ℂ) ^ (-(n : ℤ)-1), ?_⟩
+  -- summability proof left `sorry` for Day 4 clean‑up
+  sorry
 
-/-- Placeholder lemma to assert file compiles. -/
-lemma rho4_placeholder : (rho4 0 0 1 (fun _ ↦ true)) = 0 := rfl
+/-- Rank‑one compact "shaft" sending `v ↦ ⟪v,u⟫ • u` and then rescaling to β₁. -/
+noncomputable
+def shaft : BoundedOp :=
+  (ContinuousLinearMap.smulRight
+      (ContinuousLinearMap.innerSL ℂ).toContinuousLinearMap
+      (β₁ : ℂ)).comp
+    (ContinuousLinearMap.const _ _)
+
+/-! ### 2 Main operator -/
+
+/-- **ρ4** : diagonal (controlled by `b`) + rank‑one bump. -/
+noncomputable
+def rho4 (b : ℕ → Bool) : BoundedOp :=
+  ContinuousLinearMap.diagonal ℂ (ρ4Weight b) +
+  shaft
+
+/-! ### 3 Analytic lemmas (proofs `sorry` for now) -/
+
+lemma rho4_selfAdjoint (b : ℕ → Bool) :
+    IsSelfAdjoint (rho4 b) := by
+  sorry
+
+lemma rho4_bounded (b : ℕ → Bool) :
+    ‖rho4 b‖ ≤ max ‖β₂‖ ‖β₁‖ := by
+  sorry
+
+/-- Action on basis vectors `e n` (ignoring bump, which is rank‑one). -/
+lemma rho4_apply_basis (b : ℕ → Bool) (n : ℕ) :
+    rho4 b (e n) = (if b n then (β₀ : ℂ) else β₂) • e n + (β₁ : ℂ) •
+      ((e n).inner u) • u := by
+  sorry
+
+/-- Double spectral gap: low versus bump, bump versus high. -/
+lemma rho4_has_two_gaps (b : ℕ → Bool) :
+    selHasGap (rho4 b) := by
+  /- Provide the structure `GapHyp` with
+       a := β₀ + 1/4,  b := β₁ - 1/4,
+       a₂ := β₁ + 1/4, b₂ := β₂ - 1/4
+     and verify inequalities + gap conditions. -/
+  sorry
+
+/-! ### 4 Place‑holder lemma kept for CI sanity -/
+lemma rho4_compiles : (rho4 (fun _ ↦ true)) 0 = 0 := by
+  simp [rho4]
 
 end SpectralGap
