@@ -49,7 +49,7 @@ lemma wlpo_of_sel (hsel : Sel) : WLPO := by
   · left
     intro n
     have : b n = true ∨ b n = false := by
-      cases hb : b n <;> simp [hb]
+      cases hb : b n <;> simp
     cases this with
     | inl htrue => exact False.elim (h ⟨n, htrue⟩)
     | inr hfalse => exact hfalse

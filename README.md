@@ -5,13 +5,6 @@
 [![Lean 4.22.0-rc3](https://img.shields.io/badge/Lean-4.22.0--rc3-blue)](https://github.com/leanprover/lean4)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-# Foundation-Relativity
-
-[![CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml)
-[![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
-[![Lean 4.22.0-rc3](https://img.shields.io/badge/Lean-4.22.0--rc3-blue)](https://github.com/leanprover/lean4)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-
 > **🎉 SPRINT 35 COMPLETE**: Cheeger-Bottleneck pathology (ρ ≈ 3½) established ✅  
 > **Latest Achievement**: Extended Foundation-Relativity hierarchy with intermediate pathology requiring ACω constructively while admitting explicit classical witnesses.  
 > **🎯 MILESTONE C**: SpectralGap pathology (ρ=3) - First formal proof of constructive impossibility ✅

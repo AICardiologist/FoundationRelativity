@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-<
+
 - **Sprint 35 Complete**: Cheeger-Bottleneck pathology (ρ ≈ 3½) - New intermediate hierarchy level
   - **Mathematical Achievement**: Extended Foundation-Relativity hierarchy with spectral gap pathology requiring ACω constructively while admitting explicit classical witnesses
   - **Operator Implementation**: `cheeger (β : ℝ) (b : ℕ → Bool) : BoundedOp` using diagonal construction with boolean parameterization
@@ -16,19 +16,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Classical Witness**: Explicit eigenvector `chiWitness := e 0` demonstrating ZFC constructibility
   - **Bridge Theorem**: `Cheeger_requires_ACω` connecting pathology to Foundation-Relativity hierarchy
   - **Quality Verification**: 0 sorry statements, CI green <60s, complete documentation ready for publication
-- **Previous Sprint 35**: Lean toolchain upgrade from 4.3.0 to 4.22.0-rc3
-
-  - **Toolchain**: Updated to latest stable Lean with matching mathlib4
-  - **Performance**: Build time improved to 1.84s (98% faster than 90s target)
-  - **Compatibility**: Fixed all mathlib module import path changes
-  - **CI/CD**: Eliminated deprecated GitHub Actions warnings
-  - **Mathematical integrity**: All ρ-degree hierarchy proofs preserved and verified
 - **Milestone C Complete**: SpectralGap pathology (ρ=3) requires ACω - Full formal proof
   - Constructive impossibility: `Sel → WLPO → ACω → RequiresACω` 
   - Classical witness: `zeroWitness` proves eigenspace non-emptiness  
   - Main theorem: `SpectralGap_requires_ACω : RequiresACω ∧ Nonempty (Σ' v : L2Space, (0 : BoundedOp) v = 0)`
   - **Verification Status**: ✅ All proofs compile, no `sorry` statements, no unexpected axioms
-- **CI Status**: Green - builds successfully with Lean 4.22.0-rc3
+  - **CI Status**: Green - builds successfully with Lean 4.22.0-rc3
+- **Previous Sprint 35**: Lean toolchain upgrade from 4.3.0 to 4.22.0-rc3
+  - **Toolchain**: Updated to latest stable Lean with matching mathlib4
+  - **Performance**: Build time improved to 1.84s (98% faster than 90s target)
+  - **Compatibility**: Fixed all mathlib module import path changes
+  - **CI/CD**: Eliminated deprecated GitHub Actions warnings
+  - **Mathematical integrity**: All ρ-degree hierarchy proofs preserved and verified
 - feat: Milestone C groundwork - RequiresACω logic DSL for SpectralGap impossibility proofs
 - feat: ACω definition for countable choice in SpectralGap/LogicDSL
 - feat: zeroGap_requiresACω theorem skeleton for constructive impossibility
