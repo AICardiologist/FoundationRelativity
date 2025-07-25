@@ -11,6 +11,11 @@ This directory contains comprehensive documentation for the Foundation-Relativit
 - **[Roadmap](../ROADMAP.md)** - Sprint history and future development plans
 - **[Contributing](../CONTRIBUTING.md)** - How to contribute to the project
 
+### Strategic Planning
+- **[Extended Roadmap](roadmap-extended.md)** - Detailed Sprints 36-45 planning (Gödel-Gap, 2-Categorical)
+- **[Papers-to-Sprints Mapping](papers-to-sprints-mapping.md)** - How "Gödel in Four Acts" research papers map to implementation timeline
+- **[Sprint 36 Preparation](sprint36-preparation.md)** - Infrastructure status and Math-Coder integration guide
+
 ### Technical References  
 - **[CITATION.cff](../CITATION.cff)** - Academic citation information
 - **[Technical Debt](../TECHNICAL_DEBT.md)** - Active debt tracking and resolution plans
