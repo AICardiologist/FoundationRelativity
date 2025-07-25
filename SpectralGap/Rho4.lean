@@ -84,6 +84,36 @@ lemma rho4_has_two_gaps (b : ℕ → Bool) :
      and verify inequalities + gap conditions. -/
   sorry
 
+/-! -------------------------------------------------------------
+     ## Day 3 – Constructive impossibility infrastructure
+     ------------------------------------------------------------- -/
+
+/-- `Sel₂` selects an eigenvector *from each* of the two gaps produced by `rho4`. -/
+structure Sel₂ : Type where
+  /-- Boolean control sequence ‑/          b      : ℕ → Bool
+  /-- vector in low gap  (β₀‑area) -/     vLow   : L2Space
+  /-- vector in bump gap (β₁)     -/      vBump  : L2Space
+  /-- spectral conditions -/
+  low_eig  : rho4 b vLow  = (β₀ : ℂ) • vLow
+  bump_eig : rho4 b vBump = (β₁ : ℂ) • vBump
+  /-- non‑triviality ensures selector picks real vectors -/
+  vLow_ne  : vLow ≠ 0
+  vBump_ne : vBump ≠ 0
+
+/-- **Constructive impossibility.**  
+    A selector for *both* gaps is strong enough to decide WLPO⁺, hence DC_{ω·2}. -/
+theorem wlpoPlus_of_sel₂ (hSel : Sel₂) : WLPOPlus := by
+  /- **Idea (outline, proof tomorrow):**
+     • Read `hSel.b` boolean stream.
+     • If `∃ n, hSel.b n = true` we show ... else ...
+     This reproduces Cheeger logic twice and upgrades to WLPO⁺. -/
+  sorry
+
+/-- Bridge to DC_{ω·2}.  Provided for Day 5 proof chain. -/
+theorem dcω2_of_wlpoPlus (h : WLPOPlus) : DCω2 := by
+  -- Already available in `SpectralGap.LogicDSL`, but repeat signature here.
+  exact LogicDSL.dcω2_of_wlpoPlus h
+
 /-! ### 4 Place‑holder lemma kept for CI sanity -/
 lemma rho4_compiles : (rho4 (fun _ ↦ true)) 0 = 0 := by
   simp [rho4]
