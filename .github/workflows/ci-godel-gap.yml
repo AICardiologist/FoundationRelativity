@@ -11,6 +11,7 @@ on:
       - 'docs/*godel*'
 
 env:
+  LEAN_ABORT_ON_SORRY: 1
   BUILD_TIMEOUT_SECONDS: 60
 
 jobs:
@@ -40,14 +41,13 @@ jobs:
           time lake build SpectralGap.GodelGap
           echo "✅ Gödel-Gap module built successfully"
 
-      - name: Verify no 'sorry' in Gödel-Gap (except simplified)
+      - name: Verify no 'sorry' in Gödel-Gap
         run: |
-          # Check for sorries that are NOT marked as "Simplified:"
-          if grep "sorry" SpectralGap/GodelGap.lean | grep -v "Simplified:"; then
-            echo "❌ Found non-simplified 'sorry' in GodelGap.lean!"
+          if grep -r "sorry" SpectralGap/GodelGap.lean; then
+            echo "❌ Found 'sorry' in GodelGap.lean!"
             exit 1
           fi
-          echo "✅ Only simplified infrastructure sorries found"
+          echo "✅ No sorry statements found"
 
       - name: Check operator properties
         run: |
