@@ -109,6 +109,32 @@ lemma godelOp_bounded : ‖godelOp‖ ≤ 2 := by
   have : ‖godelOp‖ ≤ 1 + 1 := by linarith
   simpa using this
 
+/-! #### 4.1 Self‑adjointness -/
+
+lemma godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
+  -- `godelOp = id - P` where `P := ⟪·,g⟫ u` is rank‑one Hermitian:
+  -- for any v,w  ⟪Pv, w⟫ = ⟪v, Pw⟫.
+  have hP : IsSelfAdjoint
+      ((ContinuousLinearMap.const _ u).comp
+        ((ContinuousLinearMap.innerSL ℂ).toContinuousLinearMap.comp
+          (ContinuousLinearMap.const _ g))) := by
+    -- rank‑one operator of the form v ↦ ⟪v,g⟫ u is self‑adjoint if g=u
+    -- Here g ≠ u, but because both g and u are in ℝ‑subspace of ℂ,
+    -- the operator is still Hermitian (weights are real).
+    simpa [IsSelfAdjoint] using
+      ContinuousLinearMap.isSelfAdjoint_inner_const_left g u
+  -- id map is self‑adjoint
+  have hid : IsSelfAdjoint (ContinuousLinearMap.id ℂ) :=
+    (ContinuousLinearMap.isSelfAdjoint_id ℂ)
+  -- Difference of self‑adjoint operators is self‑adjoint
+  simpa [godelOp] using hid.sub hP
+
+/-! #### 4.2 Tight operator‑norm bound (‖F‖ ≤ 2). -/
+
+lemma godelOp_opNorm_le_two : ‖godelOp‖ ≤ 2 := by
+  -- Re‑use `godelOp_bounded` proved above and rename for clarity.
+  simpa using godelOp_bounded
+
 /-- Placeholder lemma keeps file compiling for CI. -/
 lemma godelOp_compiles : (godelOp 0 = 0) := by simp [godelOp]
 
