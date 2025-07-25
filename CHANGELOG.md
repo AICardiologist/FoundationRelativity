@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Sprint 36 Complete**: Borel-Selector pathology (ρ=4) - Foundation-Relativity hierarchy extended to DC_{ω·2}
+  - **Mathematical Achievement**: ρ=4 double-gap spectral operator requiring full classical dependent choice
+  - **Operator Implementation**: `rho4 : (ℕ → Bool) → BoundedOp` with boolean-controlled diagonal + rank-one bump
+  - **Double-Gap Structure**: Creates spectral separations at [β₀, β₀+¼] and [β₁+¼, β₂] with β₀=0, β₁=1/2, β₂=1  
+  - **Constructive Impossibility**: Diagonal argument proving `Sel₂ → WLPO⁺ → DC_{ω·2}` logical bridge
+  - **Classical Witness**: Sophisticated choice pattern handling ∃ true bits vs all-false stream cases
+  - **Bridge Theorem**: `Rho4_requires_DCω2` establishing ρ=4 logical strength in Foundation-Relativity hierarchy
+  - **Innovation**: First formal verification of DC_{ω·2} pathology with complete mathematical proofs
 - **Sprint 35 Complete**: Cheeger-Bottleneck pathology (ρ ≈ 3½) - New intermediate hierarchy level
   - **Mathematical Achievement**: Extended Foundation-Relativity hierarchy with spectral gap pathology requiring ACω constructively while admitting explicit classical witnesses
   - **Operator Implementation**: `cheeger (β : ℝ) (b : ℕ → Bool) : BoundedOp` using diagonal construction with boolean parameterization
