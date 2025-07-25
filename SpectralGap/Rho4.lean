@@ -90,15 +90,13 @@ lemma rho4_has_two_gaps (b : ℕ → Bool) :
 
 /-- `Sel₂` selects an eigenvector *from each* of the two gaps produced by `rho4`. -/
 structure Sel₂ : Type where
-  /-- Boolean control sequence ‑/          b      : ℕ → Bool
-  /-- vector in low gap  (β₀‑area) -/     vLow   : L2Space
-  /-- vector in bump gap (β₁)     -/      vBump  : L2Space
-  /-- spectral conditions -/
-  low_eig  : rho4 b vLow  = (β₀ : ℂ) • vLow
-  bump_eig : rho4 b vBump = (β₁ : ℂ) • vBump
-  /-- non‑triviality ensures selector picks real vectors -/
-  vLow_ne  : vLow ≠ 0
-  vBump_ne : vBump ≠ 0
+  /-- given any Boolean stream `b`, produce a vector in the low gap -/
+  selectLow  : (ℕ → Bool) → L2Space
+  selectBump : (ℕ → Bool) → L2Space
+  low_eig    : ∀ b, rho4 b (selectLow  b)  = (β₀ : ℂ) • selectLow  b
+  bump_eig   : ∀ b, rho4 b (selectBump b)  = (β₁ : ℂ) • selectBump b
+  low_ne     : ∀ b, selectLow  b ≠ 0
+  bump_ne    : ∀ b, selectBump b ≠ 0
 
 /-- **Constructive impossibility.**  
     A selector for *both* gaps is strong enough to decide WLPO⁺, hence DC_{ω·2}. -/
