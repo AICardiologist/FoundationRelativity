@@ -42,14 +42,19 @@ noncomputable def godelOp : BoundedOp :=
 
 /-- `godelOp` is bounded with norm ≤ 2. -/
 lemma godelOp_bounded : ‖godelOp‖ ≤ 2 := by
-  -- `norm_op_id` is in `Mathlib/Analysis/NormedSpace/OperatorNorm.lean`
-  have : ‖(1 : BoundedOp)‖ = (1 : ℝ) := by
-    simpa using norm_op_id
-  simpa [godelOp, this] using (show (1 : ℝ) ≤ 2 by norm_num)
+  -- godelOp = 1, so we need to show ‖1‖ ≤ 2
+  rw [godelOp]
+  -- The norm of identity is 1
+  have h : ‖(1 : BoundedOp)‖ = 1 := by norm_num
+  rw [h]
+  norm_num
 
 /-- `godelOp` is self‑adjoint. -/
 theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
-  simpa [godelOp] using isSelfAdjoint_id
+  -- godelOp = 1 and identity is self-adjoint
+  rw [godelOp, IsSelfAdjoint]
+  -- adjoint 1 = 1
+  rfl
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
