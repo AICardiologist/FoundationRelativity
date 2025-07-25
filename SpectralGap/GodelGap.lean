@@ -7,6 +7,8 @@
 -/
 import SpectralGap.HilbertSetup
 import LogicDSL
+import Mathlib.Analysis.NormedSpace.OperatorNorm.Basic
+import Mathlib.Analysis.InnerProductSpace.Adjoint
 
 open Complex Real BigOperators
 
@@ -41,20 +43,14 @@ noncomputable def godelOp : BoundedOp :=
 /-! ### 4 Elementary lemmas -/
 
 /-- `godelOp` is bounded with norm ≤ 2. -/
-lemma godelOp_bounded : ‖godelOp‖ ≤ 2 := by
-  -- godelOp = 1, so we need to show ‖1‖ ≤ 2
-  rw [godelOp]
-  -- The norm of identity is 1
-  have h : ‖(1 : BoundedOp)‖ = 1 := by norm_num
-  rw [h]
-  norm_num
+lemma godelOp_bounded : ‖godelOp‖ ≤ (2 : ℝ) := by
+  -- godelOp is the identity operator
+  simp [godelOp, opNorm_id]  -- opNorm_id : ‖(1 : BoundedOp)‖ = 1
 
 /-- `godelOp` is self‑adjoint. -/
 theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
-  -- godelOp = 1 and identity is self-adjoint
-  rw [godelOp, IsSelfAdjoint]
-  -- adjoint 1 = 1
-  rfl
+  -- identity operator is self-adjoint
+  simpa [godelOp] using isSelfAdjoint_id
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
