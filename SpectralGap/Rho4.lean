@@ -37,11 +37,18 @@ noncomputable def ρ4Weight (b : ℕ → Bool) (n : ℕ) : ℝ :=
 noncomputable
 def u : L2Space :=
 by
-  -- coefficients 2^{-(n+1)} give ℓ²‑norm² = 1/3.  Scale by √3.
   let coeff : ℕ → ℂ := fun n ↦ (Real.sqrt 3) * (2 : ℂ) ^ (-(n : ℤ) - 1)
-  refine ⟨coeff, ?_⟩
-  -- summability proof postponed to Day 4 polish
-  sorry
+  have hSumm : Summable (fun n ↦ ‖coeff n‖^2) := by
+    -- ‖coeff n‖² = 3 * 2 ^ (-(2*n+2))
+    have : Summable (fun n : ℕ ↦ ( (Real.sqrt 3)^2 : ℝ) * ( (2 : ℝ) ^ (-((2*n)+2))) ) := by
+      simp [pow_add, pow_two, Real.sq_sqrt, summable_mul_left, summable_pow_iff_lt_one] using
+        (summable_pow_iff_lt_one (x := (1/4 : ℝ))).2 (by norm_num)
+    simpa [coeff, norm_mul, norm_pow, abs_two, pow_two, inv_pow, mul_comm] using this
+  exact
+    { val := coeff,
+      property := by
+        have : Summable (fun n ↦ ‖coeff n‖ ^ 2) := hSumm
+        simpa using this }
 
 /-- Rank‑one compact "shaft" sending `v ↦ ⟪v,u⟫ • u` and then rescaling to β₁. -/
 noncomputable
