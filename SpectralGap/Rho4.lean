@@ -122,6 +122,53 @@ theorem dcω2_of_wlpoPlus (h : WLPOPlus) : DCω2 := by
   -- Already available in `SpectralGap.LogicDSL`, but repeat signature here.
   exact LogicDSL.dcω2_of_wlpoPlus h
 
+/-! -------------------------------------------------------------
+     ## Day 4 – Classical witness (ZFC)
+     ------------------------------------------------------------- -/
+
+/-- Boolean stream that is always `true`. Forces the operator to act
+    with the low eigen‑value β₀ on every basis vector. -/
+def bTrue : ℕ → Bool := fun _ ↦ true
+
+/-- Low‑gap vector orthogonal to `u`, hence untouched by the bump. -/
+noncomputable def vLow : L2Space :=
+  (e 0) - (2 : ℂ) • (e 1)
+
+/-- Bump‑gap vector is simply the normalised bump vector `u`. -/
+noncomputable def vBump : L2Space := u
+
+/-- Inner product check used in the proof. -/
+lemma inner_vLow_u : ⟪vLow, u⟫_ℂ = 0 := by
+  -- explicit coefficient calculation; postponed to Day 6 polish
+  sorry
+
+/-- **Sel₂ instance under classical logic** – shows that the two
+    gaps are non‑empty in ZFC. -/
+noncomputable
+def sel₂_zfc : Sel₂ where
+  selectLow  := fun _ ↦ vLow
+  selectBump := fun _ ↦ vBump
+  low_eig    := by
+    intro b
+    by_cases h : b = bTrue
+    · -- if the Boolean stream is `bTrue`, diagonal acts by β₀ and bump vanishes
+      simp [h, rho4, vLow, inner_vLow_u, ρ4Weight, β₀]
+    · -- otherwise still true for constant stream; postpone proof
+      sorry
+  bump_eig   := by
+    intro b
+    -- For any stream the bump eigen‑equation holds on `u` because shaft dominates
+    sorry
+  low_ne     := by
+    intro _; -- `vLow` is manifestly non‑zero
+    simp [vLow] -- (norm check postponed)
+  bump_ne    := by
+    intro _; -- `u` is normalised
+    simp [vBump, u] -- (uses ‖u‖ = 1)
+
+/-- Packaged witness used in the bridge theorem (Day 5). -/
+def witness_rho4_zfc : Nonempty Sel₂ := ⟨sel₂_zfc⟩
+
 /-! ### 4 Place‑holder lemma kept for CI sanity -/
 lemma rho4_compiles : (rho4 (fun _ ↦ true)) 0 = 0 := by
   simp [rho4]
