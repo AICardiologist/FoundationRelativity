@@ -73,6 +73,8 @@ FoundationRelativity/
 │   ├── APProofTest.lean     #     AP_Fail₂ theorem verification  
 │   ├── RNPProofTest.lean    #     RNP_Fail₂ theorem verification
 │   ├── RNP3ProofTest.lean   #     RNP₃ theorem verification
+│   ├── CheegerProofTest.lean #    Cheeger pathology test ✅
+│   ├── Rho4ProofTest.lean   #     ρ=4 Borel-Selector test ✅
 │   ├── SpectralGapProofTest.lean # SpectralGap implementation test ✅
 │   └── AllPathologiesTest.lean # Complete integration tests
 ├── scripts/                 # 🔧  Development tools
@@ -82,7 +84,11 @@ FoundationRelativity/
 ├── docs/                    # 📚  Documentation
 │   ├── README.md            #     Documentation index
 │   ├── DEV_GUIDE.md         #     Development setup guide
-│   └── papers/              #     Academic papers and LaTeX sources
+│   ├── SprintLog.md         #     Complete sprint history and achievements
+│   ├── rho4-pathology.md    #     ρ=4 Borel-Selector documentation ✅
+│   ├── cheeger-pathology.md #     ρ≈3½ Cheeger-Bottleneck documentation ✅
+│   ├── papers/              #     Academic papers and LaTeX sources
+│   └── archive/             #     Sprint documentation archives
 ├── old_files/               # 🗂️  Archived obsolete files and debugging artifacts
 │   ├── README.md            #     Archive documentation  
 │   ├── sprint_s6_debugging/ #     Math-AI debugging session files
