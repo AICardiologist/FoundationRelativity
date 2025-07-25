@@ -62,9 +62,23 @@ jobs:
         run: |
           echo "📊 Build Performance Report"
           echo "Module: SpectralGap.GodelGap"
-          echo "Expected: <5s, Timeout: 60s"
+          echo "Expected: <8s (Day 2), Alert: >20s, Timeout: 60s"
+          
+          # Extract build time if available
+          BUILD_TIME=$(grep -oE 'real[[:space:]]+[0-9]+m[0-9.]+s' .lake/build/trace 2>/dev/null | tail -1 | awk '{print $2}' || echo "unknown")
+          echo "Build time: $BUILD_TIME"
+          
+          # Check if build exceeded 20s threshold
+          if [[ "$BUILD_TIME" =~ ^0m([0-9]+)\..*s$ ]]; then
+            SECONDS=${BASH_REMATCH[1]}
+            if [ "$SECONDS" -gt 20 ]; then
+              echo "⚠️ WARNING: Build time exceeded 20s threshold!"
+              echo "Consider optimizing proofs or splitting modules."
+            fi
+          fi
+          
           if [ -f .lake/build/trace ]; then
-            echo "Build trace:"
+            echo "Build trace (last 20 lines):"
             tail -20 .lake/build/trace || true
           fi
 
