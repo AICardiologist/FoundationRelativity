@@ -1,8 +1,12 @@
 # Foundation-Relativity Roadmap
 
-## 📍 Current Status: Sprint S6 Active - Milestone B Complete
+## 📍 Current Status: v1.0-rc Released - Sprint 36 Ready
 
-SpectralGap pathology infrastructure is complete with concrete zero operator implementation. All ρ=1 and ρ=2 level pathologies proven. Ready for Milestone C (non-trivial operators).
+✅ **Foundation-Relativity Complete**: All ρ-hierarchy levels (ρ=1 through ρ≈3½) formally verified  
+✅ **v1.0-rc Released**: Production-ready with zero sorry statements  
+🚀 **Sprint 36 Prepared**: Infrastructure ready for ρ=4 pathology development
+
+**Extended Planning**: See [Extended Roadmap](docs/roadmap-extended.md) for Sprints 36-45 covering Gödel-Gap pathologies and 2-categorical framework.
 
 ---
 
