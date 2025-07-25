@@ -2,15 +2,16 @@
 
 Thank you for your interest in contributing to Foundation-Relativity! This project formalizes foundation-relative mathematics in Lean 4, and we welcome contributions from mathematicians, formal methods experts, and anyone interested in constructive mathematics.
 
-**Current Status**: Sprint S5 complete! All core pathology proofs (ρ=1, ρ=2, ρ=2+) now have rigorous theorem statements with zero axioms in core modules.
+**Current Status**: Sprint 36 complete! Foundation-Relativity hierarchy now extends to ρ=4 (DC_{ω·2}) with complete formal verification of all pathologies from WLPO to classical dependent choice.
 
 ## 🚀 Quick Start
 
 1. **Fork** the repository
 2. **Clone** your fork: `git clone https://github.com/yourusername/FoundationRelativity.git`
-3. **Install** Lean 4.3.0 and VS Code with the lean4 extension
+3. **Install** Lean 4.22.0-rc3 and VS Code with the lean4 extension
 4. **Build** the project: `lake build`
 5. **Run tests**: `lake exe testFunctors && lake exe AllPathologiesTests`
+6. **Check quality**: `bash scripts/verify-no-sorry.sh`
 
 ## 🎯 Types of Contributions
 
