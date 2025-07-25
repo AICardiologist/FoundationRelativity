@@ -138,4 +138,24 @@ lemma godelOp_opNorm_le_two : ‖godelOp‖ ≤ 2 := by
 /-- Placeholder lemma keeps file compiling for CI. -/
 lemma godelOp_compiles : (godelOp 0 = 0) := by simp [godelOp]
 
+/-! -------------------------------------------------------------
+     ## 5 Selector `Sel₃`  and constructive impossibility
+     ------------------------------------------------------------- -/
+
+/-- `Sel₃` packages evidence that `godelOp` fails to be onto:
+    we store a non‑zero vector in the cokernel (orthogonal complement of Range). -/
+structure Sel₃ : Type where
+  witness   : (∀ v : L2Space, ∃ w, godelOp w = v) → False   -- ¬ surjective
+  vCoker    : L2Space
+  coker_eq  : godelOp vCoker = 0
+  nonzero   : vCoker ≠ 0
+
+/-- **Constructive impossibility.**  
+    A `Sel₃` implies the strengthened WLPO (Π⁰₂ form).  
+    (*For now `LogicDSL.WLPOPlusPlus` is `True`, so the proof is trivial;
+     the real diagonal argument will replace this `by trivial` tomorrow.*) -/
+theorem wlpoPlusPlus_of_sel₃ (S : Sel₃) :
+    WLPOPlusPlus := by
+  trivial
+
 end SpectralGap
