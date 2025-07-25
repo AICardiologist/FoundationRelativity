@@ -9,6 +9,9 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lean-version: ['4.22.0-rc3']
     steps:
       - uses: actions/checkout@v4
 
@@ -82,3 +85,41 @@ jobs:
               echo "⚠ $test failed or timed out (non-critical)"
             fi
           done
+
+  mathlib45-rehearsal:
+    runs-on: ubuntu-latest
+    continue-on-error: true  # Allow failures initially
+    if: github.ref == 'refs/heads/upgrade/mathlib4.5'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Lean 4.5-nightly
+        uses: leanprover/lean-action@v1
+        with:
+          lean-version: '4.5.0-nightly'
+          use-mathlib-cache: false  # May not have cache for nightly
+          build-args: "-K 400000"
+
+      - name: Cache .lake
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.lake
+            .lake/build
+          key: ${{ runner.os }}-lake-45-${{ hashFiles('lakefile.lean') }}
+
+      - name: Attempt mathlib 4.5 build
+        timeout-minutes: 5
+        continue-on-error: true
+        run: |
+          echo "🧪 Attempting Lean 4.5-nightly build..."
+          echo "This is expected to fail initially - measuring compatibility"
+          time lake build || echo "Build failed as expected"
+
+      - name: Collect compatibility report
+        run: |
+          echo "📊 mathlib 4.5 Compatibility Report"
+          echo "Branch: upgrade/mathlib4.5"
+          echo "Lean Version: $(lean --version || echo 'version check failed')"
+          echo "Lake Version: $(lake --version || echo 'version check failed')"
+          echo "Build status: See logs above"
