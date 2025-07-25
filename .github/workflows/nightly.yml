@@ -5,6 +5,8 @@ on:
     # Run at 2 AM UTC every day
     - cron: '0 2 * * *'
   workflow_dispatch:  # Allow manual trigger
+  push:
+    branches: [feat/godel-gap]  # Also run on Gödel-Gap development
 
 env:
   LEAN_ABORT_ON_SORRY: 1
@@ -44,7 +46,7 @@ jobs:
       - name: Run all tests
         run: |
           # Run all test executables if they exist
-          for test in testFunctors testNonIdMorphisms WitnessTests AllPathologiesTests Gap2ProofTests APProofTests RNPProofTests RNP3ProofTests SpectralGapProofTests; do
+          for test in testFunctors testNonIdMorphisms WitnessTests AllPathologiesTests Gap2ProofTests APProofTests RNPProofTests RNP3ProofTests SpectralGapProofTests GodelGapProofTests; do
             if lake exe $test 2>/dev/null; then
               echo "✓ $test passed"
             else
