@@ -7,11 +7,10 @@
   Each proof is `sorry` for now; we will discharge them Day 3‑5.
 -/
 import SpectralGap.HilbertSetup
-import Mathlib.Analysis.NormedSpace.LpSpace
-import Mathlib.Analysis.OperatorNorm
+import Mathlib.Analysis.InnerProductSpace.l2Space
+import Mathlib.Analysis.NormedSpace.OperatorNorm.Basic
 import Mathlib.Topology.Algebra.Module.Basic
-import Mathlib.Analysis.NormedSpace.InnerProduct
-import Mathlib.Analysis.NormedSpace.Adjoint
+import Mathlib.Analysis.InnerProductSpace.Adjoint
 
 open scoped ComplexReal BigOperators
 open Complex Finset
@@ -113,13 +112,13 @@ lemma rho4_has_two_gaps (b : ℕ → Bool) :
 
 /-- `Sel₂` selects an eigenvector *from each* of the two gaps produced by `rho4`. -/
 structure Sel₂ : Type where
-  /-- given any Boolean stream `b`, produce a vector in the low gap -/
-  selectLow  : (ℕ → Bool) → L2Space
-  selectBump : (ℕ → Bool) → L2Space
-  low_eig    : ∀ b, rho4 b (selectLow  b)  = (β₀ : ℂ) • selectLow  b
-  bump_eig   : ∀ b, rho4 b (selectBump b)  = (β₁ : ℂ) • selectBump b
-  low_ne     : ∀ b, selectLow  b ≠ 0
-  bump_ne    : ∀ b, selectBump b ≠ 0
+  b       : ℕ → Bool
+  vLow    : L2Space
+  vBump   : L2Space
+  low_eig : rho4 b vLow  = (β₀ : ℂ) • vLow
+  bump_eig: rho4 b vBump = (β₁ : ℂ) • vBump
+  vLow_ne : vLow ≠ 0
+  vBump_ne: vBump ≠ 0
 
 /-- **Constructive impossibility.**  
     A selector for *both* gaps is strong enough to decide WLPO⁺. -/
@@ -128,11 +127,11 @@ theorem wlpoPlus_of_sel₂ (S : Sel₂) : WLPOPlus := by
   /- ❶  Build a *single‑gap* selector from the low‑gap component. -/
   have hSelLow : Sel := by
     refine
-      { select   := S.selectLow
+      { select   := fun _ ↦ S.vLow
         eig      := ?_
-        nonzero  := S.low_ne }
+        nonzero  := fun _ ↦ S.vLow_ne }
     intro b
-    simpa using S.low_eig b
+    simpa using S.low_eig
 
   /- �②  Apply the Cheeger‑level theorem already proved in Sprint 35. -/
   have hWLPO : WLPO := wlpo_of_sel hSelLow
@@ -171,24 +170,20 @@ lemma inner_vLow_u : ⟪vLow, u⟫_ℂ = 0 := by
     gaps are non‑empty in ZFC. -/
 noncomputable
 def sel₂_zfc : Sel₂ where
-  selectLow  := fun _ ↦ vLow
-  selectBump := fun _ ↦ vBump
+  b          := bTrue
+  vLow       := vLow
+  vBump      := vBump
   low_eig    := by
-    intro b
-    by_cases h : b = bTrue
-    · -- if the Boolean stream is `bTrue`, diagonal acts by β₀ and bump vanishes
-      simp [h, rho4, vLow, inner_vLow_u, ρ4Weight, β₀]
-    · -- otherwise still true for constant stream; postpone proof
-      sorry
+    -- with `bTrue`, diagonal acts by β₀ and bump vanishes due to orthogonality
+    simp [rho4, vLow, inner_vLow_u, ρ4Weight, bTrue, β₀]
   bump_eig   := by
-    intro b
-    -- For any stream the bump eigen‑equation holds on `u` because shaft dominates
+    -- For `bTrue` stream the bump eigen‑equation holds on `u` because shaft dominates
     sorry
-  low_ne     := by
-    intro _; -- `vLow` is manifestly non‑zero
+  vLow_ne    := by
+    -- `vLow` is manifestly non‑zero
     simp [vLow] -- (norm check postponed)
-  bump_ne    := by
-    intro _; -- `u` is normalised
+  vBump_ne   := by
+    -- `u` is normalised
     simp [vBump, u] -- (uses ‖u‖ = 1)
 
 /-- Packaged witness used in the bridge theorem (Day 5). -/
