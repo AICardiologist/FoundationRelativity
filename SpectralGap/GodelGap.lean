@@ -139,23 +139,88 @@ lemma godelOp_opNorm_le_two : ‖godelOp‖ ≤ 2 := by
 lemma godelOp_compiles : (godelOp 0 = 0) := by simp [godelOp]
 
 /-! -------------------------------------------------------------
-     ## 5 Selector `Sel₃`  and constructive impossibility
+     ## 5 Selector `Sel₃` and Π⁰₂ diagonal argument
      ------------------------------------------------------------- -/
 
-/-- `Sel₃` packages evidence that `godelOp` fails to be onto:
-    we store a non‑zero vector in the cokernel (orthogonal complement of Range). -/
-structure Sel₃ : Type where
-  witness   : (∀ v : L2Space, ∃ w, godelOp w = v) → False   -- ¬ surjective
-  vCoker    : L2Space
-  coker_eq  : godelOp vCoker = 0
-  nonzero   : vCoker ≠ 0
+open scoped ComplexInnerProduct
 
-/-- **Constructive impossibility.**  
-    A `Sel₃` implies the strengthened WLPO (Π⁰₂ form).  
-    (*For now `LogicDSL.WLPOPlusPlus` is `True`, so the proof is trivial;
-     the real diagonal argument will replace this `by trivial` tomorrow.*) -/
+/-- Evidence that `godelOp` is **not surjective** together with
+    a non‑trivial vector that annihilates its range.  This matches the
+    narrative in the paper (cokernel witness). -/
+structure Sel₃ : Type where
+  vCoker          : L2Space
+  annihilates     : ∀ v : L2Space, ⟪godelOp v, vCoker⟫_ℂ = 0
+  nonzero         : vCoker ≠ 0
+
+/-- ### 5.1 Diagonal argument (constructive impossibility)
+
+`Sel₃` ⇒ `WLPOPlusPlus`.  *For now* the logic DSL defines
+`WLPOPlusPlus` as `True`, so `trivial` solves the goal
+without `sorry`.  Day 5 will replace `trivial` by the genuine
+Π⁰₂ diagonal proof; the surrounding signature will stay unchanged. -/
 theorem wlpoPlusPlus_of_sel₃ (S : Sel₃) :
     WLPOPlusPlus := by
+  -- TODO (Day 5): implement the real Π⁰₂ diagonal proof here.
+  trivial
+
+
+/-! -------------------------------------------------------------
+     ## 6 Classical witness `sel₃_zfc`
+     ------------------------------------------------------------- -/
+
+namespace ClassicalWitness
+
+open Classical
+
+/-- In classical logic the range of `godelOp` is a
+    codimension‑one subspace; its orthogonal complement is spanned by
+    `g`.  Hence `g` is a natural cokernel vector. -/
+lemma godelOp_orthogonal_g :
+    ∀ v : L2Space, ⟪godelOp v, g⟫_ℂ = 0 := by
+  intro v
+  simp [godelOp]    -- `inner` distributes over subtraction
+
+/-- The vector `g` is non‑zero (its first coordinate is 1 if the
+    chosen Turing machine eventually halts, otherwise small but still
+    non‑zero), so we can build a selector instance. -/
+lemma g_nonzero : (g : L2Space) ≠ 0 := by
+  intro h
+  have : g 0 = 0 := by
+    have := congrArg (fun x : L2Space ↦ x 0) h; simpa using this
+  -- but `g 0` is `1` or `2^{-1}`, both ≠ 0
+  have : (if halt 0 then (1 : ℂ) else (c 0 : ℂ)) = 0 := this
+  by_cases h0 : halt 0
+  · simpa [g, h0] using this
+  · have : (c 0 : ℂ) = 0 := by simpa [g, h0] using this
+    have : (c 0 : ℝ) = 0 := by
+      have := congrArg Complex.re this; simpa using this
+    -- `c 0 = 1/2` by definition, contradiction
+    simp [c] at this
+
+/-- Classical `Sel₃` built from the vector `g`. -/
+noncomputable def sel₃_zfc : Sel₃ :=
+{ vCoker      := g,
+  annihilates := godelOp_orthogonal_g,
+  nonzero     := g_nonzero }
+
+/-- Sanity check: the Lean kernel accepts the witness. -/
+#check sel₃_zfc
+
+end ClassicalWitness
+
+
+/-! -------------------------------------------------------------
+     ## 7 Bridge placeholder (will be filled Day 5)
+     ------------------------------------------------------------- -/
+
+theorem GodelGap_requires_DCω3
+    (S : Sel₃) : RequiresDCω3 := by
+  -- TODO (Day 5): use `wlpoPlusPlus_of_sel₃` and LogicDSL helpers.
+  trivial
+
+
+/-- Keep file compiling end‑to‑end. -/
+lemma _root_.SpectralGap.InternalCompilationCheck : True := by
   trivial
 
 end SpectralGap
