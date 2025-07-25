@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 env:
   LEAN_ABORT_ON_SORRY: 1
+  BUILD_TIMEOUT_SECONDS: 90
 
 jobs:
   build:
@@ -26,7 +27,11 @@ jobs:
           key: ${{ runner.os }}-lake-${{ hashFiles('lakefile.lean') }}
 
       - name: Build
-        run: lake build
+        timeout-minutes: 2  # Fail if build takes longer than $BUILD_TIMEOUT_SECONDS
+        run: |
+          echo "Starting build with timeout of $BUILD_TIMEOUT_SECONDS seconds..."
+          time lake build
+          echo "Build completed successfully"
 
       - name: Verify no 'sorry'
         run: |
