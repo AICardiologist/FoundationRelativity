@@ -42,16 +42,17 @@ noncomputable def godelOp : BoundedOp :=
 
 /-- `godelOp` is bounded with norm ≤ 2. -/
 lemma godelOp_bounded : ‖godelOp‖ ≤ 2 := by
-  -- Since godelOp = 1 in our simplified version, norm is 1 ≤ 2
-  simp only [godelOp]
-  norm_num
+  -- In our simplified version godelOp = 1, so ‖1‖ = 1 ≤ 2
+  have h : ‖(1 : BoundedOp)‖ = 1 := by norm_num
+  calc ‖godelOp‖ = ‖(1 : BoundedOp)‖ := by rw [godelOp]
+  _ = 1 := h
+  _ ≤ 2 := by norm_num
 
 /-- `godelOp` is self‑adjoint. -/
 theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
-  -- Identity operator is self-adjoint
-  simp only [godelOp, IsSelfAdjoint]
-  -- For identity: adjoint 1 = 1
-  rfl
+  -- Identity operator is self-adjoint: adjoint(1) = 1
+  rw [godelOp]
+  exact IsSelfAdjoint.one
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
@@ -81,9 +82,12 @@ lemma godelOp_orthogonal_g : g = g := by
 lemma g_nonzero : (g : L2Space) ≠ 0 := by
   -- `g = lp.single 2 0 1` has value 1 at index 0
   intro h
-  have : (g 0 : ℂ) = 0 := by
-    simpa using congrArg (fun v : L2Space ↦ v 0) h
-  simp [g] at this   -- `g 0` is definitionally `1`
+  -- evaluate both sides at coordinate 0
+  have : (g 0 : ℂ) = 0 := congrArg (fun v : L2Space ↦ v 0) h
+  -- but `g 0 = 1` by definition
+  simp only [g, lp.single_apply, if_pos] at this
+  -- 1 ≠ 0
+  exact one_ne_zero this
 
 /-- Classical `Sel₃` built from the vector `g`. -/
 noncomputable def sel₃_zfc : Sel₃ :=

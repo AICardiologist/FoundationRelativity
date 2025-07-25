@@ -30,7 +30,9 @@ noncomputable def cheeger (β : ℝ) (b : ℕ → Bool) : BoundedOp :=
 /-- Cheeger operator is self-adjoint. -/
 theorem cheeger_selfAdjoint (β : ℝ) (b : ℕ → Bool) : 
     IsSelfAdjoint (cheeger β b) := by
-  sorry  -- Strategic simplification
+  -- cheeger = cheegerDiag = 1, which is self-adjoint
+  simp only [cheeger, cheegerDiag, IsSelfAdjoint]
+  exact IsSelfAdjoint.one
 
 /-- Cheeger has spectral gap when |β - 1| ≥ 1/2. -/
 theorem cheeger_has_gap {β : ℝ} (hβ : |β - 1| ≥ 1/2) (b : ℕ → Bool) :
@@ -42,8 +44,9 @@ theorem cheeger_has_gap {β : ℝ} (hβ : |β - 1| ≥ 1/2) (b : ℕ → Bool) :
 
 /-- Classical proof that ACω holds. -/
 theorem classical_ACω : ACω := by
-  -- Use the fact that ACω is classically true
-  sorry  -- Strategic simplification
+  -- ACω is classically true via choice
+  intro α hα
+  exact ⟨fun n ↦ Classical.choice (hα n)⟩
 
 /-! ### 4 Main theorem -/
 
