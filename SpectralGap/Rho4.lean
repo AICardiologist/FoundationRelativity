@@ -70,7 +70,20 @@ def rho4 (b : ℕ → Bool) : BoundedOp :=
 
 lemma rho4_selfAdjoint (b : ℕ → Bool) :
     IsSelfAdjoint (rho4 b) := by
-  sorry
+  -- `rho4 b = diagonal + shaft`.  Both summands are self‑adjoint:
+  --  • the diagonal has real weights
+  --  • the rank‑one bump is `β₁ • (λ v, ⟪v,u⟫ u)` which is Hermitian.
+  have hDiag : IsSelfAdjoint (ContinuousLinearMap.diagonal ℂ (ρ4Weight b)) := by
+    simpa [IsSelfAdjoint, ContinuousLinearMap.adjoint_diagonal]
+          using ContinuousLinearMap.isSelfAdjoint_diagonal
+  have hShaft : IsSelfAdjoint shaft := by
+    -- `shaft` is defined as `(λ v, ⟪v,u⟫ u)` scaled by a real constant
+    have : IsSelfAdjoint
+        ((ContinuousLinearMap.innerSL ℂ).toContinuousLinearMap.comp
+            (ContinuousLinearMap.const _ u)) := by
+      simpa [IsSelfAdjoint, ContinuousLinearMap.adjoint_inner_right]
+    simpa [shaft] using this.smul_right (β₁ : ℂ)
+  simpa [rho4] using hDiag.add hShaft
 
 lemma rho4_bounded (b : ℕ → Bool) :
     ‖rho4 b‖ ≤ max ‖β₂‖ ‖β₁‖ := by
@@ -78,9 +91,12 @@ lemma rho4_bounded (b : ℕ → Bool) :
 
 /-- Action on basis vectors `e n` (ignoring bump, which is rank‑one). -/
 lemma rho4_apply_basis (b : ℕ → Bool) (n : ℕ) :
-    rho4 b (e n) = (if b n then (β₀ : ℂ) else β₂) • e n + (β₁ : ℂ) •
-      ((e n).inner u) • u := by
-  sorry
+    rho4 b (e n) =
+      (if b n then (β₀ : ℂ) else β₂) • e n  +  (β₁ : ℂ) • ⟪e n, u⟫_ℂ • u := by
+  simp [rho4, ContinuousLinearMap.diagonal_apply, ρ4Weight,
+        ContinuousLinearMap.add_apply, shaft,
+        ContinuousLinearMap.comp_apply, ContinuousLinearMap.smulRight_apply,
+        ContinuousLinearMap.const_apply]
 
 /-- Double spectral gap: low versus bump, bump versus high. -/
 lemma rho4_has_two_gaps (b : ℕ → Bool) :
@@ -146,8 +162,10 @@ noncomputable def vBump : L2Space := u
 
 /-- Inner product check used in the proof. -/
 lemma inner_vLow_u : ⟪vLow, u⟫_ℂ = 0 := by
-  -- explicit coefficient calculation; postponed to Day 6 polish
-  sorry
+  --  `vLow = e 0 − 2·e 1`,  `u` has coefficients proportional to 2^{-(n+1)}.
+  simp [vLow, u, inner_sub_left, inner_smul_left,
+        inner_smul_right, inner_inner_self_eq_norm_mul_norm,
+        inner_Lp_basis_eq]  -- the `inner_Lp_basis_eq` lemma sends ⟪e i, e j⟫ to δ_ij
 
 /-- **Sel₂ instance under classical logic** – shows that the two
     gaps are non‑empty in ZFC. -/
