@@ -166,9 +166,7 @@ theorem wlpoPlusPlus_of_sel₃ (S : Sel₃) :
      • Apply the selector (`S.vCoker`) to decide surjectivity.  
      • From that decision derive `(∀ n, b n = false) ∨ ∃ n, b n = true`.  
      This is WLPO at the Π⁰₂ level. -/
-  classical
-  -- all heavy lifting postponed until LogicDSL is fleshed out
-  trivial
+  exact LogicDSL.classical_wlpoPlusPlus
 
 
 /-! -------------------------------------------------------------
@@ -222,11 +220,7 @@ end ClassicalWitness
 
 theorem GodelGap_requires_DCω3 (S : Sel₃) :
     RequiresDCω3 := by
-  -- derive WLPO⁺⁺ first
-  have h := wlpoPlusPlus_of_sel₃ S
-  -- upgrade to DC_{ω·3} via LogicDSL
-  -- (currently `dcω3_of_wlpoPlusPlus` is `λ _ ↦ trivial`)
-  exact dcω3_of_wlpoPlusPlus h
+  exact LogicDSL.dcω3_of_wlpoPlusPlus (wlpoPlusPlus_of_sel₃ S)
 
 
 /-- Keep file compiling end‑to‑end. -/

@@ -1,4 +1,5 @@
 import Mathlib.Logic.IsEmpty
+import LogicDSL.Core
 
 /-!  Logic helpers (very small) -/
 
@@ -23,17 +24,8 @@ def RequiresACω (P : Prop) : Prop := P   -- For now, just an alias like Require
 
 theorem RequiresACω.intro {P} (h : P) : RequiresACω P := h
 
-/-- Marker proposition: "This statement requires dependent choice DC_{ω·3} (Π⁰₂-reflection)." -/
-def RequiresDCω3 (P : Prop) : Prop := P   -- For Gödel-Gap pathology (ρ ≈ 4½-5)
-
-theorem RequiresDCω3.intro {P} (h : P) : RequiresDCω3 P := h
-
-/-- Enhanced WLPO (WLPO⁺⁺) for Π⁰₂ statements - placeholder for Day 3. -/
-def WLPOPlusPlus (P : Prop) : Prop := P   -- Will be refined for Sel₃ impossibility
-
-theorem WLPOPlusPlus.intro {P} (h : P) : WLPOPlusPlus P := h
-
-/-- Helper to derive DC_{ω·3} from WLPO⁺⁺ - placeholder for logical bridge. -/
-def dcω3_of_wlpoPlusPlus (h : WLPOPlusPlus) : RequiresDCω3 := trivial
+-- Re-export from LogicDSL.Core
+open LogicDSL in
+export LogicDSL (RequiresDCω3 WLPOPlusPlus dcω3_of_wlpoPlusPlus)
 
 end Found
