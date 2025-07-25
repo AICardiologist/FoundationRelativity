@@ -19,6 +19,6 @@ theorem classical_wlpoPlusPlus : WLPOPlusPlus := trivial
 theorem classical_dcω3 : RequiresDCω3 := trivial
 
 /-- Logical bridge: WLPO⁺⁺ → DC_{ω·3} -/
-theorem dcω3_of_wlpoPlusPlus (h : WLPOPlusPlus) : RequiresDCω3 := trivial
+theorem dcω3_of_wlpoPlusPlus (_ : WLPOPlusPlus) : RequiresDCω3 := trivial
 
 end LogicDSL

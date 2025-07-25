@@ -15,7 +15,7 @@ namespace SpectralGap
 /-! ### 1 Primitive‑recursive predicate (placeholder) -/
 
 /-- Primitive‑recursive predicate encoding our chosen Turing machine. -/
-def halt (n : ℕ) : Bool := false
+def halt (_ : ℕ) : Bool := false
 
 /-! ### 2 Vectors `u` and `g` -/
 
@@ -40,19 +40,18 @@ noncomputable def godelOp : BoundedOp :=
 
 /-! ### 4 Elementary lemmas -/
 
-/-- `godelOp` is bounded with norm ≤ 2. -/
+/-- `godelOp` is bounded with `‖godelOp‖ ≤ 2`.  
+    In the current stub implementation `godelOp = 1`, so the claim is immediate. -/
 lemma godelOp_bounded : ‖godelOp‖ ≤ (2 : ℝ) := by
-  -- godelOp = 1, and ‖1‖ ≤ 1 ≤ 2
-  rw [godelOp]
-  calc ‖(1 : BoundedOp)‖ ≤ 1 := by norm_num
-  _ ≤ 2 := by norm_num
+  -- unfold to `‖1‖ ≤ 2` and finish with `norm_num`
+  simpa [godelOp, norm_one] using (show (1 : ℝ) ≤ 2 by norm_num)
 
-/-- `godelOp` is self‑adjoint. -/
+/-- `godelOp` is self‑adjoint (because it is the identity operator at this stage). -/
 theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
-  -- identity operator is self-adjoint: adjoint(1) = 1
-  rw [godelOp, IsSelfAdjoint]
-  -- This should be true by definition of adjoint for identity
-  rfl
+  -- `IsSelfAdjoint` is `T.adjoint = T`; for `1` this is `adjoint_one`
+  simpa [godelOp, IsSelfAdjoint] using (by
+    -- `simp` turns the goal into `1 = 1`
+    simpa using adjoint_one)
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
@@ -64,7 +63,7 @@ structure Sel₃ : Type where
   nonzero     : vCoker ≠ 0
 
 /-- ### 5.1 Diagonal argument (constructive impossibility) -/
-theorem wlpoPlusPlus_of_sel₃ (S : Sel₃) :
+theorem wlpoPlusPlus_of_sel₃ (_ : Sel₃) :
     LogicDSL.WLPOPlusPlus := by
   exact LogicDSL.classical_wlpoPlusPlus
 
@@ -81,11 +80,10 @@ lemma godelOp_orthogonal_g : g = g := by
 /-- The vector `g` is non‑zero. -/
 lemma g_nonzero : (g : L2Space) ≠ 0 := by
   intro h
-  -- Evaluate both sides at coordinate 0.
+  -- evaluate both sides of `h` at coordinate 0
   have : ((g : L2Space) 0 : ℂ) = 0 := congrArg (fun v : L2Space ↦ v 0) h
-  -- but `g 0 = 1`
-  simp [g, lp.single_apply] at this
-  exact one_ne_zero this
+  -- but `g 0 = 1`, contradiction
+  simpa [g, lp.single_apply] using this
 
 /-- Classical `Sel₃` built from the vector `g`. -/
 noncomputable def sel₃_zfc : Sel₃ :=
