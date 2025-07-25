@@ -7,7 +7,8 @@
 -/
 import SpectralGap.HilbertSetup
 import LogicDSL
-import Mathlib.Analysis.InnerProductSpace.Adjoint
+import Mathlib.Analysis.NormedSpace.OperatorNorm.Basic   -- for `norm_id_le`
+import Mathlib.Analysis.InnerProductSpace.Adjoint        -- for `IsSelfAdjoint`
 
 open Complex Real BigOperators
 
@@ -41,17 +42,19 @@ noncomputable def godelOp : BoundedOp :=
 
 /-! ### 4 Elementary lemmas -/
 
-/-- `godelOp` is bounded with `‖godelOp‖ ≤ 2`.
-    (Here `godelOp = 1`, so the claim is immediate.) -/
+/-- `godelOp` is bounded with `‖godelOp‖ ≤ 2`.  
+    In the current stub `godelOp = 1`, so the claim is immediate. -/
 lemma godelOp_bounded : ‖godelOp‖ ≤ (2 : ℝ) := by
-  -- first turn the left hand side into a numeral
-  have : ‖godelOp‖ = (1 : ℝ) := by simp [godelOp]
-  -- now everything is a numeral inequality
-  simpa [this] using (show (1 : ℝ) ≤ 2 by norm_num)
+  -- first bound `‖godelOp‖` by 1
+  have h₁ : ‖godelOp‖ ≤ (1 : ℝ) := by
+    simpa [godelOp] using norm_id_le (𝕜 := ℂ) (E := L2Space)
+  -- then chain `1 ≤ 2`
+  exact h₁.trans (by norm_num)
 
-/-- `godelOp` is self‑adjoint (identity operator). -/
+/-- `godelOp` is self‑adjoint (because it is the identity operator). -/
 theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
-  simpa [godelOp] using isSelfAdjoint_one
+  -- `IsSelfAdjoint T` is `T† = T`; `simp` handles the identity
+  dsimp [IsSelfAdjoint, godelOp]; simp
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
@@ -81,9 +84,12 @@ lemma godelOp_orthogonal_g : g = g := by
 lemma g_nonzero : (g : L2Space) ≠ 0 := by
   intro h
   -- evaluate equality at coordinate 0
-  have : ((g : L2Space) 0 : ℂ) = 0 := congrArg (fun v : L2Space ↦ v 0) h
-  -- but `g 0 = 1`
-  simp [g, lp.single_apply] at this
+  have : ((g : L2Space) 0 : ℂ) = 0 :=
+    congrArg (fun v : L2Space ↦ v 0) h
+  -- but `g 0 = 1`, contradiction
+  have : (1 : ℂ) = 0 := by
+    simpa [g, lp.single_apply] using this
+  exact one_ne_zero this
 
 /-- Classical `Sel₃` built from the vector `g`. -/
 noncomputable def sel₃_zfc : Sel₃ :=

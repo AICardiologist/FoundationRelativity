@@ -14,8 +14,6 @@ env:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/leanprover/lean4:4.22.0-rc4  # Use stable RC4
     steps:
       - uses: actions/checkout@v3
 
@@ -56,8 +54,6 @@ jobs:
 
   mathlib-bump:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/leanprover/lean4:4.22.0-rc4
     steps:
       - uses: actions/checkout@v3
 
