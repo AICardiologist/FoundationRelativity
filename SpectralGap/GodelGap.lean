@@ -7,8 +7,6 @@
 -/
 import SpectralGap.HilbertSetup
 import LogicDSL
-import Mathlib.Analysis.NormedSpace.OperatorNorm.Basic
-import Mathlib.Analysis.InnerProductSpace.Adjoint
 
 open Complex Real BigOperators
 
@@ -44,13 +42,17 @@ noncomputable def godelOp : BoundedOp :=
 
 /-- `godelOp` is bounded with norm ≤ 2. -/
 lemma godelOp_bounded : ‖godelOp‖ ≤ (2 : ℝ) := by
-  -- godelOp is the identity operator
-  simp [godelOp, opNorm_id]  -- opNorm_id : ‖(1 : BoundedOp)‖ = 1
+  -- godelOp = 1, and ‖1‖ ≤ 1 ≤ 2
+  rw [godelOp]
+  calc ‖(1 : BoundedOp)‖ ≤ 1 := by norm_num
+  _ ≤ 2 := by norm_num
 
 /-- `godelOp` is self‑adjoint. -/
 theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
-  -- identity operator is self-adjoint
-  simpa [godelOp] using isSelfAdjoint_id
+  -- identity operator is self-adjoint: adjoint(1) = 1
+  rw [godelOp, IsSelfAdjoint]
+  -- This should be true by definition of adjoint for identity
+  rfl
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
@@ -82,7 +84,8 @@ lemma g_nonzero : (g : L2Space) ≠ 0 := by
   -- Evaluate both sides at coordinate 0.
   have : ((g : L2Space) 0 : ℂ) = 0 := congrArg (fun v : L2Space ↦ v 0) h
   -- but `g 0 = 1`
-  simpa [g, lp.single_apply] using this
+  simp [g, lp.single_apply] at this
+  exact one_ne_zero this
 
 /-- Classical `Sel₃` built from the vector `g`. -/
 noncomputable def sel₃_zfc : Sel₃ :=
