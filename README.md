@@ -5,9 +5,11 @@
 [![Lean 4.22.0-rc3](https://img.shields.io/badge/Lean-4.22.0--rc3-blue)](https://github.com/leanprover/lean4)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
+
 > **🎉 SPRINT 36 COMPLETE**: Borel-Selector pathology (ρ=4) established ✅  
 > **Latest Achievement**: Extended Foundation-Relativity hierarchy to DC_{ω·2} with double-gap spectral operator requiring full classical dependent choice.  
 > **🎯 ρ-HIERARCHY**: Complete formal verification from WLPO (ρ=1) to DC_{ω·2} (ρ=4) ✅
+
 
 A Lean 4 formalization exploring how mathematical pathologies behave differently under various foundational assumptions.
 
