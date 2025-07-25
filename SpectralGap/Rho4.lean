@@ -33,14 +33,14 @@ lemma β₁_lt_β₂ : β₁ < β₂ := by norm_num
 noncomputable def ρ4Weight (b : ℕ → Bool) (n : ℕ) : ℝ :=
   if b n then β₀ else β₂
 
-/-- Rank‑one bump vector `u` with square‑summable coefficients `2^{-(n+1)}`. -/
+/-- Normalised bump vector `u` with norm 1 for clean eigenvalue properties. -/
 noncomputable
 def u : L2Space :=
 by
-  -- quick construction with `lp.single` + `summable_pow_2`
-  refine
-    ⟨fun n ↦ (2 : ℂ) ^ (-(n : ℤ)-1), ?_⟩
-  -- summability proof left `sorry` for Day 4 clean‑up
+  -- coefficients 2^{-(n+1)} give ℓ²‑norm² = 1/3.  Scale by √3.
+  let coeff : ℕ → ℂ := fun n ↦ (Real.sqrt 3) * (2 : ℂ) ^ (-(n : ℤ) - 1)
+  refine ⟨coeff, ?_⟩
+  -- summability proof postponed to Day 4 polish
   sorry
 
 /-- Rank‑one compact "shaft" sending `v ↦ ⟪v,u⟫ • u` and then rescaling to β₁. -/
