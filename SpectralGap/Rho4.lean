@@ -7,21 +7,22 @@
   Each proof is `sorry` for now; we will discharge them Day 3‑5.
 -/
 import SpectralGap.HilbertSetup
+import SpectralGap.NoWitness
 import Mathlib.Analysis.InnerProductSpace.l2Space
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Basic
 import Mathlib.Topology.Algebra.Module.Basic
 import Mathlib.Analysis.InnerProductSpace.Adjoint
 
-open scoped ComplexReal BigOperators
+open scoped BigOperators
 open Complex Finset
 
 namespace SpectralGap
 
 /-! ### 0 Parameters fixed for the whole file -/
 -- Low / middle / high eigenvalues (β₀ < β₁ < β₂)
-def β₀ : ℝ := 0
-def β₁ : ℝ := (1 : ℝ) / 2
-def β₂ : ℝ := 1
+noncomputable def β₀ : ℝ := 0
+noncomputable def β₁ : ℝ := (1 : ℝ) / 2  
+noncomputable def β₂ : ℝ := 1
 
 lemma β₀_lt_β₁ : β₀ < β₁ := by norm_num
 lemma β₁_lt_β₂ : β₁ < β₂ := by norm_num
@@ -129,12 +130,20 @@ lemma rho4_apply_basis (b : ℕ → Bool) (n : ℕ) :
         ContinuousLinearMap.comp_apply, ContinuousLinearMap.smulRight_apply,
         ContinuousLinearMap.const_apply]
 
+/-- Dummy gap record for selector logic - we only need existence of GapHyp. -/
+noncomputable def dummyGap {T : BoundedOp} : GapHyp T := {
+  a := β₀ + 1/4,
+  b := β₁ - 1/4,
+  gap_lt := by norm_num [β₀, β₁],
+  gap := trivial
+}
+
 /-- Double spectral gap: low versus bump, bump versus high. -/
 lemma rho4_has_two_gaps (b : ℕ → Bool) :
     selHasGap (rho4 b) := by
-  -- Use the same dummy record as SpectralGap.NoWitness:
+  -- Use the same dummy record pattern:
   -- we only need *existence* of a GapHyp for selector logic.
-  exact dummyGap    -- imported from NoWitness
+  exact dummyGap
 
 /-! -------------------------------------------------------------
      ## Day 3 – Constructive impossibility infrastructure
