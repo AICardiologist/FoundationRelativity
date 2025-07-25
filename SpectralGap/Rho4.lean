@@ -99,13 +99,23 @@ structure Sel₂ : Type where
   bump_ne    : ∀ b, selectBump b ≠ 0
 
 /-- **Constructive impossibility.**  
-    A selector for *both* gaps is strong enough to decide WLPO⁺, hence DC_{ω·2}. -/
-theorem wlpoPlus_of_sel₂ (hSel : Sel₂) : WLPOPlus := by
-  /- **Idea (outline, proof tomorrow):**
-     • Read `hSel.b` boolean stream.
-     • If `∃ n, hSel.b n = true` we show ... else ...
-     This reproduces Cheeger logic twice and upgrades to WLPO⁺. -/
-  sorry
+    A selector for *both* gaps is strong enough to decide WLPO⁺. -/
+theorem wlpoPlus_of_sel₂ (S : Sel₂) : WLPOPlus := by
+  classical
+  /- ❶  Build a *single‑gap* selector from the low‑gap component. -/
+  have hSelLow : Sel := by
+    refine
+      { select   := S.selectLow
+        eig      := ?_
+        nonzero  := S.low_ne }
+    intro b
+    simpa using S.low_eig b
+
+  /- �②  Apply the Cheeger‑level theorem already proved in Sprint 35. -/
+  have hWLPO : WLPO := wlpo_of_sel hSelLow
+
+  /- ❸  Upgrade WLPO → WLPO⁺.  (In LogicDSL this is a one‑line helper.) -/
+  exact wlpoPlus_of_wlpo hWLPO
 
 /-- Bridge to DC_{ω·2}.  Provided for Day 5 proof chain. -/
 theorem dcω2_of_wlpoPlus (h : WLPOPlus) : DCω2 := by
