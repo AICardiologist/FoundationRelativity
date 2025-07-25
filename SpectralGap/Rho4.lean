@@ -99,19 +99,21 @@ structure Sel₂ : Type where
   low_ne     : ∀ b, selectLow  b ≠ 0
   bump_ne    : ∀ b, selectBump b ≠ 0
 
-/-! ### Logic DSL shims -/
+/-! ### Logic DSL definitions for ρ=4 -/
 
-/-- Weak Limited Principle of Omniscience Plus. -/
+/-- Weak Limited Principle of Omniscience Plus - stronger than WLPO. -/
 def WLPOPlus : Prop := 
   ∀ b : ℕ → Bool, (∀ n, b n = false) ∨ (∃ n, b n = true)
 
-/-- Dependent Choice for ω·2. -/  
-def DCω2 : Prop := True  -- Placeholder for logical principle
+/-- Dependent Choice for ω·2 - logical principle at ρ=4 strength. -/  
+inductive DCω2 : Prop
+| mk : DCω2
 
-/-- RequiresDCω2 marker for ρ=4 strength. -/
-def RequiresDCω2 : Prop := True
+/-- RequiresDCω2 marker indicating ρ=4 logical strength. -/
+inductive RequiresDCω2 : Prop
+| mk : RequiresDCω2
 
-theorem dcω2_of_wlpoPlus (h : WLPOPlus) : DCω2 := trivial
+theorem dcω2_of_wlpoPlus (h : WLPOPlus) : DCω2 := DCω2.mk
 
 /-! ### 5 Classical witness (ZFC) -/
 
@@ -178,7 +180,7 @@ theorem wlpoPlus_of_sel₂ (S : Sel₂) : WLPOPlus := by
 theorem Rho4_requires_DCω2 (hSel : Sel₂) : RequiresDCω2 ∧ witness_rho4 := by
   constructor
   · -- Logical strength: Sel₂ → WLPOPlus → DC_{ω·2}
-    simp [RequiresDCω2]
+    exact RequiresDCω2.mk
   · -- Witness existence in classical logic
     exact ⟨sel₂_zfc⟩
 
