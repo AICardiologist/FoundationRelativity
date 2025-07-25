@@ -33,4 +33,7 @@ def WLPOPlusPlus (P : Prop) : Prop := P   -- Will be refined for Sel₃ impossib
 
 theorem WLPOPlusPlus.intro {P} (h : P) : WLPOPlusPlus P := h
 
+/-- Helper to derive DC_{ω·3} from WLPO⁺⁺ - placeholder for logical bridge. -/
+def dcω3_of_wlpoPlusPlus (h : WLPOPlusPlus) : RequiresDCω3 := trivial
+
 end Found

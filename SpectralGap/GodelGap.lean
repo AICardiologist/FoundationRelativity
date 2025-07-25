@@ -160,7 +160,14 @@ without `sorry`.  Day 5 will replace `trivial` by the genuine
 Π⁰₂ diagonal proof; the surrounding signature will stay unchanged. -/
 theorem wlpoPlusPlus_of_sel₃ (S : Sel₃) :
     WLPOPlusPlus := by
-  -- TODO (Day 5): implement the real Π⁰₂ diagonal proof here.
+  /- Outline (all purely logical, no analysis):  
+     • For any Boolean stream `b`, build a modified operator  
+       `godelOp_b := godelOp` (uses `b` to tweak the coefficient `g`).  
+     • Apply the selector (`S.vCoker`) to decide surjectivity.  
+     • From that decision derive `(∀ n, b n = false) ∨ ∃ n, b n = true`.  
+     This is WLPO at the Π⁰₂ level. -/
+  classical
+  -- all heavy lifting postponed until LogicDSL is fleshed out
   trivial
 
 
@@ -213,10 +220,13 @@ end ClassicalWitness
      ## 7 Bridge placeholder (will be filled Day 5)
      ------------------------------------------------------------- -/
 
-theorem GodelGap_requires_DCω3
-    (S : Sel₃) : RequiresDCω3 := by
-  -- TODO (Day 5): use `wlpoPlusPlus_of_sel₃` and LogicDSL helpers.
-  trivial
+theorem GodelGap_requires_DCω3 (S : Sel₃) :
+    RequiresDCω3 := by
+  -- derive WLPO⁺⁺ first
+  have h := wlpoPlusPlus_of_sel₃ S
+  -- upgrade to DC_{ω·3} via LogicDSL
+  -- (currently `dcω3_of_wlpoPlusPlus` is `λ _ ↦ trivial`)
+  exact dcω3_of_wlpoPlusPlus h
 
 
 /-- Keep file compiling end‑to‑end. -/
