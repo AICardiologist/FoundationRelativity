@@ -7,6 +7,7 @@
 -/
 import SpectralGap.HilbertSetup
 import LogicDSL
+import Mathlib.Analysis.InnerProductSpace.Adjoint
 
 open Complex Real BigOperators
 
@@ -40,17 +41,17 @@ noncomputable def godelOp : BoundedOp :=
 
 /-! ### 4 Elementary lemmas -/
 
-/-- `godelOp` is bounded with `‖godelOp‖ ≤ 2`.  
+/-- `godelOp` is bounded with `‖godelOp‖ ≤ 2`.
     (Here `godelOp = 1`, so the claim is immediate.) -/
 lemma godelOp_bounded : ‖godelOp‖ ≤ (2 : ℝ) := by
-  -- rewrite `‖godelOp‖` to a numeral first
-  have h : ‖(1 : BoundedOp)‖ = (1 : ℝ) := by simp
-  -- finish with `norm_num`
-  simpa [godelOp, h] using (show (1 : ℝ) ≤ 2 by norm_num)
+  -- first turn the left hand side into a numeral
+  have : ‖godelOp‖ = (1 : ℝ) := by simp [godelOp]
+  -- now everything is a numeral inequality
+  simpa [this] using (show (1 : ℝ) ≤ 2 by norm_num)
 
 /-- `godelOp` is self‑adjoint (identity operator). -/
 theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
-  simpa [godelOp] using IsSelfAdjoint.one
+  simpa [godelOp] using isSelfAdjoint_one
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
@@ -83,7 +84,6 @@ lemma g_nonzero : (g : L2Space) ≠ 0 := by
   have : ((g : L2Space) 0 : ℂ) = 0 := congrArg (fun v : L2Space ↦ v 0) h
   -- but `g 0 = 1`
   simp [g, lp.single_apply] at this
-  exact one_ne_zero this
 
 /-- Classical `Sel₃` built from the vector `g`. -/
 noncomputable def sel₃_zfc : Sel₃ :=
