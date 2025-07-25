@@ -5,7 +5,6 @@ package «FoundationRelativity» where
 
 require mathlib from git
   "https://github.com/leanprover-community/mathlib4"
-  @ "v4.3.0"
 
 -- one lean_lib per root namespace (folder name = module prefix)
 @[default_target] lean_lib Found where srcDir := "."
