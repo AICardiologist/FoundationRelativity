@@ -42,19 +42,20 @@ noncomputable def godelOp : BoundedOp :=
 
 /-! ### 4 Elementary lemmas -/
 
-/-- `godelOp` is bounded with `‖godelOp‖ ≤ 2`.  
-    In the current stub `godelOp = 1`, so the claim is immediate. -/
-lemma godelOp_bounded : ‖godelOp‖ ≤ (2 : ℝ) := by
-  -- first bound `‖godelOp‖` by 1
-  have h₁ : ‖godelOp‖ ≤ (1 : ℝ) := by
-    simpa [godelOp] using norm_id_le (𝕜 := ℂ) (E := L2Space)
-  -- then chain `1 ≤ 2`
-  exact h₁.trans (by norm_num)
+open ContinuousLinearMap
 
-/-- `godelOp` is self‑adjoint (because it is the identity operator). -/
+/-- `godelOp` is bounded with `‖godelOp‖ ≤ 2`. -/
+lemma godelOp_bounded : ‖godelOp‖ ≤ (2 : ℝ) := by
+  -- `‖godelOp‖ = 1`
+  have h : ‖godelOp‖ = (1 : ℝ) := by
+    -- coercion `BoundedOp →L[ℂ] _` + the lemma `norm_id`
+    simpa [godelOp] using norm_id (𝕜 := ℂ) (E := L2Space)
+  -- turn the goal into `1 ≤ 2`
+  simpa [h] using (show (1 : ℝ) ≤ 2 by norm_num)
+
+/-- `godelOp` is self‑adjoint (it is the identity operator). -/
 theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
-  -- `IsSelfAdjoint T` is `T† = T`; `simp` handles the identity
-  dsimp [IsSelfAdjoint, godelOp]; simp
+  dsimp [IsSelfAdjoint, godelOp]; simp   -- `adjoint 1 = 1`
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
