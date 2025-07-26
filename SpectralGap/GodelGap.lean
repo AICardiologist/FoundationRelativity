@@ -42,8 +42,8 @@ instance : Nontrivial L2Space := by
     congrArg (fun v : L2Space ↦ v 0) h_eq
   -- but `g 0 = 1`
   rw [g] at h0
-  simp only [lp.single_apply, eq_self_iff_true, if_true] at h0
-  exact one_ne_zero h0
+  simp only [lp.single_apply] at h0
+  norm_num at h0
 
 /-! ### 3 The Gödel‑gap operator -/
 
@@ -66,8 +66,7 @@ theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
   rw [IsSelfAdjoint, godelOp]
   -- adjoint of identity is identity
   ext x
-  ext n
-  simp only [ContinuousLinearMap.coe_id', id_eq, adjoint_id, ContinuousLinearMap.id_apply]
+  simp
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
@@ -99,8 +98,8 @@ lemma g_nonzero : (g : L2Space) ≠ 0 := by
   have h0 : ((g : L2Space) 0 : ℂ) = 0 :=
     congrArg (fun v : L2Space ↦ v 0) h
   rw [g] at h0
-  simp only [lp.single_apply, eq_self_iff_true, if_true] at h0
-  exact one_ne_zero h0
+  simp only [lp.single_apply] at h0
+  norm_num at h0
 
 /-- Classical `Sel₃` built from the vector `g`. -/
 noncomputable def sel₃_zfc : Sel₃ :=
