@@ -6,17 +6,17 @@ This directory contains the source papers for the Foundation-Relativity project 
 
 ### Paper 1: Gödel-Banach Correspondence
 - **LaTeX Source**: `P1-GBC.tex` ✅
-- **PDF**: `P1-GBC.pdf` (manual download needed)
+- **PDF**: `P1-GBC.pdf` ⚠️ (placeholder - replace with actual PDF)
 - **ResearchGate**: https://www.researchgate.net/publication/393185227_The_Godel-Banach_Correspondence_Internal_Undecidability_from_Hilbert_Spaces_to_Derived_Categories
 - **Usage**: Sprints 39-40 (Gödel-Gap implementation)
-- **Status**: ✅ LaTeX source available for Math-Coder AI
+- **Status**: ✅ LaTeX source available, PDF placeholder created
 
 ### Paper 3: 2-Categorical Framework  
 - **LaTeX Source**: `P3-2CatFramework.tex` ✅
-- **PDF**: `P3-2CatFramework.pdf` (manual download needed)
+- **PDF**: `P3-2CatFramework.pdf` ⚠️ (placeholder - replace with actual PDF)
 - **ResearchGate**: https://www.researchgate.net/publication/393782503_A_2-Categorical_Framework_for_Foundation-Relativity
 - **Usage**: Sprints 41-45 (CategoryTheory framework)
-- **Status**: ✅ LaTeX source available for Math-Coder AI
+- **Status**: ✅ LaTeX source available, PDF placeholder created
 
 ## Instructions
 
