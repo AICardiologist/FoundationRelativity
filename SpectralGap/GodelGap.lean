@@ -63,7 +63,10 @@ lemma godelOp_bounded : ‖godelOp‖ ≤ (2 : ℝ) := by
 /-- `godelOp` is self‑adjoint (it *is* the identity operator). -/
 theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
   -- `IsSelfAdjoint T` is the proposition `T† = T`.
-  simp [IsSelfAdjoint, godelOp]
+  -- The identity operator is self-adjoint
+  convert (ContinuousLinearMap.isSymmetric_id : IsSelfAdjoint (ContinuousLinearMap.id ℂ L2Space)) using 1
+  rw [godelOp]
+  rfl
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
