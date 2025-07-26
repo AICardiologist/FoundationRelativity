@@ -1,0 +1,118 @@
+\documentclass[11pt]{article}
+
+% -------------------------------------------------
+% Basic packages
+% -------------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[american]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{margin=1.1in}
+\usepackage{microtype}
+\usepackage{enumitem}
+
+% ---------- reproducibility & tooling macros ----------
+\usepackage{hyperref}   % ensure hyperlinks work
+
+\newcommand{\leanRepoTag}{%
+  \href{https://github.com/AICardiologist/FoundationRelativity/tree/v0.3.4-rnp3-complete}%
+       {v0.3.4-rnp3-complete}}
+
+% Detailed LLM-assistance disclosure
+\newcommand{\llmNote}{%
+  Preliminary drafting, proof-sketch generation, and Lean-code
+  refactoring benefited from large-language-model assistance:
+  OpenAI \textbf{o3-pro} (proof completion),
+  Anthropic \textbf{Claude Code} (\emph{Sonnet} \& \emph{Opus} 4.0) for Lean tactics,
+  \textbf{xAI Grok 4 Heavy}, and Google/DeepMind \textbf{Gemini 2.5 Pro}
+  for critique and editorial suggestions.
+}
+% ------------------------------------------------------
+
+
+\setlist[enumerate,1]{label=\textnormal{(\alph*)}}
+
+% Math & theorem tools
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{amsthm}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% Graphics & colour for GAP boxes
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,decorations.markings,calc,cd,patterns}
+\usepackage{mdframed}
+\mdfdefinestyle{gapbox}{%
+  backgroundcolor=gray!10,
+  linecolor=red!70!black,
+  linewidth=1.0pt,
+  leftmargin=0pt,
+  rightmargin=0pt,
+  innerleftmargin=6pt,
+  innerrightmargin=6pt,
+  innertopmargin=4pt,
+  innerbottommargin=4pt
+}
+
+% Index setup
+\usepackage{imakeidx}
+\makeindex
+
+% Small arrow for 2-cells
+\newcommand{\Rto}{\,\Rightarrow\,}
+% New commands for pathology functors
+\newcommand{\APFail}{\mathsf{AP\_Fail}}
+\newcommand{\RNPFail}{\mathsf{RNP\_Fail}}
+\newcommand{\SDual}{\mathsf{SDual}}
+\newcommand{\TwoCat}{\mathbf{2Cat}}
+
+\title{A 2--Categorical Framework for Foundation--Relativity\\
+  \large{Preliminary Notes and Open Problems}}
+\author{Paul Chun-Kit Lee\\
+  \small New York University, New York}
+\date{July 17, 2025}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{abstract}
+  These notes present a comprehensive 2-categorical framework for understanding
+  foundation-relativity in mathematics, demonstrating how fundamental analytic
+  phenomena transform across different foundational systems. We establish:
+  (i) the \emph{2-category of mathematical foundations}~\(\mathbf{Found}\),
+  where interpretations compose up to coherent isomorphism;
+  (ii) the \emph{Functorial Obstruction Theorem}, showing that constructions
+  creating non-constructive principles fail to extend pseudofunctorially;
+  (iii) the \emph{Gap 2-functor}
+  \(\mathrm{Gap}\colon\mathbf{Found}^{\mathrm{op}}\to\mathbf{2Cat}\),
+  capturing how witness spaces vary contravariantly across foundations,
+  along with explicit constructions of the \(\mathsf{AP\_Fail}\) and
+  \(\mathsf{RNP\_Fail}\) 2-functors for other pathologies;
+  (iv) a \emph{quantitative relativity degree} \(\rho\) that precisely
+  measures the logical strength needed for phenomena (bidual gap and AP
+  failure at \(\rho=1\), RNP at \(\rho=2\));
+  (v) the \emph{Gödel-Gap correspondence}: a Boolean-lattice isomorphism 
+  between closed \(\Pi^0_1\)
+  sentences of PA and a canonical sublattice of \(\ell^\infty/c_0\),
+  revealing deep connections between logical incompleteness and analytic
+  non-reflexivity; and
+  (vi) a powerful \emph{foundation-hopping method} that extracts explicit
+  quantitative bounds by transporting constructive
+  \(\neg\neg\)-facts
+  through DNS-TT to classical choice. 
+  Together, these results establish that foundation-relativity is not
+  merely about different axioms but reflects structural incompatibilities
+  measurable by precise categorical invariants. The framework uses conventional 2-categories, avoiding higher homotopy structures, with full bicategorical coherence established via the Gordon-Power-Street theorem.
+\end{abstract}
+
+[Document continues with full Paper 3 content...]
+
+\end{document}
