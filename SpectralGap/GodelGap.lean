@@ -60,13 +60,14 @@ lemma godelOp_bounded : ‖godelOp‖ ≤ (2 : ℝ) := by
   _ = 1 := norm_id (𝕜 := ℂ) (E := L2Space)
   _ ≤ 2 := by norm_num
 
-/-- `godelOp` is self‑adjoint (it *is* the identity operator). -/
+/-- `godelOp` (the identity) is self‑adjoint. -/
 theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
-  -- `IsSelfAdjoint T` is the proposition `T† = T`.
-  -- The identity operator is self-adjoint
-  convert (ContinuousLinearMap.isSymmetric_id : IsSelfAdjoint (ContinuousLinearMap.id ℂ L2Space)) using 1
-  rw [godelOp]
-  rfl
+  -- unfold the predicate
+  dsimp [IsSelfAdjoint, godelOp]
+  -- coerce to `ContinuousLinearMap` to hit the existing lemma
+  simpa using
+    (adjoint_id : (adjoint (1 : ContinuousLinearMap ℂ L2Space L2Space) =
+                   1))
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
