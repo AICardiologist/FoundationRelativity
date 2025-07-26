@@ -12,6 +12,7 @@ require mathlib from git
 @[default_target] lean_lib APFunctor where srcDir := "."
 @[default_target] lean_lib RNPFunctor where srcDir := "."
 @[default_target] lean_lib SpectralGap where srcDir := "."
+@[default_target] lean_lib LogicDSL where srcDir := "."
 
 -- Test executables
 lean_exe testFunctors where
@@ -40,3 +41,6 @@ lean_exe RNP3ProofTests where
 
 lean_exe SpectralGapProofTests where
   root := `test.SpectralGapProofTest
+
+lean_exe GodelGapProofTests where
+  root := `test.GodelGapProofTest

@@ -1,4 +1,5 @@
 import Mathlib.Logic.IsEmpty
+import LogicDSL.Core
 
 /-!  Logic helpers (very small) -/
 
@@ -22,5 +23,9 @@ theorem RequiresDCωPlus.intro {P} (h : P) : RequiresDCωPlus P := h
 def RequiresACω (P : Prop) : Prop := P   -- For now, just an alias like RequiresDCω
 
 theorem RequiresACω.intro {P} (h : P) : RequiresACω P := h
+
+-- Re-export from LogicDSL.Core
+open LogicDSL in
+export LogicDSL (RequiresDCω3 WLPOPlusPlus dcω3_of_wlpoPlusPlus)
 
 end Found

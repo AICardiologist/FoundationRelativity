@@ -5,6 +5,8 @@ on:
     # Run at 2 AM UTC every day
     - cron: '0 2 * * *'
   workflow_dispatch:  # Allow manual trigger
+  push:
+    branches: [feat/godel-gap]  # Also run on Gödel-Gap development
 
 env:
   LEAN_ABORT_ON_SORRY: 1
@@ -12,10 +14,14 @@ env:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/leanprover/lean4:nightly  # Use nightly Lean
     steps:
       - uses: actions/checkout@v3
+
+      - name: Set up Lean tool-chain
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | \
+            sh -s -- -y --default-toolchain leanprover/lean4:4.22.0-rc4
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
       - name: Cache .lake
         uses: actions/cache@v3
@@ -25,10 +31,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nightly-lake-
 
-      - name: Update Lean toolchain to nightly
-        run: |
-          echo "leanprover/lean4:nightly" > lean-toolchain
-          lake update
+      - name: Update dependencies
+        run: lake update
 
       - name: Build
         run: lake build
@@ -44,7 +48,7 @@ jobs:
       - name: Run all tests
         run: |
           # Run all test executables if they exist
-          for test in testFunctors testNonIdMorphisms WitnessTests AllPathologiesTests Gap2ProofTests APProofTests RNPProofTests RNP3ProofTests SpectralGapProofTests; do
+          for test in testFunctors testNonIdMorphisms WitnessTests AllPathologiesTests Gap2ProofTests APProofTests RNPProofTests RNP3ProofTests SpectralGapProofTests GodelGapProofTests; do
             if lake exe $test 2>/dev/null; then
               echo "✓ $test passed"
             else
@@ -54,14 +58,17 @@ jobs:
 
   mathlib-bump:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/leanprover/lean4:nightly
     steps:
       - uses: actions/checkout@v3
 
+      - name: Set up Lean tool-chain
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | \
+            sh -s -- -y --default-toolchain leanprover/lean4:4.22.0-rc4
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
       - name: Update dependencies
         run: |
-          echo "leanprover/lean4:nightly" > lean-toolchain
           lake update
           # Try to update mathlib to latest
           cd .lake/packages/mathlib && git pull origin main || true
@@ -70,6 +77,7 @@ jobs:
 
       - name: Create bump PR if successful
         if: success()
+        continue-on-error: true
         uses: peter-evans/create-pull-request@v5
         with:
           title: 'chore: bump mathlib and Lean nightly'
