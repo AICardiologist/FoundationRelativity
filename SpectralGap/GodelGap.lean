@@ -63,7 +63,7 @@ lemma godelOp_bounded : ‖godelOp‖ ≤ (2 : ℝ) := by
 
 /-- `godelOp` is self‑adjoint (it is the identity). -/
 theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
-  dsimp [IsSelfAdjoint, godelOp]; simp [adjoint_id]
+  simpa [godelOp] using isSelfAdjoint_one
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
