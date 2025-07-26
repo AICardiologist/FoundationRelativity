@@ -1,0 +1,18 @@
+# Git attributes for Foundation-Relativity project
+
+# Research papers - treat as binary
+docs/papers/*.pdf binary
+docs/papers/*.tex text
+docs/papers/*.bib text
+
+# Lean build artifacts
+*.olean binary
+*.ilean binary
+lake-manifest.json text
+
+# Documentation
+*.md text
+*.txt text
+
+# Lean source files
+*.lean text eol=lf

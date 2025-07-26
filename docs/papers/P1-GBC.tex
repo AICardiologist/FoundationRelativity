@@ -1,0 +1,125 @@
+%------------------------------------------------------------------
+% Document class and core packages
+%------------------------------------------------------------------
+\documentclass[11pt]{article}
+
+
+
+% ---------- reproducibility & tooling macros ----------
+\usepackage{hyperref}   % ensure hyperlinks work
+
+\newcommand{\leanRepoTag}{%
+  \href{https://github.com/AICardiologist/FoundationRelativity/tree/v0.3.4-rnp3-complete}%
+       {v0.3.4-rnp3-complete}}
+
+% Detailed LLM-assistance disclosure
+\newcommand{\llmNote}{%
+  Preliminary drafting, proof-sketch generation, and Lean-code
+  refactoring benefited from large-language-model assistance:
+  OpenAI \textbf{o3-pro} (proof completion),
+  Anthropic \textbf{Claude Code} (\emph{Sonnet} \& \emph{Opus} 4.0) for Lean tactics,
+  \textbf{xAI Grok 4 Heavy}, and Google/DeepMind \textbf{Gemini 2.5 Pro}
+  for critique and editorial suggestions.
+}
+% ------------------------------------------------------
+\usepackage[T1]{fontenc}      % better font encoding
+\usepackage{lmodern}          % nicer Latin Modern fonts
+\usepackage{microtype}        % better justification (moved after fonts)
+\usepackage[american]{babel}  % American hyphenation
+\usepackage{mathtools}        % includes amsmath, amssymb
+\usepackage{amssymb}          % for \mathbb and extra symbols
+\usepackage{amsthm}          % theorem environments
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{mdframed}
+\usepackage[colorlinks=true,
+            linkcolor=blue,
+            citecolor=blue,
+            urlcolor=blue]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,decorations.markings,calc,cd,patterns}
+
+%------------------------------------------------------------------
+% PDF metadata
+%------------------------------------------------------------------
+\hypersetup{
+  pdftitle={The Godel-Banach Correspondence: Internal Undecidability from Hilbert Spaces to Derived Categories},
+  pdfauthor={Paul Chun-Kit Lee}
+}
+
+%------------------------------------------------------------------
+% Theorem environments
+%------------------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem*{conjecture*}{Conjecture}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+%------------------------------------------------------------------
+% Custom commands
+%------------------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\lp}{\ell^{2}(\N)}
+
+% Category and logical shorthand
+\newcommand{\SigOne}{\Sigma^{0}_{\!1}}
+\newcommand{\Ban}{\mathfrak{Ban}_{\!\infty}}
+\newcommand{\bool}{\mathbf{2}}
+
+% Norm, range, etc.
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\DeclareMathOperator{\Range}{Range}
+\DeclareMathOperator{\Ker}{Ker}
+\DeclareMathOperator{\Coker}{Coker}
+\DeclareMathOperator{\Surj}{Surj}
+\DeclareMathOperator{\Inj}{Inj}
+\DeclareMathOperator{\ind}{ind}
+\DeclareMathOperator{\rank}{rank}
+
+% Point-spectrum truncation
+\newcommand{\trunc}[1]{\lvert #1\rvert_{(-1)}}
+
+% Meta-theory markers
+\newcommand{\internal}{\langle\text{internal}\rangle}
+\newcommand{\meta}{\langle\text{meta}\rangle}
+
+\title{The Gödel--Banach Correspondence:\\
+  Internal Undecidability from Hilbert Spaces to Derived Categories}
+
+\author{Paul Chun-Kit Lee\thanks{New York University, New York.  Formal Lean 4 artefacts: \url{https://github.com/AICardiologist/FoundationRelativity}
+(tag \leanRepoTag).  The operator construction will appear in a forthcoming tag once mechanised.  }}
+
+\date{July 2, 2025}
+
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\noindent
+We demonstrate that Gödel's incompleteness theorem can be directly encoded in the surjectivity of simple bounded operators on Hilbert space. A rank-one operator on $\lp$, $\mathcal G = I - c_{G}P_{g}$, is surjective iff the Gödel sentence $G$ (`\emph{PA does not prove $G$}') is true.
+
+Working in Homotopy Type Theory (HoTT) + untruncated $\SigOne$-Excluded Middle ($\SigOne$-EM), we prove this equivalence constructively. The phenomenon manifests in two distinct analytical contexts. In reflexive spaces, undecidability is related to kernel/cokernel structures. In non-reflexive spaces, it emerges in the bidual gap: for $X = c_{0}$ there exists a bounded operator $\mathcal B : X \to X$ such that
+\[
+  \Surj\bigl(\mathcal B^{**}\bigr) \quad\Longleftrightarrow\quad G,
+  \qquad
+  \Surj(\mathcal B) \text{ provable in HoTT.}
+\]
+Both constructions exemplify a unifying heuristic: wherever analysis creates ``invisible quotients''---completions, dualizations, or localizations; Gödel's incompleteness may find a place to be encoded. This persistence extends across logical frameworks down to double-negation shift: weaker logics yield double-negated statements, but the undecidability endures when computational content can be extracted. Our arguments unfold across three logical layers detailed in Section 1.5. The paper culminates by showing that this Gödel--Banach correspondence extends to stable $(\infty,1)$-categories, revealing undecidability as a feature of homological algebra that is not exclusive to functional analysis.
+\end{abstract}
+
+[Document continues with full Paper 1 content...]
+
+\end{document}
