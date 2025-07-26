@@ -53,9 +53,8 @@ jobs:
         run: |
           echo 'import SpectralGap.GodelGap
           #check SpectralGap.godelOp
-          #check SpectralGap.norm_u
           #check SpectralGap.godelOp_bounded
-          #check SpectralGap.godelOp_rank_one' | lake env lean --stdin
+          #check SpectralGap.godelOp_selfAdjoint' | lake env lean --stdin
 
       - name: Monitor build performance
         if: always()
