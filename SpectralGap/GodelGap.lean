@@ -42,7 +42,8 @@ instance : Nontrivial L2Space := by
     congrArg (fun v : L2Space ↦ v 0) h_eq
   -- but `g 0 = 1`
   have : (1 : ℂ) = 0 := by
-    simpa [g, lp.single_apply] using this
+    simp [g, lp.single_apply] at this
+    exact this
   exact one_ne_zero this
 
 /-! ### 3 The Gödel‑gap operator -/
@@ -63,10 +64,8 @@ lemma godelOp_bounded : ‖godelOp‖ ≤ (2 : ℝ) := by
 
 /-- `godelOp` is self‑adjoint (it *is* the identity operator). -/
 theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
-  -- unfold the definition and prove equality point‑wise
-  dsimp [IsSelfAdjoint, godelOp]
-  ext x
-  simp
+  -- `IsSelfAdjoint T` is the proposition `T† = T`.
+  simpa [IsSelfAdjoint, godelOp, adjoint_id]
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
@@ -95,10 +94,11 @@ lemma godelOp_orthogonal_g : g = g := by
 /-- The vector `g` is non‑zero. -/
 lemma g_nonzero : (g : L2Space) ≠ 0 := by
   intro h
-  have : ((g : L2Space) 0 : ℂ) = 0 :=
+  have h0 : ((g : L2Space) 0 : ℂ) = 0 :=
     congrArg (fun v : L2Space ↦ v 0) h
   have : (1 : ℂ) = 0 := by
-    simpa [g, lp.single_apply] using this
+    simp [g, lp.single_apply] at h0
+    exact h0
   exact one_ne_zero this
 
 /-- Classical `Sel₃` built from the vector `g`. -/
