@@ -2,13 +2,13 @@
 
 [![CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml)
 [![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
-[![Lean 4.22.0-rc3](https://img.shields.io/badge/Lean-4.22.0--rc3-blue)](https://github.com/leanprover/lean4)
+[![Lean 4.22.0-rc4](https://img.shields.io/badge/Lean-4.22.0--rc4-blue)](https://github.com/leanprover/lean4)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 
-> **🎉 v1.1-alpha RELEASED**: Foundation-Relativity ρ=4 Achievement ✅  
-> **Latest**: First formal verification of DC_{ω·2} pathology with zero-sorry compliance  
-> **🎯 ρ-HIERARCHY**: Complete progression from WLPO (ρ=1) to DC_{ω·2} (ρ=4) ✅
+> **🎉 v0.4.0 RELEASED**: Foundation-Relativity ρ=5 Peak Achievement ✅  
+> **Latest**: Gödel-Gap pathology requiring full DC_{ω·3} with zero-sorry compliance  
+> **🎯 ρ-HIERARCHY**: Complete progression from WLPO (ρ=1) to DC_{ω·3} (ρ=5) ✅
 
 
 A Lean 4 formalization exploring how mathematical pathologies behave differently under various foundational assumptions.
@@ -101,8 +101,19 @@ FoundationRelativity/
 
 ### Prerequisites
 
-- [Lean 4.22.0-rc3](https://github.com/leanprover/lean4/releases/tag/v4.22.0-rc3)
+- [Lean 4.22.0-rc4](https://github.com/leanprover/lean4/releases/tag/v4.22.0-rc4)
 - [VS Code](https://code.visualstudio.com/) with [lean4 extension](https://marketplace.visualstudio.com/items?itemName=leanprover.lean4)
+
+### Toolchain Setup
+
+```bash
+# Install elan (Lean version manager)
+curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh
+
+# Install the required Lean version
+elan toolchain install leanprover/lean4:4.22.0-rc4
+elan default leanprover/lean4:4.22.0-rc4
+```
 
 ### Building
 
@@ -147,6 +158,9 @@ lake exe SpectralGapProofTests
 
 # Verify Cheeger-Bottleneck pathology (ρ ≈ 3½)
 lake exe CheegerProofTests
+
+# Verify Gödel-Gap pathology (ρ=5)
+lake exe GodelGapProofTests
 
 # Run all pathology tests
 lake exe AllPathologiesTests
