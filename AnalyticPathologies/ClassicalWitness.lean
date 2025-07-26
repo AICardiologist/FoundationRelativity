@@ -2,7 +2,7 @@ import AnalyticPathologies.HilbertSetup
 
 /-! # Classical witness for the zero operator (Milestone C) -/
 
-open SpectralGap
+open AnalyticPathologies
 
 namespace AnalyticPathologies
 

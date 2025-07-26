@@ -7,7 +7,7 @@ Everything here **compiles without `sorry`**; the real constructive proof will
 replace the trivial bodies on Day 3–4.
 -/
 
-open SpectralGap
+open AnalyticPathologies
 
 namespace AnalyticPathologies
 
