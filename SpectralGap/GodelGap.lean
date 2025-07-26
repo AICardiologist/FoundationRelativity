@@ -33,14 +33,16 @@ noncomputable def u : L2Space := u₀
 /-- Gödel‑gap vector `g`. -/
 noncomputable def g : L2Space := lp.single 2 0 1
 
-/-! ### 2.5 Non-triviality witness for `L2Space` -/
+/-! ### 2.5 `L2Space` is non‑trivial (needed by `norm_id`) -/
 
 instance : Nontrivial L2Space := by
-  -- `lp.single 2 0 1` is the basis vector e₀, clearly non‑zero
-  refine ⟨⟨(0 : L2Space), g, ?_⟩⟩
+  refine ⟨⟨g, 0, ?_⟩⟩
   intro h
-  have : ((g : L2Space) 0 : ℂ) = 0 := congrArg (fun v : L2Space ↦ v 0) h
-  simp [g, lp.single_apply] at this             -- gives `1 = 0`
+  have h0 : ((g : L2Space) 0 : ℂ) = 0 :=
+    congrArg (fun v : L2Space ↦ v 0) h
+  -- but `g 0 = 1`
+  have : (1 : ℂ) = 0 := by
+    simpa [g, lp.single_apply] using h0
   exact one_ne_zero this
 
 /-! ### 3 The Gödel‑gap operator -/
@@ -54,10 +56,9 @@ noncomputable def godelOp : BoundedOp :=
 
 /-- `godelOp` is bounded with `‖godelOp‖ ≤ 2`. -/
 lemma godelOp_bounded : ‖godelOp‖ ≤ (2 : ℝ) := by
-  -- `‖id‖ = 1`
-  have : ‖godelOp‖ = (1 : ℝ) := by
+  have h₁ : ‖godelOp‖ = (1 : ℝ) := by
     simpa [godelOp] using norm_id (𝕜 := ℂ) (E := L2Space)
-  simpa [this] using (show (1 : ℝ) ≤ 2 by norm_num)
+  simpa [h₁] using (show (1 : ℝ) ≤ 2 by norm_num)
 
 /-- `godelOp` is self‑adjoint (it is the identity). -/
 theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
@@ -90,12 +91,10 @@ lemma godelOp_orthogonal_g : g = g := by
 /-- The vector `g` is non‑zero. -/
 lemma g_nonzero : (g : L2Space) ≠ 0 := by
   intro h
-  -- evaluate equality at coordinate 0
-  have : ((g : L2Space) 0 : ℂ) = 0 :=
+  have h0 : ((g : L2Space) 0 : ℂ) = 0 :=
     congrArg (fun v : L2Space ↦ v 0) h
-  -- but `g 0 = 1`, contradiction
   have : (1 : ℂ) = 0 := by
-    simpa [g, lp.single_apply] using this
+    simpa [g, lp.single_apply] using h0
   exact one_ne_zero this
 
 /-- Classical `Sel₃` built from the vector `g`. -/
