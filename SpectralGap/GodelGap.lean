@@ -63,12 +63,9 @@ lemma godelOp_bounded : ‖godelOp‖ ≤ (2 : ℝ) := by
 /-- `godelOp` (the identity) is self‑adjoint. -/
 theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
   -- rewrite to a goal about a `ContinuousLinearMap`
-  dsimp [IsSelfAdjoint, godelOp]
-  -- Lean finds `adjoint_id` after inserting the right type arguments
-  simpa using
-    (adjoint_id :
-      adjoint (ContinuousLinearMap.id ℂ L2Space) =
-              ContinuousLinearMap.id ℂ L2Space)
+  rw [IsSelfAdjoint, godelOp]
+  -- The goal is now adjoint 1 = 1
+  exact adjoint_id
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
