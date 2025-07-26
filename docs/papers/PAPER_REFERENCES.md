@@ -7,15 +7,16 @@ This document provides access to Paul Lee's "Gödel in Four Acts" paper series t
 | Paper | Title | ResearchGate Link | Sprint Usage |
 |-------|-------|------------------|--------------|
 | **Paper 1** | The Gödel-Banach Correspondence: Internal Undecidability from Hilbert Spaces to Derived Categories | [Link](https://www.researchgate.net/publication/393185227_The_Godel-Banach_Correspondence_Internal_Undecidability_from_Hilbert_Spaces_to_Derived_Categories) | Sprints 39-40 (Gödel-Gap) |
-| **Paper 2** | The Bidual Gap Across Foundations: Non-Functoriality, Quantitative Tiers, and a Gödel-Gap Correspondence | [Link](https://www.researchgate.net/publication/393723227_The_Bidual_Gap_Across_Foundations_Non-Functoriality_Quantitative_Tiers_and_a_Godel-Gap_Correspondence_The_Core_Phenomenon) | Already implemented (ρ-hierarchy) |
+| **Paper 2** | The Bidual Gap Across Foundations: Non-Functoriality, Quantitative Tiers, and a Gödel-Gap Correspondence | [Link](https://www.researchgate.net/publication/393723227_The_Bidual_Gap_Across_Foundations_Non-Functoriality_Quantitative_Tiers_and_a_Godel-Gap_Correspondence_The_Core_Phenomenon) | Sprints 38-39 (ρ-hierarchy refinement) |
 | **Paper 3** | A 2-Categorical Framework for Foundation-Relativity | [Link](https://www.researchgate.net/publication/393782503_A_2-Categorical_Framework_for_Foundation-Relativity) | Sprints 41-45 (CategoryTheory) |
-| **Paper 4** | Undecidability and Foundation-Relativity in Spectral Geometry | [Link](https://www.researchgate.net/publication/393796022_Undecidability_and_Foundation-Relativity_in_Spectral_Geometry) | Future work (Sprints 46-48) |
+| **Paper 4** | Undecidability and Foundation-Relativity in Spectral Geometry | [Link](https://www.researchgate.net/publication/393796022_Undecidability_and_Foundation-Relativity_in_Spectral_Geometry) | Sprints 46-48 (Spectral undecidability) |
 
 ## Sprint-Specific Paper Usage
 
 ### Sprint 38: ρ = 4 Polish + Artifact Evaluation
-- **Papers needed**: None beyond existing repo content
+- **Papers needed**: **Paper 2** (for ρ-hierarchy refinement)
 - **Purpose**: Refactoring and packaging completed Cheeger/Borel-Selector proofs
+- **Key sections**: Bidual gap-WLPO equivalence, quantitative tier analysis
 
 ### Sprint 39-40: Gödel-Gap Implementation  
 - **Primary paper**: **Paper 1** - "The Gödel-Banach Correspondence"

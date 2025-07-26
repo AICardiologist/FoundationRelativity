@@ -24,10 +24,19 @@ This directory contains the source papers for the Foundation-Relativity project 
 2. **Commit**: Place files in this directory with specified filenames
 3. **Git Attributes**: Files will be tracked as binary in .gitattributes
 
-## Reference Papers (Available but not immediately needed)
+### Paper 2: Bidual Gap Across Foundations
+- **LaTeX Source**: `P2-BidualGap.tex` ✅
+- **PDF**: `P2-BidualGap.pdf` ⚠️ (placeholder - replace with actual PDF)
+- **ResearchGate**: https://www.researchgate.net/publication/[PAPER2_ID]
+- **Usage**: Already implemented in current codebase (ρ-hierarchy)
+- **Status**: ✅ LaTeX source available, PDF placeholder created
 
-- **Paper 2**: Already implemented in current codebase (ρ-hierarchy)
-- **Paper 4**: Future work (Sprints 46-48, spectral geometry)
+### Paper 4: Spectral Geometry and Foundation-Relativity
+- **LaTeX Source**: `P4-SpectralGeometry.tex` ✅
+- **PDF**: `P4-SpectralGeometry.pdf` ⚠️ (placeholder - replace with actual PDF)
+- **ResearchGate**: https://www.researchgate.net/publication/[PAPER4_ID]
+- **Usage**: Future work (Sprints 46-48, spectral geometry)
+- **Status**: ✅ LaTeX source available, PDF placeholder created
 
 ---
 
