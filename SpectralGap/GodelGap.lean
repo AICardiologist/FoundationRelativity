@@ -65,8 +65,7 @@ theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
   -- `IsSelfAdjoint T` is the proposition `T† = T`.
   rw [IsSelfAdjoint, godelOp]
   -- adjoint of identity is identity
-  ext x
-  simp
+  rfl
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
