@@ -8,7 +8,7 @@
 import SpectralGap.HilbertSetup
 import LogicDSL
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Basic   -- for `norm_id_le`
-import Mathlib.Analysis.InnerProductSpace.Adjoint        -- for `IsSelfAdjoint`
+import Mathlib.Analysis.InnerProductSpace.Adjoint        -- `adjoint_id`
 
 open Complex Real BigOperators ContinuousLinearMap
 
@@ -37,12 +37,12 @@ noncomputable def g : L2Space := lp.single 2 0 1
 
 instance : Nontrivial L2Space := by
   refine ⟨⟨g, 0, ?_⟩⟩
-  intro h
-  have h0 : ((g : L2Space) 0 : ℂ) = 0 :=
-    congrArg (fun v : L2Space ↦ v 0) h
+  intro h_eq        -- assume `g = 0`, derive a contradiction
+  have : ((g : L2Space) 0 : ℂ) = 0 :=
+    congrArg (fun v : L2Space ↦ v 0) h_eq
   -- but `g 0 = 1`
   have : (1 : ℂ) = 0 := by
-    simpa [g, lp.single_apply] using h0
+    simpa [g, lp.single_apply] using this
   exact one_ne_zero this
 
 /-! ### 3 The Gödel‑gap operator -/
@@ -58,11 +58,12 @@ noncomputable def godelOp : BoundedOp :=
 lemma godelOp_bounded : ‖godelOp‖ ≤ (2 : ℝ) := by
   have h₁ : ‖godelOp‖ = (1 : ℝ) := by
     simpa [godelOp] using norm_id (𝕜 := ℂ) (E := L2Space)
-  simpa [h₁] using (show (1 : ℝ) ≤ 2 by norm_num)
+  have : (1 : ℝ) ≤ 2 := by norm_num
+  simpa [h₁] using this
 
 /-- `godelOp` is self‑adjoint (it is the identity). -/
 theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
-  dsimp [IsSelfAdjoint, godelOp]; simp      -- `adjoint 1 = 1`
+  dsimp [IsSelfAdjoint, godelOp]; simp [adjoint_id]
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
