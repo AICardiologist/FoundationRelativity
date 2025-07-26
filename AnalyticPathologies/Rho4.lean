@@ -43,14 +43,15 @@ noncomputable def rho4 (b : ℕ → Bool) : BoundedOp :=
 
 /-- rho4 is self‐adjoint for any Boolean stream b. -/
 theorem rho4_selfAdjoint (b : ℕ → Bool) : IsSelfAdjoint (rho4 b) := by
-  -- rho4 = diagonal + shaft where diagonal = 1 and shaft = 0
-  -- Both are self-adjoint, so their sum is self-adjoint
-  sorry -- TODO: Pre-existing proof gap from main branch
+  simp only [rho4, shaft, IsSelfAdjoint, add_zero]
+  -- diagonal is self-adjoint: adjoint(diagonal) = diagonal
+  sorry -- TODO: Need diagonal self-adjoint lemma from HilbertSetup
 
 /-- rho4 is bounded with norm at most 1. -/
 theorem rho4_bounded (b : ℕ → Bool) : ‖rho4 b‖ ≤ 1 := by
-  -- rho4 = diagonal + shaft = 1 + 0 = 1, so ‖rho4‖ = 1
-  sorry -- TODO: Pre-existing proof gap from main branch
+  simp only [rho4, shaft, add_zero]
+  -- ‖diagonal‖ ≤ 1 since diagonal entries are bounded
+  sorry -- TODO: Need diagonal norm bound lemma from HilbertSetup
 
 /-! ### 4 Low selector structure -/
 

@@ -30,8 +30,9 @@ noncomputable def cheeger (β : ℝ) (b : ℕ → Bool) : BoundedOp :=
 /-- Cheeger operator is self-adjoint. -/
 theorem cheeger_selfAdjoint (β : ℝ) (b : ℕ → Bool) : 
     IsSelfAdjoint (cheeger β b) := by
-  -- cheeger = cheegerDiag = 1, which is self-adjoint
-  sorry -- TODO: Pre-existing proof gap from main branch
+  simp only [cheeger, cheegerDiag, IsSelfAdjoint]
+  -- cheegerDiag = 1, and 1 is self-adjoint
+  sorry -- TODO: Need identity self-adjoint lemma from HilbertSetup
 
 /-- Cheeger has spectral gap when |β - 1| ≥ 1/2. -/
 theorem cheeger_has_gap {β : ℝ} (hβ : |β - 1| ≥ 1/2) (b : ℕ → Bool) :
