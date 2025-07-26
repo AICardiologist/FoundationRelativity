@@ -77,6 +77,7 @@ jobs:
 
       - name: Create bump PR if successful
         if: success()
+        continue-on-error: true
         uses: peter-evans/create-pull-request@v5
         with:
           title: 'chore: bump mathlib and Lean nightly'
