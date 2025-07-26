@@ -16,17 +16,18 @@ attribute [instance] Foundation.UnivCat
 
 /-- Interpretations between foundations. -/
 structure Interp (A B : Foundation) where
-  dummy : Unit  -- TODO(S41): Replace with proper functor A.Univ ⥤ B.Univ
+  toFun : Unit  -- TODO(S41): Replace with A.Univ ⥤ B.Univ (Unicode issue)
+  -- TODO(S41): add preservesLimits, preservesColimits, idOnSigma0
 
 namespace Interp
 
 /-- Identity interpretation. -/
 def id (A : Foundation) : Interp A A :=
-  { dummy := () }
+  { toFun := () }
 
 /-- Composition of interpretations. -/
 def comp {A B C : Foundation} (f : Interp A B) (g : Interp B C) : Interp A C :=
-  { dummy := () }
+  { toFun := () }
 
 end Interp
 
