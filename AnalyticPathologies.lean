@@ -1,8 +1,8 @@
 /-!
 # AnalyticPathologies - Root module
-#
-# This file re-exports all analytic pathology modules for convenient access.
-# Formerly known as SpectralGap in earlier versions.
+
+This file re-exports all analytic pathology modules for convenient access.
+Formerly known as SpectralGap in earlier versions.
 -/
 
 import AnalyticPathologies.HilbertSetup
