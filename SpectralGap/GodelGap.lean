@@ -61,9 +61,12 @@ lemma godelOp_bounded : ‖godelOp‖ ≤ (2 : ℝ) := by
   have : (1 : ℝ) ≤ 2 := by norm_num
   simpa [h₁] using this
 
-/-- `godelOp` is self‑adjoint (it is the identity). -/
+/-- `godelOp` is self‑adjoint (it *is* the identity operator). -/
 theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
-  simpa [godelOp] using isSelfAdjoint_one
+  -- unfold the definition and prove equality point‑wise
+  dsimp [IsSelfAdjoint, godelOp]
+  ext x
+  simp
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
@@ -92,10 +95,10 @@ lemma godelOp_orthogonal_g : g = g := by
 /-- The vector `g` is non‑zero. -/
 lemma g_nonzero : (g : L2Space) ≠ 0 := by
   intro h
-  have h0 : ((g : L2Space) 0 : ℂ) = 0 :=
+  have : ((g : L2Space) 0 : ℂ) = 0 :=
     congrArg (fun v : L2Space ↦ v 0) h
   have : (1 : ℂ) = 0 := by
-    simpa [g, lp.single_apply] using h0
+    simpa [g, lp.single_apply] using this
   exact one_ne_zero this
 
 /-- Classical `Sel₃` built from the vector `g`. -/
