@@ -10,7 +10,7 @@ import LogicDSL
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Basic   -- for `norm_id_le`
 import Mathlib.Analysis.InnerProductSpace.Adjoint        -- for `IsSelfAdjoint`
 
-open Complex Real BigOperators
+open Complex Real BigOperators ContinuousLinearMap
 
 namespace SpectralGap
 
@@ -33,6 +33,16 @@ noncomputable def u : L2Space := u₀
 /-- Gödel‑gap vector `g`. -/
 noncomputable def g : L2Space := lp.single 2 0 1
 
+/-! ### 2.5 Non-triviality witness for `L2Space` -/
+
+instance : Nontrivial L2Space := by
+  -- `lp.single 2 0 1` is the basis vector e₀, clearly non‑zero
+  refine ⟨⟨(0 : L2Space), g, ?_⟩⟩
+  intro h
+  have : ((g : L2Space) 0 : ℂ) = 0 := congrArg (fun v : L2Space ↦ v 0) h
+  simp [g, lp.single_apply] at this             -- gives `1 = 0`
+  exact one_ne_zero this
+
 /-! ### 3 The Gödel‑gap operator -/
 
 /-- The Gödel‑gap operator: rank‑one Fredholm operator
@@ -42,20 +52,16 @@ noncomputable def godelOp : BoundedOp :=
 
 /-! ### 4 Elementary lemmas -/
 
-open ContinuousLinearMap
-
 /-- `godelOp` is bounded with `‖godelOp‖ ≤ 2`. -/
 lemma godelOp_bounded : ‖godelOp‖ ≤ (2 : ℝ) := by
-  -- `‖godelOp‖ = 1`
-  have h : ‖godelOp‖ = (1 : ℝ) := by
-    -- coercion `BoundedOp →L[ℂ] _` + the lemma `norm_id`
+  -- `‖id‖ = 1`
+  have : ‖godelOp‖ = (1 : ℝ) := by
     simpa [godelOp] using norm_id (𝕜 := ℂ) (E := L2Space)
-  -- turn the goal into `1 ≤ 2`
-  simpa [h] using (show (1 : ℝ) ≤ 2 by norm_num)
+  simpa [this] using (show (1 : ℝ) ≤ 2 by norm_num)
 
-/-- `godelOp` is self‑adjoint (it is the identity operator). -/
+/-- `godelOp` is self‑adjoint (it is the identity). -/
 theorem godelOp_selfAdjoint : IsSelfAdjoint godelOp := by
-  dsimp [IsSelfAdjoint, godelOp]; simp   -- `adjoint 1 = 1`
+  dsimp [IsSelfAdjoint, godelOp]; simp      -- `adjoint 1 = 1`
 
 /-! ### 5 Selector `Sel₃` and Π⁰₂ diagonal argument -/
 
