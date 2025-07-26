@@ -16,7 +16,8 @@ attribute [instance] Foundation.UnivCat
 
 /-- Interpretations between foundations. -/
 structure Interp (A B : Foundation) where
-  toFun : Unit  -- TODO(S41): Replace with A.Univ ⥤ B.Univ (Unicode issue)
+  /-- The underlying functor - TODO(Day4): Replace with A.Univ ⥤ B.Univ once Unicode fixed -/  
+  toFun : Unit
   -- TODO(S41): add preservesLimits, preservesColimits, idOnSigma0
 
 namespace Interp
