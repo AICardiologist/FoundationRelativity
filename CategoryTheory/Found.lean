@@ -1,4 +1,5 @@
 import Mathlib.CategoryTheory.Category.Basic
+import Mathlib.CategoryTheory.Functor.Basic
 
 -- Sprint 40 Day 3: Basic Foundation category skeleton  
 -- TODO(S41): Add full 2-categorical structure
@@ -16,19 +17,18 @@ attribute [instance] Foundation.UnivCat
 
 /-- Interpretations between foundations. -/
 structure Interp (A B : Foundation) where
-  /-- The underlying functor - TODO(Day4): Replace with A.Univ ⥤ B.Univ once Unicode fixed -/  
-  toFun : Unit
+  toFun : CategoryTheory.Functor A.Univ B.Univ
   -- TODO(S41): add preservesLimits, preservesColimits, idOnSigma0
 
 namespace Interp
 
 /-- Identity interpretation. -/
 def id (A : Foundation) : Interp A A :=
-  { toFun := () }
+  { toFun := CategoryTheory.Functor.id _ }
 
 /-- Composition of interpretations. -/
 def comp {A B C : Foundation} (f : Interp A B) (g : Interp B C) : Interp A C :=
-  { toFun := () }
+  { toFun := CategoryTheory.Functor.comp f.toFun g.toFun }
 
 end Interp
 
