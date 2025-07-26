@@ -5,14 +5,14 @@
   
   Strategic simplification to work with available mathlib APIs.
 -/
-import SpectralGap.HilbertSetup
+import AnalyticPathologies.HilbertSetup
 import LogicDSL
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Basic   -- for `norm_id_le`
 import Mathlib.Analysis.InnerProductSpace.Adjoint        -- `adjoint_id`
 
 open Complex Real BigOperators ContinuousLinearMap
 
-namespace SpectralGap
+namespace AnalyticPathologies
 
 /-! ### 1 Primitive‑recursive predicate (placeholder) -/
 
@@ -117,4 +117,4 @@ theorem GodelGap_requires_DCω3 (S : Sel₃) :
     LogicDSL.RequiresDCω3 := by
   exact LogicDSL.dcω3_of_wlpoPlusPlus (wlpoPlusPlus_of_sel₃ S)
 
-end SpectralGap
+end AnalyticPathologies

@@ -1,4 +1,4 @@
-import SpectralGap.GodelGap
+import AnalyticPathologies.GodelGap
 
 -- Compilation sanity checks
 open SpectralGap ClassicalWitness

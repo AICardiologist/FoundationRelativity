@@ -11,8 +11,10 @@ require mathlib from git
 @[default_target] lean_lib Gap2 where srcDir := "."
 @[default_target] lean_lib APFunctor where srcDir := "."
 @[default_target] lean_lib RNPFunctor where srcDir := "."
-@[default_target] lean_lib SpectralGap where srcDir := "."
+@[default_target] lean_lib AnalyticPathologies where srcDir := "."
+@[default_target] lean_lib Axiom where srcDir := "."
 @[default_target] lean_lib LogicDSL where srcDir := "."
+@[default_target] lean_lib CategoryTheory where srcDir := "."
 
 -- Test executables
 lean_exe testFunctors where

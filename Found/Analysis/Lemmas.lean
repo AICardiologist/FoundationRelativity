@@ -3,6 +3,7 @@ import Mathlib.MeasureTheory.Measure.MeasureSpace
 import Mathlib.Logic.IsEmpty
 import Mathlib.Logic.Unique
 import Found.LogicDSL
+import Axiom.BanachLimit
 
 /-!
 # Analysis Lemmas for Pathology Proofs
@@ -28,12 +29,6 @@ structure MartingaleTail where
   /-- Property: normalized on constant sequences -/
   normalized : functional (fun _ => 1) = 1
 
-/-- Simplified classical construction marker -/
-axiom classical_banach_limit_exists : 
-  ∃ (φ : (ℕ → ℝ) →ₗ[ℝ] ℝ), 
-    (∀ f : ℕ → ℝ, φ (fun n => f (n + 1)) = φ f) ∧  -- shift invariance
-    (∀ c : ℝ, φ (fun _ => c) = c) ∧                -- normalization
-    (∀ f : ℕ → ℝ, (∀ n, 0 ≤ f n) → 0 ≤ φ f)      -- positivity
 
 /-- Technical lemma: Banach limit satisfies tail measurability -/
 axiom banach_limit_tail_measurable (φ : (ℕ → ℝ) →ₗ[ℝ] ℝ) 

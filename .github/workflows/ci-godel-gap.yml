@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'SpectralGap/GodelGap.lean'
+      - 'AnalyticPathologies/GodelGap.lean'
       - 'test/GodelGapProofTest.lean'
       - 'docs/*godel*'
 
@@ -32,18 +32,18 @@ jobs:
           path: |
             ~/.lake
             .lake/build
-          key: ${{ runner.os }}-lake-godel-${{ hashFiles('lakefile.lean', 'SpectralGap/GodelGap.lean') }}
+          key: ${{ runner.os }}-lake-godel-${{ hashFiles('lakefile.lean', 'AnalyticPathologies/GodelGap.lean') }}
 
       - name: Build Gödel-Gap module
         timeout-minutes: 1  # Should compile in <5s
         run: |
           echo "🧪 Building Gödel-Gap pathology (ρ ≈ 4½-5)..."
-          time lake build SpectralGap.GodelGap
+          time lake build AnalyticPathologies.GodelGap
           echo "✅ Gödel-Gap module built successfully"
 
       - name: Verify no 'sorry' in Gödel-Gap
         run: |
-          if grep -r "sorry" SpectralGap/GodelGap.lean; then
+          if grep -r "sorry" AnalyticPathologies/GodelGap.lean; then
             echo "❌ Found 'sorry' in GodelGap.lean!"
             exit 1
           fi
@@ -51,16 +51,16 @@ jobs:
 
       - name: Check operator properties
         run: |
-          echo 'import SpectralGap.GodelGap
-          #check SpectralGap.godelOp
-          #check SpectralGap.godelOp_bounded
-          #check SpectralGap.godelOp_selfAdjoint' | lake env lean --stdin
+          echo 'import AnalyticPathologies.GodelGap
+          #check AnalyticPathologies.godelOp
+          #check AnalyticPathologies.godelOp_bounded
+          #check AnalyticPathologies.godelOp_selfAdjoint' | lake env lean --stdin
 
       - name: Monitor build performance
         if: always()
         run: |
           echo "📊 Build Performance Report"
-          echo "Module: SpectralGap.GodelGap"
+          echo "Module: AnalyticPathologies.GodelGap"
           echo "Expected: <9s (Day 3), Alert: >20s, Timeout: 60s"
           
           # Extract build time if available

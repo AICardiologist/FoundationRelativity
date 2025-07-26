@@ -1,62 +1,52 @@
-import Found.InterpCore
 import Mathlib.CategoryTheory.Category.Basic
 import Mathlib.CategoryTheory.Functor.Basic
 
-/-!
-# Found.lean - 2-Category of Foundations
-
-Sprint 42 infrastructure for 2-categorical layer implementation.
-
-## Objects
-- Foundation types (BISH, ZFC, INT, DNS-TT, HoTT)
-
-## 1-cells  
-- Interpretation morphisms between foundations
-
-## 2-cells
-- Natural transformations and coherence data
-
-This module establishes the 2-categorical framework for foundation-relative mathematics.
--/
-
-open CategoryTheory
+-- Sprint 40 Day 3: Basic Foundation category skeleton  
+-- TODO(S41): Add full 2-categorical structure
 
 namespace CategoryTheory.Found
 
-/-! ### Objects: Foundation Types -/
+open CategoryTheory
 
--- Foundation is already defined in Found.InterpCore
--- We'll use it as our object type
+/-- A foundation with universe category. -/
+structure Foundation where
+  Univ    : Type*
+  UnivCat : Category Univ
 
-/-! ### 1-cells: Interpretation Morphisms -/
+attribute [instance] Foundation.UnivCat
 
--- Interp is already defined in Found.InterpCore
--- We'll build the category structure around it
+/-- Interpretations between foundations. -/
+structure Interp (A B : Foundation) where
+  toFun : CategoryTheory.Functor A.Univ B.Univ
+  -- TODO(S41): add preservesLimits, preservesColimits, idOnSigma0
 
-/-! ### 2-cells: Natural Transformations -/
+namespace Interp
 
-/-- 2-cells in the 2-category of foundations.
-    These represent coherence data between interpretation morphisms. -/
-structure TwoCell (F G : Foundation → Foundation) : Type where
-  /-- Component at each foundation -/
-  component : ∀ (X : Foundation), F X = G X
-  /-- Naturality condition (placeholder for now) -/
-  naturality : True
+/-- Identity interpretation. -/
+def id (A : Foundation) : Interp A A :=
+  { toFun := CategoryTheory.Functor.id _ }
 
-/-! ### Category Structure -/
+/-- Composition of interpretations. -/
+def comp {A B C : Foundation} (f : Interp A B) (g : Interp B C) : Interp A C :=
+  { toFun := CategoryTheory.Functor.comp f.toFun g.toFun }
 
-/-- The category of foundations as a 1-category (ignoring 2-cell structure for now) -/
-def FoundationCat : Type := Foundation
+end Interp
 
--- Simplified category structure for Sprint 42 scaffold
-instance : Category FoundationCat where
-  Hom X Y := Unit  -- Placeholder: simplified morphisms
-  id _ := ()
-  comp _ _ := ()
-
-/-! ### 2-Categorical Structure (Future Work) -/
-
--- Placeholder for full 2-categorical implementation
--- Will be expanded in subsequent sprints
+instance : Category Foundation where
+  Hom := Interp
+  id := Interp.id
+  comp := Interp.comp
+  id_comp := by
+    intro A B f
+    -- TODO(S41): Prove category laws
+    sorry
+  comp_id := by
+    intro A B f
+    -- TODO(S41): Prove category laws
+    sorry  
+  assoc := by
+    intro A B C D f g h
+    -- TODO(S41): Prove category laws
+    sorry
 
 end CategoryTheory.Found

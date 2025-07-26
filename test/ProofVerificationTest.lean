@@ -10,9 +10,9 @@ import Gap2.Proofs
 import APFunctor.Proofs
 import RNPFunctor.Proofs
 import RNPFunctor.Proofs3
-import SpectralGap.Proofs
-import SpectralGap.ClassicalWitness
-import SpectralGap.NoWitness
+import AnalyticPathologies.Proofs
+import AnalyticPathologies.ClassicalWitness
+import AnalyticPathologies.NoWitness
 
 open CategoryTheory Foundation Found Gap APFail RNPFunctor SpectralGap
 

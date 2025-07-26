@@ -1,5 +1,5 @@
-import SpectralGap.LogicDSL
-import SpectralGap.HilbertSetup   -- for `BoundedOp`, `L2Space`, `e`
+import AnalyticPathologies.LogicDSL
+import AnalyticPathologies.HilbertSetup   -- for `BoundedOp`, `L2Space`, `e`
 
 /-! # Constructive Impossibility for Spectral Gap – stub layer
 
@@ -7,9 +7,9 @@ Everything here **compiles without `sorry`**; the real constructive proof will
 replace the trivial bodies on Day 3–4.
 -/
 
-open SpectralGap
+open AnalyticPathologies
 
-namespace SpectralGap
+namespace AnalyticPathologies
 
 /-! ## 1 Auxiliary notions -/
 
@@ -69,4 +69,4 @@ theorem noWitness_bish (hsel : Sel) : RequiresACω := by
   have _ : ACω := acω_of_wlpo hwlpo
   exact RequiresACω.mk
 
-end SpectralGap
+end AnalyticPathologies

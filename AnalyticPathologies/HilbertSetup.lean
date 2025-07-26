@@ -17,7 +17,7 @@ import Mathlib.Analysis.Normed.Operator.Compact
 
 
 
-namespace SpectralGap
+namespace AnalyticPathologies
 
 /-- **Canonical Hilbert space** - the ℓ² space over complex numbers. -/
 abbrev L2Space : Type := lp (fun _ : ℕ => ℂ) 2
@@ -90,4 +90,4 @@ noncomputable def zeroGapOp : SpectralGapOperator :=
   gap_lt  := by norm_num,
   gap     := trivial }
 
-end SpectralGap
+end AnalyticPathologies
