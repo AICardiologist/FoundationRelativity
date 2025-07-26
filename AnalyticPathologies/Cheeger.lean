@@ -4,11 +4,11 @@
   Sprint 35 - Cheeger-Bottleneck operator (ρ ≈ 3½)
   Mathematical content preserved with infrastructure adaptations.
 -/
-import SpectralGap.HilbertSetup
-import SpectralGap.NoWitness
-import SpectralGap.LogicDSL
+import AnalyticPathologies.HilbertSetup
+import AnalyticPathologies.NoWitness
+import AnalyticPathologies.LogicDSL
 
-namespace SpectralGap
+namespace AnalyticPathologies
 
 open Real
 
@@ -82,4 +82,4 @@ theorem Cheeger_requires_ACω (S : ∀ β b, |β - 1| ≥ 1/2 → SelExt (cheege
     RequiresACω := by
   exact RequiresACω.mk
 
-end SpectralGap
+end AnalyticPathologies

@@ -1,62 +1,44 @@
-import Found.InterpCore
-import Mathlib.CategoryTheory.Category.Basic
-import Mathlib.CategoryTheory.Functor.Basic
-
 /-!
-# Found.lean - 2-Category of Foundations
-
-Sprint 42 infrastructure for 2-categorical layer implementation.
-
-## Objects
-- Foundation types (BISH, ZFC, INT, DNS-TT, HoTT)
-
-## 1-cells  
-- Interpretation morphisms between foundations
-
-## 2-cells
-- Natural transformations and coherence data
-
-This module establishes the 2-categorical framework for foundation-relative mathematics.
+# The 2‑Category `Found` – sprint‑40 skeleton
+#
+# Objects   : `Foundation` – an opaque type for now.
+# 1‑morphisms: `Interp`    – data of an interpretation (functor part only).
+# 2‑morphisms: `Interp₂`   – natural transformation between functor parts.
+#
+# This version is *strict* and proof‑minimal.  It compiles, so the rest of the
+# repo will accept `import CategoryTheory.Found`.  Coherence fillers will be
+# added in the day‑5 task.
 -/
+
+import Mathlib.CategoryTheory.Category.Basic
 
 open CategoryTheory
 
+/-‐-----------------------------------------------------------------/
+/- Objects -/
+/-‐-----------------------------------------------------------------/
+
+/-- A "foundation" is currently just a tag; the analytic details live elsewhere. -/
+opaque Foundation : Type
+
+/-- Skeleton category of foundations -/
+instance : Category Foundation where
+  Hom      := fun _ _ ↦ Unit        -- placeholder for `Interp`
+  id       := fun _   ↦ ()
+  comp     := fun _ _ _ _ _ ↦ ()
+
+/-- 1‑morphisms (interpretations) – *placeholder* -/
+abbrev Interp (F₁ F₂ : Foundation) := PUnit
+
+/-- 2‑morphisms between interpretations – also placeholder -/
+abbrev Interp₂ {F₁ F₂ : Foundation} (Φ Ψ : Interp F₁ F₂) := Unit
+
+/-‐-----------------------------------------------------------------/
+/- Namespace packaging -/
+/-‐-----------------------------------------------------------------/
+
 namespace CategoryTheory.Found
 
-/-! ### Objects: Foundation Types -/
-
--- Foundation is already defined in Found.InterpCore
--- We'll use it as our object type
-
-/-! ### 1-cells: Interpretation Morphisms -/
-
--- Interp is already defined in Found.InterpCore
--- We'll build the category structure around it
-
-/-! ### 2-cells: Natural Transformations -/
-
-/-- 2-cells in the 2-category of foundations.
-    These represent coherence data between interpretation morphisms. -/
-structure TwoCell (F G : Foundation → Foundation) : Type where
-  /-- Component at each foundation -/
-  component : ∀ (X : Foundation), F X = G X
-  /-- Naturality condition (placeholder for now) -/
-  naturality : True
-
-/-! ### Category Structure -/
-
-/-- The category of foundations as a 1-category (ignoring 2-cell structure for now) -/
-def FoundationCat : Type := Foundation
-
--- Simplified category structure for Sprint 42 scaffold
-instance : Category FoundationCat where
-  Hom X Y := Unit  -- Placeholder: simplified morphisms
-  id _ := ()
-  comp _ _ := ()
-
-/-! ### 2-Categorical Structure (Future Work) -/
-
--- Placeholder for full 2-categorical implementation
--- Will be expanded in subsequent sprints
+abbrev Obj := Foundation
 
 end CategoryTheory.Found

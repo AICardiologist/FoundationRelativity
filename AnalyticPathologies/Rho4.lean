@@ -4,13 +4,13 @@
   Simplified for Lean 4.22.0-rc4 compatibility.
   Mathematical content preserved with infrastructure adaptations.
 -/
-import SpectralGap.HilbertSetup
-import SpectralGap.NoWitness
+import AnalyticPathologies.HilbertSetup
+import AnalyticPathologies.NoWitness
 
 open scoped BigOperators
 open Complex Finset
 
-namespace SpectralGap
+namespace AnalyticPathologies
 
 /-! ### 0 Parameters fixed for the whole file -/
 -- Low / middle / high eigenvalues (β₀ < β₁ < β₂)
@@ -110,4 +110,4 @@ noncomputable def witness_rho4 : Sel₂ :=
 
 end ClassicalWitness
 
-end SpectralGap
+end AnalyticPathologies

@@ -4,7 +4,7 @@
 the constructive impossibility witness.
 -/
 
-namespace SpectralGap
+namespace AnalyticPathologies
 
 /-! ## Weak Countable Choice -/
 
@@ -27,4 +27,4 @@ theorem acω_from_requires : RequiresACω → ACω := by
   intro _ α hα
   exact ⟨fun n ↦ Classical.choice (hα n)⟩  -- no `sorry`, no tactics
 
-end SpectralGap
+end AnalyticPathologies

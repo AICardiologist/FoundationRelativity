@@ -1,10 +1,10 @@
-import SpectralGap.HilbertSetup
+import AnalyticPathologies.HilbertSetup
 
 /-! # Classical witness for the zero operator (Milestone C) -/
 
 open SpectralGap
 
-namespace SpectralGap
+namespace AnalyticPathologies
 
 /-- A concrete unit vector: `e 0` (Kronecker δ at index 0). -/
 noncomputable def zeroWitness : L2Space := e 0
@@ -19,4 +19,4 @@ noncomputable def zeroWitness : L2Space := e 0
 def witness_zfc : Nonempty (Σ' v : L2Space, (0 : BoundedOp) v = 0) :=
   ⟨⟨zeroWitness, zeroWitness_eigen⟩⟩
 
-end SpectralGap
+end AnalyticPathologies

@@ -10,7 +10,7 @@ the ρ ≈ 3½ pathology proofs once they are completed.
 - Day 7: ⏳ Final verification and integration
 -/
 
-import SpectralGap.Cheeger
+import AnalyticPathologies.Cheeger
 
 open SpectralGap
 

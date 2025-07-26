@@ -1,5 +1,5 @@
-import SpectralGap.NoWitness
-import SpectralGap.Proofs
+import AnalyticPathologies.NoWitness
+import AnalyticPathologies.Proofs
 import Lean
 
 open IO SpectralGap

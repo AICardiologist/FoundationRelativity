@@ -1,6 +1,6 @@
-import SpectralGap.Proofs
-import SpectralGap.HilbertSetup
-import SpectralGap.NoWitness
+import AnalyticPathologies.Proofs
+import AnalyticPathologies.HilbertSetup
+import AnalyticPathologies.NoWitness
 
 /-!
 # SpectralGap Module

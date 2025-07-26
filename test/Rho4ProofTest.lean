@@ -1,4 +1,4 @@
-import SpectralGap.Rho4
+import AnalyticPathologies.Rho4
 
 /-!
 # Rho4 Proof Test - Sprint 36 Regression Test
