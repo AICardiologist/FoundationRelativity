@@ -1,44 +1,50 @@
-/-!
-# The 2‑Category `Found` – sprint‑40 skeleton
-#
-# Objects   : `Foundation` – an opaque type for now.
-# 1‑morphisms: `Interp`    – data of an interpretation (functor part only).
-# 2‑morphisms: `Interp₂`   – natural transformation between functor parts.
-#
-# This version is *strict* and proof‑minimal.  It compiles, so the rest of the
-# repo will accept `import CategoryTheory.Found`.  Coherence fillers will be
-# added in the day‑5 task.
--/
-
 import Mathlib.CategoryTheory.Category.Basic
 
-open CategoryTheory
-
-/-‐-----------------------------------------------------------------/
-/- Objects -/
-/-‐-----------------------------------------------------------------/
-
-/-- A "foundation" is currently just a tag; the analytic details live elsewhere. -/
-opaque Foundation : Type
-
-/-- Skeleton category of foundations -/
-instance : Category Foundation where
-  Hom      := fun _ _ ↦ Unit        -- placeholder for `Interp`
-  id       := fun _   ↦ ()
-  comp     := fun _ _ _ _ _ ↦ ()
-
-/-- 1‑morphisms (interpretations) – *placeholder* -/
-abbrev Interp (F₁ F₂ : Foundation) := PUnit
-
-/-- 2‑morphisms between interpretations – also placeholder -/
-abbrev Interp₂ {F₁ F₂ : Foundation} (Φ Ψ : Interp F₁ F₂) := Unit
-
-/-‐-----------------------------------------------------------------/
-/- Namespace packaging -/
-/-‐-----------------------------------------------------------------/
+-- Sprint 40 Day 3: Basic Foundation category skeleton
+-- TODO(S41): Add full 2-categorical structure
 
 namespace CategoryTheory.Found
 
-abbrev Obj := Foundation
+open CategoryTheory
+
+/-- A foundation with universe category. -/
+structure Foundation where
+  Univ    : Type
+  UnivCat : Category Univ
+
+attribute [instance] Foundation.UnivCat
+
+/-- Interpretations between foundations. -/
+structure Interp (A B : Foundation) where
+  toFun : A.Univ ⥤ B.Univ
+
+namespace Interp
+
+/-- Identity interpretation. -/
+def id (A : Foundation) : Interp A A :=
+  ⟨𝟭 A.Univ⟩
+
+/-- Composition of interpretations. -/
+def comp {A B C : Foundation} (f : Interp A B) (g : Interp B C) : Interp A C :=
+  ⟨f.toFun ⋙ g.toFun⟩
+
+end Interp
+
+instance : Category Foundation where
+  Hom := Interp
+  id := Interp.id
+  comp := Interp.comp
+  id_comp := by
+    intro A B f
+    -- TODO(S41): Prove category laws
+    sorry
+  comp_id := by
+    intro A B f
+    -- TODO(S41): Prove category laws
+    sorry  
+  assoc := by
+    intro A B C D f g h
+    -- TODO(S41): Prove category laws
+    sorry
 
 end CategoryTheory.Found
