@@ -72,3 +72,7 @@ lean_exe PseudoFunctorLawsTests where
 -- Sprint 43 Day 3: Enhanced test suite
 lean_exe PseudoFunctorLaws where
   root := `test.PseudoFunctorLaws
+
+-- Sprint 43 Day 3: Additional regression test
+lean_exe PseudoFunctorLawsTest where
+  root := `test.PseudoFunctorLawsTests
