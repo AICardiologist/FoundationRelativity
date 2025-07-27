@@ -28,7 +28,7 @@ noncomputable def ρ4Weight (b : ℕ → Bool) (n : ℕ) : ℝ :=
   if b n then β₀ else β₂
 
 /-- Diagonal operator placeholder - simplified for compatibility. -/
-noncomputable def diagonal (w : ℕ → ℝ) : BoundedOp := 1
+noncomputable def diagonal (_ : ℕ → ℝ) : BoundedOp := 1
 
 /-- Shaft operator placeholder - simplified for compatibility. -/
 noncomputable def shaft : BoundedOp := 0
@@ -65,7 +65,7 @@ structure Sel₂ : Type where
   bump_eig   : ∀ b, selectBump b = selectBump b  -- Simplified constraint
 
 /-- rho4 has double spectral gap for any b. -/
-theorem rho4_hasDoubleGap (b : ℕ → Bool) : β₀ < β₁ ∧ β₁ < β₂ := by
+theorem rho4_hasDoubleGap (_ : ℕ → Bool) : β₀ < β₁ ∧ β₁ < β₂ := by
   exact ⟨β₀_lt_β₁, β₁_lt_β₂⟩
 
 /-! ### 5 DC definitions -/
@@ -81,13 +81,13 @@ inductive DCω2 : Prop
 inductive RequiresDCω2 : Prop
 | mk : RequiresDCω2
 
-theorem dcω2_of_wlpoPlus (h : WLPOPlus) : DCω2 := DCω2.mk
+theorem dcω2_of_wlpoPlus (_ : WLPOPlus) : DCω2 := DCω2.mk
 
 /-! ### 6 Main theorem: Sel₂ implies DC_{ω·2} -/
 
 open Classical
 
-theorem DC_omega2_of_Sel₂ (S : Sel₂) : DCω2 := by
+theorem DC_omega2_of_Sel₂ (_ : Sel₂) : DCω2 := by
   apply DCω2.mk
 
 /-! ### 7 Classical selector witness -/
@@ -95,19 +95,19 @@ theorem DC_omega2_of_Sel₂ (S : Sel₂) : DCω2 := by
 namespace ClassicalWitness
 
 /-- Low eigenfunction placeholder. -/
-noncomputable def vLow (b : ℕ → Bool) : L2Space := 
+noncomputable def vLow (_ : ℕ → Bool) : L2Space := 
   lp.single 2 0 1
 
 /-- Bump eigenfunction placeholder. -/
-noncomputable def vBump (b : ℕ → Bool) : L2Space := 
+noncomputable def vBump (_ : ℕ → Bool) : L2Space := 
   lp.single 2 1 1
 
 /-- Classical witness that Sel₂ exists. -/
 noncomputable def witness_rho4 : Sel₂ :=
 { selectLow  := vLow,
   selectBump := vBump,
-  low_eig    := fun b => rfl,
-  bump_eig   := fun b => rfl }
+  low_eig    := fun _ => rfl,
+  bump_eig   := fun _ => rfl }
 
 end ClassicalWitness
 

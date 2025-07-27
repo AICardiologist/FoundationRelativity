@@ -1,25 +1,34 @@
-/-
-  BicatFound.lean - Sprint 42 Day 1
-  
-  Bicategory lift of Foundation 2-category to full bicategory framework.
-  
-  This upgrades the strict 2-category Found to a genuine bicategory BicatFound
-  with proper associators, unitors, and coherence conditions.
-  
-  Roadmap:
-  - Day 1: Objects, 1-cells, 2-cells structure
-  - Day 2: Associator/unitor, pentagon/triangle coherence
-  - Day 3-4: PseudoInverse + biequivalence proof
--/
-
-import Found.InterpCore
+import CategoryTheory.Found
 import Mathlib.CategoryTheory.Bicategory.Basic
 import Mathlib.CategoryTheory.Bicategory.Strict
 import Mathlib.CategoryTheory.Category.Basic
 
+/-!
+# Foundation Bicategory Implementation
+
+Bicategory lift of Foundation 2-category to full bicategory framework.
+
+This upgrades the strict 2-category Found to a genuine bicategory BicatFound
+with proper associators, unitors, and coherence conditions.
+
+## Main Definitions
+
+- `FoundationBicat`: The Foundation category as a bicategory
+- `associator`, `left_unitor`, `right_unitor`: Coherence 2-cells
+- `whiskerLeft₂`, `whiskerRight₂`: Whiskering operations
+
+## Implementation Notes
+
+The bicategory structure enables pseudo-functor development and provides
+the mathematical foundation for Sprint 43 pseudo-functor infrastructure.
+  - Day 2: Associator/unitor, pentagon/triangle coherence
+  - Day 3-4: PseudoInverse + biequivalence proof
+-/
+
 namespace CategoryTheory.BicatFound
 
 open CategoryTheory
+open CategoryTheory.Found
 
 -- Note: bicategorical_coherence attribute defined implicitly by @[simp] for Day 2
 
@@ -30,11 +39,11 @@ open CategoryTheory
 
 structure BicatFound_Scaffold where
   /-- Objects are foundations -/
-  objects : Type
+  objects : Type*
   /-- 1-cells between foundations -/
-  oneCells : objects → objects → Type
+  oneCells : objects → objects → Type*
   /-- 2-cells between 1-cells -/  
-  twoCells : ∀ {A B : objects}, oneCells A B → oneCells A B → Type
+  twoCells : ∀ {A B : objects}, oneCells A B → oneCells A B → Type*
   /-- Identity 1-cell -/
   id : (A : objects) → oneCells A A
   /-- Composition of 1-cells -/
