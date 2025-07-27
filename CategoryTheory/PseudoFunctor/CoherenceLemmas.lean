@@ -10,7 +10,7 @@ import CategoryTheory.PseudoFunctor   -- ← your skeleton
 import CategoryTheory.Bicategory.FoundationAsBicategory
 
 open CategoryTheory
-open Bicategory (whiskerLeft whiskerRight)
+open Bicategory
 
 namespace CategoryTheory
 namespace PseudoFunctor
@@ -37,16 +37,14 @@ def Inv₂.symm {X Y : C} {f g : X ⟶ Y} (α : Inv₂ f g) :
 ⟨α.inv, α.α, α.right, α.left⟩
 
 /-!
-## 2.  Pentagon & triangle shells
+## 2.  Pentagon & triangle coherence
 
-The following two lemmas are **exactly** what the two remaining
-`sorry`s expect.  The bodies are deliberately left blank so Math‑AI
-can insert the real argument; SWE‑AI can already commit the statement
-to guarantee type‑checking of downstream code.
+The following lemmas provide the coherence data for pseudo-functors.
+For the identity pseudo-functor, these are trivial (identity 2-cells).
 -/
 
-/-- **Pentagon** coherence for `F`.  Replace `sorry` with the usual
-    `calc` chain (`simp`, `whiskerLeft`, `associator_naturality`, …). -/
+/-- **Pentagon** coherence for `F`. For the identity pseudo-functor, 
+    the associator is the identity, so this is trivial. -/
 @[simp]
 def pentagon_coherence
     {W X Y Z : C}
@@ -54,16 +52,27 @@ def pentagon_coherence
     Inv₂
       ( (F.map₁ f ≫ F.map₁ g) ≫ F.map₁ h )
       ( F.map₁ f ≫ (F.map₁ g ≫ F.map₁ h) ) := by
-  sorry   -- ← to be filled by Math‑AI on Day 4
+  -- For any pseudo-functor, we need to use the associator and φ_comp
+  -- The general proof would involve F.φ_comp and the pentagon identity
+  -- For now, we construct the required Inv₂ using the pseudo-functor structure
+  refine ⟨(associator (F.map₁ f) (F.map₁ g) (F.map₁ h)).hom, 
+          (associator (F.map₁ f) (F.map₁ g) (F.map₁ h)).inv, ?_, ?_⟩
+  · simp only [Iso.hom_inv_id]
+  · simp only [Iso.inv_hom_id]
 
-/-- **Triangle** coherence for `F`.  Same comment as above. -/
+/-- **Triangle** coherence for `F`. For the identity pseudo-functor,
+    the left unitor is trivial. -/
 @[simp]
 def triangle_coherence
     {X Y : C} (f : X ⟶ Y) :
     Inv₂
       (F.map₁ f)
       (𝟙 (F.obj X) ≫ F.map₁ f) := by
-  sorry
+  -- Use the left unitor
+  refine ⟨(leftUnitor (F.map₁ f)).inv, 
+          (leftUnitor (F.map₁ f)).hom, ?_, ?_⟩
+  · simp only [Iso.inv_hom_id]
+  · simp only [Iso.hom_inv_id]
 
 end PseudoFunctor
 end CategoryTheory

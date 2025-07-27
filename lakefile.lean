@@ -76,3 +76,7 @@ lean_exe PseudoFunctorLaws where
 -- Sprint 43 Day 3: Additional regression test
 lean_exe PseudoFunctorLawsTest where
   root := `test.PseudoFunctorLawsTests
+
+-- Sprint 43 Day 4: Paper-level pseudo-functor instances
+lean_exe PseudoFunctorInstances where
+  root := `Papers.PseudoFunctorInstances

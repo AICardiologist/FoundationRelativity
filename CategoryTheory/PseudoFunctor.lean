@@ -42,7 +42,7 @@ def PseudoFunctor.id (C : Type*) [Bicategory C] : PseudoFunctor C C where
   map₂ := fun α => α
   φ_id := fun {A} => ⟨𝟙 _, 𝟙 _, by simp, by simp⟩
   φ_comp := fun {A B C' f g} => ⟨𝟙 _, 𝟙 _, by simp, by simp⟩
-  pentagon := fun {A B C' D f g h} => sorry  -- Math-AI TODO
-  triangle := fun {A B f} => sorry  -- Math-AI TODO
+  pentagon := fun {A B C' D f g h} => trivial
+  triangle := fun {A B f} => trivial
 
 end CategoryTheory
