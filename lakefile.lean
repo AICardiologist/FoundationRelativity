@@ -64,3 +64,7 @@ lean_exe Paper2SmokeTest where
 
 lean_exe Paper3SmokeTest where
   root := `Papers.P3_2CatFramework.FunctorialObstruction
+
+-- Sprint 43 (Day 4 target)
+lean_exe PseudoFunctorLawsTests where
+  root := `CategoryTheory.PseudoFunctor
