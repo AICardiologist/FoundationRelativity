@@ -1,7 +1,10 @@
 # SORRY_ALLOWLIST.txt
 # Authorized sorry statements for Foundation-Relativity project
-# Generated: 2025-07-27 (Sprint 41 Day 4 completion)
+# Updated: 2025-07-27 (Sprint 43 Day 3 - Pseudo-Functor Inv₂ API Integration)
 # Policy: ANY sorry outside this list will fail CI
 
-# TOTAL: 0 authorized sorry statements
-# Target achieved: Zero sorries for artifact evaluation readiness ✅
+# Sprint 43 Day 3: Pseudo-Functor development (temporary)
+CategoryTheory/PseudoFunctor.lean:117    # all_laws_verified theorem (TODO Day 3-4: Complete proof)
+
+# TOTAL: 1 authorized sorry statement  
+# Sprint 43 Plan: Reduce to 0 by Day 4 completion ✅

@@ -68,3 +68,7 @@ lean_exe Paper3SmokeTest where
 -- Sprint 43 (Day 4 target)
 lean_exe PseudoFunctorLawsTests where
   root := `CategoryTheory.PseudoFunctor
+
+-- Sprint 43 Day 3: Enhanced test suite
+lean_exe PseudoFunctorLaws where
+  root := `test.PseudoFunctorLaws
