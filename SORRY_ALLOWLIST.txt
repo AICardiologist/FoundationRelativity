@@ -1,10 +1,7 @@
 # SORRY_ALLOWLIST.txt
 # Authorized sorry statements for Foundation-Relativity project
-# Generated: 2025-07-26 (Sprint 40 completion)
+# Generated: 2025-07-27 (Sprint 41 Day 4 completion)
 # Policy: ANY sorry outside this list will fail CI
 
-# Sprint 41 Infrastructure Placeholder (SWE-AI)
-CategoryTheory/Obstruction.lean:58    # 2-monadic obstruction proof - Sprint 41 Day 4
-
-# TOTAL: 1 authorized sorry statement
-# Target: 0 sorries by end of Sprint 41 for artifact evaluation readiness
+# TOTAL: 0 authorized sorry statements
+# Target achieved: Zero sorries for artifact evaluation readiness ✅
