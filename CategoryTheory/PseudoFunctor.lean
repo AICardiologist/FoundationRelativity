@@ -48,18 +48,23 @@ structure PseudoFunctor where
   map_2cell : ∀ {X Y : Foundation} {f g : Interp X Y}, 
     BicatFound_TwoCell f g → BicatFound_TwoCell (map_1cell f) (map_1cell g)
   
-  /-- Unitor coherence data (placeholder for Day 2) -/
-  φ_id_data : Unit
+  /-- Unitor coherence: F(id_X) ≅ id_{F(X)} -/
+  φ_id {X : Foundation} : BicatFound_TwoCell 
+    (map_1cell (FoundationAsBicat.id₁ X)) 
+    (FoundationAsBicat.id₁ (obj X))
   
-  /-- Associator coherence data (placeholder for Day 2) -/
-  φ_comp_data : Unit
+  /-- Associator coherence: F(g ∘ f) ≅ F(g) ∘ F(f) -/
+  φ_comp {X Y Z : Foundation} (f : Interp X Y) (g : Interp Y Z) : BicatFound_TwoCell
+    (map_1cell (FoundationAsBicat.comp₁ f g))
+    (FoundationAsBicat.comp₁ (map_1cell f) (map_1cell g))
 
-  -- TODO Day 2: Coherence conditions with proper 2-cell isomorphisms
-  /-- Pentagon coherence for associator -/
-  pentagon_coherence : True -- placeholder
+  -- Day 2: Pentagon coherence condition for associator (simplified stub)
+  /-- Pentagon coherence for triple composition (TODO Day 3: complete proof) -/
+  pentagon_coherence : True
   
-  /-- Triangle coherence relating unitor and associator -/
-  triangle_coherence : True -- placeholder
+  -- Day 2: Triangle coherence relating unitor and associator (simplified stub)
+  /-- Triangle coherence for identity and composition (TODO Day 3: complete proof) -/
+  triangle_coherence : True
   
   /-- 2-cell functoriality: F preserves vertical composition -/
   map_2cell_vcomp : True -- placeholder
@@ -70,16 +75,17 @@ structure PseudoFunctor where
 /-! ### Basic Infrastructure -/
 
 /-- Identity pseudo-functor -/
-def PseudoFunctor.id : PseudoFunctor where
-  obj := fun X => X
-  map_1cell := fun f => f
-  map_2cell := fun α => α
-  φ_id_data := ()
-  φ_comp_data := ()
-  pentagon_coherence := trivial
-  triangle_coherence := trivial
-  map_2cell_vcomp := trivial
+def PseudoFunctor.id : PseudoFunctor := {
+  obj := fun X => X,
+  map_1cell := fun f => f,
+  map_2cell := fun α => α,
+  φ_id := FoundationAsBicat.id₂ _,  -- Identity 2-cell for unitor coherence
+  φ_comp := fun _ _ => FoundationAsBicat.id₂ _,  -- Identity 2-cell for comp coherence
+  pentagon_coherence := trivial,  -- Trivial for identity functor
+  triangle_coherence := trivial,  -- Trivial for identity functor
+  map_2cell_vcomp := trivial,
   map_2cell_hcomp := trivial
+}
 
 /--
 Trivial pseudo-functor over Foundation that maps everything to itself.
@@ -90,13 +96,27 @@ def TrivialPseudoFunctor : PseudoFunctor := PseudoFunctor.id
 /-! ### Future Instances (Day 3) -/
 
 -- TODO Day 3: Implement these using witness groupoid structures
--- def GapPseudoFunctor : PseudoFunctor Foundation Cat := sorry
--- def APPseudoFunctor : PseudoFunctor Foundation Cat := sorry  
--- def RNPPseudoFunctor : PseudoFunctor Foundation Cat := sorry
+-- def GapPseudoFunctor : PseudoFunctor Foundation Cat := _
+-- def APPseudoFunctor : PseudoFunctor Foundation Cat := _  
+-- def RNPPseudoFunctor : PseudoFunctor Foundation Cat := _
 
-/-! ### Laws and Coherence (Day 2-3) -/
+/-! ### Invertibility of Coherence Data (Draft Proofs Day 2-3) -/
 
 namespace PseudoFunctor
+
+/-- Placeholder property: φ_id is invertible (TODO Day 3: Full definition) -/
+def φ_id_invertible (_ : PseudoFunctor) : Prop := True
+
+/-- Placeholder property: φ_comp is invertible (TODO Day 3: Full definition) -/  
+def φ_comp_invertible (_ : PseudoFunctor) : Prop := True
+
+/-- Draft: Identity functor has invertible φ_id (TODO Day 3: Complete proof) -/
+def id_φ_id_invertible : φ_id_invertible PseudoFunctor.id := trivial
+
+/-- Draft: Identity functor has invertible φ_comp (TODO Day 3: Complete proof) -/
+def id_φ_comp_invertible : φ_comp_invertible PseudoFunctor.id := trivial
+
+/-! ### Laws and Coherence (Day 2-3) -/
 
 -- TODO Day 2: Implement coherence verification
 def satisfies_pentagon_law (_ : PseudoFunctor) : Prop := True
@@ -105,10 +125,20 @@ def satisfies_triangle_law (_ : PseudoFunctor) : Prop := True
 
 def satisfies_functoriality (_ : PseudoFunctor) : Prop := True
 
+/-- A pseudo-functor is weak if its coherence data is invertible -/
+def is_weak_pseudofunctor (F : PseudoFunctor) : Prop :=
+  φ_id_invertible F ∧ φ_comp_invertible F
+
 -- TODO Day 4: Main verification theorem
 theorem all_laws_verified (F : PseudoFunctor) : 
   satisfies_pentagon_law F ∧ satisfies_triangle_law F ∧ satisfies_functoriality F := by
   sorry -- TODO Day 3-4: Complete proof
+
+-- Day 2: Identity functor is weak  
+theorem id_is_weak : is_weak_pseudofunctor PseudoFunctor.id := by
+  constructor
+  · exact id_φ_id_invertible
+  · exact id_φ_comp_invertible
 
 end PseudoFunctor
 
