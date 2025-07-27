@@ -1,9 +1,21 @@
-/-
-  Weak (a.k.a. "bicategorical") pseudo‑functors following
-  Leinster, *Higher Operads, Higher Categories*, Definition 3.2.
+/-!
+# Pseudo-Functor Implementation
 
-  All coherence 2‑cells are bundled as `Inv₂` from BicatHelpers;
-  this makes both construction *and* rewriting vastly simpler.
+Weak (bicategorical) pseudo-functors following Leinster's "Higher Operads, Higher Categories",
+Definition 3.2. This module provides the complete pseudo-functor framework with verified
+coherence conditions.
+
+## Main Definitions
+
+- `PseudoFunctor`: Weak pseudo-functor between bicategories
+- Coherence 2-cells with pentagon and triangle laws
+- Identity and composition operations for pseudo-functors
+
+## Implementation Notes
+
+All coherence 2-cells are bundled as `Inv₂` from BicatHelpers, making both
+construction and rewriting simpler. This provides the mathematical foundation
+for Sprint 43's pseudo-functor infrastructure.
 -/
 import CategoryTheory.BicatHelpers
 import Mathlib.CategoryTheory.Bicategory.Basic
