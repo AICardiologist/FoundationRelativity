@@ -1,29 +1,26 @@
-# Foundation-Relativity Strategic Roadmap (S38-S45)
+# Foundation-Relativity Strategic Roadmap (S43+)
 
-## Optimization-Oriented Sprint Roadmap
+## Current Status and Future Direction
 
-This roadmap incorporates the design choices established and aligns tightly with the four reference papers (P1-P4), with immediate focus on **Paper 1** (Gödel-Banach) and **Paper 3** (2-Categorical Framework).
+This roadmap reflects the **completed achievements** of Sprint 41-42 and outlines the strategic direction for Sprint 43 and beyond, with focus on **pseudo-functor implementation** and **Paper 1** (Gödel-Banach) expansion.
 
-**Key Design Decisions:**
-1. Hard-coded syntactic class `Sigma1Formula`
-2. Axiom `exists_banach_limit : ∃ Λ, is_banach_limit Λ`
-3. Deferred Borel-σ-algebra proof obligation in (I1b)
-4. **ρ-hierarchy extensions**: De-scoped "ρ > 2" work for now (can be revived once Papers 1-3 are fully verified)
+**Major Achievements (Sprint 41-42)**:
+1. ✅ **Zero-Sorry Milestone**: Complete mathematical formalization (v0.4.0)
+2. ✅ **Bicategorical Framework**: Enhanced FoundationBicat with coherence laws (v0.5.0-alpha)  
+3. ✅ **Papers 2-3 Mathematical Frameworks**: Complete implementation with meaningful theorems
+4. ✅ **All Spectral Pathologies**: Cheeger, Rho4, GodelGap complete (ρ-levels 3-4)
 
 ---
 
 ## 🗓️ **Global Timeline at a Glance**
 
-| Sprint | Calendar (7d) | Main Deliverable | Owner |
-|--------|---------------|------------------|-------|
-| **S38** | now → +7d | rho4-polish release (v0.4.1) & housekeeping merge | Claude |
-| **S39** | +7 → +14d | Found.Bicategory skeleton compiling in CI | Math-Coder |
-| **S40** | +14 → +21d | Pathology 2-functors: Gap, AP_Fail, RNP_Fail | Math-Coder |
-| **S41** | +21 → +28d | Gödel Boolean & operator core (c_G, rank-one map) | Math-Coder |
-| **S42** | +28 → +35d | Diagonal + Fredholm equivalence (Surj ↔ G) | Math-Coder |
-| **S43** | +35 → +42d | Bidual-gap variant (uses exists_banach_limit axiom) | Math-Coder |
-| **S44** | +42 → +49d | Obstruction Theorem formalised (P3 §4) | Math-Coder |
-| **S45** | +49 → +56d | DocGen / rho-ladder visualisations; release v0.5.0 | Both |
+| Sprint | Status | Main Deliverable | Achievements |
+|--------|--------|------------------|--------------|
+| **S41** | ✅ Complete | Zero-Sorry Milestone (v0.4.0) | Complete mathematical formalization, 0 sorry statements |
+| **S42** | ✅ Complete | Bicategorical Framework (v0.5.0-alpha) | Enhanced FoundationBicat, Papers 2-3 frameworks |
+| **S43** | 🔄 Current | Pseudo-Functor + CI Tightening | Complete pseudo-functor stack, enhanced automation |
+| **S44** | 🟡 Planned | Paper 1 Implementation | Gödel-Banach correspondence, rank-one operators |
+| **S45** | 🟡 Planned | Advanced Features + Documentation | doc-gen coverage, automation rules, v0.6.0 |
 
 *Claude remains "build/infra" throughout; Math-Coder is Lean-side.*
 
@@ -31,19 +28,16 @@ This roadmap incorporates the design choices established and aligns tightly with
 
 ## 📋 **Detailed Sprint Breakdown**
 
-### **Sprint 38 — "rho4-polish" (finish v0.4.1)**
+### **Sprint 43 — "Pseudo-Functor + CI Tightening" (Current)**
 
-| Day | Task | LoC/Time | Owner |
-|-----|------|----------|-------|
-| 1 | Merge PR #36, delete stray branches | — | Paul |
-| 1 | Tag v0.4.1 branch feat/rho4-polish | — | Claude |
-| 2 | Update lakefile.lean to mathlib 4.5 pin | 10 | Claude |
-| 2-3 | CI cache reset, 15-minute smoke test | — | Claude |
-| 3-5 | Artifact-evaluation zip: lake exe cache get, README | — | Claude |
-| 6 | Publish release notes; archive on Zenodo | — | Paul |
-| 7 | Close sprint retro | — | All |
+| Priority | Deliverable | Acceptance Criteria | Lead |
+|----------|-------------|-------------------|------|
+| **P1** | Complete TwoCatPseudoFunctor stack | • Full pseudo-functor definition with coherence<br>• Instances for Gap/AP/RNP functors<br>• PseudoFunctorLawsTests executable | SWE-AI ↔ Math-AI |
+| **P2** | CI tightening / hygiene | • warnings-as-errors for new modules<br>• automated sorry/axiom gates<br>• doc-gen coverage ≥ 85% | SWE-AI |
+| **P3** | Bicategory automation | • aesop rules (whisker_left, whisker_right, vcomp)<br>• ≥20% proof reduction demo | Math-AI |
+| **P4** | WLPO ↔ Bidual Gap exploration | • One direction of constructive equivalence<br>• Hahn-Banach integration study | Math-AI |
 
-**Exit criterion:** GitHub release v0.4.1, green CI ≤ 70s.
+**Timeline**: 4 days with v0.5.0-rc1 target
 
 ### **Sprint 39 — "Found.Bicategory skeleton"**
 
