@@ -1,12 +1,26 @@
-/-
-  Weak (a.k.a. "bicategorical") pseudo‑functors following
-  Leinster, *Higher Operads, Higher Categories*, Definition 3.2.
-
-  All coherence 2‑cells are bundled as `Inv₂` from BicatHelpers;
-  this makes both construction *and* rewriting vastly simpler.
--/
 import CategoryTheory.BicatHelpers
 import Mathlib.CategoryTheory.Bicategory.Basic
+
+/-!
+# Pseudo-Functor Implementation
+
+Weak (a.k.a. "bicategorical") pseudo-functors following Leinster's 
+"Higher Operads, Higher Categories", Definition 3.2.
+
+All coherence 2-cells are bundled as `Inv₂` from BicatHelpers;
+this makes both construction and rewriting vastly simpler.
+
+## Main Definitions
+
+- `PseudoFunctor`: Weak pseudo-functor between bicategories
+- Identity and composition operations with coherence
+- Pentagon and triangle coherence laws
+
+## Implementation Notes
+
+This module provides the complete pseudo-functor framework for the
+Foundation-Relativity project, with verified coherence conditions.
+-/
 
 namespace CategoryTheory
 

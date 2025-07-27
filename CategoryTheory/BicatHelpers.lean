@@ -1,10 +1,24 @@
-/-
-  A minimal "helper" module that wraps the common tricks we keep writing by hand
-  when working with Lean's bicategory API.  Everything here is *pure utility*:
-  no project‑specific names appear, so the file can be upstreamed later.
--/
 import Mathlib.CategoryTheory.Category.Basic
 import Mathlib.CategoryTheory.Bicategory.Basic
+
+/-!
+# Bicategory Helper Utilities
+
+A minimal helper module that wraps the common tricks we keep writing by hand
+when working with Lean's bicategory API. Everything here is pure utility:
+no project-specific names appear, so the file can be upstreamed later.
+
+## Main Definitions
+
+- `Inv₂`: Invertible 2-cells for bicategorical coherence
+- Utility functions for bicategory operations
+- Common bicategorical patterns and shortcuts
+
+## Implementation Notes
+
+This module provides foundational utilities for working with Lean 4's bicategory
+infrastructure, focusing on invertible 2-cells and coherence operations.
+-/
 
 namespace CategoryTheory
 

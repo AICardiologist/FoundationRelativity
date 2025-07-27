@@ -4,6 +4,25 @@ import CategoryTheory.PseudoFunctor.Gap
 import CategoryTheory.PseudoFunctor.AP
 import CategoryTheory.PseudoFunctor.RNP
 
+/-!
+# Pseudo-Functor Instances for Papers
+
+Paper-level pseudo-functor instances implementing the Gap, AP, and RNP functors
+for Foundation-Relativity analysis. These provide the concrete pseudo-functor
+implementations required for Papers #1-3.
+
+## Main Definitions
+
+- Identity pseudo-functors for bicategorical framework
+- Gap, AP, and RNP pseudo-functor instances
+- Paper-level integration with bicategorical coherence
+
+## Implementation Notes
+
+This module bridges the abstract pseudo-functor framework with the concrete
+pathology analysis required for academic paper implementations.
+-/
+
 open CategoryTheory
 
 /-- Identity pseudo‑functor on the Foundation bicategory. -/
