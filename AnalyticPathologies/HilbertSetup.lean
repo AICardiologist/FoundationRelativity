@@ -39,6 +39,7 @@ def IsSelfAdjoint (T : BoundedOp) : Prop :=
   ContinuousLinearMap.adjoint T = T
 
 
+
 /-- **Bundled object with a spectral gap**.
 
     *All* five fields already appear in the final API, so later work can

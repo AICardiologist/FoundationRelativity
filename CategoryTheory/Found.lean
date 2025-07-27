@@ -38,15 +38,15 @@ instance : Category Foundation where
   comp := Interp.comp
   id_comp := by
     intro A B f
-    -- TODO(S41): Prove category laws
-    sorry
+    cases f
+    rfl
   comp_id := by
     intro A B f
-    -- TODO(S41): Prove category laws
-    sorry  
+    cases f
+    rfl
   assoc := by
     intro A B C D f g h
-    -- TODO(S41): Prove category laws
-    sorry
+    cases f; cases g; cases h
+    rfl
 
 end CategoryTheory.Found
