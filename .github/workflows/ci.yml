@@ -91,3 +91,90 @@ jobs:
           lake exe PaperP3Tests
           
           echo "✅ All test executables completed successfully!"
+  
+  # Sprint 43 P2: CI Tightening with strict warnings/axiom gates
+  ci-strict:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Lean
+        uses: leanprover/lean-action@v1
+        with:
+          use-mathlib-cache: true
+          build-args: "-K 400000"
+
+      - name: Cache .lake
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.lake
+            .lake/build
+          key: ${{ runner.os }}-lake-strict-${{ hashFiles('lakefile.lean') }}
+
+      - name: Build with strict warnings
+        run: |
+          echo "Building with strict linter flags..."
+          # Enable strict warnings for new modules (Papers/, CategoryTheory/)
+          LEAN_BUILD_ARGS="-Dlinter.unusedVariables -Dlinter.dupNamespace -Dlinter.docBlame"
+          lake build $LEAN_BUILD_ARGS 2>&1 | tee build.log
+          
+          # Check for warnings in new modules only (allow legacy warnings)
+          if grep -E "warning.*\/(Papers|CategoryTheory)\/" build.log; then
+            echo "❌ Warnings found in new modules - CI strict mode requires warning-free code"
+            exit 1
+          fi
+          echo "✅ New modules are warning-free"
+
+      - name: Verify sorry allowlist
+        run: |
+          echo "Checking for unauthorized sorry statements..."
+          if [ -f scripts/check-sorry-allowlist.sh ]; then
+            bash scripts/check-sorry-allowlist.sh
+          else
+            # Fallback: check for sorry in new modules only
+            SORRY_COUNT=$(find Papers/ CategoryTheory/ -name "*.lean" -exec grep -l "sorry" {} \; 2>/dev/null | wc -l)
+            if [ "$SORRY_COUNT" -gt 0 ]; then
+              echo "❌ Found sorry statements in new modules:"
+              find Papers/ CategoryTheory/ -name "*.lean" -exec grep -Hn "sorry" {} \; 2>/dev/null || true
+              exit 1
+            fi
+          fi
+          echo "✅ No unauthorized sorry statements found"
+
+      - name: Verify axiom allowlist
+        run: |
+          echo "Checking for unauthorized axioms..."
+          if [ -f scripts/check-no-axioms.sh ]; then
+            bash scripts/check-no-axioms.sh
+          else
+            # Fallback: Use lake to check axioms in core modules
+            lake env lean --run scripts/check-no-axioms.lean | tee axiom_check.log
+            if grep -q "AXIOM" axiom_check.log; then
+              echo "❌ Found unauthorized axioms - see axiom_check.log"
+              cat axiom_check.log
+              exit 1
+            fi
+          fi
+          echo "✅ No unauthorized axioms found"
+
+      - name: Documentation coverage check
+        run: |
+          echo "Generating documentation coverage report..."
+          # TODO Day 2: Implement doc-gen coverage script
+          # For now, just verify key modules have doc comments
+          UNDOC_COUNT=0
+          
+          for file in Papers/*.lean CategoryTheory/*.lean; do
+            if [ -f "$file" ] && ! head -20 "$file" | grep -q "/-!"; then
+              echo "Warning: $file missing module documentation"
+              UNDOC_COUNT=$((UNDOC_COUNT + 1))
+            fi
+          done
+          
+          if [ "$UNDOC_COUNT" -gt 2 ]; then
+            echo "❌ Too many undocumented modules: $UNDOC_COUNT"
+            exit 1
+          fi
+          
+          echo "✅ Documentation coverage acceptable ($UNDOC_COUNT undocumented files)"

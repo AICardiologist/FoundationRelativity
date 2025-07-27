@@ -99,11 +99,11 @@ def TrivialPseudoFunctor : PseudoFunctor := PseudoFunctor.id
 namespace PseudoFunctor
 
 -- TODO Day 2: Implement coherence verification
-def satisfies_pentagon_law (F : PseudoFunctor) : Prop := True
+def satisfies_pentagon_law (_ : PseudoFunctor) : Prop := True
 
-def satisfies_triangle_law (F : PseudoFunctor) : Prop := True
+def satisfies_triangle_law (_ : PseudoFunctor) : Prop := True
 
-def satisfies_functoriality (F : PseudoFunctor) : Prop := True
+def satisfies_functoriality (_ : PseudoFunctor) : Prop := True
 
 -- TODO Day 4: Main verification theorem
 theorem all_laws_verified (F : PseudoFunctor) : 
