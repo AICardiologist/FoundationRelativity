@@ -4,7 +4,7 @@
 # Policy: ANY sorry outside this list will fail CI
 
 # Sprint 43 Day 2-3: Pseudo-Functor development (temporary)
-CategoryTheory/PseudoFunctor.lean:135    # all_laws_verified theorem (TODO Day 3-4: Complete proof)
+CategoryTheory/PseudoFunctor.lean:136    # all_laws_verified theorem (TODO Day 3-4: Complete proof)
 
 # TOTAL: 1 authorized sorry statement
 # Sprint 43 Plan: Reduce to 0 by Day 4 completion ✅
