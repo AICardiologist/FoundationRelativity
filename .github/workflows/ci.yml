@@ -68,17 +68,26 @@ jobs:
           
           echo "✅ All Foundation-Relativity theorems verified!"
           
-      - name: Run tests (best effort)
-        continue-on-error: true
+      - name: Run test executables
         run: |
-          # Try to run test executables, but don't fail CI if they crash
-          # The mathematical proofs are verified above - this is just bonus
-          echo "Attempting to run test executables (non-critical)..."
-          for test in testFunctors testNonIdMorphisms WitnessTests; do
-            echo "Testing $test..."
-            if lake exe $test >/dev/null 2>&1; then
-              echo "✓ $test passed"
-            else
-              echo "⚠ $test failed or timed out (non-critical)"
-            fi
-          done
+          echo "Running comprehensive test suite..."
+          
+          # Core functionality tests
+          lake exe testFunctors
+          lake exe testNonIdMorphisms
+          lake exe AllPathologiesTests
+          
+          # Mathematical proof verification tests
+          lake exe Gap2ProofTests
+          lake exe APProofTests
+          lake exe RNPProofTests
+          lake exe RNP3ProofTests
+          lake exe SpectralGapProofTests
+          lake exe GodelGapProofTests
+          
+          # Paper smoke tests (Sprint 42)
+          lake exe PaperP1Tests
+          lake exe PaperP2Tests
+          lake exe PaperP3Tests
+          
+          echo "✅ All test executables completed successfully!"
