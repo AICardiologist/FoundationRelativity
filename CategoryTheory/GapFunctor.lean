@@ -1,6 +1,24 @@
 import CategoryTheory.Found
 import CategoryTheory.WitnessGroupoid
 
+/-!
+# Gap Functor Implementation
+
+The Gap Functor provides a contravariant functor from Foundation to Type that
+maps foundations to their witness groupoids, capturing foundation-relative
+mathematical pathologies.
+
+## Main Definitions
+
+- `GapFunctor`: Contravariant functor Foundation^op → Type
+- Witness groupoid mappings for foundation-relative mathematics
+
+## Mathematical Background
+
+The Gap Functor is central to the foundation-relativity principle, demonstrating
+how mathematical objects behave differently across foundational systems (BISH vs ZFC).
+-/
+
 open CategoryTheory
 open CategoryTheory.Found
 

@@ -5,16 +5,17 @@
 -/
 
 import Papers.P2_BidualGap.Basic
-import Mathlib.Tactic.Aesop
+import Aesop
 
 namespace Papers.P2
 
 /-! ### Custom Aesop Rules for Banach Space Analysis -/
 
 -- Basic rules for gap analysis
-attribute [aesop safe apply] True.intro
-attribute [aesop norm unfold] BidualGap  
-attribute [aesop norm unfold] WLPO
+-- True.intro is already registered by default
+-- attribute [aesop safe apply] True.intro
+-- attribute [aesop norm unfold] BidualGap  
+-- attribute [aesop norm unfold] WLPO
 
 /-! ### Banach Space Automation -/
 

@@ -3,9 +3,9 @@
 ## 📚 Overview
 This directory contains comprehensive documentation for the Foundation-Relativity project - a Lean 4 formalization of foundation-relative mathematics implementing the "Gödel in Four Acts" paper series.
 
-**Current Status**: 🎉 v0.4.0 Zero-Sorry Milestone Achieved!  
-**Focus**: Complete mathematical formalization with 0 sorry statements + 0 axioms  
-**Achievement**: Full categorical infrastructure + Sprint 41 complete ✅
+**Current Status**: 🎉 v0.5.0-rc1 Zero Sorry Achievement! Pseudo-Functor Infrastructure Complete  
+**Focus**: Complete pseudo-functor coherence framework with pentagon & triangle proofs  
+**Achievement**: Papers #1-3 pseudo-functor infrastructure + Sprint 43 complete ✅
 
 ---
 
