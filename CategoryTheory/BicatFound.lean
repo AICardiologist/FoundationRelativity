@@ -162,7 +162,7 @@ already written – just wrap in instance", which is what this does.
 -/
 structure FoundationAsBicategory where
   /-- Objects are Foundation elements -/
-  Obj : Type := Foundation
+  Obj : Type _ := Foundation
   
   /-- 1-morphisms are Interp -/
   Hom (A B : Foundation) : Type := Interp A B
@@ -200,19 +200,19 @@ structure FoundationAsBicategory where
     BicatFound_TwoCell (comp₁ f (id₁ B)) f := 
     ⟨(), (), ()⟩  -- Use trivial right unitor for now
 
-/-- The Foundation bicategory instance for pseudo-functors -/
-def FoundationAsBicat : FoundationAsBicategory := {
-  Obj := Foundation,
-  Hom := fun A B => Interp A B,
-  Hom₂ := fun f g => BicatFound_TwoCell f g,
-  id₁ := fun A => CategoryTheory.CategoryStruct.id A,
-  comp₁ := fun f g => @CategoryTheory.CategoryStruct.comp Foundation _ _ _ _ f g,
-  id₂ := fun f => id_2cell f,
-  comp₂ := fun α β => vcomp_2cell α β,
-  assoc := fun _ _ _ => ⟨(), (), ()⟩,
-  left_unit := fun _ => ⟨(), (), ()⟩,
-  right_unit := fun _ => ⟨(), (), ()⟩
-}
+-- /-- The Foundation bicategory instance for pseudo-functors -/
+-- def FoundationAsBicat : FoundationAsBicategory := {
+--   Obj := Foundation,
+--   Hom := fun A B => Interp A B,
+--   Hom₂ := fun f g => BicatFound_TwoCell f g,
+--   id₁ := fun A => CategoryTheory.CategoryStruct.id A,
+--   comp₁ := fun f g => @CategoryTheory.CategoryStruct.comp Foundation _ _ _ _ f g,
+--   id₂ := fun f => id_2cell f,
+--   comp₂ := fun α β => vcomp_2cell α β,
+--   assoc := fun _ _ _ => ⟨(), (), ()⟩,
+--   left_unit := fun _ => ⟨(), (), ()⟩,
+--   right_unit := fun _ => ⟨(), (), ()⟩
+-- }
 
 /-! ### Pseudo-Functor Compatibility (Sprint 43 Day 2) -/
 
@@ -221,7 +221,7 @@ abbrev FoundationBicategory := Foundation
 
 namespace FoundationBicategory
 
-def Obj : Type := Foundation
+def Obj : Type _ := Foundation
 
 def Hom (A B : Foundation) : Type := Interp A B
 

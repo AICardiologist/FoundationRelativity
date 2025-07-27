@@ -19,6 +19,7 @@ import CategoryTheory.Found
 namespace CategoryTheory
 
 open CategoryTheory.BicatFound
+open CategoryTheory.Found
 
 /-! ### Pseudo-Functor Definition -/
 
@@ -50,13 +51,13 @@ structure PseudoFunctor where
   
   /-- Unitor coherence: F(id_X) ≅ id_{F(X)} -/
   φ_id {X : Foundation} : BicatFound_TwoCell 
-    (map_1cell (FoundationAsBicat.id₁ X)) 
-    (FoundationAsBicat.id₁ (obj X))
+    (map_1cell (FoundationBicategory.id₁ X)) 
+    (FoundationBicategory.id₁ (obj X))
   
   /-- Associator coherence: F(g ∘ f) ≅ F(g) ∘ F(f) -/
   φ_comp {X Y Z : Foundation} (f : Interp X Y) (g : Interp Y Z) : BicatFound_TwoCell
-    (map_1cell (FoundationAsBicat.comp₁ f g))
-    (FoundationAsBicat.comp₁ (map_1cell f) (map_1cell g))
+    (map_1cell (FoundationBicategory.comp₁ f g))
+    (FoundationBicategory.comp₁ (map_1cell f) (map_1cell g))
 
   -- Day 2: Pentagon coherence condition for associator (simplified stub)
   /-- Pentagon coherence for triple composition (TODO Day 3: complete proof) -/
@@ -79,8 +80,8 @@ def PseudoFunctor.id : PseudoFunctor := {
   obj := fun X => X,
   map_1cell := fun f => f,
   map_2cell := fun α => α,
-  φ_id := FoundationAsBicat.id₂ _,  -- Identity 2-cell for unitor coherence
-  φ_comp := fun _ _ => FoundationAsBicat.id₂ _,  -- Identity 2-cell for comp coherence
+  φ_id := FoundationBicategory.id₂ _,  -- Identity 2-cell for unitor coherence
+  φ_comp := fun _ _ => FoundationBicategory.id₂ _,  -- Identity 2-cell for comp coherence
   pentagon_coherence := trivial,  -- Trivial for identity functor
   triangle_coherence := trivial,  -- Trivial for identity functor
   map_2cell_vcomp := trivial,

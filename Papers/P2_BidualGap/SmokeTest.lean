@@ -7,11 +7,13 @@
 
 import CategoryTheory.BicatFound
 import CategoryTheory.GapFunctor
+import CategoryTheory.Found
 
 namespace Papers.P2_BidualGap
 
 open CategoryTheory.BicatFound
 open CategoryTheory
+open CategoryTheory.Found
 
 /-! ### Paper #2 Target Lemmas -/
 
