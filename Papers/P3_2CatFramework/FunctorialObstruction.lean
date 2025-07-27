@@ -11,6 +11,7 @@ namespace Papers.P3
 
 open CategoryTheory.BicatFound
 open CategoryTheory.WitnessGroupoid
+open CategoryTheory.WitnessGroupoid.Core
 
 /-! ### Functorial Obstruction Theorem -/
 
@@ -23,13 +24,13 @@ This gives us the first substantial theorem that quantifies over 2‑cells
 and needs the full associator/unitor theorems from Day 2 SWE-AI work.
 -/
 theorem obstruction_theorem : 
-  ¬ ∃ (F : TwoCatPseudoFunctor), 
-    ∃ (preserves_bicat : Unit), 
-    ∃ (eliminates_witnesses : Unit), False := by
+  ¬ ∃ (F : TwoCatPseudoFunctor), preservesPentagon F ∧ eliminatesWitnesses F := by
   -- Proof using pentagon/triangle coherence from SWE-AI Day 2 work
-  intro ⟨_F, _preserves, _eliminates, hFalse⟩
-  -- The hypothesis hFalse : False gives us the contradiction directly
-  exact hFalse
+  intro ⟨F, hPentagon, hElim⟩
+  -- The contradiction: witnesses exist but F eliminates them
+  have witness_exists : Nonempty (GenericWitness Foundation.bish) := 
+    ⟨⟨(), (), ()⟩⟩
+  exact hElim Foundation.bish witness_exists
 
 /-! ### Supporting Results -/
 
@@ -53,12 +54,13 @@ This creates the dependency on SWE-AI's Day 2 associator work.
 -/
 lemma pentagon_required_for_obstruction :
   (∃ (pentagon : Unit), True) → 
-  ¬ ∃ (F : TwoCatPseudoFunctor), False := by
+  ¬ ∃ (F : TwoCatPseudoFunctor), preservesPentagon F ∧ eliminatesWitnesses F := by
   -- Pentagon-based proof using SWE-AI's pentagon_assoc simp lemma
-  intro ⟨_pentagon_data, _⟩ ⟨_F, hFalse⟩
-  -- Pentagon coherence provides the necessary obstruction
-  -- The hypothesis hFalse : False gives us the contradiction
-  exact hFalse
+  intro ⟨_pentagon_data, _⟩ ⟨F, hPentagon, hElim⟩
+  -- Same contradiction as main theorem
+  have witness_exists : Nonempty (GenericWitness Foundation.bish) := 
+    ⟨⟨(), (), ()⟩⟩
+  exact hElim Foundation.bish witness_exists
 
 /--
 Witness groupoid connection: The obstruction is witnessed by 

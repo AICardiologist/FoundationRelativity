@@ -25,7 +25,7 @@ theorem bidual_gap_lemma_placeholder : True := trivial
 -- example : CategoryTheory.GapFunctor.some_lemma = CategoryTheory.GapFunctor.some_lemma := rfl
 
 -- TODO Math-AI: Bicategory structure verification
-example : BicatFound.objects = Foundation := rfl
+example : FoundationBicat.objects = Foundation := rfl
 
 end Papers.P2_BidualGap
 

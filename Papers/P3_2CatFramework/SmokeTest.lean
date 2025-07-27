@@ -25,7 +25,7 @@ theorem twocat_framework_lemma_placeholder : True := trivial
 -- example : BicatWitnessGroupoid Foundation = BicatWitnessGroupoid Foundation := rfl
 
 -- TODO Math-AI: Framework completeness
--- example : CategoryTheory.Found.Foundation = CategoryTheory.BicatFound.BicatFound.objects := rfl
+-- example : CategoryTheory.Found.Foundation = CategoryTheory.BicatFound.FoundationBicat.objects := rfl
 
 end Papers.P3_2CatFramework
 
