@@ -80,3 +80,10 @@ lean_exe PseudoFunctorLawsTest where
 -- Sprint 43 Day 4: Paper-level pseudo-functor instances
 lean_exe PseudoFunctorInstances where
   root := `Papers.PseudoFunctorInstances
+
+-- Sprint 35-36 Test Executables
+lean_exe CheegerProofTests where
+  root := `test.CheegerProofTests
+
+lean_exe Rho4ProofTests where
+  root := `test.Rho4ProofTests
