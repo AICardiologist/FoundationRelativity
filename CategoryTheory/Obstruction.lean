@@ -92,7 +92,7 @@ def obstruction_hierarchy : ℕ → Type
 /-! ### Coherence Conditions -/
 
 /-- Obstructions respect the logical strength hierarchy -/
-lemma obstruction_monotonicity (n m : ℕ) (h : n ≤ m) :
+lemma obstruction_monotonicity (n m : ℕ) (_ : n ≤ m) :
     True := by
   -- Placeholder for logical strength hierarchy proof
   trivial

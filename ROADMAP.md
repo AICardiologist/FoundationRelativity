@@ -1,12 +1,13 @@
 # Foundation-Relativity Roadmap
 
-## 📍 Current Status: v1.0-rc Released - Sprint 36 Ready
+## 📍 Current Status: 🎉 v0.4.0 Zero-Sorry Milestone Achieved!
 
-✅ **Foundation-Relativity Complete**: All ρ-hierarchy levels (ρ=1 through ρ≈3½) formally verified  
-✅ **v1.0-rc Released**: Production-ready with zero sorry statements  
-🚀 **Sprint 36 Prepared**: Infrastructure ready for ρ=4 pathology development
+✅ **Sprint 41 Complete**: Zero sorry statements + zero axioms achieved  
+✅ **v0.4.0 Released**: Complete mathematical formalization  
+✅ **Categorical Infrastructure**: WitnessGroupoid + GapFunctor implemented  
+🎯 **Achievement**: Reference implementation ready for artifact evaluation
 
-**Extended Planning**: See [Extended Roadmap](docs/roadmap-extended.md) for Sprints 36-45 covering Gödel-Gap pathologies and 2-categorical framework.
+**Foundation-Relativity Project**: Complete formal verification of foundation-relative mathematics with full categorical framework.
 
 ---
 

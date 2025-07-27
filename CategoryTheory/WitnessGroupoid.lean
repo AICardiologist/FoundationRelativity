@@ -1,57 +1,44 @@
 /-
-  WitnessGroupoid.lean - Sprint 41 Day 3
+  WitnessGroupoid.lean - Sprint 42 refactor
   
-  Witness groupoid skeleton for GapFunctor target category.
+  Witness groupoid using shared Core definitions.
   
-  This defines a structure to represent gap functional witnesses and pathology
-  failures, packaged as a small groupoid (currently only identity morphisms).
-  The groupoid structure enables GapFunctor : Found^op ⥤ Cat to map foundations
-  to their witness spaces.
-  
-  Why a groupoid? While we currently only use identity morphisms, the groupoid
-  structure provides the categorical framework needed for:
-  1. Future witness transformations and equivalences
-  2. Bicategorical coherence when upgrading to TwoCat
-  3. Natural pullback operations along foundation interpretations
+  This now imports the refactored Core module and provides backward compatibility
+  for existing GapFunctor usage while enabling new APFunctor/RNPFunctor patterns.
 -/
 
-import Mathlib.CategoryTheory.Category.Basic
-import CategoryTheory.Found
+import CategoryTheory.WitnessGroupoid.Core
 
 namespace CategoryTheory.WitnessGroupoid
 
 open CategoryTheory
+open CategoryTheory.WitnessGroupoid.Core
 
-/-- A witness structure for gap functionals and analytic pathology failures.
-    Each foundation F carries evidence of spectral gaps, selection failures, etc. -/
-structure Witness (F : Foundation) where
-  /-- Gap functional evidence placeholder -/
-  gapFunctional : Unit
-  /-- Analytic pathology failure evidence placeholder -/  
-  apFailure : Unit
-  /-- Extensional witness data placeholder -/
-  extensional : Unit
+/-! ### Backward Compatibility Aliases -/
 
-namespace Witness
+/-- Original Witness type, now aliased to Core.GenericWitness -/
+abbrev Witness (F : Foundation) := GenericWitness F
 
-/-- Identity witness morphism -/
-def id (F : Foundation) (w : Witness F) : Witness F := w
+/-- Original witness groupoid definition, now using Core -/
+abbrev WitnessGroupoidType (F : Foundation) := GenericWitnessGroupoid F
 
-/-- Witness composition (trivial since only identities exist) -/
-def comp {F : Foundation} (w1 w2 : Witness F) : Witness F := w2
+/-! ### Extended API for Bicategory Support -/
 
-end Witness
+/-- Enhanced witness structure for bicategorical extensions.
+    Adds coherence data for 2-cell transformations. -/
+structure BicatWitness (F : Foundation) extends GenericWitness F where
+  /-- Coherence data for bicategorical 2-cells -/
+  coherence : Unit
 
-/-- The witness groupoid for a foundation F.
-    Currently a discrete category (only identity morphisms). -/
-def WitnessGroupoid (F : Foundation) : Type := Witness F
+/-- Bicategorical witness groupoid -/
+def BicatWitnessGroupoid (F : Foundation) : Type := BicatWitness F
 
-instance (F : Foundation) : Category (Witness F) where
-  Hom w1 w2 := PUnit  -- Only identity morphisms (using PUnit instead of equality)
-  id w := PUnit.unit
-  comp h1 h2 := PUnit.unit  
-  id_comp h := rfl
-  comp_id h := rfl
-  assoc h1 h2 h3 := rfl
+instance (F : Foundation) : Category (BicatWitness F) where
+  Hom _ _ := PUnit
+  id _ := PUnit.unit
+  comp _ _ := PUnit.unit  
+  id_comp _ := rfl
+  comp_id _ := rfl
+  assoc _ _ _ := rfl
 
 end CategoryTheory.WitnessGroupoid
