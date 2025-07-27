@@ -1,13 +1,24 @@
-/-
-  WitnessGroupoid.lean - Sprint 42 refactor
-  
-  Witness groupoid using shared Core definitions.
-  
-  This now imports the refactored Core module and provides backward compatibility
-  for existing GapFunctor usage while enabling new APFunctor/RNPFunctor patterns.
--/
-
 import CategoryTheory.WitnessGroupoid.Core
+
+/-!
+# Witness Groupoid Implementation
+
+Witness groupoid using shared Core definitions for foundation-relative mathematics.
+
+This module imports the refactored Core module and provides backward compatibility
+for existing GapFunctor usage while enabling new APFunctor/RNPFunctor patterns.
+
+## Main Definitions
+
+- `Witness`: Foundation-relative witness type (alias to Core.GenericWitness)
+- `WitnessGroupoidType`: Witness groupoid structure for foundation mathematics
+- `BicatWitness`: Enhanced witness structure for bicategorical extensions
+
+## Implementation Notes
+
+Provides backward compatibility while supporting the bicategorical framework
+developed in Sprint 42-43 for pseudo-functor infrastructure.
+-/
 
 namespace CategoryTheory.WitnessGroupoid
 

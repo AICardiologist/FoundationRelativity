@@ -19,7 +19,7 @@ noncomputable def cheegerWeight (β : ℝ) (b : ℕ → Bool) (n : ℕ) : ℝ :=
   if b n then β else 2 - β
 
 /-- Diagonal operator placeholder - simplified. -/
-noncomputable def cheegerDiag (β : ℝ) (b : ℕ → Bool) : BoundedOp := 1
+noncomputable def cheegerDiag (_ : ℝ) (_ : ℕ → Bool) : BoundedOp := 1
 
 /-- Cheeger operator C_{β,b} = D_w + K. -/
 noncomputable def cheeger (β : ℝ) (b : ℕ → Bool) : BoundedOp :=
@@ -36,7 +36,7 @@ theorem cheeger_selfAdjoint (β : ℝ) (b : ℕ → Bool) :
   exact ContinuousLinearMap.adjoint_id
 
 /-- Cheeger has spectral gap when |β - 1| ≥ 1/2. -/
-theorem cheeger_has_gap {β : ℝ} (hβ : |β - 1| ≥ 1/2) (b : ℕ → Bool) :
+theorem cheeger_has_gap {β : ℝ} (_ : |β - 1| ≥ 1/2) (_ : ℕ → Bool) :
     ∃ (a b : ℝ), a < b ∧ a = a ∧ b = b := by
   use 0, 1
   simp
@@ -57,7 +57,7 @@ structure SelExt (T : BoundedOp) : Type where
   prop : sel = sel  -- Simplified
 
 /-- Cheeger selector implies ACω. -/
-theorem ACω_of_SelExt (S : ∀ β b, |β - 1| ≥ 1/2 → SelExt (cheeger β b)) : 
+theorem ACω_of_SelExt (_ : ∀ β b, |β - 1| ≥ 1/2 → SelExt (cheeger β b)) : 
     ACω := by
   exact classical_ACω
 
@@ -66,20 +66,20 @@ theorem ACω_of_SelExt (S : ∀ β b, |β - 1| ≥ 1/2 → SelExt (cheeger β b)
 namespace ClassicalWitness
 
 /-- Classical selector for Cheeger. -/
-noncomputable def cheegerSelector (β : ℝ) (b : ℕ → Bool) : L2Space :=
+noncomputable def cheegerSelector (_ : ℝ) (_ : ℕ → Bool) : L2Space :=
   lp.single 2 0 1
 
 /-- Classical witness for SelExt. -/
 noncomputable def witness_cheeger : 
     ∀ β b, |β - 1| ≥ 1/2 → SelExt (cheeger β b) := by
-  intro β b hβ
+  intro β b _
   exact ⟨cheegerSelector β b, rfl⟩
 
 end ClassicalWitness
 
 /-! ### 6 Bridge theorem -/
 
-theorem Cheeger_requires_ACω (S : ∀ β b, |β - 1| ≥ 1/2 → SelExt (cheeger β b)) :
+theorem Cheeger_requires_ACω (_ : ∀ β b, |β - 1| ≥ 1/2 → SelExt (cheeger β b)) :
     RequiresACω := by
   exact RequiresACω.mk
 

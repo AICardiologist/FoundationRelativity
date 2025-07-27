@@ -1,8 +1,22 @@
 import Mathlib.CategoryTheory.Category.Basic
 import Mathlib.CategoryTheory.Functor.Basic
 
--- Sprint 40 Day 3: Basic Foundation category skeleton  
--- TODO(S41): Add full 2-categorical structure
+/-!
+# Foundation Category Theory Infrastructure
+
+Basic Foundation category definitions and structures. This module provides
+the categorical foundation for the Foundation-Relativity project.
+
+## Main Definitions
+
+- Core Foundation category structure
+- Category theory infrastructure for foundation-relative mathematics
+
+## Implementation Notes
+
+This module establishes the categorical foundation that underlies the
+bicategorical and pseudo-functor infrastructure developed in later sprints.
+-/
 
 namespace CategoryTheory.Found
 
