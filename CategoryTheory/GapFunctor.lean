@@ -1,3 +1,6 @@
+import CategoryTheory.Found
+import CategoryTheory.WitnessGroupoid
+
 /-!
 # Gap Functor Implementation
 
@@ -15,9 +18,6 @@ mathematical pathologies.
 The Gap Functor is central to the foundation-relativity principle, demonstrating
 how mathematical objects behave differently across foundational systems (BISH vs ZFC).
 -/
-
-import CategoryTheory.Found
-import CategoryTheory.WitnessGroupoid
 
 open CategoryTheory
 open CategoryTheory.Found

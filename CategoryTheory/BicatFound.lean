@@ -1,3 +1,8 @@
+import CategoryTheory.Found
+import Mathlib.CategoryTheory.Bicategory.Basic
+import Mathlib.CategoryTheory.Bicategory.Strict
+import Mathlib.CategoryTheory.Category.Basic
+
 /-!
 # Foundation Bicategory Implementation
 
@@ -20,14 +25,10 @@ the mathematical foundation for Sprint 43 pseudo-functor infrastructure.
   - Day 3-4: PseudoInverse + biequivalence proof
 -/
 
-import Found.InterpCore
-import Mathlib.CategoryTheory.Bicategory.Basic
-import Mathlib.CategoryTheory.Bicategory.Strict
-import Mathlib.CategoryTheory.Category.Basic
-
 namespace CategoryTheory.BicatFound
 
 open CategoryTheory
+open CategoryTheory.Found
 
 -- Note: bicategorical_coherence attribute defined implicitly by @[simp] for Day 2
 
@@ -38,11 +39,11 @@ open CategoryTheory
 
 structure BicatFound_Scaffold where
   /-- Objects are foundations -/
-  objects : Type
+  objects : Type*
   /-- 1-cells between foundations -/
-  oneCells : objects → objects → Type
+  oneCells : objects → objects → Type*
   /-- 2-cells between 1-cells -/  
-  twoCells : ∀ {A B : objects}, oneCells A B → oneCells A B → Type
+  twoCells : ∀ {A B : objects}, oneCells A B → oneCells A B → Type*
   /-- Identity 1-cell -/
   id : (A : objects) → oneCells A A
   /-- Composition of 1-cells -/

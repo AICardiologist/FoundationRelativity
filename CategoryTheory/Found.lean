@@ -1,3 +1,6 @@
+import Mathlib.CategoryTheory.Category.Basic
+import Mathlib.CategoryTheory.Functor.Basic
+
 /-!
 # Foundation Category Theory Infrastructure
 
@@ -14,9 +17,6 @@ the categorical foundation for the Foundation-Relativity project.
 This module establishes the categorical foundation that underlies the
 bicategorical and pseudo-functor infrastructure developed in later sprints.
 -/
-
-import Mathlib.CategoryTheory.Category.Basic
-import Mathlib.CategoryTheory.Functor.Basic
 
 namespace CategoryTheory.Found
 
