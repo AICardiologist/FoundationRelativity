@@ -2,15 +2,14 @@
 
 [![CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml)
 [![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
-[![Version](https://img.shields.io/badge/Version-v0.5.0--rc1-brightgreen)](https://github.com/AICardiologist/FoundationRelativity/releases)
+[![Version](https://img.shields.io/badge/Version-v0.5.0--alpha-orange)](https://github.com/AICardiologist/FoundationRelativity/releases)
 [![Lean 4.22.0-rc4](https://img.shields.io/badge/Lean-4.22.0--rc4-blue)](https://github.com/leanprover/lean4)
-[![Zero Sorry](https://img.shields.io/badge/Sorry%20Count-0-brightgreen)](docs/sprint43-completion-report.md)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 
-> **🎉 Sprint 43 COMPLETE**: Pseudo-Functor Infrastructure + **ZERO SORRY ACHIEVEMENT!** ✅  
-> **Latest**: Complete pseudo-functor coherence framework with 0 sorry statements  
-> **🎯 NEW**: Pentagon & triangle laws proven + paper-level functor instances ready ✅
+> **🎉 Sprint 42 COMPLETE**: Bicategorical Framework + Zero-Sorry Policy ✅  
+> **Latest**: Complete bicategorical infrastructure with 0 sorry statements  
+> **🎯 NEW**: Papers #2-3 mathematical frameworks with meaningful theorem statements ✅
 
 
 A Lean 4 formalization exploring how mathematical pathologies behave differently under various foundational assumptions.
@@ -62,23 +61,14 @@ FoundationRelativity/
 │   ├── Functor.lean         #     RNP pathology definitions
 │   ├── Proofs.lean          #     RNP_requires_DCω theorem ✅
 │   └── Proofs3.lean         #     RNP₃_requires_DCωPlus theorem ✅
-├── CategoryTheory/          # 🏗️  Bicategorical infrastructure + Pseudo-Functors (Sprint 42-43)
+├── CategoryTheory/          # 🏗️  Bicategorical infrastructure (Sprint 42)
 │   ├── BicatFound.lean      #     Foundation bicategory with associators/unitors
-│   ├── BicatHelpers.lean    #     Inv₂ utilities for invertible 2-cells ✅
-│   ├── PseudoFunctor.lean   #     Complete pseudo-functor framework (zero sorry!) ✅
-│   ├── PseudoFunctor/       #     Pseudo-functor components
-│   │   ├── CoherenceLemmas.lean #  Pentagon & triangle coherence proofs ✅
-│   │   ├── Gap.lean         #     Bidual gap pseudo-functor instance
-│   │   ├── AP.lean          #     Approximation property pseudo-functor
-│   │   └── RNP.lean         #     Radon-Nikodym property pseudo-functor
-│   ├── Bicategory/          #     Bicategory infrastructure
-│   │   └── FoundationAsBicategory.lean # Foundation as LocallyDiscrete bicategory ✅
 │   ├── WitnessGroupoid/     #     Enhanced witness structures
 │   │   ├── Core.lean        #     GenericWitness, APWitness, RNPWitness
 │   │   └── *.lean           #     Groupoid categorical structure
 │   ├── GapFunctor.lean      #     Gap functor implementation
 │   └── Obstruction.lean     #     Non-functoriality obstruction theory
-├── Papers/                  # 📚  Academic paper implementations (Sprint 42-43)
+├── Papers/                  # 📚  Academic paper implementations (Sprint 42)
 │   ├── P1_GBC/              #     Paper #1: Gödel-Banach Correspondence
 │   │   └── SmokeTest.lean   #     Infrastructure verification
 │   ├── P2_BidualGap/        #     Paper #2: Bidual Gap ⇔ WLPO equivalence
@@ -87,11 +77,10 @@ FoundationRelativity/
 │   │   ├── WLPO_Equiv_Gap.lean    # WLPO ⇔ Gap equivalence proof
 │   │   ├── Tactics.lean     #     Specialized proof tactics
 │   │   └── SmokeTest.lean   #     Compilation verification
-│   ├── P3_2CatFramework/    #     Paper #3: 2-Categorical Framework
-│   │   ├── Basic.lean       #     Pseudo-functor definitions
-│   │   ├── FunctorialObstruction.lean # Pentagon-based impossibility
-│   │   └── SmokeTest.lean   #     Integration verification
-│   └── PseudoFunctorInstances.lean # Paper-level pseudo-functor instances (Sprint 43) ✅
+│   └── P3_2CatFramework/    #     Paper #3: 2-Categorical Framework
+│       ├── Basic.lean       #     Pseudo-functor definitions
+│       ├── FunctorialObstruction.lean # Pentagon-based impossibility
+│       └── SmokeTest.lean   #     Integration verification
 ├── AnalyticPathologies/     # 🎯  ρ=3/3½/4 (AC_ω/DC_{ω·2}) pathologies
 │   ├── HilbertSetup.lean    #     L² space & spectral gap operators ✅
 │   ├── NoWitness.lean       #     Constructive impossibility of witnesses

@@ -7,19 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-- **Pre-existing Compilation Errors**: Resolved all compilation issues in Papers modules
-  - **Papers/P2_BidualGap/WLPO_Equiv_Gap.lean**: Fixed type constructor mismatches and mathematical contradictions
-  - **Papers/P2_BidualGap/Tactics.lean**: Fixed incorrect Aesop import path and rule conflicts
-  - **Zero Regression**: All Sprint 35-43 proofs verified to compile successfully
-  - **Test Coverage**: Added missing CheegerProofTests and Rho4ProofTests executables
-
-### Added
-- **Enhanced Test Suite**: New test executables for analytic pathologies
-  - **CheegerProofTests**: Executable test for Cheeger-Bottleneck pathology (ρ≈3½)
-  - **Rho4ProofTests**: Executable test for Rho4 pathology (ρ=4)
-  - **Comprehensive Regression Testing**: Verified all modules from Sprint 35-43
-
 ## [0.5.0-alpha] - 2025-07-27
 
 ### Added

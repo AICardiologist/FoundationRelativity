@@ -116,10 +116,18 @@ jobs:
         run: |
           echo "Building with strict linter flags..."
           # Enable strict warnings for new modules (Papers/, CategoryTheory/)
+<<<<<<< HEAD
+          LEAN_BUILD_ARGS="-Dlinter.unusedVariables -Dlinter.dupNamespace -Dlinter.docBlame"
+          lake build $LEAN_BUILD_ARGS 2>&1 | tee build.log
+          
+          # Check for warnings in new modules only (allow legacy warnings)
+          if grep -E "warning.*\/(Papers|CategoryTheory)\/" build.log; then
+=======
           lake build 2>&1 | tee build.log
           
           # Check for warnings in new modules only (allow legacy warnings)
           if grep -E "warning.*\/(Papers|CategoryTheory)\/" build.log | grep -v "declaration uses 'sorry'"; then
+>>>>>>> origin/main
             echo "❌ Warnings found in new modules - CI strict mode requires warning-free code"
             exit 1
           fi
@@ -128,14 +136,34 @@ jobs:
       - name: Verify sorry allowlist
         run: |
           echo "Checking for unauthorized sorry statements..."
-          # Allow sorries only in specific files during development
-          SORRY_FILES=$(find Papers/ CategoryTheory/ -name "*.lean" -exec grep -l "sorry" {} \; 2>/dev/null | grep -v "PseudoFunctor.lean" || true)
-          if [ -n "$SORRY_FILES" ]; then
-            echo "❌ Found unauthorized sorry statements in:"
-            echo "$SORRY_FILES"
-            exit 1
+          if [ -f scripts/check-sorry-allowlist.sh ]; then
+            bash scripts/check-sorry-allowlist.sh
+          else
+            # Fallback: check for sorry in new modules only
+            SORRY_COUNT=$(find Papers/ CategoryTheory/ -name "*.lean" -exec grep -l "sorry" {} \; 2>/dev/null | wc -l)
+            if [ "$SORRY_COUNT" -gt 0 ]; then
+              echo "❌ Found sorry statements in new modules:"
+              find Papers/ CategoryTheory/ -name "*.lean" -exec grep -Hn "sorry" {} \; 2>/dev/null || true
+              exit 1
+            fi
           fi
           echo "✅ No unauthorized sorry statements found"
+
+      - name: Verify axiom allowlist
+        run: |
+          echo "Checking for unauthorized axioms..."
+          if [ -f scripts/check-no-axioms.sh ]; then
+            bash scripts/check-no-axioms.sh
+          else
+            # Fallback: Use lake to check axioms in core modules
+            lake env lean --run scripts/check-no-axioms.lean | tee axiom_check.log
+            if grep -q "AXIOM" axiom_check.log; then
+              echo "❌ Found unauthorized axioms - see axiom_check.log"
+              cat axiom_check.log
+              exit 1
+            fi
+          fi
+          echo "✅ No unauthorized axioms found"
 
       - name: Documentation coverage check
         run: |
