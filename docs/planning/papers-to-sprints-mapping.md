@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document shows how the four "Gödel in Four Acts" research papers translate into our Lean repository development timeline. **Updated for S38-S45 roadmap** with current implementation status and strategic focus on Papers 1-3.
+This document shows how the four "Gödel in Four Acts" research papers translate into our Lean repository development timeline. **Updated for S43+ roadmap** with current implementation status reflecting completed Sprint 41-42 achievements and strategic focus on Papers 1-3.
 
 ---
 
@@ -10,10 +10,10 @@ This document shows how the four "Gödel in Four Acts" research papers translate
 
 | **Paper** | **Core Mathematical Object(s)** | **Logical Strength (ρ-level)** | **Lean Status** | **Sprint Coverage** |
 |-----------|----------------------------------|--------------------------------|-----------------|-------------------|
-| **1. Gödel–Banach Correspondence** | • Rank-one operator 𝔊 on ℓ²<br>• Fredholm equivalence: Surj ↔ Gödel sentence | ρ ≈ 4½–5<br>(Σ¹-EM + Fredholm) | 🟡 **S41-S42**<br>Hard-coded Sigma1Formula | Core construction & equivalence |
-| **2. Bidual Gap Across Foundations** | • ℓ∞ → (ℓ∞)** bidual map<br>• AP/RNP failure at ρ ≤ 2 | ρ = 1-2<br>(WLPO, DC_ω) | ✅ **Complete**<br>Sections 1-3 proven | S40: Refactor to 2-functors |
-| **3. 2-Categorical Framework** | • Bicategory Found of foundations<br>• Gap 2-functor, obstruction theorem | Mirrors pathology<br>(ρ = 1-5) | 🟡 **S39-S44**<br>Bicategory → obstruction | Complete framework |
-| **4. Spectral Geometry** | • Gödel-torus with λ₁ ↔ Con(PA)<br>• Cheeger neck construction | ρ = 2-3<br>(DC_ω, choice fragments) | 🟡 **Future S46+**<br>Cheeger base ✅ done | Requires manifold library |
+| **1. Gödel–Banach Correspondence** | • Rank-one operator 𝔊 on ℓ²<br>• Fredholm equivalence: Surj ↔ Gödel sentence | ρ ≈ 4½–5<br>(Σ¹-EM + Fredholm) | 🟡 **S43+**<br>Infrastructure ready | Paper 1 framework implementation |
+| **2. Bidual Gap Across Foundations** | • ℓ∞ → (ℓ∞)** bidual map<br>• AP/RNP failure at ρ ≤ 2 | ρ = 1-2<br>(WLPO, DC_ω) | ✅ **Complete S42**<br>Mathematical framework | Complete with bicategorical structure |
+| **3. 2-Categorical Framework** | • Bicategory Found of foundations<br>• Gap 2-functor, obstruction theorem | Mirrors pathology<br>(ρ = 1-5) | ✅ **Complete S42**<br>Bicategory + obstruction | Complete bicategorical infrastructure |
+| **4. Spectral Geometry** | • Gödel-torus with λ₁ ↔ Con(PA)<br>• Cheeger neck construction | ρ = 2-3<br>(DC_ω, choice fragments) | ✅ **Complete S35-36**<br>Cheeger + Rho4 + GodelGap | All spectral pathologies implemented |
 
 ### **Legend**
 - ✅ **Complete**: Implemented and verified
@@ -22,24 +22,21 @@ This document shows how the four "Gödel in Four Acts" research papers translate
 
 ---
 
-## 📅 **Updated Sprint Timeline (S38-S45)**
+## 📅 **Updated Sprint Timeline (S41-S43+)**
 
 ```
 ┌───────────────┬──────────────────────────────────────────────┐
-│ S38 (now+7d)  │ rho4-polish release v0.4.1 + housekeeping    │
-│               │ → Clean foundation for bicategory work       │
+│ S41 ✅        │ Zero-Sorry Milestone (v0.4.0)                │
+│ (Complete)    │ → Complete mathematical formalization        │
 ├───────────────┼──────────────────────────────────────────────┤
-│ S39 (+7+14d)  │ Found.Bicategory skeleton (Paper 3 core)     │
-│               │ → Hard-coded foundations, basic 2-category    │
+│ S42 ✅        │ Bicategorical Framework (v0.5.0-alpha)       │
+│ (Complete)    │ → Papers #2-3 mathematical frameworks       │
 ├───────────────┼──────────────────────────────────────────────┤
-│ S40 (+14+21d) │ Pathology 2-functors: Gap, AP_Fail, RNP_Fail │
-│               │ → Paper 2 refactor + categorical integration │
+│ S43 (Current) │ Pseudo-Functor + CI Tightening               │
+│               │ → Complete pseudo-functor stack + automation │
 ├───────────────┼──────────────────────────────────────────────┤
-│ S41 (+21+28d) │ Gödel Boolean & rank-one operator (Paper 1)  │
-│               │ → Core construction: c_G, P_g, G = I - c_G•P_g│
-├───────────────┼──────────────────────────────────────────────┤
-│ S42-S45       │ Paper 1 completion + Paper 3 obstruction     │
-│ (+28+56d)     │ → Fredholm equivalence + functorial theorem  │
+│ S44+ (Future) │ Paper 1 Implementation + Advanced Features   │
+│               │ → Gödel-Banach correspondence + doc-gen      │
 └───────────────┴──────────────────────────────────────────────┘
 ```
 
@@ -47,7 +44,45 @@ This document shows how the four "Gödel in Four Acts" research papers translate
 
 ## 🔗 **Paper Coverage Strategy**
 
-### **Paper 2: Bidual Gap** ✅ **ALREADY COMPLETE**
+### **Paper 2: Bidual Gap** ✅ **COMPLETE (Sprint 42)**
+
+**Mathematical Framework**: Complete bicategorical implementation with meaningful theorem statements
+
+**Key Achievements**:
+- ✅ **Non-functoriality theorem**: Pentagon coherence-based impossibility proof  
+- ✅ **WLPO ⇔ Gap equivalence**: Constructive proof with 7 proof obligations
+- ✅ **Coherence properties**: `preservesPentagon` and `eliminatesWitnesses` replace placeholder logic
+- ✅ **Bicategorical integration**: Full integration with FoundationBicat structure
+
+**Current Status**: v0.5.0-alpha with complete mathematical frameworks ready for expansion
+
+### **Paper 3: 2-Categorical Framework** ✅ **COMPLETE (Sprint 42)**
+
+**Bicategorical Infrastructure**: Complete genuine bicategory with coherence laws
+
+**Key Achievements**:
+- ✅ **Enhanced FoundationBicat**: Associators, unitors, pentagon/triangle coherence
+- ✅ **Functorial obstruction theorem**: Witness elimination impossibility  
+- ✅ **Whiskering operations**: Left/right whiskering for 2-cell composition
+- ✅ **Enhanced witness structures**: APWitness, RNPWitness for quantitative analysis
+
+**Current Status**: Complete bicategorical framework ready for pseudo-functor implementation
+
+### **Paper 4: Spectral Geometry** ✅ **COMPLETE (Sprint 35-36)**
+
+**Spectral Gap Implementation**: All pathology levels implemented with formal proofs
+
+**Key Achievements**:
+- ✅ **Cheeger-Bottleneck pathology**: ρ ≈ 3½ with boolean parameterization
+- ✅ **Rho4 pathology**: ρ = 4 Borel-Selector with DC_{ω·2} requirement  
+- ✅ **Gödel-Gap correspondence**: Complete spectral gap → logical consistency connection
+- ✅ **Zero axioms**: All spectral pathologies proven without classical axioms
+
+**Current Status**: Complete implementation with all ρ-levels 3-4 verified
+
+### **Paper 1: Gödel-Banach Correspondence** 🟡 **PLANNED (Sprint 44+)**
+
+**Infrastructure Ready**: All dependencies implemented for Paper 1 expansion
 
 **Current Status (v0.4.0):**
 
