@@ -110,31 +110,36 @@ end PseudoNatTrans
 
 /-! ### Horizontal composition of pseudo‑natural transformations -/
 
-namespace PseudoNatTrans
+namespace CategoryTheory
 
-variable {B C D : Type*} [Bicategory B] [Bicategory C] [Bicategory D]
+open Bicategory
 
-/-- Horizontal composition of pseudo-natural transformations (full version) -/
--- Note: This requires PseudoFunctor composition which we'll implement later
--- For now, we provide the component formula that will be used
-def hcomp_component {F₁ F₂ : PseudoFunctor B C} {G₁ G₂ : PseudoFunctor C D}
-    (α : PseudoNatTrans F₁ F₂) (β : PseudoNatTrans G₁ G₂) (X : B) :
-    (G₁.obj (F₁.obj X)) ⟶ (G₂.obj (F₂.obj X)) :=
-  G₁.map₁ (α.component X) ≫ β.component (F₂.obj X)
+variable {B C D : Bicategory}
+variable {F F' : PseudoFunctor B C} {G G' : PseudoFunctor C D}
 
-/-- Placeholder for full horizontal composition -/
--- TODO: Implement when we have PseudoFunctor composition
-def hcomp {F₁ F₂ : PseudoFunctor B C} {G₁ G₂ : PseudoFunctor C D}
-    (α : PseudoNatTrans F₁ F₂) (β : PseudoNatTrans G₁ G₂) : Unit := ()
+/-- Horizontal composition of pseudo‑natural transformations. -/
+@[simp, reducible]
+def PseudoNatTrans.hcomp
+    (α : PseudoNatTrans F F')
+    (β : PseudoNatTrans G G') :
+    PseudoNatTrans (F ⋙ G) (F' ⋙ G') where
+  component  := fun X ↦
+      (β.component (F.obj X)) ≫ (G'.map₂ (α.component X))
+  naturality := by
+    intro X Y f
+    simp only [Functor.comp_map, Bicategory.assoc]
+    -- paste the two naturality squares and the functoriality of `G'`
+    -- Lean's `simp` + `aesop_cat` discharges the diagram
+    aesop_cat
+  isIso_component := by
+    intro X
+    have hβ : IsIso (β.component (F.obj X)) := β.isIso_component _
+    have hα : IsIso (α.component X) := α.isIso_component _
+    simpa using (isIso_comp_left _ (G'.map₂_isIso _)).1
+    -- LeanInk ignore tally
 
 notation α " ◆h " β => PseudoNatTrans.hcomp α β
 
-/-- Component formula is definitional -/
-@[simp]
-lemma hcomp_component_eq {F₁ F₂ : PseudoFunctor B C} {G₁ G₂ : PseudoFunctor C D}
-    (α : PseudoNatTrans F₁ F₂) (β : PseudoNatTrans G₁ G₂) (X : B) :
-    hcomp_component α β X = G₁.map₁ (α.component X) ≫ β.component (F₂.obj X) := rfl
-
-end PseudoNatTrans
+end CategoryTheory
 
 end CategoryTheory
