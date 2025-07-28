@@ -71,14 +71,12 @@ variable {B : Type u₁} {C : Type u₂} [Bicategory B] [Bicategory C]
 def id_pseudonat (F : PseudoFunctor B C) : PseudoNatTrans F F where
   component b := 𝟙 (F.obj b)
   isIso_component b := by infer_instance
-  naturality f := by
-    -- 𝟙∘g = g  and  f∘𝟙 = f
-    simp [Bicategory.comp_id, Bicategory.id_comp]
-  naturality_inv f := by
-    -- inverse of identity is identity
-    simp [Bicategory.comp_id, Bicategory.id_comp]
-  naturality_inv_left f  := by simp
-  naturality_inv_right f := by simp
+  naturality {b₁ b₂} f := by
+    simp [Bicategory.id_comp, Bicategory.comp_id]
+  naturality_inv {b₁ b₂} f := by
+    simp [Bicategory.id_comp, Bicategory.comp_id]
+  naturality_inv_left {b₁ b₂} f  := by simp
+  naturality_inv_right {b₁ b₂} f := by simp
 
 /-! ### Vertical Composition -/
 
@@ -92,7 +90,6 @@ def comp_v {F G H : PseudoFunctor B C}
     haveI := β.isIso_component b
     infer_instance
   naturality {b₁ b₂} f := by
-    -- paste the two squares for α and β
     simp [Bicategory.assoc] with aesop_cat
   naturality_inv {b₁ b₂} f := by
     simp [Bicategory.assoc] with aesop_cat
@@ -126,7 +123,3 @@ lemma component_comp {F G H : PseudoFunctor B C}
 end PseudoNatTrans
 
 end CategoryTheory
-
--- Import the full horizontal composition implementation
--- (This is at the end to avoid circular dependencies)
-import CategoryTheory.PseudoNatTransHComp
