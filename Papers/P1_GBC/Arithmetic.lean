@@ -1,0 +1,44 @@
+import Mathlib.Tactic
+
+/-!
+# Arithmetic Layer for Gödel-Banach Correspondence
+
+This module provides a minimal arithmetic layer for encoding Σ¹ formulas
+and the provability predicate, as needed for the Gödel operator construction.
+
+Following the manager's recommendation (Option C), we encode just enough
+arithmetic to express "Gödel sentence is undecidable" without heavy
+number theory machinery.
+
+## Main Definitions
+- `Sigma1`: Syntactic category of closed Σ¹ formulas
+- `G_formula`: Gödel's fixed formula
+- `Provable`: Provability predicate (axiomatized)
+- `c_G`: The Boolean flag for the Gödel operator
+
+-/
+
+namespace Arithmetic
+
+/-- A minimal syntactic category of closed Σ₁ formulas. 
+    Enough for the incompleteness statement. -/
+inductive Sigma1 : Type
+  | Halt (code : ℕ) : Sigma1   -- "Turing machine `code` halts"
+  | False                      -- convenience
+
+/-- Gödel's fixed formula: choose a particular code. -/
+def G_formula : Sigma1 := Sigma1.Halt 271828 -- any large number
+
+/-- *Provability* predicate inside Peano Arithmetic.  
+    We **postulate** Hilbert consistency so we **cannot** decide it. -/
+opaque Provable : Sigma1 → Prop
+
+/-- Consistency axiom: PA cannot prove False -/
+axiom Provable_sound : ¬ Provable Sigma1.False
+
+/-- The Boolean flag fed to the operator. -/
+noncomputable def c_G : Bool := by
+  classical
+  exact decide (Provable G_formula)
+
+end Arithmetic

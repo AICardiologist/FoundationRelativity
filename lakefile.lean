@@ -52,6 +52,10 @@ lean_exe GodelGapProofTests where
 lean_exe PaperP1Tests where
   root := `Papers.P1_GBC.SmokeTest
 
+-- Sprint 44 Day 1: Paper #1 CI integration
+lean_exe Paper1SmokeTest where
+  root := `Papers.P1_GBC.SmokeTest
+
 lean_exe PaperP2Tests where
   root := `Papers.P2_BidualGap.SmokeTest
 
@@ -87,3 +91,7 @@ lean_exe CheegerProofTests where
 
 lean_exe Rho4ProofTests where
   root := `test.Rho4ProofTests
+
+-- Sprint 44 Day 1: Pseudo-natural transformation tests
+lean_exe PseudoNatTransLawsTests where
+  root := `test.PseudoNatTransLawsTests

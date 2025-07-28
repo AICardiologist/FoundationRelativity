@@ -5,6 +5,7 @@
 [![Version](https://img.shields.io/badge/Version-v0.5.0--rc1-brightgreen)](https://github.com/AICardiologist/FoundationRelativity/releases)
 [![Lean 4.22.0-rc4](https://img.shields.io/badge/Lean-4.22.0--rc4-blue)](https://github.com/leanprover/lean4)
 [![Zero Sorry](https://img.shields.io/badge/Sorry%20Count-0-brightgreen)](docs/sprint43-completion-report.md)
+[![Doc Coverage](https://img.shields.io/badge/Doc%20Coverage-50%25-yellow)](.github/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 
