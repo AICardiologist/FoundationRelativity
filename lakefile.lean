@@ -16,6 +16,7 @@ require mathlib from git
 @[default_target] lean_lib LogicDSL where srcDir := "."
 @[default_target] lean_lib CategoryTheory where srcDir := "."
 @[default_target] lean_lib Papers where srcDir := "."
+@[default_target] lean_lib Logic where srcDir := "."
 
 -- Test executables
 lean_exe testFunctors where

@@ -42,6 +42,9 @@ structure PseudoNatTrans {B : Type u₁} {C : Type u₂} [Bicategory B] [Bicateg
   /-- Component at each object -/
   component : ∀ (b : B), F.obj b ⟶ G.obj b
   
+  /-- Each component is an isomorphism in the bicategory -/
+  isIso_component : ∀ (b : B), IsIso (component b)
+  
   /-- Naturality 2-cell for each morphism -/
   naturality : ∀ {b₁ b₂ : B} (f : b₁ ⟶ b₂),
     (F.map₁ f) ≫ (component b₂) ⟶ (component b₁) ≫ (G.map₁ f)
@@ -64,25 +67,39 @@ variable {B : Type u₁} {C : Type u₂} [Bicategory B] [Bicategory C]
 
 /-! ### Identity Pseudo-Natural Transformation -/
 
-/-- The identity pseudo-natural transformation -/
+/-- Identity pseudo‑natural transformation. -/
 def id_pseudonat (F : PseudoFunctor B C) : PseudoNatTrans F F where
   component b := 𝟙 (F.obj b)
-  naturality f := sorry -- Identity naturality square
-  naturality_inv f := sorry -- Inverse of identity naturality
-  naturality_inv_left f := sorry
-  naturality_inv_right f := sorry
+  isIso_component b := by infer_instance
+  naturality f := by
+    -- 𝟙∘g = g  and  f∘𝟙 = f
+    simp [Bicategory.comp_id, Bicategory.id_comp]
+  naturality_inv f := by
+    -- inverse of identity is identity
+    simp [Bicategory.comp_id, Bicategory.id_comp]
+  naturality_inv_left f  := by simp
+  naturality_inv_right f := by simp
 
 /-! ### Vertical Composition -/
 
-/-- Vertical composition of pseudo-natural transformations -/
-def comp_v {F G H : PseudoFunctor B C} 
-    (α : PseudoNatTrans F G) (β : PseudoNatTrans G H) : 
+/-- Vertical composition of pseudo‑natural transformations. -/
+def comp_v {F G H : PseudoFunctor B C}
+    (α : PseudoNatTrans F G) (β : PseudoNatTrans G H) :
     PseudoNatTrans F H where
   component b := α.component b ≫ β.component b
-  naturality f := sorry -- Pasting of naturality squares
-  naturality_inv f := sorry
-  naturality_inv_left f := sorry
-  naturality_inv_right f := sorry
+  isIso_component b := by
+    haveI := α.isIso_component b
+    haveI := β.isIso_component b
+    infer_instance
+  naturality {b₁ b₂} f := by
+    -- paste the two squares for α and β
+    simp [Bicategory.assoc] with aesop_cat
+  naturality_inv {b₁ b₂} f := by
+    simp [Bicategory.assoc] with aesop_cat
+  naturality_inv_left {b₁ b₂} f := by
+    simp [Bicategory.assoc] with aesop_cat
+  naturality_inv_right {b₁ b₂} f := by
+    simp [Bicategory.assoc] with aesop_cat
 
 infixr:80 " ◆ " => comp_v
 
@@ -108,33 +125,8 @@ lemma component_comp {F G H : PseudoFunctor B C}
 
 end PseudoNatTrans
 
-/-! ### Horizontal composition of pseudo‑natural transformations -/
-
-namespace PseudoNatTrans
-
-variable {B C D : Type*} [Bicategory B] [Bicategory C] [Bicategory D]
-
-/-- Horizontal composition of pseudo-natural transformations (component formula) -/
--- Note: Full implementation requires PseudoFunctor composition
--- For now, we provide the component formula that will be used
-def hcomp_component {F₁ F₂ : PseudoFunctor B C} {G₁ G₂ : PseudoFunctor C D}
-    (α : PseudoNatTrans F₁ F₂) (β : PseudoNatTrans G₁ G₂) (X : B) :
-    (G₁.obj (F₁.obj X)) ⟶ (G₂.obj (F₂.obj X)) :=
-  G₁.map₁ (α.component X) ≫ β.component (F₂.obj X)
-
-/-- Placeholder for full horizontal composition -/
--- TODO: Implement when we have PseudoFunctor composition
-def hcomp {F₁ F₂ : PseudoFunctor B C} {G₁ G₂ : PseudoFunctor C D}
-    (α : PseudoNatTrans F₁ F₂) (β : PseudoNatTrans G₁ G₂) : Unit := ()
-
-notation α " ◆h " β => PseudoNatTrans.hcomp α β
-
-/-- Component formula is definitional -/
-@[simp]
-lemma hcomp_component_eq {F₁ F₂ : PseudoFunctor B C} {G₁ G₂ : PseudoFunctor C D}
-    (α : PseudoNatTrans F₁ F₂) (β : PseudoNatTrans G₁ G₂) (X : B) :
-    hcomp_component α β X = G₁.map₁ (α.component X) ≫ β.component (F₂.obj X) := rfl
-
-end PseudoNatTrans
-
 end CategoryTheory
+
+-- Import the full horizontal composition implementation
+-- (This is at the end to avoid circular dependencies)
+import CategoryTheory.PseudoNatTransHComp
