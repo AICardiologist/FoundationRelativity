@@ -108,47 +108,32 @@ lemma component_comp {F G H : PseudoFunctor B C}
 
 end PseudoNatTrans
 
-/-! ----------------------------------------------------------------
-    Horizontal composition  ◆h  of pseudo‑natural transformations
-    Note: This is a simplified version that assumes PseudoFunctor composition
-    is defined componentwise (to be formalized later)
------------------------------------------------------------------- -/
-
-/-- Notation for horizontal composition -/
-notation α " ◆h " β => PseudoNatTrans.hcomp α β
+/-! ### Horizontal composition of pseudo‑natural transformations -/
 
 namespace PseudoNatTrans
 
 variable {B C D : Type*} [Bicategory B] [Bicategory C] [Bicategory D]
 
-/-- Horizontal composition skeleton (simplified for now) -/
-def hcomp_skeleton {F₁ F₂ : PseudoFunctor B C} {G₁ G₂ : PseudoFunctor C D}
+/-- Horizontal composition of pseudo-natural transformations (full version) -/
+-- Note: This requires PseudoFunctor composition which we'll implement later
+-- For now, we provide the component formula that will be used
+def hcomp_component {F₁ F₂ : PseudoFunctor B C} {G₁ G₂ : PseudoFunctor C D}
     (α : PseudoNatTrans F₁ F₂) (β : PseudoNatTrans G₁ G₂) (X : B) :
     (G₁.obj (F₁.obj X)) ⟶ (G₂.obj (F₂.obj X)) :=
   G₁.map₁ (α.component X) ≫ β.component (F₂.obj X)
 
-/-- Horizontal composition of pseudo-natural transformations (placeholder) -/
--- For now, we just declare the existence of horizontal composition
--- Full implementation requires PseudoFunctor composition
+/-- Placeholder for full horizontal composition -/
+-- TODO: Implement when we have PseudoFunctor composition
 def hcomp {F₁ F₂ : PseudoFunctor B C} {G₁ G₂ : PseudoFunctor C D}
     (α : PseudoNatTrans F₁ F₂) (β : PseudoNatTrans G₁ G₂) : Unit := ()
 
-/-! ### Laws - Placeholder statements -/
+notation α " ◆h " β => PseudoNatTrans.hcomp α β
 
-/-- Component of horizontal composition -/
-lemma hcomp_component {F₁ F₂ : PseudoFunctor B C} {G₁ G₂ : PseudoFunctor C D}
+/-- Component formula is definitional -/
+@[simp]
+lemma hcomp_component_eq {F₁ F₂ : PseudoFunctor B C} {G₁ G₂ : PseudoFunctor C D}
     (α : PseudoNatTrans F₁ F₂) (β : PseudoNatTrans G₁ G₂) (X : B) :
-    hcomp_skeleton α β X = G₁.map₁ (α.component X) ≫ β.component (F₂.obj X) := rfl
-
-/-- Horizontal composition respects identities (statement) -/
-lemma hcomp_id (F : PseudoFunctor B C) (G : PseudoFunctor C D) :
-    hcomp (id_pseudonat F) (id_pseudonat G) = () := rfl
-
-/-- Horizontal composition interchanges with vertical (statement) -/
-lemma hcomp_vcomp {F₁ F₂ F₃ : PseudoFunctor B C} {G₁ G₂ G₃ : PseudoFunctor C D}
-    {α₁ : PseudoNatTrans F₁ F₂} {α₂ : PseudoNatTrans F₂ F₃} 
-    {β₁ : PseudoNatTrans G₁ G₂} {β₂ : PseudoNatTrans G₂ G₃} :
-    hcomp (α₁ ◆ α₂) (β₁ ◆ β₂) = () := rfl
+    hcomp_component α β X = G₁.map₁ (α.component X) ≫ β.component (F₂.obj X) := rfl
 
 end PseudoNatTrans
 

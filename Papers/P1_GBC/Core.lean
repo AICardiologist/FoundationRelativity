@@ -157,6 +157,18 @@ lemma pullback_nontrivial_nonsurjective :
     ¬Function.Surjective (G (g:=g)).toLinearMap := by
   sorry -- TODO: Patch using reflection principle
 
+/-! ### Correspondence helper definitions -/
+
+/-- The abstract notion of Gödel sentence being true -/
+def GödelSentenceTrue : Prop := ¬(Arithmetic.Provable Arithmetic.G_formula)
+
+/-- Reflection equivalence: c_G = false iff Gödel sentence true -/
+theorem reflection_equiv : c_G = false ↔ GödelSentenceTrue := by
+  simp only [c_G, GödelSentenceTrue, Arithmetic.c_G]
+  rw [decide_eq_false_iff_not]
+
+-- Note: consistency_iff_G moved to Correspondence.lean where it has access to Defs
+
 end Papers.P1_GBC
 
 /-! ### Legacy scaffold compatibility -/
