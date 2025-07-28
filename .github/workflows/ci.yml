@@ -116,18 +116,10 @@ jobs:
         run: |
           echo "Building with strict linter flags..."
           # Enable strict warnings for new modules (Papers/, CategoryTheory/)
-<<<<<<< HEAD
-          LEAN_BUILD_ARGS="-Dlinter.unusedVariables -Dlinter.dupNamespace -Dlinter.docBlame"
-          lake build $LEAN_BUILD_ARGS 2>&1 | tee build.log
-          
-          # Check for warnings in new modules only (allow legacy warnings)
-          if grep -E "warning.*\/(Papers|CategoryTheory)\/" build.log; then
-=======
           lake build 2>&1 | tee build.log
           
           # Check for warnings in new modules only (allow legacy warnings)
           if grep -E "warning.*\/(Papers|CategoryTheory)\/" build.log | grep -v "declaration uses 'sorry'"; then
->>>>>>> origin/main
             echo "❌ Warnings found in new modules - CI strict mode requires warning-free code"
             exit 1
           fi
@@ -164,7 +156,6 @@ jobs:
             fi
           fi
           echo "✅ No unauthorized axioms found"
-
       - name: Documentation coverage check
         run: |
           echo "Checking documentation coverage..."

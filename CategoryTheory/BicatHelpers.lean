@@ -1,22 +1,24 @@
+import Mathlib.CategoryTheory.Category.Basic
+import Mathlib.CategoryTheory.Bicategory.Basic
+
 /-!
 # Bicategory Helper Utilities
 
-A minimal helper module that wraps common utilities for working with Lean's bicategory API.
-Everything here is pure utility with no project-specific names, suitable for eventual
-upstreaming to mathlib.
+A minimal helper module that wraps the common tricks we keep writing by hand
+when working with Lean's bicategory API. Everything here is pure utility:
+no project-specific names appear, so the file can be upstreamed later.
 
 ## Main Definitions
 
-- `Inv₂`: Type alias for invertible 2-cells
-- Utility functions for bicategorical reasoning and 2-cell manipulation
+- `Inv₂`: Invertible 2-cells for bicategorical coherence
+- Utility functions for bicategory operations
+- Common bicategorical patterns and shortcuts
 
-## Design Notes
+## Implementation Notes
 
-This module provides reusable utilities that simplify bicategorical proofs and
-2-cell operations throughout the Foundation-Relativity project.
+This module provides foundational utilities for working with Lean 4's bicategory
+infrastructure, focusing on invertible 2-cells and coherence operations.
 -/
-import Mathlib.CategoryTheory.Category.Basic
-import Mathlib.CategoryTheory.Bicategory.Basic
 
 namespace CategoryTheory
 

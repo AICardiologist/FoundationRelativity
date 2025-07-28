@@ -1,28 +1,27 @@
-/-!
-# Paper-Level Pseudo-Functor Instances
-
-This module implements paper-level pseudo-functor instances for the Foundation-Relativity
-project, providing concrete implementations of the Gap, AP, and RNP functors as 
-pseudo-functors with verified coherence laws.
-
-## Main Definitions
-
-- `Id₁`: Identity pseudo-functor on Foundation bicategory
-- `GapFunctorPF`: Gap pathology as pseudo-functor  
-- `APFunctorPF`: Approximation Property failure as pseudo-functor
-- `RNPFunctorPF`: Radon-Nikodym Property failure as pseudo-functor
-
-## Implementation Notes
-
-All pseudo-functors implement proper coherence conditions (pentagon and triangle laws)
-as verified in CategoryTheory.PseudoFunctor.CoherenceLemmas.
--/
-
 import CategoryTheory.PseudoFunctor
 import CategoryTheory.Bicategory.FoundationAsBicategory
 import CategoryTheory.PseudoFunctor.Gap
 import CategoryTheory.PseudoFunctor.AP
 import CategoryTheory.PseudoFunctor.RNP
+
+/-!
+# Pseudo-Functor Instances for Papers
+
+Paper-level pseudo-functor instances implementing the Gap, AP, and RNP functors
+for Foundation-Relativity analysis. These provide the concrete pseudo-functor
+implementations required for Papers #1-3.
+
+## Main Definitions
+
+- Identity pseudo-functors for bicategorical framework
+- Gap, AP, and RNP pseudo-functor instances
+- Paper-level integration with bicategorical coherence
+
+## Implementation Notes
+
+This module bridges the abstract pseudo-functor framework with the concrete
+pathology analysis required for academic paper implementations.
+-/
 
 open CategoryTheory
 
