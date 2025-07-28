@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0-rc1] - 2025-07-28
+
+### Added
+
+- **🎉 SPRINT 43 COMPLETE**: Pseudo-Functor Infrastructure + **ZERO SORRY ACHIEVEMENT**
+  - **Complete Pseudo-Functor Framework**: Full bicategorical pseudo-functor implementation
+  - **CategoryTheory/PseudoFunctor.lean**: Weak pseudo-functors with pentagon & triangle coherence
+  - **CategoryTheory/BicatHelpers.lean**: `Inv₂` utilities for invertible 2-cells with automatic proofs
+  - **Papers/PseudoFunctorInstances.lean**: Academic paper pseudo-functor instances (Gap, AP, RNP)
+  - **Zero Sorry Milestone**: Eliminated all 4 remaining sorry statements (4 → 0)
+  - **Enhanced CI Verification**: Axiom checking, strict linting, documentation coverage
+
+- **Pseudo-Functor Mathematical Framework**: Research-grade bicategorical infrastructure
+  - **Pentagon Coherence**: Formal verification of pentagon law for pseudo-functor composition
+  - **Triangle Coherence**: Unitor coherence conditions proven with automatic tactics
+  - **Foundation Integration**: Foundation bicategory as source for pathology analysis
+  - **Academic Bridge**: Paper-level instances connecting theory to research applications
+
+- **Development Infrastructure Enhancements**
+  - **Enhanced CI Pipeline**: Comprehensive verification with axiom and sorry checking
+  - **Module Documentation**: 100% documentation coverage for CategoryTheory/ and Papers/
+  - **Quality Assurance**: Strict linting for new modules with zero tolerance policy
+  - **Regression Testing**: Complete verification of Sprint 35-43 mathematical achievements
+
 ### Fixed
 - **Pre-existing Compilation Errors**: Resolved all compilation issues in Papers modules
   - **Papers/P2_BidualGap/WLPO_Equiv_Gap.lean**: Fixed type constructor mismatches and mathematical contradictions
@@ -14,11 +38,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Zero Regression**: All Sprint 35-43 proofs verified to compile successfully
   - **Test Coverage**: Added missing CheegerProofTests and Rho4ProofTests executables
 
-### Added
-- **Enhanced Test Suite**: New test executables for analytic pathologies
-  - **CheegerProofTests**: Executable test for Cheeger-Bottleneck pathology (ρ≈3½)
-  - **Rho4ProofTests**: Executable test for Rho4 pathology (ρ=4)
-  - **Comprehensive Regression Testing**: Verified all modules from Sprint 35-43
+- **CategoryTheory Module Improvements**: Enhanced bicategorical infrastructure
+  - **Import Placement**: Fixed "invalid import command" errors across CategoryTheory modules
+  - **Universe Polymorphism**: Resolved Type*/Type issues in BicatFound.lean structure definitions
+  - **Namespace Resolution**: Fixed Foundation identifier resolution in Papers smoke tests
+  - **Unused Variables**: Cleaned linter warnings in AnalyticPathologies modules
+
+### Changed
+- **SORRY_ALLOWLIST.txt**: Updated to zero authorized sorry statements (Sprint 43 achievement)
+- **Version Badge**: Updated to v0.5.0-rc1 reflecting pseudo-functor infrastructure completion
+- **Documentation Hub**: Enhanced with Sprint 43 completion report and design documentation
+- **Build Quality**: Enhanced CI with axiom verification and comprehensive module checking
 
 ## [0.5.0-alpha] - 2025-07-27
 
