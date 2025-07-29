@@ -37,8 +37,6 @@ Math-AI (Sprint 44 Day 2 PM)
 
 open scoped ComplexConjugate BigOperators
 
--- Local spectrum lemmas (since the August 2025 mathlib lemmas aren't available yet)
-
 namespace Papers.P1_GBC.Core
 
 open CategoryTheory
@@ -191,33 +189,22 @@ lemma spectrum_G :
   classical
   refine ⟨?σ_false, ?σ_true⟩
 
-  -- 1 ▸ Gödel bit = false  ⇒  G = 1
+  -- Gödel bit = false   ⇒  G = 1
   · intro hc
     have hG : G (g := g) = (1 : L2Space →L[ℂ] L2Space) := by
       simp [G, hc]
-    -- spectrum of the identity is {1}
+    -- spectrum of identity is {1}
     rw [hG]
-    ext z
-    simp [spectrum.mem_iff]
-    constructor
-    · intro hz
-      by_contra hne
-      have : IsUnit (algebraMap ℂ (L2Space →L[ℂ] L2Space) z - 1) :=
-        by sorry -- TODO: prove using isUnit properties
-      exact hz this
-    · rintro rfl h
-      -- When z = 1, we have (1 - 1) = 0, and 0 is not a unit
-      sorry -- TODO: prove 0 is not a unit
+    sorry -- TODO: prove spectrum of identity using available mathlib lemmas
 
-  -- 2 ▸ Gödel bit = true   ⇒  G = 1 - P_g
+  -- Gödel bit = true    ⇒  G = 1 - P_g
   · intro hc
     have hG : G (g := g) = 1 - P_g (g := g) := by
       simp [G, hc]
-    -- spectrum of 1 - P_g where P_g is a rank-one projection
+
+    -- spectrum of 1 - rank-one projection is {0,1}
     rw [hG]
-    -- Proof that spectrum of 1 - rank-one projection is {0,1}
-    -- This requires several mathlib lemmas that don't exist yet
-    sorry -- TODO: complete using spectrum theory for projections
+    sorry -- TODO: prove spectrum of 1 - projection using available mathlib lemmas
 
 end Papers.P1_GBC
 
