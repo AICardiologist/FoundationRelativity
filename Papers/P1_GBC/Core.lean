@@ -36,7 +36,8 @@ Math-AI (Sprint 44 Day 2 PM)
 -/
 
 open scoped ComplexConjugate BigOperators
-open spectrum
+
+-- Local spectrum lemmas (since the August 2025 mathlib lemmas aren't available yet)
 
 namespace Papers.P1_GBC.Core
 
@@ -176,7 +177,6 @@ theorem reflection_equiv : c_G = false ↔ GödelSentenceTrue := by
 /-! ### Spectrum of the Gödel operator -/
 
 open Complex Real
-open spectrum
 
 /-- **Complete description of `σ(G)`**.
 
@@ -195,16 +195,29 @@ lemma spectrum_G :
   · intro hc
     have hG : G (g := g) = (1 : L2Space →L[ℂ] L2Space) := by
       simp [G, hc]
-    -- For the identity operator, spectrum is {1}
-    sorry
+    -- spectrum of the identity is {1}
+    rw [hG]
+    ext z
+    simp [spectrum.mem_iff]
+    constructor
+    · intro hz
+      by_contra hne
+      have : IsUnit (algebraMap ℂ (L2Space →L[ℂ] L2Space) z - 1) :=
+        by sorry -- TODO: prove using isUnit properties
+      exact hz this
+    · rintro rfl h
+      -- When z = 1, we have (1 - 1) = 0, and 0 is not a unit
+      sorry -- TODO: prove 0 is not a unit
 
   -- 2 ▸ Gödel bit = true   ⇒  G = 1 - P_g
   · intro hc
     have hG : G (g := g) = 1 - P_g (g := g) := by
       simp [G, hc]
-    -- For a rank-one projection P, spectrum(P) = {0,1}
-    -- For 1 - P, spectrum(1-P) = {0,1} as well
-    sorry
+    -- spectrum of 1 - P_g where P_g is a rank-one projection
+    rw [hG]
+    -- Proof that spectrum of 1 - rank-one projection is {0,1}
+    -- This requires several mathlib lemmas that don't exist yet
+    sorry -- TODO: complete using spectrum theory for projections
 
 end Papers.P1_GBC
 
