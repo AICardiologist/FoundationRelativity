@@ -90,13 +90,17 @@ def comp_v {F G H : PseudoFunctor B C}
     haveI := β.isIso_component b
     infer_instance
   naturality {b₁ b₂} f := by
-    simp [Bicategory.assoc] with aesop_cat
+    simp [Bicategory.assoc]
+    aesop_cat
   naturality_inv {b₁ b₂} f := by
-    simp [Bicategory.assoc] with aesop_cat
+    simp [Bicategory.assoc]
+    aesop_cat
   naturality_inv_left {b₁ b₂} f := by
-    simp [Bicategory.assoc] with aesop_cat
+    simp [Bicategory.assoc]
+    aesop_cat
   naturality_inv_right {b₁ b₂} f := by
-    simp [Bicategory.assoc] with aesop_cat
+    simp [Bicategory.assoc]
+    aesop_cat
 
 infixr:80 " ◆ " => comp_v
 

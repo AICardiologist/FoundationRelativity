@@ -175,29 +175,25 @@ theorem reflection_equiv : c_G = false ↔ GödelSentenceTrue := by
 
 open Complex Real
 
-/-- The spectrum of the Gödel operator is `{1}` if `c_G = false`
-    and `{0,1}` if `c_G = true`. -/
+/-- The spectrum of the Gödel operator. -/
 lemma spectrum_G :
     (c_G = false → spectrum ℂ (G (g:=g)) = {1}) ∧
     (c_G = true  → spectrum ℂ (G (g:=g)) = {0,1}) := by
   classical
   constructor
   · intro hc
-    -- With `c_G = false` we have `G = 1 - 0 = 1`
     have hG : G (g:=g) = 1 := by
-      simp only [G, hc, Bool.false_eq_true, if_false, sub_zero]
+      simp [G, hc, Bool.false_eq_true, sub_zero]
     -- The spectrum of the identity operator is {1}
     rw [hG]
-    -- For now we axiomatize that spectrum(1) = {1}
-    sorry  -- spectrum of identity is {1}
+    -- Use the fact that for identity, only z=1 fails to be invertible
+    sorry  -- spectrum(1) = {1}
   · intro hc
-    -- With `c_G = true` we have `G = 1 - P_g`
     have hG : G (g:=g) = 1 - P_g (g:=g) := by
-      simp only [G, hc, if_true]
-    -- For rank-one projection, spectrum of 1 - P is {0,1}
-    -- This follows from the fact that P_g has spectrum {0,1} for rank-one projections
-    -- and spectrum(1 - T) = {1 - λ : λ ∈ spectrum(T)}
-    sorry  -- Requires deeper spectral theory of projections
+      simp [G, hc]
+    -- For projection P, spectrum(1 - P) = {0,1}
+    -- This requires the spectral theory of projections
+    sorry  -- spectrum of 1 - projection is {0,1}
 
 end Papers.P1_GBC
 
