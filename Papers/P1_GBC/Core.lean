@@ -1,4 +1,5 @@
 import Mathlib.Tactic
+import Mathlib.Analysis.InnerProductSpace.Spectrum
 import Mathlib.Analysis.Normed.Algebra.Spectrum
 import CategoryTheory.PseudoFunctor
 import CategoryTheory.BicatFound
@@ -35,75 +36,7 @@ Math-AI (Sprint 44 Day 2 PM)
 -/
 
 open scoped ComplexConjugate BigOperators
-
-/-! ### Local spectral facts
-     We only need two elementary lemmas:
-
-       • `spectrum_one`              : σ(1)        = {1}
-       • `spectrum_one_sub_proj`     : σ(1 - P)    = {0,1}  (rank‑one orthogonal
-                                                            projection)
-
-   They are proved below with elementary algebra; no heavy functional analysis
-   infrastructure is required. -/
-
 open Spectrum
-
-section SpectrumFacts
-variable {E : Type*} [NormedRing ℂ] [NormedAlgebra ℂ E]
-
-/-- *Spectrum of the identity* – only the point `1`. -/
-lemma spectrum_one (E) :
-    spectrum ℂ (1 : E) = {1} := by
-  ext z
-  simp only [Set.mem_singleton_iff, Spectrum.mem_iff,
-             one_smul, sub_self, map_zero, Subsingleton.elim] -- `IsUnit (0)` is `False`
-  constructor
-  · intro h
-    -- `z • 1 - 1 = (z - 1) • 1` is non‑unit;
-    -- but `1` is a unit, so `z - 1 = 0`.
-    have : (z - 1 : ℂ) = 0 := by
-      by_contra hne
-      have : IsUnit ((z - 1) • (1 : E)) := isUnit_smul_of_ne_zero hne isUnit_one
-      exact h this
-    simpa using sub_eq_zero_iff_eq.mp this
-  · rintro rfl hunit
-    simpa using hunit   -- `0` is not a unit
-end SpectrumFacts
-
-section SpectrumProjection
-open Complex
-variable {H : Type*} [InnerProductSpace ℂ H] [CompleteSpace H]
-
-/-- *Spectrum of `1 − P`* for an **orthogonal rank‑one projection**. -/
-lemma spectrum_one_sub_projection
-    {v : H} (hv : ‖v‖ = 1) :
-    spectrum ℂ (1 - @ContinuousLinearMap.projℂ _ _ _ _ v hv) = {0,1} := by
-  --  `projℂ v` has eigenvalues `{0,1}`; hence so does `1 - proj`.
-  --  First show σ(proj) ⊆ {0,1} …
-  have hσ_proj : spectrum ℂ (ContinuousLinearMap.projℂ v hv) ⊆ {0,1} := by
-    intro z hz
-    have hEigen : (z = 0) ∨ (z = 1) := by
-      -- finite‑rank projection ⇒ minimal polynomial divides `X(X‑1)`
-      -- hence the only possible eigenvalues are `0` or `1`
-      have : (ContinuousLinearMap.projℂ v hv).comp
-              (ContinuousLinearMap.projℂ v hv)
-            = ContinuousLinearMap.projℂ v hv := by
-        ext x; simp [ContinuousLinearMap.projℂ_apply, hv]   -- idempotent
-      have := spectrum_subset_polynomial (by
-        refine ⟨Polynomial.X * (Polynomial.X - 1), ?_⟩
-        ext x; simp [Polynomial.mul_comm, this])
-      exact (this hz).elim
-    simpa [Set.mem_singleton_iff] using hEigen
-  --  σ(1‑P) = 1 - σ(P)
-  have : spectrum ℂ (1 - ContinuousLinearMap.projℂ v hv)
-        = (fun λ : ℂ => 1 - λ) '' spectrum ℂ (ContinuousLinearMap.projℂ v hv) :=
-    by simpa using spectrum_one_sub _  -- already in mathlib
-  simpa [Set.image_singleton, Set.image_singleton] using
-        (by
-          simpa [Set.image_singleton] using
-                (Set.image_subset_iff.2 (by
-                  intro z hz; rcases (hσ_proj hz) with rfl | rfl <;> simp))
-end SpectrumProjection
 
 namespace Papers.P1_GBC.Core
 
@@ -244,23 +177,29 @@ theorem reflection_equiv : c_G = false ↔ GödelSentenceTrue := by
 
 open Complex Real
 
-/-- The spectrum of the Gödel operator. -/
+/--  **Spectrum of the Gödel operator**  
+
+* If `c_G = false` we literally have `G = 1`, hence σ (G)= {1};  
+* If `c_G = true` we have `G = 1 - P_g`, and for an orthogonal rank‑one
+  projection the spectrum is `{0, 1}`. -/
 lemma spectrum_G :
-    (c_G = false → spectrum ℂ (G (g:=g)) = {1}) ∧
-    (c_G = true  → spectrum ℂ (G (g:=g)) = {0,1}) := by
+    (c_G = false → spectrum ℂ (G (g := g)) = {1}) ∧
+    (c_G = true  → spectrum ℂ (G (g := g)) = {0,1}) := by
   classical
-  constructor
+  refine ⟨?σ0, ?σ1⟩
   · intro hc
-    have hG : G (g:=g) = 1 := by
-      simp [G, hc]
-    simpa [hG, spectrum_one _]
+    have h : G (g := g) = (1 : L2Space →L[ℂ] L2Space) := by
+      simp [G, hc, Bool.false_eq_true, sub_zero]
+    -- spectrum(1) = {1}
+    rw [h]
+    sorry  -- spectrum of identity is {1}
   · intro hc
-    have hG : G (g:=g) = 1 - P_g (g:=g) := by
+    have h : G (g := g) = (1 - P_g (g := g)) := by
       simp [G, hc]
-    -- `P_g` is an orthogonal rank‑one projection; we already have the unit vector `e_g`.
-    have h_spec := spectrum_one_sub_projection (v := e_g) (by
-      simpa using e_g_norm (g:=g))
-    simpa [hG] using h_spec
+    -- `P_g` is the rank‑one orthogonal projection onto `e_g`
+    -- For rank-one projection, spectrum of 1 - P is {0,1}
+    rw [h]
+    sorry  -- spectrum of 1 - rank-one projection is {0,1}
 
 end Papers.P1_GBC
 
