@@ -122,7 +122,7 @@ noncomputable def c_G : Bool := Arithmetic.c_G
 
 /-- The Gödel operator `G = I − c_G · P_g`. -/
 noncomputable
-def G : L2Space →L[ℂ] L2Space :=
+def G {g : ℕ} : L2Space →L[ℂ] L2Space :=
   1 - if c_G then P_g (g:=g) else 0
 
 /-- **Reflection principle:** G is surjective iff c_G = false -/
@@ -168,6 +168,36 @@ theorem reflection_equiv : c_G = false ↔ GödelSentenceTrue := by
   rw [decide_eq_false_iff_not]
 
 -- Note: consistency_iff_G moved to Correspondence.lean where it has access to Defs
+
+/-! ### Spectrum Analysis -/
+
+open Complex Real
+
+/-- Local definition of spectrum for bounded operators -/
+def spectrum (T : L2Space →L[ℂ] L2Space) : Set ℂ := 
+  {z : ℂ | ¬IsUnit (z • (1 : L2Space →L[ℂ] L2Space) - T)}
+
+/-- The spectrum of the Gödel operator is `{1}` if `c_G = false`
+    and `{0,1}` if `c_G = true`. -/
+lemma spectrum_G :
+    (c_G = false → spectrum (G (g:=g)) = {1}) ∧
+    (c_G = true  → spectrum (G (g:=g)) = {0,1}) := by
+  classical
+  constructor
+  · intro hc
+    -- With `c_G = false` we literally have `G = 1`
+    have hG : G (g:=g) = 1 := by
+      simp only [G, hc, if_false]
+      rfl
+    -- Since we don't have spectrum imported, we axiomatize this for now
+    sorry  -- spectrum of identity is {1}
+  · intro hc
+    -- With `c_G = true` we have `G = 1 - P_g`
+    have hG : G (g:=g) = 1 - P_g (g:=g) := by
+      simp only [G, hc, if_true]
+      rfl
+    -- For rank-one projection, spectrum of 1 - P is {0,1}
+    sorry  -- spectrum of 1 - rank-one projection is {0,1}
 
 end Papers.P1_GBC
 
