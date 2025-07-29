@@ -173,33 +173,49 @@ theorem reflection_equiv : c_G = false ↔ GödelSentenceTrue := by
 
 -- Note: consistency_iff_G moved to Correspondence.lean where it has access to Defs
 
-/-! ### Spectrum Analysis -/
+/-! ### Spectrum of the Gödel operator -/
 
 open Complex Real
+open Spectrum
 
-/--  **Spectrum of the Gödel operator**  
+/-- **Complete description of `σ(G)`**.
 
-* If `c_G = false` we literally have `G = 1`, hence σ (G)= {1};  
-* If `c_G = true` we have `G = 1 - P_g`, and for an orthogonal rank‑one
-  projection the spectrum is `{0, 1}`. -/
+*If* the Gödel bit is `false` we literally have `G = 1`, so the spectrum
+is `{1}`.  
+*If* the bit is `true` we have `G = 1 - P_g`; because `P_g` is an
+orthogonal rank‑one projection its spectrum is `{0, 1}`, and
+`1 - P_g` therefore has spectrum `{0, 1}` as well. -/
 lemma spectrum_G :
     (c_G = false → spectrum ℂ (G (g := g)) = {1}) ∧
     (c_G = true  → spectrum ℂ (G (g := g)) = {0,1}) := by
   classical
-  refine ⟨?σ0, ?σ1⟩
-  · intro hc
-    have h : G (g := g) = (1 : L2Space →L[ℂ] L2Space) := by
-      simp [G, hc, Bool.false_eq_true, sub_zero]
-    -- spectrum(1) = {1}
-    rw [h]
-    sorry  -- spectrum of identity is {1}
-  · intro hc
-    have h : G (g := g) = (1 - P_g (g := g)) := by
+  refine ⟨?σ_false, ?σ_true⟩
+  · -- 1.  Trivial branch: `G = 1`
+    intro hc
+    have hG : G (g := g) = (1 : L2Space →L[ℂ] L2Space) := by
       simp [G, hc]
-    -- `P_g` is the rank‑one orthogonal projection onto `e_g`
-    -- For rank-one projection, spectrum of 1 - P is {0,1}
-    rw [h]
-    sorry  -- spectrum of 1 - rank-one projection is {0,1}
+    simpa [hG] using Spectrum.one_eq_singleton_one ℂ _
+  · -- 2.  Rank‑one‑projection branch
+    intro hc
+    have hG : G (g := g) = 1 - P_g (g := g) := by
+      simp [G, hc]
+    -- a)  `P_g` is a self‑adjoint rank‑one idempotent,
+    --     so `Spectrum.projection` gives `σ(P_g) = {0,1}`.
+    have hσPg : spectrum ℂ (P_g (g := g)) = {0,1} := by
+      simpa using
+        ContinuousLinearMap.spectrum_projℂ
+          (v := e_g (g := g))
+          (by
+            -- `‖e_g‖ = 1`
+            simpa using e_g_norm (g := g))
+    -- b)  `σ(1 - P) = (1 - ·) '' σ(P)`
+    have hσG : spectrum ℂ (1 - P_g (g := g))
+        = (fun z : ℂ => 1 - z) '' spectrum ℂ (P_g (g := g)) := by
+      simpa using Spectrum.one_sub _
+    -- c)  Compute the image set explicitly.
+    have : (fun z : ℂ => 1 - z) '' ({0,1} : Set ℂ) = ({0,1} : Set ℂ) := by
+      simp [Set.image_insert_eq, Set.image_singleton, sub_eq_add_neg]
+    simpa [hG, hσG, hσPg, this]
 
 end Papers.P1_GBC
 

@@ -2,6 +2,8 @@ import CategoryTheory.BicatFound
 import CategoryTheory.PseudoFunctor
 import CategoryTheory.BicatHelpers
 
+open Bicategory
+
 /-!
 # Pseudo-Natural Transformations
 
