@@ -1,4 +1,5 @@
 import Mathlib.Tactic
+import Mathlib.Analysis.Normed.Algebra.Spectrum
 import CategoryTheory.PseudoFunctor
 import CategoryTheory.BicatFound
 import AnalyticPathologies.HilbertSetup
@@ -105,10 +106,11 @@ lemma rank_le_one_P_g : ∃ v : L2Space, ∀ x, ∃ c : ℂ, P_g (g:=g) x = c �
   intro x
   use x g
   ext n
-  simp only [P_g_apply, lp.single_apply, Pi.smul_apply, smul_eq_mul]
+  simp only [P_g_apply, lp.single_apply]
   by_cases h : n = g
-  · simp [h, e_g, lp.single_apply, Pi.single_apply]
-  · simp [h, e_g, lp.single_apply, Pi.single_apply]
+  · subst h
+    simp [e_g, lp.single_apply, Pi.single_eq_same]
+  · simp [h, e_g, lp.single_apply]
 
 /-- Rank‑one linear maps on a Hilbert space are compact. -/
 lemma P_g_compact : IsCompactOperator (P_g (g:=g)) := by
@@ -173,31 +175,29 @@ theorem reflection_equiv : c_G = false ↔ GödelSentenceTrue := by
 
 open Complex Real
 
-/-- Local definition of spectrum for bounded operators -/
-def spectrum (T : L2Space →L[ℂ] L2Space) : Set ℂ := 
-  {z : ℂ | ¬IsUnit (z • (1 : L2Space →L[ℂ] L2Space) - T)}
-
 /-- The spectrum of the Gödel operator is `{1}` if `c_G = false`
     and `{0,1}` if `c_G = true`. -/
 lemma spectrum_G :
-    (c_G = false → spectrum (G (g:=g)) = {1}) ∧
-    (c_G = true  → spectrum (G (g:=g)) = {0,1}) := by
+    (c_G = false → spectrum ℂ (G (g:=g)) = {1}) ∧
+    (c_G = true  → spectrum ℂ (G (g:=g)) = {0,1}) := by
   classical
   constructor
   · intro hc
-    -- With `c_G = false` we literally have `G = 1`
+    -- With `c_G = false` we have `G = 1 - 0 = 1`
     have hG : G (g:=g) = 1 := by
-      simp only [G, hc, if_false]
-      rfl
-    -- Since we don't have spectrum imported, we axiomatize this for now
+      simp only [G, hc, Bool.false_eq_true, if_false, sub_zero]
+    -- The spectrum of the identity operator is {1}
+    rw [hG]
+    -- For now we axiomatize that spectrum(1) = {1}
     sorry  -- spectrum of identity is {1}
   · intro hc
     -- With `c_G = true` we have `G = 1 - P_g`
     have hG : G (g:=g) = 1 - P_g (g:=g) := by
       simp only [G, hc, if_true]
-      rfl
     -- For rank-one projection, spectrum of 1 - P is {0,1}
-    sorry  -- spectrum of 1 - rank-one projection is {0,1}
+    -- This follows from the fact that P_g has spectrum {0,1} for rank-one projections
+    -- and spectrum(1 - T) = {1 - λ : λ ∈ spectrum(T)}
+    sorry  -- Requires deeper spectral theory of projections
 
 end Papers.P1_GBC
 
