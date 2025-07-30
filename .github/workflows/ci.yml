@@ -63,8 +63,8 @@ jobs:
           #check RNPFunctor.RNP_requires_DCω_plus' | lake env lean --stdin
           
           # Test SpectralGap requires AC_ω (ρ=3) - Milestone C
-          echo 'import SpectralGap.Proofs
-          #check SpectralGap.SpectralGap_requires_ACω' | lake env lean --stdin
+          echo 'import AnalyticPathologies.Proofs
+          #check AnalyticPathologies.SpectralGap_requires_ACω' | lake env lean --stdin
           
           echo "✅ All Foundation-Relativity theorems verified!"
           
@@ -124,6 +124,45 @@ jobs:
             exit 1
           fi
           echo "✅ New modules are warning-free"
+
+      - name: Documentation coverage check
+        id: doc_coverage
+        run: |
+          echo "Checking documentation coverage..."
+          ./scripts/doc_coverage.sh coverage.txt || true
+          COVERAGE=$(cat coverage.txt || echo "0")
+          echo "Documentation coverage: ${COVERAGE}%"
+          echo "coverage=${COVERAGE}" >> $GITHUB_OUTPUT
+          
+          # Don't fail CI for low coverage, just report
+          if (( COVERAGE < 50 )); then
+            echo "::warning::Documentation coverage (${COVERAGE}%) is below recommended threshold (50%)"
+          fi
+
+      - name: Automation metrics
+        id: automation
+        run: |
+          echo "Calculating automation metrics..."
+          ./scripts/leanink_stats.sh automation_stats.json || true
+          
+          # Extract key metrics
+          if [ -f automation_stats.json ]; then
+            AUTOMATION_RATE=$(jq -r '.summary.automation_percentage' automation_stats.json)
+            SORRY_COUNT=$(jq -r '.summary.sorry_count' automation_stats.json)
+            echo "Automation rate: ${AUTOMATION_RATE}%"
+            echo "Sorry count: ${SORRY_COUNT}"
+            echo "automation_rate=${AUTOMATION_RATE}" >> $GITHUB_OUTPUT
+            echo "sorry_count=${SORRY_COUNT}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload metrics artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: lean-metrics
+          path: |
+            coverage.txt
+            automation_stats.json
+          retention-days: 30
 
       - name: Verify sorry allowlist
         run: |

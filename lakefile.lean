@@ -16,6 +16,7 @@ require mathlib from git
 @[default_target] lean_lib LogicDSL where srcDir := "."
 @[default_target] lean_lib CategoryTheory where srcDir := "."
 @[default_target] lean_lib Papers where srcDir := "."
+@[default_target] lean_lib Logic where srcDir := "."
 
 -- Test executables
 lean_exe testFunctors where
@@ -50,6 +51,10 @@ lean_exe GodelGapProofTests where
 
 -- Paper smoke tests (Day 1)
 lean_exe PaperP1Tests where
+  root := `Papers.P1_GBC.SmokeTest
+
+-- Sprint 44 Day 1: Paper #1 CI integration
+lean_exe Paper1SmokeTest where
   root := `Papers.P1_GBC.SmokeTest
 
 lean_exe PaperP2Tests where
@@ -87,3 +92,7 @@ lean_exe CheegerProofTests where
 
 lean_exe Rho4ProofTests where
   root := `test.Rho4ProofTests
+
+-- Sprint 44 Day 1: Pseudo-natural transformation tests
+lean_exe PseudoNatTransLawsTests where
+  root := `test.PseudoNatTransLawsTests
