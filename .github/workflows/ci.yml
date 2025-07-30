@@ -170,19 +170,13 @@ jobs:
           if [ -f scripts/check-sorry-allowlist.sh ]; then
             bash scripts/check-sorry-allowlist.sh
           else
-            # For Sprint 44: Allow sorrys in Papers/P1_GBC/ (28 intentional mathematical gaps)
-            # Future sprints should tighten this allowlist
-            echo "Sprint 44: Allowing sorrys in Papers/P1_GBC/ for mathematical content"
-            UNAUTHORIZED_SORRYS=$(find Papers/ CategoryTheory/ -name "*.lean" -not -path "Papers/P1_GBC/*" -exec grep -l "sorry" {} \; 2>/dev/null | wc -l)
-            if [ "$UNAUTHORIZED_SORRYS" -gt 0 ]; then
-              echo "❌ Found unauthorized sorry statements outside Papers/P1_GBC/:"
-              find Papers/ CategoryTheory/ -name "*.lean" -not -path "Papers/P1_GBC/*" -exec grep -Hn "sorry" {} \; 2>/dev/null || true
+            # Fallback: check for sorry in new modules only
+            SORRY_COUNT=$(find Papers/ CategoryTheory/ -name "*.lean" -exec grep -l "sorry" {} \; 2>/dev/null | wc -l)
+            if [ "$SORRY_COUNT" -gt 0 ]; then
+              echo "❌ Found sorry statements in new modules:"
+              find Papers/ CategoryTheory/ -name "*.lean" -exec grep -Hn "sorry" {} \; 2>/dev/null || true
               exit 1
             fi
-            
-            # Report P1_GBC sorry count for tracking
-            P1_GBC_SORRYS=$(find Papers/P1_GBC/ -name "*.lean" -exec grep -c "sorry" {} \; 2>/dev/null | paste -sd+ | bc)
-            echo "📊 Papers/P1_GBC/ contains $P1_GBC_SORRYS intentional sorrys for mathematical content"
           fi
           echo "✅ No unauthorized sorry statements found"
 

@@ -66,8 +66,8 @@ jobs:
           #check Gap.Proofs.Gap_requires_WLPO' | lake env lean --stdin
           
           # Test ρ=3 level  
-          echo 'import SpectralGap.Proofs
-          #check SpectralGap.SpectralGap_requires_ACω' | lake env lean --stdin
+          echo 'import AnalyticPathologies.Proofs
+          #check AnalyticPathologies.SpectralGap_requires_ACω' | lake env lean --stdin
           
           echo "✅ Existing hierarchy preserved during Sprint 36"
 
