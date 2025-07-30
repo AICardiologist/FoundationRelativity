@@ -249,3 +249,8 @@ def iso_id {A B : Foundation} (f : Interp A B) : Invertible₂ f f where
 end FoundationBicategory
 
 end CategoryTheory.BicatFound
+
+-- Export FoundationBicat to CategoryTheory namespace for compatibility
+namespace CategoryTheory
+def FoundationBicat := CategoryTheory.BicatFound.FoundationBicat
+end CategoryTheory

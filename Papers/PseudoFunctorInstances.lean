@@ -41,6 +41,19 @@ def APFunctorPF  : PseudoFunctor FoundationBicat FoundationBicat :=
 def RNPFunctorPF : PseudoFunctor FoundationBicat FoundationBicat := 
   PseudoFunctor.id FoundationBicat
 
+-- Provide Papers namespace for backward compatibility
+namespace Papers
+
+/-- Gap pseudo-functor alias for Papers namespace compatibility -/
+def GapPseudoFunctor : PseudoFunctor FoundationBicat FoundationBicat := GapFunctorPF
+
+/-- Additional aliases for Papers namespace -/
+def APPseudoFunctor : PseudoFunctor FoundationBicat FoundationBicat := APFunctorPF
+def RNPPseudoFunctor : PseudoFunctor FoundationBicat FoundationBicat := RNPFunctorPF
+def IdPseudoFunctor : PseudoFunctor FoundationBicat FoundationBicat := Id₁
+
+end Papers
+
 -- Smoke test to verify the functors compile and have the expected properties
 #eval do
   -- Check that gap functor maps bish to bish (identity behavior)
