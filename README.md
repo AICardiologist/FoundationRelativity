@@ -112,6 +112,7 @@ FoundationRelativity/
 │   ├── SpectralGapProofTest.lean # SpectralGap implementation test ✅
 │   └── AllPathologiesTest.lean # Complete integration tests
 ├── scripts/                 # 🔧  Development tools
+│   ├── regression-test.sh   #     Comprehensive post-merge testing suite (10 phases, 60+ tests)
 │   ├── verify-no-sorry.sh   #     CI sorry-statement checker
 │   ├── check-no-axioms.sh   #     Axiom count verification
 │   └── check-no-axioms.lean #     Lean-based axiom inspector
@@ -206,6 +207,61 @@ lake exe PaperP3Tests      # Paper #3: 2-categorical framework
 lake exe Paper2SmokeTest  # Paper #2: Non-functoriality theorem
 lake exe Paper3SmokeTest  # Paper #3: Functorial obstruction theorem
 ```
+
+### 🧪 Comprehensive Regression Testing
+
+For post-merge verification and continuous integration, use our comprehensive regression testing suite:
+
+```bash
+# Run complete regression test suite (recommended after merges)
+./scripts/regression-test.sh
+
+# Individual test phases
+./scripts/regression-test.sh | grep "Phase"  # See all test categories
+```
+
+**Test Coverage**: The regression suite verifies:
+
+- **10 phases** with **60+ individual tests**
+- **Full project build** and module imports
+- **ρ-hierarchy theorems** (ρ=1,2,3,4 pathologies) 
+- **All pathology executables** (Gap2, AP, RNP, SpectralGap, Cheeger, Rho4)
+- **Bicategorical infrastructure** (FoundationBicat, associators, unitors)
+- **Pseudo-functor framework** (GapFunctorPF, APFunctorPF, RNPFunctorPF)
+- **Paper implementations** (P1, P2, P3 infrastructure)
+- **Mathematical operators** (self-adjoint, bounded, spectral properties)
+- **Logic and proof theory** (WLPO, DCω, ACω accessibility)
+- **CI/Build system integration**
+
+**Example Output**:
+```
+🧪 Foundation-Relativity Regression Testing Suite
+==================================================
+
+Phase 1: Full Project Build
+----------------------------
+Testing full project build... ✓ PASS
+
+Phase 3: Foundation-Relativity Core Theorems (ρ-hierarchy)
+-----------------------------------------------------------
+Testing theorem Gap_requires_WLPO... ✓ PASS
+Testing theorem DC_omega2_of_Sel₂... ✓ PASS
+Testing theorem witness_rho4... ✓ PASS
+
+==============================================
+REGRESSION TEST SUMMARY
+==============================================
+Total tests run: 64
+Tests passed: 64
+Tests failed: 0
+
+🎉 ALL TESTS PASSED! Foundation-Relativity is regression-free.
+```
+
+**Usage in Development**:
+- **Post-merge**: Always run `./scripts/regression-test.sh` after merging branches
+- **CI Integration**: Script returns exit code 0 (success) or 1 (failure) for automated workflows
+- **Debugging**: Individual test failures show specific error details for targeted fixes
 
 ## 🎯 Sprint 42 Achievements
 
