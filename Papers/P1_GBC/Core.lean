@@ -105,7 +105,7 @@ lemma rank_le_one_P_g : ∃ v : L2Space, ∀ x, ∃ c : ℂ, P_g (g:=g) x = c �
   intro x
   use x g
   ext n
-  simp only [P_g_apply, lp.single_apply, Pi.smul_apply, smul_eq_mul]
+  simp only [P_g_apply, lp.single_apply]
   by_cases h : n = g
   · simp [h, e_g, lp.single_apply, Pi.single_apply]
   · simp [h, e_g, lp.single_apply, Pi.single_apply]
@@ -187,15 +187,15 @@ lemma spectrum_G :
   · intro hc
     -- With `c_G = false` we literally have `G = 1`
     have hG : G (g:=g) = 1 := by
-      simp only [G, hc, if_false]
-      rfl
+      simp only [G, hc]
+      simp
     -- Since we don't have spectrum imported, we axiomatize this for now
     sorry  -- spectrum of identity is {1}
   · intro hc
     -- With `c_G = true` we have `G = 1 - P_g`
     have hG : G (g:=g) = 1 - P_g (g:=g) := by
-      simp only [G, hc, if_true]
-      rfl
+      simp only [G, hc]
+      simp
     -- For rank-one projection, spectrum of 1 - P is {0,1}
     sorry  -- spectrum of 1 - rank-one projection is {0,1}
 
