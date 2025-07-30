@@ -1,5 +1,6 @@
 # SORRY_ALLOWLIST.txt
 # Authorized sorry statements for Foundation-Relativity project
+
 # Updated: 2025-07-30 (Sprint 44 - Gödel-Banach Infrastructure)
 # Policy: ANY sorry outside this list will fail CI
 
@@ -51,3 +52,4 @@ Papers/P1_GBC/SmokeTest.lean:19  # Comment: "- No sorry statements in basic infr
 # TOTAL: 28 actual sorry statements + 3 comment references for Sprint 44 mathematical content
 # Sprint 44 Status: Stable infrastructure with clear mathematical progression path
 # Next: Sprint 45 (Fredholm Theory), Sprint 46 (Main Correspondence Theorem)
+
