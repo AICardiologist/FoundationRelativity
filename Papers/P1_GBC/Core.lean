@@ -77,10 +77,8 @@ def e_g : L2Space := lp.single 2 g 1
   simp [e_g, h, lp.single_apply]  
 
 lemma e_g_norm : ‖e_g (g:=g)‖ = 1 := by
-  -- %leanink:start
-  -- only the `g`‑coordinate is `1`, all others `0`
-  sorry  -- TODO: prove norm = 1
-  -- %leanink:end
+  -- `e_g` is `lp.single 2 g 1`; for p = 2 the norm is |1| = 1
+  simp [e_g]
 
 /-- The rank‑one **orthogonal** projection onto `span {e_g}`. -/
 noncomputable
@@ -88,7 +86,11 @@ def P_g : L2Space →L[ℂ] L2Space :=
   { toFun := fun x => lp.single 2 g (x g)
     map_add' := by intro x y; ext n; simp [lp.single_apply]
     map_smul' := by intro c x; ext n; simp [lp.single_apply, Pi.single_apply]
-    cont := by sorry }  -- TODO: prove continuity
+    cont := by
+      -- P_g has bound ‖P_g x‖ ≤ ‖x‖, so it's continuous
+      -- Using coordinate bound: |x g| ≤ ‖x‖
+      sorry  -- TODO: prove continuity via coordinate bound
+  }
 
 @[simp] lemma P_g_apply (x : L2Space) :
     P_g (g:=g) x = lp.single 2 g (x g) := rfl
