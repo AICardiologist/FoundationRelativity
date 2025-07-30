@@ -28,7 +28,7 @@ theorem bidual_gap_lemma_placeholder : True := trivial
 
 -- TODO Math-AI: Bicategory structure verification
 -- FoundationBicat.objects is the type Foundation from CategoryTheory.Found
-#check FoundationBicat.objects  -- This should be Foundation
+#check CategoryTheory.FoundationBicat.objects  -- This should be Foundation
 #check Foundation               -- From CategoryTheory.Found
 
 -- They are definitionally equal
