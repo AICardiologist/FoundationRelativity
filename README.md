@@ -2,16 +2,16 @@
 
 [![CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml)
 [![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
-[![Version](https://img.shields.io/badge/Version-v0.5.0--rc1-brightgreen)](https://github.com/AICardiologist/FoundationRelativity/releases)
+[![Version](https://img.shields.io/badge/Version-v0.6.0--alpha-orange)](https://github.com/AICardiologist/FoundationRelativity/releases)
 [![Lean 4.22.0-rc4](https://img.shields.io/badge/Lean-4.22.0--rc4-blue)](https://github.com/leanprover/lean4)
-[![Zero Sorry](https://img.shields.io/badge/Sorry%20Count-0-brightgreen)](docs/sprint43-completion-report.md)
+[![Sorry Count](https://img.shields.io/badge/Sorry%20Count-28%20%28WIP%29-orange)](SORRY_ALLOWLIST.txt)
 [![Doc Coverage](https://img.shields.io/badge/Doc%20Coverage-50%25-yellow)](.github/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 
-> **🎉 Sprint 43 COMPLETE**: Pseudo-Functor Infrastructure + **ZERO SORRY ACHIEVEMENT!** ✅  
-> **Latest**: Complete pseudo-functor coherence framework with 0 sorry statements  
-> **🎯 NEW**: Pentagon & triangle laws proven + paper-level functor instances ready ✅
+> **🚧 Sprint 44 WIP**: Gödel-Banach Correspondence Infrastructure + **Mathematical Content Strategy** 📊  
+> **Latest**: Complete Gödel-Banach infrastructure with 28 strategic mathematical sorrys  
+> **🎯 NEW**: P1_GBC module system + verified operator definitions + Sprint 45-46 roadmap ✅
 
 
 A Lean 4 formalization exploring how mathematical pathologies behave differently under various foundational assumptions.
