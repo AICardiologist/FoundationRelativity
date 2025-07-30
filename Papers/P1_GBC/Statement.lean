@@ -25,7 +25,7 @@ The main theorem establishes that for Gödel sentence G:
 
 namespace Papers.P1_GBC.Statement
 
-open Papers.P1_GBC.Core
+open Papers.P1_GBC
 open Papers.P1_GBC.Defs
 open CategoryTheory
 open AnalyticPathologies

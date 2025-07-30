@@ -37,7 +37,7 @@ Math-AI (Sprint 44 Day 2 PM)
 
 open scoped ComplexConjugate BigOperators
 
-namespace Papers.P1_GBC.Core
+namespace Papers.P1_GBC
 
 open CategoryTheory
 open AnalyticPathologies
@@ -57,8 +57,6 @@ def godelNum : Sigma1Formula → ℕ
   | .completeness => 23   -- Example Gödel number for Comp(PA)
   | .soundness => 29      -- Example Gödel number for Sound(PA)
   | .diagonalization => 31 -- Example Gödel number for Diag(G)
-
-namespace Papers.P1_GBC
 
 open Arithmetic
 
@@ -212,23 +210,27 @@ end Papers.P1_GBC
 
 /-! ### Legacy scaffold compatibility -/
 
+namespace Papers.P1_GBC
+
+open AnalyticPathologies
+
 /-- Rank-one projector P_g associated with Gödel formula g -/
 noncomputable def rankOneProjector (g : Sigma1Formula) : L2Space →L[ℂ] L2Space :=
-  Papers.P1_GBC.P_g (g := godelNum g)
+  P_g (g := godelNum g)
 
 /-- The rank-one projector has rank at most 1 -/
 theorem isRankOne (g : Sigma1Formula) : 
     ∃ v : L2Space, ∀ x, ∃ c : ℂ, rankOneProjector g x = c • v :=
-  Papers.P1_GBC.rank_le_one_P_g
+  rank_le_one_P_g
 
 /-- The main Gödel operator G connecting logical formulas to functional analysis -/
 noncomputable def godelOperator (g : Sigma1Formula) : L2Space →L[ℂ] L2Space :=
-  Papers.P1_GBC.G (g := godelNum g)
+  G (g := godelNum g)
 
 /-- The Gödel operator is Fredholm of index 0 -/
 theorem isFredholm (g : Sigma1Formula) : 
     ∃ (n : ℕ), n = 0 :=
-  Papers.P1_GBC.G_isFredholm
+  G_isFredholm
 
 /-! ### Foundation-Relativity Integration -/
 
@@ -250,4 +252,4 @@ theorem godel_banach_correspondence (g : Sigma1Formula) :
     ¬(Arithmetic.Provable (Arithmetic.Sigma1.Halt (godelNum g))) :=
   sorry -- TODO Math-AI Day 4: Implement full correspondence proof using reflection
 
-end Papers.P1_GBC.Core
+end Papers.P1_GBC
