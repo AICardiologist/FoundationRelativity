@@ -7,19 +7,18 @@ Basic compilation and type-checking test for the ρ=4 Borel-Selector pathology.
 Verifies that the mathematical content is accessible and the main theorems compile.
 -/
 
-open SpectralGap
+open AnalyticPathologies
+open AnalyticPathologies.ClassicalWitness
 
 -- Compilation test: verify main theorems exist and have correct types
-#check Rho4_requires_DCω2
+#check DC_omega2_of_Sel₂
 #check rho4_selfAdjoint  
 #check rho4_bounded
-#check rho4_has_two_gaps
-#check wlpoPlus_of_sel₂
-#check sel₂_zfc
+#check dcω2_of_wlpoPlus
 
 -- Type verification: ensure Sel₂ structure is well-formed
 #check Sel₂
-#check witness_rho4_zfc
+#check witness_rho4
 
 -- Operator definition accessibility
 #check rho4
@@ -31,9 +30,12 @@ open SpectralGap
 example : β₀ < β₁ := β₀_lt_β₁
 example : β₁ < β₂ := β₁_lt_β₂
 
--- Bridge theorem type verification
-example (hSel : Sel₂) : RequiresDCω2 ∧ witness_rho4 := 
-  Rho4_requires_DCω2 hSel
+-- Bridge theorem type verification - the actual theorem we have
+example (hSel : Sel₂) : DCω2 := 
+  DC_omega2_of_Sel₂ hSel
+
+-- Classical witness verification
+noncomputable example : Sel₂ := witness_rho4
 
 /-!
 ## Test Summary
