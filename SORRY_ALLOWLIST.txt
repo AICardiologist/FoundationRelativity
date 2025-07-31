@@ -16,13 +16,13 @@ Papers/P1_GBC/Core.lean:351  # spectrum_projection_is_01 (spectrum of projection
 Papers/P1_GBC/Core.lean:357  # spectrum_one_sub_Pg (spectrum of 1-projection)
 
 # Papers/P1_GBC/Auxiliaries.lean (7 sorrys) - Mathematical content from migration
-Papers/P1_GBC/Auxiliaries.lean:38   # Standard linear algebra result
-Papers/P1_GBC/Auxiliaries.lean:44   # Use compactness of P_g
-Papers/P1_GBC/Auxiliaries.lean:52   # Simplified to avoid subtype issues
-Papers/P1_GBC/Auxiliaries.lean:58   # Simplified to avoid subtype issues
-Papers/P1_GBC/Auxiliaries.lean:65   # Standard result: surjective pullback gives isometry
-Papers/P1_GBC/Auxiliaries.lean:73   # Standard Fredholm alternative
-Papers/P1_GBC/Auxiliaries.lean:82   # Technical: Fredholm operators are not generally compact
+Papers/P1_GBC/Auxiliaries.lean:37   # Standard linear algebra result
+Papers/P1_GBC/Auxiliaries.lean:43   # Use compactness of P_g
+Papers/P1_GBC/Auxiliaries.lean:51   # Simplified to avoid subtype issues
+Papers/P1_GBC/Auxiliaries.lean:57   # Simplified to avoid subtype issues
+Papers/P1_GBC/Auxiliaries.lean:64   # Standard result: surjective pullback gives isometry
+Papers/P1_GBC/Auxiliaries.lean:72   # Standard Fredholm alternative
+Papers/P1_GBC/Auxiliaries.lean:81   # Technical: Fredholm operators are not generally compact
 
 # Papers/P1_GBC/Statement.lean (11 sorrys) - High-level theorem statements
 Papers/P1_GBC/Statement.lean:41   # godel_banach_main theorem
