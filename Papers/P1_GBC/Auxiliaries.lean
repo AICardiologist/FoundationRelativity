@@ -14,8 +14,7 @@ namespace Papers.P1_GBC
 
 open ContinuousLinearMap
 
--- Type aliases for clarity
-abbrev L2Space := lp (fun _ : ℕ => ℂ) 2
+-- Type aliases already defined in Core.lean
 
 /-! ### Linear algebra auxiliaries -/
 
