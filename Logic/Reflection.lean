@@ -5,7 +5,7 @@ import Papers.P1_GBC.Defs
 import Papers.P1_GBC.Core
 
 namespace Logic
-open Papers.P1_GBC.Defs Papers.P1_GBC.Core
+open Papers.P1_GBC.Defs Papers.P1_GBC
 
 axiom reflection_equiv :
   consistencyPredicate peanoArithmetic ↔ GödelSentenceTrue
