@@ -156,7 +156,7 @@ jobs:
           fi
 
       - name: Upload metrics artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: lean-metrics
           path: |
