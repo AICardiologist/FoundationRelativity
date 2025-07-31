@@ -49,7 +49,7 @@ jobs:
           #check RNPFunctor.RNP_requires_DCω_plus' | lake env lean --stdin
           
           # Test SpectralGap requires AC_ω (ρ=3) - Milestone C
-          echo 'import SpectralGap.Proofs
-          #check SpectralGap.SpectralGap_requires_ACω' | lake env lean --stdin
+          echo 'import AnalyticPathologies.Proofs
+          #check AnalyticPathologies.SpectralGap_requires_ACω' | lake env lean --stdin
           
           echo "✅ All Foundation-Relativity theorems verified!"
