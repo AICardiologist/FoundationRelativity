@@ -1,8 +1,42 @@
 #!/bin/bash
-set -e
+# Don't exit on first error - let tests complete and report all failures  
+# set -e
 
-# Foundation-Relativity Regression Testing Script
+# Foundation-Relativity Regression Testing Script  
 # Comprehensive post-merge testing for all mathematical proofs and infrastructure
+
+# Ensure we're in the right directory
+if [ ! -f "lakefile.lean" ]; then
+    echo "Error: Must run from project root directory"
+    exit 1
+fi
+
+# Ensure we're using the correct mathlib commit 05e1c7ab1b
+echo "🔧 Ensuring correct mathlib commit and build..."
+EXPECTED_MATHLIB_COMMIT="05e1c7ab1b"
+CURRENT_MATHLIB_COMMIT=$(cd .lake/packages/mathlib && git rev-parse HEAD | cut -c1-10)
+
+if [ "$CURRENT_MATHLIB_COMMIT" != "$EXPECTED_MATHLIB_COMMIT" ]; then
+    echo "❌ ERROR: Wrong mathlib commit!"
+    echo "   Expected: $EXPECTED_MATHLIB_COMMIT"
+    echo "   Current:  $CURRENT_MATHLIB_COMMIT"
+    echo "   Run 'lake update' to fix"
+    exit 1
+fi
+
+echo "✅ Mathlib commit verified: $EXPECTED_MATHLIB_COMMIT"
+
+# Ensure mathlib is cached and built
+lake exe cache get > /dev/null 2>&1 || true
+lake build Mathlib > /dev/null 2>&1 || true
+
+# Pre-build critical modules that are tested
+echo "🔨 Pre-building tested modules..."
+lake build Papers.PseudoFunctorInstances > /dev/null 2>&1 || true
+lake build Papers.P2_BidualGap.Basic > /dev/null 2>&1 || true  
+lake build Papers.P3_2CatFramework.Basic > /dev/null 2>&1 || true
+lake build CategoryTheory.PseudoFunctor > /dev/null 2>&1 || true
+lake build CategoryTheory.BicatFound > /dev/null 2>&1 || true
 
 echo "🧪 Foundation-Relativity Regression Testing Suite"
 echo "=================================================="
@@ -29,7 +63,12 @@ run_test() {
     echo -n "Testing $test_name... "
     TOTAL_TESTS=$((TOTAL_TESTS + 1))
     
-    if eval "$test_command" > /dev/null 2>&1; then
+    # Store test output for debugging
+    local test_output
+    test_output=$(eval "$test_command" 2>&1)
+    local exit_code=$?
+    
+    if [ $exit_code -eq 0 ]; then
         if [ "$expected_success" = "true" ]; then
             echo -e "${GREEN}✓ PASS${NC}"
             TESTS_PASSED=$((TESTS_PASSED + 1))
@@ -43,6 +82,8 @@ run_test() {
             TESTS_PASSED=$((TESTS_PASSED + 1))
         else
             echo -e "${RED}✗ FAIL${NC}"
+            echo "    Error output: $test_output"
+            echo "    Exit code: $exit_code"
             TESTS_FAILED=$((TESTS_FAILED + 1))
         fi
     fi
