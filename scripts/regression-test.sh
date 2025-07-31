@@ -95,9 +95,13 @@ test_theorem() {
     local import_statement="$2"
     local namespace_open="$3"
     
-    local test_cmd="echo '$import_statement
+    # Create temporary file to ensure proper path resolution
+    local temp_file="/tmp/lean_test_$$.lean"
+    echo "$import_statement
 $namespace_open
-#check $theorem_name' | lake env lean --stdin"
+#check $theorem_name" > "$temp_file"
+    
+    local test_cmd="lake env lean \"$temp_file\" && rm -f \"$temp_file\""
     
     run_test "theorem $theorem_name" "$test_cmd" true
 }
@@ -105,7 +109,11 @@ $namespace_open
 # Helper function to test module imports
 test_import() {
     local module_name="$1"
-    local test_cmd="echo 'import $module_name' | lake env lean --stdin"
+    # Create temporary file to ensure proper path resolution
+    local temp_file="/tmp/lean_import_test_$$.lean"
+    echo "import $module_name" > "$temp_file"
+    local test_cmd="lake env lean \"$temp_file\" && rm -f \"$temp_file\""
+    
     run_test "import $module_name" "$test_cmd" true
 }
 
@@ -143,12 +151,15 @@ test_theorem "DC_omega2_of_Sel₂" "import AnalyticPathologies.Rho4" "open Analy
 test_theorem "witness_rho4" "import AnalyticPathologies.Rho4" "open AnalyticPathologies.ClassicalWitness"
 
 # Test witness_rho4 in proper noncomputable context
-run_test "witness_rho4 noncomputable example" "echo 'import AnalyticPathologies.Rho4
+# Test witness_rho4 in proper noncomputable context using temporary file
+witness_temp_file="/tmp/witness_test_$$.lean"
+echo 'import AnalyticPathologies.Rho4
 open AnalyticPathologies
 open AnalyticPathologies.ClassicalWitness
 #check DC_omega2_of_Sel₂
 #check witness_rho4
-noncomputable example : Sel₂ := witness_rho4' | lake env lean --stdin" true
+noncomputable example : Sel₂ := witness_rho4' > "$witness_temp_file"
+run_test "witness_rho4 noncomputable example" "lake env lean \"$witness_temp_file\" && rm -f \"$witness_temp_file\"" true
 
 echo
 
@@ -172,9 +183,12 @@ test_theorem "left_unitor" "import CategoryTheory.BicatFound" "open CategoryTheo
 test_theorem "associator" "import CategoryTheory.BicatFound" "open CategoryTheory.BicatFound"
 
 # Test that Foundation is accessible through CategoryTheory export
-run_test "Foundation accessibility through CategoryTheory" "echo 'import CategoryTheory
+# Test Foundation accessibility through CategoryTheory using temporary file
+foundation_temp_file="/tmp/foundation_test_$$.lean"
+echo 'import CategoryTheory
 open CategoryTheory
-#check Foundation' | lake env lean --stdin" true
+#check Foundation' > "$foundation_temp_file"
+run_test "Foundation accessibility through CategoryTheory" "lake env lean \"$foundation_temp_file\" && rm -f \"$foundation_temp_file\"" true
 echo
 
 echo -e "${BLUE}Phase 6: Pseudo-Functor Framework${NC}"
@@ -185,9 +199,12 @@ test_theorem "RNPFunctorPF" "import Papers.PseudoFunctorInstances" ""
 test_theorem "Id₁" "import Papers.PseudoFunctorInstances" ""
 
 # KNOWN FAILING TESTS: Papers namespace and GapPseudoFunctor should be accessible but aren't
-run_test "Papers namespace accessibility" "echo 'import Papers.PseudoFunctorInstances
+# Test Papers namespace accessibility using temporary file
+papers_temp_file="/tmp/papers_test_$$.lean"
+echo 'import Papers.PseudoFunctorInstances
 open Papers
-#check GapPseudoFunctor' | lake env lean --stdin" true
+#check GapPseudoFunctor' > "$papers_temp_file"
+run_test "Papers namespace accessibility" "lake env lean \"$papers_temp_file\" && rm -f \"$papers_temp_file\"" true
 echo
 
 echo -e "${BLUE}Phase 7: Paper Infrastructure${NC}"
