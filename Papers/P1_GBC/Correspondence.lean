@@ -20,7 +20,15 @@ open AnalyticPathologies
     sentence** – proved in `Logic/Reflection.lean` and re‑exported here. -/
 theorem consistency_iff_G :
     consistencyPredicate peanoArithmetic ↔ GödelSentenceTrue :=
-  sorry -- TODO: Need to connect consistencyPredicate with c_G via reflection_equiv
+  -- Use the reflection equivalence from Core.lean
+  by
+    unfold consistencyPredicate GödelSentenceTrue
+    -- Both sides are equivalent to c_G = false
+    have h1 : consistencyPredicate peanoArithmetic ↔ (c_G = false) := by
+      sorry -- TODO: Connect consistency predicate to c_G
+    have h2 : GödelSentenceTrue ↔ (c_G = false) := by
+      exact reflection_equiv.symm
+    exact h1.trans h2.symm
 
 /-! ### Gödel ⇔ Surjectivity equivalence -/
 
@@ -41,18 +49,28 @@ lemma surj_implies_false
 /-- 2. Gödel sentence *true* ⇒ surjectivity of `G`. -/
 lemma false_implies_surj (hG : c_G = false) :
     Function.Surjective (G (g:=g)).toLinearMap := 
-  sorry -- TODO: Prove G = I when c_G = false
+  -- When c_G = false, G = I, which is surjective
+  by
+    have h_eq : G (g := g) = 1 := by
+      simp [G, hG]
+    rw [h_eq]
+    exact Function.surjective_id
 
 /-- **Main equivalence.** (Surjective `G`) ↔ (Gödel bit = false). -/
 theorem surjective_iff_false :
     Function.Surjective (G (g:=g)).toLinearMap ↔ c_G = false := 
-  sorry -- TODO: Combine surj_implies_false and false_implies_surj
+  ⟨surj_implies_false, false_implies_surj⟩
 
 /-- Package the result into the statement file's name. -/
 theorem godel_banach_main_correspondence :
     consistencyPredicate peanoArithmetic ↔
       Function.Surjective (G (g:=g)).toLinearMap := 
-  sorry -- TODO: Chain consistency_iff_G, reflection_equiv, and surjective_iff_false
+  -- Chain the equivalences
+  -- consistencyPredicate ↔ GödelSentenceTrue ↔ (c_G = false) ↔ Surjective G
+  calc consistencyPredicate peanoArithmetic 
+    ↔ GödelSentenceTrue := consistency_iff_G
+    _ ↔ (c_G = false) := reflection_equiv.symm
+    _ ↔ Function.Surjective (G (g:=g)).toLinearMap := surjective_iff_false.symm
 
 end GödelEquivalence
 

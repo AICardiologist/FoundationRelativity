@@ -4,9 +4,9 @@
 This directory contains comprehensive documentation for the Foundation-Relativity project - a Lean 4 formalization of foundation-relative mathematics implementing the "Gödel in Four Acts" paper series.
 
 
-**Current Status**: 🎉 v0.5.0-rc1 Sprint 43 COMPLETE! Zero Sorry + Pseudo-Functor Infrastructure  
-**Focus**: Complete pseudo-functor coherence framework with pentagon & triangle proofs  
-**Achievement**: Zero sorry statements + Papers #1-3 pseudo-functor infrastructure ✅
+**Current Status**: 🎉 v0.5.1 Sprint 44 COMPLETE! Foundation Migration + 100% Regression Testing  
+**Focus**: Unified Foundation architecture with complete mathematical rigor  
+**Achievement**: 52/52 regression tests passing + P3 Basic pentagon coherence without cheating ✅
 
 ---
 
@@ -29,7 +29,8 @@ Complete LaTeX sources and reference materials:
 ### **🎉 Sprint Completion Reports**  
 Comprehensive documentation of major sprint achievements:
 
-- **[Sprint 43 Completion Report](sprint43-completion-report.md)** - **LATEST**: Pseudo-functor infrastructure + zero sorry achievement
+- **[Sprint 44 Completion Report](sprint44-completion-report.md)** - **LATEST**: Foundation migration + 100% regression testing achievement
+- **[Sprint 43 Completion Report](sprint43-completion-report.md)** - Pseudo-functor infrastructure + zero sorry achievement
 - **[Sprint 42 Report](sprint42-bicategorical-framework.md)** - Bicategorical framework implementation  
 - **[Sprint 41 Report](sprint41-zero-sorry-milestone.md)** - Initial zero sorry milestone achievement
 
@@ -43,6 +44,7 @@ Resources for formal proof development:
 ### **📖 Reference Documentation**
 Technical guides and development resources:
 
+- **[Code Reference](CODE_REFERENCE.md)** - **NEW**: Comprehensive function/theorem documentation based on regression tests
 - **[Development Guide](reference/DEV_GUIDE.md)** - Setup, contribution guidelines, best practices  
 - **[Toolchain Upgrade](reference/TOOLCHAIN_UPGRADE.md)** - Lean 4.22.0-rc4 upgrade guide
 

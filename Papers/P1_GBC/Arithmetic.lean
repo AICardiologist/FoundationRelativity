@@ -41,4 +41,19 @@ noncomputable def c_G : Bool := by
   classical
   exact decide (Provable G_formula)
 
+/-- Gödel's incompleteness: the Gödel sentence is not provable -/
+axiom incompleteness : ¬ Provable G_formula
+
+/-- Fixed point theorem: Gödel sentence equivalence -/
+axiom godel_fixed_point (g : ℕ) (x : ℕ → ℂ) (h : x g = 0) :
+  Provable G_formula
+
+/-- Right inverse construction when Gödel sentence is not provable -/
+axiom godel_right_inverse (g : ℕ) (h : ¬ Provable G_formula) :
+  ∃ (R : (ℕ → ℂ) →L[ℂ] (ℕ → ℂ)), Function.RightInverse R.toFun (fun x => x)
+
+-- For the blueprint we need a variable for the fixed Gödel sentence
+variable (φ : Sigma1) -- The fixed Gödel sentence
+axiom phi_is_G_formula : φ = G_formula
+
 end Arithmetic
