@@ -86,7 +86,26 @@ def P_g : L2Space →L[ℂ] L2Space :=
   { toFun := fun x => lp.single 2 g (x g)
     map_add' := by intro x y; ext n; simp [lp.single_apply]
     map_smul' := by intro c x; ext n; simp [lp.single_apply, Pi.single_apply]
-    cont := by sorry }  -- TODO: prove continuity
+    cont := by
+      -- P_g is continuous as it's built from continuous operations
+      -- We use the composition of continuous maps: evaluation at g followed by lp.single
+      apply Continuous.comp 
+      · -- lp.single 2 g is continuous
+        exact (lp.singleContinuousLinearMap ℂ (fun _ : ℕ => ℂ) 2 g).continuous
+      · -- evaluation at coordinate g is continuous on lp spaces
+        rw [Metric.continuous_iff]
+        intro x ε hε
+        use ε
+        constructor
+        · exact hε
+        · intro y hy
+          -- |y(g) - x(g)| ≤ ‖y - x‖ by lp norm property
+          calc dist (y g) (x g)
+          _ = ‖y g - x g‖ := by rw [dist_eq_norm]
+          _ = ‖(y - x) g‖ := by rfl
+          _ ≤ ‖y - x‖ := lp.norm_apply_le_norm two_ne_zero (y - x) g
+          _ = dist y x := by rw [dist_eq_norm]
+          _ < ε := hy }
 
 @[simp] lemma P_g_apply (x : L2Space) :
     P_g (g:=g) x = lp.single 2 g (x g) := rfl
