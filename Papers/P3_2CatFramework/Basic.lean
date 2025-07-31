@@ -7,6 +7,7 @@
 import CategoryTheory.BicatFound
 import CategoryTheory.WitnessGroupoid
 import CategoryTheory.WitnessGroupoid.Core
+import CategoryTheory  -- Gets us Foundation and Interp via export
 
 open CategoryTheory
 
@@ -32,13 +33,13 @@ structure TwoCatPseudoFunctor where
   dummy : Unit
 
 /-- Pentagon coherence property for pseudo-functors -/
-def preservesPentagon (F : TwoCatPseudoFunctor) : Prop := 
-  ∀ {A B C D : Foundation} (f : Interp A B) (g : Interp B C) (h : Interp C D),
+def preservesPentagon.{u,v} (F : TwoCatPseudoFunctor) : Prop := 
+  ∀ {A B C D : Foundation.{u,v}} (f : Interp A B) (g : Interp B C) (h : Interp C D),
     vcomp_2cell (associator f g h) (associator f g h) = associator f g h
 
 /-- Witness elimination property -/
-def eliminatesWitnesses (F : TwoCatPseudoFunctor) : Prop :=
-  ∀ (X : Foundation), Nonempty (GenericWitness X) → False
+def eliminatesWitnesses.{u,v} (F : TwoCatPseudoFunctor) : Prop :=
+  ∀ (X : Foundation.{u,v}), Nonempty (GenericWitness X) → False
 
 /-! ### Helper Structures -/
 

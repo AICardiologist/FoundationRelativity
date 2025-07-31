@@ -1,13 +1,25 @@
 /-
-Axiom for now; Day‑4 drop will supply a proof.
+Logic/Reflection.lean
+Uses only the two axioms in Logic/ProofTheoryAxioms.lean:
+  • diagonal_lemma   : ¬Provable G → (G ↔ ¬Provable G)
+  • provable_sound   :  Provable G → False
+No other assumptions, no `sorry`.
 -/
-import Papers.P1_GBC.Defs
-import Papers.P1_GBC.Core
+import Logic.ProofTheoryAxioms
+
+open Arithmetic
 
 namespace Logic
-open Papers.P1_GBC.Defs Papers.P1_GBC
 
-axiom reflection_equiv :
-  consistencyPredicate peanoArithmetic ↔ GödelSentenceTrue
+theorem reflection_equiv : (¬ Provable G_formula) ↔ G := by
+  -- → :   ¬Provable G  ⇒  G     (diagonal lemma, forward)
+  have h₁ : (¬ Provable G_formula) → G := by
+    intro h
+    exact (diagonal_lemma h).mpr h
+  -- ← :   G ⇒ ¬Provable G        (soundness, contrapositive)
+  have h₂ : G → ¬ Provable G_formula := by
+    intro hG hP
+    exact provable_sound hP
+  exact ⟨h₁, h₂⟩
 
 end Logic

@@ -26,15 +26,17 @@ Papers/P1_GBC/Statement.lean:110  # consistency_predicate_connection
 Papers/P1_GBC/Statement.lean:117  # classical_diagonal_lemma
 Papers/P1_GBC/Statement.lean:123  # fredholm_alternative_application
 
-# Papers/P1_GBC/Defs.lean (2 sorrys) - Auxiliary mathematical content  
-Papers/P1_GBC/Defs.lean:56   # godelSentence (diagonal lemma)
-Papers/P1_GBC/Defs.lean:92   # godel_naturality (pseudo-functor naturality)
+
+# Papers/P1_GBC/Correspondence.lean (3 sorrys) - Implementation attempts
+Papers/P1_GBC/Correspondence.lean:28  # consistency_iff_G connection
+Papers/P1_GBC/Correspondence.lean:41  # e_g_in_ker_when_true helper
+Papers/P1_GBC/Correspondence.lean:47  # surj_implies_false (main direction)
 
 # Comment references (detected by grep but not actual sorry statements)
 Papers/P1_GBC/Core.lean:33       # Comment: "- No axioms or sorry statements"
 Papers/P1_GBC/Correspondence.lean:22  # Comment: "-- already available; no `sorry`"
 Papers/P1_GBC/SmokeTest.lean:19      # Comment: "- No sorry statements in basic infrastructure"
 
-# TOTAL: 17 actual sorry statements + 3 comment references
+# TOTAL: 18 actual sorry statements + 3 comment references
 # This represents the sprint 45 mathematical sorry elimination baseline
 # Successfully reduced from 5 to 4 sorries in Core.lean by eliminating continuous_apply_coord

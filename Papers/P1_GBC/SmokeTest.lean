@@ -22,7 +22,7 @@ scaffold modules compile correctly and core imports are functional.
 
 namespace Papers.P1_GBC.SmokeTest
 
-open Papers.P1_GBC.Core
+open Papers.P1_GBC
 open Papers.P1_GBC.Defs
 open Papers.P1_GBC.Statement
 
