@@ -114,7 +114,7 @@ FoundationRelativity/
 │   ├── ProofTheoryAxioms.lean #   WLPO, DCω, ACω definitions + Gödel sentence
 │   └── Reflection.lean      #     Logical reflection theory
 ├── scripts/                 # 🔧  Development tools
-│   ├── regression-test.sh   #     Comprehensive testing suite (10 phases, 52 tests) ✅
+│   ├── regression-test.sh   #     Comprehensive post-merge testing suite (10 phases, 60+ tests)
 │   ├── verify-no-sorry.sh   #     CI sorry-statement checker
 │   ├── check-no-axioms.sh   #     Axiom count verification
 │   └── check-no-axioms.lean #     Lean-based axiom inspector
