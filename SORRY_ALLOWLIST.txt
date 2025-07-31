@@ -1,23 +1,17 @@
 # SORRY_ALLOWLIST.txt
 # Authorized sorry statements for Foundation-Relativity project
 
-# Updated: 2025-07-31 (Sprint 45 - P1_GBC sorry elimination work) 
+# Updated: 2025-07-31 (Sprint 45 - Reduced Core.lean sorries from 5 to 4) 
 # Policy: ANY sorry outside this list will fail CI
 
 # Sprint 45: Gödel-Banach Correspondence - Mathematical sorry elimination
 # These represent the mathematical content before sorry elimination improvements
 
-# Papers/P1_GBC/Core.lean (10 sorrys) - Mathematical infrastructure
-Papers/P1_GBC/Core.lean:80   # norm = 1 proof
-Papers/P1_GBC/Core.lean:89   # continuity proof  
-Papers/P1_GBC/Core.lean:116  # compactness proof
-Papers/P1_GBC/Core.lean:131  # Fredholm alternative
-Papers/P1_GBC/Core.lean:144  # Fredholm theory
-Papers/P1_GBC/Core.lean:152  # reflection principle
-Papers/P1_GBC/Core.lean:158  # reflection principle
-Papers/P1_GBC/Core.lean:193  # spectrum of identity
-Papers/P1_GBC/Core.lean:200  # spectrum of projection
-Papers/P1_GBC/Core.lean:242  # main correspondence proof
+# Papers/P1_GBC/Core.lean (4 sorrys) - Mathematical infrastructure
+Papers/P1_GBC/Core.lean:227  # G_surjective_iff_not_provable - Technical gap
+Papers/P1_GBC/Core.lean:258  # G_inj_iff_surj - Fredholm alternative
+Papers/P1_GBC/Core.lean:363  # spectrum_projection_is_01 - spectrum of projection
+Papers/P1_GBC/Core.lean:369  # spectrum_one_sub_Pg - spectrum of 1 - P_g
 
 # Papers/P1_GBC/Statement.lean (11 sorrys) - High-level theorem statements
 Papers/P1_GBC/Statement.lean:41   # godel_banach_main theorem
@@ -37,7 +31,8 @@ Papers/P1_GBC/Defs.lean:56   # godelSentence (diagonal lemma)
 Papers/P1_GBC/Defs.lean:92   # godel_naturality (pseudo-functor naturality)
 
 # Comment references (detected by grep but not actual sorry statements)
-Papers/P1_GBC/Core.lean:26       # Comment: "- No axioms or sorry statements"
+Papers/P1_GBC/Core.lean:33       # Comment: "- No axioms or sorry statements"
 
-# TOTAL: 23 actual sorry statements + 1 comment reference
+# TOTAL: 17 actual sorry statements + 1 comment reference
 # This represents the sprint 45 mathematical sorry elimination baseline
+# Successfully reduced from 5 to 4 sorries in Core.lean by eliminating continuous_apply_coord
