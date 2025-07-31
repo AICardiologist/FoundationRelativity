@@ -26,7 +26,7 @@ The Gödel-Banach correspondence establishes a fundamental connection between:
 
 namespace Papers.P1_GBC.Defs
 
-open Papers.P1_GBC.Core
+open Papers.P1_GBC
 open CategoryTheory.WitnessGroupoid
 open AnalyticPathologies
 open Found

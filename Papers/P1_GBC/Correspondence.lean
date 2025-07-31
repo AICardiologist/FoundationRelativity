@@ -13,7 +13,7 @@ import Logic.Reflection
 
 namespace Papers.P1_GBC
 
-open Core Defs
+open Papers.P1_GBC
 
 /-- **Equivalence between syntactic consistency and truth of the Gödel
     sentence** – proved in `Logic/Reflection.lean` and re‑exported here. -/
