@@ -493,19 +493,12 @@ lemma P_g_isIdempotentElem : IsIdempotentElem (P_g (g:=g)) := by
 /-- **(B‑2)**  Spectrum of an idempotent, here the rank‑one projection `P_g`. -/
 lemma spectrum_projection_is_01 (g : ℕ) :
     spectrum ℂ (P_g (g:=g)) = {0, 1} := by
-  -- For an idempotent operator P (where P² = P), the spectrum is contained in {0, 1}
-  -- This is a standard result from IsIdempotentElem.spectrum_subset
-  -- For the specific case of rank-one projections, the spectrum is exactly {0, 1}
-  -- since P_g has eigenvalue 1 on span{e_g} and eigenvalue 0 on its orthogonal complement
-  sorry -- Requires showing both 0 and 1 are actually in the spectrum, not just that spectrum ⊆ {0,1}
+  sorry -- Projection spectrum theorem: σ(P) = {0,1} for rank-one projection P
 
 /-- **(B‑3)**  Spectrum of `1 - P_g` is also `{0, 1}`. -/
 @[simp] lemma spectrum_one_sub_Pg (g : ℕ) :
     spectrum ℂ (1 - P_g (g:=g)) = ({0,1} : Set ℂ) := by
-  -- If P is a projection with σ(P) = {0,1}, then σ(I - P) = {0,1}
-  -- This follows from the spectral mapping theorem for polynomials:
-  -- σ(f(T)) = f(σ(T)) for polynomial f, where f(λ) = 1 - λ maps {0,1} to {1,0} = {0,1}
-  sorry -- Requires spectral mapping theorem or direct idempotent analysis
+  sorry -- Elementary spectral mapping: σ(1-P) = {1-λ : λ ∈ σ(P)}
 
 /-- **Complete description of `σ(G)`**.
 
