@@ -25,7 +25,10 @@ theorem consistency_iff_G :
     unfold consistencyPredicate GödelSentenceTrue
     -- Both sides are equivalent to c_G = false
     have h1 : consistencyPredicate peanoArithmetic ↔ (c_G = false) := by
-      sorry -- TODO: Connect consistency predicate to c_G
+      -- This equivalence is a deep mathematical fact requiring Gödel's incompleteness theorems
+      -- The axiom consistency_from_unprovability gives us one direction
+      -- The other direction requires the second incompleteness theorem
+      sorry -- TODO: This requires axiomatizing Gödel's second incompleteness theorem
     have h2 : GödelSentenceTrue ↔ (c_G = false) := by
       exact reflection_equiv.symm
     exact h1.trans h2.symm
@@ -37,14 +40,19 @@ variable {g : ℕ}
 
 /-- Helper lemma: When c_G = true, e_g is in the kernel of G -/
 lemma e_g_in_ker_when_true (h : c_G = true) :
-    e_g (g:=g) ∈ LinearMap.ker (G (g:=g)).toLinearMap := 
-  sorry -- TODO: Prove using G = I - P_g when c_G = true
+    e_g (g:=g) ∈ LinearMap.ker (G (g:=g)).toLinearMap := by
+  -- When c_G = true, G = I - P_g
+  -- We need to show G(e_g) = 0
+  rw [LinearMap.mem_ker]
+  -- From Core.lean proof: G(e_g) = e_g - P_g(e_g) = e_g - e_g = 0
+  simp [G, h, P_g, e_g]
 
 /-- 1. Surjectivity ⇒ Gödel sentence *true*. -/
 lemma surj_implies_false
     (h : Function.Surjective (G (g:=g)).toLinearMap) :
     c_G = false := 
-  sorry -- TODO: Prove using Fredholm alternative and kernel analysis
+  -- This is exactly the forward direction of G_surjective_iff_not_provable
+  (G_surjective_iff_not_provable (g:=g)).mp h
 
 /-- 2. Gödel sentence *true* ⇒ surjectivity of `G`. -/
 lemma false_implies_surj (hG : c_G = false) :
