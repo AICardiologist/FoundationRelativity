@@ -27,10 +27,10 @@ Papers/P1_GBC/Statement.lean:119  # classical_diagonal_lemma
 Papers/P1_GBC/Statement.lean:125  # fredholm_alternative_application
 
 
-# Papers/P1_GBC/Correspondence.lean (3 sorrys) - Implementation attempts
-Papers/P1_GBC/Correspondence.lean:28  # consistency_iff_G connection
-Papers/P1_GBC/Correspondence.lean:41  # e_g_in_ker_when_true helper
-Papers/P1_GBC/Correspondence.lean:47  # surj_implies_false (main direction)
+# Papers/P1_GBC/Correspondence.lean (1 sorry) - Implementation attempts - Sprint 47 reduced from 3 to 1
+Papers/P1_GBC/Correspondence.lean:31  # consistency_iff_G connection - requires Gödel's second incompleteness theorem
+# RESOLVED Sprint 47: Papers/P1_GBC/Correspondence.lean:41  # e_g_in_ker_when_true helper - COMPLETED!
+# RESOLVED Sprint 47: Papers/P1_GBC/Correspondence.lean:47  # surj_implies_false (main direction) - COMPLETED!
 
 # Papers/P1_GBC/Auxiliaries.lean (3 sorrys) - Mathematical content from main merge
 # RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:37   # finiteDimensional_ker_of_finiteDimRange - COMPLETED!
@@ -44,7 +44,7 @@ Logic/Reflection.lean:6          # Comment: "No other assumptions, no `sorry`."
 Papers/P1_GBC/Core.lean:33       # Comment: "- No axioms or sorry statements"
 Papers/P1_GBC/SmokeTest.lean:19      # Comment: "- No sorry statements in basic infrastructure"
 
-# TOTAL: 22 actual sorry statements + 3 comment references  
-# Sprint 47 eliminated 2 sorries from Auxiliaries.lean  
-# This represents the sprint 45 mathematical sorry elimination baseline
-# Successfully reduced from 4 to 3 sorries in Core.lean by eliminating G_surjective_iff_not_provable
+# TOTAL: 20 actual sorry statements + 3 comment references  
+# Sprint 47 eliminated 2 sorries from Auxiliaries.lean and 2 from Correspondence.lean (4 total)
+# This represents the sprint 47 mathematical sorry elimination progress
+# Successfully reduced from 24 to 20 sorries in Paper 1
