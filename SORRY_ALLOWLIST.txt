@@ -19,11 +19,11 @@ Papers/P1_GBC/Statement.lean:46   # godel_banach_main theorem - requires incompl
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:57   # surjectivity_implies_consistency - COMPLETED using main theorem!
 Papers/P1_GBC/Statement.lean:73   # foundation_relative_correspondence
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:78   # godel_rho_degree - COMPLETED!
-Papers/P1_GBC/Statement.lean:96   # correspondence_unique - needs careful analysis
-Papers/P1_GBC/Statement.lean:102  # godel_functorial
-Papers/P1_GBC/Statement.lean:125  # main_theorem_outline consistency->surj
-Papers/P1_GBC/Statement.lean:129  # main_theorem_outline surj->consistency
-Papers/P1_GBC/Statement.lean:136  # diagonal_lemma_technical
+Papers/P1_GBC/Statement.lean:99   # correspondence_unique - needs careful analysis
+Papers/P1_GBC/Statement.lean:105  # godel_functorial
+Papers/P1_GBC/Statement.lean:128  # main_theorem_outline consistency->surj
+Papers/P1_GBC/Statement.lean:132  # main_theorem_outline surj->consistency
+Papers/P1_GBC/Statement.lean:139  # diagonal_lemma_technical
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:145  # fredholm_characterization - COMPLETED using G_inj_iff_surj!
 
 
