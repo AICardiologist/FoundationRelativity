@@ -13,18 +13,29 @@ fi
 
 # Ensure we're using the correct mathlib commit 05e1c7ab1b
 echo "🔧 Ensuring correct mathlib commit and build..."
-EXPECTED_MATHLIB_COMMIT="05e1c7ab1b"
+EXPECTED_MATHLIB_COMMIT="05e1c7ab1b673fc63d01a1ce6084dbef36791ce2"
+EXPECTED_MATHLIB_SHORT="05e1c7ab1b"
 CURRENT_MATHLIB_COMMIT=$(cd .lake/packages/mathlib && git rev-parse HEAD | cut -c1-10)
 
-if [ "$CURRENT_MATHLIB_COMMIT" != "$EXPECTED_MATHLIB_COMMIT" ]; then
-    echo "❌ ERROR: Wrong mathlib commit!"
-    echo "   Expected: $EXPECTED_MATHLIB_COMMIT"
+if [ "$CURRENT_MATHLIB_COMMIT" != "$EXPECTED_MATHLIB_SHORT" ]; then
+    echo "⚠️  Wrong mathlib commit detected!"
+    echo "   Expected: $EXPECTED_MATHLIB_SHORT"
     echo "   Current:  $CURRENT_MATHLIB_COMMIT"
-    echo "   Run 'lake update' to fix"
-    exit 1
+    echo "🔧 Automatically checking out correct mathlib commit..."
+    cd .lake/packages/mathlib && git checkout "$EXPECTED_MATHLIB_COMMIT" > /dev/null 2>&1
+    cd - > /dev/null
+    
+    # Verify the checkout worked
+    CURRENT_MATHLIB_COMMIT=$(cd .lake/packages/mathlib && git rev-parse HEAD | cut -c1-10)
+    if [ "$CURRENT_MATHLIB_COMMIT" != "$EXPECTED_MATHLIB_SHORT" ]; then
+        echo "❌ ERROR: Failed to checkout correct mathlib commit!"
+        echo "   Still at: $CURRENT_MATHLIB_COMMIT"
+        exit 1
+    fi
+    echo "✅ Successfully switched to mathlib commit: $EXPECTED_MATHLIB_SHORT"
 fi
 
-echo "✅ Mathlib commit verified: $EXPECTED_MATHLIB_COMMIT"
+echo "✅ Mathlib commit verified: $EXPECTED_MATHLIB_SHORT"
 
 # Ensure mathlib is cached and built
 lake exe cache get > /dev/null 2>&1 || true
