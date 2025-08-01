@@ -10,7 +10,7 @@ This document shows how the four "Gödel in Four Acts" research papers translate
 
 | **Paper** | **Core Mathematical Object(s)** | **Logical Strength (ρ-level)** | **Lean Status** | **Sprint Coverage** |
 |-----------|----------------------------------|--------------------------------|-----------------|-------------------|
-| **1. Gödel–Banach Correspondence** | • Rank-one operator 𝔊 on ℓ²<br>• Fredholm equivalence: Surj ↔ Gödel sentence | ρ ≈ 4½–5<br>(Σ¹-EM + Fredholm) | 🟡 **S45+**<br>4 sorries eliminated | **Major progress - mathematical infrastructure complete** |
+| **1. Gödel–Banach Correspondence** | • Rank-one operator 𝔊 on ℓ²<br>• Fredholm equivalence: Surj ↔ Gödel sentence | ρ ≈ 4½–5<br>(Σ¹-EM + Fredholm) | 🟡 **S45 In Progress**<br>1 sorry eliminated<br>(G_surjective_iff_not_provable) | **Core reflection principle complete - 3 sorries remaining** |
 | **2. Bidual Gap Across Foundations** | • ℓ∞ → (ℓ∞)** bidual map<br>• AP/RNP failure at ρ ≤ 2 | ρ = 1-2<br>(WLPO, DC_ω) | ✅ **Complete S42**<br>Mathematical framework | Complete with bicategorical structure |
 | **3. 2-Categorical Framework** | • Bicategory Found of foundations<br>• Gap 2-functor, obstruction theorem | Mirrors pathology<br>(ρ = 1-5) | ✅ **Complete S42**<br>Bicategory + obstruction | Complete bicategorical infrastructure |
 | **4. Spectral Geometry** | • Gödel-torus with λ₁ ↔ Con(PA)<br>• Cheeger neck construction | ρ = 2-3<br>(DC_ω, choice fragments) | ✅ **Complete S35-36**<br>Cheeger + Rho4 + GodelGap | All spectral pathologies implemented |
@@ -38,10 +38,13 @@ This document shows how the four "Gödel in Four Acts" research papers translate
 │ S44 ✅        │ Paper 1 Implementation + Mathematical Setup   │
 │ (Complete)    │ → Gödel-Banach infrastructure established    │
 ├───────────────┼──────────────────────────────────────────────┤
-│ S45 ✅        │ Sorry Elimination + Rigorous Proofs          │
-│ (Complete)    │ → 4 sorries eliminated, custom infrastructure│
+│ S45 🔄        │ Core.lean Sorry Elimination + CI Enhancement │
+│ (In Progress) │ → 1 sorry eliminated (G_surjective_iff_not_provable) + enhanced testing │
 ├───────────────┼──────────────────────────────────────────────┤
-│ S46+ (Future) │ Paper 1 Completion + Final Validation        │
+│ S46 (Next)    │ Remaining Core.lean + Statement.lean Sorries │
+│               │ → Complete Fredholm alternative + spectrum theorems │
+├───────────────┼──────────────────────────────────────────────┤
+│ S47 (Future)  │ Paper 1 Completion + Final Validation        │
 │               │ → Complete Gödel-Banach correspondence       │
 └───────────────┴──────────────────────────────────────────────┘
 ```

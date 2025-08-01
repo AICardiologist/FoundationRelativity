@@ -37,8 +37,10 @@ For any Gödel sentence G, consistency of PA is equivalent to
 surjectivity of the associated Gödel operator. -/
 theorem godel_banach_main (G : Sigma1Formula) :
     consistencyPredicate peanoArithmetic ↔ 
-    Function.Surjective (godelOperator G).toLinearMap :=
-  sorry -- TODO Math-AI Day 4: Implement full correspondence proof
+    Function.Surjective (godelOperator G).toLinearMap := by
+  -- We need to connect this to the specific Gödel sentence
+  -- The correspondence only works for the diagonalization formula
+  sorry -- This requires connecting consistencyPredicate to the specific Gödel formula
 
 /-! ### Component Theorems -/
 

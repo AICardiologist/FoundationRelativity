@@ -325,13 +325,63 @@ lemma G_isFredholm : ∃ (n : ℕ), n = 0 := by
 lemma G_inj_iff_surj :
     Function.Injective (G (g:=g)).toLinearMap ↔
     Function.Surjective (G (g:=g)).toLinearMap := by
-  -- CATEGORY B ADVANCED LIBRARY LEMMA (one-liner or ~30-40 lines)
-  -- IMPLEMENTATION: simpa using isFredholm_index_zero_iff_injective_surjective
-  -- ROADMAP: Import Mathlib.Analysis.Normed.Operator.Fredholm in mathlib ≥ 4.23
-  -- MATHEMATICAL PROOF: Fredholm alternative for index-0 operators
-  -- EFFORT ESTIMATE: 1 hour (import or vendor ~40 lines)
-  -- STATUS: Standard theorem, ready for implementation with Fredholm theory
-  sorry
+  -- Since G = I - compact operator (either 0 or P_g), it's Fredholm of index 0
+  -- For index-0 operators: injective ↔ surjective (Fredholm alternative)
+  
+  -- We'll prove both directions using the specific structure of G
+  constructor
+  
+  -- ⇒: Injective implies surjective
+  · intro hInj
+    -- Case analysis on c_G
+    cases' h : c_G
+    case false =>
+      -- When c_G = false, G = I which is both injective and surjective
+      simp [G, h]
+      exact Function.surjective_id
+    case true =>
+      -- When c_G = true, G = I - P_g
+      -- Key insight: If G is injective, then ker(G) = {0}
+      -- But we know e_g ∈ ker(G) when c_G = true (from the reflection principle proof)
+      exfalso
+      
+      -- G(e_g) = e_g - P_g(e_g) = e_g - e_g = 0
+      have h_eg_in_ker : G (g:=g) (e_g (g:=g)) = 0 := by
+        simp [G, h, P_g, e_g]
+      
+      -- But e_g ≠ 0
+      have h_eg_ne_zero : e_g (g:=g) ≠ 0 := by
+        intro h_contra
+        -- If e_g = 0, then e_g g = 0
+        have h_eq_zero : (e_g (g:=g)) g = 0 := by
+          rw [h_contra]
+          rfl
+        -- But e_g g = 1 by definition
+        have h_eq_one : (e_g (g:=g)) g = 1 := by
+          simp [e_g, lp.single_apply]
+        -- This is a contradiction
+        rw [h_eq_one] at h_eq_zero
+        exact one_ne_zero h_eq_zero
+      
+      -- Injectivity means G x = 0 implies x = 0
+      -- But G(e_g) = 0 and e_g ≠ 0, contradiction
+      have : e_g (g:=g) = 0 := by
+        apply hInj
+        -- Need to show G.toLinearMap e_g = G.toLinearMap 0
+        simp only [map_zero]
+        exact h_eg_in_ker
+      
+      exact h_eg_ne_zero this
+  
+  -- ⇐: Surjective implies injective  
+  · intro hSurj
+    -- By the reflection principle, if G is surjective then c_G = false
+    have h_cG_false : c_G = false := by
+      exact (G_surjective_iff_not_provable (g:=g)).mp hSurj
+    
+    -- When c_G = false, G = I which is injective
+    simp [G, h_cG_false]
+    exact Function.injective_id
 
 /-! ### Pullback lemmas for reflection -/
 
@@ -435,14 +485,46 @@ lemma isUnit_smul_one {c : ℂ} (hc : c ≠ 0) :
 /-- **(B‑2)**  Spectrum of an idempotent, here the rank‑one projection `P_g`. -/
 lemma spectrum_projection_is_01 (g : ℕ) :
     spectrum ℂ (P_g (g:=g)) = {0, 1} := by
-  -- Standard result: spectrum of projection is contained in {0,1}
-  sorry
+  -- For an idempotent operator P (where P² = P), the spectrum is {0, 1}
+  -- Key insight: If P² = P, then P(P - I) = 0, so the minimal polynomial divides λ(λ-1)
+  -- Therefore eigenvalues can only be 0 or 1
+  
+  -- First, let's establish that P_g has eigenvalue 1 with eigenvector e_g
+  have h_eigen_1 : P_g (g:=g) (e_g (g:=g)) = 1 • e_g (g:=g) := by
+    simp [P_g, e_g]
+  
+  -- And P_g has eigenvalue 0 for vectors orthogonal to e_g
+  -- Since P_g is a rank-one projection onto span{e_g}, its kernel is the orthogonal complement
+  have h_eigen_0 : ∃ v : L2Space, v ≠ 0 ∧ P_g (g:=g) v = 0 := by
+    use e_g (g:=g+1)
+    constructor
+    · -- e_{g+1} ≠ 0
+      intro h_contra
+      have : (e_g (g:=g+1)) (g+1) = 0 := by rw [h_contra]; rfl
+      simp [e_g, lp.single_apply] at this
+    · -- P_g(e_{g+1}) = 0 since P_g only extracts the g-th coordinate
+      simp [P_g, e_g]
+  
+  -- The spectrum of a projection is {0, 1} if it's non-trivial
+  -- For P_g, we know it's a non-zero projection (rank 1)
+  -- and it's not the identity (since P_g(e_{g+1}) = 0)
+  
+  -- This standard result requires spectral theory for idempotent operators:
+  -- If P² = P, then (P - λI) is invertible for λ ∉ {0, 1}
+  -- with inverse: (P - λI)⁻¹ = (1/(λ(1-λ)))P - (1/λ)I
+  sorry -- Requires spectral theory for idempotent operators not yet in mathlib
 
 /-- **(B‑3)**  Spectrum of `1 - P_g` is also `{0, 1}`. -/
 @[simp] lemma spectrum_one_sub_Pg (g : ℕ) :
     spectrum ℂ (1 - P_g (g:=g)) = ({0,1} : Set ℂ) := by
-  -- Standard result: spectrum of (1 - projection) is also contained in {0,1}
-  sorry
+  -- If P is a projection with σ(P) = {0,1}, then σ(I - P) = {0,1}
+  -- This follows from the spectral mapping theorem for polynomials:
+  -- σ(f(T)) = f(σ(T)) for polynomial f
+  -- Here f(λ) = 1 - λ maps {0,1} to {1,0} = {0,1}
+  
+  -- Alternatively: I - P is also idempotent since (I-P)² = I - 2P + P² = I - 2P + P = I - P
+  -- So the same argument as for P_g applies
+  sorry -- Requires spectral mapping theorem or idempotent spectrum characterization
 
 /-- **Complete description of `σ(G)`**.
 
