@@ -41,7 +41,7 @@ Papers/P1_GBC/Auxiliaries.lean:87   # compact_of_surjective_and_rank_one - incor
 
 # Comment references (detected by grep but not actual sorry statements)
 Logic/Reflection.lean:6          # Comment: "No other assumptions, no `sorry`."
-Papers/P1_GBC/Core.lean:33       # Comment: "- No axioms or sorry statements"
+Papers/P1_GBC/Core.lean:34       # Comment: "- No axioms or sorry statements"
 Papers/P1_GBC/SmokeTest.lean:19      # Comment: "- No sorry statements in basic infrastructure"
 
 # TOTAL: 16 actual sorry statements + 3 comment references  
