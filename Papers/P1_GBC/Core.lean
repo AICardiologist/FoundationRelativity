@@ -110,8 +110,10 @@ def e_g : L2Space := lp.single 2 g 1
   simp [e_g, h, lp.single_apply]  
 
 @[simp] lemma e_g_norm : ‖e_g (g:=g)‖ = 1 := by
-  -- `lp.single_norm` specialises to ‖1‖ when p = 2
-  simpa [e_g] using (lp.single_norm (p := 2) g (1 : ℂ))
+  -- Use the lp.norm_single theorem: ‖lp.single p i x‖ = ‖x‖
+  unfold e_g
+  rw [lp.norm_single two_pos]
+  norm_num
 
 /-- Rank‑one orthogonal projection onto `span{e_g}`. -/
 noncomputable
@@ -168,7 +170,7 @@ lemma P_g_compact (g : ℕ) : IsCompactOperator (P_g (g:=g)) := by
       exact continuous_id.smul continuous_const
     have : K = (fun c : ℂ => c • e_g (g:=g)) '' Metric.closedBall 0 2 := by
       ext y
-      simp only [Set.mem_setOf_eq, Set.mem_image, Metric.mem_closedBall, dist_zero_right]
+      simp only [Set.mem_image, Metric.mem_closedBall, dist_zero_right]
       constructor
       · rintro ⟨c, hc, rfl⟩
         exact ⟨c, hc, rfl⟩
@@ -181,7 +183,7 @@ lemma P_g_compact (g : ℕ) : IsCompactOperator (P_g (g:=g)) := by
     -- We'll show P_g⁻¹(K) contains the unit ball, hence is a neighborhood of 0
     have h_ball : Metric.ball 0 1 ⊆ P_g (g:=g) ⁻¹' K := by
       intro x hx
-      simp only [Set.mem_preimage, Set.mem_setOf_eq]
+      simp only [Set.mem_preimage]
       use x g
       constructor
       · -- ‖x g‖ ≤ 2
@@ -220,11 +222,85 @@ theorem G_surjective_iff_not_provable :
       -- Case: c_G = false - this is what we want to prove
       rfl
     case true =>
-      -- Case: c_G = true - we show this leads to contradiction, hence c_G = false
+      -- Case: c_G = true - we show this leads to contradiction
       exfalso
-      -- When c_G = true, G = I - P_g has nontrivial kernel, contradicting surjectivity
-      -- This follows from Fredholm theory: compact perturbations of identity
-      sorry -- Technical gap: derive contradiction from h : c_G = true and hSurj
+      -- When c_G = true, G = I - P_g
+      have h_G_eq : G (g:=g) = 1 - P_g (g:=g) := by
+        simp [G, h]
+      -- Key insight: P_g is a rank-one projection, so P_g(e_g) = e_g
+      -- This means G(e_g) = (I - P_g)(e_g) = e_g - e_g = 0
+      have h_ker : G (g:=g) (e_g (g:=g)) = 0 := by
+        rw [h_G_eq]
+        simp only [ContinuousLinearMap.sub_apply, ContinuousLinearMap.one_apply]
+        -- Show P_g(e_g) = e_g
+        suffices P_g (g:=g) (e_g (g:=g)) = e_g (g:=g) by simp [this]
+        -- P_g(e_g) = lp.single 2 g (e_g g) = lp.single 2 g 1 = e_g
+        simp only [P_g_apply, e_g]
+        -- lp.single 2 g (lp.single 2 g 1 g) = lp.single 2 g 1
+        congr
+        simp [lp.single_apply]
+      -- e_g is nonzero (since e_g(g) = 1)
+      have h_eg_ne : e_g (g:=g) ≠ 0 := by
+        intro h_eq
+        have : e_g (g:=g) g = 0 := by rw [h_eq]; rfl
+        rw [e_g_apply_self] at this
+        exact one_ne_zero this
+      -- Now we show G cannot be surjective by showing 
+      -- it cannot have e_g in its range
+      -- Key: If G(x) = e_g for some x, then also G(x + k·e_g) = e_g for any k
+      -- because G(e_g) = 0. This would mean G is not injective.
+      -- But we'll use a direct approach instead.
+      suffices h_contra : e_g (g:=g) ∉ Set.range (G (g:=g)) by
+        exact h_contra (hSurj (e_g (g:=g)))
+      -- Suppose e_g ∈ range(G), so G(x) = e_g for some x
+      intro ⟨x, hx⟩
+      -- Then G(x + e_g) = G(x) + G(e_g) = e_g + 0 = e_g
+      have h1 : G (g:=g) (x + e_g (g:=g)) = e_g (g:=g) := by
+        rw [map_add, h_ker, hx, add_zero]
+      -- So both x and x + e_g map to e_g
+      -- This means x + e_g - x = e_g is in the kernel of G
+      -- But we already know only scalar multiples of e_g are in ker(G)
+      -- Actually, let's use that x and x + e_g both map to e_g
+      -- to get a contradiction more directly
+      -- Since G(x) = G(x + e_g), we have G((x + e_g) - x) = 0
+      -- i.e., G(e_g) = 0, which we already knew
+      -- The real issue: we need to show that ker(G) = span{e_g}
+      -- and that this prevents surjectivity
+      -- Actually, the simplest approach: P_g has rank 1, so I - P_g
+      -- has corank 1, hence cannot be surjective on infinite-dimensional space
+      -- But this needs more infrastructure. Let's use a computational approach.
+      -- We'll show directly that no x can satisfy G(x) = e_g
+      -- Suppose G(x) = e_g. Then (I - P_g)(x) = e_g
+      -- So x - P_g(x) = e_g, which gives x = e_g + P_g(x)
+      -- Now P_g(x) = lp.single 2 g (x g), so
+      -- x = e_g + lp.single 2 g (x g)
+      -- Evaluating at g: x(g) = e_g(g) + (x g) = 1 + x(g)
+      -- This gives 0 = 1, contradiction!
+      have h_eval_g : x g = e_g (g:=g) g + (P_g (g:=g) x) g := by
+        have h_eq : x = e_g (g:=g) + P_g (g:=g) x := by
+          -- From G(x) = e_g and G = I - P_g, we get x - P_g(x) = e_g
+          rw [← hx, h_G_eq]
+          simp only [ContinuousLinearMap.sub_apply, ContinuousLinearMap.one_apply]
+          abel
+        -- Apply this equation at coordinate g
+        conv_lhs => rw [h_eq]
+        rfl
+      -- Now evaluate: x(g) = 1 + (P_g x)(g)
+      simp only [e_g_apply_self] at h_eval_g
+      -- We have h_eval_g : x g = 1 + (P_g x) g
+      -- And P_g x = lp.single 2 g (x g), so (P_g x) g = x g
+      have h_Pg_at_g : (P_g (g:=g) x) g = x g := by
+        simp only [P_g_apply, lp.single_apply]
+        -- lp.single evaluates to Pi.single at the underlying function level
+        rw [Pi.single_eq_same]
+      rw [h_Pg_at_g] at h_eval_g
+      -- So we have x g = 1 + x g, which is impossible
+      -- Rearranging: 0 = 1
+      have h_contra : (0 : ℂ) = 1 := by
+        calc (0 : ℂ) = x g - x g := by ring
+        _ = (1 + x g) - x g := by rw [← h_eval_g]
+        _ = 1 := by ring
+      exact zero_ne_one h_contra
   -- ⇐ direction: If c_G = false, then G is surjective  
   · intro hFalse
     -- When c_G = false, G = I, which is clearly surjective
@@ -379,7 +455,7 @@ lemma spectrum_G (g : ℕ) :
     (c_G = false → spectrum ℂ (G (g:=g)) = {1}) ∧
     (c_G = true  → spectrum ℂ (G (g:=g)) = {0,1}) := by
   refine ⟨?σfalse, ?σtrue⟩
-  · intro h; simp [G, h, spectrum_one]
+  · intro h; simp [G, h]
   · intro h; simp [G, h, spectrum_one_sub_Pg]
 
 end Papers.P1_GBC
@@ -404,7 +480,7 @@ noncomputable def godelOperator (g : Sigma1Formula) : L2Space →L[ℂ] L2Space 
   G (g := godelNum g)
 
 /-- The Gödel operator is Fredholm of index 0 -/
-theorem isFredholm (g : Sigma1Formula) : 
+theorem isFredholm (_ : Sigma1Formula) : 
     ∃ (n : ℕ), n = 0 :=
   G_isFredholm
 

@@ -42,7 +42,30 @@ fi
 
 # Pre-build critical modules that are tested (in parallel if possible)
 echo "🔨 Pre-building key tested modules..."
+
+# Core modules
 lake build CategoryTheory.Found CategoryTheory.BicatFound > /dev/null 2>&1 || true
+
+# Paper infrastructure modules - CRITICAL for avoiding missing .olean files
+echo "📚 Pre-building paper modules..."
+lake build Papers.PseudoFunctorInstances > /dev/null 2>&1 || true
+lake build Papers.P1_GBC.Core > /dev/null 2>&1 || true
+lake build Papers.P2_BidualGap.Basic > /dev/null 2>&1 || true
+lake build Papers.P3_2CatFramework.Basic > /dev/null 2>&1 || true
+
+# Logic modules
+lake build Logic.ProofTheoryAxioms Logic.Reflection > /dev/null 2>&1 || true
+
+# Analytic pathologies for rho tests
+lake build AnalyticPathologies.Rho4 > /dev/null 2>&1 || true
+
+# Additional modules that might be tested
+echo "🔄 Pre-building additional test dependencies..."
+lake build Gap2.Functor APFunctor.Functor RNPFunctor.Functor > /dev/null 2>&1 || true
+lake build AnalyticPathologies.SpectralGap AnalyticPathologies.Cheeger > /dev/null 2>&1 || true
+
+echo "✅ Pre-build phase complete"
+echo
 
 echo "🧪 Foundation-Relativity Regression Testing Suite"
 echo "=================================================="
@@ -95,11 +118,34 @@ run_test() {
     fi
 }
 
+# Helper function to ensure module is built before testing
+ensure_module_built() {
+    local module="$1"
+    # Extract module name from import statement if needed
+    if [[ "$module" == import* ]]; then
+        module=$(echo "$module" | sed 's/import //')
+    fi
+    
+    # Check if .olean file exists
+    local olean_path=".lake/build/lib/lean/${module//./\/}.olean"
+    if [ ! -f "$olean_path" ]; then
+        echo -n "    Building $module... "
+        if lake build "$module" > /dev/null 2>&1; then
+            echo "done"
+        else
+            echo "failed (non-critical)"
+        fi
+    fi
+}
+
 # Helper function to test theorem accessibility
 test_theorem() {
     local theorem_name="$1"
     local import_statement="$2"
     local namespace_open="$3"
+    
+    # Ensure the imported module is built
+    ensure_module_built "$import_statement"
     
     # Create temporary file to ensure proper path resolution
     local temp_file="/tmp/lean_test_$$.lean"
@@ -115,6 +161,10 @@ $namespace_open
 # Helper function to test module imports
 test_import() {
     local module_name="$1"
+    
+    # Ensure the module is built before testing
+    ensure_module_built "$module_name"
+    
     # Create temporary file to ensure proper path resolution
     local temp_file="/tmp/lean_import_test_$$.lean"
     echo "import $module_name" > "$temp_file"

@@ -1,17 +1,17 @@
 # SORRY_ALLOWLIST.txt
 # Authorized sorry statements for Foundation-Relativity project
 
-# Updated: 2025-07-31 (Sprint 45 - Reduced Core.lean sorries from 5 to 4) 
+# Updated: 2025-08-01 (Sprint 45 - Reduced Core.lean sorries from 4 to 3) 
 # Policy: ANY sorry outside this list will fail CI
 
 # Sprint 45: Gödel-Banach Correspondence - Mathematical sorry elimination
 # These represent the mathematical content before sorry elimination improvements
 
-# Papers/P1_GBC/Core.lean (4 sorrys) - Mathematical infrastructure
-Papers/P1_GBC/Core.lean:227  # G_surjective_iff_not_provable - Technical gap
-Papers/P1_GBC/Core.lean:258  # G_inj_iff_surj - Fredholm alternative
-Papers/P1_GBC/Core.lean:363  # spectrum_projection_is_01 - spectrum of projection
-Papers/P1_GBC/Core.lean:369  # spectrum_one_sub_Pg - spectrum of 1 - P_g
+# Papers/P1_GBC/Core.lean (3 sorrys) - Mathematical infrastructure
+# RESOLVED: Papers/P1_GBC/Core.lean:227  # G_surjective_iff_not_provable - COMPLETED!
+Papers/P1_GBC/Core.lean:334  # G_inj_iff_surj - Fredholm alternative  
+Papers/P1_GBC/Core.lean:439  # spectrum_projection_is_01 - spectrum of projection
+Papers/P1_GBC/Core.lean:445  # spectrum_one_sub_Pg - spectrum of 1 - P_g
 
 # Papers/P1_GBC/Statement.lean (11 sorrys) - High-level theorem statements
 Papers/P1_GBC/Statement.lean:41   # godel_banach_main theorem
@@ -46,6 +46,6 @@ Logic/Reflection.lean:6          # Comment: "No other assumptions, no `sorry`."
 Papers/P1_GBC/Core.lean:33       # Comment: "- No axioms or sorry statements"
 Papers/P1_GBC/SmokeTest.lean:19      # Comment: "- No sorry statements in basic infrastructure"
 
-# TOTAL: 25 actual sorry statements + 3 comment references
+# TOTAL: 24 actual sorry statements + 3 comment references  
 # This represents the sprint 45 mathematical sorry elimination baseline
-# Successfully reduced from 5 to 4 sorries in Core.lean by eliminating continuous_apply_coord
+# Successfully reduced from 4 to 3 sorries in Core.lean by eliminating G_surjective_iff_not_provable
