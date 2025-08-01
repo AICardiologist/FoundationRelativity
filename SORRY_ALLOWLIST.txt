@@ -1,10 +1,10 @@
 # SORRY_ALLOWLIST.txt
 # Authorized sorry statements for Foundation-Relativity project
 
-# Updated: 2025-08-01 (Sprint 45 - Reduced Core.lean sorries from 4 to 3) 
+# Updated: 2025-08-01 (Sprint 47 - Reduced Auxiliaries.lean sorries from 7 to 5) 
 # Policy: ANY sorry outside this list will fail CI
 
-# Sprint 46: Gödel-Banach Correspondence - Mathematical sorry elimination continues
+# Sprint 47: Gödel-Banach Correspondence - Auxiliaries.lean sorry elimination
 # These represent the mathematical content before sorry elimination improvements
 
 # Papers/P1_GBC/Core.lean (2 sorrys) - Mathematical infrastructure  
@@ -32,20 +32,19 @@ Papers/P1_GBC/Correspondence.lean:28  # consistency_iff_G connection
 Papers/P1_GBC/Correspondence.lean:41  # e_g_in_ker_when_true helper
 Papers/P1_GBC/Correspondence.lean:47  # surj_implies_false (main direction)
 
-# Papers/P1_GBC/Auxiliaries.lean (7 sorrys) - Mathematical content from main merge
-Papers/P1_GBC/Auxiliaries.lean:37   # Standard linear algebra result
-Papers/P1_GBC/Auxiliaries.lean:43   # Use compactness of P_g
-Papers/P1_GBC/Auxiliaries.lean:51   # Simplified to avoid subtype issues
-Papers/P1_GBC/Auxiliaries.lean:57   # Simplified to avoid subtype issues
-Papers/P1_GBC/Auxiliaries.lean:64   # Standard result: surjective pullback gives isometry
-Papers/P1_GBC/Auxiliaries.lean:72   # Standard Fredholm alternative
-Papers/P1_GBC/Auxiliaries.lean:81   # Technical: Fredholm operators are not generally compact
+# Papers/P1_GBC/Auxiliaries.lean (3 sorrys) - Mathematical content from main merge
+# RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:37   # finiteDimensional_ker_of_finiteDimRange - COMPLETED!
+Papers/P1_GBC/Auxiliaries.lean:44   # finiteDimensional_of_finiteRankRange - needs hypotheses
+# RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:64   # pullback_isometry_of_surjective - COMPLETED!
+Papers/P1_GBC/Auxiliaries.lean:79   # surjective_of_compact_and_spectrum - incorrect statement
+Papers/P1_GBC/Auxiliaries.lean:87   # compact_of_surjective_and_rank_one - incorrect statement
 
 # Comment references (detected by grep but not actual sorry statements)
 Logic/Reflection.lean:6          # Comment: "No other assumptions, no `sorry`."
 Papers/P1_GBC/Core.lean:33       # Comment: "- No axioms or sorry statements"
 Papers/P1_GBC/SmokeTest.lean:19      # Comment: "- No sorry statements in basic infrastructure"
 
-# TOTAL: 24 actual sorry statements + 3 comment references  
+# TOTAL: 22 actual sorry statements + 3 comment references  
+# Sprint 47 eliminated 2 sorries from Auxiliaries.lean  
 # This represents the sprint 45 mathematical sorry elimination baseline
 # Successfully reduced from 4 to 3 sorries in Core.lean by eliminating G_surjective_iff_not_provable
