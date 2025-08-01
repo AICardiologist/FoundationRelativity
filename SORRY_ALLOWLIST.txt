@@ -10,8 +10,8 @@
 # Papers/P1_GBC/Core.lean (2 sorrys) - Mathematical infrastructure  
 # RESOLVED Sprint 45: Papers/P1_GBC/Core.lean:227  # G_surjective_iff_not_provable - COMPLETED!
 # RESOLVED Sprint 46: Papers/P1_GBC/Core.lean:334  # G_inj_iff_surj - Fredholm alternative - COMPLETED!
-Papers/P1_GBC/Core.lean:520  # spectrum_projection_is_01 - spectrum of projection
-Papers/P1_GBC/Core.lean:526  # spectrum_one_sub_Pg - spectrum of 1 - P_g
+Papers/P1_GBC/Core.lean:515  # spectrum_projection_is_01 - spectrum of projection
+Papers/P1_GBC/Core.lean:527  # spectrum_one_sub_Pg - spectrum of 1 - P_g
 
 # Papers/P1_GBC/Statement.lean (11 sorrys) - High-level theorem statements
 Papers/P1_GBC/Statement.lean:41   # godel_banach_main theorem
