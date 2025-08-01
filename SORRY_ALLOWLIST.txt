@@ -17,13 +17,13 @@ Papers/P1_GBC/Core.lean:508  # spectrum_one_sub_Pg - spectrum of 1 - P_g
 Papers/P1_GBC/Statement.lean:46   # godel_banach_main theorem - requires incompleteness theorems
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:51   # consistency_implies_surjectivity - COMPLETED using main theorem!
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:57   # surjectivity_implies_consistency - COMPLETED using main theorem!
-Papers/P1_GBC/Statement.lean:73   # foundation_relative_correspondence
+Papers/P1_GBC/Statement.lean:85   # foundation_relative_correspondence - BISH case TODO
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:78   # godel_rho_degree - COMPLETED!
-Papers/P1_GBC/Statement.lean:99   # correspondence_unique - needs careful analysis
+Papers/P1_GBC/Statement.lean:128  # correspondence_unique - needs careful analysis
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:105  # godel_functorial - COMPLETED using godel_naturality!
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:128  # main_theorem_outline consistency->surj - COMPLETED delegation to main theorem!
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:132  # main_theorem_outline surj->consistency - COMPLETED delegation to main theorem!
-Papers/P1_GBC/Statement.lean:139  # diagonal_lemma_technical
+Papers/P1_GBC/Statement.lean:175  # diagonal_lemma_technical - partial implementation with godelSentence
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:145  # fredholm_characterization - COMPLETED using G_inj_iff_surj!
 
 
