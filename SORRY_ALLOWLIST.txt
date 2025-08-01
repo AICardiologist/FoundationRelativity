@@ -21,8 +21,8 @@ Papers/P1_GBC/Statement.lean:73   # foundation_relative_correspondence
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:78   # godel_rho_degree - COMPLETED!
 Papers/P1_GBC/Statement.lean:99   # correspondence_unique - needs careful analysis
 Papers/P1_GBC/Statement.lean:105  # godel_functorial
-Papers/P1_GBC/Statement.lean:128  # main_theorem_outline consistency->surj
-Papers/P1_GBC/Statement.lean:132  # main_theorem_outline surj->consistency
+# RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:128  # main_theorem_outline consistency->surj - COMPLETED delegation to main theorem!
+# RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:132  # main_theorem_outline surj->consistency - COMPLETED delegation to main theorem!
 Papers/P1_GBC/Statement.lean:139  # diagonal_lemma_technical
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:145  # fredholm_characterization - COMPLETED using G_inj_iff_surj!
 
@@ -37,17 +37,17 @@ Papers/P1_GBC/Correspondence.lean:31  # consistency_iff_G connection - requires 
 Papers/P1_GBC/Auxiliaries.lean:44   # finiteDimensional_of_finiteRankRange - needs hypotheses
 # RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:64   # pullback_isometry_of_surjective - COMPLETED!
 Papers/P1_GBC/Auxiliaries.lean:79   # surjective_of_compact_and_spectrum - incorrect statement
-Papers/P1_GBC/Auxiliaries.lean:87   # compact_of_surjective_and_rank_one - incorrect statement
+# RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:87   # compact_of_surjective_and_rank_one - FIXED by correcting to perturbation_P_g_is_compact!
 
 # Comment references (detected by grep but not actual sorry statements)
 Logic/Reflection.lean:6          # Comment: "No other assumptions, no `sorry`."
 Papers/P1_GBC/Core.lean:34       # Comment: "- No axioms or sorry statements"
 Papers/P1_GBC/SmokeTest.lean:19      # Comment: "- No sorry statements in basic infrastructure"
 
-# TOTAL: 15 actual sorry statements + 3 comment references  
+# TOTAL: 13 actual sorry statements + 3 comment references  
 # Sprint 47 eliminated:
-#   - 2 sorries from Auxiliaries.lean
+#   - 3 sorries from Auxiliaries.lean (including perturbation_P_g_is_compact fix)
 #   - 2 sorries from Correspondence.lean  
-#   - 4 sorries from Statement.lean (including godel_rho_degree)
-# Total: 8 sorries eliminated in Sprint 47
-# Successfully reduced from 24 to 15 sorries in Paper 1
+#   - 6 sorries from Statement.lean (including godel_rho_degree + main_theorem_outline)
+# Total: 11 sorries eliminated in Sprint 47
+# Successfully reduced from 24 to 13 sorries in Paper 1

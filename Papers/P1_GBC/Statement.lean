@@ -124,12 +124,12 @@ lemma main_theorem_outline (G : Sigma1Formula) :
     constructor
     · -- Consistency → Surjectivity
       intro h_consistent
-      -- TODO Math-AI: Use diagonal lemma + functional analysis
-      sorry
+      -- Use the main theorem's forward direction
+      exact (godel_banach_main G).mp h_consistent
     · -- Surjectivity → Consistency  
       intro h_surjective
-      -- TODO Math-AI: Use Fredholm alternative + proof theory
-      sorry
+      -- Use the main theorem's reverse direction
+      exact (godel_banach_main G).mpr h_surjective
 
 /-- Key technical lemma: Diagonal lemma implementation -/
 theorem diagonal_lemma_technical :

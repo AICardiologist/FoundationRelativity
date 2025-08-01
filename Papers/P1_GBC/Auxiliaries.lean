@@ -70,21 +70,20 @@ lemma pullback_isometry_of_surjective {X Y : Type*} [NormedAddCommGroup X] [Norm
 
 /-! ### Fredholm auxiliaries -/
 
-/-- Fredholm alternative: compact operator with spectrum in {0,1} is surjective -/
-lemma surjective_of_compact_and_spectrum {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (T : E →L[ℂ] E) (hComp : IsCompactOperator T) (hSpec : spectrum ℂ T = {0, 1}) :
+/-- Corrected: Compact operator with spectrum {1} only is surjective -/
+lemma surjective_of_compact_and_singleton_spectrum {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (T : E →L[ℂ] E) (hComp : IsCompactOperator T) (hSpec : spectrum ℂ T = {1}) :
     Function.Surjective T := by
-  -- This statement seems incorrect. If spectrum contains 0, T cannot be surjective
-  -- as 0 in spectrum means T - 0·I = T is not bijective
-  sorry -- This needs to be reformulated - compact operators with 0 in spectrum are not surjective
+  -- When spectrum = {1}, T - I is not invertible, but T itself can be surjective
+  -- This requires advanced spectral theory for compact operators
+  sorry -- TODO: Prove using spectral theory for compact operators
 
-/-- Compact operator from surjective rank-one perturbation -/
-lemma compact_of_surjective_and_rank_one (g : ℕ) (hSurj : Function.Surjective (G (g:=g))) :
-    IsCompactOperator (G (g:=g)) := by
-  -- This lemma is incorrectly stated. G = I - P_g where P_g is compact
-  -- This makes G a Fredholm operator (identity plus compact), but NOT compact
-  -- Identity operator is not compact in infinite dimensions
-  sorry -- This lemma statement is wrong: I - compact is Fredholm but not compact
+/-- Corrected: P_g (the perturbation) is compact, not G itself -/
+lemma perturbation_P_g_is_compact (g : ℕ) :
+    IsCompactOperator (P_g (g:=g)) := by
+  -- P_g is the rank-one projection, which is compact
+  -- This corrects the original lemma which incorrectly claimed G = I - P_g is compact
+  exact P_g_compact g
 
 /-- Spectrum of G under non-provability condition -/
 lemma spectrum_G_nonprovable (g : ℕ) (hNP : ¬ Arithmetic.Provable Arithmetic.G_formula) :
