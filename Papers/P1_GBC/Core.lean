@@ -6,6 +6,7 @@ import Mathlib.Topology.Algebra.Module.LinearMapPiProd
 import Mathlib.Topology.MetricSpace.ProperSpace
 import Mathlib.Analysis.Normed.Lp.lpSpace
 import Mathlib.Analysis.Normed.Operator.Compact
+import Mathlib.FieldTheory.IsAlgClosed.Spectrum
 import CategoryTheory.PseudoFunctor
 import CategoryTheory.BicatFound
 import AnalyticPathologies.HilbertSetup
@@ -482,49 +483,29 @@ lemma isUnit_smul_one {c : ℂ} (hc : c ≠ 0) :
     simp only [Algebra.algebraMap_eq_smul_one, one_smul, sub_self]
     exact not_isUnit_zero
 
+/-- Helper: P_g is an idempotent element -/
+lemma P_g_isIdempotentElem : IsIdempotentElem (P_g (g:=g)) := by
+  -- IsIdempotentElem means P_g * P_g = P_g
+  rw [IsIdempotentElem]
+  -- We've already proven P_g ∘L P_g = P_g
+  exact P_g_is_projection
+
 /-- **(B‑2)**  Spectrum of an idempotent, here the rank‑one projection `P_g`. -/
 lemma spectrum_projection_is_01 (g : ℕ) :
     spectrum ℂ (P_g (g:=g)) = {0, 1} := by
-  -- For an idempotent operator P (where P² = P), the spectrum is {0, 1}
-  -- Key insight: If P² = P, then P(P - I) = 0, so the minimal polynomial divides λ(λ-1)
-  -- Therefore eigenvalues can only be 0 or 1
-  
-  -- First, let's establish that P_g has eigenvalue 1 with eigenvector e_g
-  have h_eigen_1 : P_g (g:=g) (e_g (g:=g)) = 1 • e_g (g:=g) := by
-    simp [P_g, e_g]
-  
-  -- And P_g has eigenvalue 0 for vectors orthogonal to e_g
-  -- Since P_g is a rank-one projection onto span{e_g}, its kernel is the orthogonal complement
-  have h_eigen_0 : ∃ v : L2Space, v ≠ 0 ∧ P_g (g:=g) v = 0 := by
-    use e_g (g:=g+1)
-    constructor
-    · -- e_{g+1} ≠ 0
-      intro h_contra
-      have : (e_g (g:=g+1)) (g+1) = 0 := by rw [h_contra]; rfl
-      simp [e_g, lp.single_apply] at this
-    · -- P_g(e_{g+1}) = 0 since P_g only extracts the g-th coordinate
-      simp [P_g, e_g]
-  
-  -- The spectrum of a projection is {0, 1} if it's non-trivial
-  -- For P_g, we know it's a non-zero projection (rank 1)
-  -- and it's not the identity (since P_g(e_{g+1}) = 0)
-  
-  -- This standard result requires spectral theory for idempotent operators:
-  -- If P² = P, then (P - λI) is invertible for λ ∉ {0, 1}
-  -- with inverse: (P - λI)⁻¹ = (1/(λ(1-λ)))P - (1/λ)I
-  sorry -- Requires spectral theory for idempotent operators not yet in mathlib
+  -- For an idempotent operator P (where P² = P), the spectrum is contained in {0, 1}
+  -- This is a standard result from IsIdempotentElem.spectrum_subset
+  -- For the specific case of rank-one projections, the spectrum is exactly {0, 1}
+  -- since P_g has eigenvalue 1 on span{e_g} and eigenvalue 0 on its orthogonal complement
+  sorry -- Requires showing both 0 and 1 are actually in the spectrum, not just that spectrum ⊆ {0,1}
 
 /-- **(B‑3)**  Spectrum of `1 - P_g` is also `{0, 1}`. -/
 @[simp] lemma spectrum_one_sub_Pg (g : ℕ) :
     spectrum ℂ (1 - P_g (g:=g)) = ({0,1} : Set ℂ) := by
   -- If P is a projection with σ(P) = {0,1}, then σ(I - P) = {0,1}
   -- This follows from the spectral mapping theorem for polynomials:
-  -- σ(f(T)) = f(σ(T)) for polynomial f
-  -- Here f(λ) = 1 - λ maps {0,1} to {1,0} = {0,1}
-  
-  -- Alternatively: I - P is also idempotent since (I-P)² = I - 2P + P² = I - 2P + P = I - P
-  -- So the same argument as for P_g applies
-  sorry -- Requires spectral mapping theorem or idempotent spectrum characterization
+  -- σ(f(T)) = f(σ(T)) for polynomial f, where f(λ) = 1 - λ maps {0,1} to {1,0} = {0,1}
+  sorry -- Requires spectral mapping theorem or direct idempotent analysis
 
 /-- **Complete description of `σ(G)`**.
 
