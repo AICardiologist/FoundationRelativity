@@ -2,16 +2,17 @@
 
 [![CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml)
 [![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
-[![Version](https://img.shields.io/badge/Version-v0.5.1--sprint45-brightgreen)](https://github.com/AICardiologist/FoundationRelativity/releases)
+[![Version](https://img.shields.io/badge/Version-v0.6.0--sprint46-brightgreen)](https://github.com/AICardiologist/FoundationRelativity/releases)
 [![Lean 4.22.0-rc4](https://img.shields.io/badge/Lean-4.22.0--rc4-blue)](https://github.com/leanprover/lean4)
-[![Paper 1 Progress](https://img.shields.io/badge/Paper%201%20Sorry%20Count-3%2F10-orange)](docs/sprint45-godel-banach-progress.md)
+[![Paper 1 Progress](https://img.shields.io/badge/Paper%201%20Sorry%20Count-2%2F4%20Core-yellow)](docs/planning/paper1-sorry-elimination-strategy.md)
 
 [![Doc Coverage](https://img.shields.io/badge/Doc%20Coverage-50%25-yellow)](.github/workflows/ci.yml)
 
 
-> **🎉 Sprint 45 IN PROGRESS**: Paper 1 Gödel-Banach Correspondence + **ENHANCED CI/TESTING!** ✅  
-> **Latest**: Resolved `G_surjective_iff_not_provable` proof in Core.lean (7→8 out of 10 complete)  
-> **🎯 NEW**: Enhanced regression testing with auto-build + mathlib4 cache optimization ✅
+> **🎉 Sprint 46 IN PROGRESS**: Paper 1 Gödel-Banach Sorry Elimination + **FREDHOLM ALTERNATIVE!** ✅  
+> **Latest**: Resolved `G_inj_iff_surj` proof in Core.lean - complete Fredholm alternative implementation  
+> **Paper 1 Status**: 23 total sorries (Core: 2, Statement: 11, Auxiliaries: 7, Correspondence: 3)  
+> **🎯 NEW**: Strategic elimination plan targeting 15-18 sorries over 6 sprints ✅
 
 
 A Lean 4 formalization exploring how mathematical pathologies behave differently under various foundational assumptions.
@@ -521,20 +522,21 @@ grep -r "sorry" . --exclude-dir=.git
 
 ### Current Sprint: Paper 1 Gödel-Banach Correspondence
 
-**🎯 Sprint 45 IN PROGRESS**: Paper 1 (Gödel-Banach Correspondence) mathematical proof elimination
+**🎯 Sprint 46 IN PROGRESS**: Paper 1 Strategic Sorry Elimination
 
-**Current Paper 1 Status** (3 out of 10 sorry statements remaining):
-- **✅ RESOLVED**: `G_surjective_iff_not_provable` (Core.lean:227) - Reflection principle proof complete
-- `Papers/P1_GBC/Core.lean`: 3 remaining sorries (Fredholm alternative, spectrum theorems)
-- `Papers/P1_GBC/Statement.lean`: 11 sorries (high-level theorems)
+**Paper 1 Complete Status** (23 total sorries across 4 files):
+- **✅ RESOLVED Sprint 45**: `G_surjective_iff_not_provable` - Reflection principle complete
+- **✅ RESOLVED Sprint 46**: `G_inj_iff_surj` - Fredholm alternative complete
+- `Papers/P1_GBC/Core.lean`: 2 remaining sorries (spectrum theory)
+- `Papers/P1_GBC/Statement.lean`: 11 sorries (high-level theorems) 
 - `Papers/P1_GBC/Auxiliaries.lean`: 7 sorries (mathematical infrastructure)
-- `Papers/P1_GBC/Correspondence.lean`: 3 sorries (implementation attempts)
+- `Papers/P1_GBC/Correspondence.lean`: 3 sorries (logic-analysis bridge)
 
-**Sprint 45 Achievements** (v0.5.1-sprint45):
-1. ✅ **Mathematical Progress**: Eliminated 1 sorry with rigorous proof (8/10 complete in Core.lean)
-2. ✅ **Enhanced CI**: Improved regression testing with auto-build and missing .olean file prevention
-3. ✅ **Code Quality**: All warnings eliminated, proper mathlib4 API usage
-4. ✅ **Maintained Quality**: 100% regression test success (52/52 tests passing)
+**Sprint 46 Achievements** (v0.6.0-sprint46):
+1. ✅ **G_inj_iff_surj Eliminated**: Complete Fredholm alternative proof with case analysis
+2. ✅ **Strategic Plan**: 4-phase elimination targeting 15-18 sorries over 6 sprints
+3. ✅ **CI Resolution**: Fixed SORRY_ALLOWLIST.txt line number mismatches 
+4. ✅ **Documentation**: Complete sorry analysis and feasibility assessment
 
 ### Previous Achievement: Foundation Migration + Regression Testing
 
