@@ -78,9 +78,21 @@ variable {g : ℕ}
 /-- **(A‑1)**  On `ℓ²`, evaluating at coordinate `g` is continuous. -/
 lemma continuous_apply_coord (g : ℕ) :
     Continuous (fun x : L2Space => (x : ℕ → ℂ) g) := by
-  -- This is truly a mathlib gap about coordinate evaluation on lp spaces
-  -- The proof would require showing that the evaluation map is bounded linear
-  sorry
+  -- We prove this directly using the Lipschitz property
+  -- |x(g) - y(g)| = |(x-y)(g)| ≤ ‖x-y‖ by lp.norm_apply_le_norm
+  rw [Metric.continuous_iff]
+  intro x ε hε
+  use ε
+  constructor
+  · exact hε
+  · intro y hy
+    -- The distance between x(g) and y(g) is bounded by the lp norm
+    calc dist (y g) (x g)
+    _ = ‖y g - x g‖ := by rw [dist_eq_norm]
+    _ = ‖(y - x) g‖ := by rfl
+    _ ≤ ‖y - x‖ := lp.norm_apply_le_norm two_ne_zero (y - x) g
+    _ = dist y x := by rw [dist_eq_norm]
+    _ < ε := hy
 
 /-- **(A‑2)**  The map `c ↦ lp.single 2 g c` is continuous. -/
 lemma continuous_single_coord (g : ℕ) :
