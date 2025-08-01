@@ -111,7 +111,7 @@ def e_g : L2Space := lp.single 2 g 1
 
 @[simp] lemma e_g_norm : ‖e_g (g:=g)‖ = 1 := by
   -- `lp.single_norm` specialises to ‖1‖ when p = 2
-  simpa [e_g] using (lp.single_norm (p := 2) g (1 : ℂ))
+  simp [e_g, lp.single_norm]
 
 /-- Rank‑one orthogonal projection onto `span{e_g}`. -/
 noncomputable
@@ -168,7 +168,7 @@ lemma P_g_compact (g : ℕ) : IsCompactOperator (P_g (g:=g)) := by
       exact continuous_id.smul continuous_const
     have : K = (fun c : ℂ => c • e_g (g:=g)) '' Metric.closedBall 0 2 := by
       ext y
-      simp only [Set.mem_setOf_eq, Set.mem_image, Metric.mem_closedBall, dist_zero_right]
+      simp only [Set.mem_image, Metric.mem_closedBall, dist_zero_right]
       constructor
       · rintro ⟨c, hc, rfl⟩
         exact ⟨c, hc, rfl⟩
@@ -181,7 +181,7 @@ lemma P_g_compact (g : ℕ) : IsCompactOperator (P_g (g:=g)) := by
     -- We'll show P_g⁻¹(K) contains the unit ball, hence is a neighborhood of 0
     have h_ball : Metric.ball 0 1 ⊆ P_g (g:=g) ⁻¹' K := by
       intro x hx
-      simp only [Set.mem_preimage, Set.mem_setOf_eq]
+      simp only [Set.mem_preimage]
       use x g
       constructor
       · -- ‖x g‖ ≤ 2
@@ -453,7 +453,7 @@ lemma spectrum_G (g : ℕ) :
     (c_G = false → spectrum ℂ (G (g:=g)) = {1}) ∧
     (c_G = true  → spectrum ℂ (G (g:=g)) = {0,1}) := by
   refine ⟨?σfalse, ?σtrue⟩
-  · intro h; simp [G, h, spectrum_one]
+  · intro h; simp [G, h]
   · intro h; simp [G, h, spectrum_one_sub_Pg]
 
 end Papers.P1_GBC
@@ -478,7 +478,7 @@ noncomputable def godelOperator (g : Sigma1Formula) : L2Space →L[ℂ] L2Space 
   G (g := godelNum g)
 
 /-- The Gödel operator is Fredholm of index 0 -/
-theorem isFredholm (g : Sigma1Formula) : 
+theorem isFredholm (_ : Sigma1Formula) : 
     ∃ (n : ℕ), n = 0 :=
   G_isFredholm
 
