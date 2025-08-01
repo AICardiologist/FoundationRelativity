@@ -14,17 +14,17 @@ Papers/P1_GBC/Core.lean:515  # spectrum_projection_is_01 - spectrum of projectio
 Papers/P1_GBC/Core.lean:527  # spectrum_one_sub_Pg - spectrum of 1 - P_g
 
 # Papers/P1_GBC/Statement.lean (11 sorrys) - High-level theorem statements
-Papers/P1_GBC/Statement.lean:41   # godel_banach_main theorem
-Papers/P1_GBC/Statement.lean:49   # consistency_implies_surjectivity
-Papers/P1_GBC/Statement.lean:55   # surjectivity_implies_consistency  
-Papers/P1_GBC/Statement.lean:64   # foundation_relativity
-Papers/P1_GBC/Statement.lean:69   # pathology_hierarchy_connection
-Papers/P1_GBC/Statement.lean:77   # injectivity_characterization
-Papers/P1_GBC/Statement.lean:83   # fredholm_application
-Papers/P1_GBC/Statement.lean:106  # godel_diagonal_lemma
-Papers/P1_GBC/Statement.lean:110  # consistency_predicate_connection
-Papers/P1_GBC/Statement.lean:117  # classical_diagonal_lemma
-Papers/P1_GBC/Statement.lean:123  # fredholm_alternative_application
+Papers/P1_GBC/Statement.lean:43   # godel_banach_main theorem
+Papers/P1_GBC/Statement.lean:51   # consistency_implies_surjectivity
+Papers/P1_GBC/Statement.lean:57   # surjectivity_implies_consistency  
+Papers/P1_GBC/Statement.lean:66   # foundation_relativity
+Papers/P1_GBC/Statement.lean:71   # pathology_hierarchy_connection
+Papers/P1_GBC/Statement.lean:79   # injectivity_characterization
+Papers/P1_GBC/Statement.lean:85   # fredholm_application
+Papers/P1_GBC/Statement.lean:108  # godel_diagonal_lemma
+Papers/P1_GBC/Statement.lean:112  # consistency_predicate_connection
+Papers/P1_GBC/Statement.lean:119  # classical_diagonal_lemma
+Papers/P1_GBC/Statement.lean:125  # fredholm_alternative_application
 
 
 # Papers/P1_GBC/Correspondence.lean (3 sorrys) - Implementation attempts
