@@ -69,8 +69,37 @@ theorem surjectivity_implies_consistency (G : Sigma1Formula) :
 theorem foundation_relative_correspondence (G : Sigma1Formula) :
     ∀ (F : Foundation),
     (F = Foundation.bish → ¬∃ (w : foundationGodelCorrespondence F), True) ∧
-    (F = Foundation.zfc → ∃ (w : foundationGodelCorrespondence F), True) :=
-  sorry -- TODO Math-AI: Foundation-dependent behavior
+    (F = Foundation.zfc → ∃ (w : foundationGodelCorrespondence F), True) := by
+  intro F
+  constructor
+  · -- BISH case: No witnesses exist
+    intro h_bish
+    intro ⟨w, _⟩
+    -- In BISH foundation, the enhanced witness structure fails to exist
+    -- This follows the standard Foundation-Relativity pattern from Papers 2&3
+    -- The Gödel correspondence requires classical logic (excluded middle)
+    -- which is not available in constructive BISH foundation
+    rw [h_bish] at w
+    -- The witness w : EnhancedGodelWitness Foundation.bish leads to contradiction
+    -- because constructive foundations cannot support the classical Gödel proof
+    sorry -- TODO: Use that BISH doesn't support classical diagonal lemma
+  · -- ZFC case: Witnesses exist  
+    intro h_zfc
+    -- In ZFC foundation, we can construct the enhanced witness
+    -- using classical logic and the axiom of choice
+    rw [h_zfc]
+    -- Construct the witness explicitly
+    let witness : foundationGodelCorrespondence Foundation.zfc := ⟨
+      -- Base GodelWitness structure
+      { formula := G
+        operator := godelOperator G  
+        surjectivity := Function.Surjective (godelOperator G).toLinearMap },
+      -- Proof theory component  
+      peanoArithmetic,
+      -- Correspondence map
+      canonicalCorrespondence
+    ⟩
+    exact ⟨witness, trivial⟩
 
 /-- Integration with ρ-degree hierarchy -/
 theorem godel_rho_degree (G : Sigma1Formula) :
@@ -102,7 +131,8 @@ theorem correspondence_unique (G₁ G₂ : Sigma1Formula) :
 theorem godel_functorial (F G : Foundation) (h : Interp F G) :
     ∃ (map : foundationGodelCorrespondence F → foundationGodelCorrespondence G),
     True := -- Simplified placeholder
-  sorry
+  -- Use the naturality construction from Defs.lean
+  (godel_naturality F G h)
 
 /-! ### Connection to Existing Infrastructure -/
 
@@ -135,8 +165,15 @@ lemma main_theorem_outline (G : Sigma1Formula) :
 theorem diagonal_lemma_technical :
     ∃ (D : Sigma1Formula), 
     peanoArithmetic.provable D ↔ 
-    ¬peanoArithmetic.provable D :=
-  sorry -- TODO Math-AI: Classical diagonal lemma in PA
+    ¬peanoArithmetic.provable D := 
+  -- Use the Gödel sentence which by definition satisfies this property
+  -- The diagonal lemma constructs exactly such a formula
+  ⟨godelSentence peanoArithmetic, by
+    -- This is the defining property of the Gödel sentence
+    -- G ↔ "G is not provable"
+    -- For our placeholder proof theory, this requires proper incompleteness theory
+    sorry -- TODO: Implement proper diagonal lemma using Gödel numbering
+  ⟩
 
 /-- Key technical lemma: Fredholm characterization -/
 theorem fredholm_characterization (G : Sigma1Formula) :
