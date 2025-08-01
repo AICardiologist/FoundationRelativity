@@ -11,32 +11,38 @@ if [ ! -f "lakefile.lean" ]; then
     exit 1
 fi
 
-# Ensure we're using the correct mathlib commit 05e1c7ab1b
-echo "🔧 Ensuring correct mathlib commit and build..."
-EXPECTED_MATHLIB_COMMIT="05e1c7ab1b"
+# Use latest mathlib commit (no longer pinned to specific version)
+echo "🔧 Checking mathlib cache and build status..."
 CURRENT_MATHLIB_COMMIT=$(cd .lake/packages/mathlib && git rev-parse HEAD | cut -c1-10)
+echo "📍 Using mathlib commit: $CURRENT_MATHLIB_COMMIT"
 
-if [ "$CURRENT_MATHLIB_COMMIT" != "$EXPECTED_MATHLIB_COMMIT" ]; then
-    echo "❌ ERROR: Wrong mathlib commit!"
-    echo "   Expected: $EXPECTED_MATHLIB_COMMIT"
-    echo "   Current:  $CURRENT_MATHLIB_COMMIT"
-    echo "   Run 'lake update' to fix"
-    exit 1
+# No longer forcing specific mathlib commit - use whatever is in lake-manifest.json
+
+# Ensure mathlib cache is downloaded for current commit
+echo "📦 Downloading mathlib cache for commit $CURRENT_MATHLIB_COMMIT..."
+lake exe cache get > /dev/null 2>&1 || echo "⚠️  Cache download failed, will build from source"
+
+# Check if we have usable mathlib cache
+MATHLIB_CACHE_PATH=".lake/packages/mathlib/.lake/build/lib/lean"
+CACHE_FILE_COUNT=$(find "$MATHLIB_CACHE_PATH" -name "*.olean" 2>/dev/null | wc -l | tr -d ' ')
+if [ -f "$MATHLIB_CACHE_PATH/Mathlib.olean" ] && [ "$CACHE_FILE_COUNT" -gt 1000 ]; then
+    echo "✅ Using mathlib cache ($CACHE_FILE_COUNT olean files available)"
+    # Quick verification that cache works by building a simple module
+    echo "🔍 Verifying cache works with quick build test..."
+    if lake build Mathlib.Tactic.Basic > /dev/null 2>&1; then
+        echo "✅ Cache verification successful - ready for fast builds"
+    else
+        echo "⚠️  Cache verification failed, doing minimal rebuild"
+        lake build Mathlib.Data.Nat.Basic > /dev/null 2>&1 || true
+    fi
+else
+    echo "❌ Insufficient cache ($CACHE_FILE_COUNT files), doing minimal build..."
+    lake build Mathlib.Data.Nat.Basic > /dev/null 2>&1 || true
 fi
 
-echo "✅ Mathlib commit verified: $EXPECTED_MATHLIB_COMMIT"
-
-# Ensure mathlib is cached and built
-lake exe cache get > /dev/null 2>&1 || true
-lake build Mathlib > /dev/null 2>&1 || true
-
-# Pre-build critical modules that are tested
-echo "🔨 Pre-building tested modules..."
-lake build Papers.PseudoFunctorInstances > /dev/null 2>&1 || true
-lake build Papers.P2_BidualGap.Basic > /dev/null 2>&1 || true  
-lake build Papers.P3_2CatFramework.Basic > /dev/null 2>&1 || true
-lake build CategoryTheory.PseudoFunctor > /dev/null 2>&1 || true
-lake build CategoryTheory.BicatFound > /dev/null 2>&1 || true
+# Pre-build critical modules that are tested (in parallel if possible)
+echo "🔨 Pre-building key tested modules..."
+lake build CategoryTheory.Found CategoryTheory.BicatFound > /dev/null 2>&1 || true
 
 echo "🧪 Foundation-Relativity Regression Testing Suite"
 echo "=================================================="
