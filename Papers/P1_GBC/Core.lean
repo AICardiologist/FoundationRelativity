@@ -110,8 +110,10 @@ def e_g : L2Space := lp.single 2 g 1
   simp [e_g, h, lp.single_apply]  
 
 @[simp] lemma e_g_norm : ‖e_g (g:=g)‖ = 1 := by
-  -- `lp.single_norm` specialises to ‖1‖ when p = 2
-  simp [e_g, lp.single_norm]
+  -- Use the lp.norm_single theorem: ‖lp.single p i x‖ = ‖x‖
+  unfold e_g
+  rw [lp.norm_single two_pos]
+  norm_num
 
 /-- Rank‑one orthogonal projection onto `span{e_g}`. -/
 noncomputable
