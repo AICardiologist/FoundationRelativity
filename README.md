@@ -2,17 +2,17 @@
 
 [![CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml)
 [![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
-[![Version](https://img.shields.io/badge/Version-v0.6.1--sprint47-brightgreen)](https://github.com/AICardiologist/FoundationRelativity/releases)
+[![Version](https://img.shields.io/badge/Version-v0.6.2--sprint48-brightgreen)](https://github.com/AICardiologist/FoundationRelativity/releases)
 [![Lean 4.22.0-rc4](https://img.shields.io/badge/Lean-4.22.0--rc4-blue)](https://github.com/leanprover/lean4)
 [![Paper 1 Progress](https://img.shields.io/badge/Paper%201%20Sorry%20Count-11%20total-yellow)](docs/planning/paper1-sorry-elimination-strategy.md)
 
 [![Doc Coverage](https://img.shields.io/badge/Doc%20Coverage-50%25-yellow)](.github/workflows/ci.yml)
 
 
-> **🎉 Sprint 47 COMPLETE**: Paper 1 Sorry Elimination Progress + **11 SORRIES ELIMINATED!** ✅  
-> **Latest**: Eliminated 11 sorries across Statement, Auxiliaries, and Correspondence files  
-> **Paper 1 Status**: 13 total sorries (Core: 2, Statement: 8, Auxiliaries: 3, Correspondence: 0)  
-> **🎯 NEW**: Strategic cascade elimination achieved major progress in Sprint 47 ✅
+> **🎉 Sprint 48 COMPLETE**: Core.lean Spectrum Sorry Elimination + **2 MORE SORRIES ELIMINATED!** ✅  
+> **Latest**: Eliminated final spectrum sorries using algebraic IsIdempotentElem strategy  
+> **Paper 1 Status**: 11 total sorries (Core: 0, Statement: 8, Auxiliaries: 3, Correspondence: 0)  
+> **🎯 MILESTONE**: Core.lean and Correspondence.lean are now COMPLETE (0 sorries each)! ✅
 
 
 A Lean 4 formalization exploring how mathematical pathologies behave differently under various foundational assumptions.
@@ -512,7 +512,19 @@ grep -r "sorry" . --exclude-dir=.git
   - **Day 3** ✅: Paper-level pseudo-functor instances (Gap, AP, RNP)
   - **Day 4** ✅: Zero sorry elimination + enhanced CI verification
   - **v0.5.0-rc1** ✅: **Complete pseudo-functor framework + ZERO SORRY MILESTONE**
-- ✅ **Sprint 44**: Foundation Migration + Regression Testing **← LATEST ACHIEVEMENT**
+- ✅ **Sprint 48**: Core.lean Spectrum Sorry Elimination **← LATEST ACHIEVEMENT**
+  - **Algebraic Strategy** ✅: Eliminated 2 spectrum sorries using IsIdempotentElem.iff_eq_one_of_isUnit
+  - **Mathematical Innovation** ✅: Clean proof avoiding infinite-dimensional complexities
+  - **Core.lean Complete** ✅: 2 → 0 sorries, now fully sorry-free
+  - **Paper 1 Progress** ✅: 13 → 11 total sorries (15% reduction)
+  - **Quality Assurance** ✅: Full regression testing and documentation updates
+  - **v0.6.2-sprint48** ✅: **Core.lean Mathematical Completion**
+- ✅ **Sprint 47**: Paper 1 Sorry Elimination (24 → 13 reduction)
+  - **Cascade Strategy** ✅: 11 sorries eliminated across Statement, Auxiliaries, Correspondence
+  - **Correspondence.lean Complete** ✅: All sorries eliminated from this file
+  - **Statement.lean Progress** ✅: Reduced from 11 to 8 sorries
+  - **v0.6.1-sprint47** ✅: **Major Paper 1 Progress**
+- ✅ **Sprint 44**: Foundation Migration + Regression Testing
   - **Foundation Unification** ✅: Migrated all files to single complex Foundation type (CategoryTheory.Found)
   - **Logic Module Enhancement** ✅: Added WLPO, DCω, ACω definitions to Logic.ProofTheoryAxioms
   - **P3 Basic Completion** ✅: Pentagon coherence using real Foundation types (no cheating/sorry)
@@ -522,9 +534,9 @@ grep -r "sorry" . --exclude-dir=.git
 
 ### Current Sprint: Paper 1 Gödel-Banach Correspondence
 
-**🎯 Sprint 47 COMPLETE**: Paper 1 Core.lean Complete + Spectrum Theory Implementation
+**🎯 Sprint 48 COMPLETE**: Core.lean Spectrum Sorry Elimination Using Algebraic Strategy
 
-**Paper 1 Status After Sprint 48** (11 total sorries across 4 files):
+**Paper 1 Status After Sprint 48** (11 total sorries across 3 files):
 - **✅ RESOLVED Sprint 45**: `G_surjective_iff_not_provable` - Reflection principle complete
 - **✅ RESOLVED Sprint 46**: `G_inj_iff_surj` - Fredholm alternative complete  
 - **✅ RESOLVED Sprint 48**: `spectrum_projection_is_01` + `spectrum_one_sub_Pg` - Spectrum theory complete using algebraic proof!
@@ -533,12 +545,19 @@ grep -r "sorry" . --exclude-dir=.git
 - `Papers/P1_GBC/Auxiliaries.lean`: 3 sorries (mathematical infrastructure)
 - `Papers/P1_GBC/Correspondence.lean`: 0 sorries - COMPLETE! ✅
 
-**Sprint 47 Achievements** (v0.6.1-sprint47):
+**Sprint 48 Achievements** (v0.6.2-sprint48):
+1. ✅ **Core.lean Complete**: Eliminated final 2 spectrum sorries using algebraic IsIdempotentElem approach
+2. ✅ **Mathematical Innovation**: Used `IsIdempotentElem.iff_eq_one_of_isUnit` for clean proof strategy
+3. ✅ **Paper 1 Progress**: 13 → 11 total sorries (15% reduction)
+4. ✅ **Quality Maintained**: Full regression test suite passes
+5. ✅ **Documentation Updated**: Complete sorry tracking and sprint reporting
+
+**Previous Sprint 47 Achievements** (v0.6.1-sprint47):
 1. ✅ **11 Sorries Eliminated**: Major progress across Statement, Auxiliaries, and Correspondence
 2. ✅ **Correspondence.lean Complete**: All sorries eliminated from this file
 3. ✅ **Statement.lean Progress**: Reduced from 11 to 8 sorries
-3. ✅ **Cascade Strategy**: Used spectrum dependencies for efficient elimination
-4. ✅ **Maintained Quality**: 100% regression test success (52/52 tests passing)
+4. ✅ **Cascade Strategy**: Used spectrum dependencies for efficient elimination
+5. ✅ **Maintained Quality**: 100% regression test success (52/52 tests passing)
 
 ### Previous Achievement: Foundation Migration + Regression Testing
 

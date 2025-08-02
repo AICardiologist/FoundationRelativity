@@ -1,13 +1,13 @@
-# Foundation-Relativity Strategic Roadmap (Post-Sprint 44)
+# Foundation-Relativity Strategic Roadmap (Post-Sprint 48)
 
-## 🎯 Current Status: Sprint 46 IN PROGRESS - Gödel-Banach Sorry Elimination
+## 🎯 Current Status: Sprint 48 COMPLETE ✅ - Core.lean Spectrum Sorry Elimination 
 
-
-**Last Updated**: 2025-08-01  
-**Current Version**: v0.6.0-sprint46  
-**Status**: Sprint 46 In Progress 🔄 - Paper 1 Systematic Sorry Elimination  
-**Latest Achievement**: G_inj_iff_surj eliminated (Fredholm alternative) + PR #55 CI issues resolved  
-**Paper 1 Progress**: 23 sorries total (Core: 2, Statement: 11, Auxiliaries: 7, Correspondence: 3)
+**Last Updated**: 2025-08-02  
+**Current Version**: v0.6.2-sprint48  
+**Status**: Sprint 48 Complete ✅ - Core.lean Mathematical Completion  
+**Latest Achievement**: Core.lean spectrum sorries eliminated using algebraic IsIdempotentElem strategy  
+**Paper 1 Progress**: 11 sorries total (Core: 0, Statement: 8, Auxiliaries: 3, Correspondence: 0)  
+**🎯 MILESTONE**: Core.lean and Correspondence.lean are now COMPLETE (0 sorries each)! ✅
 
 ---
 
@@ -21,7 +21,9 @@
 | **S43** | ✅ Complete | Pseudo-Functor Infrastructure & Coherence Proofs | Pseudo-functor framework complete |
 | **S44** | ✅ Complete | Paper #1 Gödel-Banach Implementation | Mathematical infrastructure established |
 | **S45** | ✅ Complete | Paper #1 Core.lean Sorry Elimination | **1 sorry eliminated (G_surjective_iff_not_provable) + CI enhancements** |
-| **S46** | 🔄 In Progress | Paper #1 Continued Sorry Elimination | **1 sorry eliminated (G_inj_iff_surj) - Fredholm alternative complete** |
+| **S46** | ✅ Complete | Paper #1 Continued Sorry Elimination | **1 sorry eliminated (G_inj_iff_surj) - Fredholm alternative complete** |
+| **S47** | ✅ Complete | Paper #1 Major Sorry Elimination | **11 sorries eliminated (24→13) across Statement, Auxiliaries, Correspondence** |
+| **S48** | ✅ Complete | Core.lean Spectrum Sorry Elimination | **2 sorries eliminated using algebraic strategy - Core.lean COMPLETE** |
 
 ---
 
@@ -29,40 +31,46 @@
 
 | Sprint | Timeline | Main Deliverable | Owner | Priority |
 |--------|----------|------------------|-------|----------|
-| **S46** | Current | Core.lean spectrum sorries + Auxiliaries standard results | Math-AI | P1 |
-| **S47** | Next | Complete Auxiliaries.lean + Start Correspondence.lean | Math-AI | P1 |
-| **S48** | +7d | Finish Correspondence + Core Statement.lean theorems | Math-AI | P1 |
-| **S49** | +14d | Remaining Statement.lean results + Integration | Math-AI | P2 |
-| **S50** | +21d | Paper #1 Publication Preparation + Mathlib PRs | Both | P2 |
-| **S51** | +28d | Release v0.7.0 + Academic Submission | Both | P3 |
+| **S49** | Next | Remaining Statement.lean theorems (8 remaining) | Math-AI | P1 |
+| **S50** | +7d | Complete Statement.lean + Auxiliaries.lean (11→0) | Math-AI | P1 |
+| **S51** | +14d | Paper #1 Publication Preparation + Mathlib PRs | Both | P2 |
+| **S52** | +21d | Release v0.7.0 + Academic Submission | Both | P2 |
+| **S53** | +28d | Paper #2 Implementation + Advanced Pathologies | Both | P3 |
 
 ---
 
-## 📋 **Sprint 46 Progress Summary**
+## 📋 **Sprint 47-48 Progress Summary**
 
-### 🏆 Mathematical Progress
-- **Core.lean Sorries**: 4 → 2 (2 eliminated: G_surjective_iff_not_provable, G_inj_iff_surj)
-- **Total Paper 1 Sorries**: 23 remaining across 4 files (was 24+)
-- **Proof Quality**: Fredholm alternative theorem with complete case analysis
-- **CI Compliance**: All checks passing after SORRY_ALLOWLIST fixes
+### 🏆 Mathematical Progress (24 → 11 sorry reduction)
+- **Core.lean**: 4 → 0 (COMPLETE ✅) - Spectrum theory using algebraic IsIdempotentElem approach
+- **Correspondence.lean**: 3 → 0 (COMPLETE ✅) - Logic-analysis bridge complete
+- **Statement.lean**: 11 → 8 (27% reduction) - Major theorem progress  
+- **Auxiliaries.lean**: 6 → 3 (50% reduction) - Mathematical infrastructure progress
+- **Total Progress**: 24 → 11 sorries (54% reduction)
 
-### ✅ Major Implementation: G_inj_iff_surj
-1. **Fredholm Alternative**: For index-0 operators, injective ↔ surjective
-2. **Key Insight**: When c_G = false, G = I (identity operator)
-3. **Proof Strategy**: Case analysis on c_G with kernel characterization
-4. **Mathematical Foundation**: Standard functional analysis result
+### ✅ Sprint 48 Major Achievement: Core.lean Complete
+1. **Algebraic Strategy**: Used `IsIdempotentElem.iff_eq_one_of_isUnit` for spectrum proofs
+2. **Mathematical Innovation**: Avoided infinite-dimensional spectral complexities
+3. **Key Proofs**: `spectrum_projection_is_01` and `spectrum_one_sub_Pg` complete
+4. **Clean Implementation**: Elegant contradiction proof using unit characterization
 
-### 📊 Paper 1 Sorry Breakdown (23 total)
-- **Core.lean**: 2 sorries (spectrum theory)
-- **Statement.lean**: 11 sorries (high-level theorems)
-- **Auxiliaries.lean**: 7 sorries (mathematical infrastructure)
-- **Correspondence.lean**: 3 sorries (logic-analysis bridge)
+### ✅ Sprint 47 Cascade Strategy Success
+1. **Correspondence.lean Complete**: All 3 sorries eliminated
+2. **Statement.lean Progress**: 11 → 8 sorries using proof dependencies
+3. **Auxiliaries.lean Progress**: 6 → 3 sorries with infrastructure improvements
+4. **Quality Maintained**: 100% regression test success throughout
+
+### 📊 Paper 1 Sorry Breakdown (11 total - 54% complete)
+- **Core.lean**: 0 sorries ✅ COMPLETE
+- **Correspondence.lean**: 0 sorries ✅ COMPLETE  
+- **Statement.lean**: 8 sorries (high-level theorems)
+- **Auxiliaries.lean**: 3 sorries (mathematical infrastructure)
 
 ### 🔧 Infrastructure Achievements
-- **PR #55**: Created and CI issues resolved
-- **SORRY_ALLOWLIST**: Corrected line numbers for Statement.lean
-- **Testing**: Maintained 52/52 regression test success
-- **Documentation**: Complete sorry analysis and strategic plan
+- **Quality Assurance**: Full regression testing maintained
+- **Documentation**: Complete sorry tracking and sprint reporting
+- **Version Release**: v0.6.2-sprint48 with Core.lean completion milestone
+- **Mathematical Bridge**: Core.lean mathematical infrastructure now complete
 
 ---
 
@@ -83,46 +91,31 @@
 
 ---
 
-## 🎯 **Sprint 46-51 Strategic Sorry Elimination Plan**
+## 🎯 **Sprint 49-52 Strategic Sorry Elimination Plan (11 remaining)**
 
-### Phase 1: Mathematical Infrastructure (Auxiliaries.lean - 7 sorries)
-**Sprint 46-47 Focus**: Standard results and operator theory
+### Phase 1: COMPLETED ✅ Core Mathematical Infrastructure  
+**Sprint 47-48 Achievement**: Core.lean and Correspondence.lean complete
+- ✅ **Core.lean**: All spectrum sorries eliminated using algebraic strategy
+- ✅ **Correspondence.lean**: All logic-analysis bridge sorries eliminated
+- ✅ **Major Progress**: 13 sorries eliminated across Sprint 47-48
+
+### Phase 2: Remaining Mathematical Infrastructure (Auxiliaries.lean - 3 sorries)
+**Sprint 49 Focus**: Complete mathematical infrastructure
 
 | Line | Sorry | Type | Strategy | Priority |
 |------|-------|------|----------|----------|
-| 37 | Standard linear algebra | Easy | Mathlib lemma | High |
-| 64 | Surjective pullback isometry | Easy | Standard result | High |
-| 72 | Fredholm alternative | Easy | Classical theorem | High |
-| 43 | P_g compactness | Medium | Rank-one theory | Medium |
-| 81 | Fredholm not compact | Medium | Counterexample | Medium |
-| 51,57 | Subtype issues | Medium | Refactoring | Low |
+| 44 | finiteDimensional_of_finiteRankRange | Medium | Hypotheses refinement | High |
+| 79 | surjective_of_compact_and_spectrum | Medium | Statement correction | High |
+| Final | Infrastructure completion | Easy | Standard results | Medium |
 
-### Phase 2: Core Spectral Theory (Core.lean - 2 sorries)
-**Sprint 46 Focus**: Well-understood spectrum results
+### Phase 3: High-Level Theorems (Statement.lean - 8 sorries)
+**Sprint 49-50 Focus**: Main theorem completion
 
-| Line | Sorry | Mathematical Content | Strategy |
-|------|-------|---------------------|----------|
-| 515 | spectrum_projection_is_01 | σ(P) = {0,1} | Direct eigenvalue computation |
-| 527 | spectrum_one_sub_Pg | σ(I-P) from σ(P) | Spectral mapping theorem |
-
-### Phase 3: Logic-Analysis Bridge (Correspondence.lean - 3 sorries)
-**Sprint 48 Focus**: Connect logical and analytical sides
-
-| Line | Sorry | Content | Dependency |
-|------|-------|---------|------------|
-| 28 | Consistency ↔ c_G | Definition alignment | Core complete |
-| 41 | Kernel analysis | G = I - P_g application | Phase 1 & 2 |
-| 47 | Fredholm application | Full theory | Auxiliaries.72 |
-
-### Phase 4: High-Level Theorems (Statement.lean - 11 sorries)
-**Sprint 49-51 Focus**: Main results and integration
-
-| Priority | Lines | Content | Prerequisites |
-|----------|-------|---------|---------------|
-| Critical | 43,51,57 | Main theorem + key lemmas | All phases |
-| High | 66,71,79 | Framework integration | Phase 1-3 |
-| Medium | 85,125 | Fredholm applications | Auxiliaries |
-| Low | 108,112,119 | Gödel diagonal lemmas | Advanced logic |
+| Priority | Lines | Content | Status |
+|----------|-------|---------|---------|
+| Critical | 46 | godel_banach_main theorem | Core infrastructure complete |
+| High | 85,128,175 | Framework integration | Ready for implementation |
+| Medium | Multiple | Remaining theorem statements | Dependency chain ready |
 
 ### Priority 2: Mathematical Validation
 **Goal**: Ensure all implementations meet research-quality standards
@@ -177,21 +170,21 @@ def RNPFunctorPF : PseudoFunctor FoundationBicat FoundationBicat
 
 ## 📈 **Quality Metrics & KPIs**
 
-### Sprint 46 Current Metrics
-- **Core.lean Sorry Count**: 2 (down from 4 - 50% reduction)
-- **Total Paper 1 Sorries**: 23 (Core: 2, Statement: 11, Auxiliaries: 7, Correspondence: 3)
-- **Regression Tests**: 52/52 passing (100% success rate)
-- **PR Status**: #55 open with all CI checks passing
-- **Documentation**: Complete sorry analysis and elimination strategy
+### Sprint 48 Current Metrics ✅ ACHIEVED
+- **Core.lean Sorry Count**: 0 (COMPLETE ✅ - down from 4)
+- **Total Paper 1 Sorries**: 11 (Core: 0, Statement: 8, Auxiliaries: 3, Correspondence: 0)
+- **Regression Tests**: 52/52 passing (100% success rate maintained)
+- **Major Achievement**: 54% sorry elimination (24→11) across Sprint 47-48
+- **Documentation**: Complete sprint reporting and mathematical validation
 
-### Sprint 46-51 Targets
-- **Sprint 46**: Core.lean spectrum (2) + Auxiliaries easy (3-4)
-- **Sprint 47**: Auxiliaries complete (3-4) + Correspondence start (1-2)
-- **Sprint 48**: Correspondence complete (1) + Statement core (3-4)
-- **Sprint 49-51**: Statement remaining + Polish
-- **Realistic Goal**: 15-18 sorries eliminated
-- **Stretch Goal**: 20+ sorries eliminated
-- **Academic Ready**: ~5-8 sorries acceptable with clear "future work" marking
+### Sprint 49-52 Targets (11 remaining sorries)
+- **Sprint 49**: Auxiliaries.lean complete (3→0) + Statement.lean progress (8→4-5)
+- **Sprint 50**: Statement.lean completion (remaining → 0)
+- **Sprint 51**: Paper #1 publication preparation + quality assurance
+- **Sprint 52**: Release v0.7.0 + academic submission
+- **Achievement Goal**: 100% Paper #1 sorry elimination
+- **Stretch Goal**: Enhanced mathematical documentation + mathlib PRs
+- **Academic Ready**: Paper #1 publication-ready with complete formalization
 
 ---
 
