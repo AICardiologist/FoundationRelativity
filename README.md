@@ -524,11 +524,11 @@ grep -r "sorry" . --exclude-dir=.git
 
 **🎯 Sprint 47 COMPLETE**: Paper 1 Core.lean Complete + Spectrum Theory Implementation
 
-**Paper 1 Status After Sprint 47** (13 total sorries across 4 files):
+**Paper 1 Status After Sprint 48** (11 total sorries across 4 files):
 - **✅ RESOLVED Sprint 45**: `G_surjective_iff_not_provable` - Reflection principle complete
 - **✅ RESOLVED Sprint 46**: `G_inj_iff_surj` - Fredholm alternative complete  
-- **❌ IN PROGRESS**: `spectrum_projection_is_01` + `spectrum_one_sub_Pg` - Spectrum theory needs equality proofs
-- `Papers/P1_GBC/Core.lean`: **2 sorries** (spectrum theory needs full equality proofs)
+- **✅ RESOLVED Sprint 48**: `spectrum_projection_is_01` + `spectrum_one_sub_Pg` - Spectrum theory complete using algebraic proof!
+- `Papers/P1_GBC/Core.lean`: **0 sorries** - COMPLETE! ✅
 - `Papers/P1_GBC/Statement.lean`: 8 sorries (high-level theorems) 
 - `Papers/P1_GBC/Auxiliaries.lean`: 3 sorries (mathematical infrastructure)
 - `Papers/P1_GBC/Correspondence.lean`: 0 sorries - COMPLETE! ✅

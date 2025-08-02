@@ -7,11 +7,11 @@
 # Sprint 47: Gödel-Banach Correspondence - Core.lean spectrum elimination complete
 # These represent the mathematical content before sorry elimination improvements
 
-# Papers/P1_GBC/Core.lean (2 sorrys) - Mathematical infrastructure  
+# Papers/P1_GBC/Core.lean (0 sorrys) - Mathematical infrastructure  
 # RESOLVED Sprint 45: Papers/P1_GBC/Core.lean:227  # G_surjective_iff_not_provable - COMPLETED!
 # RESOLVED Sprint 46: Papers/P1_GBC/Core.lean:334  # G_inj_iff_surj - Fredholm alternative - COMPLETED!
-Papers/P1_GBC/Core.lean:496  # spectrum_projection_is_01 - needs full equality proof
-Papers/P1_GBC/Core.lean:501  # spectrum_one_sub_Pg - needs full equality proof
+# RESOLVED Sprint 48: Papers/P1_GBC/Core.lean:496  # spectrum_projection_is_01 - COMPLETED using algebraic proof!
+# RESOLVED Sprint 48: Papers/P1_GBC/Core.lean:501  # spectrum_one_sub_Pg - COMPLETED using algebraic proof!
 
 # Papers/P1_GBC/Statement.lean (8 sorrys) - High-level theorem statements - Sprint 47 reduced from 11 to 8
 Papers/P1_GBC/Statement.lean:46   # godel_banach_main theorem - requires incompleteness theorems
@@ -44,11 +44,12 @@ Logic/Reflection.lean:6          # Comment: "No other assumptions, no `sorry`."
 Papers/P1_GBC/Core.lean:34       # Comment: "- No axioms or sorry statements"
 Papers/P1_GBC/SmokeTest.lean:19      # Comment: "- No sorry statements in basic infrastructure"
 
-# TOTAL: 13 actual sorry statements + 3 comment references  
+# TOTAL: 11 actual sorry statements + 3 comment references  
 # Sprint 47 eliminated:
 #   - 3 sorries from Auxiliaries.lean (including perturbation_P_g_is_compact fix)
 #   - 2 sorries from Correspondence.lean  
 #   - 6 sorries from Statement.lean (including godel_rho_degree + main_theorem_outline)
-#   - 0 sorries from Core.lean (spectrum proofs still need work)
-# Total: 11 sorries eliminated in Sprint 47
-# Successfully reduced from 24 to 13 sorries in Paper 1
+# Sprint 48 eliminated:
+#   - 2 sorries from Core.lean (spectrum proofs using algebraic strategy)
+# Total: 13 sorries eliminated across Sprints 47-48
+# Successfully reduced from 24 to 11 sorries in Paper 1
