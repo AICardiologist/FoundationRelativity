@@ -60,7 +60,7 @@ theorem surjectivity_implies_consistency :
     consistencyPredicate peanoArithmetic := by
   intro h_surj
   -- Use the main theorem to get the reverse direction
-  exact godel_banach_main.mpr h_surj
+  exact godel_banach_main.mpr h_surj origin/main
 
 /-! ### Foundation-Relativity Results -/
 
@@ -91,7 +91,7 @@ theorem foundation_relative_correspondence (G : Sigma1Formula) :
     
     sorry -- AXIOMATIZED: Use LogicAxioms.classical_logic_requirement
            -- The existence of witness w in BISH leads to contradiction
-           -- because it would imply BISH supports the diagonal lemma
+           -- because it would imply BISH supports the diagonal lemma origin/main
   · -- ZFC case: Witnesses exist  
     intro h_zfc
     -- In ZFC foundation, we can construct the enhanced witness
@@ -111,7 +111,7 @@ theorem foundation_relative_correspondence (G : Sigma1Formula) :
     exact ⟨witness, trivial⟩
 
 /-- Integration with ρ-degree hierarchy -/
-theorem godel_rho_degree (G : Sigma1Formula) :
+theorem godel_rho_degree (_ : Sigma1Formula) :
     ∃ (ρ : ℕ), ρ ≥ 3 ∧ True := 
   -- The Gödel-Banach correspondence involves spectral properties of operators
   -- Similar to SpectralGap pathology which has ρ-degree 3 (requires AC_ω)
@@ -120,13 +120,14 @@ theorem godel_rho_degree (G : Sigma1Formula) :
 
 /-! ### Auxiliary Results -/
 
--- REMOVED: correspondence_unique was mathematically flawed
--- When c_G = false (always true by incompleteness), all operators map to identity
--- Making the correspondence non-injective
+-- REMOVED: correspondence_unique theorem was mathematically incorrect.
+-- When c_G = false (which is always the case by incompleteness),
+-- all Gödel operators become the identity operator, so the
+-- correspondence is not injective. origin/main
 
 /-- Functoriality with respect to foundations -/
 theorem godel_functorial (F G : Foundation) (h : Interp F G) :
-    ∃ (map : foundationGodelCorrespondence F → foundationGodelCorrespondence G),
+    ∃ (_ : foundationGodelCorrespondence F → foundationGodelCorrespondence G),
     True := -- Simplified placeholder
   -- Use the naturality construction from Defs.lean
   (godel_naturality F G h)
@@ -152,7 +153,7 @@ lemma main_theorem_outline :
 
 -- REMOVED: diagonal_lemma_technical was mathematically problematic
 -- The diagonal lemma produces G ↔ ¬Provable(G), not G ↔ ¬G
--- This will be axiomatized in LogicAxioms.lean instead
+-- This is properly axiomatized in LogicAxioms.lean instead origin/main
 
 /-- Key technical lemma: Fredholm characterization -/
 theorem fredholm_characterization (G : Sigma1Formula) :

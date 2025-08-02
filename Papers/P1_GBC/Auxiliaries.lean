@@ -36,9 +36,32 @@ lemma finiteDimensional_ker_of_finiteDimRange {E F : Type*} [NormedAddCommGroup 
   -- Since E is finite-dimensional and ker f is a submodule of E, it's finite-dimensional
   infer_instance
 
--- REMOVED: finiteDimensional_of_finiteRankRange was too general
--- Not all operators have finite-dimensional range
--- For specific operators like P_g, use P_g_rank_one from Core.lean instead
+/-- Rank-one operators have one-dimensional range -/
+lemma finiteDimensional_range_of_rankOne {E F : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    [NormedAddCommGroup F] [NormedSpace ℂ F] (f : E →L[ℂ] F) 
+    (h_rank_one : ∃ (v : F) (φ : E →L[ℂ] ℂ), f = fun x => φ x • v) : 
+    FiniteDimensional ℂ (LinearMap.range f.toLinearMap) := by
+  -- A rank-one operator has range contained in span{v}
+  obtain ⟨v, φ, h_eq⟩ := h_rank_one
+  -- The range is at most 1-dimensional
+  have h_range : LinearMap.range f.toLinearMap ≤ Submodule.span ℂ {v} := by
+    -- Show that every element in range(f) is in span{v}
+    rintro y ⟨x, rfl⟩
+    -- f(x) = φ(x) • v by h_eq
+    -- We know that f.toLinearMap x = f x
+    simp only [ContinuousLinearMap.coe_coe]
+    have : f x = φ x • v := by
+      -- h_eq says ⇑f = fun x => φ x • v
+      exact congrFun h_eq x
+    rw [this]
+    exact Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self v)
+  -- span{v} is finite dimensional
+  have h_finite : FiniteDimensional ℂ (Submodule.span ℂ {v}) := by
+    apply FiniteDimensional.span_of_finite
+    exact Set.finite_singleton v
+  -- A subspace of a finite dimensional space is finite dimensional
+  -- We use that range(f) ≤ span{v} and span{v} is finite dimensional
+  exact Submodule.finiteDimensional_of_le h_range origin/main
 
 /-! ### Pullback auxiliaries -/
 
@@ -67,9 +90,9 @@ lemma pullback_isometry_of_surjective {X Y : Type*} [NormedAddCommGroup X] [Norm
 
 /-! ### Fredholm auxiliaries -/
 
--- REMOVED: surjective_of_compact_and_singleton_spectrum was impossible
--- In infinite-dimensional spaces, compact operators must have 0 in spectrum
--- So spectrum = {1} is impossible for compact operators
+-- REMOVED: surjective_of_compact_and_singleton_spectrum was based on an incorrect 
+-- mathematical statement. For compact operators on infinite-dimensional spaces, 
+-- 1 ∈ spectrum typically means the operator is NOT surjective. origin/main
 
 /-- Corrected: P_g (the perturbation) is compact, not G itself -/
 lemma perturbation_P_g_is_compact (g : ℕ) :
