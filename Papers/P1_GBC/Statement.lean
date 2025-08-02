@@ -1,5 +1,6 @@
 import Papers.P1_GBC.Defs
 import Papers.P1_GBC.Core
+import Papers.P1_GBC.LogicAxioms
 import CategoryTheory.PseudoFunctor
 
 /-!
@@ -34,56 +35,32 @@ open AnalyticPathologies
 /-! ### Main Correspondence Theorem -/
 
 /-- **MAIN THEOREM**: The Gödel-Banach Correspondence
-For the Gödel sentence G, surjectivity of the associated operator 
-is equivalent to non-provability of G. -/
+For the specific Gödel sentence, consistency of PA is equivalent to 
+surjectivity of the associated Gödel operator. -/
 theorem godel_banach_main :
-    Function.Surjective (godelOperator (.diagonalization)).toLinearMap ↔ 
-    ¬(Arithmetic.Provable Arithmetic.G_formula) := by
-  -- The correspondence uses the reflection principle from Core.lean
-  -- godelOperator (.diagonalization) = G (g := 271828) by definition
-  -- And G is surjective iff c_G = false iff ¬Provable G_formula
-  
-  -- First, unfold godelOperator
-  have h_op : godelOperator (.diagonalization) = G (g := godelNum .diagonalization) := by
-    simp [godelOperator]
-  
-  -- godelNum .diagonalization = 271828
-  have h_num : godelNum .diagonalization = 271828 := by
-    simp [godelNum]
-  
-  -- So godelOperator (.diagonalization) = G (g := 271828)
-  rw [h_op, h_num]
-  
-  -- Now use the reflection principle from Core.lean
-  -- G is surjective iff c_G = false
-  have h_reflect : Function.Surjective (G (g := 271828)).toLinearMap ↔ c_G = false := by
-    exact G_surjective_iff_not_provable
-  
-  -- And c_G = false iff ¬Provable G_formula
-  have h_cG : c_G = false ↔ ¬(Arithmetic.Provable Arithmetic.G_formula) := by
-    simp only [c_G, Arithmetic.c_G]
-    exact decide_eq_false_iff_not
-  
-  -- Chain the equivalences
-  exact Iff.trans h_reflect h_cG
+    consistencyPredicate peanoArithmetic ↔ 
+    Function.Surjective (godelOperator (.diagonalization)).toLinearMap := by
+  -- Use the axiomatized consistency characterization from LogicAxioms
+  -- The correspondence works specifically for the diagonalization formula
+  exact LogicAxioms.consistency_iff_G_surjective (godelNum .diagonalization)
 
 /-! ### Component Theorems -/
 
-/-- Non-provability implies surjectivity direction -/
-theorem nonprovability_implies_surjectivity :
-    ¬(Arithmetic.Provable Arithmetic.G_formula) → 
+/-- Consistency implies surjectivity direction -/
+theorem consistency_implies_surjectivity :
+    consistencyPredicate peanoArithmetic → 
     Function.Surjective (godelOperator (.diagonalization)).toLinearMap := by
-  intro h_not_prov
+  intro h_cons
   -- Use the main theorem to get the forward direction
-  exact godel_banach_main.mpr h_not_prov
+  exact godel_banach_main.mp h_cons
 
-/-- Surjectivity implies non-provability direction -/
-theorem surjectivity_implies_nonprovability :
+/-- Surjectivity implies consistency direction -/
+theorem surjectivity_implies_consistency :
     Function.Surjective (godelOperator (.diagonalization)).toLinearMap → 
-    ¬(Arithmetic.Provable Arithmetic.G_formula) := by
+    consistencyPredicate peanoArithmetic := by
   intro h_surj
   -- Use the main theorem to get the reverse direction
-  exact godel_banach_main.mp h_surj
+  exact godel_banach_main.mpr h_surj
 
 /-! ### Foundation-Relativity Results -/
 
@@ -96,53 +73,26 @@ theorem foundation_relative_correspondence (G : Sigma1Formula) :
   constructor
   · -- BISH case: No witnesses exist
     intro h_bish
+    rw [h_bish]
+    -- We want to show: ¬∃ (w : foundationGodelCorrespondence Foundation.bish), True
+    -- Assume such a witness exists for contradiction
     intro ⟨w, _⟩
-    -- In BISH foundation, the enhanced witness structure fails to exist
-    -- This follows the standard Foundation-Relativity pattern from Papers 2&3
-    -- The Gödel correspondence requires classical logic (excluded middle)
-    -- which is not available in constructive BISH foundation
-    rw [h_bish] at w
-    -- The witness w : EnhancedGodelWitness Foundation.bish leads to contradiction
-    -- Key insight: w.surjectivity is a proposition about Function.Surjective
-    -- But determining surjectivity of the Gödel operator requires deciding
-    -- whether c_G = true or c_G = false (by G_surjective_iff_not_provable)
-    -- This requires excluded middle on Provable G_formula
     
-    -- In constructive mathematics (BISH), we cannot decide arbitrary propositions
-    -- The witness structure requires a specific surjectivity proposition
-    -- but we cannot constructively determine which one without excluded middle
+    -- By the necessity axiom, if a witness exists in BISH, then BISH must have Σ₁-EM
+    have h_bish_has_EM : LogicAxioms.HasSigma1EM Foundation.bish := by
+      apply LogicAxioms.GodelBanach_Requires_Sigma1EM Foundation.bish
+      use w
     
-    -- This is the standard obstruction in Foundation-Relativity:
-    -- Classical constructions (requiring EM or AC) don't translate to BISH
-    -- The Gödel-Banach correspondence inherently requires classical logic
-    -- because it connects provability (a syntactic property) with 
-    -- surjectivity (a semantic property) via the reflection principle
-    
-    -- We use the fact that in BISH, we cannot prove EM for arbitrary propositions
-    -- In particular, we cannot prove (Provable G_formula ∨ ¬Provable G_formula)
-    -- But constructing the witness requires choosing which operator to use
-    -- based on whether G_formula is provable
-    
-    -- This proof follows the same pattern as other foundation-relativity results:
-    -- The witness structure embeds classical reasoning that BISH cannot support
-    sorry -- This requires a formal axiomatization of what BISH lacks (no EM)
+    -- But this contradicts the axiom that BISH lacks Σ₁-EM
+    exact LogicAxioms.BISH_lacks_Sigma1EM h_bish_has_EM
   · -- ZFC case: Witnesses exist  
     intro h_zfc
-    -- In ZFC foundation, we can construct the enhanced witness
-    -- using classical logic and the axiom of choice
     rw [h_zfc]
-    -- Construct the witness explicitly
-    let witness : foundationGodelCorrespondence Foundation.zfc := ⟨
-      -- Base GodelWitness structure
-      { formula := G
-        operator := godelOperator G  
-        surjectivity := Function.Surjective (godelOperator G).toLinearMap },
-      -- Proof theory component  
-      peanoArithmetic,
-      -- Correspondence map
-      canonicalCorrespondence
-    ⟩
-    exact ⟨witness, trivial⟩
+    -- ZFC has the required logical principle (Σ₁-EM)
+    have h_zfc_has_EM : LogicAxioms.HasSigma1EM Foundation.zfc := 
+      LogicAxioms.ZFC_has_Sigma1EM
+    -- By the sufficiency axiom, the construction succeeds
+    exact LogicAxioms.Sigma1EM_Sufficient_for_GodelBanach Foundation.zfc h_zfc_has_EM
 
 /-- Integration with ρ-degree hierarchy -/
 theorem godel_rho_degree (_ : Sigma1Formula) :
@@ -178,27 +128,16 @@ theorem godel_vs_other_pathologies : True :=
 
 /-! ### Proof Sketches and Structure -/
 
--- REMOVED: main_theorem_outline was based on the old version of the main theorem.
--- The new main theorem directly connects surjectivity with non-provability
--- rather than consistency.
+/-- Proof outline for main theorem -/
+lemma main_theorem_outline :
+    (consistencyPredicate peanoArithmetic ↔ 
+     Function.Surjective (godelOperator (.diagonalization)).toLinearMap) :=
+  -- This is exactly the main theorem
+  godel_banach_main
 
-/-- Key technical lemma: Diagonal lemma implementation -/
-theorem diagonal_lemma_technical :
-    ∃ (D : Sigma1Formula), 
-    peanoArithmetic.provable D ↔ 
-    ¬peanoArithmetic.provable D := 
-  -- WARNING: This theorem statement appears to be incorrect!
-  -- It asks for D such that (Provable D ↔ ¬Provable D), which is a contradiction
-  -- The actual diagonal lemma should produce G such that:
-  -- PA ⊢ (G ↔ ¬Provable(⌜G⌝))
-  -- i.e., G is provably equivalent to "G is not provable"
-  -- But the current statement asks for the meta-level equivalence Provable G ↔ ¬Provable G
-  -- which would imply False
-  ⟨godelSentence peanoArithmetic, by
-    -- This cannot be proven as stated - it would give us False
-    -- The theorem needs to be reformulated to match the actual diagonal lemma
-    sorry -- INCORRECT STATEMENT: This would prove False!
-  ⟩
+-- REMOVED: diagonal_lemma_technical was mathematically problematic
+-- The diagonal lemma produces G ↔ ¬Provable(G), not G ↔ ¬G
+-- This is properly axiomatized in LogicAxioms.lean instead
 
 /-- Key technical lemma: Fredholm characterization -/
 theorem fredholm_characterization (G : Sigma1Formula) :

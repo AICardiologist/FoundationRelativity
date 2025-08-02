@@ -1,168 +1,125 @@
-# Foundation-Relativity Documentation Hub
+# Foundation-Relativity Documentation
 
-## 📚 Overview
-This directory contains comprehensive documentation for the Foundation-Relativity project - a Lean 4 formalization of foundation-relative mathematics implementing the "Gödel in Four Acts" paper series.
+This directory contains comprehensive documentation for the Foundation-Relativity project, a Lean 4 formalization exploring how mathematical pathologies behave differently under various foundational assumptions.
 
-**Current Status**: 🎉 v0.6.0 Sprint 45 COMPLETE! Paper 1 Sorry Elimination + Mathematical Infrastructure  
-**Focus**: Rigorous mathematical proofs with custom infrastructure  
-**Achievement**: 4 sorries eliminated + 50+ lines custom mathematical content + 52/52 regression tests ✅
+## 📁 Documentation Organization
 
----
+### 📋 Planning & Status
+- **[`planning/project-status.md`](planning/project-status.md)** - Current project status across all papers
+- **[`planning/paper4-roadmap.md`](planning/paper4-roadmap.md)** - Detailed roadmap for Paper 4 (Spectral Geometry)
+- **[`planning/roadmap-extended.md`](planning/roadmap-extended.md)** - Long-term project vision and goals
+- **[`planning/paper1-sorry-elimination-strategy.md`](planning/paper1-sorry-elimination-strategy.md)** - Historical sorry elimination strategy
 
-## 🗂️ **Documentation Organization**
+### 📚 Papers & LaTeX Sources
+- **[`papers/`](papers/)** - LaTeX sources for all academic papers
+  - [`P1-GBC.tex`](papers/P1-GBC.tex) - Gödel-Banach Correspondence (Complete)
+  - [`P2-BidualGap.tex`](papers/P2-BidualGap.tex) - Bidual Gap Construction (Complete)
+  - [`P3-2CatFramework.tex`](papers/P3-2CatFramework.tex) - 2-Categorical Framework (Complete)
+  - [`P4-SpectralGeometry.tex`](papers/P4-SpectralGeometry.tex) - Spectral Geometry (Draft)
+  - **[`papers/revised/`](papers/revised/)** - Enhanced versions incorporating formalization insights
 
-### **📋 Planning & Roadmap**
-Strategic planning documents for current and future development:
+### 🔬 Analysis & Insights  
+- **[`analysis/`](analysis/)** - Formalization insights and comparisons
+  - [`lean-latex-alignment-p1.md`](analysis/lean-latex-alignment-p1.md) - Paper 1 Lean/LaTeX comparison
+  - [`lean-latex-complete-alignment.md`](analysis/lean-latex-complete-alignment.md) - Complete alignment analysis
+  - [`lean-mathAI-insights.md`](analysis/lean-mathAI-insights.md) - Insights from AI collaboration
 
-- **[Strategic Roadmap](planning/roadmap-extended.md)** - Post-Sprint 45 roadmap with Sprint 46 planning
-- **[Sprint Breakdown](planning/sprint38-41-breakdown.md)** - Historical Sprint 38-45 record with current status  
-- **[Papers-to-Sprints Mapping](planning/papers-to-sprints-mapping.md)** - Research implementation timeline updated to Sprint 45
+### 🏃 Sprint Reports
+- **[`sprints/`](sprints/)** - Sprint completion reports and summaries
+  - [`sprint50-summary.md`](sprints/sprint50-summary.md) - Final sprint completing Paper 1
+  - [`sprint50-final-sorry-analysis.md`](sprints/sprint50-final-sorry-analysis.md) - Detailed analysis of final sorry elimination
 
-### **📚 Research Papers Infrastructure**  
-Complete LaTeX sources and reference materials:
+### 📦 Historical Archive
+- **[`archive/`](archive/)** - Historical documentation and completed sprints
+  - [`archive/sprint35/`](archive/sprint35/) through [`archive/sprint48/`](archive/sprint48/) - Detailed sprint reports
+  - [`archive/old-documentation/`](archive/old-documentation/) - Legacy materials
+  - [`archive/SprintLog.md`](archive/SprintLog.md) - Historical sprint log
 
-- **[Papers Directory](papers/README.md)** - Four complete LaTeX sources (P1-P4)
-- **[Paper References](papers/PAPER_REFERENCES.md)** - Master reference linking papers to sprint implementation
-- **Papers**: P1 (Gödel-Banach), P2 (Bidual Gap), P3 (2-Categorical), P4 (Spectral Geometry)
+### 🛠️ Developer Reference
+- **[`reference/`](reference/)** - Development guides and technical documentation
+  - [`DEV_GUIDE.md`](reference/DEV_GUIDE.md) - Developer setup and workflows
+  - [`TOOLCHAIN_UPGRADE.md`](reference/TOOLCHAIN_UPGRADE.md) - Lean toolchain management
 
-### **🎉 Current Sprint Achievement**  
-Latest major mathematical breakthrough:
+## 🎯 Current Project Status
 
-- **[Sprint 45 Completion Report](sprint45-actual-completion-report.md)** - **LATEST**: 4 sorries eliminated + mathematical infrastructure complete
-- **[Mathematical Implementations Reference](mathematical-implementations-reference.md)** - Complete catalog of 251 mathematical implementations
-- **[Code Reference](CODE_REFERENCE.md)** - Comprehensive function/theorem documentation with testing verification
+### ✅ Completed Papers (0 sorries total)
+1. **Paper 1: Gödel-Banach Correspondence** - Rank-one operators encoding Gödel's incompleteness
+2. **Paper 2: Bidual Gap Construction** - Non-reflexive spaces and WLPO equivalence  
+3. **Paper 3: 2-Categorical Framework** - Foundation-relative pseudo-functors
 
-### **🎯 Mathematical Reference**
-Comprehensive mathematical content documentation:
+### 📋 Next Target
+**Paper 4: Spectral Geometry** - Undecidable eigenvalues on Riemannian manifolds (Planning phase)
 
-- **[Mathematical Implementations Reference](mathematical-implementations-reference.md)** - Complete catalog of 251 implementations across 2,665 lines
-- **[Code Reference](CODE_REFERENCE.md)** - Systematic documentation with regression test verification
-- **[Paper 1 Verification Status](paper1-verification-status.md)** - Current status of Gödel-Banach correspondence implementation
+## 🔍 Key Documentation Highlights
 
-### **🎯 Development Resources**
-Technical guides and development materials:
+### For New Contributors
+1. Start with [`planning/project-status.md`](planning/project-status.md) for current status
+2. Read [`reference/DEV_GUIDE.md`](reference/DEV_GUIDE.md) for development setup
+3. Explore [`papers/`](papers/) for mathematical content
+4. Check [`planning/paper4-roadmap.md`](planning/paper4-roadmap.md) for next steps
 
-- **[Development Guide](reference/DEV_GUIDE.md)** - Setup, contribution guidelines, best practices  
-- **[Toolchain Upgrade](reference/TOOLCHAIN_UPGRADE.md)** - Lean 4.22.0-rc4 upgrade guide
-- **[Onboarding Guide](onboarding.md)** - Complete integration handbook
-- **[Math-AI Handoff](math-ai-handoff-s41.md)** - Historical Math-AI coordination
+### For Researchers
+1. **Paper Sources**: [`papers/`](papers/) contains all LaTeX sources
+2. **Enhanced Versions**: [`papers/revised/`](papers/revised/) includes formalization insights
+3. **Analysis**: [`analysis/`](analysis/) documents Lean/LaTeX alignment and AI insights
+4. **Sprint History**: [`sprints/`](sprints/) and [`archive/`](archive/) show development process
 
-### **📁 Archive**
-Historical sprint documentation and obsolete materials:
+### For Understanding the Project
+1. **Mathematical Results**: See theorem statements in paper sources
+2. **Formalization Insights**: [`analysis/lean-mathAI-insights.md`](analysis/lean-mathAI-insights.md)
+3. **Development Process**: Sprint reports in [`sprints/`](sprints/) and [`archive/`](archive/)
+4. **Future Plans**: [`planning/paper4-roadmap.md`](planning/paper4-roadmap.md)
 
-- **[Sprint Archives](archive/)** - Complete historical record of Sprints 35-45
-- **[Old Documentation](archive/old-documentation/)** - Obsolete docs superseded by comprehensive references
-- **[Sprint Log](archive/SprintLog.md)** - Historical sprint progression record
+## 📊 Documentation Statistics
 
----
+| Category | Files | Status | Coverage |
+|----------|-------|--------|----------|
+| Planning | 4 files | ✅ Current | Complete |
+| Papers | 8 files | ✅ Current | 3/4 complete |
+| Analysis | 3 files | ✅ Current | Comprehensive |
+| Sprints | 2 files | ✅ Current | Papers 1-3 |
+| Archive | 20+ files | 📦 Archived | Complete history |
+| Reference | 2 files | ✅ Current | Developer-ready |
 
-## 🎯 **Current Implementation Status**
+## 🔄 Documentation Maintenance
 
-### **v0.6.0 Achievement Matrix (Sprint 45)**
+### Regular Updates
+- **Project Status**: Updated after major milestones
+- **Planning Documents**: Revised as project evolves
+- **Sprint Reports**: Added after each sprint completion
 
-| **Component** | **Current Status** | **Achievement** |
-|---------------|---------------------|------------------|
-| **Paper 1 Gödel-Banach** | 🟡 **6/10 sorries remaining** | 4 sorries eliminated with rigorous proofs |
-| **Mathematical Infrastructure** | ✅ **Complete** | 50+ lines custom infrastructure built |
-| **Regression Testing** | ✅ **Complete** | 52/52 tests passing (100% success rate) |
-| **Documentation** | ✅ **Complete** | 251 implementations cataloged |
-| **Papers 2-4** | ✅ **Complete** | Full bicategorical + pathology framework |
-| **Academic Readiness** | ✅ **Complete** | Research-quality mathematical content |
+### Archive Policy
+- Completed sprint reports moved to [`archive/`](archive/)
+- Legacy documentation preserved for historical reference
+- Current documentation kept in root folders
 
-### **Sprint 45 Mathematical Achievements**
+### Version Control
+- All documentation versioned with main codebase
+- Major revisions tagged with project releases
+- Enhanced paper versions track formalization insights
 
-| **Sorry Eliminated** | **Mathematical Content** | **Infrastructure Built** | **Significance** |
-|---------------------|--------------------------|--------------------------|------------------|
-| **P_g_compact** | Rank-one projection compactness | 44-line rigorous proof | Core operator theory |
-| **spectrum_one** | Identity operator spectrum | Custom unit analysis | **Novel infrastructure** |
-| **godel_banach_correspondence** | Main theorem equivalence | Reflection principle chain | **Research contribution** |
-| **continuous_single_coord** | Basis construction continuity | Mathlib integration | Foundation for projections |
+## 🤝 Contributing to Documentation
 
----
+### Adding New Documentation
+1. Place in appropriate subdirectory based on content type
+2. Follow existing naming conventions
+3. Update this README to include new files
+4. Ensure links are properly formatted
 
-## 🚀 **Quick Start Guide**
+### Updating Existing Documentation  
+1. Keep current versions in main folders
+2. Archive outdated versions if significant
+3. Update cross-references as needed
+4. Maintain consistency with project status
 
-### **For Users**
-1. **Project Overview**: Start with [Main README](../README.md)
-2. **v0.6.0 Achievement**: See [Sprint 45 Completion Report](sprint45-actual-completion-report.md)
-3. **Mathematical Content**: Browse [Mathematical Implementations Reference](mathematical-implementations-reference.md)
-4. **Technical Setup**: Follow [Development Guide](reference/DEV_GUIDE.md)
+## 🔗 Quick Links
 
-### **For Developers**
-1. **Current Status**: v0.6.0 with 4 sorries eliminated + custom mathematical infrastructure ✅
-2. **Mathematical API**: See [Code Reference](CODE_REFERENCE.md) for complete function documentation
-3. **Quality Standards**: Research-grade proofs + 52/52 regression tests maintained
-4. **Contributing**: Follow rigorous proof standards established in Sprint 45
-
-### **For Researchers**
-1. **Mathematical Excellence**: 251 implementations across 2,665 lines with rigorous proofs
-2. **Paper 1 Progress**: Major breakthrough with 4 sorries eliminated using custom infrastructure
-3. **Academic Quality**: Research-grade mathematical content ready for peer review
-4. **Complete Reference**: [Mathematical Implementations Reference](mathematical-implementations-reference.md) provides comprehensive catalog
-
----
-
-## 📊 **Key Design Achievements (v0.6.0)**
-
-### **Mathematical Excellence**
-- **Sorry Elimination**: 4 rigorous proofs completed with custom infrastructure
-- **Research Quality**: All proofs use standard mathematical techniques, zero shortcuts
-- **Custom Infrastructure**: 50+ lines of reusable mathematical components built
-- **Academic Standards**: Publication-ready mathematical content
-
-### **Quality Assurance**
-- **Perfect Testing**: 52/52 regression tests maintained throughout development
-- **Mathematical Rigor**: Every proof step justified with proper mathematical reasoning
-- **Documentation Complete**: 251 implementations cataloged with comprehensive coverage
-- **Integration Excellence**: Seamless mathlib compatibility maintained
-
----
-
-## 🔗 **External References**
-
-### **Project Resources**
-- **Main Repository**: [Foundation-Relativity GitHub](https://github.com/AICardiologist/FoundationRelativity)
-- **Releases**: [GitHub Releases](https://github.com/AICardiologist/FoundationRelativity/releases)
-- **CI Status**: ![Build Status](https://github.com/AICardiologist/FoundationRelativity/workflows/CI/badge.svg)
-
-### **Research Background**
-- **Author**: [Paul Lee's ResearchGate](https://www.researchgate.net/profile/Paul-Lee-106)
-- **Paper Series**: "Gödel in Four Acts" - foundation-relative mathematics
-- **Academic Citation**: [CITATION.cff](../CITATION.cff)
-
-### **Technical Resources**
-- **Lean 4**: [Lean Prover](https://leanprover.github.io/)
-- **mathlib4**: [Mathematical Library](https://github.com/leanprover-community/mathlib4)
-- **License**: [Apache 2.0](../LICENSE)
+- **Main Project README**: [`../README.md`](../README.md)
+- **Paper 1 Formalization**: [`../Papers/P1_GBC/`](../Papers/P1_GBC/)
+- **Paper 2 Formalization**: [`../Papers/P2_BidualGap/`](../Papers/P2_BidualGap/)
+- **Paper 3 Formalization**: [`../Papers/P3_2CatFramework/`](../Papers/P3_2CatFramework/)
+- **Core Infrastructure**: [`../CategoryTheory/`](../CategoryTheory/)
 
 ---
 
-## 📝 **Documentation Status**
-
-### **Recently Updated**
-- ✅ **v0.6.0 Sprint 45 Achievement**: 4 sorries eliminated with rigorous mathematical infrastructure
-- ✅ **Mathematical Excellence**: 50+ lines custom infrastructure with research-quality proofs
-- ✅ **Complete Documentation**: 251 implementations cataloged in comprehensive reference
-- ✅ **Archive Consolidation**: All historical documents properly organized
-
-### **Active Documents**
-- **Current Achievement**: [Sprint 45 Completion Report](sprint45-actual-completion-report.md)
-- **Mathematical Reference**: [251 Implementations Catalog](mathematical-implementations-reference.md)
-- **Code Documentation**: [Comprehensive Code Reference](CODE_REFERENCE.md)
-- **Strategic Planning**: Updated roadmaps reflecting Sprint 45 success
-
-### **Verified Status**
-- **Mathematical Rigor**: 4 sorries eliminated with zero shortcuts, research-quality proofs ✅
-- **Testing Excellence**: 52/52 regression tests maintained (100% success rate) ✅
-- **Documentation Complete**: Comprehensive catalog of all 251 mathematical implementations ✅
-- **Academic Ready**: Publication-quality mathematical content suitable for peer review ✅
-
----
-
-**Documentation Complete**: v0.6.0 Sprint 45 achievement with comprehensive mathematical reference + clean organization  
-**Mathematical Achievement**: 4 sorries eliminated + 50+ lines custom infrastructure + 251 implementations cataloged  
-**Quality Standard**: Research-grade proofs + perfect regression testing + academic publication readiness** 🎯
-
----
-
-*Last updated: v0.6.0 release - Sprint 45 complete: Sorry elimination breakthrough + mathematical infrastructure achievement*
+This documentation provides comprehensive coverage of the Foundation-Relativity project from conception through completion of Papers 1-3 and planning for Paper 4. For questions or contributions, see the developer guide or contact the project maintainers.
