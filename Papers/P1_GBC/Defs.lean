@@ -92,8 +92,8 @@ def godelPseudoFunctor : Foundation → Type 1 :=
   foundationGodelCorrespondence
 
 /-- Naturality condition for Gödel correspondence -/
-theorem godel_naturality (F G : Foundation) (h : Interp F G) :
-    ∃ (f : foundationGodelCorrespondence F → foundationGodelCorrespondence G),
+theorem godel_naturality (F G : Foundation) (_h : Interp F G) :
+    ∃ (_f : foundationGodelCorrespondence F → foundationGodelCorrespondence G),
     True := 
 ⟨fun witness => {
   -- Map the enhanced witness structure along the foundation interpretation
@@ -112,11 +112,11 @@ theorem godel_naturality (F G : Foundation) (h : Interp F G) :
 /-! ### Auxiliary Lemmas (Placeholders) -/
 
 /-- Rank-one operators form a manageable class -/
-theorem rankOne_manageable (g : Sigma1Formula) : True :=
+theorem rankOne_manageable (_g : Sigma1Formula) : True :=
   trivial -- TODO Math-AI: Use finite-rank compactness
 
 /-- Fredholm alternative applies to Gödel operators -/
-theorem fredholm_alternative (g : Sigma1Formula) : True :=
+theorem fredholm_alternative (_g : Sigma1Formula) : True :=
   trivial -- TODO Math-AI: Apply standard Fredholm theory
 
 end Papers.P1_GBC.Defs

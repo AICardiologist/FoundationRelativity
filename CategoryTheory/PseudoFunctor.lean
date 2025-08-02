@@ -43,9 +43,9 @@ structure PseudoFunctor (C D : Type*) [Bicategory C] [Bicategory D] where
       map₂ (α ≫ β) = map₂ α ≫ map₂ β := by intros; aesop_cat
 
   /- Coherence conditions (pentagon and triangle) -/
-  pentagon : ∀ {A B C' D : C} {f : A ⟶ B} {g : B ⟶ C'} {h : C' ⟶ D},
+  pentagon : ∀ {A B C' D : C} {_f : A ⟶ B} {_g : B ⟶ C'} {_h : C' ⟶ D},
     True  -- TODO: actual pentagon law
-  triangle : ∀ {A B : C} {f : A ⟶ B},
+  triangle : ∀ {A B : C} {_f : A ⟶ B},
     True  -- TODO: actual triangle law
 
 /--  Identity pseudo‑functor (useful for smoke tests). -/
