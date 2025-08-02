@@ -45,6 +45,8 @@ open scoped ComplexConjugate BigOperators
 
 namespace Papers.P1_GBC
 
+open Polynomial
+
 open CategoryTheory
 open AnalyticPathologies
 
@@ -490,15 +492,211 @@ lemma P_g_isIdempotentElem : IsIdempotentElem (P_g (g:=g)) := by
   -- We've already proven P_g ∘L P_g = P_g
   exact P_g_is_projection
 
+/-- Auxiliary: e_g is nonzero -/
+lemma e_g_ne_zero (g : ℕ) : e_g (g:=g) ≠ 0 := by
+  intro h
+  have : e_g (g:=g) g = 0 := by rw [h]; rfl
+  rw [e_g_apply_self] at this
+  exact one_ne_zero this
+
+/-- Auxiliary: P_g has eigenvalue 1 (e_g is an eigenvector) -/
+lemma P_g_has_eigenvalue_one : Module.End.HasEigenvalue (P_g (g:=g).toLinearMap) 1 := by
+  rw [Module.End.hasEigenvalue_iff]
+  intro h
+  -- Show e_g is in the eigenspace
+  have : e_g (g:=g) ∈ Module.End.eigenspace (P_g (g:=g).toLinearMap) 1 := by
+    rw [Module.End.eigenspace_def, LinearMap.mem_ker]
+    simp only [LinearMap.sub_apply, LinearMap.smul_apply]
+    ext n
+    simp only [P_g_apply, ContinuousLinearMap.coe_coe]
+    by_cases hn : n = g
+    · subst hn
+      simp [e_g, lp.single_apply, Pi.single_eq_same, sub_self]
+    · simp [e_g, lp.single_apply]
+  -- But eigenspace is ⊥, contradiction
+  rw [h, Submodule.mem_bot] at this
+  exact e_g_ne_zero g this
+
+/-- Auxiliary: P_g has eigenvalue 0 -/
+lemma P_g_has_eigenvalue_zero : Module.End.HasEigenvalue (P_g (g:=g).toLinearMap) 0 := by
+  rw [Module.End.hasEigenvalue_iff]
+  intro h
+  -- Take e_{g+1} as an eigenvector
+  let v := e_g (g:=g+1)
+  have : v ∈ Module.End.eigenspace (P_g (g:=g).toLinearMap) 0 := by
+    rw [Module.End.eigenspace_def, LinearMap.mem_ker]
+    simp only [zero_smul, sub_zero]
+    ext n
+    simp only [P_g_apply, ContinuousLinearMap.coe_coe]
+    -- v g = 0 because g ≠ g+1
+    have hv_g : v g = 0 := by
+      simp only [v]
+      rw [e_g_apply_ne]
+      omega
+    simp [hv_g, lp.single_zero]
+  rw [h, Submodule.mem_bot] at this
+  exact e_g_ne_zero (g+1) this
+
 /-- **(B‑2)**  Spectrum of an idempotent, here the rank‑one projection `P_g`. -/
 lemma spectrum_projection_is_01 (g : ℕ) :
     spectrum ℂ (P_g (g:=g)) = {0, 1} := by
-  sorry -- Projection spectrum theorem: σ(P) = {0,1} for rank-one projection P
+  -- Use the general result for idempotent elements
+  -- Since P_g² = P_g, we know spectrum ⊆ {0, 1}
+  have h_subset : spectrum ℂ (P_g (g:=g)) ⊆ {0, 1} := by
+    exact P_g_isIdempotentElem.spectrum_subset ℂ
+  
+  -- P_g is not the zero operator
+  have h_ne_zero : P_g (g:=g) ≠ 0 := by
+    intro h
+    have : P_g (g:=g) (e_g (g:=g)) = 0 := by rw [h]; rfl
+    -- P_g(e_g) = e_g because P_g is projection onto span{e_g}
+    -- But we also have P_g(e_g) = 0, contradiction
+    have h1 : P_g (g:=g) (e_g (g:=g)) = e_g (g:=g) := by
+      ext n
+      simp only [P_g_apply, e_g]
+      by_cases hn : n = g
+      · subst hn
+        simp [lp.single_apply, Pi.single_eq_same]
+      · simp [lp.single_apply]
+    rw [this] at h1
+    exact e_g_ne_zero g h1.symm
+  
+  -- P_g is not the identity operator
+  have h_ne_one : P_g (g:=g) ≠ 1 := by
+    intro h
+    -- If P_g = 1, then P_g(e_{g+1}) = e_{g+1}
+    have : P_g (g:=g) (e_g (g:=g+1)) = e_g (g:=g+1) := by rw [h]; rfl
+    -- But P_g(e_{g+1}) = lp.single 2 g (e_{g+1} g) = lp.single 2 g 0 = 0
+    simp only [P_g_apply] at this
+    have h1 : e_g (g:=g+1) g = 0 := by
+      rw [e_g_apply_ne]; omega
+    rw [h1, lp.single_zero] at this
+    -- So e_{g+1} = 0, contradiction
+    exact e_g_ne_zero (g+1) this.symm
+  
+  -- Now we prove the reverse inclusion: {0, 1} ⊆ spectrum P_g
+  apply Set.eq_of_subset_of_subset h_subset
+  intro z
+  simp only [Set.mem_insert_iff, Set.mem_singleton_iff]
+  intro hz
+  cases hz with
+  | inl h => -- Case: z = 0
+    rw [h, spectrum.mem_iff]
+    -- Goal is to show (0•I - P_g) is not a unit
+    -- Simplify to: ¬ IsUnit P_g
+    simp only [map_zero, zero_sub, IsUnit.neg_iff]
+    intro h_unit_P
+    -- Since P_g is idempotent and a unit, P_g must be 1
+    have h_eq_one : P_g (g:=g) = 1 := by
+      have : IsIdempotentElem (P_g (g:=g)) ↔ P_g (g:=g) = 1 := 
+        IsIdempotentElem.iff_eq_one_of_isUnit h_unit_P
+      exact this.mp P_g_isIdempotentElem
+    -- Contradiction with P_g ≠ 1
+    exact h_ne_one h_eq_one
+    
+  | inr h => -- Case: z = 1
+    rw [h, spectrum.mem_iff]
+    -- Goal is to show (1•I - P_g) is not a unit
+    -- Simplify algebraMap 1 to the identity operator 1
+    simp only [Algebra.algebraMap_eq_smul_one, one_smul]
+    -- Goal: ¬ IsUnit (1 - P_g)
+    intro h_unit_one_sub_P
+    -- 1 - P_g is also idempotent
+    have h_idem_one_sub : IsIdempotentElem (1 - P_g (g:=g)) := P_g_isIdempotentElem.one_sub
+    -- Since (1 - P_g) is idempotent and a unit, it must be 1
+    have h_eq_one : 1 - P_g (g:=g) = 1 := by
+      have : IsIdempotentElem (1 - P_g (g:=g)) ↔ 1 - P_g (g:=g) = 1 := 
+        IsIdempotentElem.iff_eq_one_of_isUnit h_unit_one_sub_P
+      exact this.mp h_idem_one_sub
+    -- 1 - P_g = 1 implies P_g = 0
+    have h_eq_zero : P_g (g:=g) = 0 := by
+      -- From 1 - P_g = 1, we get P_g = 0
+      rw [sub_eq_iff_eq_add] at h_eq_one
+      simp at h_eq_one
+      exact h_eq_one
+    -- Contradiction with P_g ≠ 0
+    exact h_ne_zero h_eq_zero
 
 /-- **(B‑3)**  Spectrum of `1 - P_g` is also `{0, 1}`. -/
 @[simp] lemma spectrum_one_sub_Pg (g : ℕ) :
     spectrum ℂ (1 - P_g (g:=g)) = ({0,1} : Set ℂ) := by
-  sorry -- Elementary spectral mapping: σ(1-P) = {1-λ : λ ∈ σ(P)}
+  -- 1 - P_g is also idempotent, so its spectrum is a subset of {0, 1}
+  have h_idemp : IsIdempotentElem (1 - P_g (g:=g)) := by
+    have : IsIdempotentElem (P_g (g:=g)) := P_g_isIdempotentElem
+    exact this.one_sub
+  
+  have h_subset : spectrum ℂ (1 - P_g (g:=g)) ⊆ {0, 1} := by
+    exact h_idemp.spectrum_subset ℂ
+  
+  -- We'll show 1 - P_g ≠ 0 and 1 - P_g ≠ 1
+  -- 1 - P_g is not the zero operator
+  have h_ne_zero : 1 - P_g (g:=g) ≠ 0 := by
+    intro h
+    -- If 1 - P_g = 0, then P_g = 1
+    have : P_g (g:=g) = 1 := by
+      -- From 1 - P_g = 0, we get P_g = 1
+      rw [sub_eq_zero] at h
+      exact h.symm
+    -- But we proved P_g ≠ 1 in the previous lemma
+    have : P_g (g:=g) (e_g (g:=g+1)) = e_g (g:=g+1) := by rw [this]; rfl
+    simp only [P_g_apply] at this
+    have h1 : e_g (g:=g+1) g = 0 := by
+      rw [e_g_apply_ne]; omega
+    rw [h1, lp.single_zero] at this
+    exact e_g_ne_zero (g+1) this.symm
+  
+  -- 1 - P_g is not the identity operator
+  have h_ne_one : 1 - P_g (g:=g) ≠ 1 := by
+    intro h
+    -- If 1 - P_g = 1, then P_g = 0
+    have : P_g (g:=g) = 0 := by
+      -- From 1 - P_g = 1, we get P_g = 0
+      rw [sub_eq_iff_eq_add] at h
+      simp at h
+      exact h
+    -- But P_g(e_g) = e_g ≠ 0
+    have h1 : P_g (g:=g) (e_g (g:=g)) = 0 := by rw [this]; rfl
+    have h2 : P_g (g:=g) (e_g (g:=g)) = e_g (g:=g) := by
+      ext n
+      simp only [P_g_apply, e_g]
+      by_cases hn : n = g
+      · subst hn
+        simp [lp.single_apply, Pi.single_eq_same]
+      · simp [lp.single_apply]
+    rw [h1] at h2
+    exact e_g_ne_zero g h2.symm
+  
+  -- Now prove {0, 1} ⊆ spectrum(1 - P_g) using the same algebraic argument
+  apply Set.eq_of_subset_of_subset h_subset
+  intro z
+  simp only [Set.mem_insert_iff, Set.mem_singleton_iff]
+  intro hz
+  cases hz with
+  | inl h => -- Case: z = 0
+    rw [h, spectrum.mem_iff]
+    simp only [map_zero, zero_sub, IsUnit.neg_iff]
+    intro h_unit
+    -- If 1 - P_g is a unit and idempotent, then 1 - P_g = 1
+    have h_eq_one : 1 - P_g (g:=g) = 1 := by
+      have : IsIdempotentElem (1 - P_g (g:=g)) ↔ 1 - P_g (g:=g) = 1 := 
+        IsIdempotentElem.iff_eq_one_of_isUnit h_unit
+      exact this.mp h_idemp
+    exact h_ne_one h_eq_one
+    
+  | inr h => -- Case: z = 1
+    rw [h, spectrum.mem_iff]
+    simp only [Algebra.algebraMap_eq_smul_one, one_smul]
+    -- Goal: ¬ IsUnit (1 - (1 - P_g)) = ¬ IsUnit P_g
+    simp only [sub_sub_cancel]
+    intro h_unit_P
+    -- If P_g is a unit and idempotent, then P_g = 1
+    have h_eq_one : P_g (g:=g) = 1 := by
+      have : IsIdempotentElem (P_g (g:=g)) ↔ P_g (g:=g) = 1 := 
+        IsIdempotentElem.iff_eq_one_of_isUnit h_unit_P
+      exact this.mp P_g_isIdempotentElem
+    -- But this contradicts h_ne_zero (which shows P_g ≠ 1)
+    have : 1 - P_g (g:=g) = 0 := by simp [h_eq_one]
+    exact h_ne_zero this
 
 /-- **Complete description of `σ(G)`**.
 

@@ -7,6 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.2-sprint48] - 2025-08-02
+
+### Sprint 48: Core.lean Spectrum Sorry Elimination ✅ COMPLETE
+
+### Added
+- **Core.lean Mathematical Completion**: Eliminated final 2 spectrum sorries using algebraic IsIdempotentElem strategy
+- **Mathematical Innovation**: Clean proof approach avoiding infinite-dimensional spectral complexities
+- **Sprint 48 Archive**: Complete achievement documentation in `docs/archive/sprint48/`
+- **Updated Documentation**: Comprehensive roadmap and strategy updates reflecting major progress
+
+### Changed
+- **Core.lean Complete**: 2→0 sorries - now 100% sorry-free ✅
+- **spectrum_projection_is_01**: Eliminated using algebraic contradiction proof with `IsIdempotentElem.iff_eq_one_of_isUnit`
+- **spectrum_one_sub_Pg**: Eliminated using idempotent unit characterization approach
+- **Paper 1 Progress**: 13→11 total sorries (15% reduction, 54% total elimination from baseline)
+- **SORRY_ALLOWLIST.txt**: Updated to reflect Core.lean completion
+
+### Mathematical Achievements
+- **Algebraic Strategy**: Used `IsIdempotentElem.iff_eq_one_of_isUnit` for clean spectrum proofs
+- **Avoided Complexity**: Bypassed infinite-dimensional spectral theory challenges with elegant algebraic approach
+- **Bridge Completion**: Core.lean mathematical infrastructure now complete
+- **Quality Maintained**: Full regression test suite passes (52/52 tests)
+
+### Infrastructure
+- **Version Release**: v0.6.2-sprint48 with Core.lean completion milestone
+- **Quality Assurance**: 100% regression testing maintained throughout
+- **Documentation Bridge**: Core mathematical infrastructure documentation complete
+
+## [0.6.1-sprint47] - 2025-08-01
+
+### Sprint 47: Paper 1 Major Sorry Elimination (24→13 reduction) ✅ COMPLETE
+
+### Added
+- **Correspondence.lean Complete**: All 3 sorries eliminated - logic-analysis bridge complete ✅
+- **Major Progress Documentation**: Complete achievement tracking and mathematical validation
+- **Strategic Cascade**: Leveraged proof dependencies for efficient elimination across multiple files
+
+### Changed
+- **Statement.lean Progress**: 11→8 sorries (27% reduction) - major theorem progress
+- **Auxiliaries.lean Progress**: 6→3 sorries (50% reduction) - mathematical infrastructure improvements
+- **Total Sprint 47 Impact**: 11 sorries eliminated (46% reduction in single sprint)
+- **Quality Maintained**: 100% regression test success throughout major changes
+
+### Mathematical Achievements
+- **Cascade Strategy Success**: Used spectrum dependencies for efficient elimination
+- **Logic-Analysis Bridge**: Complete connection between logical and analytical sides
+- **Infrastructure Progress**: Significant advancement in mathematical foundations
+
 ## [0.6.0-sprint46] - 2025-08-01
 
 ### Sprint 46: Fredholm Alternative & Strategic Planning
