@@ -111,21 +111,9 @@ theorem godel_rho_degree (G : Sigma1Formula) :
 
 /-! ### Auxiliary Results -/
 
-/-- Uniqueness of the correspondence -/
-theorem correspondence_unique (G₁ G₂ : Sigma1Formula) :
-    godelNum G₁ ≠ godelNum G₂ → 
-    godelOperator G₁ ≠ godelOperator G₂ := by
-  intro h_ne
-  -- godelOperator G = G (g := godelNum G) by definition
-  -- If godelNum G₁ ≠ godelNum G₂, then G (g := godelNum G₁) ≠ G (g := godelNum G₂)
-  -- because they act differently on basis vectors
-  intro h_eq
-  -- Suppose godelOperator G₁ = godelOperator G₂
-  -- Then G (g := godelNum G₁) = G (g := godelNum G₂)
-  simp only [godelOperator] at h_eq
-  -- This would mean the operators are equal, but they differ on e_{godelNum G₁}
-  -- when c_G = true (one has it in kernel, other doesn't)
-  sorry -- TODO: This needs a more careful analysis of how G depends on g
+-- REMOVED: correspondence_unique was mathematically flawed
+-- When c_G = false (always true by incompleteness), all operators map to identity
+-- Making the correspondence non-injective
 
 /-- Functoriality with respect to foundations -/
 theorem godel_functorial (F G : Foundation) (h : Interp F G) :
@@ -161,19 +149,9 @@ lemma main_theorem_outline (G : Sigma1Formula) :
       -- Use the main theorem's reverse direction
       exact (godel_banach_main G).mpr h_surjective
 
-/-- Key technical lemma: Diagonal lemma implementation -/
-theorem diagonal_lemma_technical :
-    ∃ (D : Sigma1Formula), 
-    peanoArithmetic.provable D ↔ 
-    ¬peanoArithmetic.provable D := 
-  -- Use the Gödel sentence which by definition satisfies this property
-  -- The diagonal lemma constructs exactly such a formula
-  ⟨godelSentence peanoArithmetic, by
-    -- This is the defining property of the Gödel sentence
-    -- G ↔ "G is not provable"
-    -- For our placeholder proof theory, this requires proper incompleteness theory
-    sorry -- TODO: Implement proper diagonal lemma using Gödel numbering
-  ⟩
+-- REMOVED: diagonal_lemma_technical was mathematically problematic
+-- The diagonal lemma produces G ↔ ¬Provable(G), not G ↔ ¬G
+-- This will be axiomatized in LogicAxioms.lean instead
 
 /-- Key technical lemma: Fredholm characterization -/
 theorem fredholm_characterization (G : Sigma1Formula) :

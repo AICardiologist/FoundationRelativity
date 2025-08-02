@@ -36,12 +36,9 @@ lemma finiteDimensional_ker_of_finiteDimRange {E F : Type*} [NormedAddCommGroup 
   -- Since E is finite-dimensional and ker f is a submodule of E, it's finite-dimensional
   infer_instance
 
-/-- Finite dimensional range implies finite rank -/
-lemma finiteDimensional_of_finiteRankRange {E F : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    [NormedAddCommGroup F] [NormedSpace ℂ F] (f : E →L[ℂ] F) : FiniteDimensional ℂ (LinearMap.range f.toLinearMap) := by
-  -- This lemma as stated is too general - not all operators have finite-dimensional range
-  -- For P_g specifically, it's rank-one so has 1-dimensional range
-  sorry -- This needs hypotheses - not all operators have finite-dimensional range
+-- REMOVED: finiteDimensional_of_finiteRankRange was too general
+-- Not all operators have finite-dimensional range
+-- For specific operators like P_g, use P_g_rank_one from Core.lean instead
 
 /-! ### Pullback auxiliaries -/
 
@@ -70,13 +67,9 @@ lemma pullback_isometry_of_surjective {X Y : Type*} [NormedAddCommGroup X] [Norm
 
 /-! ### Fredholm auxiliaries -/
 
-/-- Corrected: Compact operator with spectrum {1} only is surjective -/
-lemma surjective_of_compact_and_singleton_spectrum {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (T : E →L[ℂ] E) (hComp : IsCompactOperator T) (hSpec : spectrum ℂ T = {1}) :
-    Function.Surjective T := by
-  -- When spectrum = {1}, T - I is not invertible, but T itself can be surjective
-  -- This requires advanced spectral theory for compact operators
-  sorry -- TODO: Prove using spectral theory for compact operators
+-- REMOVED: surjective_of_compact_and_singleton_spectrum was impossible
+-- In infinite-dimensional spaces, compact operators must have 0 in spectrum
+-- So spectrum = {1} is impossible for compact operators
 
 /-- Corrected: P_g (the perturbation) is compact, not G itself -/
 lemma perturbation_P_g_is_compact (g : ℕ) :

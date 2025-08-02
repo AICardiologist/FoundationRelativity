@@ -1,4 +1,5 @@
 import Mathlib.Tactic
+import Mathlib.Logic.Basic
 
 /-!
 # Arithmetic Layer for Gödel-Banach Correspondence
@@ -36,7 +37,8 @@ opaque Provable : Sigma1 → Prop
 /-- Consistency axiom: PA cannot prove False -/
 axiom Provable_sound : ¬ Provable Sigma1.False
 
-/-- The Boolean flag fed to the operator. -/
+/-- The Boolean flag fed to the operator.
+Using Classical logic as recommended by Math-AI for Phase 1. -/
 noncomputable def c_G : Bool := by
   classical
   exact decide (Provable G_formula)

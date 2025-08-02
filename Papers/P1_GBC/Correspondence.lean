@@ -9,6 +9,7 @@ for the rank‑one operator `G` introduced in `Core.lean`.
 import Papers.P1_GBC.Core
 import Papers.P1_GBC.Defs
 import Papers.P1_GBC.Statement
+import Papers.P1_GBC.LogicAxioms
 import Logic.Reflection
 
 namespace Papers.P1_GBC
@@ -25,10 +26,24 @@ theorem consistency_iff_G :
     unfold consistencyPredicate GödelSentenceTrue
     -- Both sides are equivalent to c_G = false
     have h1 : consistencyPredicate peanoArithmetic ↔ (c_G = false) := by
-      -- This equivalence is a deep mathematical fact requiring Gödel's incompleteness theorems
-      -- The axiom consistency_from_unprovability gives us one direction
-      -- The other direction requires the second incompleteness theorem
-      sorry -- TODO: This requires axiomatizing Gödel's second incompleteness theorem
+      -- Use the axiomatized consistency characterization from LogicAxioms
+      constructor
+      · -- consistency → c_G = false
+        intro h_cons
+        -- By consistency_characterization: consistency ↔ ¬Provable G_formula
+        have h_not_prov : ¬Arithmetic.Provable Arithmetic.G_formula := 
+          LogicAxioms.consistency_characterization.mp h_cons
+        -- By definition: c_G = decide (Provable G_formula)
+        simp only [c_G, Arithmetic.c_G]
+        exact decide_eq_false_iff_not.mpr h_not_prov
+      · -- c_G = false → consistency
+        intro h_cG_false
+        -- By definition: c_G = false means ¬Provable G_formula
+        have h_not_prov : ¬Arithmetic.Provable Arithmetic.G_formula := by
+          simp only [c_G, Arithmetic.c_G] at h_cG_false
+          exact decide_eq_false_iff_not.mp h_cG_false
+        -- By consistency_characterization: ¬Provable G_formula → consistency
+        exact LogicAxioms.consistency_characterization.mpr h_not_prov
     have h2 : GödelSentenceTrue ↔ (c_G = false) := by
       exact reflection_equiv.symm
     exact h1.trans h2.symm
