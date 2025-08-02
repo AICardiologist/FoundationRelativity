@@ -60,7 +60,7 @@ theorem surjectivity_implies_consistency :
     consistencyPredicate peanoArithmetic := by
   intro h_surj
   -- Use the main theorem to get the reverse direction
-  exact godel_banach_main.mpr h_surj origin/main
+  exact godel_banach_main.mpr h_surj
 
 /-! ### Foundation-Relativity Results -/
 
