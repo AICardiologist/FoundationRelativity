@@ -52,6 +52,7 @@ lake build Papers.PseudoFunctorInstances > /dev/null 2>&1 || true
 lake build Papers.P1_GBC.Core > /dev/null 2>&1 || true
 lake build Papers.P2_BidualGap.Basic > /dev/null 2>&1 || true
 lake build Papers.P3_2CatFramework.Basic > /dev/null 2>&1 || true
+lake build Papers.P4_SpectralGeometry > /dev/null 2>&1 || true
 
 # Logic modules
 lake build Logic.ProofTheoryAxioms Logic.Reflection > /dev/null 2>&1 || true
@@ -269,7 +270,24 @@ test_import "Papers.P1_GBC.Core"
 test_import "Papers.P2_BidualGap.Basic"
 # KNOWN FAILING TEST: P3 Basic has Foundation import errors - needs fixing
 test_import "Papers.P3_2CatFramework.Basic"
+test_import "Papers.P4_SpectralGeometry"
 test_theorem "BidualGap" "import Papers.P2_BidualGap.Basic" "open Papers.P2"
+
+# Test Paper 4 specific components
+echo
+echo -e "${BLUE}Phase 7b: Paper 4 Neck Scaling${NC}"
+echo "--------------------------------"
+test_import "Papers.P4_SpectralGeometry.Geometry.Neck"
+test_import "Papers.P4_SpectralGeometry.Spectral.Variational"
+test_import "Papers.P4_SpectralGeometry.Spectral.NeckScaling"
+test_import "Papers.P4_SpectralGeometry.Logic.ConPA_bridge"
+
+# Test key theorems and definitions from Paper 4
+test_theorem "NeckTorus" "import Papers.P4_SpectralGeometry.Geometry.Neck" "open P4_SpectralGeometry"
+test_theorem "lambda_1_neck" "import Papers.P4_SpectralGeometry.Spectral.Variational" "open P4_SpectralGeometry"
+test_theorem "neck_scaling" "import Papers.P4_SpectralGeometry.Spectral.NeckScaling" "open P4_SpectralGeometry"
+test_theorem "spectral_gap_undecidable" "import Papers.P4_SpectralGeometry.Logic.ConPA_bridge" "open P4_SpectralGeometry"
+test_theorem "spectral_gap_consistency" "import Papers.P4_SpectralGeometry.Logic.ConPA_bridge" "open P4_SpectralGeometry"
 echo
 
 echo -e "${BLUE}Phase 8: Mathematical Operators and Structures${NC}"
