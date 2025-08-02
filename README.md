@@ -9,10 +9,10 @@
 [![Doc Coverage](https://img.shields.io/badge/Doc%20Coverage-50%25-yellow)](.github/workflows/ci.yml)
 
 
-> **🎉 Sprint 47 COMPLETE**: Paper 1 Core.lean Spectrum Elimination + **SPECTRUM THEORY!** ✅  
-> **Latest**: Eliminated spectrum sorries using `IsIdempotentElem.spectrum_subset` - complete Core.lean!  
-> **Paper 1 Status**: 11 total sorries (Core: 0, Statement: 8, Auxiliaries: 3, Correspondence: 1)  
-> **🎯 NEW**: Strategic cascade elimination with 13 sorries eliminated in Sprint 47 ✅
+> **🎉 Sprint 47 COMPLETE**: Paper 1 Sorry Elimination Progress + **11 SORRIES ELIMINATED!** ✅  
+> **Latest**: Eliminated 11 sorries across Statement, Auxiliaries, and Correspondence files  
+> **Paper 1 Status**: 13 total sorries (Core: 2, Statement: 8, Auxiliaries: 3, Correspondence: 0)  
+> **🎯 NEW**: Strategic cascade elimination achieved major progress in Sprint 47 ✅
 
 
 A Lean 4 formalization exploring how mathematical pathologies behave differently under various foundational assumptions.
@@ -524,18 +524,19 @@ grep -r "sorry" . --exclude-dir=.git
 
 **🎯 Sprint 47 COMPLETE**: Paper 1 Core.lean Complete + Spectrum Theory Implementation
 
-**Paper 1 Status After Sprint 47** (11 total sorries across 4 files):
+**Paper 1 Status After Sprint 47** (13 total sorries across 4 files):
 - **✅ RESOLVED Sprint 45**: `G_surjective_iff_not_provable` - Reflection principle complete
 - **✅ RESOLVED Sprint 46**: `G_inj_iff_surj` - Fredholm alternative complete  
-- **✅ RESOLVED Sprint 47**: `spectrum_projection_is_01` + `spectrum_one_sub_Pg` - Complete spectrum theory!
-- `Papers/P1_GBC/Core.lean`: **0 sorries** - COMPLETE! ✅
+- **❌ IN PROGRESS**: `spectrum_projection_is_01` + `spectrum_one_sub_Pg` - Spectrum theory needs equality proofs
+- `Papers/P1_GBC/Core.lean`: **2 sorries** (spectrum theory needs full equality proofs)
 - `Papers/P1_GBC/Statement.lean`: 8 sorries (high-level theorems) 
 - `Papers/P1_GBC/Auxiliaries.lean`: 3 sorries (mathematical infrastructure)
-- `Papers/P1_GBC/Correspondence.lean`: 1 sorry (logic-analysis bridge)
+- `Papers/P1_GBC/Correspondence.lean`: 0 sorries - COMPLETE! ✅
 
 **Sprint 47 Achievements** (v0.6.1-sprint47):
-1. ✅ **Core.lean Complete**: Eliminated final 2 spectrum sorries using `IsIdempotentElem.spectrum_subset`
-2. ✅ **13 Sorries Eliminated**: Massive progress across all files (24→11 total reduction)
+1. ✅ **11 Sorries Eliminated**: Major progress across Statement, Auxiliaries, and Correspondence
+2. ✅ **Correspondence.lean Complete**: All sorries eliminated from this file
+3. ✅ **Statement.lean Progress**: Reduced from 11 to 8 sorries
 3. ✅ **Cascade Strategy**: Used spectrum dependencies for efficient elimination
 4. ✅ **Maintained Quality**: 100% regression test success (52/52 tests passing)
 

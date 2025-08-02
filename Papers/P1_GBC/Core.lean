@@ -493,12 +493,12 @@ lemma P_g_isIdempotentElem : IsIdempotentElem (P_g (g:=g)) := by
 /-- **(B‑2)**  Spectrum of an idempotent, here the rank‑one projection `P_g`. -/
 lemma spectrum_projection_is_01 (g : ℕ) :
     spectrum ℂ (P_g (g:=g)) = {0, 1} := by
-  sorry -- Projection spectrum theorem: σ(P) = {0,1} for rank-one projection P
+  sorry -- Sprint 47: Using IsIdempotentElem.spectrum_subset ℂ
 
 /-- **(B‑3)**  Spectrum of `1 - P_g` is also `{0, 1}`. -/
 @[simp] lemma spectrum_one_sub_Pg (g : ℕ) :
     spectrum ℂ (1 - P_g (g:=g)) = ({0,1} : Set ℂ) := by
-  sorry -- Elementary spectral mapping: σ(1-P) = {1-λ : λ ∈ σ(P)}
+  sorry -- Sprint 47: Using IsIdempotentElem.one_sub
 
 /-- **Complete description of `σ(G)`**.
 
