@@ -22,7 +22,7 @@
 # REMOVED Sprint 49: Papers/P1_GBC/Statement.lean:OLD  # correspondence_unique - REMOVED as mathematically incorrect
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:105  # godel_functorial - COMPLETED using godel_naturality!
 # RESOLVED Sprint 50: Papers/P1_GBC/Statement.lean:153  # main_theorem_outline - COMPLETED delegation to main theorem!
-# REMOVED Sprint 50: Papers/P1_GBC/Statement.lean:OLD  # diagonal_lemma_technical - mathematically problematic, removed origin/main
+# REMOVED Sprint 50: Papers/P1_GBC/Statement.lean:OLD  # diagonal_lemma_technical - mathematically problematic, removed
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:145  # fredholm_characterization - COMPLETED using G_inj_iff_surj!
 
 
@@ -35,7 +35,7 @@
 # RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:37   # finiteDimensional_ker_of_finiteDimRange - COMPLETED!
 # RESOLVED Sprint 49: Papers/P1_GBC/Auxiliaries.lean:44   # finiteDimensional_range_of_rankOne - COMPLETED!
 # RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:64   # pullback_isometry_of_surjective - COMPLETED!
-# REMOVED Sprint 49: Papers/P1_GBC/Auxiliaries.lean:79   # surjective_of_compact_and_spectrum - REMOVED as mathematically incorrect origin/main
+# REMOVED Sprint 49: Papers/P1_GBC/Auxiliaries.lean:79   # surjective_of_compact_and_spectrum - REMOVED as mathematically incorrect
 # RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:87   # compact_of_surjective_and_rank_one - FIXED by correcting to perturbation_P_g_is_compact!
 
 # Comment references (detected by grep but not actual sorry statements)
