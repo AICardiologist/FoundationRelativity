@@ -61,7 +61,7 @@ lemma finiteDimensional_range_of_rankOne {E F : Type*} [NormedAddCommGroup E] [N
     exact Set.finite_singleton v
   -- A subspace of a finite dimensional space is finite dimensional
   -- We use that range(f) ≤ span{v} and span{v} is finite dimensional
-  exact Submodule.finiteDimensional_of_le h_range
+  exact Submodule.finiteDimensional_of_le h_range origin/main
 
 /-! ### Pullback auxiliaries -/
 
@@ -92,7 +92,7 @@ lemma pullback_isometry_of_surjective {X Y : Type*} [NormedAddCommGroup X] [Norm
 
 -- REMOVED: surjective_of_compact_and_singleton_spectrum was based on an incorrect 
 -- mathematical statement. For compact operators on infinite-dimensional spaces, 
--- 1 ∈ spectrum typically means the operator is NOT surjective.
+-- 1 ∈ spectrum typically means the operator is NOT surjective. origin/main
 
 /-- Corrected: P_g (the perturbation) is compact, not G itself -/
 lemma perturbation_P_g_is_compact (g : ℕ) :
