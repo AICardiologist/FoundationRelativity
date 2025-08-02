@@ -73,42 +73,26 @@ theorem foundation_relative_correspondence (G : Sigma1Formula) :
   constructor
   · -- BISH case: No witnesses exist
     intro h_bish
+    rw [h_bish]
+    -- We want to show: ¬∃ (w : foundationGodelCorrespondence Foundation.bish), True
+    -- Assume such a witness exists for contradiction
     intro ⟨w, _⟩
-    -- In BISH foundation, the enhanced witness structure fails to exist
-    -- This follows the standard Foundation-Relativity pattern from Papers 2&3
-    rw [h_bish] at w
     
-    -- The witness w contains a GodelWitness which asserts surjectivity of some Gödel operator
-    -- By our correspondence theorem: surjectivity ↔ consistency ↔ ¬Provable(G_formula)
-    -- This requires classical logic to establish (via Gödel's incompleteness theorems)
+    -- By the necessity axiom, if a witness exists in BISH, then BISH must have Σ₁-EM
+    have h_bish_has_EM : LogicAxioms.HasSigma1EM Foundation.bish := by
+      apply LogicAxioms.GodelBanach_Requires_Sigma1EM Foundation.bish
+      use w
     
-    -- The key insight: BISH cannot support the diagonal lemma needed for Gödel's construction
-    -- The axiom classical_logic_requirement captures this limitation
-    
-    -- Rather than attempting a direct proof (which would require formalizing the
-    -- internals of BISH's proof theory), we rely on the axiomatized fact that
-    -- BISH cannot support formulas with the diagonal property G ↔ ¬Provable(G)
-    
-    sorry -- AXIOMATIZED: Use LogicAxioms.classical_logic_requirement
-           -- The existence of witness w in BISH leads to contradiction
-           -- because it would imply BISH supports the diagonal lemma
+    -- But this contradicts the axiom that BISH lacks Σ₁-EM
+    exact LogicAxioms.BISH_lacks_Sigma1EM h_bish_has_EM
   · -- ZFC case: Witnesses exist  
     intro h_zfc
-    -- In ZFC foundation, we can construct the enhanced witness
-    -- using classical logic and the axiom of choice
     rw [h_zfc]
-    -- Construct the witness explicitly
-    let witness : foundationGodelCorrespondence Foundation.zfc := ⟨
-      -- Base GodelWitness structure
-      { formula := G
-        operator := godelOperator G  
-        surjectivity := Function.Surjective (godelOperator G).toLinearMap },
-      -- Proof theory component  
-      peanoArithmetic,
-      -- Correspondence map
-      canonicalCorrespondence
-    ⟩
-    exact ⟨witness, trivial⟩
+    -- ZFC has the required logical principle (Σ₁-EM)
+    have h_zfc_has_EM : LogicAxioms.HasSigma1EM Foundation.zfc := 
+      LogicAxioms.ZFC_has_Sigma1EM
+    -- By the sufficiency axiom, the construction succeeds
+    exact LogicAxioms.Sigma1EM_Sufficient_for_GodelBanach Foundation.zfc h_zfc_has_EM
 
 /-- Integration with ρ-degree hierarchy -/
 theorem godel_rho_degree (_ : Sigma1Formula) :
