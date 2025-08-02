@@ -39,7 +39,7 @@ axiom neck_scaling (h : ℚ) (hh : 0 < h) :
 /-- Concrete evaluation example -/
 example : (1/400 : ℝ) ≤ lambda_1_neck (1/10) ∧ lambda_1_neck (1/10) ≤ 1/20 := by
   have := neck_scaling (1/10) (by norm_num : (0 : ℚ) < 1/10)
-  simp only [one_div, div_pow] at this
+  simp only [div_pow] at this
   norm_num at this ⊢
   exact this
 

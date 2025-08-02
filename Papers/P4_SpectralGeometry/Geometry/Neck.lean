@@ -55,8 +55,8 @@ noncomputable instance (h : ℝ) (hh : 0 < h) : MetricSpace (NeckTorus h) where
     intro p q
     simp [neckMetric]
     by_cases heq : p = q
-    · simp [heq, eq_comm]
-    · simp [heq, eq_comm]
+    · simp [heq]
+    · simp [heq]
   dist_triangle := by
     intro p q r
     sorry -- Simplified implementation
