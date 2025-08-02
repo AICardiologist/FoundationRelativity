@@ -89,26 +89,38 @@ This document shows how the four "Gödel in Four Acts" research papers translate
 
 **Current Status**: Complete implementation with all ρ-levels 3-4 verified
 
-### **Paper 1: Gödel-Banach Correspondence** 🟡 **MAJOR PROGRESS (Sprint 45 Complete)**
+### **Paper 1: Gödel-Banach Correspondence** 🟡 **SPRINT 46 IN PROGRESS**
 
-**Mathematical Infrastructure**: Complete with 4 sorries eliminated and custom proof infrastructure
+**Mathematical Infrastructure**: 23 total sorries across 4 files (was 24+)
 
-**Current Status (v0.6.0):**
+**Current Status (v0.6.0-sprint46):**
 
-| Section | Mathematical Implementation | Status | Sprint 45 Achievement |
-|---------|---------------------------|--------|----------------------|
-| **Core Infrastructure** | L2Space, Sigma1Formula, Gödel numbering | ✅ Complete | Foundation established |
-| **Projection Operators** | P_g rank-one projection with full properties | ✅ Complete | **P_g_compact eliminated** ✅ |
-| **Gödel Operator** | G = I - c_G·P_g with spectrum theory | 🟡 **6/10 sorries** | **Major progress** - custom infrastructure |
-| **Correspondence Theorem** | Main equivalence chain proven | ✅ Complete | **godel_banach_correspondence eliminated** ✅ |
-| **Spectrum Theory** | Identity operator spectrum computed | ✅ Complete | **spectrum_one eliminated** ✅ |
-| **Continuity Results** | Basis construction continuity | ✅ Complete | **continuous_single_coord eliminated** ✅ |
+| File | Sorry Count | Sprint 46 Progress | Description |
+|------|-------------|-------------------|-------------|
+| **Core.lean** | 2 (was 4) | G_inj_iff_surj ✅ | Spectrum theory remaining |
+| **Statement.lean** | 11 | Not started | High-level theorems |
+| **Auxiliaries.lean** | 7 | Not started | Mathematical infrastructure |
+| **Correspondence.lean** | 3 | Not started | Logic-analysis bridge |
 
-**Sprint 45 Mathematical Achievements:**
-- **4 rigorous proofs** completed with 50+ lines of custom infrastructure
-- **Zero mathematical shortcuts** - all proofs use standard techniques
-- **Complete spectrum computation** for identity operator using unit analysis
-- **Main correspondence theorem** proven with equivalence chain methodology
+**Sprint 46-51 Strategic Plan (Phases 1-4):**
+
+**Phase 1**: Auxiliaries.lean standard results (Sprint 46-47)
+- Lines 37, 64, 72: Easy mathlib gaps
+- Lines 43, 81: Medium operator theory
+- Lines 51, 57: Technical refactoring
+
+**Phase 2**: Core.lean spectrum (Sprint 46)
+- Line 515: σ(P) = {0,1} for projections
+- Line 527: Spectral mapping application
+
+**Phase 3**: Correspondence.lean bridge (Sprint 48)
+- Connect consistency predicate to c_G
+- Complete Fredholm analysis
+
+**Phase 4**: Statement.lean theorems (Sprint 49-51)
+- Main theorem + key lemmas
+- Framework integration
+- Advanced diagonal lemmas
 
 ### **Paper 1: Gödel-Banach** 🟡 **S41-S42 TARGET**
 

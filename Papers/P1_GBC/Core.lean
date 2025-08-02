@@ -6,6 +6,7 @@ import Mathlib.Topology.Algebra.Module.LinearMapPiProd
 import Mathlib.Topology.MetricSpace.ProperSpace
 import Mathlib.Analysis.Normed.Lp.lpSpace
 import Mathlib.Analysis.Normed.Operator.Compact
+import Mathlib.FieldTheory.IsAlgClosed.Spectrum
 import CategoryTheory.PseudoFunctor
 import CategoryTheory.BicatFound
 import AnalyticPathologies.HilbertSetup
@@ -482,49 +483,172 @@ lemma isUnit_smul_one {c : ℂ} (hc : c ≠ 0) :
     simp only [Algebra.algebraMap_eq_smul_one, one_smul, sub_self]
     exact not_isUnit_zero
 
+/-- Helper: P_g is an idempotent element -/
+lemma P_g_isIdempotentElem : IsIdempotentElem (P_g (g:=g)) := by
+  -- IsIdempotentElem means P_g * P_g = P_g
+  rw [IsIdempotentElem]
+  -- We've already proven P_g ∘L P_g = P_g
+  exact P_g_is_projection
+
 /-- **(B‑2)**  Spectrum of an idempotent, here the rank‑one projection `P_g`. -/
 lemma spectrum_projection_is_01 (g : ℕ) :
     spectrum ℂ (P_g (g:=g)) = {0, 1} := by
-  -- For an idempotent operator P (where P² = P), the spectrum is {0, 1}
-  -- Key insight: If P² = P, then P(P - I) = 0, so the minimal polynomial divides λ(λ-1)
-  -- Therefore eigenvalues can only be 0 or 1
-  
-  -- First, let's establish that P_g has eigenvalue 1 with eigenvector e_g
-  have h_eigen_1 : P_g (g:=g) (e_g (g:=g)) = 1 • e_g (g:=g) := by
-    simp [P_g, e_g]
-  
-  -- And P_g has eigenvalue 0 for vectors orthogonal to e_g
-  -- Since P_g is a rank-one projection onto span{e_g}, its kernel is the orthogonal complement
-  have h_eigen_0 : ∃ v : L2Space, v ≠ 0 ∧ P_g (g:=g) v = 0 := by
-    use e_g (g:=g+1)
-    constructor
-    · -- e_{g+1} ≠ 0
-      intro h_contra
-      have : (e_g (g:=g+1)) (g+1) = 0 := by rw [h_contra]; rfl
-      simp [e_g, lp.single_apply] at this
-    · -- P_g(e_{g+1}) = 0 since P_g only extracts the g-th coordinate
-      simp [P_g, e_g]
-  
-  -- The spectrum of a projection is {0, 1} if it's non-trivial
-  -- For P_g, we know it's a non-zero projection (rank 1)
-  -- and it's not the identity (since P_g(e_{g+1}) = 0)
-  
-  -- This standard result requires spectral theory for idempotent operators:
-  -- If P² = P, then (P - λI) is invertible for λ ∉ {0, 1}
-  -- with inverse: (P - λI)⁻¹ = (1/(λ(1-λ)))P - (1/λ)I
-  sorry -- Requires spectral theory for idempotent operators not yet in mathlib
+  ext z
+  simp only [Set.mem_insert_iff, Set.mem_singleton_iff, spectrum.mem_iff]
+  constructor
+  · -- Forward: if z ∈ σ(P_g), then z = 0 or z = 1
+    intro h_in_spectrum
+    -- Step 1: `σ(P_g) ⊆ {0,1}` comes straight from the library
+    have h_subset : spectrum ℂ (P_g (g:=g)) ⊆ ({0,1} : Set ℂ) := 
+      P_g_isIdempotentElem.spectrum_subset ℂ
+    -- Apply the subset to our z
+    exact h_subset h_in_spectrum
+  · -- Backward: if z = 0 or z = 1, then z ∈ σ(P_g)
+    intro h_or
+    cases' h_or with h_zero h_one
+    · -- Case z = 0: show 0-(1-P) = -(1-P) is not a unit
+      rw [h_zero]
+      -- algebraMap ℂ _ 0 - P_g = -P_g
+      simp only [map_zero, zero_sub]
+      intro h_unit
+      have h_ker_ne : ∃ x ≠ 0, P_g (g:=g) x = 0 := by
+        let x : L2Space := lp.single 2 (g+1) (1 : ℂ)
+        use x
+        constructor
+        · intro h_eq_zero
+          have : x (g+1) = 0 := by rw [h_eq_zero]; rfl
+          rw [lp.single_apply] at this
+          simp at this
+        · simp only [P_g_apply]
+          -- P_g x = lp.single 2 g (x g) = lp.single 2 g 0 = 0
+          -- because x = lp.single 2 (g+1) 1, so x g = 0
+          have x_g_eq : x g = 0 := by
+            -- x = lp.single 2 (g+1) 1
+            -- x g = (lp.single 2 (g+1) 1) g = if g = g+1 then 1 else 0 = 0
+            rw [lp.single_apply]
+            have : g ≠ g + 1 := Nat.ne_of_lt (Nat.lt_succ_self g)
+            simp [Ne.symm this]
+          rw [x_g_eq]
+          simp
+      obtain ⟨x, hx_ne, hx_ker⟩ := h_ker_ne
+      have h_inj : Function.Injective (P_g (g:=g)) := by
+        -- If P_g is a unit, it's injective
+        intro x y hxy
+        have ⟨u, hu⟩ := h_unit
+        have h_inv : ∃ P_inv, P_inv * P_g (g:=g) = 1 := by
+          use u.inv
+          rw [← hu]
+          exact u.inv_val
+        obtain ⟨P_inv, h_left_inv⟩ := h_inv
+        have : P_inv (P_g (g:=g) x) = P_inv (P_g (g:=g) y) := by rw [hxy]
+        calc x = (1 : L2Space →L[ℂ] L2Space) x := by simp
+        _ = (P_inv * P_g (g:=g)) x := by rw [← h_left_inv]
+        _ = P_inv (P_g (g:=g) x) := by simp only [ContinuousLinearMap.mul_apply]
+        _ = P_inv (P_g (g:=g) y) := this
+        _ = (P_inv * P_g (g:=g)) y := by simp only [ContinuousLinearMap.mul_apply]
+        _ = (1 : L2Space →L[ℂ] L2Space) y := by rw [h_left_inv]
+        _ = y := by simp
+      have : x = 0 := by
+        apply h_inj
+        rw [hx_ker]
+        simp
+      exact hx_ne this
+    · -- Case z = 1: show 1-P is not a unit
+      rw [h_one]
+      -- algebraMap ℂ _ 1 - P_g = 1 - P_g
+      simp only [map_one, sub_sub_cancel]
+      -- Show that P_g is not a unit
+      intro h_unit
+      have h_eg_ne : e_g (g:=g) ≠ 0 := by
+        intro h_eq
+        have : e_g (g:=g) g = 0 := by rw [h_eq]; rfl
+        rw [e_g_apply_self] at this
+        exact one_ne_zero this
+      -- If 1-P_g were a unit, kernel would be trivial
+      have h_inj : Function.Injective ((1 : L2Space →L[ℂ] L2Space) - P_g (g:=g)) := by
+        -- If 1-P_g is a unit, it's injective
+        intro x y hxy
+        have ⟨u, hu⟩ := h_unit
+        -- hu says ↑u = (algebraMap ℂ _) 1 - P_g = 1 - P_g
+        have hu' : (↑u : L2Space →L[ℂ] L2Space) = (1 : L2Space →L[ℂ] L2Space) - P_g (g:=g) := by
+          convert hu
+          simp only [map_one]
+        have h_inv : ∃ Q_inv, Q_inv * ((1 : L2Space →L[ℂ] L2Space) - P_g (g:=g)) = 1 := by
+          use u.inv
+          rw [← hu']
+          exact u.inv_val
+        obtain ⟨Q_inv, h_left_inv⟩ := h_inv
+        have : Q_inv (((1 : L2Space →L[ℂ] L2Space) - P_g (g:=g)) x) = Q_inv (((1 : L2Space →L[ℂ] L2Space) - P_g (g:=g)) y) := by rw [hxy]
+        calc x = (1 : L2Space →L[ℂ] L2Space) x := by simp
+        _ = (Q_inv * ((1 : L2Space →L[ℂ] L2Space) - P_g (g:=g))) x := by 
+          conv_lhs => rw [← h_left_inv]
+        _ = Q_inv (((1 : L2Space →L[ℂ] L2Space) - P_g (g:=g)) x) := by simp only [ContinuousLinearMap.mul_apply]
+        _ = Q_inv (((1 : L2Space →L[ℂ] L2Space) - P_g (g:=g)) y) := this
+        _ = (Q_inv * ((1 : L2Space →L[ℂ] L2Space) - P_g (g:=g))) y := by simp only [ContinuousLinearMap.mul_apply]
+        _ = (1 : L2Space →L[ℂ] L2Space) y := by rw [h_left_inv]
+        _ = y := by simp
+      have h_ker : ((1 : L2Space →L[ℂ] L2Space) - P_g (g:=g)) (e_g (g:=g)) = 0 := by
+        simp only [ContinuousLinearMap.sub_apply, ContinuousLinearMap.one_apply]
+        rw [P_g_apply_e_g]
+        simp
+      have : e_g (g:=g) = 0 := by
+        apply h_inj
+        rw [h_ker]
+        simp
+      exact h_eg_ne this
 
 /-- **(B‑3)**  Spectrum of `1 - P_g` is also `{0, 1}`. -/
 @[simp] lemma spectrum_one_sub_Pg (g : ℕ) :
     spectrum ℂ (1 - P_g (g:=g)) = ({0,1} : Set ℂ) := by
-  -- If P is a projection with σ(P) = {0,1}, then σ(I - P) = {0,1}
-  -- This follows from the spectral mapping theorem for polynomials:
-  -- σ(f(T)) = f(σ(T)) for polynomial f
-  -- Here f(λ) = 1 - λ maps {0,1} to {1,0} = {0,1}
+  -- Since 1 - P_g is also idempotent (as P_g is), we can use the same approach
+  -- First establish that (1 - P_g) is idempotent
+  have h_idem : IsIdempotentElem ((1 : L2Space →L[ℂ] L2Space) - P_g (g:=g)) := by
+    rw [IsIdempotentElem]
+    -- (1 - P_g)² = 1 - 2P_g + P_g² = 1 - 2P_g + P_g = 1 - P_g (since P_g is idempotent)
+    ext x
+    simp only [ContinuousLinearMap.mul_apply, ContinuousLinearMap.sub_apply, 
+               ContinuousLinearMap.one_apply, ContinuousLinearMap.add_apply]
+    rw [← ContinuousLinearMap.comp_apply, P_g_is_projection, ContinuousLinearMap.comp_apply]
+    ring
   
-  -- Alternatively: I - P is also idempotent since (I-P)² = I - 2P + P² = I - 2P + P = I - P
-  -- So the same argument as for P_g applies
-  sorry -- Requires spectral mapping theorem or idempotent spectrum characterization
+  -- Now use the spectrum subset for idempotent elements
+  ext z
+  simp only [Set.mem_insert_iff, Set.mem_singleton_iff, spectrum.mem_iff]
+  constructor
+  · -- Forward: spectrum ⊆ {0,1}
+    intro h_in_spectrum
+    have h_subset : spectrum ℂ ((1 : L2Space →L[ℂ] L2Space) - P_g (g:=g)) ⊆ ({0,1} : Set ℂ) := 
+      h_idem.spectrum_subset ℂ
+    exact h_subset h_in_spectrum
+  · -- Backward: {0,1} ⊆ spectrum
+    intro h_or
+    cases' h_or with h_zero h_one
+    · -- Case z = 0: Use spectrum_projection_is_01 since σ(1-P) ∋ 0 ⟺ σ(P) ∋ 1
+      rw [h_zero]
+      -- 0 ∈ σ(1-P) ⟺ 1-P is not invertible
+      -- This happens ⟺ 1 ∈ σ(P) (since 1-P has a kernel when P has eigenvalue 1)
+      have h_one_in_P : (1 : ℂ) ∈ spectrum ℂ (P_g (g:=g)) := by
+        rw [spectrum_projection_is_01]
+        simp
+      -- Now show that if 1 ∈ σ(P), then 0 ∈ σ(1-P)
+      rw [spectrum.mem_iff] at h_one_in_P ⊢
+      intro h_inv_unit
+      have : IsUnit ((algebraMap ℂ _) 1 - P_g (g:=g)) := by
+        simp only [map_one]
+        rw [← neg_sub]
+        exact IsUnit.neg h_inv_unit
+      exact h_one_in_P this
+    · -- Case z = 1: Use spectrum_projection_is_01 since σ(1-P) ∋ 1 ⟺ σ(P) ∋ 0  
+      rw [h_one]
+      have h_zero_in_P : (0 : ℂ) ∈ spectrum ℂ (P_g (g:=g)) := by
+        rw [spectrum_projection_is_01]
+        simp
+      rw [spectrum.mem_iff] at h_zero_in_P ⊢
+      intro h_inv_unit
+      have : IsUnit ((algebraMap ℂ _) 0 - P_g (g:=g)) := by
+        simp only [map_zero, zero_sub]
+        exact IsUnit.neg h_inv_unit
+      exact h_zero_in_P this
 
 /-- **Complete description of `σ(G)`**.
 

@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0-sprint46] - 2025-08-01
+
+### Sprint 46: Fredholm Alternative & Strategic Planning
+
+### Added
+- **Complete Sorry Analysis**: Comprehensive inventory of all 23 Paper 1 sorries across 4 files
+- **Strategic Elimination Plan**: 4-phase approach targeting 15-18 sorries over 6 sprints  
+- **Sprint 46 Report**: Detailed achievement documentation in `docs/archive/sprint46/`
+- **Paper 1 Strategy Document**: Complete elimination roadmap with feasibility assessment
+
+### Changed
+- **G_inj_iff_surj Eliminated**: Complete Fredholm alternative proof with case analysis
+- **Core.lean Progress**: 4→2 sorries remaining (50% reduction)
+- **SORRY_ALLOWLIST.txt**: Fixed line number mismatches for Statement.lean
+- **Documentation**: Updated README, roadmap, and planning documents for v0.6.0-sprint46
+
+### Mathematical Achievements
+- **Fredholm Alternative**: Rigorous proof for `G_inj_iff_surj` with complete case analysis
+- **Kernel Characterization**: Established e_g ∈ ker(G) when c_G = true
+- **Index-0 Theory**: Applied standard Fredholm theory to Gödel operator
+
+### Infrastructure  
+- **CI Resolution**: All checks passing after SORRY_ALLOWLIST fixes
+- **PR Management**: Successfully merged PR #55 with comprehensive CI resolution
+- **Strategic Planning**: Multi-sprint roadmap with realistic targets
 
 ## [0.6.0-alpha] - 2025-07-30
 

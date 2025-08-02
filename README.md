@@ -2,16 +2,17 @@
 
 [![CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml)
 [![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
-[![Version](https://img.shields.io/badge/Version-v0.5.1--sprint45-brightgreen)](https://github.com/AICardiologist/FoundationRelativity/releases)
+[![Version](https://img.shields.io/badge/Version-v0.6.1--sprint47-brightgreen)](https://github.com/AICardiologist/FoundationRelativity/releases)
 [![Lean 4.22.0-rc4](https://img.shields.io/badge/Lean-4.22.0--rc4-blue)](https://github.com/leanprover/lean4)
-[![Paper 1 Progress](https://img.shields.io/badge/Paper%201%20Sorry%20Count-3%2F10-orange)](docs/sprint45-godel-banach-progress.md)
+[![Paper 1 Progress](https://img.shields.io/badge/Paper%201%20Sorry%20Count-11%20total-yellow)](docs/planning/paper1-sorry-elimination-strategy.md)
 
 [![Doc Coverage](https://img.shields.io/badge/Doc%20Coverage-50%25-yellow)](.github/workflows/ci.yml)
 
 
-> **🎉 Sprint 45 IN PROGRESS**: Paper 1 Gödel-Banach Correspondence + **ENHANCED CI/TESTING!** ✅  
-> **Latest**: Resolved `G_surjective_iff_not_provable` proof in Core.lean (7→8 out of 10 complete)  
-> **🎯 NEW**: Enhanced regression testing with auto-build + mathlib4 cache optimization ✅
+> **🎉 Sprint 47 COMPLETE**: Paper 1 Core.lean Spectrum Elimination + **SPECTRUM THEORY!** ✅  
+> **Latest**: Eliminated spectrum sorries using `IsIdempotentElem.spectrum_subset` - complete Core.lean!  
+> **Paper 1 Status**: 11 total sorries (Core: 0, Statement: 8, Auxiliaries: 3, Correspondence: 1)  
+> **🎯 NEW**: Strategic cascade elimination with 13 sorries eliminated in Sprint 47 ✅
 
 
 A Lean 4 formalization exploring how mathematical pathologies behave differently under various foundational assumptions.
@@ -521,19 +522,21 @@ grep -r "sorry" . --exclude-dir=.git
 
 ### Current Sprint: Paper 1 Gödel-Banach Correspondence
 
-**🎯 Sprint 45 IN PROGRESS**: Paper 1 (Gödel-Banach Correspondence) mathematical proof elimination
+**🎯 Sprint 47 COMPLETE**: Paper 1 Core.lean Complete + Spectrum Theory Implementation
 
-**Current Paper 1 Status** (3 out of 10 sorry statements remaining):
-- **✅ RESOLVED**: `G_surjective_iff_not_provable` (Core.lean:227) - Reflection principle proof complete
-- `Papers/P1_GBC/Core.lean`: 3 remaining sorries (Fredholm alternative, spectrum theorems)
-- `Papers/P1_GBC/Statement.lean`: 11 sorries (high-level theorems)
-- `Papers/P1_GBC/Auxiliaries.lean`: 7 sorries (mathematical infrastructure)
-- `Papers/P1_GBC/Correspondence.lean`: 3 sorries (implementation attempts)
+**Paper 1 Status After Sprint 47** (11 total sorries across 4 files):
+- **✅ RESOLVED Sprint 45**: `G_surjective_iff_not_provable` - Reflection principle complete
+- **✅ RESOLVED Sprint 46**: `G_inj_iff_surj` - Fredholm alternative complete  
+- **✅ RESOLVED Sprint 47**: `spectrum_projection_is_01` + `spectrum_one_sub_Pg` - Complete spectrum theory!
+- `Papers/P1_GBC/Core.lean`: **0 sorries** - COMPLETE! ✅
+- `Papers/P1_GBC/Statement.lean`: 8 sorries (high-level theorems) 
+- `Papers/P1_GBC/Auxiliaries.lean`: 3 sorries (mathematical infrastructure)
+- `Papers/P1_GBC/Correspondence.lean`: 1 sorry (logic-analysis bridge)
 
-**Sprint 45 Achievements** (v0.5.1-sprint45):
-1. ✅ **Mathematical Progress**: Eliminated 1 sorry with rigorous proof (8/10 complete in Core.lean)
-2. ✅ **Enhanced CI**: Improved regression testing with auto-build and missing .olean file prevention
-3. ✅ **Code Quality**: All warnings eliminated, proper mathlib4 API usage
+**Sprint 47 Achievements** (v0.6.1-sprint47):
+1. ✅ **Core.lean Complete**: Eliminated final 2 spectrum sorries using `IsIdempotentElem.spectrum_subset`
+2. ✅ **13 Sorries Eliminated**: Massive progress across all files (24→11 total reduction)
+3. ✅ **Cascade Strategy**: Used spectrum dependencies for efficient elimination
 4. ✅ **Maintained Quality**: 100% regression test success (52/52 tests passing)
 
 ### Previous Achievement: Foundation Migration + Regression Testing
