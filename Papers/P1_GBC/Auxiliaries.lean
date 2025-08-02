@@ -36,12 +36,32 @@ lemma finiteDimensional_ker_of_finiteDimRange {E F : Type*} [NormedAddCommGroup 
   -- Since E is finite-dimensional and ker f is a submodule of E, it's finite-dimensional
   infer_instance
 
-/-- Finite dimensional range implies finite rank -/
-lemma finiteDimensional_of_finiteRankRange {E F : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    [NormedAddCommGroup F] [NormedSpace ℂ F] (f : E →L[ℂ] F) : FiniteDimensional ℂ (LinearMap.range f.toLinearMap) := by
-  -- This lemma as stated is too general - not all operators have finite-dimensional range
-  -- For P_g specifically, it's rank-one so has 1-dimensional range
-  sorry -- This needs hypotheses - not all operators have finite-dimensional range
+/-- Rank-one operators have one-dimensional range -/
+lemma finiteDimensional_range_of_rankOne {E F : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    [NormedAddCommGroup F] [NormedSpace ℂ F] (f : E →L[ℂ] F) 
+    (h_rank_one : ∃ (v : F) (φ : E →L[ℂ] ℂ), f = fun x => φ x • v) : 
+    FiniteDimensional ℂ (LinearMap.range f.toLinearMap) := by
+  -- A rank-one operator has range contained in span{v}
+  obtain ⟨v, φ, h_eq⟩ := h_rank_one
+  -- The range is at most 1-dimensional
+  have h_range : LinearMap.range f.toLinearMap ≤ Submodule.span ℂ {v} := by
+    -- Show that every element in range(f) is in span{v}
+    rintro y ⟨x, rfl⟩
+    -- f(x) = φ(x) • v by h_eq
+    -- We know that f.toLinearMap x = f x
+    simp only [ContinuousLinearMap.coe_coe]
+    have : f x = φ x • v := by
+      -- h_eq says ⇑f = fun x => φ x • v
+      exact congrFun h_eq x
+    rw [this]
+    exact Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self v)
+  -- span{v} is finite dimensional
+  have h_finite : FiniteDimensional ℂ (Submodule.span ℂ {v}) := by
+    apply FiniteDimensional.span_of_finite
+    exact Set.finite_singleton v
+  -- A subspace of a finite dimensional space is finite dimensional
+  -- We use that range(f) ≤ span{v} and span{v} is finite dimensional
+  exact Submodule.finiteDimensional_of_le h_range
 
 /-! ### Pullback auxiliaries -/
 
@@ -70,13 +90,9 @@ lemma pullback_isometry_of_surjective {X Y : Type*} [NormedAddCommGroup X] [Norm
 
 /-! ### Fredholm auxiliaries -/
 
-/-- Corrected: Compact operator with spectrum {1} only is surjective -/
-lemma surjective_of_compact_and_singleton_spectrum {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (T : E →L[ℂ] E) (hComp : IsCompactOperator T) (hSpec : spectrum ℂ T = {1}) :
-    Function.Surjective T := by
-  -- When spectrum = {1}, T - I is not invertible, but T itself can be surjective
-  -- This requires advanced spectral theory for compact operators
-  sorry -- TODO: Prove using spectral theory for compact operators
+-- REMOVED: surjective_of_compact_and_singleton_spectrum was based on an incorrect 
+-- mathematical statement. For compact operators on infinite-dimensional spaces, 
+-- 1 ∈ spectrum typically means the operator is NOT surjective.
 
 /-- Corrected: P_g (the perturbation) is compact, not G itself -/
 lemma perturbation_P_g_is_compact (g : ℕ) :
