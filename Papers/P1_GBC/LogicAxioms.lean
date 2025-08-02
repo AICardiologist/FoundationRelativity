@@ -92,6 +92,28 @@ lemma bish_no_diagonal :
   | isTrue hp => exact h1 hp hp
   | isFalse hnp => exact hnp (h2 hnp)
 
+/-! ### Sigma1-EM Axiomatization -/
+
+/-- Predicate indicating if a foundation supports Untruncated Σ₁ Excluded Middle.
+This is the key logical principle required for the Gödel-Banach construction. -/
+axiom HasSigma1EM (F : Foundation) : Prop
+
+/-- BISH lacks Σ₁-EM (being constructive/intuitionistic) -/
+axiom BISH_lacks_Sigma1EM : ¬HasSigma1EM Foundation.bish
+
+/-- ZFC has Σ₁-EM (being classical) -/
+axiom ZFC_has_Sigma1EM : HasSigma1EM Foundation.zfc
+
+/-- Necessity: The Gödel-Banach construction requires Σ₁-EM.
+This captures that c_G cannot be defined without case analysis on undecidable Σ₁ statements. -/
+axiom GodelBanach_Requires_Sigma1EM (F : Foundation) :
+  (∃ (w : Papers.P1_GBC.Defs.foundationGodelCorrespondence F), True) → HasSigma1EM F
+
+/-- Sufficiency: If the foundation has Σ₁-EM, the correspondence can be constructed.
+This captures that the analytical machinery works once c_G is definable. -/
+axiom Sigma1EM_Sufficient_for_GodelBanach (F : Foundation) :
+  HasSigma1EM F → ∃ (w : Papers.P1_GBC.Defs.foundationGodelCorrespondence F), True
+
 /-! ### Model-Theoretic Properties -/
 
 -- Model theory aspects are deferred to avoid circular dependencies
