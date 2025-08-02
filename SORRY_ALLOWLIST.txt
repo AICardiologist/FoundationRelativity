@@ -17,7 +17,7 @@
 # RESOLVED Sprint 50: Papers/P1_GBC/Statement.lean:46   # godel_banach_main theorem - COMPLETED using axiomatization!
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:51   # consistency_implies_surjectivity - COMPLETED using main theorem!
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:57   # surjectivity_implies_consistency - COMPLETED using main theorem!
-Papers/P1_GBC/Statement.lean:145   # foundation_relative_correspondence - BISH case axiomatized
+Papers/P1_GBC/Statement.lean:92   # foundation_relative_correspondence - BISH case axiomatized
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:78   # godel_rho_degree - COMPLETED!
 # REMOVED Sprint 49: Papers/P1_GBC/Statement.lean:OLD  # correspondence_unique - REMOVED as mathematically incorrect
 # RESOLVED Sprint 47: Papers/P1_GBC/Statement.lean:105  # godel_functorial - COMPLETED using godel_naturality!

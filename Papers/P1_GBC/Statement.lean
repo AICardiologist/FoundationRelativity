@@ -91,7 +91,7 @@ theorem foundation_relative_correspondence (G : Sigma1Formula) :
     
     sorry -- AXIOMATIZED: Use LogicAxioms.classical_logic_requirement
            -- The existence of witness w in BISH leads to contradiction
-           -- because it would imply BISH supports the diagonal lemma origin/main
+           -- because it would imply BISH supports the diagonal lemma
   · -- ZFC case: Witnesses exist  
     intro h_zfc
     -- In ZFC foundation, we can construct the enhanced witness
@@ -123,7 +123,7 @@ theorem godel_rho_degree (_ : Sigma1Formula) :
 -- REMOVED: correspondence_unique theorem was mathematically incorrect.
 -- When c_G = false (which is always the case by incompleteness),
 -- all Gödel operators become the identity operator, so the
--- correspondence is not injective. origin/main
+-- correspondence is not injective.
 
 /-- Functoriality with respect to foundations -/
 theorem godel_functorial (F G : Foundation) (h : Interp F G) :
@@ -153,7 +153,7 @@ lemma main_theorem_outline :
 
 -- REMOVED: diagonal_lemma_technical was mathematically problematic
 -- The diagonal lemma produces G ↔ ¬Provable(G), not G ↔ ¬G
--- This is properly axiomatized in LogicAxioms.lean instead origin/main
+-- This is properly axiomatized in LogicAxioms.lean instead
 
 /-- Key technical lemma: Fredholm characterization -/
 theorem fredholm_characterization (G : Sigma1Formula) :
