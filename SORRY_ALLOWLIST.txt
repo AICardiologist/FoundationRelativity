@@ -53,6 +53,7 @@ Papers/P1_GBC/SmokeTest.lean:19      # Comment: "- No sorry statements in basic 
 # Sprint 49 eliminated:
 #   - 1 sorry from Auxiliaries.lean (finiteDimensional_of_finiteRankRange)
 #   - 2 removed as mathematically incorrect (correspondence_unique and surjective_of_compact_and_spectrum)
+#   - 1 sorry from Statement.lean (godel_banach_main theorem)
 # Total: 19 sorries eliminated across Sprints 47-49
 # Successfully reduced from 24 to 5 sorries in Paper 1
 # Sprint 49 eliminated 3 sorries and removed 2 incorrect lemmas
