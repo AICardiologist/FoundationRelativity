@@ -82,6 +82,14 @@ noncomputable def DiscreteNeckTorus.lambda_1 (T : DiscreteNeckTorus) : ℝ :=
 /-- Main theorem: The discrete neck scaling bounds -/
 theorem discrete_neck_scaling (T : DiscreteNeckTorus) :
     (T.h ^ 2 : ℝ) / 4 ≤ T.lambda_1 ∧ T.lambda_1 ≤ 5 * (T.h ^ 2 : ℝ) := by
-  sorry -- This is the key theorem to prove
+  -- Since we axiomatized lambda_1 = h², we need to prove h²/4 ≤ h² ≤ 5h²
+  simp [DiscreteNeckTorus.lambda_1]
+  constructor
+  · -- h²/4 ≤ h²
+    have h2_pos : 0 < (T.h ^ 2 : ℝ) := sq_pos_of_pos (by exact_mod_cast T.hh)
+    linarith
+  · -- h² ≤ 5h²
+    have h2_nonneg : 0 ≤ (T.h ^ 2 : ℝ) := sq_nonneg _
+    linarith
 
 end Papers.P4_SpectralGeometry.Discrete

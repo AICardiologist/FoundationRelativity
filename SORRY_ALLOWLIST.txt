@@ -78,7 +78,6 @@ Papers/P4_SpectralGeometry/Geometry/Neck.lean:66        # dist_triangle simplifi
 Papers/P4_SpectralGeometry/Geometry/Neck.lean:69        # firstEigenvalue axiomatized definition
 
 # Paper 4 Discrete CPW Model (Phase 1A) - Fast track implementation
-Papers/P4_SpectralGeometry/Discrete/NeckGraph.lean:83   # discrete_neck_scaling theorem
 Papers/P4_SpectralGeometry/Discrete/TuringEncoding.lean:90   # spectral_gap_jump main theorem
 Papers/P4_SpectralGeometry/Discrete/TuringEncoding.lean:96   # spectral_gap_consistency
 Papers/P4_SpectralGeometry/Discrete/IntervalBookkeeping.lean:122   # halting_preserves_gap
@@ -91,4 +90,4 @@ Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:79   # spectral_gap_is_pi1 
 Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:86   # perturbed_gap_is_pi1
 Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:94   # spectral_question_co_ce
 
-# TOTAL Paper 4: 8 axiomatization points + 12 discrete model sorries = 20 total
+# TOTAL Paper 4: 8 axiomatization points + 11 discrete model sorries = 19 total
