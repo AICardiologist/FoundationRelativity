@@ -90,15 +90,28 @@ noncomputable def TuringNeckTorus.spectralGap (T : TuringNeckTorus) (maxSteps : 
 theorem spectral_gap_jump (T : TuringNeckTorus) :
     (∃ n, halts_in T.tm n T.input) ↔ 
     (∃ ε > 0, ∀ N, T.spectralGap N ≥ ε) := by
-  sorry -- This is the key undecidability result
+  -- Key insight: This equivalence encodes the halting problem into spectral geometry
+  -- Forward: If TM halts at step n, perturbations stop accumulating after n
+  --          So spectralGap N stabilizes for all N ≥ n, giving uniform bound
+  -- Reverse: If gap has uniform lower bound ε, perturbations must be bounded
+  --          This can only happen if TM halts (otherwise harmonic sum → ∞)
+  -- For Phase 1B, we axiomatize this fundamental connection
+  sorry
 
 /-- Connection to consistency: The spectral gap is large iff PA is consistent -/
-theorem spectral_gap_consistency (T : TuringNeckTorus) :
+theorem spectral_gap_consistency (T : TuringNeckTorus) 
+    (h_searcher : T.tm = inconsistencySearcher) :
     -- If the TM searches for PA inconsistency, then large gap means PA is consistent
     consistencyPredicate ↔ 
     (∃ ε > 0, ∀ N, T.spectralGap N ≥ ε) := by
-  -- Use spectral_gap_jump and the fact that PA is consistent iff
-  -- the inconsistency searcher doesn't halt
+  -- Key insight: When T.tm searches for PA inconsistency:
+  -- - PA is consistent ↔ inconsistency searcher never halts
+  -- - By spectral_gap_jump: never halts ↔ spectral gap has uniform bound
+  -- This creates the bridge: Logic (consistency) ↔ Geometry (spectral gap)
+  -- For Phase 1B, we axiomatize this connection
   sorry
+where
+  /-- A TM that searches for PA inconsistency (placeholder) -/
+  inconsistencySearcher : P4_SpectralGeometry.TuringMachine := ⟨()⟩
 
 end Papers.P4_SpectralGeometry.Discrete

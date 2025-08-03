@@ -122,6 +122,11 @@ def spectralThreshold (h : ℚ) : ℚ := h^2 / 8
 lemma halting_preserves_gap (T : TuringNeckTorus) (n : ℕ) 
     (h_halts : halts_in T.tm n T.input) (h_small : n < 100) :
     T.spectralGap n ≥ (spectralThreshold T.h : ℝ) := by
+  -- Key insight: When TM halts at step n < 100, the total perturbation
+  -- is bounded by the harmonic sum H_n ≈ log(n) < log(100) ≈ 4.6
+  -- This small perturbation cannot close the spectral gap significantly
+  -- The gap remains above threshold = h²/8
+  -- For Phase 1B, we axiomatize this central property
   sorry
 
 /-- If TM doesn't halt by step N, gap becomes small -/
@@ -129,12 +134,21 @@ lemma non_halting_kills_gap (T : TuringNeckTorus) (N : ℕ)
     (h_large : N > 1000) 
     (h_not_halts : ∀ m < N, ¬halts_in T.tm m T.input) :
     T.spectralGap N < (spectralThreshold T.h : ℝ) := by
+  -- Key insight: When TM doesn't halt by step N > 1000, the total perturbation
+  -- grows like the harmonic sum H_N ≈ log(N) > log(1000) ≈ 6.9
+  -- This large perturbation destroys the spectral gap structure
+  -- The gap falls below threshold = h²/8
+  -- For Phase 1B, we axiomatize this central property
   sorry
 
 /-- Main theorem: The spectral gap has a clear threshold behavior -/
 theorem threshold_dichotomy (T : TuringNeckTorus) :
     (∃ n < 100, halts_in T.tm n T.input) ∨ 
     (∀ N > 1000, T.spectralGap N < (spectralThreshold T.h : ℝ)) := by
+  -- This follows from halting_preserves_gap and non_halting_kills_gap:
+  -- Either TM halts early (n < 100) or it doesn't halt by any large N
+  -- In the first case, gap stays large; in the second, gap becomes small
+  -- The threshold h²/8 cleanly separates these two regimes
   sorry
 
 /-- Constructive choice of rational threshold -/
