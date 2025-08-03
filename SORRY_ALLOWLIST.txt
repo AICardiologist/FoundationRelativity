@@ -91,3 +91,75 @@ Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:86   # perturbed_gap_is_pi1
 Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:94   # spectral_question_co_ce
 
 # TOTAL Paper 4: 8 axiomatization points + 11 discrete model sorries = 19 total
+
+# Paper 4 Discrete CPW Model (Phase 1B) - Additional implementation sorries
+# Added during consultant corrections implementation
+Papers/P4_SpectralGeometry/Discrete/ConsultantBounds.lean:60    # neck_test_variation axiomatization
+Papers/P4_SpectralGeometry/Discrete/ConsultantBounds.lean:64    # neck_test_variation proof
+Papers/P4_SpectralGeometry/Discrete/ConsultantBounds.lean:106   # perturbation_upper_bound
+Papers/P4_SpectralGeometry/Discrete/ConsultantBounds.lean:125   # perturbation_term_bound
+Papers/P4_SpectralGeometry/Discrete/ConsultantBounds.lean:140   # gap_collapse_theorem
+Papers/P4_SpectralGeometry/Discrete/ConsultantBounds.lean:159   # smallestEigenvalue definition
+Papers/P4_SpectralGeometry/Discrete/ConsultantBounds.lean:177   # weyl_lower_bound
+
+Papers/P4_SpectralGeometry/Discrete/ConsultantBoundsRevised.lean:43   # test_function_energy
+Papers/P4_SpectralGeometry/Discrete/ConsultantBoundsRevised.lean:52   # revised_upper_bound
+Papers/P4_SpectralGeometry/Discrete/ConsultantBoundsRevised.lean:64   # gap_collapse_threshold
+Papers/P4_SpectralGeometry/Discrete/ConsultantBoundsRevised.lean:72   # weyl_lower_bound_revised
+Papers/P4_SpectralGeometry/Discrete/ConsultantBoundsRevised.lean:85   # bareissLDL implementation
+Papers/P4_SpectralGeometry/Discrete/ConsultantBoundsRevised.lean:102  # gap_condition_primitive_recursive
+
+Papers/P4_SpectralGeometry/Discrete/HarmonicBounds.lean:46    # harmonic_sum_lower
+Papers/P4_SpectralGeometry/Discrete/HarmonicBounds.lean:52    # harmonic_sum_upper
+Papers/P4_SpectralGeometry/Discrete/HarmonicBounds.lean:58    # harmonic_asymptotic
+Papers/P4_SpectralGeometry/Discrete/HarmonicBounds.lean:165   # large_N_large_perturbation H_1000 > 7
+
+Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:48    # encode_undecidability_discrete
+Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:63    # neck_scaling_discrete
+Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:72    # spectral_gap_bounds
+Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:89    # spectral_gap_collapse
+Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:118   # neck_scaling_continuous
+Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:124   # neck_scaling_main
+Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:146   # spectral_undecidability_neck
+
+Papers/P4_SpectralGeometry/Discrete/PerturbationTheory.lean:59    # small_perturbation_preserves_gap
+Papers/P4_SpectralGeometry/Discrete/PerturbationTheory.lean:68    # large_perturbation_destroys_gap
+Papers/P4_SpectralGeometry/Discrete/PerturbationTheory.lean:75    # harmonic_growth
+Papers/P4_SpectralGeometry/Discrete/PerturbationTheory.lean:87    # log_dominates in non_halting_implies_small_gap
+Papers/P4_SpectralGeometry/Discrete/PerturbationTheory.lean:95    # non_halting_implies_small_gap final step
+Papers/P4_SpectralGeometry/Discrete/PerturbationTheory.lean:104   # pert_bounded in halting_implies_large_gap
+Papers/P4_SpectralGeometry/Discrete/PerturbationTheory.lean:108   # pert_small in halting_implies_large_gap
+Papers/P4_SpectralGeometry/Discrete/PerturbationTheory.lean:116   # halting_implies_large_gap final step
+
+Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:56    # orthogonal_is_primrec
+Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:65    # rayleigh_is_primrec
+Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:84    # spectral_gap_is_pi1 primrec part
+Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:89    # spectral_gap_is_pi1 TM halting part
+Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:99    # perturbed_gap_is_pi1
+Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:110   # spectral_question_co_ce
+
+Papers/P4_SpectralGeometry/Discrete/SpectralTheory.lean:67    # neckTestFunction_orthogonal set theory
+Papers/P4_SpectralGeometry/Discrete/SpectralTheory.lean:73    # neckTestFunction_orthogonal sum calculation  
+Papers/P4_SpectralGeometry/Discrete/SpectralTheory.lean:75    # neckTestFunction_orthogonal disjoint sets
+Papers/P4_SpectralGeometry/Discrete/SpectralTheory.lean:86    # rayleigh_neck_lower_bound
+Papers/P4_SpectralGeometry/Discrete/SpectralTheory.lean:98    # rayleigh_orthogonal_upper_bound
+Papers/P4_SpectralGeometry/Discrete/SpectralTheory.lean:106   # spectral_gap_variational_scaling lower
+Papers/P4_SpectralGeometry/Discrete/SpectralTheory.lean:108   # spectral_gap_variational_scaling upper
+Papers/P4_SpectralGeometry/Discrete/SpectralTheory.lean:116   # spectral_gap_equivalence
+
+Papers/P4_SpectralGeometry/Discrete/SturmTheorem.lean:34    # characteristicPolynomial
+Papers/P4_SpectralGeometry/Discrete/SturmTheorem.lean:39    # sturmSequence
+Papers/P4_SpectralGeometry/Discrete/SturmTheorem.lean:65    # polynomial_operations_primitive_recursive
+Papers/P4_SpectralGeometry/Discrete/SturmTheorem.lean:70    # sign_changes_primitive_recursive
+Papers/P4_SpectralGeometry/Discrete/SturmTheorem.lean:76    # spectral_gap_primitive_recursive
+Papers/P4_SpectralGeometry/Discrete/SturmTheorem.lean:86    # spectral_gap_in_Pi1
+
+Papers/P4_SpectralGeometry/Discrete/TuringEncoding.lean:99    # spectral_gap_jump
+Papers/P4_SpectralGeometry/Discrete/TuringEncoding.lean:112   # spectral_gap_consistency
+
+Papers/P4_SpectralGeometry/Discrete/Undecidability.lean:98    # reduction_correct basic
+Papers/P4_SpectralGeometry/Discrete/Undecidability.lean:101   # reduction_correct undecidability
+Papers/P4_SpectralGeometry/Discrete/Undecidability.lean:114   # spectral_gap_undecidable reduction
+Papers/P4_SpectralGeometry/Discrete/Undecidability.lean:121   # main_theorem
+
+# TOTAL NEW: 61 sorries in Paper 4 discrete implementation
