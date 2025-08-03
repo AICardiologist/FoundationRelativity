@@ -109,14 +109,4 @@ theorem godel_naturality (F G : Foundation) (_h : Interp F G) :
   correspondence := witness.correspondence
 }, trivial⟩
 
-/-! ### Auxiliary Lemmas (Placeholders) -/
-
-/-- Rank-one operators form a manageable class -/
-theorem rankOne_manageable (_g : Sigma1Formula) : True :=
-  trivial -- TODO Math-AI: Use finite-rank compactness
-
-/-- Fredholm alternative applies to Gödel operators -/
-theorem fredholm_alternative (_g : Sigma1Formula) : True :=
-  trivial -- TODO Math-AI: Apply standard Fredholm theory
-
 end Papers.P1_GBC.Defs

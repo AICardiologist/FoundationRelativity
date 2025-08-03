@@ -66,7 +66,7 @@ structure FiniteRankOperator (X Y : BanachSpace) where dummy : Unit
 
 -- Basic arithmetic instances for simplified operators
 instance : HSub (CompOperator X X) (FiniteRankOperator X X) (CompOperator X X) where
-  hSub _ _ := ⟨()⟩
+  hSub _ _ := sorry -- TODO: Implement operator subtraction
 
 def operator_norm {X Y : BanachSpace} (_ : CompOperator X Y) : ℝ := 0
 notation "‖" T "‖" => operator_norm T

@@ -41,6 +41,19 @@ jobs:
             echo "Warning: verify-no-sorry.sh not found"
           fi
 
+      - name: Check for cheap proofs
+        run: |
+          lake build cheap_proofs
+          lake exe cheap_proofs
+
+      - name: Check for stub structures
+        run: |
+          python scripts/check_struct_stubs.py
+
+      - name: Check LaTeX-Lean alignment
+        run: |
+          python scripts/check_alignment.py
+
       - name: Verify core mathematical proofs
         run: |
           # Verify key theorems compile and type-check correctly

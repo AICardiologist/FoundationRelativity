@@ -20,15 +20,15 @@ open CategoryTheory.WitnessGroupoid.Core
 
 /-! ### Basic Definitions for Bidual Gap Analysis -/
 
--- Forward declaration: bidual gap structure (Day 2 scaffold)
--- TODO Day 3: Replace with proper bidual Banach space theory
-structure BidualGap where
-  dummy : Unit
+/-- The bidual gap property: A Banach space X has the bidual gap property if 
+    the canonical embedding X → X** is not surjective.
+    TODO: Implement proper definition with Banach space theory -/
+def BidualGap : Prop := sorry
 
--- Forward declaration: WLPO (weak limited principle of omniscience)
--- Links to constructive logic foundations
-structure WLPO where
-  dummy : Unit
+/-- Weak Limited Principle of Omniscience: For every sequence α : ℕ → Bool,
+    either all values are false or not all values are false.
+    TODO: Implement proper constructive logic definition -/
+def WLPO : Prop := sorry
 
 /-! ### Helper Tactics for Banach Space Reasoning -/
 

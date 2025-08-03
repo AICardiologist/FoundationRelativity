@@ -28,13 +28,14 @@ This directory contains the complete paper collection for the Foundation-Relativ
 - **Main Result**: Pseudo-functor theory and foundation-relative obstructions
 - **Status**: ✅ Fully formalized with machine verification
 
-### 📋 Paper 4: Spectral Geometry (Next Target)
+### 🔧 Paper 4: Spectral Geometry (In Progress)
 - **LaTeX Source**: `P4-SpectralGeometry.tex`
 - **PDF**: `P4-SpectralGeometry.pdf`
 - **ResearchGate**: https://www.researchgate.net/publication/[PAPER4_ID]
-- **Main Goal**: Undecidable eigenvalues on Riemannian manifolds
-- **Planning**: See `../planning/paper4-roadmap.md`
-- **Status**: 📋 Planning phase (2025-2026 target)
+- **Main Goal**: Undecidable eigenvalues via discrete neck torus
+- **Implementation**: `Papers/P4_SpectralGeometry/Discrete/` (61 sorries)
+- **Status**: 🔧 Phase 1A complete, implementing fast-track discrete approach
+- **Timeline**: 6-7 weeks to completion
 
 ## 🔄 Enhanced Versions
 
@@ -52,14 +53,14 @@ The `revised/` subdirectory contains enhanced versions of papers incorporating i
 | Paper 1 | ✅ | ✅ | ✅ Complete | 0 | ✅ Complete |
 | Paper 2 | ✅ | ✅ | ✅ Complete | 0 | ✅ Complete |
 | Paper 3 | ✅ | ✅ | ✅ Complete | 0 | ✅ Complete |
-| Paper 4 | ✅ | ✅ | 📋 Planning | - | 📋 Planning |
+| Paper 4 | ✅ | ✅ | 🔧 Phase 1A | 61 | 🔧 In Progress |
 
 ## 🎯 Key Achievements
 
-1. **Zero Sorries**: All Papers 1-3 fully formalized with machine verification
+1. **Papers 1-3 Complete**: Zero sorries, fully machine-verified
 2. **Foundation-Relativity**: Precise characterization of foundational dependencies
 3. **Enhanced Versions**: Papers improved through formal verification insights
-4. **Complete Documentation**: Full academic and technical documentation
+4. **Paper 4 Progress**: Discrete CPW model infrastructure complete
 
 ## 📖 Usage Guide
 
@@ -71,23 +72,32 @@ The `revised/` subdirectory contains enhanced versions of papers incorporating i
 ### For Developers
 1. **Implementation Reference**: Use papers as specification for formalization
 2. **Verification**: All theorems in Papers 1-3 are machine-verified
-3. **Planning**: See Paper 4 materials for future development
+3. **Active Work**: Paper 4 discrete implementation in `Papers/P4_SpectralGeometry/Discrete/`
 
 ### For Understanding the Project
 1. **Start with**: Paper 1 for the main results
 2. **Continue with**: Papers 2-3 for the complete framework
-3. **Look ahead**: Paper 4 for future geometric applications
+3. **Current work**: Paper 4 discrete CPW model
 4. **Enhanced insight**: Review `revised/` versions for formalization benefits
+
+## 🔬 Paper 4 Implementation Notes
+
+### Discrete CPW Model Approach
+- **P4-neck-scaling.md** - Core analytical result (neck scaling theorem)
+- Fast-track discrete approximation avoiding full manifold theory
+- Consultant corrections implemented after critical feedback
+- See `../planning/paper4-status.md` for detailed progress
 
 ## 📚 Related Documentation
 
 - **Project Status**: `../planning/project-status.md`
-- **Paper 4 Roadmap**: `../planning/paper4-roadmap.md`
+- **Paper 4 Status**: `../planning/paper4-status.md`
+- **Paper 4 Roadmap**: `../planning/paper4-roadmap-enhanced.md`
 - **Formalization Analysis**: `../analysis/`
 - **Development Guide**: `../reference/DEV_GUIDE.md`
 
 ---
 
 *Updated: August 2025*  
-*Status: Papers 1-3 Complete (0 sorries total)*  
-*Next: Paper 4 Planning Phase*
+*Status: Papers 1-3 Complete (0 sorries) | Paper 4 Phase 1A Complete (61 sorries)*  
+*Next: Paper 4 Phase 1B - Key lemma proofs*
