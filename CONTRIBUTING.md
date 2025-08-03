@@ -2,7 +2,21 @@
 
 Thank you for your interest in contributing to Foundation-Relativity! This project formalizes foundation-relative mathematics in Lean 4, and we welcome contributions from mathematicians, formal methods experts, and anyone interested in constructive mathematics.
 
-**Current Status**: Sprint 36 complete! Foundation-Relativity hierarchy now extends to ρ=4 (DC_{ω·2}) with complete formal verification of all pathologies from WLPO to classical dependent choice.
+> **⚠️ CRITICAL QA NOTICE**: Papers 1-3 have significant formalization issues despite "0 sorries" claims. See [CRITICAL_QA_NOTICE.md](CRITICAL_QA_NOTICE.md) and [roadmap-corrective-action.md](docs/planning/roadmap-corrective-action.md) for details. All contributors must follow the **No-Shortcuts Rules** below.
+
+**Current Status**: QA audit revealed Unit/() tricks used instead of real formalization. 12-week corrective action plan in progress.
+
+## ⚠️ MANDATORY READING: No-Shortcuts Policy
+
+**QA Audit Finding**: The repository has been using deceptive Unit/() tricks to achieve "0 sorries" without real formalization.
+
+**This is now FORBIDDEN. All contributors must:**
+1. Use `sorry` for incomplete work - NEVER use Unit stubs
+2. Write real mathematical definitions - NEVER use `dummy : Unit`
+3. Create genuine proofs - NEVER use `exact ⟨()⟩` tricks
+4. Follow the detailed No-Shortcuts Rules below
+
+**Violations will result in PR rejection.**
 
 ## 🚀 Quick Start
 
@@ -12,6 +26,7 @@ Thank you for your interest in contributing to Foundation-Relativity! This proje
 4. **Build** the project: `lake build`
 5. **Run tests**: `lake exe testFunctors && lake exe AllPathologiesTests`
 6. **Check quality**: `bash scripts/verify-no-sorry.sh`
+7. **NEW - Check for shortcuts**: `lake exe cheap_proofs && python scripts/check_struct_stubs.py`
 
 ## 🎯 Types of Contributions
 
@@ -35,12 +50,63 @@ Thank you for your interest in contributing to Foundation-Relativity! This proje
 
 ## 📋 Development Guidelines
 
+### 🚨 No-Shortcuts Rules (CRITICAL - QA MANDATED)
+
+These rules prevent the deceptive practices identified in QA audit:
+
+#### Golden Rules
+1. **Only two acceptable states for any theorem:**
+   - Work-in-progress: contains `sorry`
+   - Finished: no `sorry` AND uses real mathematical definitions
+
+2. **FORBIDDEN patterns:**
+   - ❌ Single-field structures with `Unit` or `True`
+   - ❌ Defining `Prop` as `True`
+   - ❌ Proofs using only `trivial`, `⟨()⟩`, or pattern matching on Unit
+   - ❌ Theorems proved by `exact ⟨()⟩` or similar Unit tricks
+   - ❌ Hidden axioms outside `src/Extra/Axioms.lean`
+
+3. **Every finished theorem MUST:**
+   - ✅ Depend on non-trivial definitions from the project or mathlib
+   - ✅ Have a proof that actually uses mathematical content
+   - ✅ Include `-- (LaTeX Theorem X.Y)` reference if from a paper
+
+#### Examples of Violations
+```lean
+-- ❌ FORBIDDEN: Unit stub
+structure BidualGap where
+  dummy : Unit
+
+-- ❌ FORBIDDEN: Vacuous proof
+theorem main_result : BidualGap := ⟨()⟩
+
+-- ❌ FORBIDDEN: Trivial-only proof
+lemma key_lemma : ImportantProperty := by trivial
+```
+
+#### Correct Approach
+```lean
+-- ✅ CORRECT: Real definition or sorry
+def BidualGap : Prop := 
+  ∃ (X : BanachSpace ℝ), ¬Isometric (canonicalEmbedding X)
+
+-- ✅ CORRECT: Incomplete work marked with sorry
+theorem main_result : BidualGap := by
+  sorry -- TODO: Implement using Goldstine theorem
+
+-- ✅ CORRECT: Real proof using mathematical content
+lemma key_lemma : ImportantProperty := by
+  apply fundamental_theorem
+  exact mathematical_construction
+```
+
 ### Code Standards
 
-#### No Sorry Policy
+#### No Sorry Policy (Updated)
 - **Zero sorry** allowed in core modules (`Found/`, `Gap2/`, `APFunctor/`, `RNPFunctor/`)
 - Test files may use `sorry` for incomplete test cases (clearly marked)
 - CI enforces this with `LEAN_ABORT_ON_SORRY=1`
+- **NEW**: CI also enforces no cheap proofs via `lake exe cheap_proofs`
 
 #### Style Guidelines
 ```lean
@@ -127,7 +193,7 @@ Co-Authored-By: [Your Name] <email@example.com>
 
 #### Pull Request Process
 1. **Create feature branch** from latest `main`
-2. **Implement changes** following style guidelines
+2. **Implement changes** following style guidelines AND no-shortcuts rules
 3. **Verify code quality** with our tools:
    ```bash
    # Required checks before PR
@@ -135,6 +201,11 @@ Co-Authored-By: [Your Name] <email@example.com>
    LEAN_ABORT_ON_SORRY=1 lake build  # Zero sorry policy
    bash scripts/verify-no-sorry.sh   # CI verification  
    bash scripts/check-no-axioms.sh   # Axiom audit
+   
+   # NEW QA-MANDATED CHECKS:
+   lake exe cheap_proofs              # No Unit/() trick proofs
+   python scripts/check_struct_stubs.py  # No Unit stub structures
+   python scripts/check_alignment.py     # LaTeX theorems properly formalized
    ```
 4. **Run relevant tests**:
    ```bash
@@ -145,6 +216,28 @@ Co-Authored-By: [Your Name] <email@example.com>
 5. **Add/update tests** to maintain coverage
 6. **Update documentation** if needed
 7. **Create PR** with clear description and test plan
+
+## 🚧 Corrective Action Plan (Active)
+
+Due to QA findings, we are implementing a 12-week corrective action plan:
+
+### Current Priorities
+1. **Paper 1** (Weeks 1-3): Fix 12 cheap proofs, implement OrdinalRho
+2. **Paper 2** (Weeks 4-8): Complete implementation from scratch (currently 0%)
+3. **Paper 3** (Weeks 6-12): Complete implementation from scratch (currently <5%)
+
+### How to Contribute
+- **Pick a missing module** from [roadmap-corrective-action.md](docs/planning/roadmap-corrective-action.md)
+- **Follow the No-Shortcuts Rules** strictly
+- **Use `sorry`** for incomplete work - never use Unit tricks
+- **Reference LaTeX theorems** with comments like `-- (LaTeX Theorem 3.4)`
+
+### Priority Modules Needing Implementation
+- `Cat/OrdinalRho.lean` - Ordinal-valued 2-functor (Paper 1)
+- `Analysis/WeakStar.lean` - Weak* topology (Paper 2)
+- `Analysis/Goldstine.lean` - Goldstine theorem (Paper 2)
+- `Cat/Bicategory/GPS.lean` - Gordon-Power-Street coherence (Paper 3)
+- See full list in corrective action roadmap
 
 ## 🧪 Testing Your Changes
 
@@ -162,6 +255,11 @@ bash scripts/verify-no-sorry.sh
 
 # Check style (if linter available)
 lake exe lint
+
+# NEW: Run QA-mandated checks
+lake exe cheap_proofs
+python scripts/check_struct_stubs.py
+python scripts/check_alignment.py
 ```
 
 ### CI Testing
@@ -170,6 +268,9 @@ All PRs automatically run:
 - **Complete test suite** including new tests
 - **Sorry verification** with `LEAN_ABORT_ON_SORRY=1`
 - **Dependency checks** for mathlib compatibility
+- **NEW**: Cheap proof detection
+- **NEW**: Unit stub detection
+- **NEW**: LaTeX-Lean alignment verification
 
 ## 📖 Mathematical Background
 
@@ -213,6 +314,19 @@ theorem pathology_requires_principle (P : PathologyType) :
 - **Be specific**: Point to exact lines and suggest alternatives
 - **Be patient**: Complex mathematical proofs take time to review
 - **Ask questions**: Better to clarify than assume
+
+### PR Approval Criteria (QA Mandated)
+PRs will NOT be approved if they contain:
+- 🚫 Unit stub structures (`structure X where dummy : Unit`)
+- 🚫 Vacuous proofs (`exact ⟨()⟩`, `by trivial` for non-trivial claims)
+- 🚫 Theorems that don't use real mathematical definitions
+- 🚫 Missing LaTeX cross-references for paper theorems
+
+PRs MUST pass:
+- ✅ All standard CI checks
+- ✅ `lake exe cheap_proofs` (no output)
+- ✅ `python scripts/check_struct_stubs.py`
+- ✅ `python scripts/check_alignment.py` (if modifying paper content)
 
 ### Communication
 - **Issues**: Use for bug reports and feature requests

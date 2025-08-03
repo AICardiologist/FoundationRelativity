@@ -22,15 +22,15 @@ open CategoryTheory.WitnessGroupoid.Core
 
 /-! ### Basic Definitions for 2-Categorical Framework -/
 
--- Forward declaration: 2-categorical obstruction theory
--- TODO Day 3: Expand with proper 2-categorical machinery
-structure CategoricalObstruction where
-  dummy : Unit
+/-- 2-categorical obstruction: A property that prevents certain functorial
+    constructions from being strict, requiring pseudo-functors instead.
+    TODO: Implement proper obstruction theory with coherence conditions -/
+def CategoricalObstruction : Prop := sorry
 
--- Forward declaration: pseudo-functor type for the main theorem
--- TODO Day 2 PM: Replace with proper mathlib4 PseudoFunctor
-structure TwoCatPseudoFunctor where  
-  dummy : Unit
+/-- Pseudo-functor in the 2-categorical framework. Should map foundations
+    to categories while preserving composition only up to isomorphism.
+    TODO: Replace with proper mathlib4 PseudoFunctor when available -/
+def TwoCatPseudoFunctor : Type* := sorry
 
 /-- Pentagon coherence property for pseudo-functors -/
 def preservesPentagon.{u,v} (F : TwoCatPseudoFunctor) : Prop := 

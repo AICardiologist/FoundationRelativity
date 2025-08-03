@@ -76,7 +76,7 @@ def generic_obstruction (P : Type) (strength : String) : FunctorialObstruction P
   pathology := P,
   logic_strength := strength,
   bish_empty := id,
-  zfc_nonempty := ⟨()⟩
+  zfc_nonempty := sorry -- TODO: Provide proper witness for ZFC case
 }
 
 /-! ### Obstruction Hierarchy -/

@@ -1,0 +1,89 @@
+name: No-Shortcuts CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  cheap-proofs:
+    name: Check for cheap proofs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Lean
+        uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+
+      - name: Cache .lake
+        uses: actions/cache@v4
+        with:
+          path: .lake
+          key: ${{ runner.os }}-lake-${{ hashFiles('lake-manifest.json') }}-v3
+
+      - name: Build project
+        run: lake build
+
+      - name: Build cheap proofs linter
+        run: lake build cheap_proofs
+
+      - name: Run cheap proofs check
+        run: lake exe cheap_proofs
+        
+  stub-structures:
+    name: Check for stub structures
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Check for stub structures
+        run: python scripts/check_struct_stubs.py
+        
+  alignment:
+    name: Check LaTeX-Lean alignment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Check LaTeX-Lean alignment
+        run: python scripts/check_alignment.py
+
+  summary:
+    name: No-Shortcuts Summary
+    runs-on: ubuntu-latest
+    needs: [cheap-proofs, stub-structures, alignment]
+    if: always()
+    steps:
+      - name: Check results
+        run: |
+          if [ "${{ needs.cheap-proofs.result }}" != "success" ] || \
+             [ "${{ needs.stub-structures.result }}" != "success" ] || \
+             [ "${{ needs.alignment.result }}" != "success" ]; then
+            echo "❌ No-shortcuts checks failed!"
+            echo ""
+            echo "Results:"
+            echo "  Cheap proofs check: ${{ needs.cheap-proofs.result }}"
+            echo "  Stub structures check: ${{ needs.stub-structures.result }}"
+            echo "  LaTeX alignment check: ${{ needs.alignment.result }}"
+            echo ""
+            echo "Fix all Unit/() tricks and use 'sorry' for incomplete work."
+            exit 1
+          else
+            echo "✅ All no-shortcuts checks passed!"
+          fi

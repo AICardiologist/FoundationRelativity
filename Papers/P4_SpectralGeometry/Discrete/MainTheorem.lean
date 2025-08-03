@@ -123,7 +123,7 @@ theorem spectral_gap_consistency_proof (T : TuringNeckTorus)
   -- This requires showing the spectral condition is "all or nothing"
   sorry
 where
-  inconsistencySearcher : P4_SpectralGeometry.TuringMachine := ⟨()⟩
+  inconsistencySearcher : P4_SpectralGeometry.TuringMachine := sorry -- TODO: Implement TM
 
 /-- The spectral gap question is undecidable -/
 theorem spectral_gap_undecidable :

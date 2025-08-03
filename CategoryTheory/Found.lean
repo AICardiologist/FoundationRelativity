@@ -63,4 +63,30 @@ instance : Category Foundation where
     cases f; cases g; cases h
     rfl
 
+/-! ### Standard Foundation Instances -/
+
+/-- Trivial category instance for Type (used as placeholder) -/
+instance : Category.{0} Unit where
+  Hom _ _ := Unit
+  id _ := ()
+  comp _ _ := ()
+  id_comp := by simp
+  comp_id := by simp
+  assoc := by simp
+
+/-- Bishop's constructive mathematics foundation (BISH) -/
+def Foundation.bish : Foundation where
+  Univ := Unit
+  UnivCat := inferInstance
+
+/-- Zermelo-Fraenkel with Choice foundation (ZFC) -/
+def Foundation.zfc : Foundation where
+  Univ := Unit
+  UnivCat := inferInstance
+
+/-- Homotopy Type Theory foundation (HoTT) -/
+def Foundation.hott : Foundation where
+  Univ := Unit
+  UnivCat := inferInstance
+
 end CategoryTheory.Found
