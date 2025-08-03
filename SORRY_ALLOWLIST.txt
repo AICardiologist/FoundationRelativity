@@ -40,8 +40,6 @@
 
 # Comment references (detected by grep but not actual sorry statements)
 Logic/Reflection.lean:6          # Comment: "No other assumptions, no `sorry`."
-Papers/P1_GBC/Core.lean:34       # Comment: "- No axioms or sorry statements"
-Papers/P1_GBC/SmokeTest.lean:19      # Comment: "- No sorry statements in basic infrastructure"
 
 # Papers/P1_GBC/LogicAxioms.lean (0 sorrys) - Axiomatization layer added in Sprint 50
 # This module axiomatizes Gödel's incompleteness consequences without full formalization
@@ -185,6 +183,10 @@ Papers/P3_2CatFramework/FunctorialObstruction.lean:59
 # Paper 4 - Updated TuringMachine placeholders
 Papers/P4_SpectralGeometry/Discrete/TuringEncoding.lean:115
 Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:126
+
+# Comment references (detected by grep but not actual sorry statements)
+Papers/P1_GBC/Core.lean:34       # Comment: "- No axioms or sorry statements"
+Papers/P1_GBC/SmokeTest.lean:19  # Comment: "- No sorry statements in basic infrastructure"
 
 # GRAND TOTAL: 88 authorized sorries
 # - Paper 1: 0 (COMPLETE!)

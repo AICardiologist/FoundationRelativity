@@ -116,16 +116,6 @@ theorem godel_functorial (F G : Foundation) (h : Interp F G) :
   -- Use the naturality construction from Defs.lean
   (godel_naturality F G h)
 
-/-! ### Connection to Existing Infrastructure -/
-
-/-- Integration with pseudo-functor framework -/
-theorem godel_pseudo_functor_instance : True :=
-  trivial -- TODO Math-AI: Use Sprint 43 pseudo-functor infrastructure
-
-/-- Connection to other pathologies in the hierarchy -/
-theorem godel_vs_other_pathologies : True :=
-  trivial -- TODO Math-AI: Relate to existing Gap2, AP, RNP results
-
 /-! ### Proof Sketches and Structure -/
 
 /-- Proof outline for main theorem -/

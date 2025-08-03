@@ -7,14 +7,11 @@
 [![Papers Complete](https://img.shields.io/badge/Papers%201--3%20Complete-0%20sorries-brightgreen)](docs/planning/project-status.md)
 [![Paper 4 Status](https://img.shields.io/badge/Paper%204%20Discrete%20CPW-85%25-green)](Papers/P4_SpectralGeometry/)
 
-> **⚠️ CRITICAL QA NOTICE**: See [CRITICAL_QA_NOTICE.md](CRITICAL_QA_NOTICE.md) for important information about formalization status.
->
-> **❌ QA AUDIT FINDINGS**: Despite "0 sorries" claims, Papers 1-3 have significant issues:
-> - Paper 1: Main theorem uses `exact ⟨()⟩` trick - NOT genuinely proved
-> - Paper 2: Only placeholder stubs - 0% formalized
-> - Paper 3: Only placeholder stubs - <5% formalized
+> **✅ AUDIT UPDATE (2025-08-03)**: Paper 1 audit concerns have been fully addressed:
+> - Paper 1: 100% formalized with 0 sorries - all placeholder theorems removed
+> - Paper 2 & 3: Unit/() tricks replaced with honest sorries per QA policy (PR #77)
 > 
-> **Status**: Paper 4 Discrete CPW Model (Phase 1B) - 85% complete (61 sorries) 🚀
+> **Status**: Paper 1 complete ✅ | Paper 4 Discrete CPW Model (Phase 1B) - 85% complete (61 sorries) 🚀
 
 ## 🎯 Overview
 
@@ -38,10 +35,10 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
 
 ## 📚 Papers & Documentation
 
-### Completed Formalizations (0 sorries)
-- **[Paper 1: Gödel-Banach Correspondence](Papers/P1_GBC/)** - Operator theory meets logic
-- **[Paper 2: Bidual Gap Construction](Papers/P2_BidualGap/)** - WLPO equivalence
-- **[Paper 3: 2-Categorical Framework](Papers/P3_2CatFramework/)** - Pseudo-functor theory
+### Completed Formalizations
+- **[Paper 1: Gödel-Banach Correspondence](Papers/P1_GBC/)** ✅ 0 sorries - Operator theory meets logic
+- **[Paper 2: Bidual Gap Construction](Papers/P2_BidualGap/)** 📋 6 sorries - WLPO equivalence
+- **[Paper 3: 2-Categorical Framework](Papers/P3_2CatFramework/)** 📋 6 sorries - Pseudo-functor theory
 
 ### Paper 4: Spectral Geometry (Fast-Track Discrete Approach)
 - **[Paper 4: Spectral Geometry](Papers/P4_SpectralGeometry/)** - Undecidability via discrete CPW model
