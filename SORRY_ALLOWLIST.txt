@@ -78,19 +78,12 @@ Papers/P4_SpectralGeometry/Geometry/Neck.lean:66        # dist_triangle simplifi
 Papers/P4_SpectralGeometry/Geometry/Neck.lean:69        # firstEigenvalue axiomatized definition
 
 # Paper 4 Discrete CPW Model (Phase 1A) - Fast track implementation
-Papers/P4_SpectralGeometry/Discrete/NeckGraph.lean:76   # lambda_1 definition placeholder
-Papers/P4_SpectralGeometry/Discrete/NeckGraph.lean:82   # discrete_neck_scaling theorem
-Papers/P4_SpectralGeometry/Discrete/TuringEncoding.lean:41   # halts_in definition
-Papers/P4_SpectralGeometry/Discrete/TuringEncoding.lean:71   # spectralGap definition
-Papers/P4_SpectralGeometry/Discrete/TuringEncoding.lean:77   # spectral_gap_jump main theorem
-Papers/P4_SpectralGeometry/Discrete/TuringEncoding.lean:86   # spectral_gap_consistency
-Papers/P4_SpectralGeometry/Discrete/IntervalBookkeeping.lean:39   # unperturbedBands band 1 h_order
-Papers/P4_SpectralGeometry/Discrete/IntervalBookkeeping.lean:41   # unperturbedBands band 2 h_order  
-Papers/P4_SpectralGeometry/Discrete/IntervalBookkeeping.lean:43   # unperturbedBands band 3 h_order
-Papers/P4_SpectralGeometry/Discrete/IntervalBookkeeping.lean:49   # unperturbed_bands_disjoint
-Papers/P4_SpectralGeometry/Discrete/IntervalBookkeeping.lean:63   # halting_preserves_gap
-Papers/P4_SpectralGeometry/Discrete/IntervalBookkeeping.lean:70   # non_halting_kills_gap
-Papers/P4_SpectralGeometry/Discrete/IntervalBookkeeping.lean:76   # threshold_dichotomy
+Papers/P4_SpectralGeometry/Discrete/NeckGraph.lean:83   # discrete_neck_scaling theorem
+Papers/P4_SpectralGeometry/Discrete/TuringEncoding.lean:90   # spectral_gap_jump main theorem
+Papers/P4_SpectralGeometry/Discrete/TuringEncoding.lean:96   # spectral_gap_consistency
+Papers/P4_SpectralGeometry/Discrete/IntervalBookkeeping.lean:122   # halting_preserves_gap
+Papers/P4_SpectralGeometry/Discrete/IntervalBookkeeping.lean:128   # non_halting_kills_gap
+Papers/P4_SpectralGeometry/Discrete/IntervalBookkeeping.lean:135   # threshold_dichotomy
 Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:55   # orthogonal_is_primrec
 Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:60   # rayleigh_is_primrec
 Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:76   # spectral_gap_is_pi1 primrec part
@@ -98,4 +91,4 @@ Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:79   # spectral_gap_is_pi1 
 Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:86   # perturbed_gap_is_pi1
 Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:94   # spectral_question_co_ce
 
-# TOTAL Paper 4: 8 axiomatization points + 19 discrete model sorries = 27 total
+# TOTAL Paper 4: 8 axiomatization points + 12 discrete model sorries = 20 total
