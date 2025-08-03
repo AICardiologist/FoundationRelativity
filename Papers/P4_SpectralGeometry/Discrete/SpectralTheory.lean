@@ -46,7 +46,7 @@ def orthogonalToConstants {T : DiscreteNeckTorus} (v : RealVector T) : Prop :=
 
 /-- Variational characterization of the spectral gap -/
 noncomputable def spectralGapVariational (T : DiscreteNeckTorus) : ℝ :=
-  sInf {RayleighQuotient T v | (v : RealVector T) (hv : v ≠ 0) (horth : orthogonalToConstants v)}
+  sInf {x | ∃ v : RealVector T, (∃ i, v i ≠ 0) ∧ orthogonalToConstants v ∧ x = RayleighQuotient T v}
 
 /-- Test function on the neck (achieves lower bound) -/
 noncomputable def neckTestFunction (T : DiscreteNeckTorus) : RealVector T :=
@@ -59,7 +59,23 @@ lemma neckTestFunction_orthogonal (T : DiscreteNeckTorus) (h_even : Even T.n) :
     orthogonalToConstants (neckTestFunction T) := by
   -- The function takes value 1 on half the vertices and -1 on the other half
   -- So the sum is 0
-  sorry
+  simp only [orthogonalToConstants, neckTestFunction]
+  -- Split the sum into two parts: i < n/2 and i ≥ n/2
+  have : Finset.univ = 
+    {v : T.Vertex | v.1.val < T.n / 2}.toFinset ∪ 
+    {v : T.Vertex | v.1.val ≥ T.n / 2}.toFinset := by
+    sorry -- Set theory: every vertex is in one of these sets
+  rw [this, Finset.sum_union]
+  · -- Sum over first half (value = 1) + sum over second half (value = -1)
+    -- First sum = number of vertices with i < n/2 = (n/2) * n
+    -- Second sum = -(number of vertices with i ≥ n/2) = -(n/2) * n
+    -- Total = (n/2)*n - (n/2)*n = 0
+    sorry
+  · -- Disjoint sets
+    sorry
+
+/-- Constant for the upper bound -/
+noncomputable def C : ℝ := 10
 
 /-- Lower bound: The Rayleigh quotient of neck test function is O(h²) -/
 lemma rayleigh_neck_lower_bound (T : DiscreteNeckTorus) (h_even : Even T.n) :
@@ -68,19 +84,18 @@ lemma rayleigh_neck_lower_bound (T : DiscreteNeckTorus) (h_even : Even T.n) :
   -- So the Laplacian energy concentrates on neck edges with weight h
   -- This gives Rayleigh quotient ≈ h² / 1 = h²
   sorry
-where
-  noncomputable C : ℝ := 10  -- Some constant
+
+/-- Constant for the lower bound -/
+noncomputable def c : ℝ := 1/4
 
 /-- Upper bound: Any orthogonal function has Rayleigh quotient ≥ c·h² -/
 lemma rayleigh_orthogonal_upper_bound (T : DiscreteNeckTorus) (v : RealVector T)
-    (hv : v ≠ 0) (horth : orthogonalToConstants v) :
+    (hv : ∃ i, v i ≠ 0) (horth : orthogonalToConstants v) :
     RayleighQuotient T v ≥ c * (T.h ^ 2 : ℝ) := by
   -- Key insight: Any function orthogonal to constants must vary
   -- The minimum variation occurs when change is concentrated at neck
   -- This gives the h² scaling
   sorry
-where
-  noncomputable c : ℝ := 1/4  -- Some constant
 
 /-- Main theorem: Variational characterization gives correct scaling -/
 theorem spectral_gap_variational_scaling (T : DiscreteNeckTorus) (h_even : Even T.n) :

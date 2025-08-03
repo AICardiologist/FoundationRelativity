@@ -29,15 +29,19 @@ namespace Papers.P4_SpectralGeometry.Discrete
 def totalPerturbation (T : TuringNeckTorus) (N : ℕ) : ℚ :=
   maxPerturbation N
 
+/-- Check if an edge is a neck edge (gets perturbed) -/
+def isNeckEdge (T : TuringNeckTorus) (v w : T.Vertex) : Bool :=
+  v.1 ≠ w.1 ∧ v.2 = w.2  -- Horizontal neck edges
+
 /-- Edges that get perturbed (simplified: just the neck edges) -/
 def perturbedEdges (T : TuringNeckTorus) : Set (T.Vertex × T.Vertex) :=
-  {⟨v, w⟩ | v.1 ≠ w.1 ∧ v.2 = w.2}  -- Horizontal neck edges
+  {⟨v, w⟩ | isNeckEdge T v w}
 
 /-- The perturbed Laplacian as a function of perturbation strength -/
 noncomputable def perturbedLaplacianParametric (T : TuringNeckTorus) (ε : ℝ) :
     Matrix T.Vertex T.Vertex ℝ :=
   let L₀ := T.discreteLaplacian.map (fun x => (x : ℝ))
-  let P := Matrix.of (fun v w => if ⟨v, w⟩ ∈ perturbedEdges T then 1 else 0)
+  let P := Matrix.of (fun v w => if isNeckEdge T v w then 1 else 0)
   L₀ + ε • P
 
 /-- Sensitivity: How much λ₁ changes with respect to edge perturbations -/
@@ -49,7 +53,7 @@ noncomputable def spectralSensitivity (T : TuringNeckTorus) : ℝ :=
 /-- Key lemma: Small perturbations preserve the gap -/
 lemma small_perturbation_preserves_gap (T : TuringNeckTorus) (ε : ℝ) 
     (h_small : ε < (T.h ^ 2 : ℝ) / 16) :
-    spectralGapVariational T - spectralSensitivity T * ε ≥ (T.h ^ 2 : ℝ) / 8 := by
+    spectralGapVariational T.toDiscreteNeckTorus - spectralSensitivity T * ε ≥ (T.h ^ 2 : ℝ) / 8 := by
   -- When ε < h²/16 and sensitivity ≈ 1, we have:
   -- λ₁ - ε ≥ h²/4 - h²/16 = 3h²/16 > h²/8
   sorry
@@ -57,8 +61,8 @@ lemma small_perturbation_preserves_gap (T : TuringNeckTorus) (ε : ℝ)
 /-- Key lemma: Large perturbations destroy the gap -/
 lemma large_perturbation_destroys_gap (T : TuringNeckTorus) (ε : ℝ)
     (h_large : ε > (T.h ^ 2 : ℝ) / 4) :
-    ∃ v : RealVector T, v ≠ 0 ∧ orthogonalToConstants v ∧
-    RayleighQuotient T v < (T.h ^ 2 : ℝ) / 8 := by
+    ∃ v : RealVector T.toDiscreteNeckTorus, (∃ i, v i ≠ 0) ∧ orthogonalToConstants v ∧
+    RayleighQuotient T.toDiscreteNeckTorus v < (T.h ^ 2 : ℝ) / 8 := by
   -- When ε > h²/4, the perturbation dominates the original gap
   -- The perturbed system has eigenvalues approaching 0
   sorry
@@ -84,7 +88,8 @@ theorem non_halting_implies_small_gap (T : TuringNeckTorus) (N : ℕ)
   
   -- Step 3: Large perturbation destroys gap
   have gap_destroyed := large_perturbation_destroys_gap T _ 
-    (trans pert_large log_dominates)
+    (calc (totalPerturbation T N : ℝ) > Real.log N := pert_large
+     _ > (T.h ^ 2 : ℝ) / 4 := log_dominates)
   
   -- Step 4: spectralGap < threshold = h²/8
   sorry
@@ -104,7 +109,8 @@ theorem halting_implies_large_gap (T : TuringNeckTorus) (n : ℕ)
   
   -- Step 3: Small perturbation preserves gap
   have gap_preserved := small_perturbation_preserves_gap T _ 
-    (trans_lt_of_le_of_lt pert_bounded pert_small)
+    (calc (totalPerturbation T N : ℝ) ≤ (maxPerturbation n : ℝ) := pert_bounded
+     _ < (T.h ^ 2 : ℝ) / 16 := pert_small)
   
   -- Step 4: spectralGap ≥ threshold = h²/8
   sorry
