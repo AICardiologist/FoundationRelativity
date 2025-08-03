@@ -4,8 +4,17 @@ import Papers.P4_SpectralGeometry.Discrete.SpectralTheory
 /-!
 # Perturbation Bounds via Consultant's Variational Argument
 
+## WARNING: This file contains errors identified by the consultant!
+## See ConsultantBoundsRevised.lean for the corrected version.
+
 This module implements the consultant's key insight: use the unperturbed
 eigenvector as a test function for the perturbed system.
+
+CRITICAL ERRORS IN THIS FILE:
+1. Used eigenvalue instead of Rayleigh quotient (line 82 is wrong!)
+2. Counted only n neck edges instead of 2n (torus wraps around)
+3. Created negative weights which is invalid
+4. Missing proper n-h scaling
 
 ## Main Results
 
@@ -58,35 +67,50 @@ lemma neck_test_variation (T : DiscreteNeckTorus) (i j : T.Vertex)
 def isPerturbedEdge (T : TuringNeckTorus) (i j : T.Vertex) : Bool :=
   i.1 ≠ j.1 ∧ i.2 = j.2  -- Horizontal neck edges
 
+/-- New edge weight using resistance model -/
+noncomputable def perturbedEdgeWeight (T : TuringNeckTorus) (N : ℕ) : ℝ :=
+  -- Original weight is 1, resistance increases by H_N
+  -- New weight = 1/(1 + H_N)
+  1 / (1 + (totalPerturbation T N : ℝ))
+
 /-- Perturbation matrix after N steps -/
 noncomputable def perturbationMatrix (T : TuringNeckTorus) (N : ℕ) : 
     Matrix T.Vertex T.Vertex ℝ :=
-  -- ΔL_N subtracts Σ(1/k) from neck edge weights
+  -- ΔL_N = L_N - L_0
+  -- For neck edges: new weight is 1/(1+H_N), old weight was h
+  -- So change is 1/(1+H_N) - h
   Matrix.of fun i j => 
     if isPerturbedEdge T i j then 
-      -(totalPerturbation T N : ℝ)
+      perturbedEdgeWeight T N - (T.h : ℝ)
     else 0
+
+/-- Rayleigh quotient of the test function on unperturbed Laplacian -/
+noncomputable def testFunctionRayleigh (T : DiscreteNeckTorus) : ℝ :=
+  let v₁ := neckTestFunction T
+  let L₀ := T.discreteLaplacian.map (Rat.cast : ℚ → ℝ)
+  ⟪v₁, L₀.mulVec v₁⟫ / ⟪v₁, v₁⟫
 
 /-- Main upper bound: Non-halting collapses gap -/
 theorem perturbation_upper_bound (T : TuringNeckTorus) (N : ℕ) :
     let L₀ := T.discreteLaplacian.map (Rat.cast : ℚ → ℝ)
     let L_N := L₀ + perturbationMatrix T N
     let v₁ := unperturbedEigenvector T.toDiscreteNeckTorus
-    T.spectralGap N ≤ spectralGapVariational T.toDiscreteNeckTorus + 
+    T.spectralGap N ≤ testFunctionRayleigh T.toDiscreteNeckTorus + 
       ⟪v₁, (perturbationMatrix T N).mulVec v₁⟫ / ⟪v₁, v₁⟫ := by
   -- By variational principle: λ₁(L_N) ≤ R(v₁, L_N)
   -- R(v₁, L_N) = ⟨v₁, L_N v₁⟩ / ⟨v₁, v₁⟩
   --            = ⟨v₁, (L₀ + ΔL_N) v₁⟩ / ⟨v₁, v₁⟩
   --            = ⟨v₁, L₀ v₁⟩ / ⟨v₁, v₁⟩ + ⟨v₁, ΔL_N v₁⟩ / ⟨v₁, v₁⟩
   --            = R(v₁, L₀) + perturbation term
-  -- Since v₁ is the eigenvector for L₀: R(v₁, L₀) = λ₁(L₀)
+  -- Note: v₁ is NOT necessarily the eigenvector, so we use its Rayleigh quotient
   sorry
 
 /-- Number of neck edges in the torus -/
 def neckEdgeCount (T : DiscreteNeckTorus) : ℕ := 
-  -- Each vertex on one side connects to exactly one vertex on the other side
-  -- So number of neck edges = T.n (one per position along the neck)
-  T.n
+  -- The torus has periodic boundary conditions, so there are TWO boundaries
+  -- when we partition into halves: one at x=n/2 and one at x=0
+  -- So number of neck edges = 2 * T.n
+  2 * T.n
 
 /-- Concrete bound on perturbation term -/
 lemma perturbation_term_bound (T : TuringNeckTorus) (N : ℕ) :
