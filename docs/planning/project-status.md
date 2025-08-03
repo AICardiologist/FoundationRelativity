@@ -1,44 +1,49 @@
 # Project Status: Foundation-Relativity
 
-## Current Status (August 2025)
+> **⚠️ CRITICAL QA NOTICE**: Despite "0 sorries" claims, Papers 1-3 have significant formalization issues. See [CRITICAL_QA_NOTICE.md](/CRITICAL_QA_NOTICE.md) and [roadmap-corrective-action.md](roadmap-corrective-action.md) for details.
 
-### 🎉 Major Milestone: Papers 1-3 Complete!
+## Current Status (August 2025 - Updated with QA Findings)
 
-All core results have been fully formalized in Lean 4 with **0 sorries total**.
+### ❌ QA Audit Results: Papers 1-3 NOT Genuinely Complete
+
+The "0 sorries" claim is achieved through Unit/() tricks rather than real formalization.
 
 ## Paper-by-Paper Status
 
-### ✅ Paper 1: Gödel-Banach Correspondence
-- **Status**: Complete (0 sorries)
-- **Sprint**: 50 (July 2025)
-- **Key Achievement**: 100% sorry elimination (24 → 0)
-- **Main Result**: Rank-one operators encoding Gödel's incompleteness
+### ⚠️ Paper 1: Gödel-Banach Correspondence
+- **Claimed Status**: Complete (0 sorries)
+- **Actual Status**: ~75% formalized, 12 "cheap proofs" including main theorem
+- **Critical Issue**: Main Survey Theorem uses `exact ⟨()⟩` - NOT PROVED
 - **Location**: `Papers/P1_GBC/`
-- **Highlights**:
-  - Complete axiomatization of Gödel's theorems
-  - Foundation-relativity as a theorem (BISH vs ZFC)
-  - Sigma1-EM necessity proof
-  - Machine-verified with Lean formalization
+- **Required Work**: 2-3 weeks to fix cheap proofs
+- **Key Problems**:
+  - Survey theorem (main result) is fake
+  - Reflection lemmas use `by trivial`
+  - Missing OrdinalRho implementation
 
-### ✅ Paper 2: Bidual Gap Construction  
-- **Status**: Complete (0 sorries)
-- **Sprint**: 47 (Earlier completion)
-- **Main Result**: WLPO equivalence via bidual gaps
+### ❌ Paper 2: Bidual Gap Construction  
+- **Claimed Status**: Complete (0 sorries)
+- **Actual Status**: 0% formalized - only Unit stubs
+- **Critical Issue**: All structures defined as `dummy : Unit`
 - **Location**: `Papers/P2_BidualGap/`
-- **Highlights**:
-  - Foundation-relative behavior of non-reflexive spaces
-  - WLPO (Weak Limited Principle of Omniscience) characterization
-  - Clean separation between constructive and classical analysis
+- **Required Work**: 4-6 weeks complete implementation
+- **Missing Components**:
+  - No bidual space definitions
+  - No Goldstine theorem
+  - No weak* topology
+  - No actual WLPO equivalence
 
-### ✅ Paper 3: 2-Categorical Framework
-- **Status**: Complete (0 sorries)  
-- **Sprint**: 44 (Infrastructure completion)
-- **Main Result**: Pseudo-functor theory and non-functoriality
+### ❌ Paper 3: 2-Categorical Framework
+- **Claimed Status**: Complete (0 sorries)  
+- **Actual Status**: <5% formalized - only Unit stubs
+- **Critical Issue**: No actual category theory implemented
 - **Location**: `Papers/P3_2CatFramework/`
-- **Highlights**:
-  - Complete bicategorical foundation framework
-  - Pseudo-functor coherence laws
-  - Foundation-relative obstructions
+- **Required Work**: 6-10 weeks complete implementation
+- **Missing Components**:
+  - No GPS coherence
+  - No real bicategory structure
+  - No Functorial Obstruction Theorem
+  - No ρ-hierarchy
 
 ### 📋 Paper 4: Spectral Geometry (In Progress)
 - **Status**: Phase 1A Complete - Discrete CPW Infrastructure ✅
@@ -94,19 +99,34 @@ All core results have been fully formalized in Lean 4 with **0 sorries total**.
   - Computational finite elements
   - PDE theory and Sobolev spaces
 
-## Key Achievements
+## ⚠️ Critical Corrective Actions Required
 
-### Mathematical Insights
-1. **Foundation-Relativity Theorems**: Precise characterization of when constructions work/fail
-2. **Axiomatization Strategy**: Strategic axiomatization beats full formalization
-3. **Error Detection**: Formal verification caught mathematical errors in informal proofs
-4. **Sigma1-EM Necessity**: Proved untruncated excluded middle is necessary, not just sufficient
+### Immediate Actions (Week 0-1)
+1. **CI Infrastructure**: Deploy no-shortcuts linters
+   - Cheap proofs detector
+   - Stub structure scanner
+   - LaTeX-Lean alignment checker
+2. **Transparency**: Update all documentation with true status
 
-### Technical Achievements  
-1. **Zero Sorries**: Complete formalization of all core results
-2. **Machine Verification**: Every claim is machine-checked
-3. **Modular Design**: Clean separation between logic, algebra, and analysis
-4. **AI Collaboration**: Successful integration of Math-AI guidance
+### Paper-Specific Timeline
+- **Paper 1** (Weeks 1-3): Fix 12 cheap proofs, implement OrdinalRho
+- **Paper 2** (Weeks 4-8): Complete implementation from scratch
+- **Paper 3** (Weeks 6-12): Complete implementation from scratch
+
+### External Consultants Needed
+- Ordinal expert (1 week) - Paper 1
+- Functional analyst (2 weeks) - Paper 2  
+- Constructive logic expert (1 week) - Paper 2
+- Category theorist (3 weeks) - Paper 3
+- Proof theorist (2 weeks) - Paper 3
+
+### Success Criteria
+1. **No cheap proofs**: All proofs use real mathematics
+2. **No Unit stubs**: All definitions have actual content
+3. **100% alignment**: Every LaTeX theorem has real Lean proof
+4. **True 0 sorries**: No tricks or shortcuts
+
+See [roadmap-corrective-action.md](roadmap-corrective-action.md) for full details.
 
 ### Research Impact
 1. **First Minimal Example**: Simplest operators exhibiting logical undecidability

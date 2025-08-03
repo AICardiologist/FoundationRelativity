@@ -1,5 +1,7 @@
 # Foundation-Relativity Documentation
 
+> **⚠️ CRITICAL QA NOTICE**: See [/CRITICAL_QA_NOTICE.md](/CRITICAL_QA_NOTICE.md) for important information about the actual formalization status of Papers 2 and 3. Despite claims of "0 sorries", these papers currently contain only placeholder stubs and require substantial formalization work.
+
 This directory contains comprehensive documentation for the Foundation-Relativity project, a Lean 4 formalization exploring how mathematical pathologies behave differently under various foundational assumptions.
 
 ## 📁 Documentation Organization

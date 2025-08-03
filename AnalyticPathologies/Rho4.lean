@@ -71,7 +71,7 @@ theorem rho4_hasDoubleGap (_ : ℕ → Bool) : β₀ < β₁ ∧ β₁ < β₂ :
 /-! ### 5 DC definitions -/
 
 /-- WLPOPlus - Boolean omniscience at ρ=4 level. -/
-def WLPOPlus : Prop := True  -- Simplified
+def WLPOPlus : Prop := sorry -- TODO: Define enhanced WLPO variant  -- Simplified
 
 /-- DCω2 - Dependent choice at ω·2 level. -/
 inductive DCω2 : Prop

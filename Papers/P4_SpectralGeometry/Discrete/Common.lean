@@ -1,5 +1,6 @@
 import Papers.P4_SpectralGeometry.Discrete.NeckGraph
 import Papers.P4_SpectralGeometry.Discrete.TuringEncoding
+import Mathlib.Data.Matrix.Basic
 
 /-!
 # Common Definitions for Discrete CPW Model
@@ -51,7 +52,7 @@ def orthogonalToConstants {T : Type*} [Fintype T] {K : Type*} [AddCommMonoid K]
 /-! ## Rayleigh Quotient -/
 
 /-- General Rayleigh quotient for any field -/
-noncomputable def RayleighQuotient {T : Type*} [Fintype T] {K : Type*} [Field K]
+noncomputable def RayleighQuotient {T : Type*} [Fintype T] {K : Type*} [Field K] [DecidableEq K]
     (L : Matrix T T K) (v : T → K) : K :=
   let Lv : T → K := fun i => Finset.univ.sum (fun j => L i j * v j)
   let num := Finset.univ.sum (fun i => v i * Lv i)
@@ -79,12 +80,12 @@ noncomputable def RayleighQuotientTuring (T : TuringNeckTorus) (N : ℕ)
 /-- Variational characterization of spectral gap (real) -/
 noncomputable def spectralGapVariational (T : DiscreteNeckTorus) : ℝ :=
   sInf {RayleighQuotientℝ T v | (v : RealVector T.Vertex) 
-    (hv : v ≠ 0) (horth : orthogonalToConstants v)}
+    (hv : ¬(∀ x, v x = 0)) (horth : orthogonalToConstants v)}
 
 /-- Spectral gap predicate for Π₁ encoding -/
 def spectralGapPredicate {T : Type*} [Fintype T] 
     (L : Matrix T T ℚ) (threshold : ℚ) : Prop :=
-  ∀ v : RationalVector T, v ≠ 0 → orthogonalToConstants v → 
+  ∀ v : RationalVector T, (∃ x, v x ≠ 0) → orthogonalToConstants v → 
     RayleighQuotient L v ≥ threshold
 
 end Papers.P4_SpectralGeometry.Discrete

@@ -96,3 +96,7 @@ lean_exe Rho4ProofTests where
 -- Sprint 44 Day 1: Pseudo-natural transformation tests
 lean_exe PseudoNatTransLawsTests where
   root := `test.PseudoNatTransLawsTests
+
+-- QA Mandated: No-shortcuts enforcement tools
+lean_exe cheap_proofs where
+  root := `scripts.lean.CheapProofs

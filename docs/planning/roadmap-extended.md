@@ -1,13 +1,23 @@
 # Foundation-Relativity Strategic Roadmap (Post-Sprint 48)
 
+> **⚠️ CRITICAL QA NOTICE**: QA audit has revealed that Papers 1-3 are NOT genuinely formalized despite "0 sorries" claims. See [roadmap-corrective-action.md](roadmap-corrective-action.md) for the detailed 12-week corrective action plan.
+
+## 🚨 QA Audit Summary
+- **Paper 1**: Main theorem uses `exact ⟨()⟩` - 12 "cheap proofs" identified
+- **Paper 2**: 0% formalized - only Unit stubs exist
+- **Paper 3**: <5% formalized - only Unit stubs exist
+- **Required**: 12-week corrective action plan with external consultants
+
 ## 🎯 Current Status: Sprint 48 COMPLETE ✅ - Core.lean Spectrum Sorry Elimination 
 
-**Last Updated**: 2025-08-02  
+**Last Updated**: 2025-08-03 (Updated with QA findings)  
 **Current Version**: v0.6.2-sprint48  
 **Status**: Sprint 48 Complete ✅ - Core.lean Mathematical Completion  
 **Latest Achievement**: Core.lean spectrum sorries eliminated using algebraic IsIdempotentElem strategy  
 **Paper 1 Progress**: 11 sorries total (Core: 0, Statement: 8, Auxiliaries: 3, Correspondence: 0)  
 **🎯 MILESTONE**: Core.lean and Correspondence.lean are now COMPLETE (0 sorries each)! ✅
+
+> **Note**: The above progress is for Paper 1 only. Papers 2 and 3 require complete reimplementation.
 
 ---
 

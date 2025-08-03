@@ -112,6 +112,6 @@ theorem spectral_gap_consistency (T : TuringNeckTorus)
   sorry
 where
   /-- A TM that searches for PA inconsistency (placeholder) -/
-  inconsistencySearcher : P4_SpectralGeometry.TuringMachine := ⟨()⟩
+  inconsistencySearcher : P4_SpectralGeometry.TuringMachine := sorry -- TODO: Implement TM
 
 end Papers.P4_SpectralGeometry.Discrete

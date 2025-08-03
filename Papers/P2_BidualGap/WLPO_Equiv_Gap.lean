@@ -13,6 +13,7 @@ namespace Papers.P2
 
 open CategoryTheory.BicatFound
 open CategoryTheory.WitnessGroupoid.Core
+open CategoryTheory.Found
 
 /-! ### Bidual Gap ⇔ WLPO Equivalence -/
 
@@ -24,18 +25,9 @@ This relies on the generalised GapFunctor with 2‑cell action and provides
 a perfect test‑bed for Stream B bicategorical development.
 -/
 theorem gap_equiv_WLPO : Nonempty BidualGap ↔ Nonempty WLPO := by
-  constructor
-  · -- BidualGap → WLPO
-    intro gap
-    -- Following Ishihara's argument: encode WLPO as a sequence
-    -- and evaluate it with a gap functional
-    cases gap
-    exact ⟨⟨()⟩⟩
-  · -- WLPO → BidualGap  
-    intro wlpo
-    -- Use Hahn-Banach to extend c₀-functional built from binary choices
-    cases wlpo
-    exact ⟨⟨()⟩⟩
+  sorry -- TODO: Implement using Ishihara's argument
+  -- BidualGap → WLPO: Encode WLPO as a sequence and evaluate with gap functional
+  -- WLPO → BidualGap: Use Hahn-Banach to extend c₀-functional from binary choices
 
 /-! ### Supporting Lemmas -/
 
@@ -44,18 +36,14 @@ Forward direction: Bidual gap implies constructive choice principles.
 This uses the witness groupoid to extract choice functions.
 -/
 lemma gap_implies_choice : Nonempty BidualGap → ∃ (w : GenericWitness Foundation.bish), True := by
-  intro ⟨gap⟩
-  -- Extract witness from gap structure
-  use ⟨(), (), ()⟩
+  sorry -- TODO: Extract witness from gap structure using bidual analysis
 
 /--
 Reverse direction: WLPO enables bidual gap construction.
 This demonstrates the constructive content of the equivalence.
 -/
 lemma wlpo_enables_gap : Nonempty WLPO → ∃ (gap : BidualGap), True := by
-  intro ⟨wlpo⟩
-  -- Construct gap from WLPO instance
-  use ⟨()⟩
+  sorry -- TODO: Construct gap from WLPO instance using Hahn-Banach extension
 
 /--
 Quantitative refinement: The equivalence preserves bounds.
@@ -91,13 +79,7 @@ This bridges to the APFunctor and RNPFunctor frameworks.
 -/
 lemma connection_to_pathologies :
   Nonempty BidualGap ↔ (∃ (X : BanachSpace), True) := by
-  constructor
-  · intro ⟨gap⟩
-    -- Gap implies some Banach space exists
-    use ⟨()⟩
-  · intro ⟨X, _⟩
-    -- Any Banach space implies gap (in this simplified framework)
-    exact ⟨⟨()⟩⟩
+  sorry -- TODO: Implement proper connection to Banach space pathologies
 
 end Papers.P2
 

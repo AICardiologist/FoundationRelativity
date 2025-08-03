@@ -5,12 +5,16 @@
 [![Version](https://img.shields.io/badge/Version-v0.9.1--papers123+discrete-brightgreen)](https://github.com/AICardiologist/FoundationRelativity/releases)
 [![Lean 4.22.0-rc4](https://img.shields.io/badge/Lean-4.22.0--rc4-blue)](https://github.com/leanprover/lean4)
 [![Papers Complete](https://img.shields.io/badge/Papers%201--3%20Complete-0%20sorries-brightgreen)](docs/planning/project-status.md)
-[![Paper 4 Status](https://img.shields.io/badge/Paper%204%20Discrete%20CPW-Phase%201A%20Complete-green)](Papers/P4_SpectralGeometry/)
+[![Paper 4 Status](https://img.shields.io/badge/Paper%204%20Discrete%20CPW-85%25-green)](Papers/P4_SpectralGeometry/)
 
-> **🎉 MAJOR MILESTONE**: Papers 1-3 Complete - **All Core Results Formalized!** ✅  
-> **Latest**: Three papers fully formalized with 0 sorries total  
-> **Status**: Paper 1 (Gödel-Banach), Paper 2 (Bidual Gap), Paper 3 (2-Cat Framework) ✅  
-> **NEW**: Paper 4 Discrete CPW Model (Phase 1A) - Infrastructure complete! 🚀
+> **⚠️ CRITICAL QA NOTICE**: See [CRITICAL_QA_NOTICE.md](CRITICAL_QA_NOTICE.md) for important information about formalization status.
+>
+> **❌ QA AUDIT FINDINGS**: Despite "0 sorries" claims, Papers 1-3 have significant issues:
+> - Paper 1: Main theorem uses `exact ⟨()⟩` trick - NOT genuinely proved
+> - Paper 2: Only placeholder stubs - 0% formalized
+> - Paper 3: Only placeholder stubs - <5% formalized
+> 
+> **Status**: Paper 4 Discrete CPW Model (Phase 1B) - 85% complete (61 sorries) 🚀
 
 ## 🎯 Overview
 

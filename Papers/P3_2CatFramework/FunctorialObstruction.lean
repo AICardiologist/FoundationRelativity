@@ -25,12 +25,8 @@ and needs the full associator/unitor theorems from Day 2 SWE-AI work.
 -/
 theorem obstruction_theorem : 
   ¬ ∃ (F : TwoCatPseudoFunctor), preservesPentagon F ∧ eliminatesWitnesses F := by
-  -- Proof using pentagon/triangle coherence from SWE-AI Day 2 work
-  intro ⟨F, hPentagon, hElim⟩
-  -- The contradiction: witnesses exist but F eliminates them
-  have witness_exists : Nonempty (GenericWitness Foundation.bish) := 
-    ⟨⟨(), (), ()⟩⟩
-  exact hElim Foundation.bish witness_exists
+  sorry -- TODO: Implement using pentagon/triangle coherence and witness groupoid theory
+  -- Key idea: Witnesses exist in BISH but F would eliminate them, contradiction
 
 /-! ### Supporting Results -/
 
@@ -41,12 +37,8 @@ This demonstrates why strict 2-categories are insufficient.
 lemma obstruction_at_twocells :
   ∀ (F G : Foundation) (α β : Interp F G),
   ∃ (witness_2cell : Unit), True := by
-  -- 2-cell analysis using BicatFound infrastructure
-  intros F G α β
-  -- Every pair of 1-cells has a witnessing 2-cell showing non-functoriality
-  -- The witness is provided by the enhanced 2-cell structure
-  have _witness : BicatFound_TwoCell α β := ⟨(), (), ()⟩
-  use ()
+  sorry -- TODO: Implement proper 2-cell analysis showing non-functoriality
+  -- Need to construct actual 2-cells witnessing the obstruction
 
 /--
 Pentagon dependency: The obstruction proof requires pentagon coherence.
@@ -55,20 +47,16 @@ This creates the dependency on SWE-AI's Day 2 associator work.
 lemma pentagon_required_for_obstruction :
   (∃ (pentagon : Unit), True) → 
   ¬ ∃ (F : TwoCatPseudoFunctor), preservesPentagon F ∧ eliminatesWitnesses F := by
-  -- Pentagon-based proof using SWE-AI's pentagon_assoc simp lemma
-  intro ⟨_pentagon_data, _⟩ ⟨F, hPentagon, hElim⟩
-  -- Same contradiction as main theorem
-  have witness_exists : Nonempty (GenericWitness Foundation.bish) := 
-    ⟨⟨(), (), ()⟩⟩
-  exact hElim Foundation.bish witness_exists
+  sorry -- TODO: Implement using pentagon coherence axioms
+  -- Show that pentagon coherence is essential for the obstruction
 
 /--
 Witness groupoid connection: The obstruction is witnessed by 
 concrete pathological objects from the witness groupoid.
 -/
 lemma witness_groupoid_realizes_obstruction :
-  ∃ (F : Foundation) (w : BicatWitness F), True := 
-⟨Foundation.bish, ⟨⟨(), (), ()⟩, ()⟩, True.intro⟩
+  ∃ (F : Foundation) (w : BicatWitness F), True := by
+  sorry -- TODO: Construct concrete witness from groupoid theory
 
 end Papers.P3
 

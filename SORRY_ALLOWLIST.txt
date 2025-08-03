@@ -154,3 +154,41 @@ Papers/P4_SpectralGeometry/Discrete/Undecidability.lean:121   # main_theorem
 
 # TOTAL NEW: 61 sorries in Paper 4 discrete implementation
 # TOTAL Paper 4: 8 axiomatization points + 61 discrete model sorries = 69 total
+
+# QA Cleanup: Unit tricks replaced with honest sorries (2025-08-03)
+# Core infrastructure
+AnalyticPathologies/Rho4.lean:74
+CategoryTheory/Obstruction.lean:79
+CategoryTheory/WitnessGroupoid/Core.lean:69
+LogicDSL/Core.lean:10
+LogicDSL/Core.lean:13
+LogicDSL/Core.lean:16
+LogicDSL/Core.lean:19
+LogicDSL/Core.lean:22
+
+# Paper 2 - Bidual Gap (replaced Unit stubs with sorries)
+Papers/P2_BidualGap/Basic.lean:26
+Papers/P2_BidualGap/Basic.lean:31
+Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:28
+Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:39
+Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:46
+Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:82
+
+# Paper 3 - 2-Categorical Framework (replaced Unit stubs with sorries)
+Papers/P3_2CatFramework/Basic.lean:28
+Papers/P3_2CatFramework/Basic.lean:33
+Papers/P3_2CatFramework/FunctorialObstruction.lean:28
+Papers/P3_2CatFramework/FunctorialObstruction.lean:40
+Papers/P3_2CatFramework/FunctorialObstruction.lean:50
+Papers/P3_2CatFramework/FunctorialObstruction.lean:59
+
+# Paper 4 - Updated TuringMachine placeholders
+Papers/P4_SpectralGeometry/Discrete/TuringEncoding.lean:115
+Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:126
+
+# GRAND TOTAL: 88 authorized sorries
+# - Paper 1: 0 (COMPLETE!)
+# - Paper 2: 6 (all new from Unit cleanup)
+# - Paper 3: 6 (all new from Unit cleanup)  
+# - Paper 4: 71 (69 original + 2 updated)
+# - Core infrastructure: 5
