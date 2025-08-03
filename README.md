@@ -7,9 +7,9 @@
 [![Papers Complete](https://img.shields.io/badge/Papers%201--3%20Complete-0%20sorries-brightgreen)](docs/planning/project-status.md)
 [![Paper 4 Status](https://img.shields.io/badge/Paper%204%20Discrete%20CPW-85%25-green)](Papers/P4_SpectralGeometry/)
 
-> **✅ AUDIT UPDATE (2025-08-03)**: Paper 1 audit concerns have been addressed:
+> **✅ AUDIT UPDATE (2025-08-03)**: Paper 1 audit concerns have been fully addressed:
 > - Paper 1: 100% formalized with 0 sorries - all placeholder theorems removed
-> - Paper 2 & 3: Unit/() tricks replaced with honest sorries per QA policy
+> - Paper 2 & 3: Unit/() tricks replaced with honest sorries per QA policy (PR #77)
 > 
 > **Status**: Paper 1 complete ✅ | Paper 4 Discrete CPW Model (Phase 1B) - 85% complete (61 sorries) 🚀
 

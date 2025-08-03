@@ -1,6 +1,6 @@
 # Project Status: Foundation-Relativity
 
-> **✅ AUDIT UPDATE (2025-08-03)**: Paper 1 audit concerns have been addressed. Paper 1 is now 100% formalized with 0 sorries.
+> **✅ AUDIT UPDATE (2025-08-03)**: Paper 1 audit concerns have been fully addressed. Paper 1 is now 100% formalized with 0 sorries.
 
 ## Current Status (August 2025 - Post-Audit Update)
 
@@ -19,7 +19,7 @@
   - All tests pass, no cheap proofs
 
 ### 📋 Paper 2: Bidual Gap Construction  
-- **Status**: 6 honest sorries (Unit tricks removed)
+- **Status**: 6 honest sorries (Unit tricks removed in PR #77)
 - **Actual State**: Placeholder implementation
 - **Critical Issue**: All structures defined as `dummy : Unit`
 - **Location**: `Papers/P2_BidualGap/`
@@ -31,7 +31,7 @@
   - No actual WLPO equivalence
 
 ### 📋 Paper 3: 2-Categorical Framework
-- **Status**: 6 honest sorries (Unit tricks removed)
+- **Status**: 6 honest sorries (Unit tricks removed in PR #77)
 - **Actual State**: Minimal implementation
 - **Critical Issue**: No actual category theory implemented
 - **Location**: `Papers/P3_2CatFramework/`
