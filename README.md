@@ -169,10 +169,15 @@ theorem gap_pseudo_functor_obstruction :
     ¬(Gap : Foundation^op ⥤ Cat).IsPseudoFunctor
 ```
 
-### Paper 4: Neck Scaling Theorem
+### Paper 4: Neck Scaling Theorem (In Progress)
 ```lean
+-- Smooth case (completed):
 theorem neck_scaling (h : ℚ) (hh : 0 < h) :
     (h^2)/4 ≤ lambda_1_neck h ∧ lambda_1_neck h ≤ 5*h^2
+
+-- Discrete case (85% complete):
+theorem gap_collapse_threshold (h : ℚ) :
+    ∀ H_N > 64/(Ch) - 1, spectralGap < h²/8
 ```
 
 ## 🧪 Verification Status
@@ -183,8 +188,9 @@ theorem neck_scaling (h : ℚ) (hh : 0 < h) :
 | Paper 2 | 0 | ✅ Complete | Sprint 47 |
 | Paper 3 | 0 | ✅ Complete | Sprint 44 |
 | Paper 4 Neck | 0 | ✅ Implemented | Sprint 51 |
+| Paper 4 Discrete | 61 | 🔧 In Progress | Current |
 | Paper 4 Full | - | 📋 Planning | Future |
-| **Total** | **0** | **✅ All Core Results Complete** | |
+| **Total** | **61** | **Papers 1-3 Complete, Paper 4 85%** | |
 
 ## 🔬 Mathematical Significance
 

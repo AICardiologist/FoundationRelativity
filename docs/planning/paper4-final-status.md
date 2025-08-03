@@ -1,10 +1,10 @@
-# Paper 4 Final Status Report
+# Paper 4 Final Status Report (UPDATED)
 
 ## Executive Summary
-- **Total Sorries**: 49 (down from initial 54)
-- **Implementation**: ~90% complete
-- **Key Blocker**: Quantitative perturbation bounds from consultant
-- **Timeline**: Ready to complete once consultant responds
+- **Total Sorries**: 61 (was 49, added revised files)
+- **Implementation**: ~85% complete (corrections needed)
+- **Key Update**: Consultant revealed critical errors in our approach
+- **Timeline**: Need to propagate corrections through codebase
 
 ## Major Accomplishments
 
@@ -28,6 +28,8 @@
 - Started fixing `neck_test_variation` proof
 - Reduced sorries from 54 to 49
 - Documented consultant's approach thoroughly
+- **CRITICAL**: Received corrections from consultant revealing fundamental errors
+- Created ConsultantBoundsRevised.lean with correct implementation
 
 ## File Status
 
@@ -50,33 +52,39 @@
 
 ## Critical Path to Completion
 
-### What We Have
+### What We Have (CORRECTED)
 ```lean
 -- Logical structure: Halting ↔ bounded perturbation ✓
 -- Variational framework: λ₁(L_N) ≤ R(v₁, L_N) ✓  
--- Test function: v₁ = neck eigenvector ✓
--- Perturbation model: ΔL_N = -Σ(1/k) on neck edges ✓
+-- Test function: v₁ = ±1 step function (NOT eigenvector!) ✓
+-- Perturbation model: w' = 1/(1+H_N) resistance model ✓
+-- Correct geometry: 2n neck edges, not n ✓
+-- Scaling: n = C/h for continuum limit ✓
 ```
 
-### What We Need
+### Corrected Bounds
 ```lean
--- Quantitative bound: |Δλ₁| ≤ f(perturbations)
--- Specifically: When Σ(1/k) > h²/4, then λ₁ < h²/8
--- And: When Σ(1/k) < h²/16, then λ₁ > h²/8
+-- Upper bound: λ₁(L_N) ≤ 8/[n(1+H_N)]
+-- Threshold: Gap collapses when H_N > 64/(Ch) - 1
+-- Lower bound: Weyl's inequality with positive weights
 ```
 
-### Consultant's Key Insights
-1. **Upper Bound**: Use unperturbed eigenvector as test function
-   - λ₁(L_N) ≤ λ₁(L₀) + ⟨v₁, ΔL_N v₁⟩/⟨v₁, v₁⟩
-   - Perturbation term = -4 * n * H_N (negative!)
+### Consultant's Key Corrections
+1. **WRONG**: Cannot use eigenvalue λ₁(L₀) in bound!
+   - Must use full Rayleigh quotient R(v₁, L₀)
+   - The ±1 function is NOT the eigenvector
 
-2. **Lower Bound**: Apply Weyl's inequality
-   - λ₁(L_N) ≥ λ₁(L₀) + λ_min(ΔL_N)
-   - λ_min(ΔL_N) ≥ -H_N
+2. **WRONG**: Only counted n neck edges
+   - Torus has periodic boundaries → 2n edges
+   - This doubles the perturbation effect
 
-3. **Π₁ Encoding**: Use Sturm's theorem
-   - Eigenvalue counting is primitive recursive
-   - Checking λ₁ ≥ threshold is decidable
+3. **WRONG**: Negative weights are invalid
+   - Must use resistance model: w = 1/(1+H_N)
+   - Ensures weights stay positive
+
+4. **Sturm Implementation**: Must use Bareiss algorithm
+   - Standard methods have exponential bit growth
+   - Need polynomial complexity for primitive recursiveness
 
 ## Immediate Next Steps
 
