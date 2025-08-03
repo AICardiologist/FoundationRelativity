@@ -53,10 +53,14 @@ noncomputable instance (h : ℝ) (hh : 0 < h) : MetricSpace (NeckTorus h) where
       linarith
   dist_comm := by
     intro p q
-    simp [neckMetric]
-    by_cases heq : p = q
-    · simp [heq]
-    · simp [heq]
+    simp only [neckMetric]
+    split_ifs
+    · rfl
+    · rename_i h1 h2
+      exact absurd h1.symm h2
+    · rename_i h1 h2
+      exact absurd h2.symm h1
+    · rfl
   dist_triangle := by
     intro p q r
     sorry -- Simplified implementation
