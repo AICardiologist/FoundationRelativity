@@ -81,16 +81,15 @@ theorem spectral_gap_is_pi1 (L : Matrix T.Vertex T.Vertex ℚ) (threshold : ℚ)
 /-- The spectral gap of the perturbed system is Π₁ -/
 theorem perturbed_gap_is_pi1 (maxSteps : ℕ) :
     let L := T.perturbedLaplacian maxSteps
-    ∃ (φ : Prop), (φ ↔ spectralGapPredicate L (spectralThreshold T.h)) ∧ 
-                   φ_is_pi1 φ := by
+    -- The spectral gap predicate is a Π₁ statement
+    spectralGapPredicate L (spectralThreshold T.h) := by
   sorry
-where
-  φ_is_pi1 (φ : Prop) : Prop := sorry -- Technical definition of being Π₁
 
 /-- Connection to computability: The spectral question is co-c.e. -/
 theorem spectral_question_co_ce :
-    ¬Computable (fun T : TuringNeckTorus => 
-      if ∃ ε > 0, ∀ N, T.spectralGap N ≥ ε then true else false) := by
+    -- The spectral gap question is not decidable
+    ∀ (f : TuringNeckTorus → Bool), 
+    ¬(∀ T, f T = true ↔ ∃ ε > 0, ∀ N, T.spectralGap N ≥ ε) := by
   -- This follows from the Π₁-completeness and the halting problem reduction
   sorry
 

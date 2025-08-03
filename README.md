@@ -2,15 +2,15 @@
 
 [![CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml)
 [![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
-[![Version](https://img.shields.io/badge/Version-v0.9.0--papers123+neck-brightgreen)](https://github.com/AICardiologist/FoundationRelativity/releases)
+[![Version](https://img.shields.io/badge/Version-v0.9.1--papers123+discrete-brightgreen)](https://github.com/AICardiologist/FoundationRelativity/releases)
 [![Lean 4.22.0-rc4](https://img.shields.io/badge/Lean-4.22.0--rc4-blue)](https://github.com/leanprover/lean4)
 [![Papers Complete](https://img.shields.io/badge/Papers%201--3%20Complete-0%20sorries-brightgreen)](docs/planning/project-status.md)
-[![Paper 4 Status](https://img.shields.io/badge/Paper%204%20Neck%20Scaling-Implemented-green)](Papers/P4_SpectralGeometry/)
+[![Paper 4 Status](https://img.shields.io/badge/Paper%204%20Discrete%20CPW-Phase%201A%20Complete-green)](Papers/P4_SpectralGeometry/)
 
 > **🎉 MAJOR MILESTONE**: Papers 1-3 Complete - **All Core Results Formalized!** ✅  
 > **Latest**: Three papers fully formalized with 0 sorries total  
 > **Status**: Paper 1 (Gödel-Banach), Paper 2 (Bidual Gap), Paper 3 (2-Cat Framework) ✅  
-> **NEW**: Paper 4 Neck Scaling theorem implemented - key analytical result in <1k lines! 🚀
+> **NEW**: Paper 4 Discrete CPW Model (Phase 1A) - Infrastructure complete! 🚀
 
 ## 🎯 Overview
 
@@ -39,12 +39,16 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
 - **[Paper 2: Bidual Gap Construction](Papers/P2_BidualGap/)** - WLPO equivalence
 - **[Paper 3: 2-Categorical Framework](Papers/P3_2CatFramework/)** - Pseudo-functor theory
 
-### Paper 4: Neck Scaling (High-Leverage Implementation)
-- **[Paper 4: Spectral Geometry](Papers/P4_SpectralGeometry/)** - Neck scaling theorem ✅
-- **Key Result**: `(h²/4) ≤ λ₁(neck_torus h) ≤ 5h²`
-- **Status**: Core analytical theorem implemented (~900 lines)
-- **Approach**: Axiomatized neck scaling bounds with undecidability bridge
-- **Documentation**: [Full Implementation Roadmap](docs/planning/paper4-roadmap.md)
+### Paper 4: Spectral Geometry (Fast-Track Discrete Approach)
+- **[Paper 4: Spectral Geometry](Papers/P4_SpectralGeometry/)** - Undecidability via discrete CPW model
+- **Key Result**: `∃ n, TM.halts n ↔ ∃ ε > 0, ∀ N, spectralGap N ≥ ε`
+- **Phase 1A Status**: ✅ Discrete infrastructure complete (28 sorries)
+  - Discrete neck torus graph structure
+  - Turing machine encoding framework
+  - Spectral band interval arithmetic
+  - Π₁ encoding of spectral conditions
+- **Next**: Phase 1B - Prove key lemmas (Weeks 1-2)
+- **Documentation**: [Enhanced Fast-Track Roadmap](docs/planning/paper4-roadmap-enhanced.md)
 
 ### Documentation Organization
 
@@ -53,7 +57,8 @@ docs/
 ├── README.md                    # This overview
 ├── planning/                    # Project roadmaps and strategies
 │   ├── project-status.md        # Current status across all papers
-│   ├── paper4-roadmap.md        # Next steps for spectral geometry
+│   ├── paper4-roadmap.md        # Original full smooth geometry vision
+│   ├── paper4-roadmap-enhanced.md # NEW: Fast-track discrete approach (6-7 weeks)
 │   └── roadmap-extended.md      # Long-term project vision
 ├── papers/                      # LaTeX sources and analysis
 │   ├── P1-GBC.tex              # Paper 1 LaTeX source
@@ -93,10 +98,15 @@ FoundationRelativity/
 │   │   ├── Basic.lean         #    Pseudo-functor infrastructure
 │   │   ├── FunctorialObstruction.lean # Non-functoriality results
 │   │   └── ...                #    Category theory foundations
-│   └── P4_SpectralGeometry/   # ✅ Spectral Geometry (Neck Scaling)
+│   └── P4_SpectralGeometry/   # 📋 Spectral Geometry (Phase 1A Complete)
 │       ├── Geometry/          #    Neck torus definition
 │       ├── Spectral/          #    Variational principles & scaling
-│       └── Logic/             #    Con(PA) undecidability bridge
+│       ├── Logic/             #    Con(PA) undecidability bridge
+│       └── Discrete/          # ✅ NEW: Fast-track CPW model
+│           ├── NeckGraph.lean      #    Discrete n×n torus
+│           ├── TuringEncoding.lean #    TM → edge weights
+│           ├── IntervalBookkeeping.lean # Spectral bands
+│           └── Pi1Encoding.lean    #    Π₁ complexity
 ├── CategoryTheory/             # 🏗️ Foundation framework
 │   ├── Found.lean             #    Foundation type and morphisms
 │   ├── BicatFound.lean        #    Bicategorical structure

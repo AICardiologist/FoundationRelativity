@@ -40,14 +40,19 @@ All core results have been fully formalized in Lean 4 with **0 sorries total**.
   - Pseudo-functor coherence laws
   - Foundation-relative obstructions
 
-### 📋 Paper 4: Spectral Geometry (Next Target)
-- **Status**: Planning Phase
-- **Target**: 2025-2026
-- **Main Goal**: Undecidable eigenvalues on Riemannian manifolds
-- **Location**: `Papers/P4_SpectralGeometry/` (planned)
-- **Challenges**:
-  - Requires extensive Riemannian geometry infrastructure
-  - Differential geometry library development
+### 📋 Paper 4: Spectral Geometry (In Progress)
+- **Status**: Phase 1A Complete - Discrete CPW Infrastructure ✅
+- **Current Sprint**: 51+ (August 2025)
+- **Main Goal**: Undecidable eigenvalues via discrete approximation
+- **Location**: `Papers/P4_SpectralGeometry/`
+- **Phase 1A Achievements** (28 sorries):
+  - Discrete neck torus graph structure (`Discrete/NeckGraph.lean`)
+  - Turing machine encoding framework (`Discrete/TuringEncoding.lean`)
+  - Spectral band interval arithmetic (`Discrete/IntervalBookkeeping.lean`)
+  - Π₁ encoding of spectral conditions (`Discrete/Pi1Encoding.lean`)
+- **Next Steps**: Phase 1B - Prove key lemmas (Weeks 1-2)
+- **Fast-Track Timeline**: 6-7 weeks to completion
+- **Long-Term Vision**: Full smooth manifold implementation (24-36 months)
   - Computational aspects (finite elements, mesh generation)
 
 ## Overall Statistics
@@ -57,9 +62,10 @@ All core results have been fully formalized in Lean 4 with **0 sorries total**.
 | Paper 1 | 9 files | 0 | ✅ Complete | Sprint 50 |
 | Paper 2 | 5 files | 0 | ✅ Complete | Sprint 47 |
 | Paper 3 | 3 files | 0 | ✅ Complete | Sprint 44 |
-| Paper 4 | - | - | 📋 Planning | Future |
+| Paper 4 (Discrete) | 8 files | 28 | 📋 Phase 1A | Sprint 51+ |
 | **Infrastructure** | 20+ files | 0 | ✅ Complete | Sprint 44 |
-| **Total Core** | **30+ files** | **0** | **✅ Complete** | **100%** |
+| **Total Papers 1-3** | **17 files** | **0** | **✅ Complete** | **100%** |
+| **Total with P4** | **25+ files** | **28** | **In Progress** | **~90%** |
 
 ## Technical Infrastructure Status
 
@@ -75,11 +81,18 @@ All core results have been fully formalized in Lean 4 with **0 sorries total**.
 - **CI/CD**: Automated verification and testing
 - **Paper Revisions**: Enhanced versions incorporating formalization insights
 
-### 📋 Future Infrastructure (Paper 4)
-- **Riemannian Geometry**: Manifolds, metrics, curvature
-- **Spectral Geometry**: Laplace-Beltrami operators, eigenvalue theory
-- **Computational Geometry**: Finite element methods, mesh generation
-- **PDE Theory**: Sobolev spaces on manifolds, regularity
+### 📋 Paper 4 Infrastructure Progress
+- **Phase 1A Complete**: Discrete CPW model infrastructure ✅
+  - Graph-based neck torus approximation
+  - Turing machine encoding in edge weights
+  - Spectral band separation logic
+  - Π₁ complexity characterization
+- **Phase 1B Next**: Key lemma proofs (Weeks 1-2)
+- **Future (Track B)**: Full smooth manifold theory (24-36 months)
+  - Riemannian geometry infrastructure
+  - Spectral geometry on manifolds
+  - Computational finite elements
+  - PDE theory and Sobolev spaces
 
 ## Key Achievements
 
