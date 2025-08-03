@@ -90,8 +90,6 @@ Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:79   # spectral_gap_is_pi1 
 Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:86   # perturbed_gap_is_pi1
 Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:94   # spectral_question_co_ce
 
-# TOTAL Paper 4: 8 axiomatization points + 11 discrete model sorries = 19 total
-
 # Paper 4 Discrete CPW Model (Phase 1B) - Additional implementation sorries
 # Added during consultant corrections implementation
 Papers/P4_SpectralGeometry/Discrete/ConsultantBounds.lean:60    # neck_test_variation axiomatization
@@ -163,3 +161,4 @@ Papers/P4_SpectralGeometry/Discrete/Undecidability.lean:114   # spectral_gap_und
 Papers/P4_SpectralGeometry/Discrete/Undecidability.lean:121   # main_theorem
 
 # TOTAL NEW: 61 sorries in Paper 4 discrete implementation
+# TOTAL Paper 4: 8 axiomatization points + 61 discrete model sorries = 69 total
