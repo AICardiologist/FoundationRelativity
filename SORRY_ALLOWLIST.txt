@@ -96,7 +96,6 @@ Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:60   # rayleigh_is_primrec
 Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:76   # spectral_gap_is_pi1 primrec part
 Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:79   # spectral_gap_is_pi1 equivalence
 Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:86   # perturbed_gap_is_pi1
-Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:88   # φ_is_pi1 definition
-Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:95   # spectral_question_co_ce
+Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:94   # spectral_question_co_ce
 
-# TOTAL Paper 4: 8 axiomatization points + 16 discrete model sorries = 24 total
+# TOTAL Paper 4: 8 axiomatization points + 19 discrete model sorries = 27 total
