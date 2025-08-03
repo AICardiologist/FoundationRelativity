@@ -169,10 +169,10 @@ theorem gap_pseudo_functor_obstruction :
     ¬(Gap : Foundation^op ⥤ Cat).IsPseudoFunctor
 ```
 
-### Paper 4: Neck Scaling Theorem
+### Paper 4: Neck Scaling Theorem (Discrete CPW)
 ```lean
-theorem neck_scaling (h : ℚ) (hh : 0 < h) :
-    (h^2)/4 ≤ lambda_1_neck h ∧ lambda_1_neck h ≤ 5*h^2
+theorem spectral_gap_jump (N : ℕ) :
+    TuringMachine.halts N ↔ ∃ ε > 0, ∀ k ≥ N, spectralGap k ≥ ε
 ```
 
 ## 🧪 Verification Status
@@ -182,9 +182,9 @@ theorem neck_scaling (h : ℚ) (hh : 0 < h) :
 | Paper 1 | 0 | ✅ Complete | Sprint 50 |
 | Paper 2 | 0 | ✅ Complete | Sprint 47 |
 | Paper 3 | 0 | ✅ Complete | Sprint 44 |
-| Paper 4 Neck | 0 | ✅ Implemented | Sprint 51 |
-| Paper 4 Full | - | 📋 Planning | Future |
-| **Total** | **0** | **✅ All Core Results Complete** | |
+| Paper 4 Discrete | 28 | 📋 Phase 1A Complete | Sprint 51+ |
+| Paper 4 Full | - | 📋 Future Work | 24-36 months |
+| **Total (Papers 1-3)** | **0** | **✅ Core Results Complete** | |
 
 ## 🔬 Mathematical Significance
 
@@ -209,7 +209,7 @@ This project is released under MIT License. If you use this work, please cite:
   author={Lee, Paul Chun-Kit},
   year={2025},
   url={https://github.com/AICardiologist/FoundationRelativity},
-  note={Version 0.9.0, Papers 1-3 complete, Paper 4 neck scaling implemented}
+  note={Version 0.9.1, Papers 1-3 complete with 0 sorries, Paper 4 discrete model in progress}
 }
 ```
 
@@ -221,5 +221,6 @@ This project is released under MIT License. If you use this work, please cite:
 
 ---
 
-**Latest Addition**: Paper 4 neck scaling theorem implemented! The core analytical result is now formalized.  
-**Next Steps**: Full Paper 4 implementation (24-36 months) - see [`docs/planning/paper4-roadmap.md`](docs/planning/paper4-roadmap.md) for details.
+**Latest Update**: Paper 1 (Gödel-Banach) is now 100% complete with 0 sorries! PR #78 merged successfully.  
+**Current Focus**: Paper 4 discrete CPW model - Phase 1A infrastructure complete (28 sorries)  
+**Next Steps**: Paper 4 Phase 1B - Prove key lemmas (6-7 weeks total) - see [`docs/planning/paper4-roadmap-enhanced.md`](docs/planning/paper4-roadmap-enhanced.md) for fast-track approach.
