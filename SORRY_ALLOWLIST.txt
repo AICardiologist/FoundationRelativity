@@ -78,17 +78,9 @@ Papers/P4_SpectralGeometry/Geometry/Neck.lean:66        # dist_triangle simplifi
 Papers/P4_SpectralGeometry/Geometry/Neck.lean:69        # firstEigenvalue axiomatized definition
 
 # Paper 4 Discrete CPW Model (Phase 1A) - Fast track implementation
-Papers/P4_SpectralGeometry/Discrete/TuringEncoding.lean:90   # spectral_gap_jump main theorem
-Papers/P4_SpectralGeometry/Discrete/TuringEncoding.lean:96   # spectral_gap_consistency
-Papers/P4_SpectralGeometry/Discrete/IntervalBookkeeping.lean:122   # halting_preserves_gap
-Papers/P4_SpectralGeometry/Discrete/IntervalBookkeeping.lean:128   # non_halting_kills_gap
-Papers/P4_SpectralGeometry/Discrete/IntervalBookkeeping.lean:135   # threshold_dichotomy
-Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:55   # orthogonal_is_primrec
-Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:60   # rayleigh_is_primrec
-Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:76   # spectral_gap_is_pi1 primrec part
-Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:79   # spectral_gap_is_pi1 equivalence
-Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:86   # perturbed_gap_is_pi1
-Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:94   # spectral_question_co_ce
+Papers/P4_SpectralGeometry/Discrete/IntervalBookkeeping.lean:130   # halting_preserves_gap
+Papers/P4_SpectralGeometry/Discrete/IntervalBookkeeping.lean:142   # non_halting_kills_gap
+Papers/P4_SpectralGeometry/Discrete/IntervalBookkeeping.lean:152   # threshold_dichotomy
 
 # Paper 4 Discrete CPW Model (Phase 1B) - Additional implementation sorries
 # Added during consultant corrections implementation
