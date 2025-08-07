@@ -1,4 +1,5 @@
 import CategoryTheory.GapFunctor
+import Papers.P3_2CatFramework.Core.FoundationBasic  
 import Found.LogicDSL
 import Mathlib.CategoryTheory.Functor.Basic
 

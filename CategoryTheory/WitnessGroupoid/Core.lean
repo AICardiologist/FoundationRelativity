@@ -7,7 +7,7 @@
   reuse in APFunctor, RNPFunctor, and future witness-generating functors.
 -/
 
-import CategoryTheory.Found
+import Papers.P3_2CatFramework.Core.FoundationBasic
 import Mathlib.CategoryTheory.Category.Basic
 import Mathlib.Data.Real.Basic
 
@@ -17,15 +17,9 @@ open CategoryTheory
 
 /-! ### 1. Generic Witness Structure -/
 
-/-- A generic witness structure for gap functionals and pathology failures.
+/-- Generic witness structure using the new Foundation infrastructure.
     Each foundation F carries evidence of various mathematical phenomena. -/
-structure GenericWitness (F : Foundation) where
-  /-- Gap functional evidence placeholder -/
-  gapFunctional : Unit
-  /-- Analytic pathology failure evidence placeholder -/  
-  apFailure : Unit
-  /-- Extensional witness data placeholder -/
-  extensional : Unit
+abbrev GenericWitness := GapWitness
 
 /-! ### 2. Witness Morphisms -/
 
@@ -35,7 +29,7 @@ namespace GenericWitness
 def id (F : Foundation) (w : GenericWitness F) : GenericWitness F := w
 
 /-- Witness composition (trivial since only identities exist) -/
-def comp {F : Foundation} (_ _ : GenericWitness F) : GenericWitness F := ⟨(), (), ()⟩
+def comp {F : Foundation} (_ _ : GenericWitness F) : GenericWitness F := ⟨()⟩
 
 end GenericWitness
 

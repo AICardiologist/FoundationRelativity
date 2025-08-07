@@ -9,7 +9,6 @@ import Papers.P3_2CatFramework.Basic
 
 namespace Papers.P3
 
-open CategoryTheory.BicatFound
 open CategoryTheory.WitnessGroupoid
 open CategoryTheory.WitnessGroupoid.Core
 
