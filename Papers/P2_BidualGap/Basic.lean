@@ -7,6 +7,9 @@
 import CategoryTheory.BicatFound
 import CategoryTheory.GapFunctor
 import CategoryTheory.WitnessGroupoid.Core
+import Mathlib.Analysis.Normed.Module.Dual
+import Mathlib.Analysis.Normed.Operator.ContinuousLinearMap
+import Mathlib.Analysis.Normed.Group.Completeness
 
 open CategoryTheory
 
@@ -20,15 +23,28 @@ open CategoryTheory.WitnessGroupoid.Core
 
 /-! ### Basic Definitions for Bidual Gap Analysis -/
 
-/-- The bidual gap property: A Banach space X has the bidual gap property if 
+/-- The bidual gap property: There exists a Banach space X such that 
     the canonical embedding X → X** is not surjective.
-    TODO: Implement proper definition with Banach space theory -/
-def BidualGap : Prop := sorry
+    
+    The canonical embedding j : X → X** is defined by (j x)(φ) = φ(x)
+    for x ∈ X and φ ∈ X*. The bidual gap occurs when this embedding
+    is not onto, meaning there exist functionals in X** that are not
+    evaluation functionals at points in X. -/
+def BidualGap : Prop :=
+  ∃ (X : Type*) (_ : NormedAddCommGroup X) (_ : NormedSpace ℝ X) (_ : CompleteSpace X),
+  let canonical_embed := NormedSpace.inclusionInDoubleDual ℝ X
+  ¬Function.Surjective canonical_embed
 
 /-- Weak Limited Principle of Omniscience: For every sequence α : ℕ → Bool,
     either all values are false or not all values are false.
-    TODO: Implement proper constructive logic definition -/
-def WLPO : Prop := sorry
+    
+    This is a constructive logic principle that is weaker than the full
+    Limited Principle of Omniscience (LPO) but still not provable in
+    Bishop-style constructive mathematics (BISH). WLPO is equivalent
+    to many classical theorems including the Hahn-Banach theorem and
+    the existence of the bidual gap. -/
+def WLPO : Prop := 
+  ∀ (α : ℕ → Bool), (∀ n, α n = false) ∨ ¬(∀ n, α n = false)
 
 /-! ### Helper Tactics for Banach Space Reasoning -/
 
