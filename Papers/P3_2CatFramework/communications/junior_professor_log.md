@@ -48,6 +48,42 @@
 
 ---
 
+### 7 Aug 2025 - Self-Contained Universe Refactor Attempt
+
+**Junior Professor provided explicit universe management strategy:**
+> **Keep every universe parameter *explicit and positional*** (no implicit `max` inference) and **never quantify over a type that already contains a universe level variable**.
+
+**Implementation Progress:**
+- ✅ Created `Papers/P3_2CatFramework/Core/UniverseLevels.lean` with explicit 𝓤₀ < 𝓤₁ < 𝓤₂
+- ⚠️ **UNIVERSE CONSTRAINT ERROR** in `Core/FoundationBasic.lean`:
+
+```
+error: Papers/P3_2CatFramework/Core/FoundationBasic.lean:6:2: invalid universe level for field 'U', has type
+  Type 𝓤₀
+at universe level
+  𝓤₀+2
+which is not less than or equal to the structure's resulting universe level
+  𝓤₂+1
+```
+
+**Analysis:**
+- Even with explicit universe levels, Lean calculates field universe as `𝓤₀+2`
+- Structure Foundation : Type 𝓤₂ has resulting level `𝓤₂+1`
+- Constraint `𝓤₀+2 ≤ 𝓤₂+1` fails, suggesting universe level relationship issue
+
+**Question for Junior Professor:**
+How should the universe levels be structured to satisfy Lean's constraint requirements? The explicit approach still triggers universe level validation errors.
+
+**RESOLUTION FOUND:**
+Changed `Foundation : Type 𝓤₂` to `Foundation : Type (𝓤₀ + 1)` to accommodate the field constraint. This allows the field `U : Type 𝓤₀` to satisfy Lean's universe level requirements.
+
+**✅ SUCCESS:**
+- Core universe scaffolding now compiles successfully
+- Minimal test file passes: `#check Interp F G` and `#check GapWitness F` work
+- Ready to proceed with Step 5 of the roadmap (incremental reconstruction)
+
+---
+
 ### Expert Session Materials
 
 Located in `Papers/P3_2CatFramework/expert-session/`:
