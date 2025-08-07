@@ -41,6 +41,42 @@ jobs:
             echo "Warning: verify-no-sorry.sh not found"
           fi
 
+      - name: Guard against placeholder code
+        run: |
+          echo "Checking for prohibited placeholder implementations..."
+          
+          # Check for unsafe placeholder code patterns (not documentation)
+          VIOLATIONS=0
+          
+          # Look for actual unsafe implementations
+          if find . -path "./.lake" -prune -o -name "*.lean" -exec grep -l "unsafe" {} \; | head -1 | grep -q .; then
+            echo "❌ Found 'unsafe' implementations in:"
+            find . -path "./.lake" -prune -o -name "*.lean" -exec grep -Hn "unsafe" {} \;
+            VIOLATIONS=$((VIOLATIONS + 1))
+          fi
+          
+          # Look for TEMP implementations (not comments)
+          if find . -path "./.lake" -prune -o -name "*.lean" -exec grep -E "^[[:space:]]*def.*TEMP|^[[:space:]]*theorem.*TEMP" {} \; | head -1 | grep -q .; then
+            echo "❌ Found 'TEMP' definitions in:"
+            find . -path "./.lake" -prune -o -name "*.lean" -exec grep -HnE "^[[:space:]]*def.*TEMP|^[[:space:]]*theorem.*TEMP" {} \;
+            VIOLATIONS=$((VIOLATIONS + 1))
+          fi
+          
+          # Look for placeholder stub definitions (not documentation)
+          if find . -path "./.lake" -prune -o -name "*.lean" -exec grep -E "def.*placeholder.*:=|theorem.*placeholder.*:=" {} \; | head -1 | grep -q .; then
+            echo "❌ Found placeholder stub definitions in:"
+            find . -path "./.lake" -prune -o -name "*.lean" -exec grep -HnE "def.*placeholder.*:=|theorem.*placeholder.*:=" {} \;
+            VIOLATIONS=$((VIOLATIONS + 1))
+          fi
+          
+          if [ "$VIOLATIONS" -gt 0 ]; then
+            echo "❌ CI Guard: Found $VIOLATIONS prohibited placeholder implementations"
+            echo "All placeholder/unsafe code must be on feature branches, not main"
+            exit 1
+          fi
+          
+          echo "✅ No prohibited placeholder implementations found"
+
       - name: Check for cheap proofs
         run: |
           lake build cheap_proofs
