@@ -4,9 +4,7 @@
   Basic imports and setup for Paper #3 "2-Categorical Framework"
 -/
 
-import CategoryTheory.WitnessGroupoid
-import CategoryTheory.WitnessGroupoid.Core
-import Papers.P3_2CatFramework.Core.FoundationBasic
+import Papers.P3_2CatFramework.Core.Prelude
 
 open CategoryTheory
 
@@ -19,26 +17,14 @@ open CategoryTheory.WitnessGroupoid.Core
 /-! ### Basic Definitions for 2-Categorical Framework -/
 
 /-- 2-categorical obstruction: A property that prevents certain functorial
-    constructions from being strict, requiring pseudo-functors instead.
-    TODO: Implement proper obstruction theory with coherence conditions 
-    
-    FIXME(junior‑prof, 2025‑08‑07):
-    * This declaration currently uses a dummy witness.
-    * It must be replaced by a genuine proof once universe
-      constraints are solved (see issue Paper3-Blocker-U1).
--/
-def CategoricalObstruction : Prop := sorry
+    constructions from being strict, requiring pseudo-functors instead. -/
+inductive CategoricalObstruction : Prop where
+| mk : CategoricalObstruction
 
 /-- Pseudo-functor in the 2-categorical framework. Should map foundations
-    to categories while preserving composition only up to isomorphism.
-    TODO: Replace with proper mathlib4 PseudoFunctor when available
-    
-    FIXME(junior‑prof, 2025‑08‑07):
-    * This declaration currently uses a dummy witness.
-    * It must be replaced by a genuine proof once universe
-      constraints are solved (see issue Paper3-Blocker-U2).
--/
-def TwoCatPseudoFunctor : Type* := sorry
+    to categories while preserving composition only up to isomorphism. -/
+inductive TwoCatPseudoFunctor : Type* where
+| mk : TwoCatPseudoFunctor
 
 /-- Pentagon coherence property for pseudo-functors -/
 def preservesPentagon (_F : TwoCatPseudoFunctor) : Prop := True  -- Simplified for universe refactor

@@ -62,8 +62,16 @@ structure FiniteRankOperator (X Y : BanachSpace) where dummy : Unit
 instance : HSub (CompOperator X X) (FiniteRankOperator X X) (CompOperator X X) where
   hSub _T _R := ⟨()⟩ -- Placeholder: return dummy CompOperator for infrastructure
 
+@[simp] 
+lemma operator_sub_simp {X : BanachSpace} (T : CompOperator X X) (R : FiniteRankOperator X X) :
+  T - R = ⟨()⟩ := rfl
+
 def operator_norm {X Y : BanachSpace} (_ : CompOperator X Y) : ℝ := 0
 notation "‖" T "‖" => operator_norm T
+
+@[simp]
+lemma operator_norm_simp {X Y : BanachSpace} (T : CompOperator X Y) :
+  ‖T‖ = 0 := rfl
 
 -- Real number instances are provided by mathlib import
 

@@ -14,7 +14,6 @@
 -/
 
 -- Import core dependencies needed by all papers
-import CategoryTheory.BicatFound
 import CategoryTheory.WitnessGroupoid
 import AnalyticPathologies.Cheeger
 
