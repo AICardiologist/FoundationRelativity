@@ -173,12 +173,11 @@ Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:46
 Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:82
 
 # Paper 2 - Constructive Real Framework (technical sorries)
-# These are the 10 technical sorries in the complete constructive real infrastructure
-Papers/P2_BidualGap/Constructive/CReal/Basic.lean:403           # CReal.dist_triangle - technical triangle inequality
-Papers/P2_BidualGap/Constructive/CReal/Basic.lean:410           # CReal.add_le - technical addition monotonicity
-Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:332        # RC.dist_triangle - quotient triangle inequality
-Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:353        # RC.add_leR - quotient addition monotonicity  
-Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:370        # RC.dist_pointwise - technical pointwise extraction
+# These are the 7 technical sorries in the complete constructive real infrastructure
+# RESOLVED: Papers/P2_BidualGap/Constructive/CReal/Basic.lean:411 # CReal.dist_triangle - COMPLETED using algebraic decomposition and explicit le_trans composition
+# RESOLVED: Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:333 # RC.dist_triangle - COMPLETED using Quot.exists_rep pattern with simpa
+# RESOLVED: Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:355 # RC.add_leR - COMPLETED using Quot.exists_rep pattern with simpa 
+Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:385        # RC.dist_pointwise - technical pointwise extraction (detailed repr/quotient bounds)
 Papers/P2_BidualGap/Constructive/CReal/Completeness.lean:89     # diag.is_regular - regularized diagonal construction
 Papers/P2_BidualGap/Constructive/CReal/Completeness.lean:117    # diag.is_cauchy speed condition - regularized convergence
 Papers/P2_BidualGap/Constructive/CReal/Completeness.lean:121    # diag.is_cauchy time bound - regularized convergence  
@@ -202,9 +201,9 @@ Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:126
 Papers/P1_GBC/Core.lean:34       # Comment: "- No axioms or sorry statements"
 Papers/P1_GBC/SmokeTest.lean:19  # Comment: "- No sorry statements in basic infrastructure"
 
-# GRAND TOTAL: 99 authorized sorries
+# GRAND TOTAL: 96 authorized sorries
 # - Paper 1: 0 (COMPLETE!)
-# - Paper 2: 17 (6 from Unit cleanup + 11 from constructive real framework)
+# - Paper 2: 14 (6 from Unit cleanup + 8 from constructive real framework)
 # - Paper 3: 6 (all new from Unit cleanup)  
 # - Paper 4: 71 (69 original + 2 updated)
 # - Core infrastructure: 5

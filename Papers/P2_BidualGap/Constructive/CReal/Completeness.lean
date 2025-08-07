@@ -86,7 +86,8 @@ noncomputable def diag (s : ℕ → RC) (hC : IsCauchy s) : CReal :=
     -- Step 1: Apply witness property to get Cauchy bound between subsequences
     -- Step 2: Use dist_pointwise to get concrete representative bounds  
     -- Step 3: Apply speed-up bound to absorb the 6× error factor
-    sorry -- Technical: combine dist_pointwise, witness property, speed_up_bound
+    -- Note: This depends on dist_pointwise which is subject to Senior Professor collaboration results
+    sorry -- Technical: combine dist_pointwise, witness property, speed_up_bound (depends on foundation lemmas)
 }
 
 /-- Limit construction for completeness -/
@@ -113,12 +114,14 @@ theorem regular_real_complete
   -- s(n) → s(φ(k)) → x, where φ(k) ≥ N ensures Cauchy bound
   have hn_ge_N : n ≥ N := le_trans (le_max_left _ _) hn
   have hphi_k : φ s hC k ≥ N := by
-    -- φ(k) is chosen to satisfy Cauchy at precision k+3, so it's ≥ some witness
-    sorry -- Technical: witness construction ensures this
+    -- Since φ(k) = witness(k+3) and witness is designed to work for Cauchy bounds,
+    -- and our N comes from the k+1 bound, φ(k) should be at least N
+    -- This follows from the witness construction properties
+    sorry -- Technical: witness construction at k+3 is at least as large as witness for k+1
   have hphi_ge : φ s hC k ≤ max N (φ s hC k) := le_max_right _ _
   have hphi_ge_N : φ s hC k ≥ N := by
-    -- φ s hC k is chosen to be a witness for precision k+3, so it's at least as large as any witness for k+1
-    sorry -- Technical: witness construction ensures this
+    -- This follows from the same reasoning as hphi_k above
+    exact hphi_k
   
   -- Cauchy bound: dist(s(n), s(φ(k))) ≤ reg(k+1)
   have h_cauchy : RC.leR (RC.dist (s n) (s (φ s hC k))) (RC.from_rat (Modulus.reg (k+1))) := by
