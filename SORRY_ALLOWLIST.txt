@@ -170,7 +170,7 @@ LogicDSL/Core.lean:22
 # IMPORTANT: Some lines below are documentation comments mentioning "sorry" - these do NOT count as actual sorry statements
 
 # Core Infrastructure Blockers (2 critical sorries blocking all others)
-Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:50                     # wlpo_implies_gap - Mathlib version issue: needs lp.not_reflexive_one ≥ 4.9.0 (admit)
+Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:45                     # wlpo_implies_gap - Mathlib version issue: needs lp.not_reflexive_one ≥ 4.9.0 (admit)
 Papers/P2_BidualGap/Constructive/CReal/Basic.lean:492           # CReal.dist_triangle - Infrastructure constraint: heartbeat timeout during lemma elaboration
 
 # Quotient Layer Operations (3 actual sorries - depend on CReal.dist_triangle foundation)
@@ -186,13 +186,12 @@ Papers/P2_BidualGap/Constructive/CReal/Completeness.lean:130    # h_conv - conve
 Papers/P2_BidualGap/Constructive/CReal/Completeness.lean:142    # h_precision - RC-level precision conversion
 Papers/P2_BidualGap/Constructive/CReal/Completeness.lean:144    # h_triangle composition - final triangulation combination
 
-# DOCUMENTATION COMMENTS (DO NOT COUNT AS ACTUAL SORRIES):
-# - Papers/P2_BidualGap/Constructive/CReal/Basic.lean:451 - Comment referencing sorry in documentation
-# - Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:322 - Comment documenting implementation attempts
-# - Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:375 - Comment documenting implementation attempts  
-# - Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:428 - Comment documenting technical steps
-# - Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:445 - Comment documenting classification
-# - Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:47 - Comment mentioning sorry/admit
+# DOCUMENTATION COMMENTS (DO NOT COUNT AS ACTUAL SORRIES - but detected by script):
+Papers/P2_BidualGap/Constructive/CReal/Basic.lean:451       # Comment referencing sorry in documentation
+Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:322    # Comment documenting implementation attempts
+Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:375    # Comment documenting implementation attempts  
+Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:428    # Comment documenting technical steps
+Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:445    # Comment documenting classification
 #
 # These are documentation lines that mention "sorry" in comments but are NOT executable sorry statements.
 # Only the lines listed above under each category (Core Infrastructure Blockers, Quotient Layer Operations, 
@@ -216,7 +215,7 @@ Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:126
 Papers/P1_GBC/Core.lean:34       # Comment: "- No axioms or sorry statements"
 Papers/P1_GBC/SmokeTest.lean:19  # Comment: "- No sorry statements in basic infrastructure"
 
-# GRAND TOTAL: 104 authorized sorries (CORRECTED COUNT updated 2025-08-07)
+# GRAND TOTAL: 109 authorized sorries (CORRECTED COUNT updated 2025-08-07 - includes 5 documentation comments)
 # - Paper 1: 0 (COMPLETE!)
 # - Paper 2: 11 (INCOMPLETE - 2 infrastructure blockers + 9 cascade dependencies)
 # - Paper 3: 6 (all new from Unit cleanup)  
