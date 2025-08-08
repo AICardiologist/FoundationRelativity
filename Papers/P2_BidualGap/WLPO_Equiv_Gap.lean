@@ -1,50 +1,38 @@
 /-
   Papers/P2_BidualGap/WLPO_Equiv_Gap.lean
-  
-  Lemma (ii): "Bidual gap ⇔ WLPO" (constructive equivalence)
-  Central result: gap_equiv_WLPO : BidualGap ↔ WLPO
+  WLPO ↔ BidualGap — *stubs only*. No vacuous proofs.
 -/
-
-import Papers.P2_BidualGap.Basic
-import Mathlib.Data.Real.Basic
 import Mathlib.Tactic
-import Mathlib.Analysis.Normed.Lp.lpSpace
-import Mathlib.Topology.ContinuousMap.ZeroAtInfty
-
-open Classical
+import Papers.P2_BidualGap.Basic
+import Papers.P2_BidualGap.Compat.NonReflexive
+import Papers.P2_BidualGap.Constructive.Ishihara
 
 namespace Papers.P2
+open Classical
+noncomputable section
 
-/-! ### Bidual Gap ⇔ WLPO Equivalence -/
-
-/-!  ###  Forward direction: `BidualGap → WLPO`                        -/
-
+/-- (Stub) `BidualGap → WLPO` via Ishihara's argument. -/
 lemma gap_implies_wlpo : BidualGap → WLPO := by
-  intro _ α                                   -- the gap is *not* needed
-  by_cases h : ∀ n, α n = false
-  · exact Or.inl h
-  · exact Or.inr h
+  intro hGap
+  -- TODO:
+  --   * Unpack the witness `⟨X, _, _, _, not_surj⟩`.
+  --   * Build `Constructive.IshiharaKernel` from `j := inclusionInDoubleDual` and `not_surj`.
+  --   * Apply `Constructive.WLPO_of_kernel`.
+  sorry -- SORRY(P2-gap-implies-wlpo)
 
-/-!  ###  Reverse direction: `WLPO → BidualGap`                        -/
-
-/-- `ℓ¹(ℕ)` is not reflexive; hence the canonical embedding into its bidual
-    is not surjective.  This witnesses `BidualGap`. -/
+/-- (Stub) `WLPO → BidualGap` via a direct `c₀ / ℓ^∞` construction (professor's Option B). -/
 lemma wlpo_implies_gap : WLPO → BidualGap := by
-  intro _          -- WLPO is *not* needed in the classical proof
-  -- We need to provide a concrete Banach space that witnesses the bidual gap
-  -- The mathematical content: ℓ¹(ℕ) is a concrete example of a space with bidual gap
-  -- This should be ⟨lp (fun _ : ℕ => ℝ) 1, ...⟩ once mathlib version allows
-  -- NOTE: Will consult Senior Professor about mathlib version constraints
-  admit -- Mathlib version issue: needs lp.not_reflexive_one ≥ 4.9.0
+  intro hWLPO
+  -- TODO:
+  --   * Work in `X := c₀` with `X* = ℓ¹`, `X** = ℓ^∞`.
+  --   * Use WLPO to build a functional on `ℓ^∞` vanishing on `c₀` that is not an ℓ¹ functional.
+  --   * Conclude `¬ surjective (inclusionInDoubleDual ℝ X)`.
+  sorry -- SORRY(P2-wlpo-implies-gap)
 
-/-!  ###  Main equivalence                                             -/
-
+/-- (Stub) Main equivalence, bundling the two directions. -/
 theorem gap_equiv_WLPO : BidualGap ↔ WLPO := by
-  exact ⟨gap_implies_wlpo, wlpo_implies_gap⟩
-
+  constructor
+  · exact gap_implies_wlpo
+  · exact wlpo_implies_gap
 
 end Papers.P2
-
-def main : IO Unit := do
-  IO.println "Papers P2 WLPO_Equiv_Gap: ✓ Compilation successful"  
-  IO.println "Papers P2 WLPO_Equiv_Gap: ✓ Ready for GapFunctor 2-cell upgrade"
