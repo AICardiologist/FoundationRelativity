@@ -31,9 +31,10 @@
 # RESOLVED Sprint 47: Papers/P1_GBC/Correspondence.lean:41  # e_g_in_ker_when_true helper - COMPLETED!
 # RESOLVED Sprint 47: Papers/P1_GBC/Correspondence.lean:47  # surj_implies_false (main direction) - COMPLETED!
 
-# Papers/P1_GBC/Auxiliaries.lean (0 sorrys) - Mathematical content - Sprint 50 cleaned up
+# Papers/P1_GBC/Auxiliaries.lean (1 sorry) - Mathematical content - Sprint 50 cleaned up + temporary mathlib API issue
 # RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:37   # finiteDimensional_ker_of_finiteDimRange - COMPLETED!
 # RESOLVED Sprint 49: Papers/P1_GBC/Auxiliaries.lean:44   # finiteDimensional_range_of_rankOne - COMPLETED!
+Papers/P1_GBC/Auxiliaries.lean:64   # finiteDimensional_range_of_rankOne mathlib API issue - temporary
 # RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:64   # pullback_isometry_of_surjective - COMPLETED!
 # REMOVED Sprint 49: Papers/P1_GBC/Auxiliaries.lean:79   # surjective_of_compact_and_spectrum - REMOVED as mathematically incorrect
 # RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:87   # compact_of_surjective_and_rank_one - FIXED by correcting to perturbation_P_g_is_compact!
