@@ -39,8 +39,9 @@ Papers/P1_GBC/Auxiliaries.lean:64   # finiteDimensional_range_of_rankOne mathlib
 # REMOVED Sprint 49: Papers/P1_GBC/Auxiliaries.lean:79   # surjective_of_compact_and_spectrum - REMOVED as mathematically incorrect
 # RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:87   # compact_of_surjective_and_rank_one - FIXED by correcting to perturbation_P_g_is_compact!
 
-# Comment references (detected by grep but not actual sorry statements)
+# Comment references (detected by grep but not actual sorry statements)  
 Logic/Reflection.lean:6          # Comment: "No other assumptions, no `sorry`."
+Papers/P1_GBC/Core.lean:33       # Comment: "- No axioms or sorry statements"
 
 # Papers/P1_GBC/LogicAxioms.lean (0 sorrys) - Axiomatization layer added in Sprint 50
 # This module axiomatizes Gödel's incompleteness consequences without full formalization
