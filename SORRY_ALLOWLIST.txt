@@ -1,7 +1,7 @@
 # SORRY_ALLOWLIST.txt
 # Authorized sorry statements for Foundation-Relativity project
 
-# Updated: 2025-08-02 (Sprint 50 + Sigma1-EM - Paper 1 100% complete!) 
+# Updated: 2025-08-08 (Paper 2 honest stubs implementation)
 # Policy: ANY sorry outside this list will fail CI
 
 # Sprint 47: Gödel-Banach Correspondence - Core.lean spectrum elimination complete
@@ -237,3 +237,10 @@ Papers/P1_GBC/SmokeTest.lean:19  # Comment: "- No sorry statements in basic infr
 # - 9 additional sorries depend on resolving the 2 critical infrastructure blockers
 # 
 # STATUS: Work in progress with substantial mathematical gaps requiring expert consultation (more manageable scope than initially assessed)
+
+# Paper 2 (WLPO ↔ BidualGapStrong) – intentional stubs
+Papers/P2_BidualGap/Constructive/DualStructure.lean:29
+Papers/P2_BidualGap/Constructive/Ishihara.lean:31
+Papers/P2_BidualGap/Constructive/Ishihara.lean:55
+Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:27
+Papers/P2_BidualGap/Compat/NonReflexive.lean:31

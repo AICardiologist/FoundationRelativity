@@ -1,50 +1,35 @@
 /-
   Papers/P2_BidualGap/WLPO_Equiv_Gap.lean
-  
-  Lemma (ii): "Bidual gap ⇔ WLPO" (constructive equivalence)
-  Central result: gap_equiv_WLPO : BidualGap ↔ WLPO
+  WLPO ↔ BidualGapStrong — stubs only (no vacuous proofs).
 -/
-
-import Papers.P2_BidualGap.Basic
-import Mathlib.Data.Real.Basic
 import Mathlib.Tactic
-import Mathlib.Analysis.Normed.Lp.lpSpace
-import Mathlib.Topology.ContinuousMap.ZeroAtInfty
-
-open Classical
+import Papers.P2_BidualGap.Basic
+import Papers.P2_BidualGap.Constructive.Ishihara
+import Papers.P2_BidualGap.Constructive.DualStructure
 
 namespace Papers.P2
+open Papers.P2.Constructive
 
-/-! ### Bidual Gap ⇔ WLPO Equivalence -/
+/-- `BidualGapStrong → WLPO` (delegates via a monomorphic Type-level package to avoid universe issues). -/
+lemma gap_implies_wlpo : BidualGapStrong → WLPO := by
+  intro hGap
+  -- Monomorphic witness → explicit-instance wrapper (no typeclass synthesis).
+  exact Papers.P2.Constructive.WLPO_of_witness
+    (Papers.P2.Constructive.kernel_from_gap hGap)
 
-/-!  ###  Forward direction: `BidualGap → WLPO`                        -/
+/-- (Stub) `WLPO → BidualGapStrong` via c₀/ℓ∞ with dual-structure provided by WLPO. -/
+lemma wlpo_implies_gap : WLPO → BidualGapStrong := by
+  intro hWLPO
+  -- TODO(P2-WLPO→gap-strong):
+  --   - Use `dual_is_banach_of_WLPO` to produce `DualIsBanach` for the spaces we need
+  --     (e.g., X := c₀; then identify X*, X** and get the gap element in ℓ^∞).
+  --   - Conclude `¬ surjective j : X → X**`.
+  sorry -- SORRY(P2-WLPO→gap-strong)
 
-lemma gap_implies_wlpo : BidualGap → WLPO := by
-  intro _ α                                   -- the gap is *not* needed
-  by_cases h : ∀ n, α n = false
-  · exact Or.inl h
-  · exact Or.inr h
-
-/-!  ###  Reverse direction: `WLPO → BidualGap`                        -/
-
-/-- `ℓ¹(ℕ)` is not reflexive; hence the canonical embedding into its bidual
-    is not surjective.  This witnesses `BidualGap`. -/
-lemma wlpo_implies_gap : WLPO → BidualGap := by
-  intro _          -- WLPO is *not* needed in the classical proof
-  -- We need to provide a concrete Banach space that witnesses the bidual gap
-  -- The mathematical content: ℓ¹(ℕ) is a concrete example of a space with bidual gap
-  -- This should be ⟨lp (fun _ : ℕ => ℝ) 1, ...⟩ once mathlib version allows
-  -- NOTE: Will consult Senior Professor about mathlib version constraints
-  admit -- Mathlib version issue: needs lp.not_reflexive_one ≥ 4.9.0
-
-/-!  ###  Main equivalence                                             -/
-
-theorem gap_equiv_WLPO : BidualGap ↔ WLPO := by
-  exact ⟨gap_implies_wlpo, wlpo_implies_gap⟩
-
+/-- (Stub) Main equivalence, bundling the two directions. -/
+theorem gap_equiv_WLPO : BidualGapStrong ↔ WLPO := by
+  constructor
+  · exact gap_implies_wlpo
+  · exact wlpo_implies_gap
 
 end Papers.P2
-
-def main : IO Unit := do
-  IO.println "Papers P2 WLPO_Equiv_Gap: ✓ Compilation successful"  
-  IO.println "Papers P2 WLPO_Equiv_Gap: ✓ Ready for GapFunctor 2-cell upgrade"
