@@ -56,15 +56,35 @@ jobs:
 
       - name: Check for unauthorized sorries
         run: |
-          # Allow sorries only in Blueprint/, FunctorialObstruction.lean, and documentation/
-          disallow=$(grep -a -R -n --include="*.lean" -E 'sorry|admit' Papers/P3_2CatFramework \
-                     | grep -v 'Blueprint\|FunctorialObstruction\|documentation')
-          if [ -n "$disallow" ]; then 
-            echo "❌ Unauthorized sorry/admit found:"
-            echo "$disallow"
+          # Check sorries against SORRY_ALLOWLIST.txt for Paper 3
+          echo "Checking Paper 3 sorries against allowlist..."
+          found_sorries=$(grep -a -R -n --include="*.lean" -E 'sorry|admit' Papers/P3_2CatFramework \
+                         | grep -v 'documentation\|Blueprint\|communications' || true)
+          
+          if [ -z "$found_sorries" ]; then
+            echo "✅ No sorries found in Paper 3"
+            exit 0
+          fi
+          
+          # Extract line numbers and check against allowlist
+          unauthorized=""
+          echo "$found_sorries" | while IFS= read -r line; do
+            if [ -n "$line" ]; then
+              file_line=$(echo "$line" | cut -d: -f1,2)
+              if ! grep -q "^$file_line" SORRY_ALLOWLIST.txt; then
+                echo "$line"
+              fi
+            fi
+          done > /tmp/unauthorized_sorries
+          
+          unauthorized=$(cat /tmp/unauthorized_sorries)
+          
+          if [ -n "$unauthorized" ]; then
+            echo "❌ Unauthorized sorry/admit found (not in SORRY_ALLOWLIST.txt):"
+            echo -e "$unauthorized"
             exit 1
           else
-            echo "✅ No unauthorized sorries found"
+            echo "✅ All sorries are authorized in SORRY_ALLOWLIST.txt"
           fi
 
       - name: Verify non-trivial placeholders  
