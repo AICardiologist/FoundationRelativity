@@ -17,8 +17,6 @@ open CategoryTheory.WitnessGroupoid
 -- Synthesis: BicatFound + WitnessGroupoid → complete pathology classification
 -- Key result: Every analytic pathology corresponds to witness groupoid 2-cell failure
 
--- theorem twocat_framework_lemma_placeholder : True := trivial
-
 -- TODO Math-AI: Witness-bicategory correspondence
 -- example : BicatWitnessGroupoid Foundation = BicatWitnessGroupoid Foundation := rfl
 
