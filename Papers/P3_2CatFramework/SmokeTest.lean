@@ -5,12 +5,10 @@
   Verifies compilation for complete bicategorical witness theory.
 -/
 
-import CategoryTheory.BicatFound
 import CategoryTheory.WitnessGroupoid
 
 namespace Papers.P3_2CatFramework
 
-open CategoryTheory.BicatFound
 open CategoryTheory.WitnessGroupoid
 
 /-! ### Paper #3 Target Lemmas -/
