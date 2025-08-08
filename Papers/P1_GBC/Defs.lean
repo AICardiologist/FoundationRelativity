@@ -1,5 +1,4 @@
 import Papers.P1_GBC.Core
-import CategoryTheory.WitnessGroupoid
 import Found.InterpCore
 
 /-!
@@ -27,7 +26,6 @@ The Gödel-Banach correspondence establishes a fundamental connection between:
 namespace Papers.P1_GBC.Defs
 
 open Papers.P1_GBC
-open CategoryTheory.WitnessGroupoid
 open AnalyticPathologies
 open Found
 
