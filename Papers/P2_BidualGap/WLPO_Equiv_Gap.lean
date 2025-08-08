@@ -10,13 +10,12 @@ import Papers.P2_BidualGap.Constructive.DualStructure
 namespace Papers.P2
 open Papers.P2.Constructive
 
-/-- (Stub) `BidualGapStrong → WLPO` via Ishihara's argument. -/
+/-- `BidualGapStrong → WLPO` (delegates via a monomorphic Type-level package to avoid universe issues). -/
 lemma gap_implies_wlpo : BidualGapStrong → WLPO := by
   intro hGap
-  -- TODO(P2-gap→WLPO-strong):
-  --   Unpack `hGap` to get `X`, `DualIsBanach X`, `DualIsBanach X**`, and `¬surj j`.
-  --   Build an `IshiharaKernel X` (f, gα, separation), then apply `WLPO_of_kernel`.
-  sorry
+  -- Monomorphic witness → explicit-instance wrapper (no typeclass synthesis).
+  exact Papers.P2.Constructive.WLPO_of_witness
+    (Papers.P2.Constructive.kernel_from_gap hGap)
 
 /-- (Stub) `WLPO → BidualGapStrong` via c₀/ℓ∞ with dual-structure provided by WLPO. -/
 lemma wlpo_implies_gap : WLPO → BidualGapStrong := by

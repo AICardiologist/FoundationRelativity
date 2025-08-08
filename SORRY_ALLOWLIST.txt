@@ -241,6 +241,6 @@ Papers/P1_GBC/SmokeTest.lean:19  # Comment: "- No sorry statements in basic infr
 # Paper 2 (WLPO ↔ BidualGapStrong) – intentional stubs
 Papers/P2_BidualGap/Constructive/DualStructure.lean:P2-dual-structure-from-WLPO
 Papers/P2_BidualGap/Constructive/Ishihara.lean:P2-Ishihara-forward
-Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:P2-gap→WLPO-strong
+Papers/P2_BidualGap/Constructive/Ishihara.lean:P2-kernel-from-gap
 Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:P2-WLPO→gap-strong
 Papers/P2_BidualGap/Compat/NonReflexive.lean:P2-c0-or-l1-weak
