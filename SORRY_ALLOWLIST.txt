@@ -202,10 +202,10 @@ Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:445    # Comment documentin
 # Paper 3 - 2-Categorical Framework (replaced Unit stubs with sorries)
 Papers/P3_2CatFramework/Basic.lean:28
 Papers/P3_2CatFramework/Basic.lean:33
-Papers/P3_2CatFramework/FunctorialObstruction.lean:28
-Papers/P3_2CatFramework/FunctorialObstruction.lean:40
-Papers/P3_2CatFramework/FunctorialObstruction.lean:50
-Papers/P3_2CatFramework/FunctorialObstruction.lean:59
+Papers/P3_2CatFramework/FunctorialObstruction.lean:26
+Papers/P3_2CatFramework/FunctorialObstruction.lean:37
+Papers/P3_2CatFramework/FunctorialObstruction.lean:46
+Papers/P3_2CatFramework/FunctorialObstruction.lean:54
 
 # Paper 4 - Updated TuringMachine placeholders
 Papers/P4_SpectralGeometry/Discrete/TuringEncoding.lean:115
