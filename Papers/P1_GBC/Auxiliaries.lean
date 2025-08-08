@@ -1,7 +1,6 @@
 import Mathlib.Tactic
 import Mathlib.Analysis.Normed.Lp.lpSpace
 import Mathlib.Analysis.Normed.Operator.Compact
-import Mathlib.LinearAlgebra.FiniteDimensional.Basic
 import Papers.P1_GBC.Core
 
 /-!
