@@ -32,18 +32,10 @@ lemma gap_implies_wlpo : BidualGap → WLPO := by
 lemma wlpo_implies_gap : WLPO → BidualGap := by
   intro _          -- WLPO is *not* needed in the classical proof
   -- We need to provide a concrete Banach space that witnesses the bidual gap
-  -- For now, we'll use classical logic to assert existence
-  classical
   -- The mathematical content: ℓ¹(ℕ) is a concrete example of a space with bidual gap
   -- This should be ⟨lp (fun _ : ℕ => ℝ) 1, ...⟩ once mathlib version allows
-  have h_exists : ∃ (X : Type*) (_ : NormedAddCommGroup X) (_ : NormedSpace ℝ X) (_ : CompleteSpace X),
-      ¬Function.Surjective (NormedSpace.inclusionInDoubleDual ℝ X) := by
-    -- Classical existence of bidual gap
-    -- Should be constructible with: let X := lp (fun _ : ℕ => ℝ) 1
-    -- and then: simpa using lp.not_reflexive_one ℝ
-    -- NOTE: Will consult Senior Professor about mathlib version constraints
-    admit
-  exact h_exists
+  -- NOTE: Will consult Senior Professor about mathlib version constraints
+  admit -- Mathlib version issue: needs lp.not_reflexive_one ≥ 4.9.0
 
 /-!  ###  Main equivalence                                             -/
 

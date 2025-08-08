@@ -170,7 +170,7 @@ LogicDSL/Core.lean:22
 # IMPORTANT: Some lines below are documentation comments mentioning "sorry" - these do NOT count as actual sorry statements
 
 # Core Infrastructure Blockers (2 critical sorries blocking all others)
-Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:45                     # wlpo_implies_gap - Mathlib version issue: needs lp.not_reflexive_one ≥ 4.9.0 (admit)
+Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:38                     # wlpo_implies_gap - Mathlib version issue: needs lp.not_reflexive_one ≥ 4.9.0 (admit)
 Papers/P2_BidualGap/Constructive/CReal/Basic.lean:492           # CReal.dist_triangle - Infrastructure constraint: heartbeat timeout during lemma elaboration
 
 # Quotient Layer Operations (3 actual sorries - depend on CReal.dist_triangle foundation)
