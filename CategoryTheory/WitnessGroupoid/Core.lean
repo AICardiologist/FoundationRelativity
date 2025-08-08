@@ -29,7 +29,7 @@ namespace GenericWitness
 def id (F : Foundation) (w : GenericWitness F) : GenericWitness F := w
 
 /-- Witness composition (trivial since only identities exist) -/
-def comp {F : Foundation} (_ _ : GenericWitness F) : GenericWitness F := ⟨()⟩
+def comp {F : Foundation} (w : GenericWitness F) (_ : GenericWitness F) : GenericWitness F := w
 
 end GenericWitness
 
@@ -60,11 +60,11 @@ structure FiniteRankOperator (X Y : BanachSpace) where dummy : Unit
 
 -- Basic arithmetic instances for simplified operators
 instance : HSub (CompOperator X X) (FiniteRankOperator X X) (CompOperator X X) where
-  hSub _T _R := ⟨()⟩ -- Placeholder: return dummy CompOperator for infrastructure
+  hSub T _R := T -- Placeholder: return original operator for infrastructure
 
 @[simp] 
 lemma operator_sub_simp {X : BanachSpace} (T : CompOperator X X) (R : FiniteRankOperator X X) :
-  T - R = ⟨()⟩ := rfl
+  T - R = T := rfl
 
 def operator_norm {X Y : BanachSpace} (_ : CompOperator X Y) : ℝ := 0
 notation "‖" T "‖" => operator_norm T
