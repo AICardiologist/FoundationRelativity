@@ -1,6 +1,6 @@
 /-
-  Axiom hygiene for Paper 2.
-  NOTE: While stubs contain `sorry`, this file intentionally surfaces that fact.
+  Axiom hygiene for Paper 2 (stubs).
+  Note: These will show `sorryAx` until the proofs are filled in.
 -/
 import Papers.P2_BidualGap.WLPO_Equiv_Gap
 

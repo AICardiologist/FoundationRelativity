@@ -1,36 +1,34 @@
 /-
   Papers/P2_BidualGap/WLPO_Equiv_Gap.lean
-  WLPO ↔ BidualGap — *stubs only*. No vacuous proofs.
+  WLPO ↔ BidualGapStrong — stubs only (no vacuous proofs).
 -/
 import Mathlib.Tactic
 import Papers.P2_BidualGap.Basic
-import Papers.P2_BidualGap.Compat.NonReflexive
 import Papers.P2_BidualGap.Constructive.Ishihara
+import Papers.P2_BidualGap.Constructive.DualStructure
 
 namespace Papers.P2
-open Classical
-noncomputable section
+open Papers.P2.Constructive
 
-/-- (Stub) `BidualGap → WLPO` via Ishihara's argument. -/
-lemma gap_implies_wlpo : BidualGap → WLPO := by
+/-- (Stub) `BidualGapStrong → WLPO` via Ishihara's argument. -/
+lemma gap_implies_wlpo : BidualGapStrong → WLPO := by
   intro hGap
-  -- TODO:
-  --   * Unpack the witness `⟨X, _, _, _, not_surj⟩`.
-  --   * Build `Constructive.IshiharaKernel` from `j := inclusionInDoubleDual` and `not_surj`.
-  --   * Apply `Constructive.WLPO_of_kernel`.
-  sorry -- SORRY(P2-gap-implies-wlpo)
+  -- TODO(P2-gap→WLPO-strong):
+  --   Unpack `hGap` to get `X`, `DualIsBanach X`, `DualIsBanach X**`, and `¬surj j`.
+  --   Build an `IshiharaKernel X` (f, gα, separation), then apply `WLPO_of_kernel`.
+  sorry
 
-/-- (Stub) `WLPO → BidualGap` via a direct `c₀ / ℓ^∞` construction (professor's Option B). -/
-lemma wlpo_implies_gap : WLPO → BidualGap := by
+/-- (Stub) `WLPO → BidualGapStrong` via c₀/ℓ∞ with dual-structure provided by WLPO. -/
+lemma wlpo_implies_gap : WLPO → BidualGapStrong := by
   intro hWLPO
-  -- TODO:
-  --   * Work in `X := c₀` with `X* = ℓ¹`, `X** = ℓ^∞`.
-  --   * Use WLPO to build a functional on `ℓ^∞` vanishing on `c₀` that is not an ℓ¹ functional.
-  --   * Conclude `¬ surjective (inclusionInDoubleDual ℝ X)`.
-  sorry -- SORRY(P2-wlpo-implies-gap)
+  -- TODO(P2-WLPO→gap-strong):
+  --   - Use `dual_is_banach_of_WLPO` to produce `DualIsBanach` for the spaces we need
+  --     (e.g., X := c₀; then identify X*, X** and get the gap element in ℓ^∞).
+  --   - Conclude `¬ surjective j : X → X**`.
+  sorry
 
 /-- (Stub) Main equivalence, bundling the two directions. -/
-theorem gap_equiv_WLPO : BidualGap ↔ WLPO := by
+theorem gap_equiv_WLPO : BidualGapStrong ↔ WLPO := by
   constructor
   · exact gap_implies_wlpo
   · exact wlpo_implies_gap

@@ -238,8 +238,9 @@ Papers/P1_GBC/SmokeTest.lean:19  # Comment: "- No sorry statements in basic infr
 # 
 # STATUS: Work in progress with substantial mathematical gaps requiring expert consultation (more manageable scope than initially assessed)
 
-# Paper 2 (WLPO ↔ BidualGap) – intentional honest stubs
-Papers/P2_BidualGap/Compat/NonReflexive.lean:SORRY(P2-c0-witness)
-Papers/P2_BidualGap/Constructive/Ishihara.lean:SORRY(P2-Ishihara-forward)
-Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:SORRY(P2-gap-implies-wlpo)
-Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:SORRY(P2-wlpo-implies-gap)
+# Paper 2 (WLPO ↔ BidualGapStrong) – intentional stubs
+Papers/P2_BidualGap/Constructive/DualStructure.lean:P2-dual-structure-from-WLPO
+Papers/P2_BidualGap/Constructive/Ishihara.lean:P2-Ishihara-forward
+Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:P2-gap→WLPO-strong
+Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:P2-WLPO→gap-strong
+Papers/P2_BidualGap/Compat/NonReflexive.lean:P2-c0-or-l1-weak
