@@ -24,7 +24,7 @@ lemma wlpo_implies_gap : WLPO → BidualGapStrong := by
   --   - Use `dual_is_banach_of_WLPO` to produce `DualIsBanach` for the spaces we need
   --     (e.g., X := c₀; then identify X*, X** and get the gap element in ℓ^∞).
   --   - Conclude `¬ surjective j : X → X**`.
-  sorry
+  sorry -- SORRY(P2-WLPO→gap-strong)
 
 /-- (Stub) Main equivalence, bundling the two directions. -/
 theorem gap_equiv_WLPO : BidualGapStrong ↔ WLPO := by

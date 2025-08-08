@@ -28,7 +28,7 @@ theorem WLPO_of_kernel
   IshiharaKernel X → WLPO := by
   -- TODO(P2-Ishihara-forward):
   --   Use the separation property: compare ‖f + g α‖ against δ to decide WLPO.
-  sorry
+  sorry -- SORRY(P2-Ishihara-forward)
 
 /-- A *Type-level* package bundling the space and its instances together with an Ishihara kernel.
     Monomorphic on `Type` to avoid universe metavariables when transporting across files. -/
@@ -52,6 +52,6 @@ def kernel_from_gap : BidualGapStrong → KernelWitness := by
   --     ⟨X, insts…, dualIsBanachX, dualIsBanachX**, notSurj⟩
   --   Build the kernel data (f, g, δ, separation).
   --   Return `⟨X, _, _, _, kernel⟩`.
-  sorry
+  sorry -- SORRY(P2-kernel-from-gap)
 
 end Papers.P2.Constructive
