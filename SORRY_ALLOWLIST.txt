@@ -31,10 +31,10 @@
 # RESOLVED Sprint 47: Papers/P1_GBC/Correspondence.lean:41  # e_g_in_ker_when_true helper - COMPLETED!
 # RESOLVED Sprint 47: Papers/P1_GBC/Correspondence.lean:47  # surj_implies_false (main direction) - COMPLETED!
 
-# Papers/P1_GBC/Auxiliaries.lean (1 sorry) - Mathematical content - Sprint 50 cleaned up + temporary mathlib API issue
+# Papers/P1_GBC/Auxiliaries.lean (0 sorries) - Mathematical content - Sprint 50+ completed!
 # RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:37   # finiteDimensional_ker_of_finiteDimRange - COMPLETED!
 # RESOLVED Sprint 49: Papers/P1_GBC/Auxiliaries.lean:44   # finiteDimensional_range_of_rankOne - COMPLETED!
-Papers/P1_GBC/Auxiliaries.lean:64   # finiteDimensional_range_of_rankOne mathlib API issue - temporary
+# RESOLVED Sprint 50+: Papers/P1_GBC/Auxiliaries.lean:71   # finiteDimensional_range_of_rankOne mathlib API issue - COMPLETED using FiniteDimensional.of_injective + Submodule.inclusion!
 # RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:64   # pullback_isometry_of_surjective - COMPLETED!
 # REMOVED Sprint 49: Papers/P1_GBC/Auxiliaries.lean:79   # surjective_of_compact_and_spectrum - REMOVED as mathematically incorrect
 # RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:87   # compact_of_surjective_and_rank_one - FIXED by correcting to perturbation_P_g_is_compact!
@@ -46,7 +46,7 @@ Papers/P1_GBC/Core.lean:33       # Comment: "- No axioms or sorry statements"
 # Papers/P1_GBC/LogicAxioms.lean (0 sorrys) - Axiomatization layer added in Sprint 50
 # This module axiomatizes Gödel's incompleteness consequences without full formalization
 
-# TOTAL: 0 actual sorry statements + 3 comment references
+# TOTAL: 0 actual sorry statements + 2 comment references
 # Sprint 47 eliminated:
 #   - 3 sorries from Auxiliaries.lean (including perturbation_P_g_is_compact fix)
 #   - 2 sorries from Correspondence.lean  
@@ -64,7 +64,7 @@ Papers/P1_GBC/Core.lean:33       # Comment: "- No axioms or sorry statements"
 # Sprint 50+: Sigma1-EM implementation eliminated:
 #   - 1 sorry from Statement.lean (foundation_relative_correspondence using Sigma1-EM)
 # Total: 22 sorries eliminated + 3 removed across Sprints 47-50+
-# Successfully reduced from 24 to 0 sorries in Paper 1 (100% elimination!)
+# Successfully reduced from 24 to 0 sorries in Paper 1 (100% elimination!) ✓ ACHIEVED
 
 # Paper 4 Neck Scaling Implementation (Sprint 51) - High-leverage axiomatization
 # These represent intentional axiomatization points for the neck scaling theorem
@@ -217,13 +217,13 @@ Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:126
 Papers/P1_GBC/Core.lean:34       # Comment: "- No axioms or sorry statements"
 Papers/P1_GBC/SmokeTest.lean:19  # Comment: "- No sorry statements in basic infrastructure"
 
-# GRAND TOTAL: 109 authorized sorries (CORRECTED COUNT updated 2025-08-07 - includes 5 documentation comments)
-# - Paper 1: 0 (COMPLETE!)
+# GRAND TOTAL: 108 authorized sorries (UPDATED 2025-08-08 - includes 4 documentation comments)
+# - Paper 1: 0 (COMPLETE!) ✓ 
 # - Paper 2: 11 (INCOMPLETE - 2 infrastructure blockers + 9 cascade dependencies)
 # - Paper 3: 6 (all new from Unit cleanup)  
 # - Paper 4: 71 (69 original + 2 updated)
 # - Core infrastructure: 5
-# - Comment references: 3
+# - Comment references: 2 (reduced from 3)
 # 
 # CORRECTED UPDATE: Paper 2 count was overcounted in previous versions  
 # REALITY: Paper 2 has 11 actual code sorries/admits (not 17) and is mathematically INCOMPLETE

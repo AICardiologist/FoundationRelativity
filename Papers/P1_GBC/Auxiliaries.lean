@@ -59,9 +59,15 @@ lemma finiteDimensional_range_of_rankOne {E F : Type*} [NormedAddCommGroup E] [N
   have h_finite : FiniteDimensional ℂ (Submodule.span ℂ {v}) := by
     apply FiniteDimensional.span_of_finite
     exact Set.finite_singleton v
-  -- A subspace of a finite dimensional space is finite dimensional
-  -- We use that range(f) ≤ span{v} and span{v} is finite dimensional
-  sorry -- TODO: Fix mathlib API for finite dimensional submodules
+  -- Since range(f) ≤ span{v} and span{v} is finite dimensional, range(f) is finite dimensional
+  -- Use Submodule.inclusion h_range : range f →ₗ[ℂ] span{v} which is injective
+  -- Since the codomain is finite-dimensional, injectivity gives finite-dimensional domain
+  haveI : FiniteDimensional ℂ (Submodule.span ℂ {v}) := h_finite
+  refine FiniteDimensional.of_injective
+    (Submodule.inclusion h_range)
+    ?hinj
+  -- inclusion is injective (this is automatic)
+  exact Submodule.inclusion_injective h_range
 
 /-! ### Pullback auxiliaries -/
 
