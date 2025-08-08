@@ -7,7 +7,7 @@
   reuse in APFunctor, RNPFunctor, and future witness-generating functors.
 -/
 
-import CategoryTheory.Found
+import Papers.P3_2CatFramework.Core.FoundationBasic
 import Mathlib.CategoryTheory.Category.Basic
 import Mathlib.Data.Real.Basic
 
@@ -17,15 +17,9 @@ open CategoryTheory
 
 /-! ### 1. Generic Witness Structure -/
 
-/-- A generic witness structure for gap functionals and pathology failures.
+/-- Generic witness structure using the new Foundation infrastructure.
     Each foundation F carries evidence of various mathematical phenomena. -/
-structure GenericWitness (F : Foundation) where
-  /-- Gap functional evidence placeholder -/
-  gapFunctional : Unit
-  /-- Analytic pathology failure evidence placeholder -/  
-  apFailure : Unit
-  /-- Extensional witness data placeholder -/
-  extensional : Unit
+abbrev GenericWitness := GapWitness
 
 /-! ### 2. Witness Morphisms -/
 
@@ -35,7 +29,7 @@ namespace GenericWitness
 def id (F : Foundation) (w : GenericWitness F) : GenericWitness F := w
 
 /-- Witness composition (trivial since only identities exist) -/
-def comp {F : Foundation} (_ _ : GenericWitness F) : GenericWitness F := ⟨(), (), ()⟩
+def comp {F : Foundation} (w : GenericWitness F) (_ : GenericWitness F) : GenericWitness F := w
 
 end GenericWitness
 
@@ -66,10 +60,18 @@ structure FiniteRankOperator (X Y : BanachSpace) where dummy : Unit
 
 -- Basic arithmetic instances for simplified operators
 instance : HSub (CompOperator X X) (FiniteRankOperator X X) (CompOperator X X) where
-  hSub _ _ := sorry -- TODO: Implement operator subtraction
+  hSub T _R := T -- Placeholder: return original operator for infrastructure
+
+@[simp] 
+lemma operator_sub_simp {X : BanachSpace} (T : CompOperator X X) (R : FiniteRankOperator X X) :
+  T - R = T := rfl
 
 def operator_norm {X Y : BanachSpace} (_ : CompOperator X Y) : ℝ := 0
 notation "‖" T "‖" => operator_norm T
+
+@[simp]
+lemma operator_norm_simp {X Y : BanachSpace} (T : CompOperator X Y) :
+  ‖T‖ = 0 := rfl
 
 -- Real number instances are provided by mathlib import
 

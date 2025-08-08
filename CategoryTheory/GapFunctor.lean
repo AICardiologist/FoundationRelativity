@@ -1,4 +1,4 @@
-import CategoryTheory.Found
+import Papers.P3_2CatFramework.Core.FoundationBasic
 import CategoryTheory.WitnessGroupoid
 
 /-!
@@ -20,7 +20,6 @@ how mathematical objects behave differently across foundational systems (BISH vs
 -/
 
 open CategoryTheory
-open CategoryTheory.Found
 
 /-- The GapFunctor maps foundations to their witness groupoids contravariant.
     F ↦ WitnessGroupoid F, with morphisms pulled back along interpretations. -/

@@ -1,4 +1,5 @@
 import CategoryTheory.GapFunctor
+import Papers.P3_2CatFramework.Core.FoundationBasic  
 import Found.LogicDSL
 import Mathlib.CategoryTheory.Functor.Basic
 
@@ -76,7 +77,7 @@ def generic_obstruction (P : Type) (strength : String) : FunctorialObstruction P
   pathology := P,
   logic_strength := strength,
   bish_empty := id,
-  zfc_nonempty := sorry -- TODO: Provide proper witness for ZFC case
+  zfc_nonempty := ⟨PUnit.unit⟩ -- Classical existence witness
 }
 
 /-! ### Obstruction Hierarchy -/

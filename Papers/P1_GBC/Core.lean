@@ -8,7 +8,6 @@ import Mathlib.Analysis.Normed.Lp.lpSpace
 import Mathlib.Analysis.Normed.Operator.Compact
 import Mathlib.FieldTheory.IsAlgClosed.Spectrum
 import CategoryTheory.PseudoFunctor
-import CategoryTheory.BicatFound
 import AnalyticPathologies.HilbertSetup
 import Found.LogicDSL
 import Found.InterpCore

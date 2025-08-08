@@ -31,15 +31,17 @@
 # RESOLVED Sprint 47: Papers/P1_GBC/Correspondence.lean:41  # e_g_in_ker_when_true helper - COMPLETED!
 # RESOLVED Sprint 47: Papers/P1_GBC/Correspondence.lean:47  # surj_implies_false (main direction) - COMPLETED!
 
-# Papers/P1_GBC/Auxiliaries.lean (0 sorrys) - Mathematical content - Sprint 50 cleaned up
+# Papers/P1_GBC/Auxiliaries.lean (1 sorry) - Mathematical content - Sprint 50 cleaned up + temporary mathlib API issue
 # RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:37   # finiteDimensional_ker_of_finiteDimRange - COMPLETED!
 # RESOLVED Sprint 49: Papers/P1_GBC/Auxiliaries.lean:44   # finiteDimensional_range_of_rankOne - COMPLETED!
+Papers/P1_GBC/Auxiliaries.lean:64   # finiteDimensional_range_of_rankOne mathlib API issue - temporary
 # RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:64   # pullback_isometry_of_surjective - COMPLETED!
 # REMOVED Sprint 49: Papers/P1_GBC/Auxiliaries.lean:79   # surjective_of_compact_and_spectrum - REMOVED as mathematically incorrect
 # RESOLVED Sprint 47: Papers/P1_GBC/Auxiliaries.lean:87   # compact_of_surjective_and_rank_one - FIXED by correcting to perturbation_P_g_is_compact!
 
-# Comment references (detected by grep but not actual sorry statements)
+# Comment references (detected by grep but not actual sorry statements)  
 Logic/Reflection.lean:6          # Comment: "No other assumptions, no `sorry`."
+Papers/P1_GBC/Core.lean:33       # Comment: "- No axioms or sorry statements"
 
 # Papers/P1_GBC/LogicAxioms.lean (0 sorrys) - Axiomatization layer added in Sprint 50
 # This module axiomatizes Gödel's incompleteness consequences without full formalization
@@ -170,7 +172,7 @@ LogicDSL/Core.lean:22
 # IMPORTANT: Some lines below are documentation comments mentioning "sorry" - these do NOT count as actual sorry statements
 
 # Core Infrastructure Blockers (2 critical sorries blocking all others)
-Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:45                     # wlpo_implies_gap - Mathlib version issue: needs lp.not_reflexive_one ≥ 4.9.0 (admit)
+Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:38                     # wlpo_implies_gap - Mathlib version issue: needs lp.not_reflexive_one ≥ 4.9.0 (admit)
 Papers/P2_BidualGap/Constructive/CReal/Basic.lean:492           # CReal.dist_triangle - Infrastructure constraint: heartbeat timeout during lemma elaboration
 
 # Quotient Layer Operations (3 actual sorries - depend on CReal.dist_triangle foundation)
@@ -202,10 +204,10 @@ Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:445    # Comment documentin
 # Paper 3 - 2-Categorical Framework (replaced Unit stubs with sorries)
 Papers/P3_2CatFramework/Basic.lean:28
 Papers/P3_2CatFramework/Basic.lean:33
-Papers/P3_2CatFramework/FunctorialObstruction.lean:28
-Papers/P3_2CatFramework/FunctorialObstruction.lean:40
-Papers/P3_2CatFramework/FunctorialObstruction.lean:50
-Papers/P3_2CatFramework/FunctorialObstruction.lean:59
+Papers/P3_2CatFramework/FunctorialObstruction.lean:26
+Papers/P3_2CatFramework/FunctorialObstruction.lean:37
+Papers/P3_2CatFramework/FunctorialObstruction.lean:46
+Papers/P3_2CatFramework/FunctorialObstruction.lean:54
 
 # Paper 4 - Updated TuringMachine placeholders
 Papers/P4_SpectralGeometry/Discrete/TuringEncoding.lean:115

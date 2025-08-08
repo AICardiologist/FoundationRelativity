@@ -9,7 +9,6 @@ import Papers.P2_BidualGap.Basic
 
 namespace Papers.P2
 
-open CategoryTheory.BicatFound
 open CategoryTheory.WitnessGroupoid.Core
 
 /-! ### Relativity as Non-Functoriality -/

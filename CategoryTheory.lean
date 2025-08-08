@@ -1,6 +1,5 @@
--- Core 2-categorical infrastructure
-import CategoryTheory.Found
-import CategoryTheory.BicatFound
+-- Core 2-categorical infrastructure  
+import Papers.P3_2CatFramework.Core.FoundationBasic
 import CategoryTheory.GapFunctor  
 import CategoryTheory.Obstruction
 
@@ -38,7 +37,5 @@ This provides the foundation for implementing the full 2-categorical theory
 from Paul Lee's research papers, particularly Paper 3 on 2-categorical frameworks.
 -/
 
--- Note: FoundationBicat is exported via CategoryTheory.BicatFound
-
--- Export the complex Foundation types globally
-export CategoryTheory.Found (Foundation Interp)
+-- Export the new Foundation types globally  
+-- Note: These are available directly since FoundationBasic doesn't use a namespace
