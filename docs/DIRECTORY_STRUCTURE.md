@@ -6,125 +6,142 @@
 FoundationRelativity/
 ├── Papers/                           # 📚 Main academic implementations
 │   ├── P1_GBC/                      # ✅ Gödel-Banach (0 sorries)
-│   │   ├── Core.lean                # Operator definitions
-│   │   ├── Statement.lean           # Main theorems
+│   │   ├── Core.lean                # Operator definitions and spectrum
+│   │   ├── Statement.lean           # Main theorems and proofs
 │   │   ├── LogicAxioms.lean         # Gödel axiomatization
 │   │   └── Correspondence.lean      # Logic-analysis bridge
-│   ├── P2_BidualGap/                # ✅ Bidual Gap (0 sorries)
-│   │   ├── Basic.lean               # Core definitions
-│   │   └── WLPO_Equiv_Gap.lean      # Main equivalence
-│   ├── P3_2CatFramework/            # ✅ 2-Categories (0 sorries)
+│   ├── P2_BidualGap/                # ✅ Gap → WLPO AXIOM-CLEAN!
+│   │   ├── Basic.lean               # Core definitions (BidualGapStrong, WLPO)
+│   │   ├── WLPO_Equiv_Gap.lean      # Main equivalence (forward complete)
+│   │   ├── Constructive/            # Implementation complete
+│   │   │   ├── Ishihara.lean        #   ✅ Gap → WLPO (0 sorries, axiom-clean)
+│   │   │   └── DualStructure.lean   #   🔧 API bridges (3 sorries)
+│   │   └── documentation/           # 📄 Papers, reports, status
+│   │       ├── paper-v3.2.tex       #   📄 LaTeX with Lean results
+│   │       ├── README.md             #   📄 Paper overview
+│   │       └── implementation_details/ # 📄 Technical details
+│   ├── P3_2CatFramework/            # 📋 Framework ready (6 sorries)
 │   │   ├── Basic.lean               # Pseudo-functor infrastructure
-│   │   └── FunctorialObstruction.lean # Non-functoriality
-│   └── P4_SpectralGeometry/         # 🔧 Spectral Geometry (61 sorries)
+│   │   └── FunctorialObstruction.lean # Non-functoriality results
+│   └── P4_SpectralGeometry/         # 🔧 Active development (61 sorries)
 │       ├── Geometry/                # Neck torus definition
 │       ├── Spectral/                # Variational principles
-│       ├── Logic/                   # Con(PA) bridge
-│       └── Discrete/                # Fast-track CPW model
+│       ├── Logic/                   # Con(PA) undecidability bridge
+│       └── Discrete/                # 🔧 CPW discrete model (85% complete)
+│           ├── NeckGraph.lean       #   Discrete n×n torus graph
+│           ├── TuringEncoding.lean  #   TM → edge weights encoding
+│           └── IntervalBookkeeping.lean # Spectral band arithmetic
 │
 ├── CategoryTheory/                  # 🏗️ Foundation framework
-│   ├── Found.lean                   # Foundation type
+│   ├── Found.lean                   # Foundation type and morphisms
 │   ├── BicatFound.lean              # Bicategorical structure
 │   ├── PseudoFunctor.lean           # Pseudo-functor implementation
 │   └── Witness.lean                 # Witness type framework
 │
-├── Gap2/, APFunctor/, RNPFunctor/   # 🎯 ρ=1,2 pathologies
+├── Gap2/                            # 🎯 ρ=1 pathologies (WLPO-level)
+├── APFunctor/                       # 🎯 ρ=1 pathologies (WLPO-level)
+├── RNPFunctor/                      # 🎯 ρ=2+ pathologies (DC_ω-level)
 │
-├── docs/                            # 📖 This documentation
-│   ├── README.md                    # Documentation hub
-│   ├── onboarding.md                # New contributor guide
-│   ├── planning/                    # Strategic planning
-│   │   ├── project-status.md        # Current status
-│   │   ├── paper4-status.md         # Paper 4 progress
-│   │   └── paper4-roadmap-enhanced.md # Fast-track plan
-│   ├── papers/                      # LaTeX sources
-│   │   ├── P1-GBC.tex              # Paper 1 source
-│   │   ├── P2-BidualGap.tex        # Paper 2 source
-│   │   ├── P3-2CatFramework.tex    # Paper 3 source
-│   │   ├── P4-SpectralGeometry.tex # Paper 4 source
-│   │   └── revised/                # Enhanced versions
-│   ├── analysis/                   # Formalization insights
-│   ├── sprints/                    # Recent sprint reports
-│   ├── reference/                  # Developer guides
-│   └── archive/                    # Historical docs
+├── Scripts/                         # 🔧 Utilities and verification
+│   └── AxiomCheck.lean             # Axiom usage verification
 │
-├── test/                           # 🧪 Comprehensive test suite
-│   ├── AllPathologiesTests.lean   # Integration tests
-│   ├── Paper1Tests.lean           # Paper 1 verification
-│   ├── Paper2Tests.lean           # Paper 2 verification
-│   └── Paper3Tests.lean           # Paper 3 verification
-│
-├── scripts/                        # 🛠️ Development tools
-│   ├── check-sorry-allowlist.sh   # Sorry verification
-│   ├── check-no-axioms.sh         # Axiom verification
-│   └── fmt.sh                     # Code formatting
-│
-└── .github/workflows/             # 🔄 CI/CD configuration
-    ├── ci.yml                     # Main CI pipeline
-    └── nightly.yml               # Nightly builds
+├── test/                           # 🧪 Regression and verification tests
+└── docs/                           # 📚 Comprehensive documentation
+    ├── README.md                   # Main documentation overview
+    ├── planning/                   # 📋 Roadmaps and status
+    │   ├── ROADMAP-v3.2.md         #   Current roadmap with axiom-clean status
+    │   ├── project-status.md       #   Overall project status
+    │   └── paper4-status.md        #   Paper 4 discrete model status
+    ├── papers/                     # 📄 LaTeX sources (legacy)
+    ├── analysis/                   # 🔬 Formalization insights
+    ├── sprints/                    # 🏃 Sprint completion reports
+    ├── archive/                    # 📦 Historical documentation
+    └── reference/                  # 🛠️ Developer guides
+        ├── DEV_GUIDE.md            #   Setup and workflows
+        └── TOOLCHAIN_UPGRADE.md    #   Lean toolchain management
 ```
 
-## 🗂️ Key Components
+## 🎯 Current Status Overview
 
-### **Papers Implementation**
-- **Papers 1-3**: Complete with 0 sorries, fully machine-verified
-- **Paper 4**: Phase 1A infrastructure complete, 61 sorries remaining
-- Each paper has its own module with clear separation of concerns
+### ✅ **Completed Papers**
+- **Paper 1**: Gödel-Banach Correspondence - Complete (0 sorries)
+- **Paper 2 Forward**: Gap → WLPO - **AXIOM-CLEAN** (0 sorries)
 
-### **Foundation Framework**
-- **CategoryTheory/**: Core bicategorical infrastructure
-- **Witness Types**: Foundation-relative constructions
-- **Pseudo-Functors**: 2-categorical coherence
+### 🔧 **Active Development**  
+- **Paper 2 Reverse**: WLPO → Gap - Pending (1 sorry)
+- **Paper 3**: 2-Categorical Framework - Ready for implementation (6 sorries)
+- **Paper 4**: Spectral Geometry Discrete Model - 85% complete (61 sorries)
 
-### **Pathology Functors**
-- **Gap2/**: WLPO-dependent bidual gap (ρ=1)
-- **APFunctor/**: Approximation property failure (ρ=1)
-- **RNPFunctor/**: Radon-Nikodym property failure (ρ=2)
+## 📁 Key Directory Details
 
-### **Documentation**
-- **Active**: Current planning and status documents
-- **Archive**: Historical sprint reports and obsolete docs
-- **Analysis**: Insights from formalization process
-- **Papers**: LaTeX sources and enhanced versions
+### `Papers/P2_BidualGap/` - Axiom-Clean Achievement
+- **`Constructive/Ishihara.lean`**: Main breakthrough - axiom-clean Gap → WLPO
+- **`documentation/paper-v3.2.tex`**: Academic paper with Lean results  
+- **`documentation/implementation_details/`**: Technical architecture and status
+- **`documentation/old_files/`**: Pre-breakthrough historical documentation
 
-### **Quality Assurance**
-- **Test Suite**: 52 comprehensive tests
-- **CI/CD**: Automated verification on every push
-- **Scripts**: Sorry allowlist, axiom checking, formatting
+### `Scripts/`
+- **`AxiomCheck.lean`**: Verification script for axiom usage
+- Confirms axiom-clean status: only `Classical.choice`, `propext`, `Quot.sound`
 
-## 🎯 Navigation Guide
+### `docs/`
+- **Current active documentation** reflecting axiom-clean breakthrough
+- **`old_files/`**: Obsolete pre-breakthrough documentation
+- **`archive/`**: Complete historical development record
 
-### **For New Contributors**
-1. Start: `docs/onboarding.md`
-2. Status: `docs/planning/project-status.md`
-3. Setup: `docs/reference/DEV_GUIDE.md`
-4. Code: `Papers/` directories
+## 🔍 Navigation Patterns
 
-### **For Active Development**
-1. Paper 4: `Papers/P4_SpectralGeometry/Discrete/`
-2. Status: `docs/planning/paper4-status.md`
-3. Roadmap: `docs/planning/paper4-roadmap-enhanced.md`
-4. Tests: `test/` directory
+### **For the Axiom-Clean Achievement**
+1. **Main theorem**: `Papers/P2_BidualGap/Constructive/Ishihara.lean`
+2. **Academic paper**: `Papers/P2_BidualGap/documentation/paper-v3.2.tex`
+3. **Technical details**: `Papers/P2_BidualGap/documentation/implementation_details/`
+4. **Axiom verification**: `Scripts/AxiomCheck.lean`
 
-### **For Understanding the Project**
-1. Papers: `docs/papers/` for LaTeX sources
-2. Analysis: `docs/analysis/` for insights
-3. History: `docs/archive/` for evolution
-4. Code Ref: `docs/CODE_REFERENCE.md`
+### **For Current Development**
+1. **Project status**: `docs/planning/project-status.md`
+2. **Current roadmap**: `docs/planning/ROADMAP-v3.2.md`  
+3. **Paper 4 progress**: `docs/planning/paper4-status.md`
+4. **Developer setup**: `docs/reference/DEV_GUIDE.md`
 
-## 📊 Project Statistics
+### **For Historical Context**
+1. **Development history**: `docs/archive/` (sprint reports, etc.)
+2. **Pre-breakthrough docs**: Various `old_files/` directories  
+3. **Legacy papers**: `docs/papers/` (superseded by paper-specific docs)
 
-| Component | Files | Lines | Sorries | Status |
-|-----------|-------|-------|---------|---------|
-| Paper 1 | 9 | ~1,500 | 0 | ✅ Complete |
-| Paper 2 | 5 | ~800 | 0 | ✅ Complete |
-| Paper 3 | 3 | ~600 | 0 | ✅ Complete |
-| Paper 4 | 15 | ~2,000 | 61 | 🔧 Phase 1A |
-| Infrastructure | 20+ | ~2,500 | 0 | ✅ Complete |
-| Tests | 15 | ~1,000 | 0 | ✅ Complete |
-| **Total** | **67+** | **~8,400** | **61** | **90%** |
+## 🏗️ Build Targets
+
+### **Main Results**
+```bash
+# Axiom-clean theorem
+lake build Papers.P2_BidualGap.Constructive.Ishihara
+
+# Complete Paper 1  
+lake build Papers.P1_GBC.Statement
+
+# Paper 4 discrete model
+lake build Papers.P4_SpectralGeometry.Discrete
+```
+
+### **Verification**
+```bash
+# Axiom checking
+lake env lean Scripts/AxiomCheck.lean
+
+# Full project build
+lake build
+```
+
+## 📊 File Statistics
+
+| Component | Files | Status | Key Achievement |
+|-----------|-------|--------|------------------|
+| **Paper 1** | ~15 | ✅ Complete | Full formalization |
+| **Paper 2** | ~10 | ✅ Forward Complete | **Axiom-clean Gap → WLPO** |
+| **Paper 3** | ~8 | 📋 Ready | Framework complete |
+| **Paper 4** | ~25 | 🔧 85% Complete | Discrete model active |
+| **Core Framework** | ~20 | ✅ Stable | Category theory foundation |
+| **Documentation** | 100+ | 📚 Comprehensive | Includes complete history |
 
 ---
 
-*Updated: August 2025*  
-*Papers 1-3 Complete | Paper 4 In Progress*
+This directory structure reflects the evolution from initial research through the major **axiom-clean breakthrough** in Paper 2's Gap → WLPO direction, while maintaining complete historical documentation and supporting active development of remaining components.

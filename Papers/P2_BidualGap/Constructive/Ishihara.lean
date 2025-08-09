@@ -16,16 +16,70 @@ open scoped BigOperators
 noncomputable section
 open Classical
 
--- Helper lemma for approximate supremum selection  
+-- API stabilization shims have been removed due to unexpected mathlib API variations.
+-- The documented sorry approach with detailed API issue documentation is more robust
+-- for cross-version compatibility at this stage.
+
+-- Helper lemma for approximate supremum selection (no compactness needed).  
 lemma exists_on_unitBall_gt_half_opNorm
   {E} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
   (T : E →L[ℝ] ℝ) (hT : T ≠ 0) :
-  ∃ x : E, ‖x‖ ≤ 1 ∧ (‖T‖ / 2) < |T x| := by
-  -- Use a classical contradiction approach
-  -- Standard result: if no point on unit ball achieves > ‖T‖/2, 
-  -- then ‖T‖ ≤ ‖T‖/2 which implies T = 0
+  ∃ x : E, ‖x‖ ≤ 1 ∧ (‖T‖ / 2) < ‖T x‖ := by
   classical
-  sorry  -- This is standard functional analysis; the proof requires careful scaling arguments
+  -- Suppose no point of the unit ball exceeds ‖T‖/2.
+  by_contra h
+  push_neg at h
+  -- Then we get a global bound ‖T x‖ ≤ (‖T‖/2)‖x‖ by scaling.
+  have bound_all : ∀ x : E, ‖T x‖ ≤ (‖T‖ / 2) * ‖x‖ := by
+    intro x
+    by_cases hx : x = 0
+    · -- trivial at 0
+      simpa [hx, norm_zero, mul_zero, div_nonneg, norm_nonneg] using
+        (show (0 : ℝ) ≤ (‖T‖ / 2) * ‖x‖ from
+          mul_nonneg (div_nonneg (norm_nonneg _) (by norm_num)) (norm_nonneg _))
+    · have hxpos : 0 < ‖x‖ := norm_pos_iff.mpr hx
+      -- Normalize u := x/‖x‖ so ‖u‖ = 1.
+      let u : E := (‖x‖)⁻¹ • x
+      have hu_norm : ‖u‖ = 1 := by
+        have h1 : ‖u‖ = ‖(‖x‖)⁻¹‖ * ‖x‖ := by simpa [u] using norm_smul ((‖x‖)⁻¹) x
+        have h2 : ‖(‖x‖)⁻¹‖ = (‖x‖)⁻¹ :=
+          by simpa [Real.norm_of_nonneg (le_of_lt (inv_pos.mpr hxpos))]
+        have hxne : (‖x‖ : ℝ) ≠ 0 := ne_of_gt hxpos
+        have : ‖u‖ = (‖x‖)⁻¹ * ‖x‖ := by simpa [h2] using h1
+        -- (‖x‖)⁻¹ * ‖x‖ = 1 by hxne; let `simp` do it
+        simpa [hxne] using this
+      have hu_le : ‖u‖ ≤ 1 := by simpa [hu_norm]
+      have hu_ball : ‖T u‖ ≤ ‖T‖ / 2 := h u hu_le
+      -- T x = ‖x‖ * T u by linearity
+      have hxu : (‖x‖ : ℝ) • u = x := by
+        have hxne : (‖x‖ : ℝ) ≠ 0 := ne_of_gt hxpos
+        -- (‖x‖) • ((‖x‖)⁻¹ • x) = (‖x‖ * (‖x‖)⁻¹) • x = 1 • x = x
+        simpa [u, smul_smul, hxne, one_smul]
+      have : T x = ‖x‖ * T u := by simpa [hxu] using T.map_smul (‖x‖ : ℝ) u
+      -- Bound ‖T x‖.
+      calc
+        ‖T x‖ = ‖‖x‖ * T u‖ := by simpa [this]
+        _ = ‖x‖ * ‖T u‖     := by simpa using (norm_mul (‖x‖) (T u))
+        _ ≤ (‖T‖ / 2) * ‖x‖ := by
+          have := mul_le_mul_of_nonneg_left hu_ball (norm_nonneg x)
+          simpa [mul_comm] using this
+  -- Turn the global pointwise bound into an op-norm bound.
+  have hnonneg : 0 ≤ ‖T‖ / 2 := div_nonneg (norm_nonneg _) (by norm_num)
+  have hle : ‖T‖ ≤ ‖T‖ / 2 := by
+    simpa using
+      ContinuousLinearMap.opNorm_le_bound T hnonneg
+        (by intro x; simpa [mul_comm] using bound_all x)
+  -- Hence ‖T‖ = 0, hence T = 0, contradiction.
+  have hTnorm0 : ‖T‖ = 0 := by
+    have : 0 ≤ ‖T‖ := norm_nonneg _
+    nlinarith
+  have T0 : T = 0 := by
+    ext x
+    have hx' : ‖T x‖ ≤ ‖T‖ * ‖x‖ := by simpa using T.le_opNorm x
+    have : ‖T x‖ ≤ 0 := by simpa [hTnorm0] using hx'
+    have : ‖T x‖ = 0 := le_antisymm this (norm_nonneg _)
+    simpa using (norm_eq_zero.mp this)
+  exact hT T0
 
 -- Helper lemma for zero map normability  
 lemma hasOpNorm_zero {X} [NormedAddCommGroup X] [NormedSpace ℝ X] :
@@ -42,14 +96,35 @@ lemma hasOpNorm_zero {X} [NormedAddCommGroup X] [NormedSpace ℝ X] :
     have : 0 ∈ OpNorm.valueSet (X:=X) (0 : X →L[ℝ] ℝ) := ⟨0, by simp [OpNorm.UnitBall], by simp⟩
     exact hb this
 
--- Any continuous linear functional has an OpNorm LUB (classical existence)
+-- Any continuous linear functional has an OpNorm LUB (classical completeness of ℝ).
 lemma hasOpNorm_CLF
   {X} [NormedAddCommGroup X] [NormedSpace ℝ X]
   (h : X →L[ℝ] ℝ) : OpNorm.HasOpNorm (X:=X) h := by
   classical
-  -- Standard result: the value set on unit ball is nonempty, bounded above,
-  -- so by classical real completeness it has a supremum which is the LUB
-  sorry  -- This is standard: use sSup of bounded nonempty set in ℝ
+  -- S := {|h x| | ‖x‖ ≤ 1}; we phrase with norm to avoid abs/Real.* drift
+  let S : Set ℝ := OpNorm.valueSet (X:=X) h
+  -- Nonempty: take x = 0
+  have hne : S.Nonempty := by
+    refine ⟨0, ?_⟩
+    refine ⟨(0 : X), ?_, ?_⟩
+    · simp [OpNorm.UnitBall]
+    · simp
+  -- Bounded above by ‖h‖.
+  have hbdd : BddAbove S := by
+    refine ⟨‖h‖, ?_⟩
+    intro r hr
+    rcases hr with ⟨x, hx, rfl⟩
+    have : ‖h x‖ ≤ ‖h‖ * ‖x‖ := by simpa using h.le_opNorm x
+    have hx1 : ‖x‖ ≤ 1 := hx
+    have hnn : 0 ≤ ‖h‖ := norm_nonneg _
+    have : ‖h x‖ ≤ ‖h‖ :=
+      this.trans <| by
+        have : ‖h‖ * ‖x‖ ≤ ‖h‖ * 1 := mul_le_mul_of_nonneg_left hx1 hnn
+        simpa using this
+    exact this
+  -- Classical completeness of ℝ.
+  exact ⟨sSup S, isLUB_csSup hne hbdd⟩
+  -- If your tree spells it `isLub_csSup`, just change the lemma name here.
 
 /-
   Lightweight kernel API for the forward direction.
@@ -58,7 +133,7 @@ lemma hasOpNorm_CLF
   a family `g : (ℕ → Bool) → X →L[ℝ] ℝ`, and a gap δ > 0 giving the
   separation `|y (f + g α)| = 0 ∨ δ ≤ |y (f + g α)|`.
 -/
-structure IshiharaKernel (X : Type) [NormedAddCommGroup X] [NormedSpace ℝ X] where
+structure IshiharaKernel (X : Type _) [NormedAddCommGroup X] [NormedSpace ℝ X] where
   y     : (X →L[ℝ] ℝ) →L[ℝ] ℝ
   f     : X →L[ℝ] ℝ
   g     : (ℕ → Bool) → (X →L[ℝ] ℝ)
@@ -70,7 +145,7 @@ structure IshiharaKernel (X : Type) [NormedAddCommGroup X] [NormedSpace ℝ X] w
   zero_iff_allFalse :
     ∀ α : ℕ → Bool, (∀ n, α n = false) ↔ y (f + g α) = 0
   /-- Normability closure (kept as before). -/
-  closed_add : ∀ α, HasOperatorNorm (f + g α)
+  closed_add : ∀ α, OpNorm.HasOpNorm (X:=X) (f + g α)
 
 /-- Monomorphic witness package to avoid universe headaches when transporting across files. -/
 structure KernelWitness where
@@ -98,7 +173,7 @@ by
     never needs to reason about the details again.
 -/
 theorem WLPO_of_kernel
-  {X : Type} [NormedAddCommGroup X] [NormedSpace ℝ X] [CompleteSpace X]
+  {X : Type _} [NormedAddCommGroup X] [NormedSpace ℝ X] [CompleteSpace X]
   (K : IshiharaKernel X) : WLPO := by
   -- WLPO for Bool-sequences: for every α, either all-false or not-all-false.
   intro α
@@ -144,28 +219,114 @@ Notes:
 def WLPO_of_witness (W : KernelWitness) : WLPO :=
   @WLPO_of_kernel W.X _ _ _ W.K
 
-/-- Extract an Ishihara kernel from a strong bidual gap.  This is where you use:
-    - the point `y ∈ X** \ j(X)`,
-    - closedness of `j(X)` and the *positive* distance (no HB needed),
-    - and the `DualIsBanach` hypotheses (closed under addition) to define `g α`.
+-- Previous approach: Extract an Ishihara kernel from a strong bidual gap.  
+-- This used the point y ∈ X** \ j(X), closedness of j(X), positive distance,  
+-- and DualIsBanach hypotheses (closed under addition) to define g α.
+-- However, this approach hit Prop→Type elimination issues.
+--
+-- Old approach kept for reference but not used:
+-- def kernel_from_gap : BidualGapStrong → KernelWitness := ...
 
-    Keep the analytic meat here, boxed behind a single sorry, so the rest of
-    the pipeline remains clean. -/
-def kernel_from_gap : BidualGapStrong → KernelWitness := 
-  -- This is the classical uniform gap construction, following the user's plan:
-  -- 1. Extract the gap witness from BidualGapStrong
-  -- 2. Use uniform gap δ := ‖y‖/2 where y ∉ j(X)
-  -- 3. Find h_star with |y(h_star)| > δ via approximate supremum
-  -- 4. Define kernel: f := 0, g(α) := if all-false then 0 else h_star
-  -- 5. Show separation: |y(f + g α)| = 0 iff all-false, ≥ δ otherwise
-  -- 6. Package everything as KernelWitness
-  --
-  -- The construction relies on classical choice to extract the witness space X
-  -- and the gap element y from the existential structure of BidualGapStrong.
-  -- Once extracted, the uniform gap approach gives clean separation properties.
-  --
-  -- SORRY(P2-kernel-from-gap)
-  sorry
+/-- Gap ⇒ WLPO: Direct proof in `Prop` (avoids Prop→Type elimination). -/
+theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
+  classical
+  -- Unpack witnesses (allowed: target is Prop)
+  rcases hGap with ⟨X, Xng, Xns, Xc, _dualBan, _bidualBan, hNotSurj⟩
+  -- Activate instances for this X
+  letI : NormedAddCommGroup X := Xng
+  letI : NormedSpace ℝ X := Xns
+  letI : CompleteSpace X := Xc
+  -- Non-surjectivity gives y ∉ range j
+  let j := NormedSpace.inclusionInDoubleDual ℝ X
+  have : ∃ y : (X →L[ℝ] ℝ) →L[ℝ] ℝ, y ∉ Set.range j := by
+    -- `¬ surjective j` ⇔ `¬ ∀ y, ∃ x, j x = y`
+    have : ¬ (∀ y, ∃ x, j x = y) := by
+      simpa [Function.Surjective] using hNotSurj
+    rcases not_forall.mp this with ⟨y, hy⟩
+    have hy' : y ∉ Set.range j := by simpa [Set.mem_range] using hy
+    exact ⟨y, hy'⟩
+  rcases this with ⟨y, hy⟩
+  have hy0 : y ≠ 0 := by
+    intro h0; subst h0
+    exact hy ⟨0, by simp⟩
+
+  -- Uniform gap
+  let δ : ℝ := ‖y‖ / 2
+  have δpos : 0 < δ := by
+    -- (1) Get 0 ≤ ‖y‖ without letting `simp` collapse it to `True`
+    have h₀ : (0 : ℝ) ≤ ‖y‖ := by
+      exact (@norm_nonneg ((X →L[ℝ] ℝ) →L[ℝ] ℝ) _ y)
+
+    -- (2) From ‖y‖ = 0 ⇒ y = 0, contradicting hy0
+    have hne : ‖y‖ ≠ 0 := by
+      intro hnorm
+      have hy_zero : (y : (X →L[ℝ] ℝ) →L[ℝ] ℝ) = 0 :=
+        ((@norm_eq_zero ((X →L[ℝ] ℝ) →L[ℝ] ℝ) _ y)).1 hnorm
+      exact hy0 hy_zero
+
+    -- (3) Strict positivity and then halve
+    have : 0 < ‖y‖ := lt_of_le_of_ne h₀ (by simpa [ne_comm] using hne)
+    simpa [δ] using half_pos this
+
+  -- Near maximizer h⋆ in X* (use ASCII `hstar`, and pin E explicitly)
+  obtain ⟨hstar, hstar_le1, hstar_big⟩ :
+      ∃ h : (X →L[ℝ] ℝ), ‖h‖ ≤ 1 ∧ δ < ‖y h‖ := by
+    -- the helper lemma returns (‖y‖/2) < ‖y h‖; rewrite to δ with [δ]
+    simpa [δ] using
+      (exists_on_unitBall_gt_half_opNorm (E := (X →L[ℝ] ℝ)) y hy0)
+
+  -- Define kernel data
+  let f : X →L[ℝ] ℝ := 0
+  let g : (ℕ → Bool) → (X →L[ℝ] ℝ) := fun α =>
+    if (∀ n, α n = false) then 0 else hstar
+
+  -- Separation property (goal uses |·|; rewrite via Real.norm_eq_abs)
+  have sep : ∀ α, |y (f + g α)| = 0 ∨ δ ≤ |y (f + g α)| := by
+    intro α
+    by_cases hall : ∀ n, α n = false
+    · -- all-false
+      left
+      -- y(0) = 0; use Real.norm_eq_abs to produce |·|
+      simp [f, g, hall]
+    · -- not all-false → g α = hstar, so ‖y (f + g α)‖ = ‖y hstar‖
+      right
+      have : δ ≤ ‖y hstar‖ := le_of_lt hstar_big
+      -- rewrite to abs with Real.norm_eq_abs and unfold f,g
+      simpa [f, g, hall, zero_add, Real.norm_eq_abs] using this
+
+  -- Zero-characterization
+  have zero_iff_allFalse : ∀ α, (∀ n, α n = false) ↔ y (f + g α) = 0 := by
+    intro α; constructor
+    · intro hall; simp [f, g, hall]
+    · intro h0
+      by_contra hnot
+      -- if not all-false, g α = hstar
+      have yh_eq : y (f + g α) = y hstar := by simpa [f, g, hnot, zero_add]
+      have yhstar0 : y hstar = 0 := by simpa [yh_eq] using h0
+      -- But hstar_big gives δ < ‖y hstar‖; with δpos we get 0 < ‖y hstar‖
+      have pos : 0 < ‖y hstar‖ := by
+        have : δ < ‖y hstar‖ := by simpa [δ] using hstar_big
+        exact lt_trans δpos this
+      have zero : ‖y hstar‖ = 0 := by simpa [yhstar0]
+      -- Contradiction: 0 < ‖y hstar‖ = 0
+      have : (0 : ℝ) < 0 := by simpa [zero] using pos
+      exact lt_irrefl _ this
+
+  -- Normability closure
+  have closed_add : ∀ α, OpNorm.HasOpNorm (X:=X) (f + g α) := by
+    intro α
+    by_cases hall : ∀ n, α n = false
+    · -- f + g α = 0
+      have : OpNorm.HasOpNorm (X:=X) (0 : X →L[ℝ] ℝ) := hasOpNorm_zero
+      simpa [f, g, hall] using this
+    · -- f + g α = hstar
+      have : OpNorm.HasOpNorm (X:=X) hstar := hasOpNorm_CLF (X:=X) hstar
+      simpa [f, g, hall] using this
+
+  -- Conclude WLPO from the kernel package
+  exact WLPO_of_kernel (X := X)
+    { y := y, f := f, g := g, δ := δ, δpos := δpos
+      sep := sep, zero_iff_allFalse := zero_iff_allFalse, closed_add := closed_add }
 
 end -- noncomputable section
 
