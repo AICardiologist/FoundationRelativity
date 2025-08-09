@@ -13,7 +13,6 @@ import Papers.P2_BidualGap.Basic
 namespace Papers.P2.Constructive
 open Papers.P2
 
-<<<<<<< HEAD
 /-! ### Local constructive "operator norm" scaffolding
 
 We keep these helpers in a local namespace and *Prop*-only, to avoid
