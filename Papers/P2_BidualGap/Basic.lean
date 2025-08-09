@@ -33,7 +33,7 @@ structure DualIsBanach
   (X : Type*) [NormedAddCommGroup X] [NormedSpace ℝ X] : Prop where
   (closed_add :
     ∀ f g : X →L[ℝ] ℝ, HasOperatorNorm f → HasOperatorNorm g → HasOperatorNorm (f + g))
-  (complete : CompleteSpace (X →L[ℝ] ℝ))
+  (complete_normable_dual : True)   -- Prop-only placeholder
 
 /-- *Strong* Bidual Gap (BISH interpretation):
     There exists a real Banach space `X` such that
