@@ -238,13 +238,15 @@ Papers/P1_GBC/SmokeTest.lean:19  # Comment: "- No sorry statements in basic infr
 # 
 # STATUS: Work in progress with substantial mathematical gaps requiring expert consultation (more manageable scope than initially assessed)
 
-# Paper 2 (WLPO ↔ BidualGapStrong) – intentional mathematical stubs
-# Updated 2025-08-08: Surgical patches applied, two core mathematical lemmas identified
-Papers/P2_BidualGap/Constructive/DualStructure.lean:111         # SORRY(P2-dual-LUB-exists-for-valueSet) - lub_exists_for_valueSet_of_WLPO  
-Papers/P2_BidualGap/Constructive/DualStructure.lean:80          # Definition bridge (HasOperatorNorm → OpNorm.HasOpNorm)
-Papers/P2_BidualGap/Constructive/DualStructure.lean:97          # Definition bridge (OpNorm.HasOpNorm → HasOperatorNorm)
-Papers/P2_BidualGap/Constructive/Ishihara.lean:28               # exists_on_unitBall_gt_half_opNorm - approximate supremum selection helper  
-Papers/P2_BidualGap/Constructive/Ishihara.lean:52               # hasOpNorm_CLF - any CLF has OpNorm LUB (classical existence)
-Papers/P2_BidualGap/Constructive/Ishihara.lean:154              # SORRY(P2-kernel-from-gap) - kernel_from_gap (uniform gap construction)
-Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:27                      # SORRY(P2-WLPO→gap-strong) - wlpo_implies_gap
+# Paper 2 (WLPO ↔ BidualGapStrong) – AXIOM-CLEAN BREAKTHROUGH STATUS
+# Updated 2025-08-09: Gap → WLPO AXIOM-CLEAN (0 sorries)
+# Only 1 active sorry remaining in reverse direction + bridge lemmas
+Papers/P2_BidualGap/Constructive/DualStructure.lean:89          # SORRY - hasOperatorNorm_to_hasOpNorm bridge
+Papers/P2_BidualGap/Constructive/DualStructure.lean:97          # SORRY - hasOpNorm_to_hasOperatorNorm bridge (3 lemmas)
+Papers/P2_BidualGap/Constructive/DualStructure.lean:111         # SORRY - lub_exists_for_valueSet_of_WLPO  
+Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:24                      # SORRY(P2-WLPO→gap-strong) - wlpo_implies_gap (reverse direction)
 Papers/P2_BidualGap/Compat/NonReflexive.lean:31                 # SORRY(P2-compat) - c0_or_l1_witness (optional)
+
+# Paper 2 CReal_obsolete infrastructure (22 sorries - OBSOLETE, bypassed by direct approach)
+# These were part of complex constructive framework that became unnecessary
+# Papers/P2_BidualGap/Constructive/CReal_obsolete/* - All sorries in this folder are obsolete

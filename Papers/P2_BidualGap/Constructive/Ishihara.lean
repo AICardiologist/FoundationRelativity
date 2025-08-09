@@ -16,10 +16,6 @@ open scoped BigOperators
 noncomputable section
 open Classical
 
--- API stabilization shims have been removed due to unexpected mathlib API variations.
--- The documented sorry approach with detailed API issue documentation is more robust
--- for cross-version compatibility at this stage.
-
 -- Helper lemma for approximate supremum selection (no compactness needed).  
 lemma exists_on_unitBall_gt_half_opNorm
   {E} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
