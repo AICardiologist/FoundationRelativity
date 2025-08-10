@@ -42,6 +42,11 @@
 # Comment references (detected by grep but not actual sorry statements)  
 Logic/Reflection.lean:6          # Comment: "No other assumptions, no `sorry`."
 Papers/P1_GBC/Core.lean:33       # Comment: "- No axioms or sorry statements"
+lakefile.lean:64                 # Comment reference to sorry scanner
+lakefile.lean:65                 # Comment reference to sorry scanner
+lakefile.lean:67                 # Comment reference to sorry scanner script
+lakefile.lean:83                 # Comment reference to sorry scanner script
+scripts/ConstructiveGuard.lean:28 # Comment reference to sorryAx detection
 
 # Papers/P1_GBC/LogicAxioms.lean (0 sorrys) - Axiomatization layer added in Sprint 50
 # This module axiomatizes Gödel's incompleteness consequences without full formalization
@@ -209,6 +214,10 @@ Papers/P3_2CatFramework/FunctorialObstruction.lean:37
 Papers/P3_2CatFramework/FunctorialObstruction.lean:46
 Papers/P3_2CatFramework/FunctorialObstruction.lean:54
 
+# Paper 3 documentation sorries (not active code)
+Papers/P3_2CatFramework/documentation/universe_refactor_draft.lean:72
+Papers/P3_2CatFramework/documentation/universe_refactor_draft.lean:78
+
 # Paper 4 - Updated TuringMachine placeholders
 Papers/P4_SpectralGeometry/Discrete/TuringEncoding.lean:115
 Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:126
@@ -266,4 +275,6 @@ Papers/P2_BidualGap/Constructive/CReal_obsolete/Completeness.lean:142  # CReal i
 Papers/P2_BidualGap/Constructive/CReal_obsolete/Completeness.lean:144  # CReal infrastructure (OBSOLETE)
 
 # Paper 2 documentation comments (detected by script but not actual sorries)
+Papers/P2_BidualGap/Constructive/DualStructure.lean:96                 # Comment mentioning sorry in documentation  
 Papers/P2_BidualGap/Constructive/Ishihara.lean:168                     # Comment mentioning sorry in documentation
+Papers/P2_BidualGap/Gap/FiniteEmbedding.lean:7                         # Comment mentioning sorry in documentation
