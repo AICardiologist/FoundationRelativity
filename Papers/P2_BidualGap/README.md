@@ -1,43 +1,70 @@
 # Paper 2: WLPO ↔ BidualGap Equivalence
 
-## 🎯 AXIOM-CLEAN BREAKTHROUGH: Gap → WLPO Complete!
+## 🎯 COMPLETE MATHEMATICAL FRAMEWORK: §3.1-3.5 Equivalence Chain!
 
+[![§3.1-3.5](https://img.shields.io/badge/%C2%A73.1--3.5-Complete-brightgreen)](#section-31-35-complete)
 [![Gap→WLPO](https://img.shields.io/badge/Gap%E2%86%92WLPO-Axiom%20Clean-brightgreen)](#gap--wlpo-axiom-clean)
-[![Forward Direction](https://img.shields.io/badge/Forward%20Direction-0%20sorries-brightgreen)](#forward-direction-status)
-[![Axioms](https://img.shields.io/badge/Axioms-Classical%20Only-blue)](#axiom-usage)
+[![Equivalence Chain](https://img.shields.io/badge/Equivalence%20Chain-0%20sorries-brightgreen)](#equivalence-chain)
+[![Fortress CI](https://img.shields.io/badge/Fortress%20CI-8%20Guards-blue)](#fortress-ci)
 
-**Current State**: **GAP → WLPO AXIOM-CLEAN** ✅  
-**Main Result**: `WLPO_of_gap : BidualGapStrong → WLPO` with zero sorries and minimal axioms  
-**Technical Achievement**: Direct Prop-level proof avoiding Prop→Type elimination!
+**Current State**: **§3.1-3.5 COMPLETE EQUIVALENCE FRAMEWORK** ✅  
+**Main Achievement**: Complete formal proof chain `finite symmetric difference ↔ eventually zero ↔ c₀-style tail smallness`  
+**Technical Excellence**: Elegant congruence algebra with exact formulas and fortress CI protection!
 
-🎯 **BREAKTHROUGH**: Complete axiom-clean implementation achieved August 9, 2025 through direct Prop-level methodology bypassing complex constructive infrastructure.
+🎯 **MATHEMATICAL MILESTONE**: Complete §3.1-3.5 equivalence framework achieved August 10, 2025 with zero sorries and elegant lattice algebra throughout.
 
 ## Latest Achievement ✅
 
-### ✅ Gap → WLPO Axiom-Clean
+### ✅ §3.1-3.5 Complete Equivalence Framework
+- **Complete equivalence chain**: `finite symmetric difference ↔ eventually zero ↔ c₀-style tail smallness`
+- **ι embedding theory**: Lattice homomorphism properties for union/intersection/complement
+- **Elegant congruence algebra**: Exact symmetric difference formulas with one-liner proofs
+- **Zero sorries**: Complete constructive proof chain throughout
+- **Fortress CI protection**: 8-stage guard system with axiom hygiene
+
+### ✅ Gap → WLPO Axiom-Clean  
 - **Zero sorries**: Mathematically complete forward direction  
 - **Axiom-clean**: Uses only `Classical.choice`, `propext`, `Quot.sound`
 - **API-robust**: Proof patterns survive mathlib version drift
 - **Direct Prop-level**: Avoids witness extraction complexity
-- **Universe-safe**: Polymorphic kernel with explicit type parameters
 
-### 🔬 Technical Innovation
-The implementation demonstrates several advanced Lean 4 techniques:
+### 🔬 Mathematical Innovation
+The implementation demonstrates several advanced formal verification techniques:
 
-1. **Direct Prop-level proof**: Eliminates Prop→Type extraction issues
-2. **Approximate supremum selection**: Robust functional analysis without API fragility  
-3. **Universe polymorphism**: `Type _` kernel with explicit instantiation
-4. **API stabilization**: Explicit rewrites instead of fragile pattern matching
+1. **Exact symmetric difference formulas**: Crisp identities enabling one-liner congruence proofs
+2. **Modular equivalence bridges**: Clean separation between set theory and functional analysis
+3. **Pin-safe API design**: Implementation patterns stable across mathlib versions
+4. **Fortress architecture**: Comprehensive CI protection with axiom hygiene guards
 
 ## Current Architecture Status
+
+### ✅ §3.1-3.5 Complete Equivalence Framework  
+```
+Papers/P2_BidualGap/Gap/
+├── IndicatorSpec.lean                   # ✅ Core spec with congruence algebra
+├── Indicator.lean                       # ✅ χ indicator function theory
+├── IndicatorEventual.lean              # ✅ finite ↔ eventually zero bridge  
+├── C0Spec.lean                         # ✅ eventually zero ↔ c₀-spec bridge
+├── Iota.lean                           # ✅ ι embedding & lattice homomorphism
+├── BooleanSubLattice.lean              # ✅ Residue class partition lemmas
+└── *Tests.lean                         # ✅ Comprehensive smoke tests
+```
 
 ### ✅ Forward Direction Complete
 ```
 Papers/P2_BidualGap/Constructive/Ishihara.lean
 ├── exists_on_unitBall_gt_half_opNorm    # ✅ Approximate supremum selection
-├── hasOpNorm_CLF                        # ✅ Classical completeness of ℝ
+├── hasOpNorm_CLF                        # ✅ Classical completeness of ℝ  
 ├── WLPO_of_gap                         # ✅ Direct Prop-level theorem (axiom-clean)
 └── Universe-polymorphic kernel API      # ✅ Type _ with explicit instantiation
+```
+
+### ✅ Fortress CI System Complete
+```
+lakefile.lean                           # ✅ 8-stage guard system
+scripts/constructive_guard.sh          # ✅ Axiom hygiene protection  
+scripts/sorry_scan.sh                  # ✅ Sorry detection with robust file handling
+scripts/strip_lean_comments.awk        # ✅ Nested comment-aware filtering
 ```
 
 ### 🔧 Reverse Direction Pending
@@ -54,16 +81,27 @@ Papers/P2_BidualGap/
 ```
 Papers/P2_BidualGap/
 ├── Basic.lean                         # ✅ Core definitions (BidualGapStrong, WLPO)
-├── WLPO_Equiv_Gap.lean               # ✅ Main equivalence (forward complete, reverse pending)
-├── Constructive/                     # ✅ Main implementation
+├── Gap/                               # ✅ **§3.1-3.5 COMPLETE FRAMEWORK**
+│   ├── IndicatorSpec.lean             #    ✅ Core equivalence spec + congruence algebra
+│   ├── Iota.lean                      #    ✅ ι embedding + lattice homomorphism  
+│   ├── C0Spec.lean                    #    ✅ c₀-style tail smallness bridge
+│   ├── IndicatorEventual.lean         #    ✅ finite ↔ eventually zero bridge
+│   ├── Indicator.lean                 #    ✅ χ indicator function definitions
+│   ├── BooleanSubLattice.lean         #    ✅ Residue class partition theory
+│   └── *Tests.lean                    #    ✅ Comprehensive smoke test coverage
+├── Constructive/                     # ✅ Main theorem implementation  
 │   ├── Ishihara.lean                 #    ✅ **AXIOM-CLEAN** Gap → WLPO (0 sorries)
+│   ├── CReal/                        #    ✅ Constructive real analysis framework
 │   └── DualStructure.lean            #    🔧 Bridge lemmas for reverse direction
+├── WLPO_Equiv_Gap.lean               # ✅ Main equivalence (forward complete, reverse pending)
 ├── documentation/                    # 📄 Current documentation
 │   ├── paper-v3.2.tex               #    📄 LaTeX paper with Lean results  
 │   ├── README.md                     #    📄 This overview
 │   └── implementation_details/       #    📄 Technical status and architecture
-├── RelativityNonFunc.lean            # 🔧 Foundation-relativity results (if used)
-└── Compat/NonReflexive.lean         # 🔧 Classical space constructions (if needed)
+├── RelativityNonFunc.lean            # 🔧 Foundation-relativity results
+└── Compat/                           # 🔧 Classical compatibility layer
+    ├── Axioms.lean                   #    ✅ Isolated axiom declarations
+    └── NonReflexive.lean             #    🔧 Classical space constructions
 ```
 
 ### **Historical/Infrastructure Files** (Obsolete for Core Proof)
@@ -74,8 +112,27 @@ Papers/P2_BidualGap/
 
 ## Key Theorems
 
-### Forward Direction (Axiom-Clean!) ✅
+### §3.1-3.5 Complete Equivalence Chain ✅
 ```lean
+-- Core equivalence: finite symmetric difference ↔ c₀-style tail smallness
+theorem indicatorEqModC0_spec_iff_c0Spec (A B : Set ℕ) :
+    indicatorEqModC0Spec A B ↔ c0Spec (fun n => χ A n - χ B n)
+
+-- ι embedding with lattice homomorphism properties
+theorem iota_union_hom (A B : Set ℕ) :
+    ι (A ∪ B) ≈₀ (fun n => max (ι A n) (ι B n))
+
+-- Congruence under lattice operations  
+theorem iota_union_congr_right {A B C : Set ℕ} (h : ι A ≈₀ ι B) :
+    ι (A ∪ C) ≈₀ ι (B ∪ C)
+
+-- Exact symmetric difference formulas
+lemma symmDiff_union_right_eq (A B C : Set ℕ) :
+    symmDiff (A ∪ C) (B ∪ C) = symmDiff A B \ C
+```
+
+### Forward Direction (Axiom-Clean!) ✅
+```lean  
 -- Main theorem: Strong Bidual Gap implies WLPO
 theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
   classical
@@ -87,10 +144,11 @@ theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
 ```
 
 **Key Features**:
-- **Axiom usage**: Only `Classical.choice`, `propext`, `Quot.sound`
-- **Mathematical depth**: Approximate supremum selection, operator norm bounds
-- **Technical innovation**: Direct Prop construction avoiding witness extraction
-- **Robustness**: API-stable patterns for mathlib version drift
+- **§3.1-3.5 equivalence**: Complete formal proof chain with elegant algebra
+- **Axiom usage**: Only `Classical.choice`, `propext`, `Quot.sound`  
+- **Mathematical depth**: Approximate supremum selection, lattice homomorphism theory
+- **Technical innovation**: Exact formulas enabling one-liner congruence proofs
+- **Fortress protection**: 8-stage CI system with axiom hygiene guards
 
 ### Helper Lemmas (Complete) ✅
 ```lean
@@ -164,11 +222,15 @@ lake env lean Scripts/AxiomCheck.lean
 ## Build Instructions
 
 ```bash
-# Build the main forward direction theorem
+# Build the complete §3.1-3.5 equivalence framework
+lake build Papers.P2_BidualGap.Gap.Iota
+lake build Papers.P2_BidualGap.Gap.IndicatorSpec
+
+# Build the main forward direction theorem  
 lake build Papers.P2_BidualGap.Constructive.Ishihara
 
-# Build the complete equivalence module
-lake build Papers.P2_BidualGap.WLPO_Equiv_Gap  
+# Run fortress CI system (8-stage guard with axiom hygiene)
+lake run fullGuard
 
 # Check axiom usage
 lake env lean Scripts/AxiomCheck.lean
@@ -186,5 +248,6 @@ lake build Papers.P2_BidualGap
 
 ---
 
-**STATUS**: **GAP → WLPO AXIOM-CLEAN COMPLETE** ✅ - Mathematically complete forward direction with minimal axiom usage.  
-**NEXT**: Complete reverse direction and establish full WLPO ↔ BidualGap equivalence.
+**STATUS**: **§3.1-3.5 COMPLETE EQUIVALENCE FRAMEWORK** ✅ - Complete formal proof chain with elegant congruence algebra.  
+**ACHIEVEMENT**: Forward direction axiom-clean, comprehensive lattice algebra, fortress CI protection.  
+**NEXT**: Complete reverse direction, explore §3.6+ quotient view, continue Paper 4 formalization.
