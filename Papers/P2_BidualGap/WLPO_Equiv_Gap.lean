@@ -10,12 +10,9 @@ import Papers.P2_BidualGap.Constructive.DualStructure
 namespace Papers.P2
 open Papers.P2.Constructive
 
-/-- `BidualGapStrong → WLPO` (delegates via a monomorphic Type-level package to avoid universe issues). -/
-lemma gap_implies_wlpo : BidualGapStrong → WLPO := by
-  intro hGap
-  -- Monomorphic witness → explicit-instance wrapper (no typeclass synthesis).
-  exact Papers.P2.Constructive.WLPO_of_witness
-    (Papers.P2.Constructive.kernel_from_gap hGap)
+/-- `BidualGapStrong → WLPO` (uses direct Prop-level proof to avoid Prop→Type elimination). -/
+lemma gap_implies_wlpo : BidualGapStrong → WLPO := 
+  Papers.P2.Constructive.WLPO_of_gap
 
 /-- (Stub) `WLPO → BidualGapStrong` via c₀/ℓ∞ with dual-structure provided by WLPO. -/
 lemma wlpo_implies_gap : WLPO → BidualGapStrong := by
