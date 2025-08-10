@@ -9,3 +9,6 @@ import Papers.P2_BidualGap.Constructive.Ishihara
 #print axioms Papers.P2.Constructive.WLPO_of_kernel
 #print axioms Papers.P2.Constructive.hasOpNorm_to_hasOperatorNorm
 #print axioms Papers.P2.Constructive.IshiharaKernel
+
+-- Silence --run noise
+def main : IO Unit := pure ()
