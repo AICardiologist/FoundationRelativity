@@ -7,6 +7,7 @@ Then we descend ι : Set ℕ → (ℕ → ℝ) to a quotient map ῑ between the
 -/
 import Mathlib.Data.Set.Lattice
 import Mathlib.Order.Lattice
+import Mathlib.Logic.Relation   -- for Equivalence.eqvGen_iff
 import Papers.P2_BidualGap.Gap.Indicator
 import Papers.P2_BidualGap.Gap.IndicatorSpec
 import Papers.P2_BidualGap.Gap.C0Spec
@@ -150,6 +151,8 @@ instance instSetoidSeq : Setoid (ℕ → ℝ) where
         funext x; norm_num [sub_add_sub_cancel']
       rw [this]
       exact c0Spec_add hfg hgh
+
+-- ✅ Collapse EqvGen back to the setoid relation using mathlib's lemma
 
 /-- The quotient of sequences by `≈₀`. -/
 abbrev SeqModC0 := Quot instSetoidSeq.r
@@ -691,45 +694,32 @@ private lemma finite_of_c0_indicator_diff {A B : Set ℕ}
     by_cases hge : n ≥ N
     · have h1 : |chi A n - chi B n| ≤ 1/2 := hN n hge
       have h2 : |chi A n - chi B n| = 1 := (abs_chi_sub_chi_eq_one_iff).mpr hn
-      -- derive a contradiction 1 ≤ 1/2
+      -- derive contradiction: from h1 and h2 we get 1 ≤ 1/2
       exfalso
-      have hle : (1 : ℝ) ≤ 1/2 := by simpa [h2] using h1
-      -- derive contradiction: |χ_A n - χ_B n| = 1 but ≤ 1/2
-      -- From h1: |χ_A n - χ_B n| ≤ 1/2 and h2: |χ_A n - χ_B n| = 1
-      -- We get 1 ≤ 1/2 by substitution
-      exfalso
-      have h_contra : (1 : ℝ) ≤ 1/2 := by 
-        rw [h2] at h1  -- h1 becomes: 1 ≤ 1/2
-        exact h1
-      -- We have 1 ≤ 1/2, but this is false since 1/2 < 1
-      have : ¬ ((1 : ℝ) ≤ 1/2) := by 
-        norm_num  -- This proves ¬ (1 ≤ 1/2)
-        -- But it leaves 2⁻¹ < 1 unproven, so prove it:
-        show (2 : ℝ)⁻¹ < 1
-        norm_num
-      exact this h_contra
+      have hle : (1 : ℝ) ≤ (1/2 : ℝ) := by simpa [h2] using h1
+      -- but 1/2 < 1, so not (1 ≤ 1/2)
+      exact (one_half_lt_one.not_le) hle
     · -- ¬n ≥ N means n < N
       exact Nat.lt_of_not_ge hge
   -- finiteness: {n | n < N} is finite
   exact (Set.finite_lt_nat N).subset this
 
 theorem iotaBar_injective : Function.Injective iotaBar := by
-  classical  
-  -- Direct approach: use the fact that two quotients are equal iff the underlying relation holds
-  rintro ⟨A⟩ ⟨B⟩ hxy
-  -- hxy : iotaBar ⟨A⟩ = iotaBar ⟨B⟩ where ⟨·⟩ is Quot.mk instSetoidSetNat.r
-  -- equality on the quotient of sequences  
+  classical
+  intro x y hxy
+  -- Use induction and explicitly manage the assumption transformation
+  refine Quot.induction_on₂ x y (fun A B => ?_)  
+  -- hxy: iotaBar x = iotaBar y where x = Quot.mk _ A, y = Quot.mk _ B
+  -- Goal: x = y, i.e., Quot.mk _ A = Quot.mk _ B
+  -- Transport equality through the simp lemma for iotaBar on representatives  
   have hmk : Quot.mk instSetoidSeq.r (ι A) = Quot.mk instSetoidSeq.r (ι B) := by
-    rw [iotaBar_mk, iotaBar_mk] at hxy
+    show Quot.mk instSetoidSeq.r (ι A) = Quot.mk instSetoidSeq.r (ι B)
+    rw [← iotaBar_mk, ← iotaBar_mk]
     exact hxy
-
-  -- underlying relation
-  have h1 : EqModC0Spec (ι A) (ι B) := by
-    -- hmk says the quotients are equal, so the relation holds
-    -- Since we defined instSetoidSeq.r as EqModC0Spec, hmk implies the relation
-    have : Quot.mk instSetoidSeq.r (ι A) = Quot.mk instSetoidSeq.r (ι B) := hmk
-    -- Use the fact that equal quotients means related elements
-    exact Quotient.exact this
+  
+  -- Collapse EqvGen back to the setoid relation using Mathlib's canonical lemma
+  have h1 : EqModC0Spec (ι A) (ι B) :=
+    (instSetoidSeq.iseqv.eqvGen_iff).1 ((Quot.eq).1 hmk)
   -- 'chi' agrees pointwise with ι
   have hAchi : (fun n => chi A n) = ι A := by
     funext n; simp [ι, χ, chi]
