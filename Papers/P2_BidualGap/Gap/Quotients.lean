@@ -701,9 +701,13 @@ private lemma finite_of_c0_indicator_diff {A B : Set ℕ}
       have h_contra : (1 : ℝ) ≤ 1/2 := by 
         rw [h2] at h1  -- h1 becomes: 1 ≤ 1/2
         exact h1
-      -- But 1/2 < 1, so we get 1 < 1 which is impossible
-      have h_lt : (1/2 : ℝ) < 1 := by norm_num; norm_num  -- provide 2⁻¹ < 1 explicitly
-      exact lt_irrefl 1 (h_contra.trans_lt h_lt)
+      -- We have 1 ≤ 1/2, but this is false since 1/2 < 1
+      have : ¬ ((1 : ℝ) ≤ 1/2) := by 
+        norm_num  -- This proves ¬ (1 ≤ 1/2)
+        -- But it leaves 2⁻¹ < 1 unproven, so prove it:
+        show (2 : ℝ)⁻¹ < 1
+        norm_num
+      exact this h_contra
     · -- ¬n ≥ N means n < N
       exact Nat.lt_of_not_ge hge
   -- finiteness: {n | n < N} is finite
