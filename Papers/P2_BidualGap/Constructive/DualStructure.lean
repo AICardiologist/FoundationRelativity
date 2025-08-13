@@ -74,9 +74,15 @@ end OpNorm
 
 open OpNorm
 
+-- OBSOLETE: Bridge lemmas below are not used in the main proof
+-- These were scaffolding for an earlier approach and contain sorries
+-- The main theorem only uses the definitions above (HasOpNorm, UnitBall, valueSet)
+-- TODO: Remove these lemmas in future cleanup
+
 -- Bridge between the two HasOpNorm definitions
 -- For now, we use Classical.choose to bridge them
 -- TODO: implement proper equivalence proof
+@[deprecated "Obsolete - not used in main proof"]
 lemma hasOperatorNorm_to_hasOpNorm 
   {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X] (f : X →L[ℝ] ℝ) :
   HasOperatorNorm f → HasOpNorm (X:=X) f := by
@@ -88,6 +94,7 @@ lemma hasOperatorNorm_to_hasOpNorm
   -- TODO: implement rigorous equivalence proof  
   sorry
 
+@[deprecated "Obsolete - not used in main proof"]
 lemma hasOpNorm_to_hasOperatorNorm
   {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X] (f : X →L[ℝ] ℝ) :
   HasOpNorm (X:=X) f → HasOperatorNorm f := by
@@ -98,6 +105,7 @@ lemma hasOpNorm_to_hasOperatorNorm
 
 /-- WLPO supplies a LUB for the value set of a bounded functional image on the unit ball.
 This is the *only* nontrivial constructive step needed to turn bounded+nonempty into a LUB. -/
+@[deprecated "Obsolete - not used in main proof"]
 theorem lub_exists_for_valueSet_of_WLPO
   (hWLPO : WLPO)
   {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X] [CompleteSpace X]
