@@ -11,6 +11,8 @@
 import Mathlib.Analysis.Normed.Module.Dual
 import Mathlib.Analysis.Normed.Group.Completeness
 
+universe u
+
 namespace Papers.P2
 
 /-- A *constructive* predicate saying a continuous linear functional has an
@@ -40,7 +42,7 @@ structure DualIsBanach
     - the dual and the bidual satisfy `DualIsBanach`,
     - and the canonical embedding `j : X → X**` is not surjective. -/
 def BidualGapStrong : Prop :=
-  ∃ (X : Type*) (_ : NormedAddCommGroup X) (_ : NormedSpace ℝ X) (_ : CompleteSpace X),
+  ∃ (X : Type u) (_ : NormedAddCommGroup X) (_ : NormedSpace ℝ X) (_ : CompleteSpace X),
     DualIsBanach X ∧ DualIsBanach (X →L[ℝ] ℝ) ∧
     ¬ Function.Surjective (NormedSpace.inclusionInDoubleDual ℝ X)
 
