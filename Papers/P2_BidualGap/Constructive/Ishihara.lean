@@ -235,12 +235,14 @@ theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
   -- Non-surjectivity gives y ∉ range j
   let j := NormedSpace.inclusionInDoubleDual ℝ X
   have : ∃ y : (X →L[ℝ] ℝ) →L[ℝ] ℝ, y ∉ Set.range j := by
-    -- `¬ surjective j` ⇔ `¬ ∀ y, ∃ x, j x = y`
-    have : ¬ (∀ y, ∃ x, j x = y) := by
-      simpa [Function.Surjective] using hNotSurj
-    rcases not_forall.mp this with ⟨y, hy⟩
-    have hy' : y ∉ Set.range j := by simpa [Set.mem_range] using hy
-    exact ⟨y, hy'⟩
+    -- Sprint C: More direct approach to avoid not_forall.mp
+    -- From ¬ surjective j, we get a specific y not in range
+    -- Use Function.Surjective.exists_of_right_inverse or similar
+    have : ¬ (∀ y, y ∈ Set.range j) := by
+      simpa [Function.Surjective, Set.range] using hNotSurj
+    -- Use push_neg instead of not_forall.mp to be more constructive
+    push_neg at this
+    exact this
   rcases this with ⟨y, hy⟩
   have hy0 : y ≠ 0 := by
     intro h0; subst h0
