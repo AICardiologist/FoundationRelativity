@@ -99,6 +99,12 @@ lemma wlpo_implies_gap : WLPO → BidualGapStrong.{0} := by
          dual_is_banach_c0_dual_from_WLPO hWLPO,
          gap_c0⟩
 
+/-
+Note on Universes: BidualGapStrong is defined universe-polymorphically. We instantiate
+it here at universe {0} using the concrete witness c₀ = C₀(ℕ, ℝ). This is
+mathematically sufficient to establish the equivalence with WLPO.
+-/
+
 /-- Complete bidirectional equivalence via direct construction. -/
 theorem gap_equiv_wlpo : BidualGapStrong.{0} ↔ WLPO := by
   constructor
