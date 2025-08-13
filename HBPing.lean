@@ -1,2 +1,0 @@
-import Mathlib.Analysis.NormedSpace.HahnBanach.Extension
-#check exists_extension_norm_eq
