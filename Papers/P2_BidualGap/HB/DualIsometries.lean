@@ -14,7 +14,7 @@ import Mathlib.Analysis.Normed.Module.Dual
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Topology.ContinuousMap.ZeroAtInfty
 import Mathlib.Topology.ContinuousMap.Bounded.Basic
-import Mathlib.Analysis.NormedSpace.lpSpace
+import Mathlib.Analysis.Normed.Lp.lpSpace
 import Papers.P2_BidualGap.Basic
 import Papers.P2_BidualGap.HB.DirectDual
 
