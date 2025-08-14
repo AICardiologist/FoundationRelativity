@@ -30,7 +30,19 @@ def HasOperatorNorm
 /-- BISH-flavored "the dual is a Banach space":
     - sums of normable functionals are normable (closure under addition);
     - there is a (constructive) completeness witness for the dual.
-    *Do not* register `complete` as a global instance; keep it local. -/
+    *Do not* register `complete` as a global instance; keep it local.
+    
+    CONSTRUCTIVE CONTENT: This is stricter than classical "dual is complete".
+    The key requirement is that operator norms exist as genuine least upper bounds
+    (not just infima), and that addition preserves this property. In BISH, this
+    fails without WLPO because we cannot constructively find the minimum norm.
+    
+    With WLPO, we can:
+    1. Decide for each rational q whether ‖f‖ ≤ q or ‖f‖ > q
+    2. Locate the norm within any ε > 0
+    3. Show the norm is attained (or approached arbitrarily closely)
+    
+    This is why Gap ⇒ WLPO works: without WLPO, DualIsBanach fails even for c₀. -/
 structure DualIsBanach
   (X : Type*) [NormedAddCommGroup X] [NormedSpace ℝ X] : Prop where
   (closed_add :
