@@ -1,7 +1,11 @@
 /-
   Papers/P2_BidualGap/Logic/WLPOBasic.lean
   
-  Basic WLPO definition that compiles cleanly.
+  ⚠️ ORPHANED FILE - NOT USED BY ANY OTHER MODULE
+  ⚠️ DOES NOT COMPILE - olean not built
+  
+  This file is not imported by any active proof and can be ignored.
+  Original purpose: Basic WLPO definition that compiles cleanly.
 -/
 
 import Papers.P2_BidualGap.Basic

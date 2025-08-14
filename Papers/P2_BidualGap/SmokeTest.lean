@@ -1,7 +1,11 @@
 /-
   Papers/P2_BidualGap/SmokeTest.lean
   
-  Smoke test for Paper #2: Bidual gap analysis
+  ⚠️ ORPHANED FILE - NOT USED BY ANY OTHER MODULE
+  ⚠️ DOES NOT COMPILE - olean not built
+  
+  This file is not imported by any active proof and can be ignored.
+  Original purpose: Smoke test for Paper #2: Bidual gap analysis
   Verifies basic compilation for bicategorical gap structure analysis.
 -/
 

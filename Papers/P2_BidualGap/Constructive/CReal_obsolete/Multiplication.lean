@@ -1,6 +1,13 @@
 /-
   Papers/P2_BidualGap/Constructive/CReal/Multiplication.lean
   
+  
+  ⚠️ ORPHANED FILE - NOT USED BY ANY OTHER MODULE
+  ⚠️ DOES NOT COMPILE - olean not built
+  ⚠️ OBSOLETE - Part of abandoned CReal approach
+  
+  This file is not imported by any active proof and can be ignored.
+  Original purpose follows:
   Multiplication infrastructure for constructive reals.
   Contains: ValidShift, get_shift, mul_K, shift_invariance, common_bound, CReal.mul
 -/
