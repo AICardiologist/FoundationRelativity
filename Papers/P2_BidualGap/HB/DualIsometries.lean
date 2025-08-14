@@ -2,8 +2,8 @@
 Papers/P2_BidualGap/HB/DualIsometries.lean
 
 Isometric identifications to discharge the two DualIsBanach axioms:
-1. (c₀ →L[ℝ] ℝ) ≃ₗᵢ ℓ¹
-2. (ℓ¹ →L[ℝ] ℝ) ≃ₗᵢ ℓ^∞
+1. (c₀ →L[ℝ] ℝ) ≃ₗᵢ lp (fun _ : ℕ => ℝ) 1
+2. (lp (fun _ : ℕ => ℝ) 1 →L[ℝ] ℝ) ≃ₗᵢ lp (fun _ : ℕ => ℝ) ⊤
 
 These will allow us to prove:
 - WLPO → DualIsBanach c₀
@@ -14,6 +14,7 @@ import Mathlib.Analysis.Normed.Module.Dual
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Topology.ContinuousMap.ZeroAtInfty
 import Mathlib.Topology.ContinuousMap.Bounded.Basic
+import Mathlib.Analysis.NormedSpace.lpSpace
 import Papers.P2_BidualGap.Basic
 import Papers.P2_BidualGap.HB.DirectDual
 
@@ -23,7 +24,7 @@ open scoped BigOperators
 
 /-
 ================================================================================
-PART A: (c₀ →L[ℝ] ℝ) ≃ₗᵢ ℓ¹
+PART A: (c₀ →L[ℝ] ℝ) ≃ₗᵢ lp (fun _ : ℕ => ℝ) 1
 ================================================================================
 -/
 
@@ -39,7 +40,7 @@ def toCoeffs : (c₀ →L[ℝ] ℝ) →ₗ[ℝ] (ℕ → ℝ) where
     -- TODO: Show (r • f)(e n) = r • f(e n)
     sorry
 
-/-- The coefficients are summable with ℓ¹ norm equal to operator norm -/
+/-- The coefficients are summable with lp (fun _ : ℕ => ℝ) 1 norm equal to operator norm -/
 lemma toCoeffs_summable (f : c₀ →L[ℝ] ℝ) : 
     Summable (fun n => ‖f (e n)‖) := by
   -- TODO: Use the fact that for any finite F ⊆ ℕ,
@@ -47,7 +48,7 @@ lemma toCoeffs_summable (f : c₀ →L[ℝ] ℝ) :
   -- This is already proven in DirectDual.lean
   sorry
 
-/-- The coefficients satisfy ℓ¹ norm equals operator norm -/
+/-- The coefficients satisfy lp (fun _ : ℕ => ℝ) 1 norm equals operator norm -/
 lemma toCoeffs_norm_eq (f : c₀ →L[ℝ] ℝ) :
     ∑' n, ‖f (e n)‖ = ‖f‖ := by
   -- TODO: 
@@ -56,11 +57,11 @@ lemma toCoeffs_norm_eq (f : c₀ →L[ℝ] ℝ) :
   -- (Reuse signVector lemmas from DirectDual.lean)
   sorry
 
-/-- toCoeffs lands in ℓ¹ -/
-def toCoeffsL1 : (c₀ →L[ℝ] ℝ) →ₗᵢ[ℝ] ℓ¹ where
+/-- toCoeffs lands in lp (fun _ : ℕ => ℝ) 1 -/
+def toCoeffsL1 : (c₀ →L[ℝ] ℝ) →ₗᵢ[ℝ] (lp (fun _ : ℕ => ℝ) 1) where
   toLinearMap := {
     toFun := fun f => ⟨toCoeffs f, by
-      -- TODO: Show membership in ℓ¹
+      -- TODO: Show membership in lp (fun _ : ℕ => ℝ) 1
       -- Use toCoeffs_summable
       sorry⟩
     map_add' := by sorry
@@ -70,8 +71,8 @@ def toCoeffsL1 : (c₀ →L[ℝ] ℝ) →ₗᵢ[ℝ] ℓ¹ where
     -- TODO: Use toCoeffs_norm_eq
     sorry
 
-/-- Reconstruct a functional from ℓ¹ coefficients -/
-def ofCoeffs (a : ℓ¹) : c₀ →L[ℝ] ℝ where
+/-- Reconstruct a functional from lp (fun _ : ℕ => ℝ) 1 coefficients -/
+def ofCoeffs (a : lp (fun _ : ℕ => ℝ) 1) : c₀ →L[ℝ] ℝ where
   toLinearMap := {
     toFun := fun x => ∑' n, a.val n * x.val n
     map_add' := by
@@ -86,16 +87,16 @@ def ofCoeffs (a : ℓ¹) : c₀ →L[ℝ] ℝ where
     -- Use ∑ |aₙ xₙ| ≤ ‖a‖₁ ‖x‖∞
     sorry
 
-/-- ofCoeffs has norm equal to ℓ¹ norm -/
-lemma ofCoeffs_norm_eq (a : ℓ¹) :
+/-- ofCoeffs has norm equal to lp (fun _ : ℕ => ℝ) 1 norm -/
+lemma ofCoeffs_norm_eq (a : lp (fun _ : ℕ => ℝ) 1) :
     ‖ofCoeffs a‖ = ‖a‖ := by
   -- TODO:
   -- 1. ≤ direction: standard estimate
   -- 2. ≥ direction: test on sign vectors for a
   sorry
 
-/-- The main isometry: c₀ dual ≃ ℓ¹ -/
-def dual_c0_iso_l1 : (c₀ →L[ℝ] ℝ) ≃ₗᵢ[ℝ] ℓ¹ where
+/-- The main isometry: c₀ dual ≃ lp (fun _ : ℕ => ℝ) 1 -/
+def dual_c0_iso_l1 : (c₀ →L[ℝ] ℝ) ≃ₗᵢ[ℝ] lp (fun _ : ℕ => ℝ) 1 where
   toLinearEquiv := {
     toFun := toCoeffsL1.toLinearMap.toFun
     invFun := ofCoeffs
@@ -118,26 +119,26 @@ end C0DualIsoL1
 
 /-
 ================================================================================
-PART B: (ℓ¹ →L[ℝ] ℝ) ≃ₗᵢ ℓ^∞
+PART B: (lp (fun _ : ℕ => ℝ) 1 →L[ℝ] ℝ) ≃ₗᵢ lp (fun _ : ℕ => ℝ) ⊤
 ================================================================================
 -/
 
 section L1DualIsoLinf
 
-/-- Extract bounded sequence from functional on ℓ¹ -/
-def toBounded (φ : ℓ¹ →L[ℝ] ℝ) : ℕ → ℝ :=
-  fun n => φ (l1.single n 1)  -- φ evaluated on n-th basis vector
+/-- Extract bounded sequence from functional on lp (fun _ : ℕ => ℝ) 1 -/
+def toBounded (φ : lp (fun _ : ℕ => ℝ) 1 →L[ℝ] ℝ) : ℕ → ℝ :=
+  fun n => φ (lp.single 1 (fun _ => (1 : ℝ)) n 1)  -- φ evaluated on n-th basis vector
 
 /-- toBounded gives a bounded sequence with sup norm = operator norm -/
-lemma toBounded_sup_eq (φ : ℓ¹ →L[ℝ] ℝ) :
+lemma toBounded_sup_eq (φ : lp (fun _ : ℕ => ℝ) 1 →L[ℝ] ℝ) :
     ⨆ n, ‖toBounded φ n‖ = ‖φ‖ := by
   -- TODO:
   -- 1. ≤: Each |φ(eₙ)| ≤ ‖φ‖
-  -- 2. ≥: Test φ on sign-truncated vectors in ℓ¹
+  -- 2. ≥: Test φ on sign-truncated vectors in lp (fun _ : ℕ => ℝ) 1
   sorry
 
-/-- toBounded lands in ℓ^∞ -/
-def toBoundedLinf : (ℓ¹ →L[ℝ] ℝ) →ₗᵢ[ℝ] ℓ^∞ where
+/-- toBounded lands in lp (fun _ : ℕ => ℝ) ⊤ -/
+def toBoundedLinf : (lp (fun _ : ℕ => ℝ) 1 →L[ℝ] ℝ) →ₗᵢ[ℝ] lp (fun _ : ℕ => ℝ) ⊤ where
   toLinearMap := {
     toFun := fun φ => ⟨toBounded φ, by
       -- TODO: Show boundedness using toBounded_sup_eq
@@ -150,7 +151,7 @@ def toBoundedLinf : (ℓ¹ →L[ℝ] ℝ) →ₗᵢ[ℝ] ℓ^∞ where
     sorry
 
 /-- Reconstruct functional from bounded sequence -/
-def ofBounded (b : ℓ^∞) : ℓ¹ →L[ℝ] ℝ where
+def ofBounded (b : lp (fun _ : ℕ => ℝ) ⊤) : lp (fun _ : ℕ => ℝ) 1 →L[ℝ] ℝ where
   toLinearMap := {
     toFun := fun x => ∑' n, x.val n * b.val n
     map_add' := by sorry
@@ -161,13 +162,13 @@ def ofBounded (b : ℓ^∞) : ℓ¹ →L[ℝ] ℝ where
     sorry
 
 /-- ofBounded has norm equal to sup norm -/
-lemma ofBounded_norm_eq (b : ℓ^∞) :
+lemma ofBounded_norm_eq (b : lp (fun _ : ℕ => ℝ) ⊤) :
     ‖ofBounded b‖ = ‖b‖ := by
   -- TODO: Similar to ofCoeffs_norm_eq
   sorry
 
-/-- The main isometry: ℓ¹ dual ≃ ℓ^∞ -/
-def dual_l1_iso_linf : (ℓ¹ →L[ℝ] ℝ) ≃ₗᵢ[ℝ] ℓ^∞ where
+/-- The main isometry: lp (fun _ : ℕ => ℝ) 1 dual ≃ lp (fun _ : ℕ => ℝ) ⊤ -/
+def dual_l1_iso_linf : (lp (fun _ : ℕ => ℝ) 1 →L[ℝ] ℝ) ≃ₗᵢ[ℝ] lp (fun _ : ℕ => ℝ) ⊤ where
   toLinearEquiv := {
     toFun := toBoundedLinf.toLinearMap.toFun
     invFun := ofBounded
@@ -191,8 +192,8 @@ section DischargeAxioms
 /-- WLPO implies DualIsBanach for c₀ -/
 theorem dual_is_banach_c0_from_WLPO_proof (h : WLPO) : DualIsBanach c₀ := by
   -- TODO:
-  -- 1. Use dual_c0_iso_l1 to transport to ℓ¹
-  -- 2. Show DualIsBanach ℓ¹ using WLPO
+  -- 1. Use dual_c0_iso_l1 to transport to lp (fun _ : ℕ => ℝ) 1
+  -- 2. Show DualIsBanach lp (fun _ : ℕ => ℝ) 1 using WLPO
   -- 3. Transport back
   -- Note: Need to understand exact content of DualIsBanach
   sorry
@@ -201,9 +202,9 @@ theorem dual_is_banach_c0_from_WLPO_proof (h : WLPO) : DualIsBanach c₀ := by
 theorem dual_is_banach_c0_dual_from_WLPO_proof (h : WLPO) : 
     DualIsBanach (c₀ →L[ℝ] ℝ) := by
   -- TODO:
-  -- 1. Use dual_c0_iso_l1 to identify (c₀ →L ℝ) with ℓ¹
-  -- 2. Use dual_l1_iso_linf to identify (ℓ¹ →L ℝ) with ℓ^∞
-  -- 3. Show DualIsBanach ℓ^∞ using WLPO
+  -- 1. Use dual_c0_iso_l1 to identify (c₀ →L ℝ) with lp (fun _ : ℕ => ℝ) 1
+  -- 2. Use dual_l1_iso_linf to identify (lp (fun _ : ℕ => ℝ) 1 →L ℝ) with lp (fun _ : ℕ => ℝ) ⊤
+  -- 3. Show DualIsBanach lp (fun _ : ℕ => ℝ) ⊤ using WLPO
   -- 4. Transport back through isometries
   sorry
 
