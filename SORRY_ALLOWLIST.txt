@@ -258,21 +258,61 @@ Papers/P2_BidualGap/Compat/NonReflexive.lean:31                 # SORRY(P2-compa
 
 # Paper 2 CReal_obsolete infrastructure (22 sorries - OBSOLETE, bypassed by direct approach)
 # These were part of complex constructive framework that became unnecessary
-Papers/P2_BidualGap/Constructive/CReal_obsolete/Basic.lean:451         # CReal infrastructure (OBSOLETE)
-Papers/P2_BidualGap/Constructive/CReal_obsolete/Basic.lean:492         # CReal infrastructure (OBSOLETE)
-Papers/P2_BidualGap/Constructive/CReal_obsolete/Quotient.lean:322      # CReal infrastructure (OBSOLETE)
-Papers/P2_BidualGap/Constructive/CReal_obsolete/Quotient.lean:360      # CReal infrastructure (OBSOLETE)
-Papers/P2_BidualGap/Constructive/CReal_obsolete/Quotient.lean:375      # CReal infrastructure (OBSOLETE)
-Papers/P2_BidualGap/Constructive/CReal_obsolete/Quotient.lean:409      # CReal infrastructure (OBSOLETE)
-Papers/P2_BidualGap/Constructive/CReal_obsolete/Quotient.lean:428      # CReal infrastructure (OBSOLETE)
-Papers/P2_BidualGap/Constructive/CReal_obsolete/Quotient.lean:445      # CReal infrastructure (OBSOLETE)
-Papers/P2_BidualGap/Constructive/CReal_obsolete/Quotient.lean:449      # CReal infrastructure (OBSOLETE)
-Papers/P2_BidualGap/Constructive/CReal_obsolete/Completeness.lean:89   # CReal infrastructure (OBSOLETE)
-Papers/P2_BidualGap/Constructive/CReal_obsolete/Completeness.lean:117  # CReal infrastructure (OBSOLETE)
-Papers/P2_BidualGap/Constructive/CReal_obsolete/Completeness.lean:121  # CReal infrastructure (OBSOLETE)
-Papers/P2_BidualGap/Constructive/CReal_obsolete/Completeness.lean:130  # CReal infrastructure (OBSOLETE)
-Papers/P2_BidualGap/Constructive/CReal_obsolete/Completeness.lean:142  # CReal infrastructure (OBSOLETE)
-Papers/P2_BidualGap/Constructive/CReal_obsolete/Completeness.lean:144  # CReal infrastructure (OBSOLETE)
+Papers/P2_BidualGap/Constructive/CReal_obsolete/Basic.lean:456         # CReal infrastructure (OBSOLETE)
+Papers/P2_BidualGap/Constructive/CReal_obsolete/Basic.lean:497         # CReal infrastructure (OBSOLETE)
+Papers/P2_BidualGap/Constructive/CReal_obsolete/Quotient.lean:329      # CReal infrastructure (OBSOLETE)
+Papers/P2_BidualGap/Constructive/CReal_obsolete/Quotient.lean:367      # CReal infrastructure (OBSOLETE)
+Papers/P2_BidualGap/Constructive/CReal_obsolete/Quotient.lean:382      # CReal infrastructure (OBSOLETE - Quotient_Broken.lean)
+Papers/P2_BidualGap/Constructive/CReal_obsolete/Quotient.lean:416      # CReal infrastructure (OBSOLETE)
+Papers/P2_BidualGap/Constructive/CReal_obsolete/Quotient.lean:435      # CReal infrastructure (OBSOLETE - Quotient_Broken.lean)
+Papers/P2_BidualGap/Constructive/CReal_obsolete/Quotient.lean:452      # CReal infrastructure (OBSOLETE - Quotient_Broken.lean)
+Papers/P2_BidualGap/Constructive/CReal_obsolete/Quotient.lean:456      # CReal infrastructure (OBSOLETE)
+Papers/P2_BidualGap/Constructive/CReal_obsolete/Completeness.lean:96   # CReal infrastructure (OBSOLETE)
+Papers/P2_BidualGap/Constructive/CReal_obsolete/Completeness.lean:124  # CReal infrastructure (OBSOLETE)
+Papers/P2_BidualGap/Constructive/CReal_obsolete/Completeness.lean:128  # CReal infrastructure (OBSOLETE)
+Papers/P2_BidualGap/Constructive/CReal_obsolete/Completeness.lean:137  # CReal infrastructure (OBSOLETE)
+Papers/P2_BidualGap/Constructive/CReal_obsolete/Completeness.lean:149  # CReal infrastructure (OBSOLETE)
+Papers/P2_BidualGap/Constructive/CReal_obsolete/Completeness.lean:151  # CReal infrastructure (OBSOLETE)
+
+# Paper 2 DualStructure (4 sorries - unused deprecated lemmas only)
+Papers/P2_BidualGap/Constructive/DualStructure.lean:95                 # Deprecated - LinearIsometryEquiv version
+Papers/P2_BidualGap/Constructive/DualStructure.lean:103                # Deprecated - old version
+Papers/P2_BidualGap/Constructive/DualStructure.lean:104                # Deprecated - old version
+Papers/P2_BidualGap/Constructive/DualStructure.lean:119                # Deprecated - SeminormedAddCommGroup version
+
+# Paper 2 HB/DualIsometries (27 sorries - skeleton for roadmap v4.0)
+Papers/P2_BidualGap/HB/DualIsometries.lean:38                          # Skeleton - c0_dual_iso_l1
+Papers/P2_BidualGap/HB/DualIsometries.lean:41                          # Skeleton - c0_dual_iso_l1 bijective
+Papers/P2_BidualGap/HB/DualIsometries.lean:49                          # Skeleton - c0_dual_iso_l1 add_comm
+Papers/P2_BidualGap/HB/DualIsometries.lean:58                          # Skeleton - c0_dual_iso_l1 smul_comm
+Papers/P2_BidualGap/HB/DualIsometries.lean:66                          # Skeleton - c0_dual_iso_l1 norm_map
+Papers/P2_BidualGap/HB/DualIsometries.lean:67                          # Skeleton - c0_dual_iso_l1 apply_symm_apply
+Papers/P2_BidualGap/HB/DualIsometries.lean:68                          # Skeleton - c0_dual_iso_l1 symm_apply_apply
+Papers/P2_BidualGap/HB/DualIsometries.lean:72                          # Skeleton - l1_dual_iso_linf
+Papers/P2_BidualGap/HB/DualIsometries.lean:80                          # Skeleton - l1_dual_iso_linf add_comm
+Papers/P2_BidualGap/HB/DualIsometries.lean:83                          # Skeleton - l1_dual_iso_linf smul_comm
+Papers/P2_BidualGap/HB/DualIsometries.lean:88                          # Skeleton - l1_dual_iso_linf norm_map
+Papers/P2_BidualGap/HB/DualIsometries.lean:96                          # Skeleton - ell1_complete
+Papers/P2_BidualGap/HB/DualIsometries.lean:106                         # Skeleton - c0_complete
+Papers/P2_BidualGap/HB/DualIsometries.lean:110                         # Skeleton - linfty_complete
+Papers/P2_BidualGap/HB/DualIsometries.lean:116                         # Skeleton - c0_DualIsBanach implementation
+Papers/P2_BidualGap/HB/DualIsometries.lean:138                         # Skeleton - functional_isometry
+Papers/P2_BidualGap/HB/DualIsometries.lean:145                         # Skeleton - linear_isometry_construction
+Papers/P2_BidualGap/HB/DualIsometries.lean:146                         # Skeleton - check_bijective
+Papers/P2_BidualGap/HB/DualIsometries.lean:147                         # Skeleton - norm_map check
+Papers/P2_BidualGap/HB/DualIsometries.lean:151                         # Skeleton - ell1_banach_proof
+Papers/P2_BidualGap/HB/DualIsometries.lean:157                         # Skeleton - functional_isometry_for_proof
+Papers/P2_BidualGap/HB/DualIsometries.lean:158                         # Skeleton - norm_equality
+Papers/P2_BidualGap/HB/DualIsometries.lean:162                         # Skeleton - l1_DualIsBanach implementation
+Papers/P2_BidualGap/HB/DualIsometries.lean:168                         # Skeleton - c0_bidual_iso_linf
+Papers/P2_BidualGap/HB/DualIsometries.lean:175                         # Skeleton - l1_dual_iso_linf surj
+Papers/P2_BidualGap/HB/DualIsometries.lean:176                         # Skeleton - l1_dual_iso_linf inj
+Papers/P2_BidualGap/HB/DualIsometries.lean:180                         # Skeleton - c0_bidual_not_iso_c0
+Papers/P2_BidualGap/HB/DualIsometries.lean:199                         # Skeleton - roadmap_axiom_discharge
+Papers/P2_BidualGap/HB/DualIsometries.lean:209                         # Skeleton - Main theorem from axiom discharge
+
+# Paper 2 orphaned file
+Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:30                             # Orphaned file - not imported
 
 # Paper 2 documentation comments (detected by script but not actual sorries)
 Papers/P2_BidualGap/Constructive/DualStructure.lean:96                 # Comment mentioning sorry in documentation  

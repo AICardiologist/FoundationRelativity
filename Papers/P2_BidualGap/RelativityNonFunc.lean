@@ -1,7 +1,11 @@
 /-
   Papers/P2_BidualGap/RelativityNonFunc.lean
   
-  Lemma (i): "Relativity as Non‑Functoriality"
+  ⚠️ ORPHANED FILE - NOT USED BY ANY OTHER MODULE
+  ⚠️ DOES NOT COMPILE - olean not built
+  
+  This file is not imported by any active proof and can be ignored.
+  Original purpose: Lemma (i): "Relativity as Non‑Functoriality"
   Central result: relativity_nonfunctorial : ¬ PseudoFunctor Bidual
 -/
 

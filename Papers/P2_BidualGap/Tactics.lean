@@ -1,7 +1,11 @@
 /-
   Papers/P2_BidualGap/Tactics.lean
   
-  Custom aesop rules for Banach / Gap reasoning
+  ⚠️ ORPHANED FILE - NOT USED BY ANY OTHER MODULE
+  ⚠️ DOES NOT COMPILE - olean not built
+  
+  This file is not imported by any active proof and can be ignored.
+  Original purpose: Custom aesop rules for Banach / Gap reasoning
 -/
 
 import Papers.P2_BidualGap.Basic

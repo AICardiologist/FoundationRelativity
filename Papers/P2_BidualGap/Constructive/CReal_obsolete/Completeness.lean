@@ -1,6 +1,13 @@
 /-
   Papers/P2_BidualGap/Constructive/CReal/Completeness.lean
   
+  
+  ⚠️ ORPHANED FILE - NOT USED BY ANY OTHER MODULE
+  ⚠️ DOES NOT COMPILE - olean not built
+  ⚠️ OBSOLETE - Part of abandoned CReal approach
+  
+  This file is not imported by any active proof and can be ignored.
+  Original purpose follows:
   Completeness theorem for constructive reals using precision shifting approach
   with regularization via subsequence extraction and speed-up.
   

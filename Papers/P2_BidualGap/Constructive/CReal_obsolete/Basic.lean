@@ -1,7 +1,12 @@
 /-
   Papers/P2_BidualGap/Constructive/CReal/Basic.lean
   
-  Basic definitions for constructive real numbers (BISH).
+  ⚠️ ORPHANED FILE - NOT USED BY ANY OTHER MODULE
+  ⚠️ DOES NOT COMPILE - olean not built
+  ⚠️ OBSOLETE - Part of abandoned CReal approach
+  
+  This file is not imported by any active proof and can be ignored.
+  Original purpose: Basic definitions for constructive real numbers (BISH).
   Contains: CReal definition, Modulus namespace, boundedness lemmas, 
   Archimedean property, addition, negation, and setoid instance.
 -/

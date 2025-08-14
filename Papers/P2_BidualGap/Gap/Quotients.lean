@@ -708,14 +708,14 @@ theorem iotaBar_injective : Function.Injective iotaBar := by
   classical
   intro x y hxy
   -- Use induction and explicitly manage the assumption transformation
-  refine Quot.induction_on₂ x y (fun A B => ?_)  
-  -- hxy: iotaBar x = iotaBar y where x = Quot.mk _ A, y = Quot.mk _ B
-  -- Goal: x = y, i.e., Quot.mk _ A = Quot.mk _ B
+  refine Quot.induction_on₂ x y (fun A B hAB => ?_) hxy
+  -- hAB: iotaBar (Quot.mk _ A) = iotaBar (Quot.mk _ B)
+  -- Goal: Quot.mk _ A = Quot.mk _ B
   -- Transport equality through the simp lemma for iotaBar on representatives  
   have hmk : Quot.mk instSetoidSeq.r (ι A) = Quot.mk instSetoidSeq.r (ι B) := by
     show Quot.mk instSetoidSeq.r (ι A) = Quot.mk instSetoidSeq.r (ι B)
     rw [← iotaBar_mk, ← iotaBar_mk]
-    exact hxy
+    exact hAB
   
   -- Collapse EqvGen back to the setoid relation using Mathlib's canonical lemma
   have h1 : EqModC0Spec (ι A) (ι B) :=

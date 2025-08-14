@@ -1,6 +1,12 @@
 /-
   Papers/P2_BidualGap/WLPO_Equiv_Gap.lean
-  WLPO ↔ BidualGapStrong — stubs only (no vacuous proofs).
+  
+  ⚠️ ORPHANED FILE - NOT USED BY ANY OTHER MODULE
+  ⚠️ DOES NOT COMPILE - olean not built
+  ⚠️ SUPERSEDED BY: HB/WLPO_to_Gap_HB.lean
+  
+  This file is not imported by any active proof and can be ignored.
+  Original purpose: WLPO ↔ BidualGapStrong — stubs only (no vacuous proofs).
 -/
 import Mathlib.Tactic
 import Papers.P2_BidualGap.Basic
