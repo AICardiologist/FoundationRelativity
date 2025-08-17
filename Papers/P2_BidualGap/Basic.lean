@@ -45,9 +45,17 @@ def HasOperatorNorm
     This is why Gap ⇒ WLPO works: without WLPO, DualIsBanach fails even for c₀. -/
 structure DualIsBanach
   (X : Type*) [NormedAddCommGroup X] [NormedSpace ℝ X] : Prop where
-  (closed_add :
-    ∀ f g : X →L[ℝ] ℝ, HasOperatorNorm f → HasOperatorNorm g → HasOperatorNorm (f + g))
-  (complete_normable_dual : True)   -- Prop-only placeholder
+  /-- The operator norm is located (approximable within ε) -/
+  (norm_located : ∀ f : X →L[ℝ] ℝ, ∀ ε > 0, ∃ q : ℚ, |‖f‖ - q| ≤ ε)
+  /-- The operator norm is approximately attained -/
+  (norm_attained : ∀ f : X →L[ℝ] ℝ, ∀ ε > 0, ∃ x : X, ‖x‖ ≤ 1 ∧ ‖f x‖ ≥ ‖f‖ - ε)
+  /-- The dual space is complete under the operator norm -/
+  (complete : CompleteSpace (X →L[ℝ] ℝ))
+  /-- Algebraic closure properties (these follow easily from the above) -/
+  (closed_zero : HasOperatorNorm (0 : X →L[ℝ] ℝ))
+  (closed_neg : ∀ f : X →L[ℝ] ℝ, HasOperatorNorm f → HasOperatorNorm (-f))
+  (closed_smul : ∀ (a : ℝ) (f : X →L[ℝ] ℝ), HasOperatorNorm f → HasOperatorNorm (a • f))
+  (closed_add : ∀ f g : X →L[ℝ] ℝ, HasOperatorNorm f → HasOperatorNorm g → HasOperatorNorm (f + g))
 
 /-- *Strong* Bidual Gap (BISH interpretation):
     There exists a real Banach space `X` such that

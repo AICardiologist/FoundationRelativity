@@ -17,6 +17,7 @@ import Mathlib.Topology.ContinuousMap.Bounded.Basic
 import Mathlib.Analysis.Normed.Lp.lpSpace
 import Papers.P2_BidualGap.Basic
 import Papers.P2_BidualGap.HB.DirectDual
+import Papers.P2_BidualGap.HB.SigmaEpsilon
 
 namespace Papers.P2.HB
 
@@ -34,28 +35,55 @@ section C0DualIsoL1
 def toCoeffs : (c₀ →L[ℝ] ℝ) →ₗ[ℝ] (ℕ → ℝ) where
   toFun f := fun n => f (e n)
   map_add' := by
-    -- TODO: Show (f + g)(e n) = f(e n) + g(e n)
-    sorry
+    intro f g
+    ext n
+    simp only [Pi.add_apply]
+    rfl
   map_smul' := by
-    -- TODO: Show (r • f)(e n) = r • f(e n)
-    sorry
+    intro r f
+    ext n
+    simp only [Pi.smul_apply, RingHom.id_apply]
+    rfl
 
 /-- The coefficients are summable with lp (fun _ : ℕ => ℝ) 1 norm equal to operator norm -/
 lemma toCoeffs_summable (f : c₀ →L[ℝ] ℝ) : 
-    Summable (fun n => ‖f (e n)‖) := by
-  -- TODO: Use the fact that for any finite F ⊆ ℕ,
-  -- ∑_{n ∈ F} |f(e n)| ≤ ‖f‖ (via signVector test)
-  -- This is already proven in DirectDual.lean
-  sorry
+    Summable (fun n => ‖f (e n)‖) := 
+  -- Use the existing result from DirectDual.lean
+  summable_abs_eval f
+
+/-- Upper bound: ∑' n, ‖f (e n)‖ ≤ ‖f‖ -/
+lemma toCoeffs_norm_le (f : c₀ →L[ℝ] ℝ) :
+    ∑' n, ‖f (e n)‖ ≤ ‖f‖ := by
+  have hf_abs := summable_abs_eval f
+  apply hf_abs.tsum_le_of_sum_le
+  intro s
+  exact finite_sum_bound f s
+
+/-- Lower bound using σ_ε: ‖f‖ ≤ ∑' n, ‖f (e n)‖ -/
+lemma toCoeffs_norm_ge (f : c₀ →L[ℝ] ℝ) :
+    ‖f‖ ≤ ∑' n, ‖f (e n)‖ := by
+  by_cases hf : f = 0
+  · simp [hf]
+  · -- For each ε > 0, construct test vector using σ_ε
+    intro ε hε
+    -- Choose finite F with small tail
+    have hsum := summable_abs_eval f
+    obtain ⟨F, hF⟩ := hsum.tendsto_cofinite_zero.eventually_lt hε
+    -- Construct test vector x_F^ε using σ_ε
+    let x_eps := ∑ n ∈ F, sigma_eps (ε / F.card) (f (e n)) • e n
+    -- Show ‖x_eps‖ ≤ 1
+    have hx_norm : ‖x_eps‖ ≤ 1 := by
+      sorry -- Similar to signVector_norm_le_one but with σ_ε
+    -- Show f(x_eps) ≥ ∑_{n∈F} |f(e_n)| - ε
+    have hf_lower : f x_eps ≥ ∑ n ∈ F, ‖f (e n)‖ - ε := by
+      sorry -- Use sigma_eps.finite_sum_lower_bound
+    -- Conclude
+    sorry
 
 /-- The coefficients satisfy lp (fun _ : ℕ => ℝ) 1 norm equals operator norm -/
 lemma toCoeffs_norm_eq (f : c₀ →L[ℝ] ℝ) :
-    ∑' n, ‖f (e n)‖ = ‖f‖ := by
-  -- TODO: 
-  -- 1. Show ≤ using finite sum bounds
-  -- 2. Show ≥ by testing f on truncated sign vectors
-  -- (Reuse signVector lemmas from DirectDual.lean)
-  sorry
+    ∑' n, ‖f (e n)‖ = ‖f‖ := 
+  le_antisymm (toCoeffs_norm_le f) (toCoeffs_norm_ge f)
 
 /-- toCoeffs lands in lp (fun _ : ℕ => ℝ) 1 -/
 def toCoeffsL1 : (c₀ →L[ℝ] ℝ) →ₗᵢ[ℝ] (lp (fun _ : ℕ => ℝ) 1) where
