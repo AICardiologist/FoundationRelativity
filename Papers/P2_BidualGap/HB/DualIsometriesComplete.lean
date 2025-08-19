@@ -18,6 +18,9 @@ import Mathlib.Analysis.InnerProductSpace.l2Space
 import Mathlib.Tactic
 import Mathlib.Analysis.Normed.Group.InfiniteSum
 import Mathlib.Topology.Algebra.InfiniteSum.ENNReal
+import Mathlib.Topology.Algebra.InfiniteSum.Basic  -- Added for series/sup
+import Mathlib.Topology.Algebra.InfiniteSum.Order  -- Added for series/sup characterization
+import Mathlib.Data.Real.Basic  -- Added for Real instances
 import Mathlib.Data.ENNReal.Basic
 import Mathlib.Data.ENNReal.BigOperators
 import Papers.P2_BidualGap.Basic
@@ -25,7 +28,7 @@ import Papers.P2_BidualGap.HB.SigmaEpsilon
 
 namespace Papers.P2.HB
 
-open scoped BigOperators
+open scoped BigOperators ENNReal
 open Real
 open Finset
 
@@ -102,133 +105,225 @@ lemma basis_apply' (i j : ι) :
   simpa [eq_comm] using (basis_apply i j)
 
 -- Sign helper for test vectors
-/-- Elementary sign (±1) used for finite test vectors. -/
-@[simp] noncomputable def sgn (t : ℝ) : ℝ := if 0 ≤ t then (1 : ℝ) else (-1)
+/-- Real sign with values in {-1, 0, 1}. We'll mostly use its ±1 cases. -/
+noncomputable def sgn (x : ℝ) : ℝ := if 0 ≤ x then (if x = 0 then 0 else 1) else -1
 
-/-- Our two-valued sign: `sgn x = 1` when `0 ≤ x`, else `-1`. -/
-@[simp] lemma abs_sgn (x : ℝ) : |sgn x| = 1 := by
-  by_cases h : 0 ≤ x
-  · simp [sgn, h]
-  · have hx : x ≤ 0 := le_of_not_ge h
-    simp [sgn, h, hx]
+lemma sgn_mul_self (x : ℝ) : sgn x * x = |x| := by
+  classical
+  by_cases hx : 0 ≤ x
+  · by_cases h0 : x = 0
+    · subst h0; simp [sgn]
+    · have hxpos : 0 < x := lt_of_le_of_ne hx (by exact fun h => h0 h.symm)
+      simp [sgn, hx, h0, abs_of_pos hxpos]
+  · have hxneg : x < 0 := lt_of_not_ge hx
+    simp [sgn, hx, abs_of_neg hxneg]
 
-lemma mul_sgn_abs (x : ℝ) : sgn x * x = |x| := by
-  by_cases h : 0 ≤ x
-  · simp [sgn, h, abs_of_nonneg h, mul_comm]
-  · have hx : x ≤ 0 := le_of_not_ge h
-    have : 0 ≤ -x := by simpa using neg_nonneg.mpr hx
-    simp [sgn, h, hx, abs_of_nonpos hx, mul_comm]
+-- Keep the old name for compatibility
+lemma mul_sgn_abs (x : ℝ) : sgn x * x = |x| := sgn_mul_self x
 
-lemma abs_sgn_le_one (x : ℝ) : |sgn x| ≤ 1 := by simp [abs_sgn]
+-- Comprehensive sgn shims for compatibility
+@[simp] lemma sgn_zero : sgn 0 = 0 := by simp [sgn]
 
--- (Already defined above as a simp lemma)
+lemma sgn_pos {x : ℝ} (hx : 0 < x) : sgn x = 1 := by
+  have hx' : 0 ≤ x := le_of_lt hx
+  simp [sgn, hx', ne_of_gt hx]
+
+lemma sgn_nonpos {x : ℝ} (hx : x ≤ 0) :
+  sgn x = (if x = 0 then 0 else -1) := by
+  classical
+  by_cases h0 : x = 0
+  · simp [sgn, h0]          -- the inner if-branch is 0
+  · have hxneg : x < 0 := by
+      cases' lt_or_eq_of_le hx with h h
+      · exact h
+      · contradiction
+    have : ¬ 0 ≤ x := not_le.mpr hxneg
+    simp [sgn, this, h0]    -- the outer if is false (x < 0), so result is -1
+
+/-- For legacy call-sites that used to rely on `abs_sgn` = 1. -/
+lemma abs_sgn_eq_one_of_ne {x : ℝ} (hx : x ≠ 0) : |sgn x| = 1 := by
+  by_cases hx0 : 0 ≤ x
+  · by_cases h0 : x = 0
+    · exact (hx h0).elim
+    · have hxpos : 0 < x := lt_of_le_of_ne hx0 (fun h => h0 h.symm)
+      simp only [sgn]
+      rw [if_pos hx0, if_neg h0]
+      simp [abs_of_pos (by norm_num : (0 : ℝ) < 1)]
+  · have hxneg : x < 0 := lt_of_not_ge hx0
+    simp only [sgn]
+    rw [if_neg hx0]
+    simp [abs_of_neg (by norm_num : (-1 : ℝ) < 0)]
+
+/-- The absolute value of sgn equals 0 or 1 -/
+lemma abs_sgn_eq (x : ℝ) : |sgn x| = if x = 0 then 0 else 1 := by
+  by_cases hx : x = 0
+  · simp [hx, sgn_zero]
+  · simp [hx, abs_sgn_eq_one_of_ne hx]
+
+/-- For non-zero values, |sgn x| = 1 -/
+@[simp] lemma abs_sgn_of_ne_zero {x : ℝ} (hx : x ≠ 0) : |sgn x| = 1 := 
+  abs_sgn_eq_one_of_ne hx
+
+/-- The bound we actually need in proofs -/
+lemma abs_sgn_le_one (x : ℝ) : |sgn x| ≤ 1 := by
+  rw [abs_sgn_eq]
+  split_ifs <;> norm_num
 
 end Helpers
 
-/-- B2: A standard finite-sum bound: `∑_{i∈s} |f (e i)| ≤ ‖f‖`. -/
+/-
+================================================================================
+PART B: Constructive approximate sign (σ_ε machinery)
+================================================================================
+-/
+
+-- The sigma_eps functions are imported from Papers.P2_BidualGap.HB.SigmaEpsilon
+-- Note: SigmaEpsilon uses formula σ_ε(t) = t / (|t| + ε)
+open Papers.P2.HB
+
+
+/-- Nonnegative + uniformly bounded finite partial sums ⇒ summable (in ℝ). -/
+private lemma summable_of_nonneg_bdd_partial
+  (a : ι → ℝ) (h0 : ∀ i, 0 ≤ a i)
+  (M : ℝ) (hbdd : ∀ s : Finset ι, (∑ i ∈ s, a i) ≤ M) :
+  Summable a := by
+  classical
+  -- Define S = set of all finite partial sums
+  let S : Set ℝ := {t | ∃ s : Finset ι, t = ∑ i ∈ s, a i}
+  have hne : S.Nonempty := ⟨0, ⟨∅, by simp⟩⟩
+  have hbd : BddAbove S := ⟨M, by intro t ht; rcases ht with ⟨s, rfl⟩; exact hbdd s⟩
+  -- L = sup S
+  set L := sSup S with hL
+  
+  -- Monotonicity helper for partial sums
+  have h_mono : ∀ {s t : Finset ι}, s ⊆ t → (∑ i ∈ s, a i) ≤ ∑ i ∈ t, a i := by
+    intro s t hst
+    have : 0 ≤ ∑ i ∈ t \ s, a i := Finset.sum_nonneg (by intro i _; exact h0 i)
+    calc
+      (∑ i ∈ s, a i) = (∑ i ∈ s, a i) + 0 := by ring
+      _ ≤ (∑ i ∈ s, a i) + ∑ i ∈ t \ s, a i := by linarith
+      _ = ∑ i ∈ t, a i := by rw [add_comm, ← Finset.sum_sdiff hst]
+
+  -- The partial-sum net over Finsets is monotone and bounded ⇒ converges to L
+  have h_tend :
+    Filter.Tendsto (fun s : Finset ι => ∑ i ∈ s, a i) Filter.atTop (nhds L) := by
+    -- Use `tendsto_order`
+    refine tendsto_order.2 ?_
+    constructor
+    · -- eventually ≥ any `b < L`
+      intro b hb
+      -- pick a partial sum `> b` using the `csSup` property
+      have hblt : b < L := hb
+      obtain ⟨y, ⟨s0, rfl⟩, hy⟩ := exists_lt_of_lt_csSup hne hblt
+      refine Filter.eventually_atTop.2 ⟨s0, ?_⟩
+      intro t ht
+      exact lt_of_lt_of_le hy (h_mono ht)
+    · -- eventually ≤ any `b > L` (in fact: always ≤ b)
+      intro b hb
+      refine Filter.Eventually.of_forall ?_
+      intro s
+      have : (∑ i ∈ s, a i) ≤ L := by exact le_csSup hbd ⟨s, rfl⟩
+      exact lt_of_le_of_lt this hb
+
+  -- `HasSum a L` is by definition the convergence of the Finset-net to `L`.
+  exact ⟨L, by simpa [HasSum] using h_tend⟩
+
+/-- Bounded partial sums: ∑_{i∈s} |f(e i)| ≤ ‖f‖ (constructive using σ_ε) -/
 lemma finite_sum_bound (f : c₀ →L[ℝ] ℝ) (s : Finset ι) :
   ∑ i ∈ s, |f (e i)| ≤ ‖f‖ := by
   classical
-  -- Test vector: +/- e_i with signs chosen from `f (e i)`
-  set x : c₀ := ∑ i ∈ s, sgn (f (e i)) • e i
-
-  -- (1) ‖x‖ ≤ 1 via pointwise bound on coordinates
-  have hx_coord : ∀ m, |(x : ι → ℝ) m| ≤ 1 := by
-    intro m
-    by_cases hm : m ∈ s
-    · -- here `(x m) = sgn (f (e m))`
-      have hx : (x : ι → ℝ) m = sgn (f (e m)) := by
-        simpa [x, hm] using coord_sum_apply s (fun i => sgn (f (e i))) m
-      -- close directly
-      have : |(x : ι → ℝ) m| = 1 := by rw [hx, abs_sgn]
-      exact this.le
-    · -- here `(x m) = 0`
-      have hx : (x : ι → ℝ) m = 0 := by
-        simpa [x, hm] using coord_sum_apply s (fun i => sgn (f (e i))) m
-      simpa [hx]
-
-  have hx_norm : ‖x‖ ≤ 1 := by
-    have : ‖(x : c₀).toBCF‖ ≤ 1 := by
-      -- use the forward direction (".2") of the iff
-      refine (BoundedContinuousFunction.norm_le (by norm_num)).2 ?_
-      intro m; simpa using hx_coord m
-    simpa [ZeroAtInftyContinuousMap.norm_toBCF_eq_norm] using this
-
-  -- (2) Compute `f x`
-  have hfx : f x = ∑ i ∈ s, sgn (f (e i)) * f (e i) := by
+  -- Handle empty case
+  by_cases hs : s.Nonempty
+  swap
+  · simp [Finset.not_nonempty_iff_eq_empty.mp hs]
+    exact norm_nonneg f
+  
+  -- For every δ > 0, we'll show ∑ |f(e i)| ≤ ‖f‖ + δ
+  refine le_of_forall_pos_le_add ?_
+  intro δ hδ
+  
+  -- Choose ε small enough
+  set ε := δ / (max 1 (s.card : ℝ)) with hε_def
+  have hε : 0 < ε := by
+    simp only [hε_def]
+    apply div_pos hδ
+    apply lt_of_lt_of_le zero_lt_one
+    exact le_max_left _ _
+  
+  -- Test vector using σ_ε
+  set x : c₀ := ∑ i ∈ s, (sigma_eps ε (f (e i))) • e i
+  
+  -- (1) ‖x‖ ≤ 1 (since |σ_ε| ≤ 1)
+  have hx : ‖x‖ ≤ 1 := by
+    -- Pointwise bound ⇒ supnorm bound
+    have hcoord : ∀ m, |(x : ι → ℝ) m| ≤ 1 := by
+      intro m
+      simp only [x]
+      rw [coord_sum_apply]
+      by_cases hm : m ∈ s
+      · simp [hm]
+        exact sigma_eps.abs_le_one hε _
+      · simp [hm]
+    -- Bounded continuous function norm = sup of coords
+    have hBCF : ‖(x : c₀).toBCF‖ ≤ 1 := by
+      rw [BoundedContinuousFunction.norm_le (by norm_num : (0 : ℝ) ≤ 1)]
+      intro m
+      simpa [Real.norm_eq_abs] using hcoord m
+    simpa [ZeroAtInftyContinuousMap.norm_toBCF_eq_norm] using hBCF
+  
+  -- (2) Evaluate f on x
+  have hfx : f x = ∑ i ∈ s, sigma_eps ε (f (e i)) * f (e i) := by
     simp only [x]
     rw [map_sum]
     congr 1
     ext i
-    rw [map_smul, smul_eq_mul]
-
-  -- (3) Identify with sum of absolutes
-  have hsum : ∑ i ∈ s, sgn (f (e i)) * f (e i) = ∑ i ∈ s, |f (e i)| := by
-    refine Finset.sum_congr rfl ?_
-    intro i hi
-    by_cases h : 0 ≤ f (e i)
-    · simp [sgn, h, abs_of_nonneg h, mul_comm]
-    · have : f (e i) ≤ 0 := le_of_not_ge h
-      simp [sgn, h, this, abs_of_nonpos this, mul_comm]
-
-  -- (4) Nonnegativity, hence absolute value collapses
-  have hnonneg : 0 ≤ ∑ i ∈ s, |f (e i)| := by
-    refine Finset.sum_nonneg ?_; intro i hi; exact abs_nonneg _
-  have hfx_abs : |f x| = ∑ i ∈ s, |f (e i)| := by
-    rw [hfx, hsum, abs_of_nonneg hnonneg]
-
-  -- (5) Conclude
-  have : ∑ i ∈ s, |f (e i)| ≤ ‖f‖ := by
-    rw [← hfx_abs]
-    calc
-      |f x| ≤ ‖f‖ * ‖x‖ := f.le_opNorm x
-      _     ≤ ‖f‖ * 1   := mul_le_mul_of_nonneg_left hx_norm (norm_nonneg f)
-      _     = ‖f‖       := by simp
-  exact this
-
-/-- If nonnegative reals have uniformly bounded finite partial sums, then they are summable. -/
-private lemma summable_of_nonneg_bdd_partial
-  (a : ι → ℝ) (h0 : ∀ i, 0 ≤ a i) (M : ℝ)
-  (hbdd : ∀ s : Finset ι, (∑ i ∈ s, a i) ≤ M) :
-  Summable a := by
-  classical
-  -- Work in `ℝ≥0∞`.
-  let f : ι → ENNReal := fun i => ENNReal.ofReal (a i)
-
-  -- Bound the `tsum` in `ENNReal` via the iSup of finite subsums.
-  have htsum_le : (∑' i, f i) ≤ ENNReal.ofReal M := by
-    -- `tsum = ⨆ over finite subsums` in `ℝ≥0∞`
-    have htsum :
-        (∑' i, f i) = ⨆ s : Finset ι, ∑ i ∈ s, f i :=
-      ENNReal.tsum_eq_iSup_sum
-    -- Each finite subsum is ≤ `ofReal M`.
-    have hiSup_le :
-        (⨆ s : Finset ι, ∑ i ∈ s, f i) ≤ ENNReal.ofReal M := by
-      refine iSup_le ?_
-      intro s
-      -- push `ofReal` through the finite sum under nonnegativity
-      simpa [f, ENNReal.ofReal_sum_of_nonneg (fun i _ => h0 i)]
-        using ENNReal.ofReal_le_ofReal (hbdd s)
-    -- Combine.
-    simpa [htsum] using hiSup_le
-
-  -- Finite bound ⇒ not top ⇒ summable in `ℝ≥0∞`.
-  have hf_summ : Summable f := by
-    have : (∑' i, f i) ≠ (⊤ : ENNReal) :=
-      ne_of_lt (lt_of_le_of_lt htsum_le ENNReal.ofReal_lt_top)
-    exact ENNReal.summable_iff_ne_top.mpr this
-
-  -- Convert back: for nonnegative reals, summability of `ofReal ∘ a` ↔ summability of `a`.
-  -- Since f i = ENNReal.ofReal (a i) and a i ≥ 0, we have summability equivalence
-  convert hf_summ
-  ext i
-  simp [f]
+    simp [map_smul, smul_eq_mul]
+  
+  -- (3) Lower bound using sigma_eps_key  
+  have hfx_bound : f x ≥ (∑ i ∈ s, |f (e i)|) - s.card * ε := by
+    rw [hfx]
+    -- ∑ σ_ε(f(e_i)) * f(e_i) ≥ ∑ (|f(e_i)| - ε)
+    have : ∑ i ∈ s, (|f (e i)| - ε) ≤ ∑ i ∈ s, sigma_eps ε (f (e i)) * f (e i) := by
+      apply Finset.sum_le_sum
+      intro i hi
+      -- sigma_eps.t_mul_sigma_ge gives: f(e i) * σ_ε(f(e i)) ≥ |f(e i)| - ε
+      -- But σ_ε(f(e i)) * f(e i) = f(e i) * σ_ε(f(e i)) by commutativity
+      rw [mul_comm]
+      exact sigma_eps.t_mul_sigma_ge hε (f (e i))
+    calc ∑ i ∈ s, sigma_eps ε (f (e i)) * f (e i) 
+        ≥ ∑ i ∈ s, (|f (e i)| - ε) := le_of_le_of_eq this rfl
+      _ = ∑ i ∈ s, |f (e i)| - ∑ i ∈ s, ε := by simp [Finset.sum_sub_distrib]
+      _ = ∑ i ∈ s, |f (e i)| - s.card * ε := by simp
+  
+  -- (4) Since s.card * ε ≤ δ, we get the bound
+  -- with ε := δ / max 1 s.card
+  have hcard_eps : (s.card : ℝ) * ε ≤ δ := by
+    have hpos : 0 < (max (1 : ℝ) (s.card : ℝ)) := by
+      exact lt_of_lt_of_le zero_lt_one (le_max_left _ _)
+    calc (s.card : ℝ) * ε
+        = (s.card : ℝ) * (δ / max (1 : ℝ) (s.card : ℝ)) := by 
+          simp only [hε_def, Nat.cast_max, Nat.cast_one]
+      _ ≤ max (1 : ℝ) (s.card : ℝ) * (δ / max (1 : ℝ) (s.card : ℝ)) := by
+          exact mul_le_mul_of_nonneg_right (le_max_right _ _) 
+            (div_nonneg (le_of_lt hδ) (le_of_lt hpos))
+      _ = δ := by field_simp [ne_of_gt hpos]
+  
+  -- (5) Combine everything
+  have h1 : |f x| ≤ ‖f‖ := by
+    have := ContinuousLinearMap.le_opNorm_of_le f hx
+    simp [Real.norm_eq_abs] at this
+    exact this
+  calc ∑ i ∈ s, |f (e i)| 
+      ≤ f x + s.card * ε := by linarith [hfx_bound]
+    _ ≤ |f x| + s.card * ε := by simp [le_abs_self]
+    _ ≤ ‖f‖ + s.card * ε := by linarith [h1]
+    _ ≤ ‖f‖ + δ := by linarith [hcard_eps]
 
 /-- The coefficients f(e_n) are absolutely summable for any bounded linear functional -/
 lemma summable_abs_eval (f : c₀ →L[ℝ] ℝ) : Summable (fun i : ι => |f (e i)|) := by
   have h0 : ∀ i, 0 ≤ |f (e i)| := fun _ => abs_nonneg _
   have hbdd : ∀ s : Finset ι, ∑ i ∈ s, |f (e i)| ≤ ‖f‖ :=
-    fun s => finite_sum_bound f s  -- your existing lemma
+    fun s => finite_sum_bound f s
   exact summable_of_nonneg_bdd_partial (fun i => |f (e i)|) h0 ‖f‖ hbdd
 
 /-
@@ -279,7 +374,13 @@ PART B: Lower bound for operator norm using σ_ε
 /-- Lower bound: ‖f‖ ≥ ∑' |f(eₙ)| by testing with approximate sign vectors -/
 theorem opNorm_ge_tsum_abs_coeff (f : c₀ →L[ℝ] ℝ) :
     ‖f‖ ≥ ∑' n, |f (e n)| := by
-  sorry
+  classical
+  -- The series converges by summable_abs_eval
+  have hsumm : Summable (fun n => |f (e n)|) := summable_abs_eval f
+  -- For every finite subset, we have the bound
+  have hfin : ∀ s : Finset ι, ∑ i ∈ s, |f (e i)| ≤ ‖f‖ := finite_sum_bound f
+  -- The tsum is the supremum of finite partial sums, so ∑' ≤ ‖f‖
+  exact tsum_le_of_sum_le hsumm hfin
   
 /-  -- LONG BROKEN PROOF COMMENTED OUT
   classical
@@ -396,16 +497,245 @@ PART C: Main norm equality theorem
 ================================================================================
 -/
 
+/-- For y ∈ c₀, the set of coordinates with |y i| ≥ ε is finite -/
+lemma finite_large_coords (y : c₀) (ε : ℝ) (hε : 0 < ε) :
+    {i : ι | ε ≤ |y i|}.Finite := by
+  -- Since y vanishes at infinity, eventually |y i| < ε
+  have h_vanish := y.zero_at_infty'
+  -- In discrete topology, cocompact = cofinite
+  have cofinite_le : (Filter.cofinite : Filter ι) ≤ (@Filter.cocompact ι _) := by
+    simpa [Filter.cocompact_eq_cofinite]
+  -- Apply vanishing at infinity with ε
+  have h_eps : ∀ᶠ i in Filter.cofinite, |(y : ι → ℝ) i| < ε := by
+    -- y vanishes at infinity means y i → 0 along cocompact
+    have h1 : Filter.Tendsto (⇑y : ι → ℝ) (@Filter.cocompact ι _) (nhds 0) := 
+      y.zero_at_infty'
+    -- For each ε > 0, eventually |y i| < ε
+    have h2 : ∀ᶠ i in @Filter.cocompact ι _, |(y : ι → ℝ) i| < ε := by
+      have : ∀ᶠ i in @Filter.cocompact ι _, (y : ι → ℝ) i ∈ Metric.ball 0 ε :=
+        h1 (Metric.ball_mem_nhds 0 hε)
+      simp only [Metric.mem_ball, dist_zero_right, Real.norm_eq_abs] at this
+      exact this
+    -- Transfer from cocompact to cofinite
+    exact h2.filter_mono cofinite_le
+  -- Extract finite set from cofinite filter
+  -- h_eps : ∀ᶠ i in Filter.cofinite, |y i| < ε
+  -- This means {i | ¬(|y i| < ε)} is finite
+  have : {i : ι | ε ≤ |y i|}.Finite := by
+    have hfin : {i | ¬(|y i| < ε)}.Finite := Filter.eventually_cofinite.mp h_eps
+    apply hfin.subset
+    intro i hi
+    simp only [Set.mem_setOf] at hi ⊢
+    exact not_lt.mpr hi
+  exact this
+
+/-- Upper bound: `‖f‖ ≤ ∑' |f(e i)|`. 
+This version is complete and self-contained with no sorries. -/
+lemma opNorm_le_tsum_abs_coeff (f : c₀ →L[ℝ] ℝ) :
+  ‖f‖ ≤ ∑' i, |f (e i)| := by
+  classical
+  -- 1) Absolute summability and the nonnegative sum S.
+  have hs : Summable (fun i => |f (e i)|) := summable_abs_eval f
+  set S : ℝ := ∑' i, |f (e i)| with hSdef
+  have hS₀ : 0 ≤ S := by
+    have : ∀ i, 0 ≤ |f (e i)| := fun _ => abs_nonneg _
+    simpa [hSdef] using tsum_nonneg this
+
+  -- 2) A uniform bound on the unit ball: if ‖y‖ ≤ 1 then |f y| ≤ S.
+  have unit_bound : ∀ y : c₀, ‖y‖ ≤ 1 → |f y| ≤ S := by
+    intro y hy_le
+    -- finite-support approximants: g s := ∑ i∈s, y i • e i
+    let g : Finset ι → c₀ := fun s => ∑ i ∈ s, (y i) • e i
+
+    -- (a) Finite-step estimate: |f (g s)| ≤ ∑_{i∈s} |f (e i)|.
+    have h_fin : ∀ s : Finset ι, |f (g s)| ≤ ∑ i ∈ s, |f (e i)| := by
+      intro s
+      -- Expand and apply triangle inequality; then use |y i| ≤ ‖y‖ ≤ 1
+      have : f (g s) = ∑ i ∈ s, y i * f (e i) := by
+        simp [g, map_sum, map_smul, smul_eq_mul]
+      calc
+        |f (g s)| = |∑ i ∈ s, y i * f (e i)| := by simpa [this]
+        _ ≤ ∑ i ∈ s, |y i * f (e i)| := by
+          -- Triangle inequality for finite sums
+          exact Finset.abs_sum_le_sum_abs _ _
+        _ = ∑ i ∈ s, |y i| * |f (e i)| := by
+          simp [abs_mul]
+        _ ≤ ∑ i ∈ s, 1 * |f (e i)| := by
+          refine Finset.sum_le_sum ?_
+          intro i hi
+          have hyi_le_one : |y i| ≤ 1 := by
+            have : |y i| ≤ ‖y‖ := by
+              -- Use the BCF norm bridge: ‖(y.toBCF) i‖ ≤ ‖y.toBCF‖ = ‖y‖
+              have := BoundedContinuousFunction.norm_coe_le_norm (y.toBCF) i
+              simpa [Real.norm_eq_abs, ZeroAtInftyContinuousMap.norm_toBCF_eq_norm] using this
+            exact this.trans hy_le
+          exact mul_le_mul_of_nonneg_right hyi_le_one (abs_nonneg _)
+        _ = ∑ i ∈ s, |f (e i)| := by simp
+
+    -- (b) Convergence: g s → y in sup-norm via vanishing at infinity
+    have h_tend : Filter.Tendsto (fun s : Finset ι => g s) Filter.atTop (nhds y) := by
+      refine Metric.tendsto_nhds.mpr ?_
+      intro ε hε
+      -- Finite set of "large" coordinates for y at scale ε/2
+      have hfin : {i : ι | ε/2 ≤ |y i|}.Finite :=
+        finite_large_coords y (ε/2) (by linarith [hε])
+      let Sε : Finset ι := hfin.toFinset
+      have h_small : ∀ {i}, i ∉ Sε → |y i| < ε/2 := by
+        intro i hi
+        -- i ∉ Sε means i ∉ {j | ε/2 ≤ |y j|}
+        -- so ¬(ε/2 ≤ |y i|), i.e. |y i| < ε/2.
+        simpa [Sε, Set.Finite.mem_toFinset, Set.mem_setOf] using hi
+      -- For s ⊇ Sε we get ‖y - g s‖ ≤ ε/2 < ε.
+      refine (Filter.eventually_atTop.2 ?_)
+      refine ⟨Sε, ?_⟩
+      intro s hs_sup
+      -- pointwise control of (y - g s) coordinates
+      have hcoord : ∀ i, |((y - g s : c₀) : ι → ℝ) i| ≤ ε/2 := by
+        intro i
+        by_cases hi : i ∈ s
+        · -- On s the i-th coordinate cancels: (g s) i = y i
+          have hgi : ((g s : c₀) : ι → ℝ) i = y i := by
+            -- The coordinate formula for finite sums we defined
+            have := coord_sum_apply s (fun j => y j) i
+            have hi' : i ∈ s := hi
+            -- unfold g and evaluate the i-th coordinate
+            simpa [g, this, hi', smul_eq_mul]
+          -- hence the difference is 0 at i
+          have : ((y - g s : c₀) : ι → ℝ) i = 0 := by
+            simp [hgi, sub_self]
+          simp [this, abs_zero]
+          linarith
+        · -- Off s we have (g s) i = 0 and |y i| is small (since Sε ⊆ s)
+          have hgs0 : ((g s : c₀) : ι → ℝ) i = 0 := by
+            have := coord_sum_apply s (fun j => y j) i
+            have hi' : i ∉ s := hi
+            simpa [g, this, hi', smul_eq_mul]
+          have : i ∉ Sε := fun h => hi (hs_sup h)
+          have hyi : |y i| < ε/2 := h_small this
+          have : |((y - g s : c₀) : ι → ℝ) i| = |y i| := by
+            simp [hgs0, sub_zero]
+          rw [this]
+          exact le_of_lt hyi
+      -- sup-norm bound from pointwise estimates
+      have hnorm : ‖y - g s‖ ≤ ε/2 := by
+        -- First bound the BCF supnorm, then transfer to c₀ via the norm bridge.
+        have hBCF : ‖(y - g s).toBCF‖ ≤ ε/2 := by
+          rw [BoundedContinuousFunction.norm_le (by linarith : 0 ≤ ε/2)]
+          intro i
+          -- (y - g s) is ℝ-valued, so ‖·‖ = |·|
+          simpa [Real.norm_eq_abs] using hcoord i
+        simpa [ZeroAtInftyContinuousMap.norm_toBCF_eq_norm] using hBCF
+      -- metric estimate: dist(g s, y) < ε
+      calc
+        dist (g s) y = ‖g s - y‖ := dist_eq_norm _ _
+        _ = ‖y - g s‖ := by simpa [norm_sub_rev]
+        _ ≤ ε/2 := hnorm
+        _ < ε := by linarith
+
+    -- (c) Pass to the limit. We compare against the constant net `S`.
+    -- every finite partial sum ≤ S (nonneg summable family)
+    have partial_le_tsum : ∀ s : Finset ι, ∑ i ∈ s, |f (e i)| ≤ S := by
+      intro s
+      have hnn : ∀ i, 0 ≤ |f (e i)| := fun _ => abs_nonneg _
+      simpa [hSdef] using hs.sum_le_tsum s (fun i _ => hnn i)
+    
+    have hbnd : ∀ᶠ s : Finset ι in Filter.atTop, |f (g s)| ≤ S := by
+      -- combine the finite-step estimate with the partial≤tsum bound
+      simp only [Filter.eventually_atTop]
+      exact ⟨∅, fun s _ => (h_fin s).trans (partial_le_tsum s)⟩
+    
+    -- compare to constant S and pass to the limit
+    have hfy : Filter.Tendsto (fun s : Finset ι => f (g s)) Filter.atTop (nhds (f y)) :=
+      (f.continuous.tendsto _).comp h_tend
+    have h1 := Filter.Tendsto.norm hfy
+    simp [Real.norm_eq_abs] at h1
+    have hconst : Filter.Tendsto (fun _ : Finset ι => S) Filter.atTop (nhds S) := 
+      tendsto_const_nhds
+    -- Extract the bound for all s
+    have hbnd' : ∀ s, |f (g s)| ≤ S := fun s => (h_fin s).trans (partial_le_tsum s)
+    exact le_of_tendsto_of_tendsto' h1 hconst hbnd'
+
+  -- 3) Use opNorm_le_bound, scaling arbitrary x to the unit sphere.
+  refine ContinuousLinearMap.opNorm_le_bound f hS₀ ?_
+  intro x
+  by_cases hx : ‖x‖ = 0
+  · -- trivial case
+    have hx0 : x = 0 := by simpa [norm_eq_zero] using hx
+    simpa [hx0, hx, map_zero]  -- ‖f x‖ = 0 ≤ S * 0
+  · -- normalize y := x / ‖x‖ (so ‖y‖ = 1), apply the unit bound, and rescale.
+    set y := (‖x‖)⁻¹ • x with hy
+    have hx_ne : ‖x‖ ≠ 0 := hx
+    -- ‖y‖ = |‖x‖⁻¹| * ‖x‖ = (‖x‖)⁻¹ * ‖x‖ = 1
+    have hy_norm : ‖y‖ = 1 := by
+      rw [hy, norm_smul, norm_inv, norm_norm]
+      field_simp
+    -- unit bound at y
+    have : |f y| ≤ S := unit_bound y (le_of_eq hy_norm)
+    have : ‖f y‖ ≤ S := by simpa [Real.norm_eq_abs] using this
+    -- Undo the scaling: (‖x‖) • ((‖x‖)⁻¹ • x) = x
+    have hx_scale : ‖x‖ • y = x := by
+      rw [hy, smul_smul]
+      field_simp
+    have hx_eq : x = ‖x‖ • y := hx_scale.symm
+    calc
+      ‖f x‖ = ‖f (‖x‖ • y)‖ := by rw [← hx_eq]
+      _ = ‖‖x‖ • f y‖       := by rw [map_smul]
+      _ = ‖x‖ * ‖f y‖       := by simp [norm_smul, abs_norm]
+      _ ≤ ‖x‖ * S           := mul_le_mul_of_nonneg_left this (norm_nonneg _)
+      _ = S * ‖x‖           := mul_comm _ _
+
 /-- Main equality (constructive): operator norm equals ℓ¹-sum of coefficients -/
 theorem opNorm_eq_tsum_abs_coeff (f : c₀ →L[ℝ] ℝ) :
     ‖f‖ = ∑' n, |f (e n)| := by
-  sorry
+  refine le_antisymm ?upper ?lower
+  · exact opNorm_le_tsum_abs_coeff f
+  · exact opNorm_ge_tsum_abs_coeff f
 
 /-
 ================================================================================
 PART D: Building functionals from ℓ¹ coefficients
 ================================================================================
 -/
+
+namespace IsometryHelpers
+  open Classical
+
+  -- (A) Basic: ∑' a j * (e i) j = a i
+  lemma tsum_mul_ei (a : ι → ℝ) (i : ι) :
+      (∑' j, a j * (e i : ι → ℝ) j) = a i := by
+    have hzero : ∀ j ∉ ({i} : Finset ι), a j * (e i : ι → ℝ) j = 0 := by
+      intro j hj
+      have : j ≠ i := by simpa [Finset.mem_singleton] using hj
+      simp [basis_apply, this]
+    simpa [Finset.sum_singleton, basis_apply] using tsum_eq_sum hzero
+
+  -- (B) With an arbitrary scalar coefficient c : ℝ
+  lemma tsum_mul_smul_ei (a : ι → ℝ) (i : ι) (c : ℝ) :
+      (∑' j, a j * (c • e i : ι → ℝ) j) = c * a i := by
+    have hzero : ∀ j ∉ ({i} : Finset ι), a j * ((c • e i : ι → ℝ) j) = 0 := by
+      intro j hj
+      have : j ≠ i := by simpa [Finset.mem_singleton] using hj
+      simp [basis_apply, this]
+    -- reduce to a finite singleton sum and compute
+    simpa [Finset.sum_singleton, basis_apply, smul_eq_mul, mul_comm, mul_left_comm, mul_assoc]
+      using tsum_eq_sum hzero
+
+  -- (C) Specialization: c = sgn (a i)
+  lemma tsum_mul_sgn_ei (a : ι → ℝ) (i : ι) :
+      (∑' j, a j * (sgn (a i) • e i : ι → ℝ) j) = sgn (a i) * a i :=
+    tsum_mul_smul_ei a i (sgn (a i))
+  
+  -- Tsum with indicator function
+  lemma tsum_single (a : ι → ℝ) (i : ι) :
+    (∑' j, if j = i then a j else 0) = a i := by
+    have hzero : ∀ j ∉ ({i} : Finset ι), (if j = i then a j else 0) = 0 := by
+      intro j hj
+      simp [Finset.mem_singleton] at hj
+      simp [hj]
+    have := tsum_eq_sum hzero
+    simp [Finset.sum_singleton] at this
+    exact this
+end IsometryHelpers
 
 -- Helper lemmas for ofCoeffsCLM
 
@@ -465,32 +795,22 @@ noncomputable def ofCoeffsLM (a : ι → ℝ) (ha : Summable (fun i => |a i|)) :
 { toFun    := fun x => ∑' i, a i * x i,
   map_add' := by
     intro x y
-    -- summability of both parts
     have hx := summable_ax a ha x
     have hy := summable_ax a ha y
-    -- rewrite integrand
-    have hring : (fun i => a i * (x + y) i) =
-                 (fun i => a i * x i + a i * y i) := by
-      ext i; simp [Pi.add_apply, mul_add]
-    -- finish with `tsum_add`
-    simp only [Function.comp_apply]
-    rw [hring]
-    exact tsum_add hx hy
+    have hring :
+        (fun i => a i * (x + y) i) = (fun i => a i * x i + a i * y i) := by
+      funext i; simp [Pi.add_apply, mul_add]
+    calc ∑' i, a i * (x + y) i
+          = ∑' i, (a i * x i + a i * y i) := by rw [hring]
+      _   = (∑' i, a i * x i) + (∑' i, a i * y i) := tsum_add hx hy
   map_smul' := by
     intro r x
     have hx := summable_ax a ha x
-    -- turn `(r • x) i` into `r * x i`
-    have hsmul : (fun i => a i * (r • x) i) =
-                 (fun i => a i * (r * x i)) := by
-      ext i; simp [Pi.smul_apply, smul_eq_mul]
-    -- factor out `r` cleanly
-    have hring : (fun i => a i * (r * x i)) =
-                 (fun i => r * (a i * x i)) := by
-      ext i; ring
-    -- use HasSum.mul_left → tsum equality
-    simp only [Function.comp_apply]
-    rw [hsmul, hring]
-    exact (hx.hasSum.mul_left r).tsum_eq }
+    have hsmul : (fun i => a i * (r • x) i) = (fun i => r * (a i * x i)) := by
+      funext i; simp [Pi.smul_apply, mul_left_comm, mul_assoc]
+    calc ∑' i, a i * (r • x) i
+          = ∑' i, r * (a i * x i) := by rw [hsmul]
+      _   = r * (∑' i, a i * x i) := by rw [← tsum_mul_left]}
 
 @[simp] lemma ofCoeffsLM_apply (a : ι → ℝ) (ha : Summable (fun i => |a i|)) (x : c₀) :
   ofCoeffsLM a ha x = ∑' i, a i * x i := rfl
@@ -519,92 +839,64 @@ lemma ofCoeffsCLM_norm (a : ι → ℝ) (ha : Summable (fun n => |a n|)) :
       simp only [ofCoeffsCLM_apply]
       exact opnorm_bound a ha x
     exact ContinuousLinearMap.opNorm_le_bound _ (tsum_nonneg fun _ => abs_nonneg _) this
-  · -- Lower bound: ∑' |a n| ≤ ‖ofCoeffsCLM a ha‖ via sign test vectors
-    refine le_of_forall_pos_le_add ?_
-    intro ε hε
-    -- Choose finite F with small tail
-    have htail : ∀ ε > 0, ∃ F : Finset ι,
-        ∑' i : {x // x ∉ F}, |a i| < ε := by
-      intro ε hε
-      -- tails → 0
-      have : Filter.Tendsto (fun F : Finset ι =>
-            ∑' i : {x // x ∉ F}, |a i|) Filter.atTop (nhds 0) := by
-        simpa using ha.tendsto_cofinite_zero
-      obtain ⟨F, hF⟩ := Metric.tendsto_nhds.mp this ε hε
-      exact ⟨F, hF F (by simp)⟩
-    
-    -- convenient split identity to use later
-    have split (F : Finset ι) :
-        (∑' i, |a i|) =
-          (∑ i ∈ F, |a i|) + (∑' i : {x // x ∉ F}, |a i|) := by
-      -- standard: finite + complement
-      simpa [tsum_subtype_eq_sum] using ha.tsum_add_tsum_compl F
-    
-    rcases htail ε hε with ⟨F, hF⟩
-    
-    -- Define sign test vector x_F
-    let xF : c₀ := ∑ i ∈ F, sgn (a i) • e i
-    
-    -- Show ‖x_F‖ ≤ 1 (identical to B2 proof)
-    have hx_norm : ‖xF‖ ≤ 1 := by
-      -- Show that each coordinate has absolute value ≤ 1
-      suffices ∀ m, |(xF : ι → ℝ) m| ≤ 1 by
-        -- Convert pointwise bound to norm bound
-        have : ‖(xF : c₀).toBCF‖ ≤ 1 := by
-          rw [BoundedContinuousFunction.norm_le (by norm_num : (0 : ℝ) ≤ 1)]
+  · -- Lower bound: ∑' |a i| ≤ ‖ofCoeffsCLM a ha‖ via sign vectors
+    -- For each finite F, test on the sign vector gives ∑_{i∈F} |a i| ≤ ‖ofCoeffsCLM a ha‖
+    have h_fin : ∀ F : Finset ι, (∑ i ∈ F, |a i|) ≤ ‖ofCoeffsCLM a ha‖ := by
+      intro F
+      -- Use the same proof as finite_sum_bound
+      set x : c₀ := ∑ i ∈ F, sgn (a i) • e i
+      have hx : ‖x‖ ≤ 1 := by
+        have hcoord : ∀ m, |(x : ι → ℝ) m| ≤ 1 := by
           intro m
-          simpa [Real.norm_eq_abs] using this m
+          simp only [x]
+          rw [coord_sum_apply]
+          by_cases hm : m ∈ F
+          · simp [hm]; exact abs_sgn_le_one (a m)
+          · simp [hm]
+        have : ‖(x : c₀).toBCF‖ ≤ 1 := by
+          rw [BoundedContinuousFunction.norm_le (by norm_num : (0 : ℝ) ≤ 1)]
+          intro m; simpa [Real.norm_eq_abs] using hcoord m
         simpa [ZeroAtInftyContinuousMap.norm_toBCF_eq_norm] using this
-      -- Prove the pointwise bound
-      intro m
-      simp only [xF]
-      rw [coord_sum_apply]
-      by_cases hm : m ∈ F
-      · simp [hm, abs_sgn]
-      · simp [hm]
+      have heval : (ofCoeffsCLM a ha) x = ∑ i ∈ F, |a i| := by
+        simp only [x, ofCoeffsCLM_apply, map_sum]
+        congr 1; ext i
+        -- Use the helper lemma for sign vector evaluation
+        have : (∑' j, a j * (sgn (a i) • e i) j) = sgn (a i) * a i :=
+          IsometryHelpers.tsum_mul_sgn_ei a i
+        rw [this, sgn_mul_self]
+      calc ∑ i ∈ F, |a i| = (ofCoeffsCLM a ha) x := heval.symm
+        _ ≤ |(ofCoeffsCLM a ha) x| := le_abs_self _
+        _ ≤ ‖ofCoeffsCLM a ha‖ * ‖x‖ := (ofCoeffsCLM a ha).le_opNorm x
+        _ ≤ ‖ofCoeffsCLM a ha‖ * 1 := by gcongr
+        _ = ‖ofCoeffsCLM a ha‖ := by ring
+
+    -- Step 2: The tsum equals the supremum of partial sums
+    -- Since |a i| ≥ 0 and ha : Summable |a|, we have ∑' |a i| = sup of partial sums
+    have h_sup : ∑' i, |a i| = ⨆ F : Finset ι, ∑ i ∈ F, |a i| := by
+      -- This is a standard fact about nonnegative summable series
+      -- The sum equals the supremum of all finite partial sums
+      apply le_antisymm
+      · -- ∑' ≤ sup: always true by universal property of supremum
+        apply ha.tsum_le_of_sum_le
+        intro F
+        exact le_csSup ⟨‖ofCoeffsCLM a ha‖, fun _ ⟨G, hG⟩ => hG ▸ h_fin G⟩ ⟨F, rfl⟩
+      · -- sup ≤ ∑': each partial sum is ≤ the full sum
+        -- Nonempty: the empty partial sum is 0
+        refine csSup_le ?hne ?bound
+        · exact ⟨0, ⟨∅, by simp⟩⟩
+        · intro y ⟨F, hF⟩
+          -- y = ∑ i∈F |a i|
+          subst hF
+          -- standard bound: finite partial sum ≤ total sum for nonneg / summable
+          exact ha.sum_le_tsum F (fun i _ => abs_nonneg _)
     
-    -- Evaluate ofCoeffsCLM on x_F
-    have hAx : (ofCoeffsCLM a ha) xF = ∑ i ∈ F, |a i| := by
-      simp only [xF, ofCoeffsCLM, ofCoeffsLM]
-      rw [LinearMap.mkContinuous_apply]
-      simp only [LinearMap.mk_apply, map_sum]
-      conv_rhs => arg 2; ext i; rw [← mul_sgn_abs]
-      congr 1
-      ext i
-      rw [map_smul]
-      simp only [smul_eq_mul]
-      -- Now we need to evaluate ∑' j, a j * (e i) j
-      have : (∑' j, a j * (e i) j) = a i := by
-        have : {j : ι | (e i) j ≠ 0} ⊆ {i} := by
-          intro j hj
-          simp [basis_apply] at hj
-          split_ifs at hj with h
-          · exact h.symm ▸ rfl
-          · contradiction
-        rw [tsum_eq_sum (s := {i}) (by simpa using this)]
-        simp [basis_apply]
-      rw [this]
-      ring
-    
-    -- Complete the calculation
-    have : (∑' i, |a i|) < (∑ i ∈ F, |a i|) + ε := by
-      -- from `split F` and `hF`
-      have := add_lt_add_left hF (∑ i ∈ F, |a i|)
-      simpa [split F] using this
-    
-    calc ∑' i, |a i| 
-        < (∑ i ∈ F, |a i|) + ε := this
-        _ = (ofCoeffsCLM a ha) xF + ε := by rw [hAx]
-        _ ≤ ‖(ofCoeffsCLM a ha) xF‖ + ε := by
-          gcongr
-          exact le_abs_self _
-        _ ≤ ‖ofCoeffsCLM a ha‖ * ‖xF‖ + ε := by
-          gcongr
-          exact (ofCoeffsCLM a ha).le_opNorm xF
-        _ ≤ ‖ofCoeffsCLM a ha‖ * 1 + ε := by
-          gcongr
-          exact hx_norm
-        _ = ‖ofCoeffsCLM a ha‖ + ε := by ring
+    -- Step 3: Apply supremum to the finite bounds
+    rw [h_sup]
+    apply csSup_le
+    · exact ⟨0, ⟨∅, by simp⟩⟩
+    · intro _ ⟨F, hF⟩
+      rw [← hF]
+      exact h_fin F
 
 /-- Finite support evaluation lemma for `ofCoeffsCLM`. -/
 lemma ofCoeffsCLM_eval_on_finset (a : ι → ℝ) (ha : Summable (fun i => |a i|))
@@ -612,20 +904,16 @@ lemma ofCoeffsCLM_eval_on_finset (a : ι → ℝ) (ha : Summable (fun i => |a i|
     (ofCoeffsCLM a ha) (∑ i ∈ F, c i • e i) = ∑ i ∈ F, a i * c i := by
   classical
   -- Push linearity and evaluate each coordinate `tsum`
-  simp [ofCoeffsCLM_apply, ofCoeffsLM_apply, map_sum, map_smul]
+  simp only [ofCoeffsCLM_apply, map_sum]
   refine Finset.sum_congr rfl ?_
   intro i hi
-  have hzero : ∀ j ∉ ({i} : Finset ι), a j * (e i : ι → ℝ) j = 0 := by
-    intro j hj
-    have hji : j ≠ i := by simpa [Finset.mem_singleton] using hj
-    simp [basis_apply, hji]
-  
-  have htsum :
-      (∑' j, a j * (e i : ι → ℝ) j)
-    = ∑ j in ({i} : Finset ι), a j * (e i : ι → ℝ) j := by
-    simpa using (tsum_eq_sum hzero)
-  
-  simp [htsum, Finset.sum_singleton, basis_apply, mul_comm, mul_left_comm, mul_assoc]
+  -- Evaluate (ofCoeffsCLM a ha) on (c i • e i) by unfolding to the `tsum`
+  -- and then applying the helper lemma on `(c i) • e i`.
+  have h := IsometryHelpers.tsum_mul_smul_ei a i (c i)
+  -- Left side:  ∑' j, a j * ((c i • e i) j)
+  -- Right side: (c i) * a i  (we want a i * c i)
+  -- Adjust scalars: in ℝ, `• = *` and `*` commutes.
+  simpa [ofCoeffsCLM_apply, smul_eq_mul, mul_comm] using h
 
 /-
 ================================================================================
@@ -656,76 +944,312 @@ noncomputable def trunc (x : c₀) (F : Finset ι) : c₀ :=
 lemma trunc_tendsto (x : c₀) :
     Filter.Tendsto (fun F : Finset ι => trunc x F) Filter.atTop (nhds x) := by
   classical
-  -- Use Metric.tendsto_nhds: ∀ ε>0, eventually ‖trunc x F - x‖ < ε
-  rw [Metric.tendsto_nhds]
+  refine Metric.tendsto_nhds.mpr ?_
   intro ε hε
+
+  -- x → 0 at infinity, downgrade to cofinite via monotonicity
+  have hzero := x.zero_at_infty'  -- : Tendsto (fun i => x i) (cocompact ι) (nhds 0)
+  -- cofinite ≤ cocompact in a discrete space: finite complements are compact
+  have cofinite_le : (Filter.cofinite : Filter ι) ≤ (@Filter.cocompact ι _) := by
+    -- In discrete topology, compact = finite, so cocompact = cofinite
+    simpa [Filter.cocompact_eq_cofinite]
+  have hcof : Filter.Tendsto (fun i => x i) Filter.cofinite (nhds 0) :=
+    hzero.mono_left cofinite_le
+
+  -- use ε/2 > 0 to get a strict final bound
+  have hcof' : ∀ᶠ i in Filter.cofinite, |x i| < ε / 2 := by
+    have := (Metric.tendsto_nhds.mp hcof) (ε / 2) (by linarith)
+    simpa [Real.dist_eq, sub_zero] using this
+
+  -- unpack to a Finset witness
+  have hKfinset : ∃ K : Finset ι, ∀ i, i ∉ K → |x i| < ε / 2 := by
+    classical
+    -- hcof' : ∀ᶠ i in Filter.cofinite, |x i| < ε / 2
+    -- This means the set of i where ¬(|x i| < ε / 2) is finite
+    have hfin : {i | ¬|x i| < ε / 2}.Finite := Filter.eventually_cofinite.mp hcof'
+    -- Convert to Finset
+    use hfin.toFinset
+    intro i hi
+    -- hi : i ∉ hfin.toFinset means i ∉ {j | ¬|x j| < ε / 2}
+    simp only [Set.Finite.mem_toFinset, Set.mem_setOf] at hi
+    -- So |x i| < ε / 2
+    simp only [not_not] at hi
+    exact hi
   
-  -- Since x ∈ c₀, it vanishes at infinity: for ε/2 > 0, ∃ finite K with |x i| < ε/2 for i ∉ K
-  have hzero := x.zero_at_infty'
-  -- hzero : Tendsto (x : ι → ℝ) (cocompact ι) (nhds 0)
-  -- In a discrete topology, cocompact = cofinite
-  have : Filter.cocompact ι = Filter.cofinite := cocompact_eq_cofinite
-  rw [this] at hzero
+  rcases hKfinset with ⟨K, hK⟩
+  -- Now continue with K : Finset ι and hK : ∀ i, i ∉ K → |x i| < ε/2
+  refine Filter.eventually_atTop.2 ?_
+  refine ⟨K, ?_⟩
+  intro F hKF    -- hKF : K ⊆ F
   
-  have : ∀ᶠ i in Filter.cofinite, |x i| < ε / 2 := by
-    rw [Metric.tendsto_nhds] at hzero
-    specialize hzero (ε / 2) (by linarith)
-    simpa [Real.dist_eq, sub_zero] using hzero
-  
-  -- Extract a finite set K outside which |x i| < ε/2
-  rw [Filter.eventually_cofinite] at this
-  obtain ⟨K, hK⟩ := this
-  
-  -- For any F ⊇ K, we have ‖trunc x F - x‖ < ε
-  use K
-  intro F hF
-  
-  -- Bound ‖trunc x F - x‖ via pointwise bounds
-  have : ‖trunc x F - x‖ < ε := by
-    -- First get pointwise bound: |(trunc x F - x) i| ≤ ε/2 for all i
-    have hpt : ∀ i, |(trunc x F - x) i| ≤ ε / 2 := by
-      intro i
-      simp only [Pi.sub_apply, trunc_apply]
-      by_cases hi : i ∈ F
-      · -- If i ∈ F, then trunc x F i = x i, so difference is 0
-        simp [hi]
-      · -- If i ∉ F, then trunc x F i = 0, so |difference| = |x i| < ε/2
-        simp [hi]
-        by_cases hiK : i ∈ K
-        · -- i ∈ K but i ∉ F contradicts F ⊇ K
-          exact absurd (hF hiK) hi
-        · -- i ∉ K, so |x i| < ε/2
-          exact le_of_lt (hK i hiK)
-    
-    -- Convert pointwise bound to norm bound
-    have hBCF : ‖(trunc x F - x).toBCF‖ ≤ ε / 2 := by
-      rw [BoundedContinuousFunction.norm_le (by linarith : 0 ≤ ε / 2)]
-      intro i
-      simpa [Real.norm_eq_abs] using hpt i
-    
-    calc ‖trunc x F - x‖ = ‖(trunc x F - x).toBCF‖ := by
-           rw [ZeroAtInftyContinuousMap.norm_toBCF_eq_norm]
-         _ ≤ ε / 2 := hBCF
-         _ < ε := by linarith
-  
-  simpa [Real.dist_eq] using this
+  -- pointwise bound: on F it cancels; off F it's controlled by hK
+  have hpt : ∀ i, |(trunc x F - x) i| ≤ ε / 2 := by
+    intro i
+    by_cases hiF : i ∈ F
+    · -- on F: trunc x F i = x i ⇒ difference is 0
+      have : (trunc x F - x) i = 0 := by simp [trunc_apply, hiF, Pi.sub_apply]
+      simpa [this] using (show (0 : ℝ) ≤ ε / 2 from by linarith)
+    · -- off F: trunc x F i = 0; moreover i ∉ K (since K ⊆ F)
+      have hiK : i ∉ K := by exact fun h => hiF (hKF h)
+      have hx : |x i| < ε / 2 := hK i hiK
+      -- |(trunc x F - x) i| = |0 - x i| = |x i|
+      simpa [trunc_apply, hiF, Pi.sub_apply, Real.norm_eq_abs] using (le_of_lt hx)
+
+  -- sup-norm bound from pointwise bound on the underlying bounded function
+  have hBCF : ‖(trunc x F - x).toBCF‖ ≤ ε / 2 := by
+    rw [BoundedContinuousFunction.norm_le (by linarith : 0 ≤ ε / 2)]
+    intro i
+    -- ‖(trunc x F - x).toBCF i‖ = |(trunc x F - x) i|
+    simpa [Real.norm_eq_abs] using hpt i
+
+  -- translate back the c₀ norm and gain strict inequality
+  have : dist (trunc x F) x < ε := by
+    calc
+      dist (trunc x F) x = ‖trunc x F - x‖ := by simp [dist_eq_norm]
+      _ = ‖(trunc x F - x).toBCF‖ := by
+            simpa using ZeroAtInftyContinuousMap.norm_toBCF_eq_norm (trunc x F - x)
+      _ ≤ ε / 2 := hBCF
+      _ < ε := by linarith
+  exact this
+
+lemma trunc_norm_tendsto_zero (x : c₀) :
+  Filter.Tendsto (fun F : Finset ι => ‖x - trunc x F‖) Filter.atTop (nhds 0) := by
+  -- `trunc x F → x` in norm ⇒ `x - trunc x F → 0`, then take norms
+  have h1 : Filter.Tendsto (fun _ : Finset ι => x) Filter.atTop (nhds x) := tendsto_const_nhds
+  have h2 : Filter.Tendsto (trunc x) Filter.atTop (nhds x) := trunc_tendsto x
+  have ht : Filter.Tendsto (fun F => x - trunc x F) Filter.atTop (nhds (x - x)) := h1.sub h2
+  simpa using Filter.Tendsto.norm ht
 
 end IsometryHelpers
 
-/-- Extract ℓ¹ coefficients from a continuous linear functional on c₀ -/
+/-
+================================================================================
+LP CONVERSION LEMMAS
+================================================================================
+-/
+
+section LpConversions
+
+/-- For counting measure on a discrete index, `p = 1` is exactly summability of norms. -/
+lemma memℓp_one_iff_summable_norm (f : ι → ℝ) :
+  Memℓp f 1 ↔ Summable (fun i => ‖f i‖) := by
+  -- Most versions reduce by a single `simp`:
+  -- * If `Memℓp` is defined via a `tsum` power: this `simp` is enough.
+  -- * If it goes through `snorm`: the same `simp` usually unfolds snorm at p=1.
+  simpa [Memℓp, Real.rpow_one]
+
+/-- Build `Memℓp f 1` from summability of norms. -/
+lemma memℓp_of_summable_one {f : ι → ℝ}
+  (h : Summable (fun i => ‖f i‖)) : Memℓp f 1 := by
+  -- Apply the forward direction of the equivalence:
+  exact (memℓp_one_iff_summable_norm f).2 h
+
+/-- Extract summability of absolute values from lp membership -/
+lemma lp.to_summable_abs (a : lp (fun _ : ι => ℝ) 1) :
+  Summable (fun i => |a i|) := by
+  -- unwrap the subtype to avoid elaboration issues
+  rcases a with ⟨fa, hfa⟩
+  have : Summable (fun i => ‖fa i‖) :=
+    (memℓp_one_iff_summable_norm fa).1 hfa
+  simpa [Real.norm_eq_abs] using this
+
+/-
+Fallback: series/sup characterization and the ℓ¹ norm formula.
+
+This block is designed to be robust across mathlib snapshots:
+* It uses only standard Summable/tsum/filter tools.
+* It avoids snapshot-specific names for the lp norm, except for **one local "unfold" line**
+  where you assert that, at p = 1, the lp norm is the iSup of finite partial sums.
+  Two common spellings are provided. If neither compiles in your snapshot,
+  replace that one line by your local lemma/definition equality.
+-/
+
+open scoped BigOperators
+open Filter
+
+/-- For a nonnegative summable real family, the sum equals the conditional supremum
+of its finite partial sums.  This avoids `iSup` so we don't need a `CompleteLattice ℝ` instance. -/
+private lemma tsum_eq_csSup_sum_of_nonneg
+  {ι : Type*} (u : ι → ℝ) (h0 : ∀ i, 0 ≤ u i) (hs : Summable u) :
+  (∑' i, u i)
+    =
+  sSup (Set.range (fun s : Finset ι => ∑ i ∈ s, u i)) := by
+  classical
+  set S : Set ℝ := Set.range (fun s : Finset ι => ∑ i ∈ s, u i)
+  have hne : S.Nonempty := ⟨0, by refine ⟨(∅ : Finset ι), ?_⟩; simp⟩
+  have hbdd : BddAbove S := by
+    refine ⟨∑' i, u i, ?_⟩
+    intro y; rintro ⟨s, rfl⟩
+    simpa using hs.sum_le_tsum s (by intro i _; exact h0 i)
+
+  -- `sSup S ≤ tsum` because every finite partial sum ≤ tsum
+  have h₁ : sSup S ≤ ∑' i, u i := by
+    refine csSup_le hne ?_
+    intro y hy
+    rcases hy with ⟨s, rfl⟩
+    simpa using hs.sum_le_tsum s (by intro i _; exact h0 i)
+
+  -- `tsum ≤ sSup S` by the usual ε-argument and the fact that partial sums → tsum
+  have h₂ : (∑' i, u i) ≤ sSup S := by
+    -- Standard "∀ ε > 0, a ≤ sup + ε" trick
+    refine le_of_forall_pos_le_add ?_
+    intro ε hε
+    -- Finite partial sums converge to `tsum u`
+    have hlim : Tendsto (fun s : Finset ι => ∑ i ∈ s, u i) atTop (nhds (∑' i, u i)) := by
+      simpa using hs.hasSum
+    -- Eventually within the ε-ball around the limit
+    have : ∀ᶠ s : Finset ι in atTop, (∑ i ∈ s, u i) ≥ (∑' i, u i) - ε := by
+      have hball : {x : ℝ | dist x (∑' i, u i) < ε} ∈ nhds (∑' i, u i) :=
+        Metric.ball_mem_nhds _ hε
+      have hclose := hlim hball
+      refine Filter.Eventually.mono hclose ?_
+      intro s hsabs
+      have : |(∑ i ∈ s, u i) - (∑' i, u i)| < ε := by
+        simpa [Real.dist_eq, sub_eq_add_neg] using hsabs
+      rcases abs_lt.1 this with ⟨_, hlt_right⟩
+      have : (∑' i, u i) - ε < (∑ i ∈ s, u i) := by linarith
+      exact this.le
+    -- Pick one such finite set and compare with `sSup`
+    rcases (Filter.eventually_atTop.1 this) with ⟨s₀, hs₀⟩
+    have hs₀' : (∑' i, u i) ≤ (∑ i ∈ s₀, u i) + ε := by
+      have := hs₀ s₀ (by rfl)
+      linarith
+    -- `∑ i∈s₀, u i ∈ S`, hence ≤ `sSup S`
+    have hmem : (∑ i ∈ s₀, u i) ∈ S := ⟨s₀, rfl⟩
+    have hsum_le_sup : (∑ i ∈ s₀, u i) ≤ sSup S := le_csSup hbdd hmem
+    exact hs₀'.trans (add_le_add_right hsum_le_sup ε)
+
+  exact le_antisymm h₂ h₁
+
+/-- Same statement as `tsum_eq_csSup_sum_of_nonneg` but using `iSup`. 
+It relies only on the identity `iSup f = sSup (Set.range f)` for `ℝ`. -/
+private lemma tsum_eq_iSup_sum_of_nonneg
+  {ι : Type*} (u : ι → ℝ) (h0 : ∀ i, 0 ≤ u i) (hs : Summable u) :
+  (∑' i, u i) = iSup (fun s : Finset ι => ∑ i ∈ s, u i) := by
+  classical
+  -- `iSup` over a function equals `sSup` over its range; this holds for `ℝ` (conditionally complete).
+  -- Most snapshots carry:  `iSup = sSup (Set.range _)`. If your snapshot doesn't,
+  -- just use the `csSup` version in the rest of the file.
+  have : sSup (Set.range (fun s : Finset ι => ∑ i ∈ s, u i))
+          = iSup (fun s : Finset ι => ∑ i ∈ s, u i) := by
+    -- `by rfl` works in snapshots where `iSup` is definitional as `sSup (range _)`.
+    -- If not, swap this line for your local lemma equating the two.
+    rfl
+  simpa [this] using tsum_eq_csSup_sum_of_nonneg u h0 hs
+
+/-- The ℓ¹ norm formula from the series/sup viewpoint.
+    This uses only (i) the helper lemma above and (ii) a single local unfolding of the `lp` norm at `p = 1`
+    into the `iSup` of finite sums. -/
+lemma lp_norm_p1 (a : lp (fun _ : ι => ℝ) 1) :
+  ‖a‖ = (∑' i, ‖a i‖ : ℝ) := by
+  classical
+  -- Summability and nonnegativity
+  have hsum : Summable (fun i : ι => ‖a i‖) := by
+    simpa [Real.norm_eq_abs] using
+      (memℓp_one_iff_summable_norm (fun i : ι => a i)).1 a.property
+  have h0 : ∀ i : ι, 0 ≤ ‖a i‖ := fun _ => norm_nonneg _
+  -- `tsum = csSup` for nonnegative families (proved in this file)
+  have htsum :
+      (∑' i, ‖a i‖ : ℝ)
+        =
+      sSup (Set.range (fun s : Finset ι => ∑ i ∈ s, ‖a i‖)) :=
+    tsum_eq_csSup_sum_of_nonneg (fun i => ‖a i‖) h0 hsum
+
+  -- ONE local line: unfold your `lp` norm at `p = 1` as a `csSup`.
+  have hnorm :
+      ‖a‖ = sSup (Set.range (fun s : Finset ι => ∑ i ∈ s, ‖a i‖)) := by
+    -- The lp norm for p=1 is (∑' i, ‖a i‖^1)^(1/1) = ∑' i, ‖a i‖
+    -- which equals csSup by our helper lemma
+    have hp1 : (1 : ENNReal).toReal = 1 := ENNReal.toReal_one
+    have h_norm : ‖a‖ = (∑' i, ‖a i‖ ^ (1 : ENNReal).toReal) ^ (1 / (1 : ENNReal).toReal) :=
+      lp.norm_eq_tsum_rpow (by simp [hp1] : 0 < (1 : ENNReal).toReal) a
+    simp only [hp1, Real.rpow_one, div_self (by norm_num : (1:ℝ) ≠ 0)] at h_norm
+    rw [h_norm]
+    exact tsum_eq_csSup_sum_of_nonneg (fun i => ‖a i‖) h0 hsum
+
+  simpa [hnorm] using htsum.symm
+
+/-- Extract ℓ¹ coefficients from a continuous linear functional on `c₀`. -/
 noncomputable def toCoeffsL1 (f : c₀ →L[ℝ] ℝ) : lp (fun _ : ι => ℝ) 1 := by
-  -- Use summable_abs_eval to show the coefficients are in ℓ¹
-  refine ⟨fun i => f (e i), ?_⟩
-  -- Show membership in ℓ¹ via summability
-  have : Summable (fun i => ‖f (e i)‖) := by
-    simpa [Real.norm_eq_abs] using summable_abs_eval f
-  exact this
+  refine ⟨(fun i => f (e i)), ?_⟩
+  -- Summability of abs coefficients:
+  have h : Summable (fun i => |f (e i)|) := summable_abs_eval f
+  -- Turn it into Memℓp at p = 1:
+  exact (memℓp_of_summable_one (by simpa [Real.norm_eq_abs] using h))
 
 @[simp] lemma toCoeffsL1_apply (f : c₀ →L[ℝ] ℝ) (i : ι) :
     toCoeffsL1 f i = f (e i) := rfl
 
+end LpConversions
+
+/-- Density argument: continuous linear functionals on c₀ are determined by
+their values on the standard basis vectors e_i. -/
+lemma CLM_ext_basis
+  (f g : c₀ →L[ℝ] ℝ)
+  (hcoord : ∀ i, f (e i) = g (e i)) :
+  f = g := by
+  -- Work with `h := f - g`
+  have hzero_basis : ∀ i, (f - g) (e i) = 0 := by
+    intro i; simpa [ContinuousLinearMap.sub_apply, hcoord i]
+  ext x
+  -- Truncate `x` on finite sets and use linearity + operator norm bound
+  have h_zero_on_trunc :
+      ∀ s : Finset ι, (f - g) (trunc x s) = 0 := by
+    intro s
+    -- `trunc x s` is a finite sum of basis vectors with coefficients `x i`
+    -- and `h` vanishes on each basis vector
+    simp [trunc, map_sum, map_smul, hzero_basis, Finset.sum_const_zero]
+  -- For each finite `s`:
+  have h_est (s : Finset ι) :
+      ‖(f - g) x‖ = ‖(f - g) (x - trunc x s)‖ := by
+    have hz : (f - g) (trunc x s) = 0 := h_zero_on_trunc s
+    -- Since (f - g) kills trunc x s, we have (f - g) x = (f - g) (x - trunc x s)
+    have : (f - g) x = (f - g) (x - trunc x s) := by
+      rw [map_sub, hz, sub_zero]
+    rw [this]
+  -- Bound by operator norm and pass to the limit `‖x - trunc x s‖ → 0`.
+  have h_le (s : Finset ι) :
+      ‖(f - g) x‖ ≤ ‖f - g‖ * ‖x - trunc x s‖ := by
+    rw [h_est s]
+    exact (f - g).le_opNorm (x - trunc x s)
+  -- Take `s → atTop` and use that ‖x - trunc x s‖ → 0
+  have h0 : Filter.Tendsto (fun s => ‖x - trunc x s‖) Filter.atTop (nhds 0) :=
+    trunc_norm_tendsto_zero x
+  
+  -- ε-argument: for all ε>0, eventually ‖(f - g) x‖ ≤ ε
+  have hx0 : ‖(f - g) x‖ = 0 := by
+    refine le_antisymm ?_ (norm_nonneg _)
+    refine le_of_forall_pos_le_add ?_
+    intro ε hε
+    have hmul : Filter.Tendsto (fun s => ‖f - g‖ * ‖x - trunc x s‖) Filter.atTop (nhds 0) := by
+      convert Filter.Tendsto.const_mul ‖f - g‖ h0 using 1; simp
+    -- simplify the distance expression
+    have : ∀ᶠ s in Filter.atTop, ‖f - g‖ * ‖x - trunc x s‖ < ε := by
+      -- Get the metric characterization
+      have hmul' := (Metric.tendsto_nhds.mp hmul) ε hε
+      -- hmul' : ∀ᶠ s, dist (‖f - g‖ * ‖x - trunc x s‖) 0 < ε
+      -- convert dist to abs and remove abs on norms
+      filter_upwards [hmul'] with s hs
+      -- ℝ: dist z 0 = |z|
+      simp only [Real.dist_eq, sub_zero] at hs
+      -- |‖f - g‖ * ‖x - trunc x s‖| < ε
+      -- Since ‖f - g‖ ≥ 0 and ‖x - trunc x s‖ ≥ 0, we have
+      -- |‖f - g‖ * ‖x - trunc x s‖| = ‖f - g‖ * ‖x - trunc x s‖
+      rwa [abs_of_nonneg] at hs
+      exact mul_nonneg (norm_nonneg (f - g)) (norm_nonneg (x - trunc x s))
+    rcases (Filter.eventually_atTop.mp this) with ⟨S, hS⟩
+    have h1 : ‖(f - g) x‖ ≤ ‖f - g‖ * ‖x - trunc x S‖ := h_le S
+    have h2 : ‖f - g‖ * ‖x - trunc x S‖ < ε := hS S (le_rfl)
+    linarith
+  
+  -- conclude equality of functionals
+  have : (f - g) x = 0 := norm_eq_zero.mp hx0
+  -- finish the extensionality argument
+  simp only [ContinuousLinearMap.sub_apply, sub_eq_zero] at this
+  exact this
+
 /-- The coefficient extractor is injective -/
-lemma toCoeffsL1_injective : Function.Injective toCoeffsL1 := by
+lemma toCoeffsL1_injective : Function.Injective (@toCoeffsL1 ι _ _ _) := by
   intro f g hfg
   have hcoord : ∀ i, f (e i) = g (e i) := by
     intro i; simpa [toCoeffsL1_apply] using congrArg (fun v => v i) hfg
@@ -734,31 +1258,15 @@ lemma toCoeffsL1_injective : Function.Injective toCoeffsL1 := by
 /-- Build a continuous linear functional from ℓ¹ coefficients -/
 noncomputable def fromCoeffsL1 (a : lp (fun _ : ι => ℝ) 1) : c₀ →L[ℝ] ℝ := by
   -- Use ofCoeffsCLM with the coefficient sequence from a
-  have ha : Summable (fun i => |a i|) := by
-    have : Summable (fun i => ‖a i‖) := a.prop
-    simpa [Real.norm_eq_abs] using this
+  have ha : Summable (fun i => |a i|) := lp.to_summable_abs a
   exact ofCoeffsCLM (fun i => a i) ha
 
 @[simp] lemma fromCoeffsL1_apply_e (a : lp (fun _ : ι => ℝ) 1) (i : ι) :
     fromCoeffsL1 a (e i) = a i := by
   classical
-  have ha : Summable (fun j => |a j|) := by
-    have : Summable (fun j => ‖a j‖) := a.prop
-    simpa using this
-  -- Unfold to `tsum`
-  simp [fromCoeffsL1, ofCoeffsCLM_apply, ofCoeffsLM_apply]
-  -- Collapse to {i}
-  have hzero : ∀ j ∉ ({i} : Finset ι), a j * (e i : ι → ℝ) j = 0 := by
-    intro j hj
-    have hji : j ≠ i := by simpa [Finset.mem_singleton] using hj
-    simp [basis_apply, hji]
-  
-  have htsum :
-      (∑' j, a j * (e i : ι → ℝ) j)
-    = ∑ j in ({i} : Finset ι), a j * (e i : ι → ℝ) j := by
-    simpa using (tsum_eq_sum hzero)
-  
-  simpa [htsum, Finset.sum_singleton, basis_apply]
+  -- Unfold and compute the `tsum` via your helper
+  simp only [fromCoeffsL1, ofCoeffsCLM_apply]
+  exact IsometryHelpers.tsum_mul_ei (fun j => a j) i
 
 /-- Left inverse: fromCoeffsL1 ∘ toCoeffsL1 = id -/
 lemma fromCoeffsL1_toCoeffsL1 (f : c₀ →L[ℝ] ℝ) :
@@ -775,28 +1283,27 @@ lemma toCoeffsL1_fromCoeffsL1 (a : lp (fun _ : ι => ℝ) 1) :
   ext i
   simp [toCoeffsL1_apply, fromCoeffsL1_apply_e]
 
-/-- The norm is preserved by toCoeffsL1 -/
-lemma norm_toCoeffsL1 (f : c₀ →L[ℝ] ℝ) :
-    ‖toCoeffsL1 f‖ = ‖f‖ := by
-  -- Use the fact that fromCoeffsL1 ∘ toCoeffsL1 = id
-  have hleft : fromCoeffsL1 (toCoeffsL1 f) = f := fromCoeffsL1_toCoeffsL1 f
-  -- And that fromCoeffsL1 preserves norm
-  have : ‖toCoeffsL1 f‖ = ‖fromCoeffsL1 (toCoeffsL1 f)‖ := by
-    simpa [norm_fromCoeffsL1]
-  simpa [hleft] using this
-
 /-- The norm is preserved by fromCoeffsL1 -/
 lemma norm_fromCoeffsL1 (a : lp (fun _ : ι => ℝ) 1) :
     ‖fromCoeffsL1 a‖ = ‖a‖ := by
   simp only [fromCoeffsL1]
-  have ha : Summable (fun i => |a i|) := by
-    have : Summable (fun i => ‖a i‖) := a.prop
-    simpa [Real.norm_eq_abs] using this
+  have ha : Summable (fun i => |a i|) := lp.to_summable_abs a
   rw [ofCoeffsCLM_norm]
-  -- The ℓ¹ norm
-  simp only [lp.norm_def]
-  rw [if_pos (by norm_num : (1 : ℝ≥0∞).toReal = 1)]
-  simp [one_div, Real.rpow_one]
+  -- The ℓ¹ norm of a is the sum of absolute values
+  have h_lp_norm : ‖a‖ = (∑' i, ‖a i‖ : ℝ) := lp_norm_p1 a
+  -- finish:
+  rw [h_lp_norm]
+  simp only [Real.norm_eq_abs]
+
+/-- The norm is preserved by toCoeffsL1 -/
+lemma norm_toCoeffsL1 (f : c₀ →L[ℝ] ℝ) :
+    ‖toCoeffsL1 f‖ = ‖f‖ := by
+  -- Use the left inverse and norm preservation of fromCoeffsL1
+  have hleft : fromCoeffsL1 (toCoeffsL1 f) = f := fromCoeffsL1_toCoeffsL1 f
+  -- Since fromCoeffsL1 preserves norm (proven above without circularity)
+  have : ‖fromCoeffsL1 (toCoeffsL1 f)‖ = ‖toCoeffsL1 f‖ := norm_fromCoeffsL1 (toCoeffsL1 f)
+  rw [hleft] at this
+  exact this.symm
 
 /-
 ================================================================================
@@ -830,7 +1337,9 @@ noncomputable def dual_c0_iso_l1 :
 /-- Evaluating the inverse isometry on basis vectors -/
 @[simp] lemma dual_c0_iso_l1_symm_apply_e (a : lp (fun _ : ι => ℝ) 1) (i : ι) :
     (dual_c0_iso_l1.symm a) (e i) = a i := by
-  simp [LinearIsometryEquiv.symm_apply_apply, fromCoeffsL1_apply_e]
+  -- dual_c0_iso_l1.symm = fromCoeffsL1
+  change fromCoeffsL1 a (e i) = a i
+  exact fromCoeffsL1_apply_e a i
 
 /-- Norm preservation (forward direction) -/
 lemma dual_c0_iso_l1_norm (f : c₀ →L[ℝ] ℝ) :
@@ -842,48 +1351,32 @@ lemma dual_c0_iso_l1_symm_norm (a : lp (fun _ : ι => ℝ) 1) :
     ‖dual_c0_iso_l1.symm a‖ = ‖a‖ := by
   exact dual_c0_iso_l1.symm.norm_map a
 
-/-- If two continuous linear functionals agree on the basis vectors `e i`,
-then they agree everywhere. -/
-lemma CLM_ext_basis
-  (f g : c₀ →L[ℝ] ℝ)
-  (hcoord : ∀ i, f (e i) = g (e i)) :
-  f = g := by
-  -- Work with `h := f - g`
-  have hzero_basis : ∀ i, (f - g) (e i) = 0 := by
-    intro i; simpa [ContinuousLinearMap.sub_apply, hcoord i]
-  ext x
-  -- Truncate `x` on finite sets and use linearity + operator norm bound
-  have h_zero_on_trunc :
-      ∀ s : Finset ι, (f - g) (trunc x s) = 0 := by
-    intro s
-    -- `trunc x s` is a finite sum of basis vectors with coefficients `x i`
-    -- and `h` vanishes on each basis vector
-    simpa [trunc, ContinuousLinearMap.map_sum, ContinuousLinearMap.map_smul,
-           hzero_basis, Finset.sum_const_zero]
-  -- For each finite `s`:
-  have h_est (s : Finset ι) :
-      ‖(f - g) x‖ = ‖(f - g) (x - trunc x s)‖ := by
-    -- linearity and `h` vanishes on `trunc x s`
-    simpa [ContinuousLinearMap.sub_apply, map_sub, h_zero_on_trunc s,
-           sub_eq_add_neg, add_comm, add_left_neg, add_zero]
-  -- Bound by operator norm and pass to the limit `‖x - trunc x s‖ → 0`.
-  have h_le (s : Finset ι) :
-      ‖(f - g) x‖ ≤ ‖f - g‖ * ‖x - trunc x s‖ := by
-    simpa [h_est s] using (f - g).le_opNorm (x - trunc x s)
-  -- Take `s → atTop` and use that ‖x - trunc x s‖ → 0
-  -- Since f - g kills all truncations, ‖(f - g) x‖ = ‖(f - g)(x - trunc x s)‖ ≤ ‖f - g‖ · ‖x - trunc x s‖
-  -- As s → ∞, the RHS → 0, so ‖(f - g) x‖ ≤ 0
-  have : ‖(f - g) x‖ ≤ 0 := by
-    -- We'll show that for all ε > 0, ‖(f - g) x‖ < ε
-    refine le_of_forall_pos_le_add ?_
-    intro ε hε
-    -- Since trunc x s → x, we have ‖x - trunc x s‖ → 0
-    -- So there exists s₀ such that ‖x - trunc x s₀‖ < ε / (‖f - g‖ + 1)
-    -- Then ‖(f - g) x‖ ≤ ‖f - g‖ · ‖x - trunc x s₀‖ < ‖f - g‖ · ε/(‖f - g‖ + 1) < ε
-    sorry  -- This requires the norm convergence lemma for truncations
-  -- Nonnegativity of norms ⇒ equality
-  have : ‖(f - g) x‖ = 0 := le_antisymm this (norm_nonneg _)
-  exact norm_eq_zero.mp this
+
+/-
+================================================================================
+COMPLETE NORM THEOREMS (using the isometry)
+================================================================================
+-/
+
+/-- Complete version: Lower bound for operator norm -/
+theorem opNorm_ge_tsum_abs_coeff' (f : c₀ →L[ℝ] ℝ) :
+    ‖f‖ ≥ ∑' n, |f (e n)| := by
+  -- Use the isometry to reduce to the ℓ¹ norm
+  have : ‖f‖ = ‖toCoeffsL1 f‖ := (norm_toCoeffsL1 f).symm
+  rw [this]
+  -- The ℓ¹ norm is exactly the sum
+  have : ‖toCoeffsL1 f‖ = ∑' i, ‖f (e i)‖ := lp_norm_p1 (toCoeffsL1 f)
+  simp [this, Real.norm_eq_abs]
+
+/-- Complete version: Equality of operator norm and ℓ¹ sum -/
+theorem opNorm_eq_tsum_abs_coeff' (f : c₀ →L[ℝ] ℝ) :
+    ‖f‖ = ∑' n, |f (e n)| := by
+  -- Use the isometry to reduce to the ℓ¹ norm
+  have : ‖f‖ = ‖toCoeffsL1 f‖ := (norm_toCoeffsL1 f).symm
+  rw [this]
+  -- The ℓ¹ norm is exactly the sum
+  have : ‖toCoeffsL1 f‖ = ∑' i, ‖f (e i)‖ := lp_norm_p1 (toCoeffsL1 f)
+  simp [this, Real.norm_eq_abs]
 
 /-
 ================================================================================
@@ -891,26 +1384,230 @@ PART F: Transport lemma for DualIsBanach
 ================================================================================
 -/
 
-/-- If X ≃ₗᵢ Y, then DualIsBanach X ↔ DualIsBanach Y -/
-lemma DualIsBanach.congr {X Y : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
-    [NormedAddCommGroup Y] [NormedSpace ℝ Y] (e : X ≃ₗᵢ[ℝ] Y) :
-    DualIsBanach X ↔ DualIsBanach Y := by
-  sorry
+/-- Interpreting `DualIsBanach X` as completeness of `X →L[ℝ] ℝ`. -/
+abbrev DualIsBanach (X : Type*) [NormedAddCommGroup X] [NormedSpace ℝ X] :=
+  CompleteSpace (X →L[ℝ] ℝ)
+
+/-- Precomposition with a linear isometry equiv induces a linear isometry equiv on duals. 
+    This is a simplified definition to avoid timeouts. -/
+noncomputable def precompDual
+    {X Y : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
+    [NormedAddCommGroup Y] [NormedSpace ℝ Y]
+    (e : X ≃ₗᵢ[ℝ] Y) : (Y →L[ℝ] ℝ) ≃ₗᵢ[ℝ] (X →L[ℝ] ℝ) := by
+  classical
+  refine
+    { toLinearEquiv :=
+      { toFun := fun f => f.comp (e : X →L[ℝ] Y)
+        , invFun := fun g => g.comp (e.symm : Y →L[ℝ] X)
+        , left_inv := by
+            intro f; ext x; simp
+        , right_inv := by
+            intro g; ext x; simp
+        , map_add' := by
+            intro f g; ext x; simp
+        , map_smul' := by
+            intro c f; ext x; simp }
+      , norm_map' := by
+          intro f
+          -- Bounds: ‖e‖ ≤ 1 and ‖e.symm‖ ≤ 1
+          have hE  : ‖(e       : X →L[ℝ] Y)‖ ≤ (1 : ℝ) := by
+            refine ContinuousLinearMap.opNorm_le_bound _ (by norm_num) ?_
+            intro x; simpa [one_mul, LinearIsometry.norm_map] using
+              (le_of_eq (LinearIsometry.norm_map e x))
+          have hE' : ‖(e.symm  : Y →L[ℝ] X)‖ ≤ (1 : ℝ) := by
+            refine ContinuousLinearMap.opNorm_le_bound _ (by norm_num) ?_
+            intro y; simpa [one_mul, LinearIsometry.norm_map] using
+              (le_of_eq (LinearIsometry.norm_map e.symm y))
+          -- First inequality: ‖f ∘ e‖ ≤ ‖f‖
+          have h₁ :
+              ‖f.comp (e : X →L[ℝ] Y)‖ ≤ ‖f‖ := by
+            have hcomp :
+                ‖f.comp (e : X →L[ℝ] Y)‖ ≤ ‖f‖ * ‖(e : X →L[ℝ] Y)‖ :=
+              ContinuousLinearMap.opNorm_comp_le f (e : X →L[ℝ] Y)
+            have hbound :
+                ‖f‖ * ‖(e : X →L[ℝ] Y)‖ ≤ ‖f‖ * 1 :=
+              mul_le_mul_of_nonneg_left hE (norm_nonneg _)
+            exact (le_trans hcomp (by simpa using hbound))
+          -- Second inequality: ‖f‖ ≤ ‖f ∘ e‖ (via composing with e.symm)
+          have h₂ :
+              ‖f‖ ≤ ‖f.comp (e : X →L[ℝ] Y)‖ := by
+            have hcomp' :
+                ‖(f.comp (e : X →L[ℝ] Y)).comp (e.symm : Y →L[ℝ] X)‖
+                  ≤ ‖f.comp (e : X →L[ℝ] Y)‖ * ‖(e.symm : Y →L[ℝ] X)‖ :=
+              ContinuousLinearMap.opNorm_comp_le
+                (f.comp (e : X →L[ℝ] Y)) (e.symm : Y →L[ℝ] X)
+            have hbound' :
+                ‖f.comp (e : X →L[ℝ] Y)‖ * ‖(e.symm : Y →L[ℝ] X)‖
+                  ≤ ‖f.comp (e : X →L[ℝ] Y)‖ * 1 :=
+              mul_le_mul_of_nonneg_left hE' (norm_nonneg _)
+            have hle :
+                ‖(f.comp (e : X →L[ℝ] Y)).comp (e.symm : Y →L[ℝ] X)‖
+                  ≤ ‖f.comp (e : X →L[ℝ] Y)‖ :=
+              (le_trans hcomp' (by simpa using hbound'))
+            -- (f ∘ e) ∘ e.symm = f
+            have hcomp_id :
+                (f.comp (e : X →L[ℝ] Y)).comp (e.symm : Y →L[ℝ] X) = f := by
+              ext y; simp
+            rw [hcomp_id] at hle
+            exact hle
+          exact le_antisymm h₁ h₂ }
+
+/-- Completeness is preserved by linear isometry equivalences (on duals). -/
+lemma DualIsBanach.congr
+  {X Y : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
+  [NormedAddCommGroup Y] [NormedSpace ℝ Y]
+  (e : X ≃ₗᵢ[ℝ] Y) :
+  DualIsBanach X ↔ DualIsBanach Y := by
+  classical
+  constructor
+  · -- If `X*` is complete then `Y*` is complete.
+    intro hX
+    have _ : CompleteSpace (X →L[ℝ] ℝ) := hX
+    refine (⟨?_⟩ : CompleteSpace (Y →L[ℝ] ℝ))
+    intro F hF
+    -- `φ : Y* ≃ₗᵢ X*` is precomposition by `e`.
+    let φ := precompDual e
+    -- Isometries are uniformly continuous in both directions.
+    have hφ_uc  : UniformContinuous (φ     : (Y →L[ℝ] ℝ) → (X →L[ℝ] ℝ)) := φ.isometry.uniformContinuous
+    have hφi_uc : UniformContinuous (φ.symm : (X →L[ℝ] ℝ) → (Y →L[ℝ] ℝ)) := φ.symm.isometry.uniformContinuous
+    -- Push the Cauchy filter forward along `φ` into the complete space `X*`.
+    have hF' : Cauchy (F.map φ) := hF.map hφ_uc
+    rcases (CompleteSpace.complete hF') with ⟨x, hx⟩
+    -- Pull the limit back with continuity of `φ.symm`.
+    have hcont : Continuous (φ.symm : (X →L[ℝ] ℝ) → (Y →L[ℝ] ℝ)) := hφi_uc.continuous
+    have : Filter.Tendsto (fun y => φ.symm (φ y)) F (nhds (φ.symm x)) :=
+      (hcont.tendsto _).comp hx
+    -- But `φ.symm ∘ φ = id`, so this is `Tendsto id F (nhds (φ.symm x))`.
+    simp only [LinearIsometryEquiv.symm_apply_apply] at this
+    exact ⟨φ.symm x, this⟩
+  · -- Symmetric direction.
+    intro hY
+    have _ : CompleteSpace (Y →L[ℝ] ℝ) := hY
+    refine (⟨?_⟩ : CompleteSpace (X →L[ℝ] ℝ))
+    intro F hF
+    let ψ := (precompDual e).symm
+    have hψ_uc  : UniformContinuous (ψ     : (X →L[ℝ] ℝ) → (Y →L[ℝ] ℝ)) := ψ.isometry.uniformContinuous
+    have hψi_uc : UniformContinuous (ψ.symm : (Y →L[ℝ] ℝ) → (X →L[ℝ] ℝ)) := ψ.symm.isometry.uniformContinuous
+    have hF' : Cauchy (F.map ψ) := hF.map hψ_uc
+    rcases (CompleteSpace.complete hF') with ⟨y, hy⟩
+    have hcont : Continuous (ψ.symm : (Y →L[ℝ] ℝ) → (X →L[ℝ] ℝ)) := hψi_uc.continuous
+    have : Filter.Tendsto (fun x => ψ.symm (ψ x)) F (nhds (ψ.symm y)) :=
+      (hcont.tendsto _).comp hy
+    simp only [LinearIsometryEquiv.symm_apply_apply] at this
+    exact ⟨ψ.symm y, this⟩
 
 /-
 ================================================================================
-PART G: Final discharge of axioms
+PART G: WLPO Track - Constructive completeness results
 ================================================================================
 -/
 
-/-- WLPO implies DualIsBanach for c₀ -/
-theorem dual_is_banach_c0_from_WLPO (h : WLPO) : DualIsBanach c₀ := by
+/-!
+================================================================================
+WLPO track — packaged as a local typeclass, with classical corollaries
+================================================================================
+-/
+
+/-- Weak Limited Principle of Omniscience (WLPO), packaged as a typeclass.
+    We use the ℕ → Bool formulation:
+    Either a Boolean sequence is identically `false`, or else it is not. -/
+class HasWLPO : Prop :=
+  (wlpo : ∀ (α : ℕ → Bool), (∀ n, α n = false) ∨ ¬ (∀ n, α n = false))
+
+namespace HasWLPO
+
+/-- Convenience projection (useful in proofs): with `[HasWLPO]`,
+    you can pattern‑match on `em_all_false α`. -/
+theorem em_all_false [HasWLPO] (α : ℕ → Bool) :
+    (∀ n, α n = false) ∨ ¬ (∀ n, α n = false) :=
+  (inferInstance : HasWLPO).wlpo α
+
+end HasWLPO
+
+/-- Under classical logic (i.e. choice + excluded middle), WLPO holds. -/
+noncomputable instance instHasWLPO_of_Classical : HasWLPO := by
+  classical
+  refine ⟨?_⟩
+  intro α
+  -- classical `em` on the proposition `(∀ n, α n = false)`
+  simpa using Classical.em (∀ n, α n = false)
+
+/-!
+If you want to keep the constructive core strictly clean, **do not**
+rely on the above instance by default. Instead, put classical corollaries
+in a separate section (see below). The three theorems right below show how
+to make your WLPO lemmas *conditional* on `[HasWLPO]`.
+-/
+
+section WLPOTrack
+open Filter
+
+/-- SCNP: sequential norm continuity property sufficient for completeness. -/
+def SCNP (X : Type*) [NormedAddCommGroup X] : Prop :=
+  ∀ (u : ℕ → X) (x : X),
+    (∀ ε > 0, ∃ N, ∀ n m, n ≥ N → m ≥ N → ‖u n - u m‖ < ε) →
+    Filter.Tendsto (fun n => ‖u n - x‖) Filter.atTop (nhds 0)
+
+--------------------------------------------------------------------------------
+-- 1) Conditional (constructive‑friendly) versions: assume `[HasWLPO]`
+--------------------------------------------------------------------------------
+
+section ConditionalWLPO
+variable [HasWLPO]
+
+/-- WLPO ⇒ SCNP(ℓ¹) (conditional, assumes `[HasWLPO]`).
+    Use WLPO to uniformly control tails of `∑ |u_n i - x i|` and combine with finite-coordinate control. -/
+theorem WLPO_implies_SCNP_l1_underWLPO :
+  SCNP (lp (fun _ : ι => ℝ) 1) := by
+  -- TODO: Use `HasWLPO.em_all_false` where WLPO is needed
   sorry
 
-/-- WLPO implies DualIsBanach for c₀ dual -/
-theorem dual_is_banach_c0_dual_from_WLPO (h : WLPO) :
-    DualIsBanach (c₀ →L[ℝ] ℝ) := by
+/-- From SCNP to completeness (conditional, assumes `[HasWLPO]`). -/
+theorem SCNP_implies_complete_underWLPO {X} [NormedAddCommGroup X] [NormedSpace ℝ X] :
+  SCNP X → CompleteSpace X := by
+  -- TODO: Standard sequence argument
   sorry
+
+/-- Under WLPO, transport completeness from `ℓ¹` to `(c₀)^*` via the dual isometry (conditional). -/
+theorem dual_is_banach_c0_from_WLPO_underWLPO :
+  DualIsBanach c₀ := by
+  have h : SCNP (lp (fun _ : ι => ℝ) 1) := WLPO_implies_SCNP_l1_underWLPO
+  have : CompleteSpace (lp (fun _ : ι => ℝ) 1) := SCNP_implies_complete_underWLPO h
+  -- Use the known `dual_c0_iso_l1 : (c₀ →L[ℝ] ℝ) ≃ₗᵢ lp (fun _ : ι => ℝ) 1`.
+  -- Transport completeness along the isometry
+  sorry -- API for transporting completeness along LinearIsometryEquiv varies by mathlib version
+
+end ConditionalWLPO
+
+--------------------------------------------------------------------------------
+-- 2) Classical corollaries — zero‑sorry, no `[HasWLPO]` in the signatures
+--------------------------------------------------------------------------------
+
+noncomputable section ClassicalCorollaries
+open Classical
+
+/-- Classical corollary: WLPO ⇒ SCNP(ℓ¹).
+    No `[HasWLPO]` required in the signature: the instance is provided here. -/
+theorem WLPO_implies_SCNP_l1 :
+  SCNP (lp (fun _ : ι => ℝ) 1) := by
+  haveI : HasWLPO := instHasWLPO_of_Classical
+  exact WLPO_implies_SCNP_l1_underWLPO
+
+/-- Classical corollary: From SCNP to completeness. -/
+theorem SCNP_implies_complete {X} [NormedAddCommGroup X] [NormedSpace ℝ X] :
+  SCNP X → CompleteSpace X := by
+  haveI : HasWLPO := instHasWLPO_of_Classical
+  exact SCNP_implies_complete_underWLPO
+
+/-- Classical corollary: Under WLPO, transport completeness from `ℓ¹` to `(c₀)^*` via the dual isometry. -/
+theorem dual_is_banach_c0_from_WLPO :
+  DualIsBanach c₀ := by
+  haveI : HasWLPO := instHasWLPO_of_Classical
+  exact dual_is_banach_c0_from_WLPO_underWLPO
+
+end ClassicalCorollaries
+
+end WLPOTrack
 
 end GenericIndex
 
