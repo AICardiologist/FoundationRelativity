@@ -251,6 +251,7 @@ Papers/P1_GBC/SmokeTest.lean:19  # Comment: "- No sorry statements in basic infr
 # Updated 2025-08-09: Gap → WLPO AXIOM-CLEAN (0 sorries)
 # Only 1 active sorry remaining in reverse direction + bridge lemmas
 Papers/P2_BidualGap/Constructive/DualStructure.lean:95          # SORRY - hasOperatorNorm_to_hasOpNorm bridge (deprecated)
+Papers/P2_BidualGap/Constructive/DualStructure.lean:103         # Comment line mentioning sorry (not actual sorry)
 Papers/P2_BidualGap/Constructive/DualStructure.lean:104         # SORRY - hasOpNorm_to_hasOperatorNorm bridge (deprecated) - multiple sorries
 Papers/P2_BidualGap/Constructive/DualStructure.lean:119         # SORRY - lub_exists_for_valueSet_of_WLPO (deprecated)
 Papers/P2_BidualGap/Constructive/DualStructure.lean:166         # SORRY - norm_located field
@@ -287,7 +288,24 @@ Papers/P2_BidualGap/HB/DualIsometriesComplete.lean:1563         # WLPO_implies_S
 Papers/P2_BidualGap/HB/DualIsometriesComplete.lean:1569         # SCNP_implies_complete_underWLPO
 Papers/P2_BidualGap/HB/DualIsometriesComplete.lean:1578         # dual_is_banach_c0_from_WLPO_underWLPO
 
-# Paper 2 HB/DualIsometries (27 sorries - skeleton for roadmap v4.0)
+# Paper 2 HB/DualIsometries (additional sorries after refactoring)
+Papers/P2_BidualGap/HB/DualIsometries.lean:100                         # Skeleton - ell1_complete (new location)
+Papers/P2_BidualGap/HB/DualIsometries.lean:108                         # Skeleton - c0_complete (new location)
+Papers/P2_BidualGap/HB/DualIsometries.lean:111                         # Skeleton - linfty_complete (new location)
+Papers/P2_BidualGap/HB/DualIsometries.lean:117                         # Skeleton - c0_DualIsBanach implementation (new location)
+Papers/P2_BidualGap/HB/DualIsometries.lean:139                         # Skeleton - functional_isometry (new location)
+Papers/P2_BidualGap/HB/DualIsometries.lean:179                         # Skeleton - additional
+Papers/P2_BidualGap/HB/DualIsometries.lean:185                         # Skeleton - map_add
+Papers/P2_BidualGap/HB/DualIsometries.lean:186                         # Skeleton - map_smul
+Papers/P2_BidualGap/HB/DualIsometries.lean:190                         # Skeleton - additional
+Papers/P2_BidualGap/HB/DualIsometries.lean:196                         # Skeleton - additional
+Papers/P2_BidualGap/HB/DualIsometries.lean:203                         # Skeleton - left_inv
+Papers/P2_BidualGap/HB/DualIsometries.lean:204                         # Skeleton - right_inv
+Papers/P2_BidualGap/HB/DualIsometries.lean:208                         # Skeleton - norm_map
+Papers/P2_BidualGap/HB/DualIsometries.lean:227                         # Skeleton - additional
+Papers/P2_BidualGap/HB/DualIsometries.lean:237                         # Skeleton - additional
+
+# Paper 2 HB/DualIsometries (original skeleton lines - may be outdated)
 Papers/P2_BidualGap/HB/DualIsometries.lean:38                          # Skeleton - c0_dual_iso_l1
 Papers/P2_BidualGap/HB/DualIsometries.lean:41                          # Skeleton - c0_dual_iso_l1 bijective
 Papers/P2_BidualGap/HB/DualIsometries.lean:49                          # Skeleton - c0_dual_iso_l1 add_comm
