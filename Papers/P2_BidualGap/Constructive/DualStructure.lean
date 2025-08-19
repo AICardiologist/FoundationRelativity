@@ -151,12 +151,36 @@ theorem dual_is_banach_of_WLPO
   (hWLPO : WLPO) :
   ∀ (X : Type*) [NormedAddCommGroup X] [NormedSpace ℝ X] [CompleteSpace X],
     DualIsBanach X := by
-  -- We implement this via two micro-lemmas below.
+  -- We implement this via providing all required fields
   intro X _ _ _
   refine
-  { closed_add := ?closed,
-    complete_normable_dual := ?complete }
-  · -- closure under addition, reduced to existential `add_IsLUB_of_WLPO`
+  { norm_located := ?norm_located,
+    norm_attained := ?norm_attained,
+    complete := ?complete,
+    closed_zero := ?closed_zero,
+    closed_neg := ?closed_neg,
+    closed_smul := ?closed_smul,
+    closed_add := ?closed_add }
+  case norm_located =>
+    -- The operator norm is located (approximable within ε)
+    sorry
+  case norm_attained =>
+    -- The operator norm is approximately attained
+    sorry  
+  case complete =>
+    -- The dual space is complete under the operator norm
+    sorry
+  case closed_zero =>
+    -- Zero has an operator norm
+    sorry
+  case closed_neg =>
+    -- Negation preserves having operator norm
+    sorry
+  case closed_smul =>
+    -- Scalar multiplication preserves having operator norm
+    sorry
+  case closed_add =>
+    -- closure under addition, reduced to existential `add_IsLUB_of_WLPO`
     intro f g hf hg
     -- Convert from Basic.lean HasOperatorNorm to OpNorm.HasOpNorm
     -- Use the bridge lemmas
@@ -168,9 +192,6 @@ theorem dual_is_banach_of_WLPO
     obtain ⟨r, hLUBsum⟩ := add_IsLUB_of_WLPO hWLPO f g ⟨rf, hLUBf⟩ ⟨rg, hLUBg⟩
     -- Convert back to the Basic predicate:
     exact hasOpNorm_to_hasOperatorNorm (f + g) ⟨r, hLUBsum⟩
-  case complete =>
-    -- completeness of the normable dual, Prop-only placeholder
-    trivial
 
 /-- Helper for bidual gaps: if WLPO holds, both X and X* have constructive Banach duals. -/
 theorem duals_banach_of_WLPO

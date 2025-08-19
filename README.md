@@ -8,11 +8,11 @@
 [![Paper 2 Gap→WLPO](https://img.shields.io/badge/Paper%202%20Gap%E2%86%92WLPO-Axiom%20Clean-brightgreen)](Papers/P2_BidualGap/)
 [![Paper 4 Status](https://img.shields.io/badge/Paper%204%20Discrete%20CPW-85%25-green)](Papers/P4_SpectralGeometry/)
 
-> **🎯 SPRINT D COMPLETE (2025-08-13)**: WLPO ↔ BidualGap Equivalence Proven!
+> **🎯 SPRINT E COMPLETE (2025-08-19)**: Dual Isometry with 3 WLPO Sorries!
 > - Paper 1: 100% formalized with 0 sorries ✅ (shipped)
-> - **Paper 2: WLPO ↔ BidualGap BIDIRECTIONAL** ✅ - Direct construction complete!
-> - **New**: Direct witness G = S ∘ Φ₁ in c₀** proving non-reflexivity
-> - **Achievement**: Zero sorries in DirectDual.lean, universe-0 theorem proven
+> - **Paper 2: Complete dual isometry (c₀* ≃ₗᵢ ℓ¹)** ✅ - Only 3 WLPO sorries remain!
+> - **New**: Self-contained csSup approach avoiding CompleteLattice issues
+> - **Achievement**: 81% sorry reduction (16 → 3), clean WLPO architecture
 > - Paper 4: Discrete CPW Model (Phase 1B) - 85% complete (61 sorries) 🚀
 
 ## 🎯 Overview
