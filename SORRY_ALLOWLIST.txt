@@ -287,54 +287,38 @@ Papers/P2_BidualGap/Constructive/CReal_obsolete/Completeness.lean:151  # CReal i
 Papers/P2_BidualGap/HB/DualIsometriesComplete.lean:1563         # WLPO_implies_SCNP_l1_underWLPO
 Papers/P2_BidualGap/HB/DualIsometriesComplete.lean:1569         # SCNP_implies_complete_underWLPO
 Papers/P2_BidualGap/HB/DualIsometriesComplete.lean:1578         # dual_is_banach_c0_from_WLPO_underWLPO
+Papers/P2_BidualGap/HB/DualIsometriesComplete.lean:1583         # Comment line mentioning sorry (not actual sorry)
 
-# Paper 2 HB/DualIsometries (additional sorries after refactoring)
-Papers/P2_BidualGap/HB/DualIsometries.lean:100                         # Skeleton - ell1_complete (new location)
-Papers/P2_BidualGap/HB/DualIsometries.lean:108                         # Skeleton - c0_complete (new location)
-Papers/P2_BidualGap/HB/DualIsometries.lean:111                         # Skeleton - linfty_complete (new location)
-Papers/P2_BidualGap/HB/DualIsometries.lean:117                         # Skeleton - c0_DualIsBanach implementation (new location)
-Papers/P2_BidualGap/HB/DualIsometries.lean:139                         # Skeleton - functional_isometry (new location)
-Papers/P2_BidualGap/HB/DualIsometries.lean:179                         # Skeleton - additional
+# Paper 2 HB/DualIsometries (complete list after refactoring)
+Papers/P2_BidualGap/HB/DualIsometries.lean:76                          # Skeleton
+Papers/P2_BidualGap/HB/DualIsometries.lean:79                          # Skeleton
+Papers/P2_BidualGap/HB/DualIsometries.lean:81                          # Skeleton
+Papers/P2_BidualGap/HB/DualIsometries.lean:94                          # Skeleton
+Papers/P2_BidualGap/HB/DualIsometries.lean:95                          # Skeleton
+Papers/P2_BidualGap/HB/DualIsometries.lean:96                          # Skeleton
+Papers/P2_BidualGap/HB/DualIsometries.lean:100                         # Skeleton - ell1_complete
+Papers/P2_BidualGap/HB/DualIsometries.lean:108                         # Skeleton - c0_complete
+Papers/P2_BidualGap/HB/DualIsometries.lean:111                         # Skeleton - linfty_complete
+Papers/P2_BidualGap/HB/DualIsometries.lean:116                         # Skeleton
+Papers/P2_BidualGap/HB/DualIsometries.lean:124                         # Skeleton
+Papers/P2_BidualGap/HB/DualIsometries.lean:134                         # Skeleton
+Papers/P2_BidualGap/HB/DualIsometries.lean:138                         # Skeleton
+Papers/P2_BidualGap/HB/DualIsometries.lean:144                         # Skeleton
+Papers/P2_BidualGap/HB/DualIsometries.lean:166                         # Skeleton
+Papers/P2_BidualGap/HB/DualIsometries.lean:173                         # Skeleton
+Papers/P2_BidualGap/HB/DualIsometries.lean:174                         # Skeleton
+Papers/P2_BidualGap/HB/DualIsometries.lean:175                         # Skeleton
+Papers/P2_BidualGap/HB/DualIsometries.lean:179                         # Skeleton
 Papers/P2_BidualGap/HB/DualIsometries.lean:185                         # Skeleton - map_add
 Papers/P2_BidualGap/HB/DualIsometries.lean:186                         # Skeleton - map_smul
-Papers/P2_BidualGap/HB/DualIsometries.lean:190                         # Skeleton - additional
-Papers/P2_BidualGap/HB/DualIsometries.lean:196                         # Skeleton - additional
+Papers/P2_BidualGap/HB/DualIsometries.lean:190                         # Skeleton
+Papers/P2_BidualGap/HB/DualIsometries.lean:196                         # Skeleton
 Papers/P2_BidualGap/HB/DualIsometries.lean:203                         # Skeleton - left_inv
 Papers/P2_BidualGap/HB/DualIsometries.lean:204                         # Skeleton - right_inv
 Papers/P2_BidualGap/HB/DualIsometries.lean:208                         # Skeleton - norm_map
-Papers/P2_BidualGap/HB/DualIsometries.lean:227                         # Skeleton - additional
-Papers/P2_BidualGap/HB/DualIsometries.lean:237                         # Skeleton - additional
+Papers/P2_BidualGap/HB/DualIsometries.lean:227                         # Skeleton
+Papers/P2_BidualGap/HB/DualIsometries.lean:237                         # Skeleton
 
-# Paper 2 HB/DualIsometries (original skeleton lines - may be outdated)
-Papers/P2_BidualGap/HB/DualIsometries.lean:38                          # Skeleton - c0_dual_iso_l1
-Papers/P2_BidualGap/HB/DualIsometries.lean:41                          # Skeleton - c0_dual_iso_l1 bijective
-Papers/P2_BidualGap/HB/DualIsometries.lean:49                          # Skeleton - c0_dual_iso_l1 add_comm
-Papers/P2_BidualGap/HB/DualIsometries.lean:58                          # Skeleton - c0_dual_iso_l1 smul_comm
-Papers/P2_BidualGap/HB/DualIsometries.lean:66                          # Skeleton - c0_dual_iso_l1 norm_map
-Papers/P2_BidualGap/HB/DualIsometries.lean:67                          # Skeleton - c0_dual_iso_l1 apply_symm_apply
-Papers/P2_BidualGap/HB/DualIsometries.lean:68                          # Skeleton - c0_dual_iso_l1 symm_apply_apply
-Papers/P2_BidualGap/HB/DualIsometries.lean:72                          # Skeleton - l1_dual_iso_linf
-Papers/P2_BidualGap/HB/DualIsometries.lean:80                          # Skeleton - l1_dual_iso_linf add_comm
-Papers/P2_BidualGap/HB/DualIsometries.lean:83                          # Skeleton - l1_dual_iso_linf smul_comm
-Papers/P2_BidualGap/HB/DualIsometries.lean:88                          # Skeleton - l1_dual_iso_linf norm_map
-Papers/P2_BidualGap/HB/DualIsometries.lean:96                          # Skeleton - ell1_complete
-Papers/P2_BidualGap/HB/DualIsometries.lean:106                         # Skeleton - c0_complete
-Papers/P2_BidualGap/HB/DualIsometries.lean:110                         # Skeleton - linfty_complete
-Papers/P2_BidualGap/HB/DualIsometries.lean:116                         # Skeleton - c0_DualIsBanach implementation
-Papers/P2_BidualGap/HB/DualIsometries.lean:138                         # Skeleton - functional_isometry
-Papers/P2_BidualGap/HB/DualIsometries.lean:145                         # Skeleton - linear_isometry_construction
-Papers/P2_BidualGap/HB/DualIsometries.lean:146                         # Skeleton - check_bijective
-Papers/P2_BidualGap/HB/DualIsometries.lean:147                         # Skeleton - norm_map check
-Papers/P2_BidualGap/HB/DualIsometries.lean:151                         # Skeleton - ell1_banach_proof
-Papers/P2_BidualGap/HB/DualIsometries.lean:157                         # Skeleton - functional_isometry_for_proof
-Papers/P2_BidualGap/HB/DualIsometries.lean:158                         # Skeleton - norm_equality
-Papers/P2_BidualGap/HB/DualIsometries.lean:162                         # Skeleton - l1_DualIsBanach implementation
-Papers/P2_BidualGap/HB/DualIsometries.lean:168                         # Skeleton - c0_bidual_iso_linf
-Papers/P2_BidualGap/HB/DualIsometries.lean:175                         # Skeleton - l1_dual_iso_linf surj
-Papers/P2_BidualGap/HB/DualIsometries.lean:176                         # Skeleton - l1_dual_iso_linf inj
-Papers/P2_BidualGap/HB/DualIsometries.lean:180                         # Skeleton - c0_bidual_not_iso_c0
-Papers/P2_BidualGap/HB/DualIsometries.lean:199                         # Skeleton - roadmap_axiom_discharge
-Papers/P2_BidualGap/HB/DualIsometries.lean:209                         # Skeleton - Main theorem from axiom discharge
 
 # Paper 2 orphaned file
 Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:30                             # Orphaned file - not imported
