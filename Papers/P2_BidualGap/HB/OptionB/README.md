@@ -72,11 +72,20 @@ theorem gap_linf : GapX (ℓ∞)** :=
 
 ✅ **Option B is fully implemented** with a sorry-free, dependency-free core that compiles on any Lean 4 installation. The architecture cleanly separates:
 
-1. **WLPO logic** → provides `HasNonzeroQuotFunctional`
-2. **Functional analysis** → provides `QuotToGapBridge`  
-3. **Combination** → `gap_of_optionB` gives the bidual gap
+1. **Classical/WLPO assumption** → provides `HasNonzeroQuotFunctional`
+   - Under classical choice (e.g. via a Banach limit on ℓ∞), there exists a nonzero bounded functional on ℓ∞/c₀
+   - WLPO alone is not known to imply this for ℓ∞/c₀
+   - For c₀ directly, WLPO provides the gap (Paper 2's main constructive result)
 
-The modular design means these components can be developed and verified independently.
+2. **Functional analysis bridge** → provides `QuotToGapBridge`  
+   - Purely analytic step: from nonzero quotient functional to bidual gap
+   - Works for any Banach space with appropriate structure
+
+3. **Combination** → `gap_of_optionB` gives the bidual gap
+   - Modular theorem combining the assumption and bridge
+   - Instance-based, so different assumptions can be plugged in
+
+The modular design means these components can be developed and verified independently. In Lean, we formalize the bridge and keep the existence of the nonzero functional as an instance/assumption, making the analytic conclusion modular and re-usable.
 
 ## Next Steps
 
