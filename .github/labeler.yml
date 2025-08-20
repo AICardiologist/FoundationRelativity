@@ -1,0 +1,56 @@
+# Automatic PR labeling based on changed files
+# Used by labeler GitHub Action
+
+paper:1:
+  - changed-files:
+    - any-glob-to-any-file: 'Papers/P1_GBC/**'
+
+paper:2:
+  - changed-files:
+    - any-glob-to-any-file: 'Papers/P2_BidualGap/**'
+
+paper:3:
+  - changed-files:
+    - any-glob-to-any-file: 'Papers/P3_2CatFramework/**'
+
+infrastructure:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/**'
+      - 'scripts/**'
+      - 'lakefile.lean'
+      - 'lean-toolchain'
+      - 'lake-manifest.json'
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.md'
+      - 'docs/**'
+      - '**/documentation/**'
+
+ci:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/workflows/**'
+      - 'scripts/check*.sh'
+      - 'scripts/no_sorry*.sh'
+
+tests:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/test/**'
+      - '**/tests/**'
+      - '**/*_test.lean'
+
+wip:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/WIP/**'
+      - '**/wip/**'
+
+examples:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/examples/**'
+      - '**/Examples/**'

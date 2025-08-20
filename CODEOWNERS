@@ -1,0 +1,21 @@
+# Foundation-Relativity Project Code Ownership
+# These owners will be automatically requested for review when someone
+# opens a pull request that modifies code they own.
+
+# Global owners (fallback)
+* @AICardiologist
+
+# Paper-specific ownership
+Papers/P1_GBC/**       @AICardiologist
+Papers/P2_BidualGap/** @AICardiologist  
+Papers/P3_2CatFramework/** @AICardiologist
+
+# Infrastructure
+.github/** @AICardiologist
+scripts/** @AICardiologist
+lakefile.lean @AICardiologist
+lean-toolchain @AICardiologist
+
+# Core libraries
+CategoryTheory/** @AICardiologist
+LogicDSL/** @AICardiologist

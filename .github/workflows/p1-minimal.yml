@@ -1,0 +1,42 @@
+name: Paper1-Minimal
+
+on:
+  push:
+    paths: 
+      - 'Papers/P1_GBC/**'
+      - 'lean-toolchain'
+      - 'lakefile.lean'
+      - 'scripts/**'
+      - '.github/workflows/p1-minimal.yml'
+  pull_request:
+    paths: 
+      - 'Papers/P1_GBC/**'
+      - 'lean-toolchain'
+      - 'lakefile.lean'
+      - 'scripts/**'
+      - '.github/workflows/p1-minimal.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+      
+      - name: Cache .lake
+        uses: actions/cache@v4
+        with:
+          path: .lake
+          key: ${{ runner.os }}-lake-p1-${{ hashFiles('lake-manifest.json') }}-v1
+      
+      - name: Build P1 minimal target
+        run: |
+          lake update
+          lake exe cache get || true
+          lake build Papers.P1_GBC.P1_Minimal
+      
+      - name: Verify no sorries for P1
+        run: ./scripts/no_sorry_p1_minimal.sh
