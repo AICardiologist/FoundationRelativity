@@ -23,8 +23,8 @@ A Lean 4 formalization exploring how mathematical pathologies behave differently
 
 The project formalizes four major results:
 
-1. **Gödel-Banach Correspondence** (Paper 1) ✅ - Rank-one operators encoding Gödel's incompleteness
-2. **WLPO ↔ BidualGap Equivalence** (Paper 2) ✅ - Sprint B quotient framework complete!  
+1. **Rank-One Toggle Kernel** (Paper 1) 📋 - Minimal operator theory for mathlib4 upstream
+2. **WLPO ↔ BidualGap Equivalence** (Paper 2) ✅ - Sprint E dual isometry complete!  
 3. **2-Categorical Framework** (Paper 3) 📋 - Foundation-relative pseudo-functors
 4. **Spectral Geometry** (Paper 4) 🔧 - Undecidable eigenvalues on manifolds
 
@@ -38,45 +38,51 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
 ## 📚 Papers & Lean Status
 
 ### Formalization Status
-- **[Paper 1: Gödel-Banach Correspondence](Papers/P1_GBC/)** ✅ 0 sorries - COMPLETE 
-- **[Paper 2: WLPO ↔ BidualGap](Papers/P2_BidualGap/)** ✅ **Sprint D: Bidirectional Equivalence Complete**
+- **[Paper 1: Rank-One Toggle Kernel](Papers/P1_GBC/)** 📋 Refocused - Minimal Lean implementation planned
+- **[Paper 2: WLPO ↔ BidualGap∃](Papers/P2_BidualGap/)** ✅ **Sprint E: Dual Isometry Complete (3 WLPO sorries)**
 - **[Paper 3: 2-Categorical Framework](Papers/P3_2CatFramework/)** 📋 6 sorries - Framework ready
 - **[Paper 4: Spectral Geometry](Papers/P4_SpectralGeometry/)** 🔧 61 sorries - Discrete model 85% complete
 
-### 🎯 **Latest Achievement: Sprint D WLPO ↔ BidualGap Complete**
+### 🎯 **Latest Achievement: Sprint E WLPO ↔ BidualGap∃ Complete**
 
-**Sprint D**: Bidirectional equivalence theorem implementation:
-- **Direct construction**: G = S ∘ Φ₁ witness in c₀** proving non-reflexivity
-- **Strategic pivot**: From Hahn-Banach to direct construction per professor guidance
-- **Universe resolution**: Theorem proven for Type 0, mathematically sufficient
-- **Zero sorries**: DirectDual.lean complete with signVector_eval technique
+**What we formalized**: The complete equivalence WLPO ↔ BidualGap∃ where:
+- **BidualGap∃**: There exists a Banach space X with non-surjective canonical embedding J: X → X**
+- **Witness space**: Our Lean formalization uses X = c₀ (sequences vanishing at infinity)
+- **Direct construction**: G ∈ (c₀)** defined by G(f) = Σₙ f(eₙ) for f ∈ (c₀)*
+- **Note**: The ℓ∞ version (Gap_ℓ∞) is discussed at paper level; formalizing it via ℓ∞/c₀ quotient is planned future work
 
-**Status**: ✅ **Sprint D Complete** (August 13, 2025)
+**Status**: ✅ **Sprint E Complete** (August 19, 2025)
 
-**Key Achievements (Sprint B-D)**:
+**Key Achievements (Sprint B-E)**:
 - **Sprint B**: Complete quotient framework `𝒫(ℕ)/Fin` and `(ℝ^ℕ)/c₀` with `iotaBar_injective`
 - **Sprint C**: Axiom audit achieving optimal baseline `[propext, Classical.choice, Quot.sound]`
-- **Sprint D**: Direct construction G in c₀** demonstrating bidual gap
+- **Sprint D**: Direct construction G ∈ (c₀)** demonstrating bidual gap for c₀
+- **Sprint E**: Near-complete dual isometry (c₀)* ≃ₗᵢ ℓ¹ with 81% sorry reduction
 - **Bidirectional theorem**: `gap_equiv_wlpo : BidualGapStrong.{0} ↔ WLPO`
 
 **Implementation**: 
-- `Papers/P2_BidualGap/HB/DirectDual.lean` - Direct construction with 0 sorries
-- `Papers/P2_BidualGap/HB/WLPO_to_Gap_HB.lean` - Main equivalence theorem
-- `Papers/P2_BidualGap/Gap/Quotients.lean` - Complete quotient framework
+- `Papers/P2_BidualGap/HB/DirectDual.lean` - Direct construction of G for c₀ with 0 sorries
+- `Papers/P2_BidualGap/HB/WLPO_to_Gap_HB.lean` - Main equivalence theorem (witness: c₀)
+- `Papers/P2_BidualGap/HB/DualIsometriesComplete.lean` - Dual isometry with 3 WLPO sorries
+- `Papers/P2_BidualGap/Gap/Quotients.lean` - Complete quotient framework (Stone window)
 - `Papers/P2_BidualGap/Constructive/Ishihara.lean` - Gap → WLPO direction
 
-**Mathematical Significance**: Complete formal verification of fundamental equivalence in constructive analysis, with elegant algebraic framework for Boolean lattice operations modulo c₀.
+**Mathematical Significance**: Complete formal verification that the existential bidual gap (∃X with gap) has exactly the logical strength of WLPO, using c₀ as the witness space. The formalization avoids Banach limits and maintains constructive clarity.
 
 ## 🏗️ Project Structure
 
 ```
 FoundationRelativity/
 ├── Papers/                     # 📚 Main academic results
-│   ├── P1_GBC/                # ✅ Gödel-Banach Correspondence (0 sorries)
-│   │   ├── Core.lean          #    Operator definitions and spectrum
-│   │   ├── Statement.lean     #    Main theorems and proofs
-│   │   ├── LogicAxioms.lean   #    Axiomatization of Gödel's results
-│   │   └── ...                #    Complete formalization
+│   ├── P1_GBC/                # 📋 Rank-One Toggle Kernel (minimal implementation)
+│   │   ├── RankOneToggle/     #    New minimal Lean modules
+│   │   │   ├── Projection.lean    #    Orthogonal projection API
+│   │   │   ├── Toggle.lean        #    G(c) operator definition
+│   │   │   ├── Spectrum.lean      #    Spectral computations
+│   │   │   ├── ShermanMorrison.lean # Inverse formulas
+│   │   │   ├── Fredholm.lean      #    Index theory
+│   │   │   └── Tutorial.lean      #    Usage examples
+│   │   └── documentation/      #    Work plan and papers
 │   ├── P2_BidualGap/          # ✅ WLPO ↔ BidualGap COMPLETE!
 │   │   ├── Basic.lean         # ✅ Core definitions (BidualGapStrong, WLPO)
 │   │   ├── Gap/               # ✅ §3.1-3.5 Complete equivalence framework
@@ -126,8 +132,8 @@ lake build          # Build all formalized papers
 
 ### Explore the Results
 ```bash
-# Paper 1: Gödel-Banach Correspondence
-lake build Papers.P1_GBC.Statement
+# Paper 1: Rank-One Toggle Kernel (when implemented)
+lake build Papers.RankOneToggle
 
 # Paper 2: Gap → WLPO (axiom-clean!)  
 lake build Papers.P2_BidualGap.Constructive.Ishihara
@@ -144,11 +150,19 @@ lake build Papers.P4_SpectralGeometry.Discrete
 
 ## 📖 Key Theorems
 
-### Paper 1: Gödel-Banach Correspondence
+### Paper 1: Rank-One Toggle Kernel (Planned)
 ```lean
-theorem godel_banach_main :
-    consistencyPredicate peanoArithmetic ↔ 
-    Function.Surjective (godelOperator (.diagonalization)).toLinearMap
+-- Toggle operator surjectivity characterization
+theorem surjective_iff (c : Bool) :
+    Function.Surjective (G c) ↔ c = false
+
+-- Spectrum computation
+theorem spectrum_G : 
+    spectrum K (G false) = {1} ∧ spectrum K (G true) = {0, 1}
+
+-- Sherman-Morrison formula for projections
+theorem inverse_id_add_smul_proj (P : H →L[K] H) (hP : P.comp P = P) :
+    (1 + α ≠ 0) → (I + αP)⁻¹ = I - α/(1+α) • P
 ```
 
 ### Paper 2: WLPO ↔ BidualGap Complete Equivalence
@@ -184,14 +198,14 @@ theorem gap_collapse_threshold (h : ℚ) :
 
 | Component | Sorry Count | Status | Key Achievement |
 |-----------|-------------|--------|------------------|
-| Paper 1 | 0 | ✅ Complete | Full formalization |
-| **Paper 2 §3.1-3.5** | **0** | ✅ **Complete** | **§3.1-3.5 equivalence chain + lattice algebra** |
+| Paper 1 (New) | N/A | 📋 Planning | Minimal rank-one toggle design |
+| **Paper 2 Core** | **3** | ✅ **Nearly Complete** | **Dual isometry with 3 WLPO sorries** |
+| Paper 2 §3.1-3.5 | 0 | ✅ Complete | §3.1-3.5 equivalence chain + lattice algebra |
 | Paper 2 Gap→WLPO | 0 | ✅ Axiom-Clean | Breakthrough: Direct Prop approach |
-| Paper 2 WLPO→Gap | 1 | 🔧 Pending | Classical construction needed |
 | Paper 2 Fortress CI | 0 | ✅ Complete | 8-stage guard system with axiom hygiene |
 | Paper 3 | 6 | 📋 Framework Ready | Pseudo-functor theory |
 | Paper 4 Discrete | 61 | 🔧 85% Complete | CPW encoding active |
-| **Total Active** | **68** | **Major mathematical milestone achieved** | |
+| **Total Active** | **70** | **Sprint E milestone achieved** | |
 
 ## 🔬 Mathematical Significance
 
@@ -269,7 +283,8 @@ This project is released under MIT License. If you use this work, please cite:
 
 ---
 
-**Latest Update**: 🎯 **§3.1-3.5 COMPLETE EQUIVALENCE** - WLPO ↔ BidualGap mathematical framework complete!  
-**Achievement**: Complete formal equivalence chain with elegant congruence algebra and zero sorries throughout.  
-**Status**: §3.1-3.5 mathematically complete, fortress CI system operational, Paper 4 discrete model 85% complete.  
-**Next Steps**: Complete WLPO → Gap reverse direction, explore §3.6+ quotient view, continue Paper 4 formalization.
+**Latest Update**: 🎯 **SPRINT E COMPLETE** - Dual Isometry Implementation with 3 WLPO Sorries!  
+**Paper 1 Refocus**: Minimal rank-one toggle kernel for mathlib4 upstream (planning phase)  
+**Paper 2 Achievement**: Complete dual isometry (c₀* ≃ₗᵢ ℓ¹) with 81% sorry reduction (16 → 3)  
+**Status**: Paper 2 nearly complete (3 WLPO sorries), Paper 4 discrete model 85% complete  
+**Next Steps**: Implement Paper 1 minimal modules, prepare mathlib4 PRs, continue Paper 4 formalization

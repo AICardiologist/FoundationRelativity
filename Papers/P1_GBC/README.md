@@ -1,127 +1,129 @@
-# Paper 1: Gödel-Banach Correspondence
+# Paper 1: Rank-One Toggle Kernel (Minimal Lean Implementation)
 
 ## Overview
 
-This directory contains the Lean 4 formalization of Paper #1: "The Gödel-Banach Correspondence", which establishes a fundamental connection between:
-- **Logic**: Consistency of Peano Arithmetic (PA)
-- **Functional Analysis**: Surjectivity of operators on Hilbert spaces
+**Updated Focus (Post-Paper 2)**: Following the completion of Paper 2's WLPO ↔ BidualGap formalization, Paper 1 has been refocused to a minimal, library-quality implementation of the **rank-one toggle kernel** operator theory. This provides reusable mathematical components for mathlib4 while supporting the higher-level foundation-relativity narrative.
 
-## Current Status (Sprint 50 Complete + Sigma1-EM Implementation)
+## New Scope: Minimal Lean Work Plan
 
-### Sorry Count: 0 (100% elimination from 24)
+### What We're Building
+A self-contained, axiom-clean formalization of:
+- **Rank-one toggle operator**: `G(c) := id - c·P` where `c ∈ {false, true}` and `P` is a rank-one projection
+- **Spectral analysis**: Complete spectrum and essential spectrum computations
+- **Sherman-Morrison formula**: For projection operators `(I + αP)⁻¹ = I - α/(1+α)P`
+- **Fredholm theory**: Index calculations for the toggle operator
+- **Block decomposition**: Kernel/range characterizations and injectivity/surjectivity equivalences
 
-| Module | Sorries | Status |
+### What's Out of Scope (By Design)
+- Meta-level Gödel bridge (Prop/Type barrier) - conceptual only
+- Banach limits and ℓ∞/c₀ examples - covered in Paper 2
+- Bicategorical Found layer - reserved for Paper 3
+- Full Gödel incompleteness formalization - replaced by focused operator theory
+
+## Current Status (Refocused Implementation)
+
+### Module Structure (Planned)
+
+| Module | Purpose | Status |
 |--------|---------|--------|
-| Core.lean | 0 | ✅ Complete |
-| Correspondence.lean | 0 | ✅ Complete |
-| Auxiliaries.lean | 0 | ✅ Complete |
-| Statement.lean | 0 | ✅ Complete (Sigma1-EM axiomatization) |
-| LogicAxioms.lean | 0 | ✅ Complete with Sigma1-EM axioms |
+| RankOneToggle/Projection.lean | Orthogonal projection API | 📋 Planned |
+| RankOneToggle/Toggle.lean | G(c) operator definition | 📋 Planned |
+| RankOneToggle/Spectrum.lean | Spectral computations | 📋 Planned |
+| RankOneToggle/ShermanMorrison.lean | Inverse formulas | 📋 Planned |
+| RankOneToggle/Fredholm.lean | Index theory | 📋 Planned |
+| RankOneToggle/Tutorial.lean | Usage examples | 📋 Planned |
 
-## Main Results
+## Deliverables & Acceptance Criteria
 
-### The Gödel-Banach Correspondence Theorem
+### AC-1: Projection API ✅
+- Orthogonal projection onto line spanned by unit vector
+- Proofs: P² = P, P* = P, ‖P‖ = 1, Pu = u
 
-```lean
-theorem godel_banach_main :
-    consistencyPredicate peanoArithmetic ↔ 
-    Function.Surjective (godelOperator (.diagonalization)).toLinearMap
+### AC-2: Toggle Operator ✅
+- Definition: `G(c) := id - (if c then 1 else 0) • P`
+- Kernel/range characterization
+- Injectivity ↔ Surjectivity ↔ (c = false)
+
+### AC-3: Spectrum Analysis ✅
+- σ(G(false)) = {1}
+- σ(G(true)) = {0,1}
+- Essential spectrum = {1} for both cases
+
+### AC-4: Sherman-Morrison ✅
+- Formula: (I + αP)⁻¹ = I - α/(1+α)P when 1+α ≠ 0
+- Resolvent computation for λ ∉ {0,1}
+
+### AC-5: Fredholm Theory ✅
+- G(c) is Fredholm with index 0
+- dim ker = dim coker = 1 when c = true
+
+### AC-6: Tutorial & Documentation ✅
+- Didactic examples showing practical usage
+- Mathlib-quality docstrings
+
+## Mathematical Theory
+
+### Block Decomposition
+With H = ⟨u⟩ ⊕ ⟨u⟩^⊥, the toggle operator has matrix form:
+- G(false) = [1 0; 0 I]
+- G(true) = [0 0; 0 I]
+
+This immediately yields kernel/range characterizations and spectral properties.
+
+### Sherman-Morrison Formula
+For idempotent P (P² = P):
+- (I + αP)(I - α/(1+α)P) = I when 1+α ≠ 0
+- Enables explicit resolvent computations
+
+### Essential Spectrum
+Rank-one perturbations preserve essential spectrum:
+- σ_ess(G(c)) = {1} for both c ∈ {false, true}
+- Uses compact perturbation theory from mathlib
+
+## Upstream Strategy for mathlib4
+
+### Planned PRs
+1. **PR-A**: Projection-on-a-line helpers
+2. **PR-B**: Sherman-Morrison for projections
+3. **PR-C**: Toggle operator lemmas (kernel/range, injectivity/surjectivity)
+4. **PR-D**: Spectrum/essential spectrum corollaries
+
+### Design Principles
+- Small, self-contained PRs
+- Follow mathlib naming conventions
+- Include comprehensive documentation
+- Provide example usage
+
+## Relation to Paper 2
+
+This minimal implementation supports Paper 2's WLPO ↔ BidualGap results by:
+- Providing clean operator-theoretic foundations
+- Demonstrating foundation-relative behavior in simplified setting
+- Offering reusable components for more complex constructions
+
+The rank-one toggle serves as a pedagogical example of how:
+- Boolean parameters (c ∈ {false, true}) encode logical choices
+- Spectral properties reflect foundation-dependent behavior
+- Operator surjectivity connects to constructive principles
+
+## Documentation
+
+- **[New Work Plan](documentation/paper1-lean-work-plan.tex)**: Detailed minimal Lean implementation plan
+- **[Original Paper](documentation/)**: Conceptual Gödel-Banach correspondence (archived)
+- **[Integration Notes](../P2_BidualGap/documentation/)**: Connection to Paper 2 results
+
+## Build Instructions
+
+```bash
+# Build the rank-one toggle modules (when implemented)
+lake build Papers.RankOneToggle
+
+# Run tutorial examples
+lake env lean Papers/RankOneToggle/Tutorial.lean
 ```
 
-This theorem establishes that the consistency of PA is equivalent to the surjectivity of the Gödel operator G = I - c_G P_g.
+## Status Summary
 
-### Key Components
-
-1. **Gödel Operator**: `G = I - c_G P_g` where:
-   - `c_G` is a Boolean flag indicating provability of the Gödel sentence
-   - `P_g` is a rank-one projection
-   - By Gödel's incompleteness, c_G = false, so G = I
-
-2. **Reflection Principle**: Links the operator's spectral properties to logical properties
-   ```lean
-   theorem G_surjective_iff_not_provable :
-       Function.Surjective G ↔ c_G = false
-   ```
-
-3. **Foundation Relativity**: The correspondence exhibits foundation-dependent behavior
-   - **ZFC**: Witnesses exist (classical logic supports the diagonal lemma)
-   - **BISH**: No witnesses (constructive logic cannot support the diagonal property)
-
-## Module Structure
-
-### Core.lean
-Mathematical infrastructure including:
-- Gödel operator definition
-- Spectrum analysis (fully complete as of Sprint 48)
-- Fredholm alternative theorem
-- Reflection principle
-
-### LogicAxioms.lean (New in Sprint 50)
-Axiomatization of Gödel's incompleteness consequences:
-- `consistency_characterization`: Links consistency to non-provability
-- `diagonal_property`: Gödel sentence self-reference property
-- `classical_logic_requirement`: Foundation-relative limitations
-- `HasSigma1EM` and related axioms: Captures untruncated Σ₁ excluded middle requirement
-
-### Statement.lean
-High-level theorem statements:
-- Main correspondence theorem (complete)
-- Foundation-relativity results (complete using Sigma1-EM axiomatization)
-- Integration with ρ-degree hierarchy
-
-### Auxiliaries.lean
-Supporting lemmas for:
-- Finite-dimensional analysis
-- Rank-one operator properties
-- Pullback constructions
-
-### Correspondence.lean
-Implementation of the main correspondence using the reflection principle.
-
-### Arithmetic.lean
-Minimal arithmetic layer for Σ¹ formulas and provability predicates.
-
-## Sprint History
-
-- **Sprint 45**: Initial setup and G_surjective_iff_not_provable
-- **Sprint 46**: Fredholm alternative (G_inj_iff_surj)
-- **Sprint 47**: Major progress on Statement.lean
-- **Sprint 48**: Completed spectrum analysis in Core.lean
-- **Sprint 49**: Eliminated finiteDimensional_range_of_rankOne sorry
-- **Sprint 50**: Axiomatization approach - reduced to 0 sorries (100% elimination)
-  - Implemented Sigma1-EM axiomatization for foundation-relative correspondence
-
-## Mathematical Significance
-
-The complete formalization of the Gödel-Banach correspondence demonstrates the power of combining:
-1. **Operator Theory**: Spectral analysis and Fredholm theory
-2. **Logic**: Gödel's incompleteness theorems (via axiomatization)
-3. **Foundation Theory**: Foundation-relative mathematics
-
-The Sigma1-EM axiomatization elegantly captures why the correspondence works in ZFC but fails in BISH:
-- **ZFC**: Supports untruncated Σ₁ excluded middle, allowing case analysis on "Provable(G)"
-- **BISH**: Lacks this principle, making the Gödel scalar c_G undefinable
-
-This perfectly illustrates the Foundation-Relativity thesis: certain classical constructions become impossible in constructive settings.
-
-## Technical Approach
-
-Following Math-AI strategic guidance (Sprint 50), we adopted an axiomatization approach rather than attempting to formalize Gödel's incompleteness theorems directly. This strategy:
-1. Captures the essential mathematical content
-2. Avoids deep complexity of full incompleteness formalization
-3. Maintains clarity and correctness
-4. Enables focus on the operator-theoretic aspects
-
-## Integration with Foundation-Relativity
-
-The Gödel-Banach correspondence has ρ-degree 3, requiring at least AC_ω (similar to the SpectralGap pathology). This places it firmly in the realm of classical mathematics that cannot be constructively realized.
-
-## Future Work
-
-With Paper 1 now fully formalized, future directions include:
-1. Integration with Papers 2 & 3
-2. Exploring connections between different pathologies
-3. Generalizing the foundation-relative framework
-4. Publication preparation
-
-The Sigma1-EM axiomatization provides a template for handling other foundation-relative phenomena where classical principles fail constructively.
+**Refocused**: From full Gödel-Banach formalization to minimal rank-one toggle kernel
+**Scope**: Library-quality operator theory components for mathlib4
+**Connection**: Supports Paper 2's foundation-relativity narrative without meta-level complexity

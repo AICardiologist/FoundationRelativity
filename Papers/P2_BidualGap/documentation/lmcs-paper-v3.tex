@@ -1,12 +1,4 @@
-
-% \documentclass{lmcs}  % Uncomment when lmcs.cls is available
-\documentclass[11pt]{article}  % Temporary replacement for testing
-
-% Note: To compile with LMCS journal style:
-% 1. Download lmcs.cls from https://www.lmcs-online.org/ (under Author Guidelines)
-% 2. Place lmcs.cls in the same directory as this .tex file
-% 3. Uncomment the \documentclass{lmcs} line above and comment out \documentclass{article}
-% 4. Uncomment the LMCS-specific author commands below and comment out the article version
+\documentclass{lmcs}
 
 % ------------------------------------------------------------
 % Minimal, LMCS-friendly preamble (no hyperref/lmodern/geometry)
@@ -23,38 +15,11 @@
 \usepackage{graphicx}
 \usepackage{array}
 \usepackage{mdframed}
-\usepackage{url}  % Added for \url command
-
-% Define theorem-like environments for article class (remove when using lmcs.cls)
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{corollary}[theorem]{Corollary}
-\newtheorem{definition}[theorem]{Definition}
-\newtheorem{remark}[theorem]{Remark}
-
-% Shorthand for compatibility
-\newenvironment{thm}{\begin{theorem}}{\end{theorem}}
-\newenvironment{lem}{\begin{lemma}}{\end{lemma}}
-\newenvironment{cor}{\begin{corollary}}{\end{corollary}}
-\newenvironment{defi}{\begin{definition}}{\end{definition}}
-\newenvironment{rem}{\begin{remark}}{\end{remark}}
 
 % ---------- Lean repo link ----------
 \newcommand{\leanRepo}{\url{https://github.com/AICardiologist/FoundationRelativity}}
 
-% Define theorem-like environments for article class
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{corollary}[theorem]{Corollary}
-\newtheorem{definition}[theorem]{Definition}
-\newtheorem{remark}[theorem]{Remark}
-
-% Shorthand for compatibility
-\newenvironment{thm}{\begin{theorem}}{\end{theorem}}
-\newenvironment{lem}{\begin{lemma}}{\end{lemma}}
-\newenvironment{cor}{\begin{corollary}}{\end{corollary}}
-\newenvironment{defi}{\begin{definition}}{\end{definition}}
-\newenvironment{rem}{\begin{remark}}{\end{remark}}
+% ---------- Status indicators ----------
 \newcommand{\leanok}{\textsf{\small \textcolor{green!70!black}{✓}}}
 \newcommand{\leanpartial}{\textsf{\small \textcolor{orange!80!black}{◐}}}
 
@@ -135,17 +100,14 @@
 \lstset{style=leanstyle}
 
 % ---------- Title and author ----------
-% For LMCS class:
-% \title[The Bidual Gap and WLPO]{The Bidual Gap and WLPO: Complete Characterization and Formalization}
-% \author[P.~C.-K.~Lee]{Paul Chun-Kit Lee}
-% \address{New York University}
-% \email{paul.lee@nyu.edu} % TODO: Replace with actual email
-% \thanks{Lean 4 formalization available at \leanRepo. A citable snapshot is archived at Zenodo: DOI \texttt{10.5281/zenodo.XXXXXXX}.} % TODO: Replace DOI with actual value
+\title[The Bidual Gap and WLPO]{The Bidual Gap and WLPO: Complete Characterization and Formalization}
+\author[P.~C.-K.~Lee]{Paul Chun-Kit Lee}
+\address{New York University}
+\email{pcl326@nyu.edu} % UPDATE with actual email
+\thanks{Lean 4 formalization available at \leanRepo. A citable snapshot is archived at Zenodo: DOI \texttt{10.5281/zenodo.XXXXXXX}.} % TODO: Replace DOI with actual value
 
-% For standard article class (temporary):
-\title{The Bidual Gap and WLPO: Complete Characterization and Formalization}
-\author{Paul Chun-Kit Lee\thanks{Lean 4 formalization available at \leanRepo. A citable snapshot is archived at Zenodo: DOI \texttt{10.5281/zenodo.XXXXXXX}.} \\ New York University \\ \texttt{paul.lee@nyu.edu}}
-\date{}
+% Optional ORCID:
+% \lmcsorcid{0000-0000-0000-0000}
 
 \begin{document}
 
@@ -441,7 +403,7 @@ The result places a familiar analytic phenomenon exactly at $\WLPO$, demonstrati
 \subsection{Foundation relativity}
 
 \begin{center}
-\small % Make text smaller instead of resizing
+\resizebox{\textwidth}{!}{
 \begin{tabular}{lll}
 \toprule
 Foundation & Statement about the gap ($\exists y\notin \mathrm{im}(J)$) & Comment \\
@@ -453,6 +415,7 @@ $\BISH+\WLPO$ & \emph{Holds} & by equivalence \\
 $\BISH+\neg\WLPO$ & \emph{Does not hold} & does not imply surjectivity of $J$ \\
 \bottomrule
 \end{tabular}
+}
 \end{center}
 
 \subsection{The role of formalization}
@@ -524,6 +487,102 @@ theorem gap_equiv_wlpo : BidualGapStrong.{0} ↔ WLPO := by
   · -- WLPO implies Gap
     intro hwlpo
     exact construct_gap_from_wlpo hwlpo
+\end{lstlisting}
+
+\subsection{Robust csSup proof}\label{app:csSup-proof}
+
+\begin{lstlisting}[caption={csSup of partial sums equals the tsum (nonnegative case)}]
+private lemma tsum_eq_csSup_sum_of_nonneg
+  {ι : Type*} (u : ι → ℝ) (h0 : ∀ i, 0 ≤ u i) (hs : Summable u) :
+  (∑' i, u i) = sSup (Set.range (fun s : Finset ι => ∑ i ∈ s, u i)) := by
+  have nonempty : (Set.range _).Nonempty := ⟨0, ∅, by simp⟩
+  have bdd : BddAbove (Set.range _) := by
+    use ∑' i, u i
+    rintro x ⟨s, rfl⟩
+    exact sum_le_tsum s (fun i _ => h0 i) hs
+  apply le_antisymm
+  · apply tsum_le_of_sum_le hs; intro s; exact le_csSup bdd ⟨s, rfl⟩
+  · apply csSup_le nonempty; rintro x ⟨s, rfl⟩
+    exact sum_le_tsum s (fun i _ => h0 i) hs
+\end{lstlisting}
+
+\subsection{Stone window core}\label{app:stone-window}
+
+\begin{lstlisting}[caption={Core sketches for Stone window}]
+/-- Boolean algebra at infinity -/
+def BooleanAtInfinity := Quotient (Set ℕ) FinSymmDiff
+
+/-- Sequences modulo c₀ -/
+def SeqModC0 := Quotient (ℕ → ℝ) EqModC0
+
+/-- The Stone window map -/
+def iotaBar : BooleanAtInfinity → SeqModC0 :=
+  Quotient.lift (fun A => ⟦χ A⟧) χ_respects_fin
+
+theorem iotaBar_injective : Function.Injective iotaBar := by
+  intros ⟨A⟩ ⟨B⟩ h
+  have : χ A - χ B ∈ c₀ := quotient_eq_implies_diff_in_c0 h
+  exact finite_symmDiff_of_indicator_in_c0 this
+\end{lstlisting}
+
+\section{Reverse Direction Details}
+
+\begin{lstlisting}[caption={Lemma structure for WLPO ⇒ Gap}]
+/-- WLPO gives a Prop-level separator for the encodings used. -/
+lemma wlpo_gives_prop_separator [HasWLPO] (v : ℓ∞) :
+  (⟦v⟧ = (0 : ℓ∞/c₀)) ∨ (⟦v⟧ ≠ 0) := by
+  -- use HasWLPO.wlpo on a derived binary sequence
+  ...
+
+/-- From a nontrivial class produce a nonzero functional on the quotient. -/
+lemma nontrivial_class_gives_functional
+  {q : ℓ∞/c₀} (hq : q ≠ 0) : ∃ Φ : (ℓ∞/c₀ →L[ℝ] ℝ), Φ ≠ 0 := by
+  ...
+
+/-- Lift to the bidual and obtain a gap witness. -/
+lemma quotient_functional_to_bidual_gap
+  (Φ : ℓ∞/c₀ →L[ℝ] ℝ) (hΦ : Φ ≠ 0) :
+  ∃ G : (ℓ∞)**, G ∉ canonicalEmbedding.range := by
+  ...
+\end{lstlisting}
+
+\section{Computational Code}\label{app:computational}
+
+\begin{lstlisting}[language=Python, caption={Finite Hahn--Banach verification (Cesàro means)}]
+import random
+from typing import Callable, List
+
+def cesaro_mean_functional(n: int) -> Callable:
+    def f_n(x: List[float]) -> float:
+        return sum(x) / n
+    return f_n
+
+def verify_finite_hahn_banach(n: int, tolerance: float = 1e-10):
+    f = cesaro_mean_functional(n)
+
+    # Vanishes on {x : sum(x) = 0}
+    for _ in range(100):
+        x = [random.gauss(0, 1) for _ in range(n-1)]
+        x.append(-sum(x))
+        assert abs(f(x)) < tolerance
+
+    # f(1,...,1) = 1
+    ones = [1] * n
+    assert abs(f(ones) - 1) < tolerance
+
+    # ||f|| = 1 on the sup-norm unit ball
+    for _ in range(1000):
+        x = [random.uniform(-1, 1) for _ in range(n)]
+        assert abs(f(x)) <= 1 + tolerance
+
+    return True
+
+if __name__ == "__main__":
+    print("=== Verification Started ===")
+    for n in [2, 10, 50]:
+        verify_finite_hahn_banach(n)
+        print(f"Verified n={n}")
+    print("=== All Tests Passed ===")
 \end{lstlisting}
 
 \end{document}
