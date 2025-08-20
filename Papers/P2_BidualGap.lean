@@ -7,9 +7,9 @@ Authors: Foundation-Relativity Team
 import Papers.P2_BidualGap.Basic
 import Papers.P2_BidualGap.Logic.WLPOBasic
 import Papers.P2_BidualGap.Constructive.Ishihara
-import Papers.P2_BidualGap.Constructive.DualStructure
 import Papers.P2_BidualGap.HB.DualIsometriesComplete
-import Papers.P2_BidualGap.WLPO_Equiv_Gap
+-- Removed: Papers.P2_BidualGap.Constructive.DualStructure (obsolete, 10 sorries)
+-- Removed: Papers.P2_BidualGap.WLPO_Equiv_Gap (orphaned file, superseded by HB approach)
 
 /-!
 # Paper 2: WLPO ↔ BidualGap∃ Equivalence

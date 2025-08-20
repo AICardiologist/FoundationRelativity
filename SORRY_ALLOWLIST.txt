@@ -356,3 +356,13 @@ Papers/P2_BidualGap/HB/WLPO_to_Gap_Linf_Simple.lean:67    # Closed subspace proo
 Papers/P2_BidualGap/HB/WLPO_to_Gap_Linf.lean:84           # c₀ embedding continuity
 Papers/P2_BidualGap/HB/WLPO_to_Gap_Linf.lean:184          # Bridge to gap implementation
 Papers/P2_BidualGap/HB/WLPO_to_Gap_Linf.lean:260          # Classical Hahn-Banach instance
+# DualStructure (10 sorries - WLPO dual structure implementation)
+Papers/P2_BidualGap/Constructive/DualStructure.lean:95          # hasOperatorNorm_to_hasOpNorm bridge
+Papers/P2_BidualGap/Constructive/DualStructure.lean:104         # hasOpNorm_to_hasOperatorNorm witnesses (3 sorries)
+Papers/P2_BidualGap/Constructive/DualStructure.lean:119         # lub_exists_for_valueSet_of_WLPO
+Papers/P2_BidualGap/Constructive/DualStructure.lean:166         # norm_located
+Papers/P2_BidualGap/Constructive/DualStructure.lean:169         # norm_attained
+Papers/P2_BidualGap/Constructive/DualStructure.lean:172         # complete
+Papers/P2_BidualGap/Constructive/DualStructure.lean:175         # closed_zero
+Papers/P2_BidualGap/Constructive/DualStructure.lean:178         # closed_neg
+Papers/P2_BidualGap/Constructive/DualStructure.lean:181         # closed_smul
