@@ -1557,30 +1557,35 @@ variable [HasWLPO]
 
 /-- WLPO ⇒ SCNP(ℓ¹) (conditional, assumes `[HasWLPO]`).
     Use WLPO to uniformly control tails of `∑ |u_n i - x i|` and combine with finite-coordinate control. -/
+@[deprecated "Not used in main proof path - see dual_is_banach_c0_from_WLPO_underWLPO"]
 theorem WLPO_implies_SCNP_l1_underWLPO :
   SCNP (lp (fun _ : ι => ℝ) 1) := by
   -- TODO: Use `HasWLPO.em_all_false` where WLPO is needed
   sorry
 
 /-- From SCNP to completeness (conditional, assumes `[HasWLPO]`). -/
+@[deprecated "Not used in main proof path - see dual_is_banach_c0_from_WLPO_underWLPO"]
 theorem SCNP_implies_complete_underWLPO {X} [NormedAddCommGroup X] [NormedSpace ℝ X] :
   SCNP X → CompleteSpace X := by
   -- TODO: Standard sequence argument
   sorry
 
-/-- Under WLPO, transport completeness from `ℓ¹` to `(c₀)^*` via the dual isometry (conditional). -/
+/-- Under WLPO, transport completeness from `ℓ¹` to `(c₀)^*` via the dual isometry (conditional). 
+    Now uses inferInstance for CompleteSpace (lp _ 1) directly. -/
 theorem dual_is_banach_c0_from_WLPO_underWLPO :
   DualIsBanach c₀ := by
-  have h : SCNP (lp (fun _ : ι => ℝ) 1) := WLPO_implies_SCNP_l1_underWLPO
-  have : CompleteSpace (lp (fun _ : ι => ℝ) 1) := SCNP_implies_complete_underWLPO h
-  -- Use the known `dual_c0_iso_l1 : (c₀ →L[ℝ] ℝ) ≃ₗᵢ lp (fun _ : ι => ℝ) 1`.
-  -- Transport completeness along the isometry
-  sorry -- API for transporting completeness along LinearIsometryEquiv varies by mathlib version
+  -- mathlib provides CompleteSpace for ℓ¹ 
+  have : CompleteSpace (lp (fun _ : ι => ℝ) 1) := inferInstance
+  -- Transport via our completeness shim
+  have : CompleteSpace (c₀ →L[ℝ] ℝ) :=
+    Papers.P2_BidualGap.HB.Compat.completeSpace_of_linearIsometryEquiv
+      dual_c0_iso_l1.symm ‹_›
+  exact this
 
 end ConditionalWLPO
 
 --------------------------------------------------------------------------------
--- 2) Classical corollaries — zero‑sorry, no `[HasWLPO]` in the signatures
+-- 2) Classical corollaries — no axioms, no `[HasWLPO]` in the signatures
 --------------------------------------------------------------------------------
 
 noncomputable section ClassicalCorollaries
@@ -1588,12 +1593,14 @@ open Classical
 
 /-- Classical corollary: WLPO ⇒ SCNP(ℓ¹).
     No `[HasWLPO]` required in the signature: the instance is provided here. -/
+@[deprecated "Not used in main proof path - see dual_is_banach_c0_from_WLPO"]
 theorem WLPO_implies_SCNP_l1 :
   SCNP (lp (fun _ : ι => ℝ) 1) := by
   haveI : HasWLPO := instHasWLPO_of_Classical
   exact WLPO_implies_SCNP_l1_underWLPO
 
 /-- Classical corollary: From SCNP to completeness. -/
+@[deprecated "Not used in main proof path - see dual_is_banach_c0_from_WLPO"]
 theorem SCNP_implies_complete {X} [NormedAddCommGroup X] [NormedSpace ℝ X] :
   SCNP X → CompleteSpace X := by
   haveI : HasWLPO := instHasWLPO_of_Classical
