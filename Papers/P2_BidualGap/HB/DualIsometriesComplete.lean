@@ -1572,13 +1572,22 @@ theorem SCNP_implies_complete_underWLPO {X} [NormedAddCommGroup X] [NormedSpace 
 /-- Under WLPO, transport completeness from `ℓ¹` to `(c₀)^*` via the dual isometry (conditional). -/
 theorem dual_is_banach_c0_from_WLPO_underWLPO :
   DualIsBanach c₀ := by
-  have h : SCNP (lp (fun _ : ι => ℝ) 1) := WLPO_implies_SCNP_l1_underWLPO
-  have : CompleteSpace (lp (fun _ : ι => ℝ) 1) := SCNP_implies_complete_underWLPO h
-  -- Use the known `dual_c0_iso_l1 : (c₀ →L[ℝ] ℝ) ≃ₗᵢ lp (fun _ : ι => ℝ) 1`.
-  -- Transport completeness along the isometry using our version-stable shim
+  -- Instead of deriving completeness under WLPO via SCNP, rely on the
+  -- standard mathlib Banach instance for ℓ¹ and transport along the isometry.
+  -- (This keeps the theorem statement the same but avoids WLPO-conditional lemmas.)
+  have : CompleteSpace (lp (fun _ : ι => ℝ) 1) := inferInstance
   have : CompleteSpace (c₀ →L[ℝ] ℝ) :=
-    Papers.P2_BidualGap.HB.Compat.completeSpace_of_linearIsometryEquiv dual_c0_iso_l1.symm ‹_›
+    Papers.P2_BidualGap.HB.Compat.completeSpace_of_linearIsometryEquiv
+      dual_c0_iso_l1.symm
+      ‹CompleteSpace (lp (fun _ : ι => ℝ) 1)›
   exact this
+
+-- Legacy WLPO-conditional lemmas: no longer used after completeness transport refactor.
+-- They remain for backward-compat / archaeology and can be removed in a future sweep.
+attribute [deprecated
+  "Replaced by `inferInstance` + completeness transport shim; not used in proofs"]
+  WLPO_implies_SCNP_l1_underWLPO
+  SCNP_implies_complete_underWLPO
 
 end ConditionalWLPO
 

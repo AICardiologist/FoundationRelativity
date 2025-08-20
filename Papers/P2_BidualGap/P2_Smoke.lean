@@ -12,11 +12,15 @@ import Papers.P2_BidualGap.HB.OptionB.Instances
 import Papers.P2_BidualGap.HB.Compat.CompletenessTransport
 import Papers.P2_BidualGap.Constructive.OpNormCore
 import Papers.P2_BidualGap.Constructive.Ishihara
+-- Optionally import more HB modules as your local toolchain allows:
+-- import Papers.P2_BidualGap.HB.DualIsometriesComplete
 
 noncomputable section
 
 -- Namespaces we'll reference explicitly to avoid accidental shadowing.
 open Papers
+open Papers.P2_BidualGap
+open Papers.P2_BidualGap.HB
 
 /-- Smoke check: Option-B core API exists. -/
 #check Papers.P2_BidualGap.HB.OptionB.CorePure.HasNonzeroQuotFunctional
@@ -33,6 +37,12 @@ open Papers
 /-- Smoke check: completeness transport shim (version-stable). -/
 #check Papers.P2_BidualGap.HB.Compat.completeSpace_of_linearIsometryEquiv
 #check Papers.P2_BidualGap.HB.Compat.completeSpace_iff_of_linearIsometryEquiv
+
+/-- Smoke check: Dual isometry symbols (may drift across mathlib versions).
+    We only check types to catch name/namespace changes.
+    If you renamed your witness, update this check accordingly. -/
+-- Uncomment when DualIsometriesComplete is imported:
+-- #check Papers.P2_BidualGap.HB.DualIsometriesComplete.dual_c0_iso_l1
 
 /-
   End-to-end schema: Instances should discharge the typeclasses required by gap_of_optionB.
