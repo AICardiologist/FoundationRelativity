@@ -1585,7 +1585,7 @@ theorem dual_is_banach_c0_from_WLPO_underWLPO :
 end ConditionalWLPO
 
 --------------------------------------------------------------------------------
--- 2) Classical corollaries — zero‑sorry, no `[HasWLPO]` in the signatures
+-- 2) Classical corollaries — no axioms, no `[HasWLPO]` in the signatures
 --------------------------------------------------------------------------------
 
 noncomputable section ClassicalCorollaries
