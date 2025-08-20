@@ -11,10 +11,10 @@ class HasNonzeroQuotFunctional : Prop where
   exists_nonzero : True  -- Simplified for compilation
 
 /-- Gap property: existence of bidual element not in canonical range -/
-def HasBidualGap : Prop := True  -- Simplified for compilation
+axiom HasBidualGap : Prop  -- Placeholder for actual definition
 
 /-- Main theorem schema: If WLPO gives us the quotient functional, we get a gap -/
 theorem wlpo_implies_gap [HasNonzeroQuotFunctional] : HasBidualGap := by
-  trivial
+  sorry  -- Actual proof would use the typeclass instance
 
 end Papers.P2_BidualGap.HB
