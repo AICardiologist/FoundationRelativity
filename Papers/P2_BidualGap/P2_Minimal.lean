@@ -5,6 +5,7 @@ Authors: Foundation-Relativity Team
 -/
 
 import Papers.P2_BidualGap.HB.OptionB.CorePure
+import Papers.P2_BidualGap.HB.OptionB.Instances  -- Dummy instances showing end-to-end usage
 -- The following would be imported once toolchain is fixed:
 -- import Papers.P2_BidualGap.HB.DirectDual
 -- import Papers.P2_BidualGap.Constructive.Ishihara
