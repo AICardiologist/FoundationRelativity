@@ -349,3 +349,10 @@ Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:30                             # Orphane
 Papers/P2_BidualGap/Constructive/DualStructure.lean:96                 # Comment mentioning sorry in documentation  
 Papers/P2_BidualGap/Constructive/Ishihara.lean:168                     # Comment mentioning sorry in documentation
 Papers/P2_BidualGap/Gap/FiniteEmbedding.lean:7                         # Comment mentioning sorry in documentation
+
+# Paper 2 WLPO to Gap Bridge (Option B pattern)
+Papers/P2_BidualGap/HB/WLPO_to_Gap_Linf_Simple.lean:49    # Bridge lemma placeholder
+Papers/P2_BidualGap/HB/WLPO_to_Gap_Linf_Simple.lean:67    # Closed subspace proof
+Papers/P2_BidualGap/HB/WLPO_to_Gap_Linf.lean:84           # c₀ embedding continuity
+Papers/P2_BidualGap/HB/WLPO_to_Gap_Linf.lean:184          # Bridge to gap implementation
+Papers/P2_BidualGap/HB/WLPO_to_Gap_Linf.lean:260          # Classical Hahn-Banach instance
