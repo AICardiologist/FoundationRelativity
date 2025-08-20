@@ -1,5 +1,9 @@
 # Paper 2: WLPO ↔ BidualGap∃ Equivalence
 
+![Paper2-Minimal CI](https://github.com/FoundationRelativity/FoundationRelativity/actions/workflows/p2-minimal.yml/badge.svg)
+[![arXiv](https://img.shields.io/badge/arXiv-2025.xxxxx-b31b1b.svg)](https://arxiv.org/abs/2025.xxxxx)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.xxxxxxx.svg)](https://doi.org/10.5281/zenodo.xxxxxxx)
+
 ## 🎯 SPRINT E COMPLETE: Dual Isometry Implementation with 3 WLPO Sorries!
 
 [![Sprint E](https://img.shields.io/badge/Sprint%20E-Complete-brightgreen)](#sprint-e-complete)

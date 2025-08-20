@@ -19,3 +19,5 @@ jobs:
           lake update
           lake exe cache get || true
           lake build Papers.P2_BidualGap.P2_Minimal
+      - name: Verify no sorries in minimal target
+        run: ./scripts/no_sorry_p2_minimal.sh
