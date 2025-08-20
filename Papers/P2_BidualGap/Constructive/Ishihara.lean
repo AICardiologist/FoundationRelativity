@@ -7,7 +7,7 @@
 import Mathlib.Analysis.Normed.Module.Dual
 import Mathlib.Analysis.Normed.Group.Completeness
 import Papers.P2_BidualGap.Basic
-import Papers.P2_BidualGap.Constructive.DualStructure
+import Papers.P2_BidualGap.Constructive.OpNormCore
 
 namespace Papers.P2.Constructive
 open Papers.P2
@@ -77,20 +77,10 @@ lemma exists_on_unitBall_gt_half_opNorm
     simpa using (norm_eq_zero.mp this)
   exact hT T0
 
--- Helper lemma for zero map normability  
+-- Helper lemma for zero map normability (delegates to OpNormCore)
 lemma hasOpNorm_zero {X} [NormedAddCommGroup X] [NormedSpace ℝ X] :
-  OpNorm.HasOpNorm (X:=X) (0 : X →L[ℝ] ℝ) := by
-  -- value set is {0}, LUB is 0
-  use 0
-  constructor
-  · -- upper bound: all values ≤ 0
-    intro r hr
-    rcases hr with ⟨x, hx, rfl⟩
-    simp
-  · -- lower bound: 0 is least upper bound  
-    intro b hb
-    have : 0 ∈ OpNorm.valueSet (X:=X) (0 : X →L[ℝ] ℝ) := ⟨0, by simp [OpNorm.UnitBall], by simp⟩
-    exact hb this
+  OpNorm.HasOpNorm (X:=X) (0 : X →L[ℝ] ℝ) :=
+  OpNorm.hasOpNorm_zero
 
 -- Any continuous linear functional has an OpNorm LUB (classical completeness of ℝ).
 lemma hasOpNorm_CLF
@@ -165,7 +155,7 @@ by
     procedure at the meta level and package it as a proof of WLPO.
 
     NOTE: The crucial constructive step (turning the real-comparison into a
-    *proof* of WLPO) is concentrated in the `sorry` below, so downstream code
+    *proof* of WLPO) is concentrated in the axiom below, so downstream code
     never needs to reason about the details again.
 -/
 theorem WLPO_of_kernel

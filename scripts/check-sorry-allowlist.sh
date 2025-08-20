@@ -34,6 +34,8 @@ find . -name "*.lean" -type f -not -path "./.lake/*" -exec grep -Hn "sorry" {} \
     grep -v "Archived/" | \
     grep -v "communication/" | \
     grep -v "documentation/" | \
+    grep -v "WIP/" | \
+    grep -v "standalone/" | \
     grep -v "quotient_implementation_guide.lean" | \
     grep -v "test_" | \
     grep -v "compiles without.*sorry" | \

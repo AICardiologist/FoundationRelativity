@@ -1,0 +1,23 @@
+# Paper 2 Minimal Build CI
+name: Paper2-Minimal
+on:
+  push:
+    paths: ['Papers/P2_BidualGap/**', 'lean-toolchain', 'lakefile.lean']
+  pull_request:
+    paths: ['Papers/P2_BidualGap/**', 'lean-toolchain', 'lakefile.lean']
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Lean (elan)
+        uses: leanprover/lean-action@v1
+      - name: Show toolchain
+        run: cat lean-toolchain
+      - name: Build P2_Minimal
+        run: |
+          lake update
+          lake exe cache get || true
+          lake build Papers.P2_BidualGap.P2_Minimal
+      - name: Verify no sorries in minimal target
+        run: ./scripts/no_sorry_p2_minimal.sh
