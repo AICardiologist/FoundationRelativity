@@ -18,6 +18,7 @@ import Mathlib.Analysis.InnerProductSpace.l2Space
 import Mathlib.Tactic
 import Mathlib.Analysis.Normed.Group.InfiniteSum
 import Mathlib.Topology.Algebra.InfiniteSum.ENNReal
+import Papers.P2_BidualGap.HB.Compat.CompletenessTransport
 import Mathlib.Topology.Algebra.InfiniteSum.Basic  -- Added for series/sup
 import Mathlib.Topology.Algebra.InfiniteSum.Order  -- Added for series/sup characterization
 import Mathlib.Data.Real.Basic  -- Added for Real instances
@@ -1574,8 +1575,10 @@ theorem dual_is_banach_c0_from_WLPO_underWLPO :
   have h : SCNP (lp (fun _ : ι => ℝ) 1) := WLPO_implies_SCNP_l1_underWLPO
   have : CompleteSpace (lp (fun _ : ι => ℝ) 1) := SCNP_implies_complete_underWLPO h
   -- Use the known `dual_c0_iso_l1 : (c₀ →L[ℝ] ℝ) ≃ₗᵢ lp (fun _ : ι => ℝ) 1`.
-  -- Transport completeness along the isometry
-  sorry -- API for transporting completeness along LinearIsometryEquiv varies by mathlib version
+  -- Transport completeness along the isometry using our version-stable shim
+  have : CompleteSpace (c₀ →L[ℝ] ℝ) :=
+    Papers.P2_BidualGap.HB.Compat.completeSpace_of_linearIsometryEquiv dual_c0_iso_l1.symm ‹_›
+  exact this
 
 end ConditionalWLPO
 

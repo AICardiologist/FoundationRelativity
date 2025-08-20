@@ -275,8 +275,8 @@ Papers/P2_BidualGap/Constructive/CReal_obsolete/Completeness.lean:151  # CReal i
 # Paper 2 Sprint E: HB/DualIsometriesComplete (3 WLPO-conditional sorries)
 Papers/P2_BidualGap/HB/DualIsometriesComplete.lean:1563         # WLPO_implies_SCNP_l1_underWLPO
 Papers/P2_BidualGap/HB/DualIsometriesComplete.lean:1569         # SCNP_implies_complete_underWLPO
-Papers/P2_BidualGap/HB/DualIsometriesComplete.lean:1578         # dual_is_banach_c0_from_WLPO_underWLPO
-Papers/P2_BidualGap/HB/DualIsometriesComplete.lean:1583         # Comment line mentioning sorry (not actual sorry)
+# REMOVED - Fixed with CompletenessTransport shim
+# Papers/P2_BidualGap/HB/DualIsometriesComplete.lean:1578 # dual_is_banach_c0_from_WLPO_underWLPO
 
 # Paper 2 HB/DualIsometries (complete list after refactoring)
 Papers/P2_BidualGap/HB/DualIsometries.lean:76                          # Skeleton
