@@ -87,7 +87,7 @@ def main():
     all_issues = []
     
     # Directories to skip
-    skip_dirs = {'.lake', 'lake-packages', '.git', 'build', '.github'}
+    skip_dirs = {'.lake', 'lake-packages', '.git', 'build', '.github', 'examples', 'WIP', 'standalone'}
     
     # Find all Lean files
     lean_files = []

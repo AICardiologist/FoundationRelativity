@@ -16,13 +16,14 @@ The Option B architecture for Paper 2 (WLPO → Bidual Gap) is now fully impleme
   - No mathlib or Batteries dependencies
   - Works with any Lean 4 version
 
-### 2. **WLPO_Gap_TypeClass.lean** [COMPILES]
-- **Status**: ✅ Builds successfully
+### 2. **examples/WLPO_Gap_TypeClass_example.lean** [EXAMPLE]
+- **Status**: ✅ Example/demonstration file
 - **Sorries**: 0
 - **Dependencies**: None
 - **Key Features**:
   - Minimal working example
   - Demonstrates the pattern
+  - Not part of main build (example only)
 
 ### 3. **standalone/** [COMPILES]
 - **Status**: ✅ Isolated subproject builds successfully
