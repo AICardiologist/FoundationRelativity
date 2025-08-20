@@ -324,6 +324,33 @@ lake env lean Scripts/AxiomCheck.lean
 lake build Papers.P2_BidualGap
 ```
 
+## Dev (local only)
+
+### Smoke Testing
+
+After aligning mathlib locally, run the smoke target to check for symbol drift:
+
+```bash
+lake env lean Papers/P2_BidualGap/P2_Smoke.lean
+```
+
+This lightweight target only uses `#check` to verify key API symbols exist with expected signatures.
+
+### Full Alignment Guide
+
+See [`dev/P2_full_alignment.md`](../../dev/P2_full_alignment.md) for:
+- Toolchain alignment checklist
+- List of mathlib surfaces we depend on
+- Known API drift points and how we handle them
+- Troubleshooting common issues
+
+### Non-CI Targets
+
+- **P2_Smoke.lean**: Symbol drift detection (lightweight #check only)
+- **P2_Full.lean**: Full HB build (when toolchain aligned, not in CI)
+
+Note: The CI target remains `P2_Minimal` with 0 sorries. Dev targets are for local use only.
+
 ## Related Documentation
 
 - **[LaTeX Paper v3.2](documentation/paper-v3.2.tex)**: Academic paper with Lean results
