@@ -7,11 +7,9 @@ A Lean 4 formalization demonstrating how mathematical pathologies behave differe
 
 ## ✅ Completed Milestones
 
-### Paper 1: Rank-One Toggle Kernel (Refocused)
-- **Previous Status**: Gödel-Banach conceptualization complete
-- **New Focus**: Minimal Lean implementation of rank-one toggle operator
-- **Scope**: Library-quality components for mathlib4 upstream
-- **Status**: 📋 Planning phase - implementation pending
+### Paper 1: Gödel-Banach Correspondence
+- **Status**: ✅ COMPLETE (0 sorries)
+- **Achievement**: Full formalization of rank-one operators encoding Gödel's incompleteness
 
 ### Paper 2: WLPO ↔ BidualGap (Sprint E Complete)
 - **Status**: ✅ NEARLY COMPLETE (3 WLPO sorries)
@@ -40,13 +38,11 @@ A Lean 4 formalization demonstrating how mathematical pathologies behave differe
 ## 📅 Q3 2025 Roadmap
 
 ### August 2025 (Remaining)
-- [ ] Paper 1: Implement minimal rank-one toggle kernel modules
-- [ ] Paper 1: Prepare initial mathlib4 PR for projection helpers
+- [ ] Complete WLPO proof details in Paper 2 (optional)
+- [ ] Begin Paper 3 comprehensive analysis
 - [ ] Continue Paper 4 Phase 1B implementation
 
 ### September 2025
-- [ ] Paper 1: Complete all 6 modules (Projection, Toggle, Spectrum, Sherman-Morrison, Fredholm, Tutorial)
-- [ ] Paper 1: Submit mathlib4 PRs for upstream components
 - [ ] Paper 3: Reduce sorries to <3
 - [ ] Paper 4: Complete Phase 1B
 - [ ] Documentation consolidation
@@ -59,8 +55,6 @@ A Lean 4 formalization demonstrating how mathematical pathologies behave differe
 ## 🎯 Success Metrics
 
 ### Technical Goals
-- **Paper 1**: Implement minimal rank-one toggle with 0 sorries
-- **Paper 1**: Successfully upstream 2+ components to mathlib4
 - **Paper 2**: Maintain 3 WLPO sorries (or complete with proofs)
 - **Paper 3**: Reduce to <3 sorries
 - **Paper 4**: Complete discrete model (0 sorries)
@@ -117,11 +111,9 @@ A Lean 4 formalization demonstrating how mathematical pathologies behave differe
 - ✅ Sprint E: Dual isometry
 
 ### Upcoming Sprints
-- Sprint F: Paper 1 minimal implementation (rank-one toggle)
-- Sprint G: Paper 1 mathlib4 upstream PRs
-- Sprint H: Paper 3 analysis
-- Sprint I: Paper 4 Phase 1B completion
-- Sprint J: Integration and polish
+- Sprint F: Paper 3 analysis
+- Sprint G: Paper 4 Phase 1B completion
+- Sprint H: Integration and polish
 
 ## 🎓 Academic Impact
 
