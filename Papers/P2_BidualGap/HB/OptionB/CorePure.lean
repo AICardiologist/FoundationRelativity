@@ -19,7 +19,7 @@ universe u v w
 /-- The "gap" predicate for a type `DX` that you intend to play the role of `X**`.
     We keep it abstract here: you can refine it later to "∃ G : X**, G ∉ range(J)".
     Keeping it abstract lets this file compile with zero external deps. -/
-def GapX (DX : Type w) : Prop := ∃ G : DX, True
+def GapX (DX : Type w) : Prop := ∃ _ : DX, True
 
 /-- WLPO output (packaged): there exists a nonzero functional on the quotient `Q`.
     We keep it abstract as a `True` witness to avoid analytic dependencies here. -/
@@ -29,7 +29,7 @@ class HasNonzeroQuotFunctional (Q : Type v) : Prop where
 /-- Analytic bridge (packaged): from a nonzero quotient functional, we can produce
     a gap witness in `DX` (your future `X**`).  Again, we keep it abstract here. -/
 class QuotToGapBridge (X : Type u) (Q : Type v) (DX : Type w) : Prop where
-  from_nonzero : True → ∃ G : DX, True
+  from_nonzero : True → ∃ _ : DX, True
 
 /-- Option‑B, core: if WLPO gives the quotient functional and the bridge is available,
     then you get a gap for `DX`.  Sorry‑free and dependency‑free. -/
