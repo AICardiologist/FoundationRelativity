@@ -17,10 +17,29 @@ FOUND_SORRY=0
 
 for file in "${FILES[@]}"; do
     if [ -f "$file" ]; then
-        # Detect 'sorry' as a term or as 'by sorry' (avoid matches in comments/strings)
-        if grep -nE '(^|[^-])\bby\s+sorry\b|^\s*sorry\b' "$file" > /dev/null 2>&1; then
-            echo "❌ Found 'sorry' statement in $file:"
-            grep -nE '(^|[^-])\bby\s+sorry\b|^\s*sorry\b' "$file"
+        # Strip line comments and block-comment regions, then look for token 'sorry'
+        # This is a lightweight filter; good enough for CI and our code style.
+        stripped=$(awk '
+            BEGIN { blk=0 }
+            { line=$0 }
+            # toggle block comments
+            /\/\-/ { blk=1 }
+            /-\// { blk=0; next }
+            # drop line comments
+            { gsub(/--.*/, "", line) }
+            { if (blk==0) print line }
+        ' "$file")
+        
+        if echo "$stripped" | grep -n -E '(^|[^A-Za-z])sorry([^A-Za-z]|$)' >/dev/null; then
+            echo "❌ Found 'sorry' in $file (after stripping comments):"
+            echo "$stripped" | grep -n -E '(^|[^A-Za-z])sorry([^A-Za-z]|$)'
+            FOUND_SORRY=1
+        fi
+        
+        # Also check for 'admit'
+        if echo "$stripped" | grep -n -E '(^|[^A-Za-z])admit([^A-Za-z]|$)' >/dev/null; then
+            echo "❌ Found 'admit' in $file (after stripping comments):"
+            echo "$stripped" | grep -n -E '(^|[^A-Za-z])admit([^A-Za-z]|$)'
             FOUND_SORRY=1
         fi
     fi
