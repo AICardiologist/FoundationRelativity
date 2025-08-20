@@ -17,11 +17,10 @@ FOUND_SORRY=0
 
 for file in "${FILES[@]}"; do
     if [ -f "$file" ]; then
-        # Look for 'sorry' as a standalone word, not in comments or strings
-        # This regex looks for 'sorry' that isn't preceded by '-' (comment) or '"' (string)
-        if grep -E '^\s*sorry\s*($|--|\/)' "$file" > /dev/null 2>&1; then
+        # Detect 'sorry' as a term or as 'by sorry' (avoid matches in comments/strings)
+        if grep -nE '(^|[^-])\bby\s+sorry\b|^\s*sorry\b' "$file" > /dev/null 2>&1; then
             echo "❌ Found 'sorry' statement in $file:"
-            grep -n -E '^\s*sorry\s*($|--|\/)' "$file"
+            grep -nE '(^|[^-])\bby\s+sorry\b|^\s*sorry\b' "$file"
             FOUND_SORRY=1
         fi
     fi
