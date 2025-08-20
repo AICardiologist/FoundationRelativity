@@ -320,6 +320,28 @@ Papers/P2_BidualGap/HB/DualIsometries.lean:227                         # Skeleto
 Papers/P2_BidualGap/HB/DualIsometries.lean:237                         # Skeleton
 
 
+# Paper 1 RankOneToggle modules (in progress - not part of Paper 2 PR)
+Papers/P1_GBC/RankOneToggle/Fredholm.lean:76                           # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/Fredholm.lean:81                           # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/Fredholm.lean:84                           # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/Fredholm.lean:115                          # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/Fredholm.lean:121                          # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/ShermanMorrison.lean:149                   # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/ShermanMorrison.lean:159                   # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/Spectrum.lean:63                           # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/Spectrum.lean:69                           # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/Spectrum.lean:73                           # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/Spectrum.lean:97                           # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/Spectrum.lean:103                          # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/Spectrum.lean:107                          # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/Spectrum.lean:126                          # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/Spectrum.lean:136                          # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/Spectrum.lean:139                          # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/Tutorial.lean:48                           # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/Tutorial.lean:68                           # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/Tutorial.lean:69                           # RankOneToggle - in progress
+Papers/P1_GBC/RankOneToggle/Tutorial.lean:127                          # RankOneToggle - in progress
+
 # Paper 2 orphaned file
 Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:30                             # Orphaned file - not imported
 
