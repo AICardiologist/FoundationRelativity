@@ -9,9 +9,7 @@ import Mathlib.Analysis.Normed.Group.Completeness
 import Papers.P2_BidualGap.Basic
 import Papers.P2_BidualGap.Constructive.OpNormCore
 
-namespace Papers.P2.Constructive
-open Papers.P2
-open Papers.P2_BidualGap.Constructive
+namespace Papers.P2_BidualGap.Constructive
 open OpNorm
 open scoped BigOperators
 
@@ -320,4 +318,4 @@ theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
 
 end -- noncomputable section
 
-end Papers.P2.Constructive
+end Papers.P2_BidualGap.Constructive

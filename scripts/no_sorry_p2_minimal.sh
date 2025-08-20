@@ -19,6 +19,7 @@ for file in "${FILES[@]}"; do
     if [ -f "$file" ]; then
         # Strip line comments and nested block comments, then look for token 'sorry'
         # Lightweight and portable: handles inline and nested /- ... -/
+        # NOTE: nested block comments are rare in this repo; this filter handles basic nesting
         stripped=$(awk '
             BEGIN { depth=0 }
             {

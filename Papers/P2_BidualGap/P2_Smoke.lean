@@ -1,6 +1,8 @@
 /-
   P2_Smoke: non-CI aggregator that sanity-checks symbol names/signatures
   for the Paper 2 codebase. It's intentionally light: only `#check`s.
+  
+  IMPORTANT: This file is NOT in CI - it's for local development only.
 
   Usage (local only, after toolchain alignment):
     lake env lean Papers/P2_BidualGap/P2_Smoke.lean
