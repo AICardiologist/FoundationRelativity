@@ -17,17 +17,25 @@ FOUND_SORRY=0
 
 for file in "${FILES[@]}"; do
     if [ -f "$file" ]; then
-        # Strip line comments and block-comment regions, then look for token 'sorry'
-        # This is a lightweight filter; good enough for CI and our code style.
+        # Strip line comments and nested block comments, then look for token 'sorry'
+        # Lightweight and portable: handles inline and nested /- ... -/
         stripped=$(awk '
-            BEGIN { blk=0 }
-            { line=$0 }
-            # toggle block comments
-            /\/\-/ { blk=1 }
-            /-\// { blk=0; next }
-            # drop line comments
-            { gsub(/--.*/, "", line) }
-            { if (blk==0) print line }
+            BEGIN { depth=0 }
+            {
+                line=$0
+                # remove line comments
+                sub(/--.*/, "", line)
+                out=""
+                i=1
+                while (i <= length(line)) {
+                    two = substr(line,i,2)
+                    if (two == "/-") { depth++; i+=2; continue }
+                    if (two == "-/") { if (depth>0) depth--; i+=2; continue }
+                    if (depth == 0) { out = out substr(line,i,1) }
+                    i++
+                }
+                if (length(out) > 0) print out
+            }
         ' "$file")
         
         if echo "$stripped" | grep -n -E '(^|[^A-Za-z])sorry([^A-Za-z]|$)' >/dev/null; then
