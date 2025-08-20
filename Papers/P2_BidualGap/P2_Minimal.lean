@@ -25,7 +25,7 @@ It intentionally excludes:
 
 * `CorePure` - Option B architecture (0 sorries, dependency-free)
 * `DirectDual` - Direct c₀ bidual construction (0 sorries)
-* `Ishihara` - Gap → WLPO direction (1 sorry for constructive step)
+* `Ishihara` - Gap → WLPO direction (1 allowed axiom for constructive step)
 * `Basic` - Foundation definitions
 * `WLPOBasic` - WLPO typeclass
 

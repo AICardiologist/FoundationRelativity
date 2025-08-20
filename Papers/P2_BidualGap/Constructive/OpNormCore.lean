@@ -1,7 +1,7 @@
 /-
   Papers/P2_BidualGap/Constructive/OpNormCore.lean
   
-  Minimal, sorry-free OpNorm core used by Ishihara.lean
+  Minimal OpNorm core (no sorries) used by Ishihara.lean
   Provides just the definitions needed without the deprecated proofs.
 -/
 import Mathlib.Analysis.NormedSpace.OperatorNorm

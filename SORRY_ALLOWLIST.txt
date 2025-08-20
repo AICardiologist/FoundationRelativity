@@ -249,18 +249,7 @@ Papers/P1_GBC/SmokeTest.lean:19  # Comment: "- No sorry statements in basic infr
 
 # Paper 2 (WLPO ↔ BidualGapStrong) – AXIOM-CLEAN BREAKTHROUGH STATUS
 # Updated 2025-08-09: Gap → WLPO AXIOM-CLEAN (0 sorries)
-# Only 1 active sorry remaining in reverse direction + bridge lemmas
-Papers/P2_BidualGap/Constructive/DualStructure.lean:95          # SORRY - hasOperatorNorm_to_hasOpNorm bridge (deprecated)
-Papers/P2_BidualGap/Constructive/DualStructure.lean:103         # Comment line mentioning sorry (not actual sorry)
-Papers/P2_BidualGap/Constructive/DualStructure.lean:104         # SORRY - hasOpNorm_to_hasOperatorNorm bridge (deprecated) - multiple sorries
-Papers/P2_BidualGap/Constructive/DualStructure.lean:119         # SORRY - lub_exists_for_valueSet_of_WLPO (deprecated)
-Papers/P2_BidualGap/Constructive/DualStructure.lean:166         # SORRY - norm_located field
-Papers/P2_BidualGap/Constructive/DualStructure.lean:169         # SORRY - norm_attained field
-Papers/P2_BidualGap/Constructive/DualStructure.lean:172         # SORRY - complete field
-Papers/P2_BidualGap/Constructive/DualStructure.lean:175         # SORRY - closed_zero field
-Papers/P2_BidualGap/Constructive/DualStructure.lean:178         # SORRY - closed_neg field
-Papers/P2_BidualGap/Constructive/DualStructure.lean:181         # SORRY - closed_smul field  
-Papers/P2_BidualGap/WLPO_Equiv_Gap.lean:24                      # SORRY(P2-WLPO→gap-strong) - wlpo_implies_gap (reverse direction)
+# DualStructure and WLPO_Equiv_Gap moved to WIP (obsolete approach)
 Papers/P2_BidualGap/Compat/NonReflexive.lean:31                 # SORRY(P2-compat) - c0_or_l1_witness (optional)
 
 # Paper 2 CReal_obsolete infrastructure (22 sorries - OBSOLETE, bypassed by direct approach)

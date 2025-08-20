@@ -14,7 +14,7 @@ import Papers.P2_BidualGap.HB.DirectDual
 -- import Papers.P2_BidualGap.HB.OptionB.ClassicalInstances  -- after you add it
 -- import Papers.P2_BidualGap.Constructive.Ishihara           -- when toolchain is OK
 -- import Papers.P2_BidualGap.HB.DualIsometriesComplete       -- when toolchain is OK
--- import Papers.P2_BidualGap.WLPO_Equiv_Gap                  -- main theorem
+-- import Papers.P2_BidualGap.WIP.WLPO_Equiv_Gap              -- old approach (moved to WIP)
 
 /-!
 # Paper 2: Full Build Target (Development)

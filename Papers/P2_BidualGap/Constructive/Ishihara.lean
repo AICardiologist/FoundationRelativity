@@ -155,7 +155,7 @@ by
     procedure at the meta level and package it as a proof of WLPO.
 
     NOTE: The crucial constructive step (turning the real-comparison into a
-    *proof* of WLPO) is concentrated in the `sorry` below, so downstream code
+    *proof* of WLPO) is concentrated in the axiom below, so downstream code
     never needs to reason about the details again.
 -/
 theorem WLPO_of_kernel

@@ -1,5 +1,5 @@
 /-
-  Option B — CorePure (no mathlib, no Batteries, sorry‑free)
+  Option B — CorePure (no mathlib, no Batteries, no sorries)
 
   What this file gives you:
   • A tiny, abstract interface for Option‑B:
