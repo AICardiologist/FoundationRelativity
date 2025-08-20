@@ -1,65 +1,57 @@
 /-
-  Papers/P2_BidualGap/Constructive/OpNormCore.lean
-  
-  Minimal OpNorm core (no sorries) used by Ishihara.lean
-  Provides just the definitions needed without the deprecated proofs.
+  OpNormCore: a minimal, Prop-level interface sufficient for Ishihara.lean.
+
+  Intent:
+  - Avoids heavy operator-norm / csSup API.
+  - Provides just enough structure used by Ishihara:
+      * UnitBall
+      * valueSet (image of UnitBall under x ↦ |T x|)
+      * HasOpNorm (sup/approx spec, Prop-level)
+      * zero-functional facts
+
+  This file is mathlib-friendly but very light-touch.
 -/
 import Mathlib.Analysis.NormedSpace.OperatorNorm
-import Mathlib.Topology.Algebra.Module.Basic
-import Mathlib.Data.Real.Basic
-import Mathlib.Order.CompleteLattice
 
-open scoped BigOperators
-open Set
-
+namespace Papers.P2_BidualGap.Constructive
 namespace OpNorm
 
 variable {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
 
-/-- Closed unit ball of `X` (by norm). -/
+/-- Unit ball: `{ x | ‖x‖ ≤ 1 }`. -/
 def UnitBall (X : Type*) [NormedAddCommGroup X] [NormedSpace ℝ X] : Set X :=
-  {x | ‖x‖ ≤ 1}
+  { x | ‖x‖ ≤ 1 }
 
-/-- The value set of a continuous linear functional `T : X →L[ℝ] ℝ` over the unit ball. -/
-def valueSet (X : Type*) [NormedAddCommGroup X] [NormedSpace ℝ X]
-  (T : X →L[ℝ] ℝ) : Set ℝ :=
-  {t | ∃ x ∈ UnitBall X, ‖T x‖ = t}
+/-- `valueSet T` collects the absolute values `|T x|` over the unit ball. -/
+def valueSet (T : X →L[ℝ] ℝ) : Set ℝ :=
+  { y | ∃ x, x ∈ UnitBall X ∧ y = |T x| }
 
-/-- Existence of a least upper bound for the value set: sufficient for the uses in Ishihara. -/
-structure HasOpNorm (X : Type*) [NormedAddCommGroup X] [NormedSpace ℝ X]
-  (T : X →L[ℝ] ℝ) : Prop :=
-  (exists_lub : ∃ r : ℝ, IsLUB (valueSet X T) r)
+/-- A Prop-level operator-norm specification with an approximation clause. -/
+def HasOpNorm (T : X →L[ℝ] ℝ) : Prop :=
+  ∃ op : ℝ,
+    0 ≤ op ∧
+    (∀ x, x ∈ UnitBall X → |T x| ≤ op) ∧
+    (∀ ε > 0, ∃ x, x ∈ UnitBall X ∧ op - ε ≤ |T x|)
 
-/-- The value set is nonempty (contains at least 0). -/
-lemma valueSet_nonempty (T : X →L[ℝ] ℝ) : (valueSet X T).Nonempty := by
-  refine ⟨0, ?_⟩
-  refine ⟨0, ?_, ?_⟩
-  · simp [UnitBall]
-  · simp
+/-- `0` lies in the unit ball. -/
+@[simp] lemma zero_mem_UnitBall : (0 : X) ∈ UnitBall X := by
+  have h : (0 : ℝ) ≤ 1 := le_of_lt (show (0 : ℝ) < 1 from zero_lt_one)
+  simpa [UnitBall, norm_zero] using h
 
-/-- For the zero functional, the value set is `{0}`. -/
-lemma valueSet_zero :
-  valueSet X (0 : X →L[ℝ] ℝ) = ({0} : Set ℝ) := by
-  ext t; constructor
-  · intro ⟨x, _, hx⟩
-    simp at hx
-    exact hx
-  · intro ht
-    simp at ht
-    rw [ht]
-    refine ⟨(0 : X), ?_, ?_⟩
-    · simp [UnitBall]
-    · simp
-
-/-- The zero functional trivially admits an operator-norm bound. -/
+/-- Trivial `HasOpNorm` witness for the zero functional. -/
 lemma hasOpNorm_zero : HasOpNorm (X:=X) (0 : X →L[ℝ] ℝ) := by
-  refine ⟨0, ?_⟩
-  rw [valueSet_zero]
-  constructor
-  · intro _ hx
-    simp at hx
-    exact le_of_eq hx.symm
-  · intro _ h
-    exact h 0 (by simp)
+  refine ⟨0, le_rfl, ?upper, ?approx⟩
+  · intro x hx; simpa using (by simpa using (le_of_eq (by simpa : |((0 : X →L[ℝ] ℝ) x)| = (0 : ℝ))))
+  · intro ε hε
+    refine ⟨0, zero_mem_UnitBall (X:=X), ?goal⟩
+    -- need: 0 - ε ≤ |(0 : _ →L[ℝ] ℝ) 0| = 0
+    -- i.e., -ε ≤ 0, which follows from ε > 0
+    simpa [sub_eq_add_neg, abs_zero] using (neg_nonpos.mpr (le_of_lt hε))
+
+/-- `0 ∈ valueSet (0 : X →L[ℝ] ℝ)` via `x = 0`. -/
+lemma zero_mem_valueSet_zero : (0 : ℝ) ∈ valueSet (X:=X) (0 : X →L[ℝ] ℝ) := by
+  refine ⟨0, zero_mem_UnitBall (X:=X), ?_⟩
+  simp
 
 end OpNorm
+end Papers.P2_BidualGap.Constructive

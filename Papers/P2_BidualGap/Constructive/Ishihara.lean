@@ -11,6 +11,8 @@ import Papers.P2_BidualGap.Constructive.OpNormCore
 
 namespace Papers.P2.Constructive
 open Papers.P2
+open Papers.P2_BidualGap.Constructive
+open OpNorm
 open scoped BigOperators
 
 noncomputable section
@@ -79,21 +81,21 @@ lemma exists_on_unitBall_gt_half_opNorm
 
 -- Helper lemma for zero map normability (delegates to OpNormCore)
 lemma hasOpNorm_zero {X} [NormedAddCommGroup X] [NormedSpace ℝ X] :
-  OpNorm.HasOpNorm (X:=X) (0 : X →L[ℝ] ℝ) :=
-  OpNorm.hasOpNorm_zero
+  HasOpNorm (X:=X) (0 : X →L[ℝ] ℝ) :=
+  hasOpNorm_zero
 
 -- Any continuous linear functional has an OpNorm LUB (classical completeness of ℝ).
 lemma hasOpNorm_CLF
   {X} [NormedAddCommGroup X] [NormedSpace ℝ X]
-  (h : X →L[ℝ] ℝ) : OpNorm.HasOpNorm (X:=X) h := by
+  (h : X →L[ℝ] ℝ) : HasOpNorm (X:=X) h := by
   classical
   -- S := {|h x| | ‖x‖ ≤ 1}; we phrase with norm to avoid abs/Real.* drift
-  let S : Set ℝ := OpNorm.valueSet (X:=X) h
+  let S : Set ℝ := valueSet (X:=X) h
   -- Nonempty: take x = 0
   have hne : S.Nonempty := by
     refine ⟨0, ?_⟩
     refine ⟨(0 : X), ?_, ?_⟩
-    · simp [OpNorm.UnitBall]
+    · simp [UnitBall]
     · simp
   -- Bounded above by ‖h‖.
   have hbdd : BddAbove S := by
@@ -131,7 +133,7 @@ structure IshiharaKernel (X : Type _) [NormedAddCommGroup X] [NormedSpace ℝ X]
   zero_iff_allFalse :
     ∀ α : ℕ → Bool, (∀ n, α n = false) ↔ y (f + g α) = 0
   /-- Normability closure (kept as before). -/
-  closed_add : ∀ α, OpNorm.HasOpNorm (X:=X) (f + g α)
+  closed_add : ∀ α, HasOpNorm (X:=X) (f + g α)
 
 /-- Monomorphic witness package to avoid universe headaches when transporting across files. -/
 structure KernelWitness where
@@ -301,14 +303,14 @@ theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
       exact lt_irrefl _ this
 
   -- Normability closure
-  have closed_add : ∀ α, OpNorm.HasOpNorm (X:=X) (f + g α) := by
+  have closed_add : ∀ α, HasOpNorm (X:=X) (f + g α) := by
     intro α
     by_cases hall : ∀ n, α n = false
     · -- f + g α = 0
-      have : OpNorm.HasOpNorm (X:=X) (0 : X →L[ℝ] ℝ) := hasOpNorm_zero
+      have : HasOpNorm (X:=X) (0 : X →L[ℝ] ℝ) := hasOpNorm_zero
       simpa [f, g, hall] using this
     · -- f + g α = hstar
-      have : OpNorm.HasOpNorm (X:=X) hstar := hasOpNorm_CLF (X:=X) hstar
+      have : HasOpNorm (X:=X) hstar := hasOpNorm_CLF (X:=X) hstar
       simpa [f, g, hall] using this
 
   -- Conclude WLPO from the kernel package
