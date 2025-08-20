@@ -1,4 +1,4 @@
-# Paper 2: WLPO ↔ BidualGap Equivalence
+# Paper 2: WLPO ↔ BidualGap∃ Equivalence
 
 ## 🎯 SPRINT E COMPLETE: Dual Isometry Implementation with 3 WLPO Sorries!
 
@@ -9,10 +9,12 @@
 [![Sorry Reduction](https://img.shields.io/badge/Sorry%20Reduction-81%25-blue)](#sorry-reduction)
 
 **Current State**: **SPRINT E COMPLETE** ✅  
-**Main Achievement**: Complete dual isometry (c₀ →L[ℝ] ℝ) ≃ₗᵢ ℓ¹ with only 3 WLPO sorries  
+**Main Theorem**: WLPO ↔ BidualGap∃ (∃X such that J: X → X** is not surjective)  
+**Witness Space**: Our Lean formalization uses X = c₀ (sequences vanishing at infinity)  
+**Dual Isometry**: Complete implementation (c₀ →L[ℝ] ℝ) ≃ₗᵢ ℓ¹ with only 3 WLPO sorries  
 **Technical Excellence**: Self-contained csSup approach avoiding all CompleteLattice issues
 
-🎯 **MATHEMATICAL MILESTONE**: Sprint E completed August 19, 2025 - Dual isometry implementation reduced from 16 sorries to just 3 WLPO-conditional results.
+🎯 **MATHEMATICAL MILESTONE**: Sprint E completed August 19, 2025 - Complete equivalence WLPO ↔ BidualGap∃ formalized with c₀ as witness space. The ℓ∞ version is discussed at paper level; formalizing it via ℓ∞/c₀ quotient is planned future work.
 
 ## Latest Achievement ✅
 
@@ -30,11 +32,11 @@
   - Classical instance provides zero-sorry mode when needed
   - Clear separation between constructive core and WLPO track
 
-### ✅ Sprint D: Bidirectional WLPO ↔ BidualGap Theorem
-- **Direct construction**: G = S ∘ Φ₁ witness in c₀** proving non-reflexivity
-- **Strategic pivot**: From Hahn-Banach to direct construction per professor guidance
-- **Zero sorries**: DirectDual.lean complete with signVector_eval technique
-- **Universe resolution**: Theorem proven for Type 0, mathematically sufficient
+### ✅ Sprint D: Bidirectional WLPO ↔ BidualGap∃ Theorem
+- **Direct construction**: G ∈ (c₀)** defined by G(f) = Σₙ f(eₙ) proving non-reflexivity of c₀
+- **Witness space**: c₀ = C₀(ℕ, ℝ) (continuous functions vanishing at infinity on discrete ℕ)
+- **Zero sorries**: DirectDual.lean complete with explicit bidual functional
+- **Universe resolution**: Theorem proven for Type 0, mathematically sufficient for existential claim
 
 ### ✅ Sprint B: Complete Quotient Framework
 - **Mathematical quotients**: `BooleanAtInfinity := 𝒫(ℕ)/Fin` and `SeqModC0 := (ℝ^ℕ)/c₀`

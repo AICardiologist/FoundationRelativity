@@ -1,13 +1,21 @@
-# Sprint E Status: Dual Isometry Complete with 3 WLPO Sorries
+# Sprint E Status: WLPO ↔ BidualGap∃ Complete with 3 WLPO Sorries
 
 ## Executive Summary
 **Date**: August 19, 2025  
 **Sprint**: E  
-**Achievement**: Complete dual isometry implementation with only 3 WLPO-conditional sorries  
+**Main Theorem**: WLPO ↔ BidualGap∃ where BidualGap∃ = ∃X, J: X → X** not surjective  
+**Witness Space**: c₀ = C₀(ℕ, ℝ) (sequences vanishing at infinity)  
+**Dual Isometry**: Complete implementation with only 3 WLPO-conditional sorries  
 **Build Status**: ✅ 0 errors  
 **Sorry Reduction**: 81% (16 → 3)
 
 ## Mathematical Achievements
+
+### Main Equivalence: WLPO ↔ BidualGap∃
+- **Forward**: Gap → WLPO via Ishihara kernel (complete, 0 sorries)
+- **Reverse**: WLPO → Gap with witness X = c₀ (complete, 0 sorries)
+- **Bidual functional**: G ∈ (c₀)** defined by G(f) = Σₙ f(eₙ) for f ∈ (c₀)*
+- **Note**: The ℓ∞ version is discussed at paper level; Lean uses c₀ as witness
 
 ### Core Dual Isometry: (c₀ →L[ℝ] ℝ) ≃ₗᵢ ℓ¹
 The complete dual isometry is now implemented with full mathematical rigor:
