@@ -12,5 +12,10 @@
 -- Core rank-one toggle modules (sorry-free)
 import Papers.P1_GBC.RankOneToggle.Projection
 
+namespace Papers.P1_GBC
+  def p1_minimal_marker : Unit := ()
+  #eval (1 : Nat)
+end Papers.P1_GBC
+
 -- Export namespaces for convenient access
 export RankOneToggle
