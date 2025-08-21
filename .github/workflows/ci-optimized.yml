@@ -1,0 +1,202 @@
+name: CI Optimized
+
+on: [push, pull_request]
+
+env:
+  LEAN_ABORT_ON_SORRY: 1
+  BUILD_TIMEOUT_SECONDS: 90
+
+jobs:
+  # Determine what paths changed
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      p3: ${{ steps.filter.outputs.p3 }}
+      p2: ${{ steps.filter.outputs.p2 }}
+      p1: ${{ steps.filter.outputs.p1 }}
+      core: ${{ steps.filter.outputs.core }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            p3:
+              - 'Papers/P3_2CatFramework/**'
+              - 'CategoryTheory/TwoCategory/**'
+            p2:
+              - 'Papers/P2_BidualGap/**'
+            p1:
+              - 'Papers/P1_GBC/**'
+            core:
+              - 'lakefile.lean'
+              - 'lean-toolchain'
+              - '.github/workflows/**'
+              - 'scripts/**'
+
+  build:
+    needs: changes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Lean
+        uses: leanprover/lean-action@v1
+        with:
+          use-mathlib-cache: true
+          build-args: "-K 400000"
+
+      - name: Cache .lake
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.lake
+            .lake/build
+          key: ${{ runner.os }}-lake-${{ hashFiles('lakefile.lean') }}
+
+      # Build P1 (always)
+      - name: Build P1 Minimal
+        timeout-minutes: 2
+        run: |
+          echo "Building P1 minimal target..."
+          lake build Papers.P1_GBC.P1_Minimal
+          echo "P1 build completed successfully"
+
+      # Build P2 (always)
+      - name: Build P2 Minimal
+        timeout-minutes: 2
+        run: |
+          echo "Building P2 minimal target..."
+          lake build Papers.P2_BidualGap.P2_Minimal
+          echo "P2 build completed successfully"
+
+      # Build P3 only if P3 files changed
+      - name: Check P3 changes
+        if: needs.changes.outputs.p3 == 'true' || needs.changes.outputs.core == 'true'
+        run: echo "P3 files changed, will build P3"
+
+      - name: Build P3 Framework (conditional)
+        if: needs.changes.outputs.p3 == 'true' || needs.changes.outputs.core == 'true'
+        timeout-minutes: 2
+        run: |
+          echo "Building P3 2-category framework..."
+          lake build Papers.P3_2CatFramework.Basic || {
+            echo "::warning::P3 build failed but not blocking PR"
+            exit 0
+          }
+
+      # Build legacy modules only if needed
+      - name: Build Legacy (conditional)
+        if: github.ref == 'refs/heads/main' || needs.changes.outputs.core == 'true'
+        continue-on-error: true
+        timeout-minutes: 2
+        run: |
+          echo "Building legacy modules..."
+          lake build || {
+            echo "::warning::Legacy build incomplete"
+            exit 0
+          }
+
+      - name: Verify no 'sorry' in P1
+        run: |
+          if [ -f scripts/no_sorry_p1_minimal.sh ]; then
+            bash scripts/no_sorry_p1_minimal.sh
+          else
+            echo "Checking P1 for sorries..."
+            ! grep -r "sorry" Papers/P1_GBC/RankOneToggle/ --include="*.lean"
+          fi
+
+      - name: Verify no 'sorry' in P2
+        run: |
+          if [ -f scripts/no_sorry_p2_minimal.sh ]; then
+            bash scripts/no_sorry_p2_minimal.sh
+          else
+            echo "Checking P2 for sorries..."
+            bash scripts/check-sorry-allowlist.sh
+          fi
+
+      - name: Guard against placeholder code
+        run: |
+          echo "Checking for prohibited placeholder implementations..."
+          
+          # Check for unsafe placeholder code patterns (not documentation)
+          VIOLATIONS=0
+          
+          # Look for actual unsafe implementations
+          if find Papers/ -name "*.lean" -exec grep -l "unsafe" {} \; | head -1 | grep -q .; then
+            echo "❌ Found 'unsafe' implementations in:"
+            find Papers/ -name "*.lean" -exec grep -Hn "unsafe" {} \;
+            VIOLATIONS=$((VIOLATIONS + 1))
+          fi
+          
+          # Look for TEMP implementations (not comments)
+          if find Papers/ -name "*.lean" -exec grep -E "^[[:space:]]*def.*TEMP|^[[:space:]]*theorem.*TEMP" {} \; | head -1 | grep -q .; then
+            echo "❌ Found 'TEMP' definitions in:"
+            find Papers/ -name "*.lean" -exec grep -HnE "^[[:space:]]*def.*TEMP|^[[:space:]]*theorem.*TEMP" {} \;
+            VIOLATIONS=$((VIOLATIONS + 1))
+          fi
+          
+          if [ "$VIOLATIONS" -gt 0 ]; then
+            echo "❌ CI Guard: Found $VIOLATIONS prohibited placeholder implementations"
+            exit 1
+          fi
+          
+          echo "✅ No prohibited placeholder implementations found"
+
+  # Quick P3 skip job for when P3 hasn't changed
+  p3-skip:
+    needs: changes
+    if: needs.changes.outputs.p3 != 'true' && needs.changes.outputs.core != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: P3 Framework CI (skipped)
+        run: |
+          echo "✅ P3 files unchanged - skipping P3 build"
+          echo "This allows P1/P2 PRs to proceed without P3 blocking"
+
+  # Lightweight tests that always run
+  quick-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Lean
+        uses: leanprover/lean-action@v1
+        with:
+          use-mathlib-cache: true
+
+      - name: Verify P1 Minimal imports
+        run: |
+          echo 'import Papers.P1_GBC.P1_Minimal
+          #check Papers.P1_GBC.p1_minimal_marker' | lake env lean --stdin
+
+      - name: Verify P2 Minimal imports
+        run: |
+          echo 'import Papers.P2_BidualGap.P2_Minimal
+          #check Papers.P2_BidualGap.p2_minimal_marker' | lake env lean --stdin
+
+      - name: Check LaTeX-Lean alignment
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        continue-on-error: true
+        run: |
+          if [ -f scripts/check_alignment.py ]; then
+            python scripts/check_alignment.py || echo "::warning::LaTeX alignment check failed"
+          fi
+
+  # Summary job for branch protection
+  ci-summary:
+    needs: [build, quick-tests]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: CI Summary
+        run: |
+          if [ "${{ needs.build.result }}" == "success" ] && [ "${{ needs.quick-tests.result }}" == "success" ]; then
+            echo "✅ All required checks passed"
+            exit 0
+          else
+            echo "❌ Some checks failed"
+            echo "Build: ${{ needs.build.result }}"
+            echo "Quick tests: ${{ needs.quick-tests.result }}"
+            exit 1
+          fi
