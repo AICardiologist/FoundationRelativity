@@ -11,6 +11,7 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
+      p4: ${{ steps.filter.outputs.p4 }}
       p3: ${{ steps.filter.outputs.p3 }}
       p2: ${{ steps.filter.outputs.p2 }}
       p1: ${{ steps.filter.outputs.p1 }}
@@ -21,6 +22,8 @@ jobs:
         id: filter
         with:
           filters: |
+            p4:
+              - 'Papers/P4_SpectralGeometry/**'
             p3:
               - 'Papers/P3_2CatFramework/**'
               - 'CategoryTheory/TwoCategory/**'
@@ -82,6 +85,21 @@ jobs:
           echo "Building P3 2-category framework..."
           lake build Papers.P3_2CatFramework.Basic || {
             echo "::warning::P3 build failed but not blocking PR"
+            exit 0
+          }
+
+      # Build P4 only if P4 files changed
+      - name: Check P4 changes
+        if: needs.changes.outputs.p4 == 'true' || needs.changes.outputs.core == 'true'
+        run: echo "P4 files changed, will build P4"
+
+      - name: Build P4 Spectral Geometry (conditional)
+        if: needs.changes.outputs.p4 == 'true' || needs.changes.outputs.core == 'true'
+        timeout-minutes: 2
+        run: |
+          echo "Building P4 spectral geometry..."
+          lake build Papers.P4_SpectralGeometry.Discrete || {
+            echo "::warning::P4 build failed but not blocking PR"
             exit 0
           }
 
@@ -153,6 +171,17 @@ jobs:
         run: |
           echo "✅ P3 files unchanged - skipping P3 build"
           echo "This allows P1/P2 PRs to proceed without P3 blocking"
+
+  # Quick P4 skip job for when P4 hasn't changed
+  p4-skip:
+    needs: changes
+    if: needs.changes.outputs.p4 != 'true' && needs.changes.outputs.core != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: P4 Spectral Geometry CI (skipped)
+        run: |
+          echo "✅ P4 files unchanged - skipping P4 build"
+          echo "This allows P1/P2/P3 PRs to proceed without P4 blocking"
 
   # Lightweight tests that always run
   quick-tests:
