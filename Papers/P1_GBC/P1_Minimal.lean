@@ -18,4 +18,4 @@ namespace Papers.P1_GBC
 end Papers.P1_GBC
 
 -- Export namespaces for convenient access
-export RankOneToggle
+open RankOneToggle
