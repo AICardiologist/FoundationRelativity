@@ -1,0 +1,36 @@
+# Configuration for PR auto-labeling based on changed paths
+
+paper-1:
+  - changed-files:
+    - any-glob-to-any-file: 'Papers/P1_GBC/**'
+
+paper-2:
+  - changed-files:
+    - any-glob-to-any-file: 'Papers/P2_BidualGap/**'
+
+paper-3:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - 'Papers/P3_2CatFramework/**'
+      - 'CategoryTheory/TwoCategory/**'
+
+paper-4:
+  - changed-files:
+    - any-glob-to-any-file: 'Papers/P4_SpectralGeometry/**'
+
+ci:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/workflows/**'
+      - '.github/*.yml'
+
+scripts:
+  - changed-files:
+    - any-glob-to-any-file: 'scripts/**'
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.md'
+      - '**/*.tex'
+      - 'docs/**'

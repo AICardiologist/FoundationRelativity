@@ -1,6 +1,11 @@
-name: CI
+name: CI (Full)
 
-on: [push, pull_request]
+# Run full CI only on main branch pushes
+# PRs use ci-optimized.yml with path filtering
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 env:
   LEAN_ABORT_ON_SORRY: 1
