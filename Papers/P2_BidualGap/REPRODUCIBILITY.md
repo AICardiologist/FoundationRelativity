@@ -1,5 +1,11 @@
 # Paper 2: Reproducibility Information
 
+## Artifact DOI
+- **10.5281/zenodo.13356587**
+
+## Release
+- **GitHub Release**: [p2-minimal-v0.1](https://github.com/AICardiologist/FoundationRelativity/releases/tag/p2-minimal-v0.1)
+
 ## Build Instructions
 
 ### Prerequisites

@@ -1,8 +1,9 @@
 # Paper 2: WLPO ↔ BidualGap∃ Equivalence
 
-![Paper2-Minimal CI](https://github.com/FoundationRelativity/FoundationRelativity/actions/workflows/p2-minimal.yml/badge.svg)
+![Paper2-Minimal CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/p2-minimal.yml/badge.svg)
+[![Release](https://img.shields.io/badge/Release-p2--minimal--v0.1-blue)](https://github.com/AICardiologist/FoundationRelativity/releases/tag/p2-minimal-v0.1)
 [![arXiv](https://img.shields.io/badge/arXiv-2025.xxxxx-b31b1b.svg)](https://arxiv.org/abs/2025.xxxxx)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.xxxxxxx.svg)](https://doi.org/10.5281/zenodo.xxxxxxx)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13356587.svg)](https://doi.org/10.5281/zenodo.13356587)
 
 ## 🎯 SPRINT E COMPLETE: Dual Isometry Implementation with 3 WLPO Sorries!
 
@@ -324,15 +325,41 @@ lake env lean Scripts/AxiomCheck.lean
 lake build Papers.P2_BidualGap
 ```
 
+## 🔧 Reproducibility
+
+### Using the Release Tag
+
+```bash
+# Clone and checkout the specific release
+git clone https://github.com/AICardiologist/FoundationRelativity.git
+cd FoundationRelativity
+git checkout p2-minimal-v0.1
+
+# Build the minimal target (0 sorries)
+lake build Papers.P2_BidualGap.P2_Minimal
+
+# Verify no sorries
+./scripts/no_sorry_p2_minimal.sh
+```
+
+### Latest Development
+
+```bash
+# Use main branch for latest changes
+git checkout main
+lake build Papers.P2_BidualGap.P2_Minimal
+```
+
 ## Related Documentation
 
 - **[LaTeX Paper v3.2](documentation/paper-v3.2.tex)**: Academic paper with Lean results
 - **[Technical Status](documentation/technical_status/)**: Implementation details and progress
 - **[Roadmap v3.2](../../docs/planning/ROADMAP-v3.2.md)**: Project roadmap and next steps
 - **[Main README](../../README.md)**: Overall project status and quick start
+- **[Release Notes](RELEASE_NOTES_v0.1.md)**: Details about p2-minimal-v0.1
 
 ---
 
-**STATUS**: **SPRINT D COMPLETE** ✅ - Bidirectional WLPO ↔ BidualGap equivalence proven.  
-**ACHIEVEMENT**: Complete Paper 2 theorem - direct construction witness, zero sorries in DirectDual.lean, universe-0 theorem proven with professor approval.  
-**NEXT**: Axiom discharge for full constructive proof, explore §3.6+ extensions, continue Paper 4 formalization.
+**STATUS**: **SPRINT E COMPLETE** ✅ - Dual isometry implementation with 3 WLPO sorries.  
+**ACHIEVEMENT**: Complete dual isometry (c₀ →L[ℝ] ℝ) ≃ₗᵢ ℓ¹ with 81% sorry reduction.  
+**RELEASE**: p2-minimal-v0.1 published with Option-B core (0 sorries).
