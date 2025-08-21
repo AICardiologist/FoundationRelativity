@@ -272,9 +272,7 @@ Papers/P2_BidualGap/Constructive/CReal_obsolete/Completeness.lean:151  # CReal i
 
 # Paper 2 DualStructure (deprecated lemmas already counted above)
 
-# Paper 2 Sprint E: HB/DualIsometriesComplete (2 deprecated WLPO lemmas)
-Papers/P2_BidualGap/HB/DualIsometriesComplete.lean:1564         # WLPO_implies_SCNP_l1_underWLPO (deprecated)
-Papers/P2_BidualGap/HB/DualIsometriesComplete.lean:1571         # SCNP_implies_complete_underWLPO (deprecated)
+# Paper 2 Sprint E: HB/DualIsometriesComplete (deprecated lemmas removed)
 
 # Paper 2 HB/DualIsometries (complete list after refactoring)
 Papers/P2_BidualGap/HB/DualIsometries.lean:76                          # Skeleton
