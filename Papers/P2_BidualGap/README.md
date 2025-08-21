@@ -3,7 +3,7 @@
 ![Paper2-Minimal CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/p2-minimal.yml/badge.svg)
 [![Release](https://img.shields.io/badge/Release-p2--minimal--v0.1-blue)](https://github.com/AICardiologist/FoundationRelativity/releases/tag/p2-minimal-v0.1)
 [![arXiv](https://img.shields.io/badge/arXiv-2025.xxxxx-b31b1b.svg)](https://arxiv.org/abs/2025.xxxxx)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.pending.svg)](https://github.com/AICardiologist/FoundationRelativity/releases/tag/p2-minimal-v0.1)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13356587.svg)](https://doi.org/10.5281/zenodo.13356587)
 
 ## 🎯 SPRINT E COMPLETE: Dual Isometry Implementation with 3 WLPO Sorries!
 
