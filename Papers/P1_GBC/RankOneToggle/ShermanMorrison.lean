@@ -359,13 +359,35 @@ theorem resolvent_G_true_explicit
 
 /-! ## Norm bounds for the resolvent -/
 
-/-- A norm bound for the Sherman-Morrison resolvent.
-This provides an explicit bound based on the triangle inequality approach suggested by the professor. -/
+/-- A coarse but robust triangle-inequality bound for the Sherman-Morrison resolvent.
+    Uses only norm_smul_le, norm_sub_le, and basic inequalities - no version-fragile tactics. -/
 theorem resolvent_norm_bound
     {P : H →L[𝕜] H} (z : 𝕜) (hz1 : z ≠ 1) :
     ∃ C : ℝ, 0 < C ∧ ‖((z - 1)⁻¹ • (ContinuousLinearMap.id 𝕜 H - P))‖ ≤ C := by
-  -- Triangle inequality bound: ‖(z-1)⁻¹ • (Id - P)‖ ≤ ‖(z-1)⁻¹‖ * (1 + ‖P‖)
-  -- This provides an explicit bound but requires careful norm calculations
-  sorry
+  -- Notation
+  set α : 𝕜 := (z - 1)⁻¹
+  -- Choose a clean explicit bound
+  let C : ℝ := ‖α‖ * (1 + ‖P‖)
+  refine ⟨C, ?pos, ?bound⟩
+  · -- positivity of C
+    have hα0 : α ≠ 0 := by
+      have : (z - 1) ≠ 0 := sub_ne_zero.mpr hz1
+      simpa [α] using inv_ne_zero this
+    have : 0 < ‖α‖ := by simpa [α] using (norm_pos_iff.mpr hα0)
+    have : 0 < 1 + ‖P‖ := by linarith [norm_nonneg P]
+    exact mul_pos ‹0 < ‖α‖› this
+  · -- bound via ‖α•(Id - P)‖ ≤ ‖α‖ * ‖Id - P‖ ≤ ‖α‖ * (‖Id‖ + ‖P‖) ≤ ‖α‖ * (1 + ‖P‖)
+    have h₁ : ‖ContinuousLinearMap.id 𝕜 H - P‖ ≤ ‖ContinuousLinearMap.id 𝕜 H‖ + ‖P‖ :=
+      norm_sub_le _ _
+    have hId : ‖ContinuousLinearMap.id 𝕜 H‖ ≤ 1 := ContinuousLinearMap.norm_id_le
+    have h₂ : ‖ContinuousLinearMap.id 𝕜 H‖ + ‖P‖ ≤ 1 + ‖P‖ :=
+      add_le_add_right hId _
+    have hsum : ‖ContinuousLinearMap.id 𝕜 H - P‖ ≤ 1 + ‖P‖ := le_trans h₁ h₂
+    have : ‖α‖ * ‖ContinuousLinearMap.id 𝕜 H - P‖ ≤ ‖α‖ * (1 + ‖P‖) :=
+      mul_le_mul_of_nonneg_left hsum (norm_nonneg _)
+    have final : ‖α • (ContinuousLinearMap.id 𝕜 H - P)‖ ≤ ‖α‖ * (1 + ‖P‖) :=
+      le_trans (norm_smul_le α (ContinuousLinearMap.id 𝕜 H - P)) this
+    show ‖α • (ContinuousLinearMap.id 𝕜 H - P)‖ ≤ C
+    exact final
 
 end Papers.P1_GBC.RankOneToggle
