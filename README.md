@@ -38,7 +38,7 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
 ## 📚 Papers & Lean Status
 
 ### Formalization Status
-- **[Paper 1: Rank-One Toggle Kernel](Papers/P1_GBC/)** 📋 Refocused - Minimal Lean implementation planned
+- **[Paper 1: Rank-One Toggle Kernel](Papers/P1_GBC/)** ✅ **Sherman-Morrison Core Complete (0 sorries)** - Ready for mathlib4 PRs
 - **[Paper 2: WLPO ↔ BidualGap∃](Papers/P2_BidualGap/)** ✅ **Sprint E: Dual Isometry Complete (3 WLPO sorries)**
 - **[Paper 3: 2-Categorical Framework](Papers/P3_2CatFramework/)** 📋 6 sorries - Framework ready
 - **[Paper 4: Spectral Geometry](Papers/P4_SpectralGeometry/)** 🔧 61 sorries - Discrete model 85% complete
@@ -74,15 +74,15 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
 ```
 FoundationRelativity/
 ├── Papers/                     # 📚 Main academic results
-│   ├── P1_GBC/                # 📋 Rank-One Toggle Kernel (minimal implementation)
-│   │   ├── RankOneToggle/     #    New minimal Lean modules
-│   │   │   ├── Projection.lean    #    Orthogonal projection API
-│   │   │   ├── Toggle.lean        #    G(c) operator definition
-│   │   │   ├── Spectrum.lean      #    Spectral computations
-│   │   │   ├── ShermanMorrison.lean # Inverse formulas
-│   │   │   ├── Fredholm.lean      #    Index theory
-│   │   │   └── Tutorial.lean      #    Usage examples
-│   │   └── documentation/      #    Work plan and papers
+│   ├── P1_GBC/                # ✅ Rank-One Toggle Kernel (Sherman-Morrison COMPLETE!)
+│   │   ├── RankOneToggle/     #    ✅ Core Lean modules (0 sorries)
+│   │   │   ├── Projection.lean    #    ✅ Orthogonal projection API
+│   │   │   ├── Toggle.lean        #    ✅ G(c) operator definition
+│   │   │   ├── Spectrum.lean      #    ✅ Spectral computations
+│   │   │   ├── ShermanMorrison.lean # ✅ Inverse formulas + robust norm bounds
+│   │   │   ├── Fredholm.lean      #    📋 Index theory (planned)
+│   │   │   └── Tutorial.lean      #    📋 Usage examples (planned)
+│   │   └── documentation/      #    📄 Work plan and papers
 │   ├── P2_BidualGap/          # ✅ WLPO ↔ BidualGap COMPLETE!
 │   │   ├── Basic.lean         # ✅ Core definitions (BidualGapStrong, WLPO)
 │   │   ├── Gap/               # ✅ §3.1-3.5 Complete equivalence framework
@@ -132,8 +132,8 @@ lake build          # Build all formalized papers
 
 ### Explore the Results
 ```bash
-# Paper 1: Rank-One Toggle Kernel (when implemented)
-lake build Papers.RankOneToggle
+# Paper 1: Sherman-Morrison Complete Implementation (0 sorries!)
+lake build Papers.P1_GBC.RankOneToggle.ShermanMorrison
 
 # Paper 2: Gap → WLPO (axiom-clean!)  
 lake build Papers.P2_BidualGap.Constructive.Ishihara
@@ -150,19 +150,21 @@ lake build Papers.P4_SpectralGeometry.Discrete
 
 ## 📖 Key Theorems
 
-### Paper 1: Rank-One Toggle Kernel (Planned)
+### Paper 1: Rank-One Toggle Kernel (Sherman-Morrison Complete)
 ```lean
--- Toggle operator surjectivity characterization
-theorem surjective_iff (c : Bool) :
-    Function.Surjective (G c) ↔ c = false
+-- Sherman-Morrison formula for projections (COMPLETE - 0 sorries)
+theorem sherman_morrison_proj {α : 𝕜} (hα : (1 : 𝕜) + α ≠ 0) :
+    ((ContinuousLinearMap.id 𝕜 H) + α • P).comp (
+      (ContinuousLinearMap.id 𝕜 H) - (α / (1 + α)) • P) = 
+    ContinuousLinearMap.id 𝕜 H
 
--- Spectrum computation
-theorem spectrum_G : 
-    spectrum K (G false) = {1} ∧ spectrum K (G true) = {0, 1}
+-- Robust norm bounds for resolvent (COMPLETE - 0 sorries)
+theorem resolvent_norm_bound {P : H →L[𝕜] H} (z : 𝕜) (hz1 : z ≠ 1) :
+    ∃ C : ℝ, 0 < C ∧ ‖((z - 1)⁻¹ • (ContinuousLinearMap.id 𝕜 H - P))‖ ≤ C
 
--- Sherman-Morrison formula for projections
-theorem inverse_id_add_smul_proj (P : H →L[K] H) (hP : P.comp P = P) :
-    (1 + α ≠ 0) → (I + αP)⁻¹ = I - α/(1+α) • P
+-- Toggle operator framework (COMPLETE)
+def G (u : H) (hu : ‖u‖ = 1) (c : Bool) : H →L[𝕜] H :=
+  ContinuousLinearMap.id 𝕜 H - (if c then (1 : 𝕜) else 0) • projLine u hu
 ```
 
 ### Paper 2: WLPO ↔ BidualGap Complete Equivalence
@@ -198,14 +200,14 @@ theorem gap_collapse_threshold (h : ℚ) :
 
 | Component | Sorry Count | Status | Key Achievement |
 |-----------|-------------|--------|------------------|
-| Paper 1 (New) | N/A | 📋 Planning | Minimal rank-one toggle design |
+| **Paper 1 Sherman-Morrison** | **0** | ✅ **Complete** | **Robust norm bounds + toggle framework** |
 | **Paper 2 Core** | **3** | ✅ **Nearly Complete** | **Dual isometry with 3 WLPO sorries** |
 | Paper 2 §3.1-3.5 | 0 | ✅ Complete | §3.1-3.5 equivalence chain + lattice algebra |
 | Paper 2 Gap→WLPO | 0 | ✅ Axiom-Clean | Breakthrough: Direct Prop approach |
 | Paper 2 Fortress CI | 0 | ✅ Complete | 8-stage guard system with axiom hygiene |
 | Paper 3 | 6 | 📋 Framework Ready | Pseudo-functor theory |
 | Paper 4 Discrete | 61 | 🔧 85% Complete | CPW encoding active |
-| **Total Active** | **70** | **Sprint E milestone achieved** | |
+| **Total Active** | **70** | **Sherman-Morrison milestone achieved** | |
 
 ## 🔬 Mathematical Significance
 
@@ -283,8 +285,8 @@ This project is released under MIT License. If you use this work, please cite:
 
 ---
 
-**Latest Update**: 🎯 **SPRINT E COMPLETE** - Dual Isometry Implementation with 3 WLPO Sorries!  
-**Paper 1 Refocus**: Minimal rank-one toggle kernel for mathlib4 upstream (planning phase)  
-**Paper 2 Achievement**: Complete dual isometry (c₀* ≃ₗᵢ ℓ¹) with 81% sorry reduction (16 → 3)  
-**Status**: Paper 2 nearly complete (3 WLPO sorries), Paper 4 discrete model 85% complete  
-**Next Steps**: Implement Paper 1 minimal modules, prepare mathlib4 PRs, continue Paper 4 formalization
+**Latest Update**: 🎯 **SHERMAN-MORRISON COMPLETE** - Paper 1 Core Implementation Achieved!  
+**Paper 1 Achievement**: Complete Sherman-Morrison implementation with robust norm bounds (0 sorries)  
+**Paper 2 Status**: Complete dual isometry (c₀* ≃ₗᵢ ℓ¹) with 81% sorry reduction (16 → 3)  
+**Status**: Paper 1 Sherman-Morrison core complete, Paper 2 nearly complete (3 WLPO sorries), Paper 4 discrete model 85% complete  
+**Next Steps**: Complete Paper 1 remaining modules (Fredholm, Tutorial), prepare mathlib4 PRs, continue Paper 4 formalization

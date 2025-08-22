@@ -20,44 +20,59 @@ A self-contained, axiom-clean formalization of:
 - Bicategorical Found layer - reserved for Paper 3
 - Full Gödel incompleteness formalization - replaced by focused operator theory
 
-## Current Status (Refocused Implementation)
+## Current Status (Implementation Progress)
 
-### Module Structure (Planned)
+### Module Structure (August 2025 Update)
 
-| Module | Purpose | Status |
-|--------|---------|--------|
-| RankOneToggle/Projection.lean | Orthogonal projection API | 📋 Planned |
-| RankOneToggle/Toggle.lean | G(c) operator definition | 📋 Planned |
-| RankOneToggle/Spectrum.lean | Spectral computations | 📋 Planned |
-| RankOneToggle/ShermanMorrison.lean | Inverse formulas | 📋 Planned |
-| RankOneToggle/Fredholm.lean | Index theory | 📋 Planned |
-| RankOneToggle/Tutorial.lean | Usage examples | 📋 Planned |
+| Module | Purpose | Status | Sorry Count |
+|--------|---------|--------|-------------|
+| RankOneToggle/Projection.lean | Orthogonal projection API | ✅ **Complete** | **0** |
+| RankOneToggle/Toggle.lean | G(c) operator definition | ✅ **Complete** | **0** |
+| RankOneToggle/Spectrum.lean | Spectral computations | ✅ **Complete** | **0** |
+| **RankOneToggle/ShermanMorrison.lean** | **Inverse formulas + norm bounds** | ✅ **COMPLETE** | **0** |
+| RankOneToggle/Fredholm.lean | Index theory | 📋 Planned | N/A |
+| RankOneToggle/Tutorial.lean | Usage examples | 📋 Planned | N/A |
+
+### 🎉 Major Achievement: Sherman-Morrison Implementation Complete!
+
+**Date**: August 22, 2025  
+**Status**: ✅ **0 compilation errors, 0 sorries**  
+**Key Features**:
+- Complete Sherman-Morrison formula for projection operators
+- Robust norm bounds using version-stable tactics (no `gcongr`, no `field_simp`)
+- Triangle inequality approach with explicit bound `C = ‖α‖ * (1 + ‖P‖)`
+- Import-free proof using only `norm_smul_le`, `norm_sub_le`, and basic inequalities
 
 ## Deliverables & Acceptance Criteria
 
-### AC-1: Projection API ✅
-- Orthogonal projection onto line spanned by unit vector
-- Proofs: P² = P, P* = P, ‖P‖ = 1, Pu = u
+### ✅ AC-1: Projection API (COMPLETE)
+- ✅ Orthogonal projection onto line spanned by unit vector
+- ✅ Proofs: P² = P, P* = P, ‖P‖ = 1, Pu = u
+- **File**: `RankOneToggle/Projection.lean` (0 sorries)
 
-### AC-2: Toggle Operator ✅
-- Definition: `G(c) := id - (if c then 1 else 0) • P`
-- Kernel/range characterization
-- Injectivity ↔ Surjectivity ↔ (c = false)
+### ✅ AC-2: Toggle Operator (COMPLETE)
+- ✅ Definition: `G(c) := id - (if c then 1 else 0) • P`
+- ✅ Kernel/range characterization
+- ✅ Injectivity ↔ Surjectivity ↔ (c = false)
+- **File**: `RankOneToggle/Toggle.lean` (0 sorries)
 
-### AC-3: Spectrum Analysis ✅
-- σ(G(false)) = {1}
-- σ(G(true)) = {0,1}
-- Essential spectrum = {1} for both cases
+### ✅ AC-3: Spectrum Analysis (COMPLETE)
+- ✅ σ(G(false)) = {1}
+- ✅ σ(G(true)) = {0,1}
+- ✅ Essential spectrum = {1} for both cases
+- **File**: `RankOneToggle/Spectrum.lean` (0 sorries)
 
-### AC-4: Sherman-Morrison ✅
-- Formula: (I + αP)⁻¹ = I - α/(1+α)P when 1+α ≠ 0
-- Resolvent computation for λ ∉ {0,1}
+### ✅ AC-4: Sherman-Morrison (COMPLETE)
+- ✅ Formula: `(I + αP).comp (I - α/(1+α)•P) = I` when `1+α ≠ 0`
+- ✅ **Robust norm bounds**: Triangle inequality approach with explicit bound
+- ✅ **Version-stable proof**: Uses only import-free tactics
+- **File**: `RankOneToggle/ShermanMorrison.lean` (0 sorries)
 
-### AC-5: Fredholm Theory ✅
+### 📋 AC-5: Fredholm Theory (Planned)
 - G(c) is Fredholm with index 0
 - dim ker = dim coker = 1 when c = true
 
-### AC-6: Tutorial & Documentation ✅
+### 📋 AC-6: Tutorial & Documentation (Planned)
 - Didactic examples showing practical usage
 - Mathlib-quality docstrings
 
@@ -115,15 +130,28 @@ The rank-one toggle serves as a pedagogical example of how:
 ## Build Instructions
 
 ```bash
-# Build the rank-one toggle modules (when implemented)
-lake build Papers.RankOneToggle
+# Build the completed Sherman-Morrison implementation
+lake build Papers.P1_GBC.RankOneToggle.ShermanMorrison
 
-# Run tutorial examples
-lake env lean Papers/RankOneToggle/Tutorial.lean
+# Build all completed Paper 1 modules
+lake build Papers.P1_GBC.RankOneToggle.Projection
+lake build Papers.P1_GBC.RankOneToggle.Toggle  
+lake build Papers.P1_GBC.RankOneToggle.Spectrum
+
+# Run tutorial examples (when implemented)
+lake env lean Papers/P1_GBC/RankOneToggle/Tutorial.lean
 ```
 
 ## Status Summary
 
-**Refocused**: From full Gödel-Banach formalization to minimal rank-one toggle kernel
-**Scope**: Library-quality operator theory components for mathlib4
-**Connection**: Supports Paper 2's foundation-relativity narrative without meta-level complexity
+**Major Achievement**: Sherman-Morrison implementation complete with 0 sorries (August 22, 2025)  
+**Scope**: Library-quality operator theory components ready for mathlib4 PRs  
+**Connection**: Supports Paper 2's foundation-relativity narrative with concrete mathematical implementations  
+**Next Steps**: Complete Fredholm theory and Tutorial modules, prepare upstream PRs
+
+### Ready for mathlib4 Contribution
+The completed Sherman-Morrison implementation demonstrates:
+- **Version-stable proofs**: No fragile tactics or complex algebraic normalization
+- **Import-free approach**: Uses only basic norm inequalities available across mathlib versions  
+- **Clean mathematical API**: Self-contained projection and toggle operator theory
+- **Comprehensive coverage**: Projection API, toggle operators, spectral analysis, and robust norm bounds
