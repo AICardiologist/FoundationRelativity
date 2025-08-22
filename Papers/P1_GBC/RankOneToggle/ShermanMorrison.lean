@@ -79,8 +79,8 @@ private lemma normalize_id_sum
     (P : H →L[𝕜] H) (b t : 𝕜) :
     (ContinuousLinearMap.id 𝕜 H - b • P) + t • P
   = ContinuousLinearMap.id 𝕜 H + ((-b) + t) • P := by
-  -- t•P + -(b•P) = t•P - b•P = (t - b)•P = (t + -b)•P
-  simp [sub_eq_add_neg, add_smul]
+  -- Just reassociate/commute the additive terms
+  simpa [sub_eq_add_neg, add_smul, add_comm, add_left_comm, add_assoc]
 
 /-! ### Toggle operator -/
 
@@ -173,12 +173,23 @@ lemma not_isUnit_id_sub_proj
   intro hU
   classical
   rcases hU with ⟨u, hu⟩
-  -- Build a left inverse and deduce injectivity.
-  have h_left :
+  -- Build a left inverse via units; then rewrite to subtraction form.
+  -- Step 1: `u.inv_mul : ↑(u⁻¹) * ↑u = 1`  (here `*` = `comp`, `1` = `Id`).
+  have h_comp₀ :
+      ((↑(u⁻¹)) : H →L[𝕜] H).comp ((↑u) : H →L[𝕜] H)
+        = ContinuousLinearMap.id 𝕜 H := by
+    change ((↑(u⁻¹)) * (↑u) = (1 : H →L[𝕜] H))
+    simpa using u.inv_mul
+  -- Step 2: rewrite the right factor using the witness `hu : ↑u = Id - P`.
+  have h_comp :
       ((↑(u⁻¹)) : H →L[𝕜] H).comp (ContinuousLinearMap.id 𝕜 H - P)
         = ContinuousLinearMap.id 𝕜 H := by
-    -- In Units, multiplication is composition and 1 is Id; rewrite via the witness
-    simpa [hu] using u.inv_mul
+    simpa [hu] using h_comp₀
+  -- Step 3: turn composition into the requested subtraction shape.
+  have h_left :
+      ((↑(u⁻¹)) : H →L[𝕜] H) - ((↑(u⁻¹)) : H →L[𝕜] H).comp P
+        = ContinuousLinearMap.id 𝕜 H := by
+    simpa [comp_sub_left, comp_id] using h_comp
   have hinj : Function.Injective (ContinuousLinearMap.id 𝕜 H - P) := by
     -- Pointwise form of `h_left` is a `LeftInverse`.
     have hLI :
@@ -231,7 +242,7 @@ theorem resolvent_G_false_explicit
   -- The typical "assumption" step becomes deterministic:
   have : ((z - 1)⁻¹) • (z • ContinuousLinearMap.id 𝕜 H - ContinuousLinearMap.id 𝕜 H) = 
          ContinuousLinearMap.id 𝕜 H := by
-    simpa [hzsmul, smul_smul, mul_inv_cancel₀ hz1', one_smul]
+    simpa [hzsmul, smul_smul, inv_mul_cancel₀ hz1', one_smul]
   -- Use this for the scalar goal
   simpa [sub_eq_add_neg, smul_sub] using this
 
@@ -247,22 +258,19 @@ theorem resolvent_G_true_explicit
   classical
   set α : 𝕜 := (z - 1)⁻¹
   have hz1' : (z - 1) ≠ 0 := sub_ne_zero.mpr hz1
-  -- Show `(1 + α) ≠ 0` using `(1+α)(z-1) = z`.
+  -- Show `(1 + α) ≠ 0` using `(1+α)(z-1) = z` (no `congrArg`).
   have hα : 1 + α ≠ 0 := by
-    intro h
-    -- (1+α)(z-1) = (z-1) + α(z-1) = (z-1) + 1 = z
+    -- `α = (z-1)⁻¹`, so `(z-1)*α = 1`.
     have hmul_base : ((z - 1) * α : 𝕜) = 1 := by simpa [α] using mul_inv_cancel₀ hz1'
-    -- Convert (z-1)*α = 1 to α*(z-1) = 1 for this direction if needed  
     have hmul1 : α * (z - 1) = 1 := by simpa [mul_comm] using hmul_base
-    have : z - 1 + α * (z - 1) = z := by
+    intro hzero
+    have hcalc : (1 + α) * (z - 1) = z := by
       calc
-        z - 1 + α * (z - 1) = z - 1 + 1 := by simpa [hmul1]
+        (1 + α) * (z - 1) = (z - 1) + α * (z - 1) := by ring
+        _ = (z - 1) + 1 := by simpa [hmul1]
         _ = z := by ring
-    -- Use this where you previously tried `assumption`
-    have : z = 0 := by 
-      simp [h, zero_mul] at this
-      exact this
-    exact hz0 this
+    have hz' : 0 = z := by simpa [hzero] using hcalc
+    exact hz0 hz'.symm
   -- The Sherman–Morrison core identity:
   have core_right :
       (ContinuousLinearMap.id 𝕜 H + α • P).comp
@@ -276,45 +284,78 @@ theorem resolvent_G_true_explicit
   have fac :
       z • ContinuousLinearMap.id 𝕜 H - G (𝕜 := 𝕜) (H := H) P true
         = (z - 1) • (ContinuousLinearMap.id 𝕜 H + α • P) := by
-    have hzsmul :
-        z • ContinuousLinearMap.id 𝕜 H - ContinuousLinearMap.id 𝕜 H
-          = (z - 1) • ContinuousLinearMap.id 𝕜 H := by
-      simpa [one_smul] using
-        (sub_smul z (1 : 𝕜) (ContinuousLinearMap.id 𝕜 H)).symm
     calc
       z • ContinuousLinearMap.id 𝕜 H - G (𝕜 := 𝕜) (H := H) P true
           = z • ContinuousLinearMap.id 𝕜 H - (ContinuousLinearMap.id 𝕜 H - P) := by
             simp [G_true]
       _ = (z - 1) • ContinuousLinearMap.id 𝕜 H + P := by
-            simpa [hzsmul, sub_eq_add_neg, add_comm, add_left_comm, add_assoc]
+        -- First normalize: z•Id - (Id - P) = (z•Id - Id) + P
+        have hL :
+            z • ContinuousLinearMap.id 𝕜 H - (ContinuousLinearMap.id 𝕜 H - P)
+              = (z • ContinuousLinearMap.id 𝕜 H - ContinuousLinearMap.id 𝕜 H) + P := by
+          simp [sub_eq_add_neg, add_comm, add_left_comm, add_assoc]
+        -- Then fold z•Id - Id = (z - 1)•Id
+        have hz :
+            z • ContinuousLinearMap.id 𝕜 H - ContinuousLinearMap.id 𝕜 H
+              = (z - 1) • ContinuousLinearMap.id 𝕜 H := by
+          simpa [one_smul]
+            using (sub_smul z (1 : 𝕜) (ContinuousLinearMap.id 𝕜 H)).symm
+        simpa [hL, hz]
       _ = (z - 1) • (ContinuousLinearMap.id 𝕜 H + α • P) := by
-            simp [smul_add, smul_smul, hmul, one_smul]
+        -- Split the RHS, then use hmul to match the LHS sum.
+        have hsplit :
+          (z - 1) • (ContinuousLinearMap.id 𝕜 H + α • P)
+            = (z - 1) • ContinuousLinearMap.id 𝕜 H
+              + ((z - 1) * α) • P := by
+          simp [smul_add, smul_smul]
+        have : (z - 1) • ContinuousLinearMap.id 𝕜 H + P
+            = (z - 1) • ContinuousLinearMap.id 𝕜 H + ((z - 1) * α) • P := by
+          simpa [hmul, one_smul]
+        exact this.trans hsplit.symm
   -- Compose the factorization with the candidate right inverse.
-  have : ((z - 1) • (ContinuousLinearMap.id 𝕜 H + α • P)).comp
-           ((z - 1)⁻¹ • (ContinuousLinearMap.id 𝕜 H - (α / (1 + α)) • P))
-         = 1 • ((ContinuousLinearMap.id 𝕜 H + α • P).comp
-                  (ContinuousLinearMap.id 𝕜 H - (α / (1 + α)) • P)) := by
-    -- Pull the scalars through once, then simplify ((z-1)*(z-1)⁻¹)=1
+  have hpull :
+    ((z - 1) • (ContinuousLinearMap.id 𝕜 H + α • P)).comp
+      ((z - 1)⁻¹ • (ContinuousLinearMap.id 𝕜 H - (α / (1 + α)) • P))
+      = 1 • ((ContinuousLinearMap.id 𝕜 H + α • P).comp
+              (ContinuousLinearMap.id 𝕜 H - (α / (1 + α)) • P)) := by
+    -- First collapse ((z-1)•A) ∘ ((z-1)⁻¹•B) → ((z-1)*(z-1)⁻¹)•(A∘B).
     have H :
-        ((z - 1) • (ContinuousLinearMap.id 𝕜 H + α • P)).comp
+      ((z - 1) • (ContinuousLinearMap.id 𝕜 H + α • P)).comp
         ((z - 1)⁻¹ • (ContinuousLinearMap.id 𝕜 H - (α / (1 + α)) • P))
-        = ((z - 1) * (z - 1)⁻¹) •
-          ((ContinuousLinearMap.id 𝕜 H + α • P).comp
+        =
+      ((z - 1) * (z - 1)⁻¹) •
+        ((ContinuousLinearMap.id 𝕜 H + α • P).comp
+         (ContinuousLinearMap.id 𝕜 H - (α / (1 + α)) • P)) := by
+      simpa using
+        (comp_smul_smul
+          (ContinuousLinearMap.id 𝕜 H + α • P)
+          (ContinuousLinearMap.id 𝕜 H - (α / (1 + α)) • P)
+          (z - 1) ((z - 1)⁻¹))
+    -- Then cancel ((z-1)*(z-1)⁻¹) = 1.
+    simpa [mul_inv_cancel₀ hz1', one_smul] using H
+  -- Put the pieces together, keeping the composition shape fixed.
+  let Y₁ : H →L[𝕜] H :=
+    ( (z - 1)⁻¹ • (ContinuousLinearMap.id 𝕜 H - (α / (1 + α)) • P) )
+  have step1 :
+    (z • ContinuousLinearMap.id 𝕜 H - G (𝕜 := 𝕜) (H := H) P true).comp Y₁
+      =
+    ((z - 1) • (ContinuousLinearMap.id 𝕜 H + α • P)).comp Y₁ := by
+    -- rewrite the left factor by `fac` and leave the right factor as `Y₁`
+    rw [fac]
+  have step2 :
+    ((z - 1) • (ContinuousLinearMap.id 𝕜 H + α • P)).comp Y₁
+      =
+    1 • ((ContinuousLinearMap.id 𝕜 H + α • P).comp
            (ContinuousLinearMap.id 𝕜 H - (α / (1 + α)) • P)) := by
-      simpa [comp_smul_smul]
-    simpa [mul_inv_cancel₀ hz1'] using H
-  -- Put the pieces together.
+    -- this is exactly `hpull`
+    simpa [Y₁] using hpull
   calc
-    (z • ContinuousLinearMap.id 𝕜 H - G (𝕜 := 𝕜) (H := H) P true).comp
-      ((z - 1)⁻¹ • (ContinuousLinearMap.id 𝕜 H - ((z - 1)⁻¹ / (1 + (z - 1)⁻¹)) • P))
-        = ((z - 1) • (ContinuousLinearMap.id 𝕜 H + α • P)).comp
-            ((z - 1)⁻¹ • (ContinuousLinearMap.id 𝕜 H - (α / (1 + α)) • P)) := by
-              -- Just rewrite α consistently
-              simp [α, fac]
-  _ = 1 • ((ContinuousLinearMap.id 𝕜 H + α • P).comp
-              (ContinuousLinearMap.id 𝕜 H - (α / (1 + α)) • P)) := this
-  _ = 1 • ContinuousLinearMap.id 𝕜 H := by simpa [core_right]
-  _ = ContinuousLinearMap.id 𝕜 H := by simp
+    (z • ContinuousLinearMap.id 𝕜 H - G (𝕜 := 𝕜) (H := H) P true).comp Y₁
+        = ((z - 1) • (ContinuousLinearMap.id 𝕜 H + α • P)).comp Y₁ := step1
+    _   = 1 • ((ContinuousLinearMap.id 𝕜 H + α • P).comp
+               (ContinuousLinearMap.id 𝕜 H - (α / (1 + α)) • P)) := step2
+    _   = 1 • ContinuousLinearMap.id 𝕜 H := by simpa [core_right]
+    _   = ContinuousLinearMap.id 𝕜 H := by simp
 
 /-! ## Optional: a norm bound for the resolvent (left as intended `sorry`) -/
 
