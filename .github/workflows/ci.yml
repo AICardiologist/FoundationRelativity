@@ -102,7 +102,7 @@ jobs:
           
           # Test Paper 1: Rank-One Toggle Kernel (Sherman-Morrison + stubs)
           echo 'import Papers.P1_GBC.P1_Minimal
-          #check Papers.P1_GBC.P1_status' | lake env lean --stdin
+          #check Papers.P1_GBC.p1_minimal_marker' | lake env lean --stdin
           
           # Test Paper 2: WLPO ↔ BidualGap equivalence (dual isometry complete)
           echo 'import Papers.P2_BidualGap.P2_Minimal
