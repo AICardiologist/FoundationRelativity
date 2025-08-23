@@ -2,10 +2,10 @@ import Papers.P3_2CatFramework.Core.UniverseLevels
 import Papers.P3_2CatFramework.Core.FoundationBasic
 import Papers.P3_2CatFramework.Core.Coherence
 import Papers.P3_2CatFramework.Core.CoherenceTwoCellSimp
-import CategoryTheory.WitnessGroupoid.Core
+-- Removed: import CategoryTheory.WitnessGroupoid.Core (doesn't exist yet)
 
 -- Foundation, Interp, and GapWitness are available directly from FoundationBasic
--- GenericWitness is available from WitnessGroupoid.Core
+-- GenericWitness will be available from WitnessGroupoid.Core in Phase 3+
 
 -- Re-export the pattern-matchable placeholders and plumbing
 export Papers.P3
