@@ -17,10 +17,11 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{mathtools,amsmath,amssymb,amsthm}
+\usepackage{url} % Add this for URL handling
 \usepackage{hyperref}
 \hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
 
-% Lean listings (minimal)
+% ---------- Lean listings (minimal, unicode-safe) ----------
 \usepackage{listings}
 \lstdefinelanguage{Lean}{
   morekeywords={structure,inductive,namespace,variable,variables,section,end,def,lemma,theorem,
@@ -41,7 +42,23 @@
   showstringspaces=false,
   breaklines=true,
   frame=single,
-  rulecolor=\color{black!20}
+  rulecolor=\color{black!20},
+  % Make common Unicode characters render sanely in listings:
+  literate=
+    {→}{{$\to$}}2
+    {⟪}{{$\langle$}}1
+    {⟫}{{$\rangle$}}1
+    {‖}{{$\|$}}1
+    {≤}{{$\le$}}1
+    {≥}{{$\ge$}}1
+    {≠}{{$\ne$}}1
+    {∈}{{$\in$}}1
+    {λ}{{$\lambda$}}1
+    {α}{{$\alpha$}}1
+    {β}{{$\beta$}}1
+    {��}{{$\mathbb{k}$}}1
+    {ℝ}{{$\mathbb{R}$}}1
+    {ℂ}{{$\mathbb{C}$}}1
 }
 
 % ---------- Theorem environments ----------
@@ -63,6 +80,7 @@
 \DeclareMathOperator{\range}{range}
 \DeclareMathOperator{\kerop}{ker}
 \newcommand{\Hsp}{H}
+\newcommand{\CL}[2]{\mathcal{L}_{#1}(#2)} % bounded operators, field then space
 
 % ---------- Lean / repo markers ----------
 \newcommand{\leanRepoTag}{\href{https://github.com/AICardiologist/FoundationRelativity/tree/main/Papers/P1_GBC}{P1\_GBC}}
@@ -73,7 +91,7 @@
 \title{\textbf{Rank-One Toggle on Hilbert Spaces:\\
 A Minimal Operator-Theoretic Core with a Lean 4 Formalization}}
 \author{Paul Chun--Kit Lee}
-\date{August 2025 \\[2pt] \small (working note / preprint)}  %% NEW/CHANGED
+\date{August 2025 \\[2pt] \small (working note / preprint)}
 
 \begin{document}
 \maketitle
@@ -85,7 +103,7 @@ G(c)\;:=\;I - c\,P,\qquad c\in\{0,1\},
 \]
 on a (real or complex) Hilbert space~$H$. We give compact proofs of block decomposition, kernel/range, injectivity $\Leftrightarrow$ surjectivity, spectrum and essential spectrum, and a projection-specialized Sherman--Morrison inverse formula which yields a closed-form resolvent away from $\{0,1\}$.
 
-A fully \emph{mechanized} development accompanies the paper in Lean~4 (\leanRepoTag). The current build (pinned toolchain) verifies the projection, toggle algebra, Sherman--Morrison identity, explicit resolvent formulas, and a robust resolvent norm bound (\leanok). The spectrum and Fredholm sections are present in the text and the code but are \leanpending\ under this pinned \texttt{mathlib4} snapshot due to missing operator-algebra instances; our Spectrum module compiles against a local placeholder until an update.  %% NEW/CHANGED
+A fully \emph{mechanized} development accompanies the paper in Lean~4 (\leanRepoTag). With the pinned toolchain, the projection API, the toggle algebra, the Sherman--Morrison identity, explicit resolvent formulas, and a robust resolvent norm bound are \leanok. The Spectrum and Fredholm sections are included mathematically, and their Lean counterparts are \leanpending\ in this snapshot due to missing operator-algebra and finiteness APIs; our Spectrum module compiles against a local placeholder until we upgrade \texttt{mathlib4}.
 \end{abstract}
 
 \tableofcontents
@@ -109,13 +127,12 @@ Despite its simplicity, $G(c)$ packages a useful microcosm of operator theory: e
 \item Proof-engineering notes: composition lemmas, module-side scalar factoring, and \emph{shape-preserving} rewriting that stabilized elaboration across \texttt{mathlib} changes.
 \end{itemize}
 
-%% NEW/CHANGED: Motivation subsection
 \subsection*{Motivation and context}
-Rank-one perturbations are ubiquitous: they model on/off \emph{gates} in dynamical systems, rank-one \emph{updates} in numerical linear algebra (e.g.\ Sherman--Morrison), and elementary \emph{projectors} for block decompositions. As a formalization target, the rank-one toggle hits a "sweet spot":
+Rank-one perturbations are ubiquitous: they model on/off \emph{gates} in dynamical systems, rank-one \emph{updates} in numerical linear algebra (e.g.\ Sherman--Morrison), and elementary \emph{projectors} for block decompositions. As a formalization target, the rank-one toggle hits a ``sweet spot'':
 \begin{itemize}
-\item \textbf{Expressive but compact:} full block structure, resolvent, spectrum, and Fredholm properties are accessible and instructive.
-\item \textbf{Reusable building block:} the same patterns reappear for finite-rank projections and block triangular resolvent computations.
-\item \textbf{Mechanization laboratory:} the development exercises standard algebraic interfaces in \texttt{mathlib4} (continuous linear maps, spectra, idempotents) and records robust proof patterns for reuse.
+\item \textbf{Expressive but compact:} block structure, resolvent, spectrum, and Fredholm properties are accessible and instructive.
+\item \textbf{Reusable building block:} the same patterns reappear for finite-rank projections and block-triangular resolvent computations.
+\item \textbf{Mechanization laboratory:} the development exercises standard algebraic interfaces in \texttt{mathlib4} and records robust proof patterns for reuse.
 \end{itemize}
 
 \section{Preliminaries}
@@ -127,7 +144,7 @@ Let $u\in H$ with $\norm{u}=1$. Define $P:H\to H$ by $P(x)=\ip{u}{x}\,u$. Then $
 \end{definition}
 
 \begin{remark}[Lean note]
-Definition~\ref{def:proj} is implemented in \texttt{Projection.lean} (\leanok). The proof that $\norm{P}=1$ uses $P(u)=u$ and the standard $\lVert P\rVert\le 1$ estimate; the adjoint law is by polarization.
+Definition~\ref{def:proj} is implemented in \texttt{Projection.lean} (\leanok). The estimate $\lVert P\rVert\le 1$ is by Cauchy--Schwarz; the equality uses $P(u)=u$; self-adjointness is by conjugate symmetry/polarization.
 \end{remark}
 
 \section{The Rank-One Toggle: Block Form, Kernel/Range, and Spectrum}\label{sec:toggle}
@@ -178,8 +195,8 @@ For both $c\in\{0,1\}$, $\sigma_{\mathrm{ess}}\big(G(c)\big)=\{1\}$.
 Since $P$ is rank one, $G(c)=I-cP$ is a finite-rank perturbation of $I$, and essential spectrum is invariant under compact (in fact, finite-rank) perturbations.
 \end{proof}
 
-\begin{remark}[Mechanization status (working note)]  %% NEW/CHANGED
-The Spectrum development is present in code but currently compiles against a local placeholder for the spectrum (due to the pinned \texttt{mathlib4} commit \texttt{32a7e535287f9c7340c0f91d05c4c20631935a27} lacking a needed operator-algebra instance). All analytic statements above are standard and used only through the explicit resolvent formula in Theorem~\ref{thm:SM-resolvent}. We intend to drop the placeholder and switch to the canonical \texttt{spectrum} once we update the dependency.
+\begin{remark}[Mechanization status (working note)]
+\texttt{Spectrum.lean} is present but currently compiles against a local placeholder because the pinned \texttt{mathlib4} commit \texttt{32a7e535287f9c7340c0f91d05c4c20631935a27} lacks required operator-algebra instances for $\CL{\K}{H}$. All analytic statements above are standard and are also supported by the explicit resolvent in Theorem~\ref{thm:SM-resolvent}. We intend to switch to the canonical \texttt{spectrum} API on upgrade.
 \end{remark}
 
 \section{Sherman--Morrison for Projections and the Resolvent}\label{sec:SM}
@@ -193,18 +210,18 @@ Let $P$ be idempotent ($P^2=P$). For $\alpha\in\K$ with $1+\alpha\neq 0$,
 
 \begin{proof}
 Compute
-\[
-(I+\alpha P)\Big(I - \frac{\alpha}{1+\alpha}P\Big)
-= I + \alpha P - \frac{\alpha}{1+\alpha}P - \frac{\alpha^2}{1+\alpha}P^2
-= I + \Big(\alpha - \tfrac{\alpha}{1+\alpha} - \tfrac{\alpha^2}{1+\alpha}\Big)P = I.
-\]
+\begin{align}
+&(I+\alpha P)\left(I - \frac{\alpha}{1+\alpha}P\right) \\
+&= I + \alpha P - \frac{\alpha}{1+\alpha}P - \frac{\alpha^2}{1+\alpha}P^2 \\
+&= I + \left(\alpha - \frac{\alpha}{1+\alpha} - \frac{\alpha^2}{1+\alpha}\right)P = I.
+\end{align}
 Symmetrically on the right.
 \end{proof}
 
 \begin{theorem}[Resolvent of $G(c)$ away from $\{0,1\}$]\label{thm:SM-resolvent}
 Let $\lambda\in\K$.
 \begin{enumerate}
-\item If $c=0$ and $\lambda\neq 1$, then $(\lambda I - G(0))^{-1}=\dfrac{1}{\lambda-1}\,I$.
+\item If $c=0$ and $\lambda\neq 1$, then $(\lambda I - G(0))^{-1}=\frac{1}{\lambda-1}\,I$.
 \item If $c=1$ and $\lambda\notin\{0,1\}$, then
 \[
 (\lambda I - G(1))^{-1}
@@ -216,12 +233,11 @@ Let $\lambda\in\K$.
 \begin{proof}
 (a) $G(0)=I$ is trivial. (b) $G(1)=I-P$ so
 \[
-\lambda I - G(1)=(\lambda-1)I+P=(\lambda-1)\Big(I + \frac{1}{\lambda-1}P\Big).
+\lambda I - G(1)=(\lambda-1)I+P=(\lambda-1)\left(I + \frac{1}{\lambda-1}P\right).
 \]
 Apply Lemma~\ref{lem:SM} with $\alpha=\frac{1}{\lambda-1}$; since $\lambda\notin\{0,1\}$, $1+\alpha=\frac{\lambda}{\lambda-1}\neq 0$. Then
 \[
-\big(I+\tfrac{1}{\lambda-1}P\big)^{-1}
-= I - \frac{\frac{1}{\lambda-1}}{1+\frac{1}{\lambda-1}}\,P
+\left(I+\frac{1}{\lambda-1}P\right)^{-1}
 = I - \frac{1}{\lambda}\,P,
 \]
 and multiply by $(\lambda-1)^{-1}$.
@@ -237,12 +253,12 @@ All bounds below are elementary consequences of the explicit Sherman--Morrison i
 \begin{theorem}[General resolvent bound]\label{thm:bound-general}
 For $c=1$ and $z\notin\{0,1\}$,
 \[
-\norm{(\,zI - G(1)\,)^{-1}} \;\le\; \frac{1}{|z-1|}\Big(1 + \frac{\norm{P}}{|z|}\Big).
+\norm{(\,zI - G(1)\,)^{-1}} \;\le\; \frac{1}{|z-1|}\left(1 + \frac{\norm{P}}{|z|}\right).
 \]
 \end{theorem}
 
 \begin{proof}[Sketch]
-Using Section~\ref{sec:SM}, $(zI - G(1))^{-1}=(z-1)^{-1}\big(I - \frac{1}{z}P\big)$. Apply $\norm{\alpha T}\le |\alpha|\,\norm{T}$ and $\norm{I - \frac{1}{z}P}\le \norm{I} + \norm{\frac{1}{z}P}\le 1 + \frac{\norm{P}}{|z|}$.
+Using Section~\ref{sec:SM}, $(zI - G(1))^{-1}=(z-1)^{-1}\left(I - \frac{1}{z}P\right)$. Apply $\norm{\alpha T}\le |\alpha|\,\norm{T}$ and $\norm{I - \frac{1}{z}P}\le \norm{I} + \norm{\frac{1}{z}P}\le 1 + \frac{\norm{P}}{|z|}$.
 \end{proof}
 
 \begin{remark}[Orthogonal vs.\ oblique projections]
@@ -252,7 +268,7 @@ If $P$ is orthogonal, the inverse is normal and one obtains the optimal spectral
 \)
 and consequently
 \(
-\norm{(zI-G(1))^{-1}}=\max\{\,|z|^{-1},|z-1|^{-1}\,\}.
+\norm{(zI-G(1))^{-1}}=\max\{|z|^{-1},|z-1|^{-1}\}.
 \)
 For oblique $P$, $\norm{P}>1$ in general, and Theorem~\ref{thm:bound-general} is a clean, implementation-friendly bound.
 \end{remark}
@@ -264,116 +280,83 @@ For oblique $P$, $\norm{P}>1$ in general, and Theorem~\ref{thm:bound-general} is
 \subsection*{Module layout \& current status}
 \begin{verbatim}
 Papers/P1_GBC/RankOneToggle/
-  Projection.lean         -- projection onto a line (idempotent, self-adjoint, ‖P‖=1)  ✓
-  Toggle.lean             -- G(c) := id - c • P; ker/range; inj↔surj                    ✓
-  ShermanMorrison.lean    -- (I + α P)^{-1}; resolvent of G(c); norm bound               ✓
-  Spectrum.lean           -- σ(G(0))={1}, σ(G(1))={0,1} (via resolvent)                 ◯ (stub)
-  Fredholm.lean           -- Fredholm facts and index 0                                  ◯
-  Tutorial.lean           -- didactic examples                                          ✓
+  Projection.lean         -- projection onto a line (idempotent, self-adjoint)        ✓
+  Toggle.lean             -- G(c) := id - c • P; ker/range; inj↔surj; block helper     ✓
+  ShermanMorrison.lean    -- (I + α P)^{-1}; resolvent of G(c); norm bound              ✓
+  Spectrum.lean           -- σ(G(0))={1}, σ(G(1))={0,1} (via resolvent)                ◯ (stub; pending)
+  FredholmAlt.lean        -- algebra-free "index-zero" spec for G(true)                ✓ (spec)
+  Tutorial.lean           -- didactic examples                                         (out of scope for P1)
 \end{verbatim}
 
-\subsection*{Key signatures (excerpt)}  %% NEW/CHANGED (fixed symbols)
+\subsection*{Key signatures (excerpt)}
 \begin{lstlisting}
 -- Projection onto a line (u unit):
-def projLine (u : H) (hu : ‖u‖ = 1) : H →L[𝕜] H := fun x => ⟪u, x⟫ • u
+def projLine (u : H) (hu : ‖u‖ = 1) : H →L[��] H := fun x => ⟪u, x⟫ • u
 
 -- Toggle operator:
-def G (c : Bool) (u : H) (hu : ‖u‖ = 1) : H →L[𝕜] H :=
-  ContinuousLinearMap.id 𝕜 H - (if c then (1:𝕜) else 0) • projLine u hu
+def G (c : Bool) (u : H) (hu : ‖u‖ = 1) : H →L[��] H :=
+  ContinuousLinearMap.id �� H - (if c then (1:��) else 0) • projLine u hu
 
 -- Sherman–Morrison for idempotent P (core identity):
-lemma sm_inverse (P : H →L[𝕜] H) (hP : P.comp P = P)
-    (α : 𝕜) (hα : 1 + α ≠ 0) :
-  (ContinuousLinearMap.id 𝕜 H + α • P).comp
-    (ContinuousLinearMap.id 𝕜 H - (α/(1+α)) • P)
-  = ContinuousLinearMap.id 𝕜 H := ...
+lemma sm_inverse (P : H →L[��] H) (hP : P.comp P = P)
+    (α : ��) (hα : 1 + α ≠ 0) :
+  (ContinuousLinearMap.id �� H + α • P).comp
+    (ContinuousLinearMap.id �� H - (α/(1+α)) • P)
+  = ContinuousLinearMap.id �� H := ...
 
 -- Resolvent (c = true) away from {0,1}:
-theorem resolvent_G_true (z : 𝕜) (hz0 : z ≠ 0) (hz1 : z ≠ 1) :
-  ((z • ContinuousLinearMap.id 𝕜 H) - G true u hu).IsRightInverse
-    ((z - 1)⁻¹ • ContinuousLinearMap.id 𝕜 H
+theorem resolvent_G_true (z : ��) (hz0 : z ≠ 0) (hz1 : z ≠ 1) :
+  ((z • ContinuousLinearMap.id �� H) - G true u hu).IsRightInverse
+    ((z - 1)⁻¹ • ContinuousLinearMap.id �� H
        - (z * (z - 1))⁻¹ • projLine u hu) := ...
 \end{lstlisting}
 
 \subsection*{Proof-engineering notes}
 \begin{itemize}
 \item \textbf{Module-side factoring.} Identities like $a\cdot(P-bP)=(a-ab)P$ are solved at the module level using \texttt{add\_smul}, \texttt{sub\_smul}, \texttt{smul\_smul}, avoiding ring tactics on composed operators.
-\item \textbf{Shape-preserving \texttt{calc}.} We keep the left/right shapes aligned, introducing intermediate \texttt{have} facts before rewriting; this avoids ``no goals to be solved'' failures.
-\item \textbf{Composition lemmas.} Small helpers (e.g.\ \texttt{comp\_smul}, \texttt{smul\_comp}, \texttt{comp\_add\_{left/right}}) isolate bilinearity of composition and make scalar pull-outs deterministic.
+\item \textbf{Shape-preserving \texttt{calc}.} We keep the left/right shapes aligned, introducing intermediate \texttt{have} facts before rewriting; this avoids ``no goals'' failures.
+\item \textbf{Composition lemmas.} Small helpers (e.g.\ \texttt{comp\_smul}, \texttt{smul\_comp}, \texttt{comp\_add\_left/right}) isolate bilinearity of composition and make scalar pull-outs deterministic.
 \end{itemize}
 
 \section{Reproducibility and Artefacts}\label{sec:artefacts}
 
 \paragraph{Repository.} \leanRepoTag\ (module directory \texttt{Papers/P1\_GBC/RankOneToggle}).
 
-\paragraph{Toolchain.} Lean toolchain: \texttt{leanprover/lean4 v4.23.0-rc2} (as pinned via \texttt{.elan}); \texttt{mathlib4} pinned to commit \texttt{32a7e535287f9c7340c0f91d05c4c20631935a27}.  %% NEW/CHANGED
+\paragraph{Toolchain.} Lean toolchain: \texttt{leanprover/lean4 v4.23.0-rc2} (as pinned via \texttt{.elan}); \texttt{mathlib4} pinned to commit \texttt{32a7e535287f9c7340c0f91d05c4c20631935a27}.
 
 \paragraph{Build.}
 \begin{verbatim}
+-- Core, all green:
+lake build Papers.P1_GBC.RankOneToggle.Projection
+lake build Papers.P1_GBC.RankOneToggle.Toggle
 lake build Papers.P1_GBC.RankOneToggle.ShermanMorrison
-\end{verbatim}
-The module builds sorry-free and contains the resolvent and norm-bound results reported here (\leanok).
+lake build Papers.P1_GBC.RankOneToggle.FredholmAlt
 
-\paragraph{Spectrum stub (temporary).}  %% NEW/CHANGED
-\texttt{Spectrum.lean} compiles against a local placeholder for the spectrum (no new axioms are introduced; the placeholder is confined to this module). Once \texttt{mathlib4} is updated to a version with the required operator-algebra instances for $H\toL_{\K}H$, this module will be switched to the canonical \texttt{spectrum} API and the placeholders removed (\leanpending).
-
-\paragraph{Minimal test.}
-\begin{verbatim}
-#eval IO.println "RankOneToggle: Sherman–Morrison core loaded"
+-- Spectrum scaffolding (compiles with documented stubs):
+lake build Papers.P1_GBC.RankOneToggle.Spectrum
 \end{verbatim}
 
-\section{Limitations and roadmap}  %% NEW/CHANGED
+\paragraph{Spectrum stub (temporary).}
+\texttt{Spectrum.lean} compiles against a local placeholder (no new axioms; confined to that module). Once \texttt{mathlib4} provides the required operator-algebra instances for $\CL{\K}{H}$, we will switch to the canonical \texttt{spectrum} API and remove the placeholder (\leanpending).
+
+\section{Limitations and roadmap}
 \begin{itemize}
-\item The spectrum and Fredholm statements are standard and included in the text, but their Lean counterparts are postponed under the pinned dependency snapshot.
-\item Our code isolates the Sherman--Morrison and resolvent machinery behind small composition lemmas to minimize blast radius when upgrading.
-\item Next steps: update \texttt{mathlib4}, replace the Spectrum placeholder by \texttt{spectrum}, finish the Fredholm section, and add a short library of finite-rank projection variations.
+\item Spectrum and numeric Fredholm index are mathematically standard and included here; Lean proofs are postponed behind the pinned dependency snapshot.
+\item Code isolates the Sherman--Morrison and resolvent machinery behind small composition lemmas to minimize blast radius on upgrade.
+\item Next steps: update \texttt{mathlib4}, replace the Spectrum placeholder, strengthen \texttt{FredholmAlt.lean} to numeric index $0$, and add a small library of finite-rank projection variants.
 \end{itemize}
 
 \section{Concluding Remarks}
 
-The rank‑one toggle encapsulates a surprising amount of operator‑theoretic behavior in a minimal package: explicit block form, complete spectral picture, closed‑form resolvent, and stable Fredholm properties.
-The formalization emphasizes \emph{robustness}: algebra on the module side, micro-lemmas for composition, and stepwise reshaping of expressions inside \texttt{calc}.
-The same patterns scale to higher-rank finite projections and to block-triangular resolvent computations.
+The rank‑one toggle encapsulates a surprising amount of operator‑theoretic behavior in a minimal package: explicit block form, complete spectral picture, closed‑form resolvent, and stable Fredholm properties. The formalization emphasizes \emph{robustness}: algebra on the module side, micro-lemmas for composition, and stepwise reshaping of expressions inside \texttt{calc}. The same patterns scale to higher-rank finite projections and to block-triangular resolvent computations.
 
 \paragraph{Acknowledgments.}
 We thank contributors and reviewers of the \texttt{mathlib4} project; any remaining gaps are our responsibility.
 
 \appendix
-
-\section{Short proofs kept on record}
-
-\subsection*{Proof of Theorem~\ref{thm:spectrum} via resolvent}
-For $c=1$ and $\lambda\notin\{0,1\}$, Theorem~\ref{thm:SM-resolvent} gives an explicit inverse to $\lambda I - G(1)$, so $\lambda$ is in the resolvent set. Thus $\sigma(G(1))\subseteq\{0,1\}$. The inclusion $\{0,1\}\subseteq\sigma(G(1))$ follows from Lemma~\ref{lem:block}.
-
-\subsection*{Proof of Theorem~\ref{thm:ess}}
-Let $K=cP$ (rank one). Then $G(c)=I-K$. Essential spectrum is invariant under compact perturbations, so $\sigma_{\mathrm{ess}}(G(c))=\sigma_{\mathrm{ess}}(I)=\{1\}$.
-
-\section{Minimal tutorial (sketch)}
-
-Let $H=\ell^2(\mathbb{N})$ and $u=e_0$. Then $P(x)=\ip{e_0}{x}e_0$ is the coordinate projection onto the first basis vector. $G(1)$ kills the first coordinate and is identity on the rest; kernel and range are as in Proposition~\ref{prop:ker-range}; the resolvent is the closed form in Theorem~\ref{thm:SM-resolvent}. A simple exercise is to verify Theorem~\ref{thm:bound-general} numerically for a truncated model.
-
-\begin{thebibliography}{9}
-
-\bibitem{Kato}
-T.~Kato, \emph{Perturbation Theory for Linear Operators}. Springer, 1995.
-
-\bibitem{Conway}
-J.~B.~Conway, \emph{A Course in Functional Analysis}. Springer, 1990.
-
-\bibitem{BoettcherSpitkovsky}
-A.~B{\"o}ttcher and I.~M.~Spitkovsky, A gentle guide to the basics of two projections theory,
-\emph{Linear Algebra Appl.} \textbf{432} (2010), 1412--1459.
-
-\bibitem{GohKrein}
-I.~C.~Gohberg and M.~G.~Krein, \emph{Introduction to the Theory of Linear Nonselfadjoint Operators}. AMS, 1969.
-
-\end{thebibliography}
-
-
-\appendix
 \section{Human proofs (self-contained)}\label{sec:human-proofs}
 
-Throughout the appendix we work over $\K\in\{\R,\C\}$ and adopt the \emph{mathlib} convention for the inner product: it is \emph{conjugate-linear} in the first argument and \emph{linear} in the second.\footnote{If you prefer the opposite convention, every proof adapts with the obvious conjugations.}
+Throughout we work over $\K\in\{\R,\C\}$ and adopt the \emph{mathlib} convention for the inner product: conjugate-linear in the first argument and linear in the second.\footnote{If you prefer the opposite convention, every proof adapts with the obvious conjugations.}
 
 \subsection{Projection onto a line: full details}
 
@@ -389,38 +372,15 @@ Let $u\in H$ with $\|u\|=1$. Define $P:H\to H$ by $P(x)=\ip{u}{x}\,u$. Then:
 \end{lemma}
 
 \begin{proof}
-(1) Linearity is immediate from linearity in the second argument:
-\[
-P(x+y)=\ip{u}{x+y}u=(\ip{u}{x}+\ip{u}{y})u=P(x)+P(y),\quad
-P(\alpha x)=\ip{u}{\alpha x}u=\alpha\ip{u}{x}u=\alpha P(x).
-\]
-Boundedness with $\|P\|\le 1$ follows from Cauchy–Schwarz:
-\[
-\|P(x)\|=\big|\ip{u}{x}\big|\,\|u\|=\big|\ip{u}{x}\big|\le \|u\|\,\|x\|=\|x\|.
-\]
-
-(2) $P(u)=\ip{u}{u}u=\|u\|^2 u=u$. Thus $\|P\|\ge \|P(u)\|/\|u\|=1$, and together with (1) we get $\|P\|=1$.
-
-(3) $P^2(x)=P(\ip{u}{x}u)=\ip{u}{x}\,P(u)=\ip{u}{x}\,u=P(x)$.
-
-(4) For all $x,y\in H$,
-\[
-\ip{P x}{y}=\ip{\ip{u}{x}u}{y}=\overline{\ip{u}{x}}\;\ip{u}{y}
-=\ip{x}{u}\,\ip{u}{y}
-=\ip{x}{\ip{u}{y}u}=\ip{x}{P y},
-\]
-using conjugate linearity in the first argument and conjugate symmetry. Hence $P^\ast=P$.
-
-(5) Since $P(x)$ is always a multiple of $u$, $\range(P)\subseteq\langle u\rangle$. Conversely $u=P(u)\in\range(P)$, so $\range(P)=\langle u\rangle$. For the kernel,
-\[
-x\in \kerop(P)\ \Longleftrightarrow\ \ip{u}{x}=0\ \Longleftrightarrow\ x\perp u
-\ \Longleftrightarrow\ x\in \langle u\rangle^\perp.\qedhere
-\]
+(1) Linearity: $\ip{u}{x+y}=\ip{u}{x}+\ip{u}{y}$ and $\ip{u}{\alpha x}=\alpha\ip{u}{x}$. By Cauchy--Schwarz,
+$\|P(x)\|=|\ip{u}{x}|\,\|u\|\le \|x\|$.
+(2) $P(u)=\|u\|^2u=u$, so $\|P\|\ge 1$; together with (1), $\|P\|=1$.
+(3) $P^2(x)=\ip{u}{x}P(u)=\ip{u}{x}u=P(x)$.
+(4) For all $x,y$, $\ip{Px}{y}=\overline{\ip{u}{x}}\,\ip{u}{y}=\ip{x}{Py}$.
+(5) $\range(P)=\langle u\rangle$ is immediate; $\kerop(P)=\{x:\ip{u}{x}=0\}=\langle u\rangle^\perp$.
 \end{proof}
 
 \subsection{The rank-one toggle: block form, kernel, and range}
-
-Recall $G(c):=I-cP$ for $c\in\{0,1\}$ and $P$ as in Lemma~\ref{lem:proj-details}.
 
 \begin{lemma}[Block form]\label{lem:block-human}
 With respect to $H=\langle u\rangle\oplus \langle u\rangle^\perp$,
@@ -431,7 +391,7 @@ G(1)=\begin{pmatrix}0&0\\[2pt]0&I\end{pmatrix}.
 \end{lemma}
 
 \begin{proof}
-By Lemma~\ref{lem:proj-details}, $P$ restricts to the identity on $\langle u\rangle$ and vanishes on $\langle u\rangle^\perp$. Hence $I-P$ acts as $0$ on the first block and $I$ on the second. For $c=0$, $G(0)=I$.
+As $P|_{\langle u\rangle}=\mathrm{id}$ and $P|_{\langle u\rangle^\perp}=0$, we have $I-P$ acting as $0$ on $\langle u\rangle$ and as $I$ on $\langle u\rangle^\perp$.
 \end{proof}
 
 \begin{proposition}[Kernel and range]\label{prop:ker-range-human}
@@ -443,7 +403,7 @@ In particular $G(c)$ is injective iff surjective, and both hold iff $c=0$.
 \end{proposition}
 
 \begin{proof}
-Immediate from the block form in Lemma~\ref{lem:block-human}.
+Immediate from Lemma~\ref{lem:block-human}.
 \end{proof}
 
 \subsection{Spectrum and essential spectrum}
@@ -455,13 +415,8 @@ Immediate from the block form in Lemma~\ref{lem:block-human}.
 \end{theorem}
 
 \begin{proof}
-If $c=0$, $G(0)=I$ so $\sigma(I)=\{1\}$. For $c=1$, note that $T:=G(1)=I-P$ satisfies
-\[
-T(T-I)=(I-P)(I-(I-P))=(I-P)P=P-P^2=0,
-\]
-so $p(T)=0$ for $p(\lambda)=\lambda(\lambda-1)$. In a Banach algebra, if $p(T)=0$ then $\sigma(T)\subseteq\{\lambda\in\K:\ p(\lambda)=0\}$; indeed, if $p(\lambda)\neq 0$ then by the Euclidean algorithm $p(z)=(z-\lambda)q(z)+p(\lambda)$, hence $0=p(T)=(T-\lambda I)q(T)+p(\lambda)I$, so $T-\lambda I$ is invertible. Therefore $\sigma(T)\subseteq\{0,1\}$.
-
-Conversely, $Tu=0$ by $Pu=u$, so $0\in\sigma(T)$, and for $v\perp u$ we have $Pv=0$, so $Tv=v$, whence $1\in\sigma(T)$.
+If $c=0$, $G(0)=I$ so $\sigma(I)=\{1\}$. For $c=1$, write $T=I-P$. Then
+$T(T-I)=0$, i.e.\ $p(T)=0$ for $p(\lambda)=\lambda(\lambda-1)$. In a unital Banach algebra, $p(T)=0$ implies $\sigma(T)\subseteq p^{-1}(0)$: if $p(\lambda)\ne 0$, Euclidean division gives $p(z)=(z-\lambda)q(z)+p(\lambda)$, hence $0=p(T)=(T-\lambda I)q(T)+p(\lambda)I$ and $T-\lambda I$ is invertible. Thus $\sigma(T)\subseteq\{0,1\}$; conversely $Tu=0$ and for $v\perp u$ we have $Tv=v$, so $0,1\in\sigma(T)$.
 \end{proof}
 
 \begin{theorem}[Essential spectrum]\label{thm:ess-human}
@@ -469,7 +424,7 @@ For $c\in\{0,1\}$, $\sigma_{\mathrm{ess}}(G(c))=\{1\}$.
 \end{theorem}
 
 \begin{proof}
-Write $G(c)=I-K$ with $K=cP$ of rank $\le 1$, hence compact. The essential spectrum (spectrum in the Calkin algebra) is invariant under compact perturbations, so $\sigma_{\mathrm{ess}}(G(c))=\sigma_{\mathrm{ess}}(I)$. The spectrum of the identity in any unital Banach algebra is $\{1\}$, hence the claim. See, e.g., Kato \cite[Sec.~IV.5]{Kato} or Conway \cite[III.6]{Conway}.
+$G(c)=I-cP$ with $cP$ finite rank. Essential spectrum is invariant under compact perturbations, so $\sigma_{\mathrm{ess}}(G(c))=\sigma_{\mathrm{ess}}(I)=\{1\}$; see Kato~\cite{Kato} or Conway~\cite{Conway}.
 \end{proof}
 
 \subsection{Sherman--Morrison for projections and the resolvent}
@@ -482,14 +437,9 @@ Let $P$ be idempotent. For $\alpha\in\K$ with $1+\alpha\neq 0$,
 \end{lemma}
 
 \begin{proof}
-Compute using $P^2=P$:
-\[
-(I+\alpha P)\Big(I-\frac{\alpha}{1+\alpha}P\Big)
+$(I+\alpha P)\left(I-\frac{\alpha}{1+\alpha}P\right)
 = I + \alpha P - \frac{\alpha}{1+\alpha}P - \frac{\alpha^2}{1+\alpha}P
-= I + \Big(\alpha - \frac{\alpha}{1+\alpha} - \frac{\alpha^2}{1+\alpha}\Big)P
-= I.
-\]
-The other side is analogous.
+= I.$
 \end{proof}
 
 \begin{theorem}[Resolvent of $G(c)$ outside $\{0,1\}$]\label{thm:resolvent-human}
@@ -505,16 +455,7 @@ Let $\lambda\in\K$.
 \end{theorem}
 
 \begin{proof}
-(a) Trivial since $G(0)=I$. (b) $G(1)=I-P$, so
-\[
-\lambda I - G(1)=(\lambda-1)I+P=(\lambda-1)\!\left(I+\frac{1}{\lambda-1}P\right).
-\]
-Apply Lemma~\ref{lem:SM-human} with $\alpha=\frac{1}{\lambda-1}$ (valid when $\lambda\notin\{0,1\}$):
-\[
-\left(I+\tfrac{1}{\lambda-1}P\right)^{-1}
-= I - \frac{1}{\lambda}\,P,
-\]
-and multiply by $(\lambda-1)^{-1}$.
+(b) $G(1)=I-P$, hence $\lambda I - G(1)=(\lambda-1)\left(I+\frac{1}{\lambda-1}P\right)$ and apply Lemma~\ref{lem:SM-human}.
 \end{proof}
 
 \subsection{Resolvent norm bound}
@@ -522,21 +463,12 @@ and multiply by $(\lambda-1)^{-1}$.
 \begin{theorem}[General resolvent bound]\label{thm:bound-human}
 For $c=1$ and $z\notin\{0,1\}$,
 \[
-\big\|(\,zI - G(1)\,)^{-1}\big\| \;\le\; \frac{1}{|z-1|}\Big(1 + \frac{\|P\|}{|z|}\Big).
+\big\|(\,zI - G(1)\,)^{-1}\big\| \;\le\; \frac{1}{|z-1|}\left(1 + \frac{\|P\|}{|z|}\right).
 \]
 \end{theorem}
 
 \begin{proof}
-By Theorem~\ref{thm:resolvent-human}(b),
-\[
-(\,zI - G(1)\,)^{-1}=(z-1)^{-1}\big(I - z^{-1}P\big).
-\]
-Use $\| \alpha T\|=|\alpha|\,\|T\|$ and the triangle inequality:
-\[
-\big\|(\,zI - G(1)\,)^{-1}\big\|
-\le \frac{1}{|z-1|}\big(\|I\| + \|z^{-1}P\|\big)
-= \frac{1}{|z-1|}\left(1+\frac{\|P\|}{|z|}\right).
-\]
+$(zI - G(1))^{-1}=(z-1)^{-1}\left(I - z^{-1}P\right)$ and $\|I - z^{-1}P\|\le \|I\| + \|z^{-1}P\|=1+\frac{\|P\|}{|z|}$.
 \end{proof}
 
 \subsection{Fredholm property and index}
@@ -546,6 +478,24 @@ For $c\in\{0,1\}$ the operator $G(c)$ is Fredholm with $\mathrm{ind}(G(c))=0$.
 \end{proposition}
 
 \begin{proof}
-$G(c)=I-cP$ is a finite-rank (hence compact) perturbation of $I$, so $G(c)$ is Fredholm and $\mathrm{ind}(G(c))=\mathrm{ind}(I)=0$ (stability of the index under compact perturbations). Alternatively, compute directly: for $c=0$, $G(0)=I$ is invertible; for $c=1$, $\kerop(G(1))=\langle u\rangle$ has dimension $1$, $\range(G(1))=\langle u\rangle^\perp$ has codimension $1$, hence $\mathrm{ind}=1-1=0$.
+$G(c)=I-cP$ is a finite-rank perturbation of $I$, hence Fredholm with the same index; alternatively, for $c=1$, $\kerop(G(1))$ is one-dimensional and $\mathrm{coker}(G(1))$ has dimension $1$ (range is the codimension-$1$ subspace $\langle u\rangle^\perp$), so $\mathrm{ind}=1-1=0$.
 \end{proof}
+
+\begin{thebibliography}{9}
+
+\bibitem{Kato}
+T.~Kato, \emph{Perturbation Theory for Linear Operators}. Springer, 1995.
+
+\bibitem{Conway}
+J.~B.~Conway, \emph{A Course in Functional Analysis}. Springer, 1990.
+
+\bibitem{BoettcherSpitkovsky}
+A.~B\"{o}ttcher and I.~M.~Spitkovsky, A gentle guide to the basics of two projections theory,
+\emph{Linear Algebra Appl.} \textbf{432} (2010), 1412--1459.
+
+\bibitem{GohKrein}
+I.~C.~Gohberg and M.~G.~Krein, \emph{Introduction to the Theory of Linear Nonselfadjoint Operators}. AMS, 1969.
+
+\end{thebibliography}
+
 \end{document}
