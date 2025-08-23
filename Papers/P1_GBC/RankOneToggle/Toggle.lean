@@ -190,6 +190,21 @@ lemma block_decomposition_true (u : H) (hu : ‖u‖ = 1) [CompleteSpace H] :
       simp [inner_self_eq_norm_sq_to_K, hu]
     · -- Show x = ⟪u, x⟫ • u + (x - ⟪u, x⟫ • u)
       simp
+
+/-! ## Block Form Analysis -/
+
+/-- Block form decomposition: For v = α•u + w where w ⊥ u, G(true) maps v ↦ w.
+    This shows G(true) acts as "0 ⊕ id" on the decomposition H = span{u} ⊕ (span{u})⊥. -/
+lemma G_true_block_form (u : H) (hu : ‖u‖ = 1) (α : 𝕜) (w : H) 
+    (hw : inner (𝕜 := 𝕜) u w = 0) :
+    G (𝕜 := 𝕜) u hu true (α • u + w) = w := by
+  -- G(true) = id - P, so G(α•u + w) = (α•u + w) - P(α•u + w)
+  simp only [G_true, ContinuousLinearMap.sub_apply, ContinuousLinearMap.id_apply]
+  -- P is linear: P(α•u + w) = α•P(u) + P(w) = α•u + 0 = α•u
+  rw [map_add, map_smul, projLine_apply_self (𝕜 := 𝕜) u hu]
+  -- P(w) = ⟪u,w⟫ • u = 0 • u = 0 since w ⊥ u
+  rw [projLine_apply, hw, zero_smul, add_zero, add_sub_cancel_left]
+
 end props
 
 end RankOneToggle
