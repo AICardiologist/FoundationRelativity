@@ -126,11 +126,11 @@ script fullGuard do
 
 -- Paper smoke tests (Day 1)
 lean_exe PaperP1Tests where
-  root := `Papers.P1_GBC.SmokeTest
+  root := `Papers.P1_GBC.P1_Minimal
 
 -- Sprint 44 Day 1: Paper #1 CI integration
 lean_exe Paper1SmokeTest where
-  root := `Papers.P1_GBC.SmokeTest
+  root := `Papers.P1_GBC.P1_Minimal
 
 lean_exe PaperP2Tests where
   root := `Papers.P2_BidualGap.SmokeTest
