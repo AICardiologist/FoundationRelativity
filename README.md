@@ -23,7 +23,7 @@ A Lean 4 formalization exploring how mathematical pathologies behave differently
 
 The project formalizes four major results:
 
-1. **Rank-One Toggle Kernel** (Paper 1) 📋 - Minimal operator theory for mathlib4 upstream
+1. **Rank-One Toggle Kernel** (Paper 1) ✅ - Complete Sherman-Morrison implementation + Lean-clean Spectrum stub
 2. **WLPO ↔ BidualGap Equivalence** (Paper 2) ✅ - Sprint E dual isometry complete!  
 3. **2-Categorical Framework** (Paper 3) 📋 - Foundation-relative pseudo-functors
 4. **Spectral Geometry** (Paper 4) 🔧 - Undecidable eigenvalues on manifolds
@@ -38,7 +38,7 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
 ## 📚 Papers & Lean Status
 
 ### Formalization Status
-- **[Paper 1: Rank-One Toggle Kernel](Papers/P1_GBC/)** ✅ **Sherman-Morrison Core Complete (0 sorries)** - Ready for mathlib4 PRs
+- **[Paper 1: Rank-One Toggle Kernel](Papers/P1_GBC/)** ✅ **Complete Implementation + Current LaTeX Paper** - Sherman-Morrison (0 sorries), Spectrum (Lean-clean stub)
 - **[Paper 2: WLPO ↔ BidualGap∃](Papers/P2_BidualGap/)** ✅ **Sprint E: Dual Isometry Complete (3 WLPO sorries)**
 - **[Paper 3: 2-Categorical Framework](Papers/P3_2CatFramework/)** 📋 6 sorries - Framework ready
 - **[Paper 4: Spectral Geometry](Papers/P4_SpectralGeometry/)** 🔧 61 sorries - Discrete model 85% complete

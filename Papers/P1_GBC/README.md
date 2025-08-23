@@ -123,7 +123,8 @@ The rank-one toggle serves as a pedagogical example of how:
 
 ## Documentation
 
-- **[New Work Plan](documentation/paper1-lean-work-plan.tex)**: Detailed minimal Lean implementation plan
+- **[Current Paper](documentation/paper1-rankone-toggle-current.tex)**: **MOST CURRENT** - Rank-One Toggle Kernel (August 2025) with complete Lean 4 formalization status and accurate build instructions
+- **[New Work Plan](documentation/paper1-lean-work-plan.tex)**: Detailed minimal Lean implementation plan  
 - **[Original Paper](documentation/)**: Conceptual Gödel-Banach correspondence (archived)
 - **[Integration Notes](../P2_BidualGap/documentation/)**: Connection to Paper 2 results
 
