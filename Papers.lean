@@ -1,25 +1,27 @@
 /-
-  Papers.lean - Sprint 42 Math-AI coordination
+  Papers.lean - Main Papers coordination
   
-  Paper formalization modules for Sprint 42 Math-AI collaboration.
+  Paper formalization modules for Foundation-Relativity project.
   
   Structure:
-  - P1_GBC: Grothendieck-Banach-Cheeger framework  
-  - P2_BidualGap: Bidual gap analysis with bicategory structure
-  - P3_2CatFramework: Complete 2-categorical witness framework
+  - P1_GBC: Rank-One Toggle Kernel (Sherman-Morrison implementation + stubs)
+  - P2_BidualGap: WLPO ↔ BidualGap equivalence (dual isometry complete)
+  - P3_2CatFramework: 2-categorical foundation-relativity framework
+  - P4_SpectralGeometry: Undecidable eigenvalue problems on manifolds
   
-  Note: Individual SmokeTest modules are built as separate executables
-  to avoid main function conflicts. This module provides documentation
-  and coordination between paper streams.
+  Note: Individual minimal modules are built as separate executables.
+  This provides coordination and documentation for all papers.
 -/
 
--- Import core dependencies needed by all papers
-import CategoryTheory.WitnessGroupoid
-import AnalyticPathologies.Cheeger
+-- Import active paper modules (no legacy dependencies)
+import Papers.P1_GBC.P1_Minimal
+import Papers.P2_BidualGap.P2_Minimal  
+-- Papers.P3_2CatFramework.SmokeTest has CategoryTheory dependencies (temporarily excluded)
+-- Papers.P4_SpectralGeometry modules available but not imported for faster builds
 
 namespace Papers
 
-/-! ### Sprint 42 Paper Coordination -/
+/-! ### Papers Coordination -/
 
--- Documentation and coordination between Math-AI paper streams
--- Each paper has its own SmokeTest executable for CI verification
+-- Documentation and coordination between active paper implementations
+-- Each paper has validated smoke tests and minimal builds

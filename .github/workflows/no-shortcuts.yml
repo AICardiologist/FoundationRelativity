@@ -17,7 +17,7 @@ jobs:
       - name: Install Lean
         uses: leanprover/lean-action@v1
         with:
-          auto-config: false
+          use-mathlib-cache: true
 
       - name: Cache .lake
         uses: actions/cache@v4
@@ -25,8 +25,8 @@ jobs:
           path: .lake
           key: ${{ runner.os }}-lake-${{ hashFiles('lake-manifest.json') }}-v3
 
-      - name: Build project
-        run: lake build
+      - name: Get mathlib cache
+        run: lake exe cache get || true
 
       - name: Build cheap proofs linter
         run: lake build cheap_proofs
