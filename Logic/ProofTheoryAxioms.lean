@@ -34,12 +34,12 @@ end Logic
 
 namespace Arithmetic
 
--- Placeholder definitions for basic proof theory concepts
-variable (Formula : Type)
-variable (Provable : Formula → Prop)
-variable (G_formula : Formula)
-variable (peanoArithmetic : Type)
-variable (consistencyPredicate : Type → Prop)
+-- Placeholder axioms for basic proof theory concepts
+axiom Formula : Type
+axiom Provable : Formula → Prop
+axiom G_formula : Formula
+axiom peanoArithmetic : Type
+axiom consistencyPredicate : Type → Prop
 
 /-- The Gödel sentence G -/
 def G : Prop := ¬ Provable G_formula
