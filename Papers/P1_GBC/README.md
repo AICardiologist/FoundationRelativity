@@ -1,37 +1,33 @@
-# Paper 1: Rank-One Toggle Kernel (Minimal Lean Implementation)
+# Paper 1: Rank‑One Toggle Kernel (Minimal, Algebra‑Free Core)
 
 ## Overview
 
-**Updated Focus (Post-Paper 2)**: Following the completion of Paper 2's WLPO ↔ BidualGap formalization, Paper 1 has been refocused to a minimal, library-quality implementation of the **rank-one toggle kernel** operator theory. This provides reusable mathematical components for mathlib4 while supporting the higher-level foundation-relativity narrative.
+Paper 1 delivers a minimal, reusable operator‑theory core around the rank‑one toggle
+G(c) := \mathrm{id} - c\cdot P on Hilbert spaces. We keep the development axiom‑clean and version‑stable under our pinned toolchain.
 
-## New Scope: Minimal Lean Work Plan
+## Scope (what's in)
+- Rank‑one projection onto a line; basic API.
+- Toggle operator G(c) with ker/range characterizations and injective↔surjective criteria.
+- Sherman–Morrison for idempotents; explicit resolvent for G(c); robust norm bounds.
+- FredholmAlt: a lightweight "index‑zero spec" for G(\mathrm{true}) expressing the algebra‑free content now, ready to be strengthened later.
 
-### What We're Building
-A self-contained, axiom-clean formalization of:
-- **Rank-one toggle operator**: `G(c) := id - c·P` where `c ∈ {false, true}` and `P` is a rank-one projection
-- **Spectral analysis**: Complete spectrum and essential spectrum computations
-- **Sherman-Morrison formula**: For projection operators `(I + αP)⁻¹ = I - α/(1+α)P`
-- **Fredholm theory**: Index calculations for the toggle operator
-- **Block decomposition**: Kernel/range characterizations and injectivity/surjectivity equivalences
+## Out of scope (for P1)
+- Tutorial.lean (examples). Not shipping for P1.
+- Numeric Fredholm index (finrank/quotients) — postponed until mathlib upgrade.
+- Full spectrum API proofs — documented stubs only under this mathlib.
 
-### What's Out of Scope (By Design)
-- Meta-level Gödel bridge (Prop/Type barrier) - conceptual only
-- Banach limits and ℓ∞/c₀ examples - covered in Paper 2
-- Bicategorical Found layer - reserved for Paper 3
-- Full Gödel incompleteness formalization - replaced by focused operator theory
+## Module status (August 2025)
 
-## Current Status (Implementation Progress)
+| Module | Purpose | Status | Sorries |
+|--------|---------|--------|---------|
+| RankOneToggle/Projection.lean | Orthogonal projection API | ✅ Complete | 0 |
+| RankOneToggle/Toggle.lean | G(c) defn., ker/range, block helper | ✅ Complete | 0 |
+| RankOneToggle/ShermanMorrison.lean | (I+\alpha P)^{-1}, resolvent, bounds | ✅ Complete | 0 |
+| RankOneToggle/Spectrum.lean | Spectrum scaffolding | ◯ Stub (doc + sorries) | 3 |
+| RankOneToggle/FredholmAlt.lean | Index‑zero spec (algebra‑free) | ✅ Complete (spec) | 0 |
+| RankOneToggle/Tutorial.lean | Examples | Removed (out of scope) | — |
 
-### Module Structure (August 2025 Update)
-
-| Module | Purpose | Status | Sorry Count |
-|--------|---------|--------|-------------|
-| RankOneToggle/Projection.lean | Orthogonal projection API | ✅ **Complete** | **0** |
-| RankOneToggle/Toggle.lean | G(c) operator definition | ✅ **Complete** | **0** |
-| RankOneToggle/Spectrum.lean | Spectral computations | ✅ **Complete** | **0** |
-| **RankOneToggle/ShermanMorrison.lean** | **Inverse formulas + norm bounds** | ✅ **COMPLETE** | **0** |
-| RankOneToggle/Fredholm.lean | Index theory | 📋 Planned | N/A |
-| RankOneToggle/Tutorial.lean | Usage examples | 📋 Planned | N/A |
+Note: Spectrum and numeric index are intentionally parked behind a mathlib update. The core algebra‑free results are fully formalized.
 
 ### 🎉 Major Achievement: Sherman-Morrison Implementation Complete!
 
@@ -128,20 +124,23 @@ The rank-one toggle serves as a pedagogical example of how:
 - **[Original Paper](documentation/)**: Conceptual Gödel-Banach correspondence (archived)
 - **[Integration Notes](../P2_BidualGap/documentation/)**: Connection to Paper 2 results
 
-## Build Instructions
+## Build targets
 
 ```bash
-# Build the completed Sherman-Morrison implementation
-lake build Papers.P1_GBC.RankOneToggle.ShermanMorrison
-
-# Build all completed Paper 1 modules
+# Core green modules
 lake build Papers.P1_GBC.RankOneToggle.Projection
-lake build Papers.P1_GBC.RankOneToggle.Toggle  
-lake build Papers.P1_GBC.RankOneToggle.Spectrum
+lake build Papers.P1_GBC.RankOneToggle.Toggle
+lake build Papers.P1_GBC.RankOneToggle.ShermanMorrison
+lake build Papers.P1_GBC.RankOneToggle.FredholmAlt
 
-# Run tutorial examples (when implemented)
-lake env lean Papers/P1_GBC/RankOneToggle/Tutorial.lean
+# Spectrum scaffolding (builds with documented sorries)
+lake build Papers.P1_GBC.RankOneToggle.Spectrum
 ```
+
+## Upgrade notes (future)
+- After a mathlib upgrade with complete operator‑algebra & linear‑algebra quotients:
+  - Replace Spectrum stubs with actual proofs.
+  - Strengthen FredholmAlt.lean from IndexZeroSpec to numeric index(G true) = 0.
 
 ## Status Summary
 
