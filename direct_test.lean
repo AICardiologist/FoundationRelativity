@@ -1,1 +1,0 @@
-#check Papers.PseudoFunctorInstances.GapFunctorPF
