@@ -57,6 +57,9 @@ jobs:
             .lake/build
           key: ${{ runner.os }}-lake-${{ hashFiles('lakefile.lean') }}
 
+      - name: Get mathlib cache
+        run: lake exe cache get || true
+
       # Build P1 (if it exists)
       - name: Build P1 Minimal
         timeout-minutes: 2
