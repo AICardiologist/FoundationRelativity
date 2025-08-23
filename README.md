@@ -4,12 +4,12 @@
 [![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
 [![Version](https://img.shields.io/badge/Version-v3.2--axiomatic-brightgreen)](https://github.com/AICardiologist/FoundationRelativity/releases)
 [![Lean 4.22.0-rc4](https://img.shields.io/badge/Lean-4.22.0--rc4-blue)](https://github.com/leanprover/lean4)
-[![Paper 1 Complete](https://img.shields.io/badge/Paper%201%20Complete-0%20sorries-brightgreen)](docs/planning/project-status.md)
+[![Paper 1 Status](https://img.shields.io/badge/Paper%201%20Status-~14%20sorries-yellow)](docs/planning/project-status.md)
 [![Paper 2 Gap→WLPO](https://img.shields.io/badge/Paper%202%20Gap%E2%86%92WLPO-Axiom%20Clean-brightgreen)](Papers/P2_BidualGap/)
 [![Paper 4 Status](https://img.shields.io/badge/Paper%204%20Discrete%20CPW-85%25-green)](Papers/P4_SpectralGeometry/)
 
 > **🎯 SPRINT E COMPLETE (2025-08-19)**: Dual Isometry with 3 WLPO Sorries!
-> - Paper 1: 100% formalized with 0 sorries ✅ (shipped)
+> - Paper 1: Sherman-Morrison complete (1 sorry), Spectrum stubs (~3 sorries), Fredholm/Tutorial planned (~10 sorries)
 > - **Paper 2: Complete dual isometry (c₀* ≃ₗᵢ ℓ¹)** ✅ - Only 3 WLPO sorries remain!
 > - **New**: Self-contained csSup approach avoiding CompleteLattice issues
 > - **Achievement**: 81% sorry reduction (16 → 3), clean WLPO architecture
@@ -23,7 +23,7 @@ A Lean 4 formalization exploring how mathematical pathologies behave differently
 
 The project formalizes four major results:
 
-1. **Rank-One Toggle Kernel** (Paper 1) ✅ - Complete Sherman-Morrison implementation + Lean-clean Spectrum stub
+1. **Rank-One Toggle Kernel** (Paper 1) 🔧 - Sherman-Morrison implementation (1 sorry) + Spectrum stubs (~3 sorries) + planned modules (~10 sorries)
 2. **WLPO ↔ BidualGap Equivalence** (Paper 2) ✅ - Sprint E dual isometry complete!  
 3. **2-Categorical Framework** (Paper 3) 📋 - Foundation-relative pseudo-functors
 4. **Spectral Geometry** (Paper 4) 🔧 - Undecidable eigenvalues on manifolds
@@ -38,7 +38,7 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
 ## 📚 Papers & Lean Status
 
 ### Formalization Status
-- **[Paper 1: Rank-One Toggle Kernel](Papers/P1_GBC/)** ✅ **Complete Implementation + Current LaTeX Paper** - Sherman-Morrison (0 sorries), Spectrum (Lean-clean stub)
+- **[Paper 1: Rank-One Toggle Kernel](Papers/P1_GBC/)** 🔧 **Partial Implementation + Current LaTeX Paper** - Sherman-Morrison (1 sorry), Spectrum (3 sorries stub), Fredholm/Tutorial (planned ~10 sorries)
 - **[Paper 2: WLPO ↔ BidualGap∃](Papers/P2_BidualGap/)** ✅ **Sprint E: Dual Isometry Complete (3 WLPO sorries)**
 - **[Paper 3: 2-Categorical Framework](Papers/P3_2CatFramework/)** 📋 6 sorries - Framework ready
 - **[Paper 4: Spectral Geometry](Papers/P4_SpectralGeometry/)** 🔧 61 sorries - Discrete model 85% complete
@@ -75,13 +75,14 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
 FoundationRelativity/
 ├── Papers/                     # 📚 Main academic results
 │   ├── P1_GBC/                # ✅ Rank-One Toggle Kernel (Sherman-Morrison COMPLETE!)
-│   │   ├── RankOneToggle/     #    ✅ Core Lean modules (0 sorries)
-│   │   │   ├── Projection.lean    #    ✅ Orthogonal projection API
-│   │   │   ├── Toggle.lean        #    ✅ G(c) operator definition
-│   │   │   ├── Spectrum.lean      #    ✅ Spectral computations
-│   │   │   ├── ShermanMorrison.lean # ✅ Inverse formulas + robust norm bounds
-│   │   │   ├── Fredholm.lean      #    📋 Index theory (planned)
-│   │   │   └── Tutorial.lean      #    📋 Usage examples (planned)
+│   │   ├── RankOneToggle/     #    🔧 Core Lean modules (~14 sorries)  
+│   │   │   ├── Projection.lean    #    ✅ Orthogonal projection API (0 sorries)
+│   │   │   ├── Toggle.lean        #    ✅ G(c) operator definition (0 sorries)
+│   │   │   ├── Spectrum.lean      #    🔧 Spectral stubs (3 sorries) 
+│   │   │   ├── ShermanMorrison.lean # 🔧 Inverse formulas + robust norm bounds (1 sorry)
+│   │   │   ├── FredholmAlt.lean   #    ✅ Alternative algebra-free approach (0 sorries)
+│   │   │   ├── Fredholm.lean      #    🔧 Index theory (5 sorries)
+│   │   │   └── Tutorial.lean      #    🔧 Usage examples (4 sorries)
 │   │   └── documentation/      #    📄 Work plan and papers
 │   ├── P2_BidualGap/          # ✅ WLPO ↔ BidualGap COMPLETE!
 │   │   ├── Basic.lean         # ✅ Core definitions (BidualGapStrong, WLPO)
@@ -200,14 +201,16 @@ theorem gap_collapse_threshold (h : ℚ) :
 
 | Component | Sorry Count | Status | Key Achievement |
 |-----------|-------------|--------|------------------|
-| **Paper 1 Sherman-Morrison** | **0** | ✅ **Complete** | **Robust norm bounds + toggle framework** |
+| **Paper 1 Sherman-Morrison** | **1** | 🔧 **Nearly Complete** | **Robust norm bounds + toggle framework** |
+| **Paper 1 Spectrum** | **3** | 🔧 **Stub Implementation** | **Mathematical framework documented, compilation-friendly stubs** |
+| **Paper 1 Fredholm/Tutorial** | **~10** | 📋 **Planned** | **Index theory and usage examples** |
 | **Paper 2 Core** | **3** | ✅ **Nearly Complete** | **Dual isometry with 3 WLPO sorries** |
 | Paper 2 §3.1-3.5 | 0 | ✅ Complete | §3.1-3.5 equivalence chain + lattice algebra |
 | Paper 2 Gap→WLPO | 0 | ✅ Axiom-Clean | Breakthrough: Direct Prop approach |
 | Paper 2 Fortress CI | 0 | ✅ Complete | 8-stage guard system with axiom hygiene |
 | Paper 3 | 6 | 📋 Framework Ready | Pseudo-functor theory |
 | Paper 4 Discrete | 61 | 🔧 85% Complete | CPW encoding active |
-| **Total Active** | **70** | **Sherman-Morrison milestone achieved** | |
+| **Total Active** | **~84** | **Paper 1 partial, Paper 2 nearly complete** | |
 
 ## 🔬 Mathematical Significance
 
@@ -285,8 +288,8 @@ This project is released under MIT License. If you use this work, please cite:
 
 ---
 
-**Latest Update**: 🎯 **SHERMAN-MORRISON COMPLETE** - Paper 1 Core Implementation Achieved!  
-**Paper 1 Achievement**: Complete Sherman-Morrison implementation with robust norm bounds (0 sorries)  
+**Latest Update**: 🎯 **PAPER 1 PARTIAL + PAPER 2 NEARLY COMPLETE** - Sherman-Morrison implementation achieved!  
+**Paper 1 Status**: Sherman-Morrison (1 sorry), Spectrum stubs (3 sorries), Fredholm/Tutorial planned (~10 sorries)  
 **Paper 2 Status**: Complete dual isometry (c₀* ≃ₗᵢ ℓ¹) with 81% sorry reduction (16 → 3)  
-**Status**: Paper 1 Sherman-Morrison core complete, Paper 2 nearly complete (3 WLPO sorries), Paper 4 discrete model 85% complete  
-**Next Steps**: Complete Paper 1 remaining modules (Fredholm, Tutorial), prepare mathlib4 PRs, continue Paper 4 formalization
+**Status**: Paper 1 partial implementation (~14 sorries), Paper 2 nearly complete (3 WLPO sorries), Paper 4 discrete model 85% complete  
+**Next Steps**: Complete Paper 1 remaining sorries (mathlib update needed for Spectrum), prepare mathlib4 PRs, continue Paper 4 formalization
