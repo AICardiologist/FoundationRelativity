@@ -34,8 +34,8 @@ deriving DecidableEq, Repr
 /-! A tiny "truth groupoid": empty vs singleton. -/
 def Truth (b : Bool) : Type := if b then PUnit else Empty
 
-@[simp] lemma Truth_true  : Truth true  = PUnit := rfl
-@[simp] lemma Truth_false : Truth false = Empty  := rfl
+lemma Truth_true  : Truth true  = PUnit := rfl
+lemma Truth_false : Truth false = Empty  := rfl
 
 -- Helper equivalences to avoid dependent rewrite issues
 -- produce an equivalence Truth b ≃ PUnit when b = true, by case-splitting the equality
@@ -80,8 +80,15 @@ structure WitnessFamily where
   C : Foundation → Sigma0 → Type
 
 /-- Uniformization-on-a-sub-2-category, but *only at Σ₀*.
-    We package, for each interpretation Φ inside W, an equivalence
-    at every pinned X : Σ₀, with identity and composition laws at Σ₀. -/
+    
+    This structure is restricted to Σ₀ components (pinned objects) and encodes 
+    only the equivalences there, not full pseudofunctor data. For each 
+    interpretation Φ inside W, we package an equivalence at every pinned X : Σ₀,
+    with identity and composition laws at Σ₀.
+    
+    Note: This is intentionally limited in scope - we only track witness 
+    equivalences at the pinned signature objects, not at arbitrary Banach spaces.
+-/
 structure UniformizableOn (W : Foundation → Prop) (WF : WitnessFamily) where
   η :
     ∀ {F F'} (_ : Interp F F'), W F → W F' →

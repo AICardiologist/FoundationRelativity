@@ -23,6 +23,7 @@ open Papers.P3.Phase2 hiding Foundation Interp BISH BISH_WLPO inclusionBW
 
 /-! ## Verify η is identity at non-ellInf Σ₀ objects -/
 
+-- η is refl on non-ellInf (micro-check enforcing expected behavior)
 example :
   (uniformization_height1.η (id_interp BISH_WLPO) rfl rfl Sigma0.nat)
   = Equiv.refl _ := rfl
@@ -50,6 +51,15 @@ example :
   (uniformization_height1.η (id_interp BISH_WLPO) rfl rfl Sigma0.ellInf)
   = Equiv.refl _ := by
   -- Match the pattern used in the file: ext on functions, then rfl
+  apply Equiv.ext
+  intro x
+  rfl
+
+-- Additional micro-check: η at ellInf with same endpoints is refl 
+-- (proof pattern mirrors the implementation)
+example :
+  (uniformization_height1.η (id_interp BISH_WLPO) rfl rfl Sigma0.ellInf)
+  = Equiv.refl _ := by
   apply Equiv.ext
   intro x
   rfl
