@@ -87,13 +87,20 @@ jobs:
 
       - name: Build P3 Framework (conditional)
         if: needs.changes.outputs.p3 == 'true' || needs.changes.outputs.core == 'true'
-        timeout-minutes: 2
+        timeout-minutes: 5
         run: |
-          echo "Building P3 2-category framework..."
-          lake build Papers.P3_2CatFramework.Basic || {
-            echo "::warning::P3 build failed but not blocking PR"
-            exit 0
+          echo "Building P3 2-category framework Phase 1-2..."
+          # Build Phase 1-2 implementation files
+          lake build Papers.P3_2CatFramework.Phase1_Simple Papers.P3_2CatFramework.Phase2_UniformHeight Papers.P3_2CatFramework.Phase2_API || {
+            echo "::error::P3 build failed - Phase 2 implementation error"
+            exit 1
           }
+          # Run Phase 2 tests
+          lake build Papers.P3_2CatFramework.test.Phase2_API_test || {
+            echo "::error::P3 tests failed"
+            exit 1
+          }
+          echo "✅ P3 Phase 1-2 build and tests completed successfully"
 
       # Build P4 only if P4 files changed
       - name: Check P4 changes
