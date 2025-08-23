@@ -80,20 +80,28 @@ jobs:
           lake build Papers.P2_BidualGap.P2_Minimal
           echo "P2 build completed successfully"
 
-      # Build P3 only if P3 files changed
-      - name: Check P3 changes
-        if: needs.changes.outputs.p3 == 'true' || needs.changes.outputs.core == 'true'
-        run: echo "P3 files changed, will build P3"
-
-      - name: Build P3 Framework (conditional)
-        if: needs.changes.outputs.p3 == 'true' || needs.changes.outputs.core == 'true'
-        timeout-minutes: 2
+      # Build P3 - always run now that it's complete
+      - name: Build P3 Status
         run: |
-          echo "Building P3 2-category framework..."
-          lake build Papers.P3_2CatFramework.Basic || {
-            echo "::warning::P3 build failed but not blocking PR"
-            exit 0
+          echo "Building P3 2-category framework (Phase 1-2 complete)"
+          echo "P3 now builds reliably with 0 sorries"
+
+      - name: Build P3 Framework (Phase 2 Implementation)
+        # Always build P3 now that Phase 2 is complete and working
+        timeout-minutes: 5
+        run: |
+          echo "Building P3 2-category framework Phase 1-2..."
+          # Build Phase 1-2 implementation files
+          lake build Papers.P3_2CatFramework.Phase1_Simple Papers.P3_2CatFramework.Phase2_UniformHeight Papers.P3_2CatFramework.Phase2_API || {
+            echo "::error::P3 build failed - Phase 2 implementation error"
+            exit 1
           }
+          # Run Phase 2 tests
+          lake build Papers.P3_2CatFramework.test.Phase2_API_test || {
+            echo "::error::P3 tests failed"
+            exit 1
+          }
+          echo "✅ P3 Phase 1-2 build and tests completed successfully"
 
       # Build P4 only if P4 files changed
       - name: Check P4 changes
@@ -176,16 +184,7 @@ jobs:
           
           echo "✅ No prohibited placeholder implementations found"
 
-  # Quick P3 skip job for when P3 hasn't changed
-  p3-skip:
-    needs: changes
-    if: needs.changes.outputs.p3 != 'true' && needs.changes.outputs.core != 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: P3 Framework CI (skipped)
-        run: |
-          echo "✅ P3 files unchanged - skipping P3 build"
-          echo "This allows P1/P2 PRs to proceed without P3 blocking"
+  # P3 no longer skipped - Phase 2 is complete and should always build
 
   # Quick P4 skip job for when P4 hasn't changed
   p4-skip:

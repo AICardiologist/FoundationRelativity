@@ -43,8 +43,10 @@ jobs:
       - name: Build Paper 3 Framework
         run: |
           lake build Papers.P3_2CatFramework.Core.Prelude
-          lake build Papers.P3_2CatFramework.Basic
-          lake build Papers.P3_2CatFramework.Core.CoherenceTwoCellSimp
+          lake build Papers.P3_2CatFramework.Phase1_Simple
+          lake build Papers.P3_2CatFramework.Phase2_UniformHeight
+          lake build Papers.P3_2CatFramework.Phase2_API
+          lake build Papers.P3_2CatFramework.test.Phase2_API_test
 
       - name: Guard vacuity regressions
         run: ./scripts/guard_vacuity.sh
