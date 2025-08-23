@@ -5,8 +5,9 @@ Minimal axioms for proof theory needed to prove reflection_equiv.
 These are placeholders until full proof theory is implemented.
 -/
 
-import Papers.P1_GBC.Arithmetic
-import Papers.P1_GBC.Defs
+-- Removed imports to deleted P1_GBC files
+-- import Papers.P1_GBC.Arithmetic
+-- import Papers.P1_GBC.Defs
 
 namespace Logic
 
@@ -33,6 +34,13 @@ end Logic
 
 namespace Arithmetic
 
+-- Placeholder definitions for basic proof theory concepts
+variable (Formula : Type)
+variable (Provable : Formula → Prop)
+variable (G_formula : Formula)
+variable (peanoArithmetic : Type)
+variable (consistencyPredicate : Type → Prop)
+
 /-- The Gödel sentence G -/
 def G : Prop := ¬ Provable G_formula
 
@@ -44,6 +52,6 @@ axiom provable_sound : Provable G_formula → False
 
 /-- Helper: If something is unprovable, PA must be consistent -/
 axiom consistency_from_unprovability :
-  ¬Provable G_formula → Papers.P1_GBC.Defs.consistencyPredicate Papers.P1_GBC.Defs.peanoArithmetic
+  ¬Provable G_formula → consistencyPredicate peanoArithmetic
 
 end Arithmetic
