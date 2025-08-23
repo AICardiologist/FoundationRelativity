@@ -80,16 +80,14 @@ jobs:
           lake build Papers.P2_BidualGap.P2_Minimal
           echo "P2 build completed successfully"
 
-      # Build P3 - always run for Phase 2 PR
-      - name: Check P3 changes
+      # Build P3 - always run now that it's complete
+      - name: Build P3 Status
         run: |
-          echo "P3 change detection: ${{ needs.changes.outputs.p3 }}"
-          echo "Core change detection: ${{ needs.changes.outputs.core }}"
-          echo "Force running P3 for Phase 2 implementation PR"
+          echo "Building P3 2-category framework (Phase 1-2 complete)"
+          echo "P3 now builds reliably with 0 sorries"
 
       - name: Build P3 Framework (Phase 2 Implementation)
-        # Run if P3 or core changed, OR if we're on the Phase 2 PR branch
-        if: needs.changes.outputs.p3 == 'true' || needs.changes.outputs.core == 'true' || contains(github.head_ref, 'mathlib-update') || contains(github.ref, 'mathlib-update')
+        # Always build P3 now that Phase 2 is complete and working
         timeout-minutes: 5
         run: |
           echo "Building P3 2-category framework Phase 1-2..."
@@ -186,17 +184,7 @@ jobs:
           
           echo "✅ No prohibited placeholder implementations found"
 
-  # Quick P3 skip job for when P3 hasn't changed (but not for Phase 2 PR)
-  p3-skip:
-    needs: changes
-    # Skip only if P3 unchanged AND not on the Phase 2 PR branch
-    if: needs.changes.outputs.p3 != 'true' && needs.changes.outputs.core != 'true' && !contains(github.head_ref, 'mathlib-update') && !contains(github.ref, 'mathlib-update')
-    runs-on: ubuntu-latest
-    steps:
-      - name: P3 Framework CI (skipped)
-        run: |
-          echo "✅ P3 files unchanged - skipping P3 build"
-          echo "This allows P1/P2 PRs to proceed without P3 blocking"
+  # P3 no longer skipped - Phase 2 is complete and should always build
 
   # Quick P4 skip job for when P4 hasn't changed
   p4-skip:
