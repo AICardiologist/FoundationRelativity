@@ -80,13 +80,16 @@ jobs:
           lake build Papers.P2_BidualGap.P2_Minimal
           echo "P2 build completed successfully"
 
-      # Build P3 only if P3 files changed
+      # Build P3 - always run for Phase 2 PR
       - name: Check P3 changes
-        if: needs.changes.outputs.p3 == 'true' || needs.changes.outputs.core == 'true'
-        run: echo "P3 files changed, will build P3"
+        run: |
+          echo "P3 change detection: ${{ needs.changes.outputs.p3 }}"
+          echo "Core change detection: ${{ needs.changes.outputs.core }}"
+          echo "Force running P3 for Phase 2 implementation PR"
 
-      - name: Build P3 Framework (conditional)
-        if: needs.changes.outputs.p3 == 'true' || needs.changes.outputs.core == 'true'
+      - name: Build P3 Framework (Phase 2 Implementation)
+        # Run if P3 or core changed, OR if we're on the Phase 2 PR branch
+        if: needs.changes.outputs.p3 == 'true' || needs.changes.outputs.core == 'true' || contains(github.head_ref, 'mathlib-update') || contains(github.ref, 'mathlib-update')
         timeout-minutes: 5
         run: |
           echo "Building P3 2-category framework Phase 1-2..."
@@ -183,10 +186,11 @@ jobs:
           
           echo "✅ No prohibited placeholder implementations found"
 
-  # Quick P3 skip job for when P3 hasn't changed
+  # Quick P3 skip job for when P3 hasn't changed (but not for Phase 2 PR)
   p3-skip:
     needs: changes
-    if: needs.changes.outputs.p3 != 'true' && needs.changes.outputs.core != 'true'
+    # Skip only if P3 unchanged AND not on the Phase 2 PR branch
+    if: needs.changes.outputs.p3 != 'true' && needs.changes.outputs.core != 'true' && !contains(github.head_ref, 'mathlib-update') && !contains(github.ref, 'mathlib-update')
     runs-on: ubuntu-latest
     steps:
       - name: P3 Framework CI (skipped)
