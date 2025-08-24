@@ -35,7 +35,14 @@ def W_ge : Nat → (Foundation → Prop)
 
 -- True from 2 upwards in the current scaffold.
 lemma W_ge_mono_from_two : ∀ k F, 2 ≤ k → W_ge k F → W_ge (k+1) F := by
-  intro k F hk h; have : 2 ≤ k+1 := Nat.succ_le_succ hk; simpa [W_ge] using h
+  intro k F hk _
+  -- For k ≥ 2, both W_ge k and W_ge (k+1) are True
+  cases k with
+  | zero => contradiction  -- 2 ≤ 0 is false
+  | succ k' =>
+    cases k' with
+    | zero => contradiction  -- 2 ≤ 1 is false
+    | succ k'' => simp [W_ge]  -- k = k''+2, so both levels are True
 
 /-- Uniformization at numeric level k (Σ₀-only, same packaging as Phase 2). -/
 structure UniformizableOnN (k : Nat) (WF : Papers.P3.Phase2.WitnessFamily) : Type where
@@ -94,13 +101,14 @@ def toW1 {WF} :
     UniformizableOnN 1 WF → Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge1 WF :=
 fun U => {
   η      := fun Φ hF hF' X => U.η Φ hF hF' X
-  η_id   := fun {F} hF X    => U.η_id hF X
-  η_comp := fun {F G H} φ ψ hF hG hH X =>
+  η_id   := fun hF X    => U.η_id hF X
+  η_comp := fun φ ψ hF hG hH X =>
     U.η_comp φ ψ hF hG hH X
 }
 
 /-- Minimal "height as Nat" (0, 1, or none for now). Extend later. -/
 noncomputable def HeightAtNat (WF : Papers.P3.Phase2.WitnessFamily) : Option Nat :=
+  open Classical in
   if Nonempty (UniformizableOnN 0 WF) then some 0
   else if Nonempty (UniformizableOnN 1 WF) then some 1
   else none
@@ -125,11 +133,10 @@ theorem gap_height_nat_is_one :
     ⟨(UniformizableOn.toN1 Papers.P3.Phase2.uniformization_height1)⟩
   -- Manually unfold the definition
   unfold HeightAtNat
-  -- Since we can't decide Nonempty in general, we must use classical logic
-  classical
-  by_cases h0 : Nonempty (UniformizableOnN 0 Papers.P3.Phase2.GapFamily)
-  · simp [h0]
-    exact (h0neg h0).elim
-  · simp [h0, h1pos]
+  -- Since we can't decide Nonempty in general, the definition uses Classical
+  -- The definition becomes: if ... then some 0 else if ... then some 1 else none
+  -- We know: not at 0 (h0neg) and yes at 1 (h1pos)
+  -- So the result should be some 1
+  simp only [h0neg, h1pos, ite_false, ite_true]
 
 end Papers.P3.Phase3
