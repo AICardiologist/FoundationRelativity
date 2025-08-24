@@ -63,4 +63,23 @@ def con_height_cert (S0 : Theory) (n : Nat) :
 , note := s!"Upper: S_{n+1} ⊢ Con(S_n) (schematic); lower via classical G2 at each r.e. stage."
 }
 
+/-- The "filler" atom used in `lArithSteps` for steps ≥ 1. -/
+def lpoFiller : Formula := Formula.atom 399
+
+/-- Upper bound: at stage 2 we have the filler (added at step 1). -/
+theorem lpo_filler_upper_two (T0 : Theory) :
+  (ExtendIter T0 (lArithSteps T0) 2).Provable lpoFiller := by
+  -- stage 2 = Extend (Extend T0 LPO) filler
+  simpa [ExtendIter_succ, ExtendIter_zero, lArithSteps, lpoFiller]
+    using (Extend_Proves :
+      (Extend (Extend T0 LPO) lpoFiller).Provable lpoFiller)
+
+/-- A height certificate for the filler at stage 2 (≤2). -/
+def lpo_filler_height2_cert (T0 : Theory) :
+  HeightCertificate T0 (lArithSteps T0) lpoFiller :=
+{ n := 2
+, upper := lpo_filler_upper_two T0
+, note := "Upper: definitional (step 1 is filler), hence height ≤ 2."
+}
+
 end Papers.P4Meta

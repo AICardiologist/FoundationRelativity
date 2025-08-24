@@ -79,4 +79,27 @@ section LadderTests
   #check lpo_cert_stage1_again.upper
 end LadderTests
 
+-- Product/sup tests on the same ladder
+section ProductSupTests
+  open Papers.P4Meta
+
+  -- Two certificates on the same LPO ladder:
+  --   - LPO at stage 1
+  --   - filler at stage 2
+  def lpo_cert := lpo_height1_cert Paper3Theory
+  def filler_cert := lpo_filler_height2_cert Paper3Theory
+
+  -- Combine them to a pair at stage max(1,2) = 2
+  def pairCert :=
+    combineCertificates (T := Paper3Theory)
+      (step := lArithSteps Paper3Theory)
+      (φ := LPO) (ψ := lpoFiller)
+      lpo_cert filler_cert
+
+  #check pairCert.n
+  #eval  pairCert.n                       -- should print 2
+  #check pairCert.upper_left              -- LPO holds at stage 2
+  #check pairCert.upper_right             -- filler holds at stage 2
+end ProductSupTests
+
 end Papers.P4Meta.Tests
