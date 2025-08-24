@@ -20,6 +20,9 @@ def W_ge : Nat → (Foundation → Prop)
 @[simp] lemma W_ge_zero (F : Foundation) : W_ge 0 F := trivial
 @[simp] lemma W_ge_one (F : Foundation) : (W_ge 1 F ↔ F.wlpo = true) := Iff.rfl
 
+@[simp] lemma W_ge_zero_iff_true (F : Foundation) : (W_ge 0 F ↔ True) := Iff.rfl
+@[simp] lemma W_ge_zero_iff_W_ge0 (F : Foundation) : W_ge 0 F ↔ W_ge0 F := Iff.rfl
+
 @[simp] lemma W_ge_succ_succ {k} {F : Foundation} :
   W_ge (Nat.succ (Nat.succ k)) F := by simp [W_ge]
 

@@ -142,12 +142,12 @@ noncomputable def HeightAt_viaNat (WF : Papers.P3.Phase2.WitnessFamily) : Option
   (Option.bind (some 1) ofNatLevel?) = some Level.one := rfl
 
 /-- Bridges showing the `Nonempty` conditions coincide at 0 and 1. -/
-lemma bridge0 (WF : Papers.P3.Phase2.WitnessFamily) :
+@[simp] lemma bridge0 (WF : Papers.P3.Phase2.WitnessFamily) :
   (Nonempty (Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge0 WF)) ↔ (Nonempty (Papers.P3.Phase3.UniformizableOnN 0 WF)) :=
 ⟨ (fun ⟨u⟩ => ⟨Papers.P3.Phase3.UniformizableOn.toN0 u⟩),
   (fun ⟨v⟩ => ⟨Papers.P3.Phase3.toW0 v⟩) ⟩
 
-lemma bridge1 (WF : Papers.P3.Phase2.WitnessFamily) :
+@[simp] lemma bridge1 (WF : Papers.P3.Phase2.WitnessFamily) :
   (Nonempty (Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge1 WF)) ↔ (Nonempty (Papers.P3.Phase3.UniformizableOnN 1 WF)) :=
 ⟨ (fun ⟨u⟩ => ⟨Papers.P3.Phase3.UniformizableOn.toN1 u⟩),
   (fun ⟨v⟩ => ⟨Papers.P3.Phase3.toW1 v⟩) ⟩
@@ -156,16 +156,11 @@ lemma bridge1 (WF : Papers.P3.Phase2.WitnessFamily) :
 theorem HeightAt_agrees_on_0_1 (WF : Papers.P3.Phase2.WitnessFamily) :
   HeightAt WF = HeightAt_viaNat WF := by
   classical
-  -- Unfold both definitions into two if-branches.
   unfold HeightAt HeightAt_viaNat
-  -- Case on existence at level 0; use the bridge lemmas to sync conditions.
+  -- `simp` picks up bridge0/bridge1 and the bind-ofNat simp facts
   by_cases h0 : Nonempty (Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge0 WF)
-  · simp [h0, bridge0 WF]
-  · simp [h0, bridge0 WF]
-    -- Now decide level 1, again via the bridge.
-    by_cases h1 : Nonempty (Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge1 WF)
-    · simp [h1, bridge1 WF]
-    · simp [h1, bridge1 WF]
+  · simp [h0]
+  · simp [h0]
 
 @[simp] theorem gap_height_viaNat_01 :
   HeightAt_viaNat Papers.P3.Phase2.GapFamily = some Level.one := by
