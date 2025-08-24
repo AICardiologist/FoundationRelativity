@@ -60,6 +60,10 @@ jobs:
       - name: Build Phase 3 tests
         run: |
           lake build Papers.P3_2CatFramework.test.Phase3_test
+      
+      - name: Build Positive Uniformization tests
+        run: |
+          lake build Papers.P3_2CatFramework.test.Positive_test
 
       - name: Check for unauthorized sorries
         run: |

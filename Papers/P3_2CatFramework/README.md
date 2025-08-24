@@ -29,6 +29,13 @@
 - **Truth groupoid**: Empty vs PUnit encoding foundation properties
 - **Test coverage**: Comprehensive sanity checks in `test/Phase2_API_test.lean`
 
+#### ✅ Positive Uniformization (Part II)
+- **`Phase2_Positive.lean`**: `PosUniformizableOn`, `PosHeightAt`, and Gap positive height = 1
+- **`Phase3_Positive.lean`**: `PosUniformizableOnN`, `PosHeightAtNat`, bridges, and API equality on {0,1}
+- **`test/Positive_test.lean`**: Gap (1), StoneWindowMock (0), bridge/equality checks
+- **Key theorem**: Positive uniformization = uniformization + fiber non-emptiness
+- **Result**: Gap requires WLPO for witness existence (positive height = 1)
+
 ### ✅ Supporting Infrastructure
 ```
 Papers/P3_2CatFramework/
