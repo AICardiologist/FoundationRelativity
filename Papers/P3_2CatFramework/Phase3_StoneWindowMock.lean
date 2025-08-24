@@ -2,7 +2,7 @@
   Papers/P3_2CatFramework/Phase3_StoneWindowMock.lean
   A mock Σ₀ witness family that is uniformizable at height 0.
 -/
-import Papers/P3_2CatFramework.Phase2_UniformHeight
+import Papers.P3_2CatFramework.Phase2_UniformHeight
 
 namespace Papers.P3.Phase3
 
