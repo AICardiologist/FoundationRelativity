@@ -121,4 +121,47 @@ noncomputable def HeightAtNat_viaPhase2 (WF : Papers.P3.Phase2.WitnessFamily) : 
   HeightAtNat_viaPhase2 Papers.P3.Phase2.GapFamily = some 1 := by
   simp [HeightAtNat_viaPhase2, Papers.P3.Phase3.gap_height_nat_is_one]
 
+/-- Map numeric levels to Phase 2's `Level` (only defined on {0,1}). -/
+def ofNatLevel? : Nat → Option Level
+  | 0 => some Level.zero
+  | 1 => some Level.one
+  | _ => none
+
+/-- Re-express `HeightAt` via the numeric height (dropping ≥2 as `none`). -/
+noncomputable def HeightAt_viaNat (WF : Papers.P3.Phase2.WitnessFamily) : Option Level :=
+  (Papers.P3.Phase3.HeightAtNat WF).bind ofNatLevel?
+
+@[simp] lemma ofNatLevel?_zero : ofNatLevel? 0 = some Level.zero := rfl
+@[simp] lemma ofNatLevel?_one  : ofNatLevel? 1 = some Level.one  := rfl
+
+/-- Bridges showing the `Nonempty` conditions coincide at 0 and 1. -/
+lemma bridge0 (WF : Papers.P3.Phase2.WitnessFamily) :
+  (Nonempty (Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge0 WF)) ↔ (Nonempty (Papers.P3.Phase3.UniformizableOnN 0 WF)) :=
+⟨ (fun ⟨u⟩ => ⟨Papers.P3.Phase3.UniformizableOn.toN0 u⟩),
+  (fun ⟨v⟩ => ⟨Papers.P3.Phase3.toW0 v⟩) ⟩
+
+lemma bridge1 (WF : Papers.P3.Phase2.WitnessFamily) :
+  (Nonempty (Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge1 WF)) ↔ (Nonempty (Papers.P3.Phase3.UniformizableOnN 1 WF)) :=
+⟨ (fun ⟨u⟩ => ⟨Papers.P3.Phase3.UniformizableOn.toN1 u⟩),
+  (fun ⟨v⟩ => ⟨Papers.P3.Phase3.toW1 v⟩) ⟩
+
+/-- On {0,1}, the Phase 2 `HeightAt` equals the Phase 3 numeric height view. -/
+theorem HeightAt_agrees_on_0_1 (WF : Papers.P3.Phase2.WitnessFamily) :
+  HeightAt WF = HeightAt_viaNat WF := by
+  classical
+  -- Unfold both definitions into two if-branches.
+  unfold HeightAt HeightAt_viaNat
+  -- Case on existence at level 0; use the bridge lemmas to sync conditions.
+  by_cases h0 : Nonempty (Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge0 WF)
+  · simp [h0, bridge0 WF]
+  · simp [h0, bridge0 WF]
+    -- Now decide level 1, again via the bridge.
+    by_cases h1 : Nonempty (Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge1 WF)
+    · simp [h1, bridge1 WF]
+    · simp [h1, bridge1 WF]
+
+@[simp] theorem gap_height_viaNat_01 :
+  HeightAt_viaNat Papers.P3.Phase2.GapFamily = some Level.one := by
+  simp [HeightAt_viaNat, Papers.P3.Phase3.gap_height_nat_is_one]
+
 end Papers.P3.Phase2API

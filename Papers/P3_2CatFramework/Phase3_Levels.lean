@@ -26,11 +26,9 @@ def W_ge : Nat → (Foundation → Prop)
 @[simp] lemma W_ge_succ {F : Foundation} :
   W_ge 1 F → W_ge 2 F := by intro; simp [W_ge]
 
-/-- Monotonicity scaffold: trivial for now, refine when you add real axioms at ≥2. -/
-lemma W_ge_mono : ∀ k F, W_ge k F → W_ge (k+1) F
-| 0, F, _ => by simp [W_ge]
-| 1, F, h => by simp [W_ge]  -- 1+1 = 2, W_ge 2 is True
-| Nat.succ (Nat.succ k), F, h => by simp [W_ge]  -- W_ge (k+3) is True
+-- True from 2 upwards in the current scaffold.
+lemma W_ge_mono_from_two : ∀ k F, 2 ≤ k → W_ge k F → W_ge (k+1) F := by
+  intro k F hk h; have : 2 ≤ k+1 := Nat.succ_le_succ hk; simpa [W_ge] using h
 
 /-- Uniformization at numeric level k (Σ₀-only, same packaging as Phase 2). -/
 structure UniformizableOnN (k : Nat) (WF : WitnessFamily) : Type where
@@ -72,6 +70,26 @@ fun U => {
     have hG_phase2 : W_ge1 G := hG
     have hH_phase2 : W_ge1 H := hH
     exact U.η_comp φ ψ hF_phase2 hG_phase2 hH_phase2 X
+}
+
+/-- Bridge back to Phase 2: numeric level 0 → W_ge0. -/
+def toW0 {WF} :
+    UniformizableOnN 0 WF → UniformizableOn W_ge0 WF :=
+fun U => {
+  η      := fun Φ _ _ X => U.η Φ (by trivial) (by trivial) X
+  η_id   := fun {F} _ X   => by simpa using U.η_id (by trivial) X
+  η_comp := fun {F G H} φ ψ _ _ _ X =>
+    by simpa using U.η_comp φ ψ (by trivial) (by trivial) (by trivial) X
+}
+
+/-- Bridge back to Phase 2: numeric level 1 → W_ge1. -/
+def toW1 {WF} :
+    UniformizableOnN 1 WF → UniformizableOn W_ge1 WF :=
+fun U => {
+  η      := fun Φ hF hF' X => U.η Φ hF hF' X
+  η_id   := fun {F} hF X    => U.η_id hF X
+  η_comp := fun {F G H} φ ψ hF hG hH X =>
+    U.η_comp φ ψ hF hG hH X
 }
 
 /-- Minimal "height as Nat" (0, 1, or none for now). Extend later. -/
