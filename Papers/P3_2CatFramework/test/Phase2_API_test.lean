@@ -126,14 +126,5 @@ example (WF : Papers.P3.Phase2.WitnessFamily) :
     = Papers.P3.Phase2API.HeightAt_viaNat WF := by
   simpa using Papers.P3.Phase2API.HeightAt_agrees_on_0_1 WF
 
--- StoneWindowMock shows up as level zero through the Phase 2 API
-example :
-  Papers.P3.Phase2API.HeightAt
-    (WF := Papers.P3.Phase3.StoneWindowMock) = some Papers.P3.Phase2API.Level.zero := by
-  -- From the equality with the numeric view + HeightAtNat = some 0
-  classical
-  have := Papers.P3.Phase2API.HeightAt_agrees_on_0_1 Papers.P3.Phase3.StoneWindowMock
-  -- Rewrite and simplify with your bind/ofNat simp lemmas.
-  simpa [Papers.P3.Phase2API.HeightAt_viaNat,
-         Papers.P3.Phase3.HeightAtNat,
-         Papers.P3.Phase3.stone_uniformization_h0]
+-- Note: The StoneWindowMock test has been moved to Phase3_test.lean
+-- since it depends on Phase 3 definitions

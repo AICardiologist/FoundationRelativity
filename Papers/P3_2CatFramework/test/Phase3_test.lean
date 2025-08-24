@@ -39,3 +39,14 @@ example :
   have h0 : Nonempty (Papers.P3.Phase3.UniformizableOnN 0 Papers.P3.Phase3.StoneWindowMock) :=
     ⟨Papers.P3.Phase3.UniformizableOn.toN0 Papers.P3.Phase3.stone_uniformization_h0⟩
   simp [h0, Papers.P3.Phase2API.ofNatLevel?]
+
+-- StoneWindowMock shows up as level zero through the Phase 2 API (moved from Phase2_API_test)
+example :
+  Papers.P3.Phase2API.HeightAt Papers.P3.Phase3.StoneWindowMock 
+    = some Papers.P3.Phase2API.Level.zero := by
+  -- Use the HeightAt_viaNat bridge and the fact that HeightAtNat = some 0
+  rw [Papers.P3.Phase2API.HeightAt_agrees_on_0_1]
+  unfold Papers.P3.Phase2API.HeightAt_viaNat Papers.P3.Phase3.HeightAtNat
+  have h0 : Nonempty (Papers.P3.Phase3.UniformizableOnN 0 Papers.P3.Phase3.StoneWindowMock) :=
+    ⟨Papers.P3.Phase3.UniformizableOn.toN0 Papers.P3.Phase3.stone_uniformization_h0⟩
+  simp [h0, Papers.P3.Phase2API.ofNatLevel?]
