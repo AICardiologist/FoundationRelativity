@@ -64,6 +64,14 @@ jobs:
       - name: Build Positive Uniformization tests
         run: |
           lake build Papers.P3_2CatFramework.test.Positive_test
+      
+      - name: Build Positive Truth Algebra tests
+        run: |
+          lake build Papers.P3_2CatFramework.test.Positive_TruthAlgebra_test
+      
+      - name: Build Positive Pins tests
+        run: |
+          lake build Papers.P3_2CatFramework.test.Positive_Pins_test
 
       - name: Check for unauthorized sorries
         run: |

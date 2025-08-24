@@ -20,3 +20,5 @@ import Papers.P3_2CatFramework.Phase3_StoneWindowMock
 -- Positive uniformization (Part II of paper)
 import Papers.P3_2CatFramework.Phase2_Positive
 import Papers.P3_2CatFramework.Phase3_Positive
+import Papers.P3_2CatFramework.Phase2_PositiveTruthAlgebra
+import Papers.P3_2CatFramework.Phase2_PositivePins
