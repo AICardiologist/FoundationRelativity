@@ -8,6 +8,7 @@
 -/
 
 import Papers.P3_2CatFramework.Phase2_UniformHeight
+import Papers.P3_2CatFramework.Phase3_Levels
 
 namespace Papers.P3.Phase2API
 
@@ -111,5 +112,70 @@ lemma gap_has_uniformization_at_one :
 #check Level
 
 #eval "Phase 2 API: Clean interface for uniformization height theory complete!"
+
+/-- Phase 3 numeric height, re-exposed through the Phase 2 API. -/
+noncomputable def HeightAtNat_viaPhase2 (WF : Papers.P3.Phase2.WitnessFamily) : Option Nat :=
+  Papers.P3.Phase3.HeightAtNat WF
+
+@[simp] theorem gap_height_nat_viaPhase2 :
+  HeightAtNat_viaPhase2 Papers.P3.Phase2.GapFamily = some 1 := by
+  simp [HeightAtNat_viaPhase2, Papers.P3.Phase3.gap_height_nat_is_one]
+
+/-- Map numeric levels to Phase 2's `Level` (only defined on {0,1}). -/
+def ofNatLevel? : Nat → Option Level
+  | 0 => some Level.zero
+  | 1 => some Level.one
+  | _ => none
+
+/-- Re-express `HeightAt` via the numeric height (dropping ≥2 as `none`). -/
+noncomputable def HeightAt_viaNat (WF : Papers.P3.Phase2.WitnessFamily) : Option Level :=
+  (Papers.P3.Phase3.HeightAtNat WF).bind ofNatLevel?
+
+@[simp] lemma ofNatLevel?_zero : ofNatLevel? 0 = some Level.zero := rfl
+@[simp] lemma ofNatLevel?_one  : ofNatLevel? 1 = some Level.one  := rfl
+
+@[simp] lemma bind_ofNatLevel?_none :
+  (Option.bind (none : Option Nat) ofNatLevel?) = (none : Option Level) := rfl
+@[simp] lemma bind_ofNatLevel?_some_zero :
+  (Option.bind (some 0) ofNatLevel?) = some Level.zero := rfl
+@[simp] lemma bind_ofNatLevel?_some_one :
+  (Option.bind (some 1) ofNatLevel?) = some Level.one := rfl
+
+/-- Bridges showing the `Nonempty` conditions coincide at 0 and 1. -/
+@[simp] lemma bridge0 (WF : Papers.P3.Phase2.WitnessFamily) :
+  (Nonempty (Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge0 WF)) ↔ (Nonempty (Papers.P3.Phase3.UniformizableOnN 0 WF)) :=
+⟨ (fun ⟨u⟩ => ⟨Papers.P3.Phase3.UniformizableOn.toN0 u⟩),
+  (fun ⟨v⟩ => ⟨Papers.P3.Phase3.toW0 v⟩) ⟩
+
+@[simp] lemma bridge1 (WF : Papers.P3.Phase2.WitnessFamily) :
+  (Nonempty (Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge1 WF)) ↔ (Nonempty (Papers.P3.Phase3.UniformizableOnN 1 WF)) :=
+⟨ (fun ⟨u⟩ => ⟨Papers.P3.Phase3.UniformizableOn.toN1 u⟩),
+  (fun ⟨v⟩ => ⟨Papers.P3.Phase3.toW1 v⟩) ⟩
+
+/-- On {0,1}, the Phase 2 `HeightAt` equals the Phase 3 numeric height view. -/
+theorem HeightAt_agrees_on_0_1 (WF : Papers.P3.Phase2.WitnessFamily) :
+  HeightAt WF = HeightAt_viaNat WF := by
+  classical
+  unfold HeightAt HeightAt_viaNat Papers.P3.Phase3.HeightAtNat
+  -- Both sides compute height based on the same uniformization conditions
+  by_cases h0 : Nonempty (Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge0 WF)
+  · -- Case: uniformizable at level 0
+    -- bridge0 tells us UniformizableOn W_ge0 ↔ UniformizableOnN 0
+    rw [bridge0] at h0
+    simp [h0, ofNatLevel?]
+  · -- Case: not uniformizable at level 0
+    rw [bridge0] at h0
+    simp [h0]
+    by_cases h1 : Nonempty (Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge1 WF)
+    · -- Case: uniformizable at level 1
+      rw [bridge1] at h1
+      simp [h1, ofNatLevel?]
+    · -- Case: not uniformizable at either level
+      rw [bridge1] at h1
+      simp [h1, ofNatLevel?]
+
+@[simp] theorem gap_height_viaNat_01 :
+  HeightAt_viaNat Papers.P3.Phase2.GapFamily = some Level.one := by
+  simp [HeightAt_viaNat, Papers.P3.Phase3.gap_height_nat_is_one]
 
 end Papers.P3.Phase2API

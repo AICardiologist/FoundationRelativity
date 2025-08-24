@@ -114,3 +114,17 @@ example (b : Bool) (hb : b = true) :
   exact Equiv.refl _
 
 #eval "Phase 2 API tests: All sanity checks pass!"
+
+-- Height APIs agree on {0,1}
+#check Papers.P3.Phase2API.HeightAt_agrees_on_0_1
+example : Papers.P3.Phase2API.HeightAt_viaNat Papers.P3.Phase2.GapFamily = some Papers.P3.Phase2API.Level.one := by
+  simpa using Papers.P3.Phase2API.gap_height_viaNat_01
+
+-- HeightAt agrees with the numeric view for any WF on {0,1}.
+example (WF : Papers.P3.Phase2.WitnessFamily) :
+  Papers.P3.Phase2API.HeightAt WF
+    = Papers.P3.Phase2API.HeightAt_viaNat WF := by
+  simpa using Papers.P3.Phase2API.HeightAt_agrees_on_0_1 WF
+
+-- Note: The StoneWindowMock test has been moved to Phase3_test.lean
+-- since it depends on Phase 3 definitions

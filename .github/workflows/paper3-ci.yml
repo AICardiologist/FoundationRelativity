@@ -43,9 +43,10 @@ jobs:
       - name: Build Paper 3 Framework
         run: |
           lake build Papers.P3_2CatFramework.Core.Prelude
-          lake build Papers.P3_2CatFramework.Phase1_Simple
-          lake build Papers.P3_2CatFramework.Phase2_UniformHeight
-          lake build Papers.P3_2CatFramework.Phase2_API
+          lake build Papers.P3_2CatFramework
+
+      - name: Build Phase 2 API test
+        run: |
           lake build Papers.P3_2CatFramework.test.Phase2_API_test
 
       - name: Guard vacuity regressions
@@ -55,6 +56,10 @@ jobs:
         run: |
           lake env lean Papers/P3_2CatFramework/test/Interp_simp_test.lean
           lake env lean Papers/P3_2CatFramework/test/TwoCell_simp_test.lean
+      
+      - name: Build Phase 3 tests
+        run: |
+          lake build Papers.P3_2CatFramework.test.Phase3_test
 
       - name: Check for unauthorized sorries
         run: |
