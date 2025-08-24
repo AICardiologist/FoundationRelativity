@@ -4,6 +4,7 @@
 import Papers.P3_2CatFramework.Phase3_Levels
 import Papers.P3_2CatFramework.Phase3_Obstruction
 import Papers.P3_2CatFramework.Phase3_StoneWindowMock
+import Papers.P3_2CatFramework.Phase2_API
 
 open Papers.P3.Phase1Simple
 open Papers.P3.Phase2
@@ -23,3 +24,13 @@ open Classical
 example : Papers.P3.Phase3.HeightAtNat Papers.P3.Phase3.StoneWindowMock = some 0 := by
   -- By definition: there is a level-0 uniformization and we ignore higher levels.
   simp [Papers.P3.Phase3.HeightAtNat, Papers.P3.Phase3.stone_uniformization_h0]
+
+-- Height APIs also agree on the positive example at level 0, via the Phase 2 bridge.
+example :
+  Papers.P3.Phase2API.HeightAt_viaNat Papers.P3.Phase3.StoneWindowMock
+    = some Papers.P3.Phase2API.Level.zero := by
+  -- HeightAtNat StoneWindowMock = some 0 by construction (uniformizable at 0)
+  -- so the Phase 2 view must pick Level.zero.
+  simp [Papers.P3.Phase2API.HeightAt_viaNat,
+        Papers.P3.Phase3.HeightAtNat,
+        Papers.P3.Phase3.stone_uniformization_h0]

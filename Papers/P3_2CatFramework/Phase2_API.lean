@@ -134,6 +134,13 @@ noncomputable def HeightAt_viaNat (WF : Papers.P3.Phase2.WitnessFamily) : Option
 @[simp] lemma ofNatLevel?_zero : ofNatLevel? 0 = some Level.zero := rfl
 @[simp] lemma ofNatLevel?_one  : ofNatLevel? 1 = some Level.one  := rfl
 
+@[simp] lemma bind_ofNatLevel?_none :
+  (Option.bind (none : Option Nat) ofNatLevel?) = (none : Option Level) := rfl
+@[simp] lemma bind_ofNatLevel?_some_zero :
+  (Option.bind (some 0) ofNatLevel?) = some Level.zero := rfl
+@[simp] lemma bind_ofNatLevel?_some_one :
+  (Option.bind (some 1) ofNatLevel?) = some Level.one := rfl
+
 /-- Bridges showing the `Nonempty` conditions coincide at 0 and 1. -/
 lemma bridge0 (WF : Papers.P3.Phase2.WitnessFamily) :
   (Nonempty (Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge0 WF)) ↔ (Nonempty (Papers.P3.Phase3.UniformizableOnN 0 WF)) :=

@@ -26,6 +26,11 @@ def W_ge : Nat → (Foundation → Prop)
 @[simp] lemma W_ge_succ {F : Foundation} :
   W_ge 1 F → W_ge 2 F := by intro; simp [W_ge]
 
+-- Phase 2's level-1 predicate is definitionally the same as our numeric level 1.
+-- (Here W_ge1 F := hasWLPO F = true and hasWLPO F is defeq F.wlpo.)
+@[simp] lemma W_ge_one_iff_W_ge1 (F : Foundation) :
+  W_ge 1 F ↔ W_ge1 F := by rfl
+
 -- True from 2 upwards in the current scaffold.
 lemma W_ge_mono_from_two : ∀ k F, 2 ≤ k → W_ge k F → W_ge (k+1) F := by
   intro k F hk h; have : 2 ≤ k+1 := Nat.succ_le_succ hk; simpa [W_ge] using h
