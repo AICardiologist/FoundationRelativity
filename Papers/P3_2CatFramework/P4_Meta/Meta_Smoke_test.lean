@@ -102,4 +102,29 @@ section ProductSupTests
   #check pairCert.upper_right             -- filler holds at stage 2
 end ProductSupTests
 
+-- N-ary product/sup aggregator tests
+section MultiSupTests
+  open Papers.P4Meta
+
+  -- Build a list of single-goal certs on the same ladder.
+  def lpoNamed : Σ φ, HeightCertificate Paper3Theory (lArithSteps Paper3Theory) φ :=
+    ⟨LPO, lpo_height1_cert Paper3Theory⟩
+  def fillerNamed : Σ φ, HeightCertificate Paper3Theory (lArithSteps Paper3Theory) φ :=
+    ⟨lpoFiller, lpo_filler_height2_cert Paper3Theory⟩
+
+  def bag := HeightCertificateBag.fromList
+    (T := Paper3Theory) (step := lArithSteps Paper3Theory)
+    [lpoNamed, fillerNamed]
+
+  #eval bag.n                             -- expect 2
+  #eval maxStageOfCerts [lpoNamed, fillerNamed]  -- expect 2
+  
+  -- Simple combination test
+  def simplePair := combineCertsSimple 
+    (lpo_height1_cert Paper3Theory)
+    (lpo_filler_height2_cert Paper3Theory)
+  
+  #check simplePair
+end MultiSupTests
+
 end Papers.P4Meta.Tests
