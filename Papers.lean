@@ -15,8 +15,8 @@
 
 -- Import active paper modules (no legacy dependencies)
 import Papers.P1_GBC.P1_Minimal
-import Papers.P2_BidualGap.P2_Minimal  
--- Papers.P3_2CatFramework.SmokeTest has CategoryTheory dependencies (temporarily excluded)
+import Papers.P2_BidualGap.P2_Minimal
+import Papers.P3_2CatFramework
 -- Papers.P4_SpectralGeometry modules available but not imported for faster builds
 
 namespace Papers

@@ -156,11 +156,23 @@ noncomputable def HeightAt_viaNat (WF : Papers.P3.Phase2.WitnessFamily) : Option
 theorem HeightAt_agrees_on_0_1 (WF : Papers.P3.Phase2.WitnessFamily) :
   HeightAt WF = HeightAt_viaNat WF := by
   classical
-  unfold HeightAt HeightAt_viaNat
-  -- `simp` picks up bridge0/bridge1 and the bind-ofNat simp facts
+  unfold HeightAt HeightAt_viaNat Papers.P3.Phase3.HeightAtNat
+  -- Both sides compute height based on the same uniformization conditions
   by_cases h0 : Nonempty (Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge0 WF)
-  · simp [h0]
-  · simp [h0]
+  · -- Case: uniformizable at level 0
+    -- bridge0 tells us UniformizableOn W_ge0 ↔ UniformizableOnN 0
+    rw [bridge0] at h0
+    simp [h0, ofNatLevel?]
+  · -- Case: not uniformizable at level 0
+    rw [bridge0] at h0
+    simp [h0]
+    by_cases h1 : Nonempty (Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge1 WF)
+    · -- Case: uniformizable at level 1
+      rw [bridge1] at h1
+      simp [h1, ofNatLevel?]
+    · -- Case: not uniformizable at either level
+      rw [bridge1] at h1
+      simp [h1, ofNatLevel?]
 
 @[simp] theorem gap_height_viaNat_01 :
   HeightAt_viaNat Papers.P3.Phase2.GapFamily = some Level.one := by
