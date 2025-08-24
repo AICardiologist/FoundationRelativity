@@ -62,4 +62,21 @@ section HeightCertTest
   #check testCert.note
 end HeightCertTest
 
+-- Part III ladders: quick sanity checks
+section LadderTests
+  open Papers.P4Meta
+
+  #check lpo_height1_cert Paper3Theory
+  #eval (lpo_height1_cert Paper3Theory).n      -- should print 1
+
+  #check con_height_cert Paper3Theory 0
+  #eval (con_height_cert Paper3Theory 0).n     -- should print 1
+
+  -- Demonstrate lifting a certificate to a later stage
+  def lpo_cert_stage1 := lpo_height1_cert Paper3Theory
+  def lpo_cert_stage1_again :=
+    HeightCertificate.lift lpo_cert_stage1 1 (Nat.le_refl _)
+  #check lpo_cert_stage1_again.upper
+end LadderTests
+
 end Papers.P4Meta.Tests
