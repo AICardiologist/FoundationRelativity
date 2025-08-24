@@ -86,22 +86,22 @@ jobs:
           echo "Building P3 2-category framework (Phase 1-2 complete)"
           echo "P3 now builds reliably with 0 sorries"
 
-      - name: Build P3 Framework (Phase 2 Implementation)
-        # Always build P3 now that Phase 2 is complete and working
+      - name: Build P3 Framework (Complete Implementation)
+        # Always build P3 now that Phase 3 is complete and working
         timeout-minutes: 5
         run: |
-          echo "Building P3 2-category framework Phase 1-2..."
-          # Build Phase 1-2 implementation files
-          lake build Papers.P3_2CatFramework.Phase1_Simple Papers.P3_2CatFramework.Phase2_UniformHeight Papers.P3_2CatFramework.Phase2_API || {
-            echo "::error::P3 build failed - Phase 2 implementation error"
+          echo "Building P3 2-category framework Phase 1-3..."
+          # Build the complete P3 framework
+          lake build Papers.P3_2CatFramework || {
+            echo "::error::P3 build failed"
             exit 1
           }
-          # Run Phase 2 tests
-          lake build Papers.P3_2CatFramework.test.Phase2_API_test || {
+          # Run Phase 3 tests
+          lake build Papers.P3_2CatFramework.test.Phase3_test || {
             echo "::error::P3 tests failed"
             exit 1
           }
-          echo "✅ P3 Phase 1-2 build and tests completed successfully"
+          echo "✅ P3 Phase 1-3 build and tests completed successfully"
 
       # Build P4 only if P4 files changed
       - name: Check P4 changes

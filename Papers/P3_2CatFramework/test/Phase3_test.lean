@@ -20,10 +20,14 @@ open Papers.P3.Phase3
 #check stone_uniformization_h0
 
 -- StoneWindowMock has numeric height 0
-open Classical
 example : Papers.P3.Phase3.HeightAtNat Papers.P3.Phase3.StoneWindowMock = some 0 := by
   -- By definition: there is a level-0 uniformization and we ignore higher levels.
-  simp [Papers.P3.Phase3.HeightAtNat, Papers.P3.Phase3.stone_uniformization_h0]
+  unfold Papers.P3.Phase3.HeightAtNat
+  -- We have stone_uniformization_h0 : UniformizableOn W_ge0 StoneWindowMock
+  -- This gives us UniformizableOnN 0 via toN0
+  have h0 : Nonempty (Papers.P3.Phase3.UniformizableOnN 0 Papers.P3.Phase3.StoneWindowMock) :=
+    ⟨Papers.P3.Phase3.UniformizableOn.toN0 Papers.P3.Phase3.stone_uniformization_h0⟩
+  simp [h0]
 
 -- Height APIs also agree on the positive example at level 0, via the Phase 2 bridge.
 example :
@@ -31,6 +35,7 @@ example :
     = some Papers.P3.Phase2API.Level.zero := by
   -- HeightAtNat StoneWindowMock = some 0 by construction (uniformizable at 0)
   -- so the Phase 2 view must pick Level.zero.
-  simp [Papers.P3.Phase2API.HeightAt_viaNat,
-        Papers.P3.Phase3.HeightAtNat,
-        Papers.P3.Phase3.stone_uniformization_h0]
+  unfold Papers.P3.Phase2API.HeightAt_viaNat Papers.P3.Phase3.HeightAtNat
+  have h0 : Nonempty (Papers.P3.Phase3.UniformizableOnN 0 Papers.P3.Phase3.StoneWindowMock) :=
+    ⟨Papers.P3.Phase3.UniformizableOn.toN0 Papers.P3.Phase3.stone_uniformization_h0⟩
+  simp [h0, Papers.P3.Phase2API.ofNatLevel?]
