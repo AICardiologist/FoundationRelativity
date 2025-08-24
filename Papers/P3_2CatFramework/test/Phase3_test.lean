@@ -17,3 +17,9 @@ open Papers.P3.Phase3
 
 -- StoneWindowMock is uniformizable at 0
 #check stone_uniformization_h0
+
+-- StoneWindowMock has numeric height 0
+open Classical
+example : Papers.P3.Phase3.HeightAtNat Papers.P3.Phase3.StoneWindowMock = some 0 := by
+  -- By definition: there is a level-0 uniformization and we ignore higher levels.
+  simp [Papers.P3.Phase3.HeightAtNat, Papers.P3.Phase3.stone_uniformization_h0]

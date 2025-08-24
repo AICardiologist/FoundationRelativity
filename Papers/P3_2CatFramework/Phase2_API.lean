@@ -8,6 +8,7 @@
 -/
 
 import Papers.P3_2CatFramework.Phase2_UniformHeight
+import Papers.P3_2CatFramework.Phase3_Levels
 
 namespace Papers.P3.Phase2API
 
@@ -111,5 +112,13 @@ lemma gap_has_uniformization_at_one :
 #check Level
 
 #eval "Phase 2 API: Clean interface for uniformization height theory complete!"
+
+/-- Phase 3 numeric height, re-exposed through the Phase 2 API. -/
+noncomputable def HeightAtNat_viaPhase2 (WF : Papers.P3.Phase2.WitnessFamily) : Option Nat :=
+  Papers.P3.Phase3.HeightAtNat WF
+
+@[simp] theorem gap_height_nat_viaPhase2 :
+  HeightAtNat_viaPhase2 Papers.P3.Phase2.GapFamily = some 1 := by
+  simp [HeightAtNat_viaPhase2, Papers.P3.Phase3.gap_height_nat_is_one]
 
 end Papers.P3.Phase2API

@@ -154,9 +154,15 @@ This paper will establish:
 - ✅ Mathematical correspondence to Paper 3 LaTeX Sections 2-4
 - ✅ Build success: 0 sorries, 301 jobs green
 
+### ✅ Phase 3 (in progress)
+- **Phase3_Levels.lean**: Numeric height levels with bridges from Phase 2
+- **Phase3_Obstruction.lean**: Generic Σ₀ obstruction lemma
+- **Phase3_StoneWindowMock.lean**: Positive height-0 case study
+- **test/Phase3_test.lean**: Verification tests
+
 ### 🔧 **Phase 3+ Requirements (Advanced Structures)**
-- General Level : ℕ → Foundation → Prop with monotonicity
-- Stone window witness family (uniformizable at Level 0)
+- Real level-2 predicate (e.g., DC_ω)
+- Σ₀-pseudofunctors lifting from Phase 2
 - Functorial Obstruction Theorem (can restore from old_files/)
 - Oplax limits and lax pullback theory
 - Integration with pathology examples from Papers 1 & 2

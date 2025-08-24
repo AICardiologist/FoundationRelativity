@@ -55,6 +55,10 @@ jobs:
         run: |
           lake env lean Papers/P3_2CatFramework/test/Interp_simp_test.lean
           lake env lean Papers/P3_2CatFramework/test/TwoCell_simp_test.lean
+      
+      - name: Build Phase 3 tests
+        run: |
+          lake build Papers.P3_2CatFramework.test.Phase3_test
 
       - name: Check for unauthorized sorries
         run: |
