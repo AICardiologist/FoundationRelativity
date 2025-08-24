@@ -22,17 +22,13 @@ theorem reflection_implies_consistency (T : Theory) [HBL T] [RE T]
 axiom consistency_implies_godel (T : Theory) [HBL T] [RE T] :
     (Extend T (Con T)).Provable (GodelSentence T)
 
-/-- Extended theories inherit HBL and RE properties -/
-axiom extend_preserves_HBL (T : Theory) [HBL T] (φ : Formula) : HBL (Extend T φ)
-axiom extend_preserves_RE (T : Theory) [RE T] (φ : Formula) : RE (Extend T φ)
-
 /-- The collision chain: two extension steps from T to prove G_T -/
 theorem collision_chain (T : Theory) [HBL T] [RE T] 
     [CodesProofs T] [Sigma1Sound T] :
     (Extend (Extend T (RFN_Sigma1 T)) (Con T)).Provable (GodelSentence T) := by
-  -- Extended theories inherit HBL and RE
-  have : HBL (Extend T (RFN_Sigma1 T)) := extend_preserves_HBL T _
-  have : RE (Extend T (RFN_Sigma1 T)) := extend_preserves_RE T _
+  -- Let typeclass search supply the instances
+  have _ : HBL (Extend T (RFN_Sigma1 T)) := inferInstance
+  have _ : RE (Extend T (RFN_Sigma1 T)) := inferInstance
   exact consistency_implies_godel (Extend T (RFN_Sigma1 T))
 
 /-- Height analysis: G_T has height ≤ 2 in the double extension -/

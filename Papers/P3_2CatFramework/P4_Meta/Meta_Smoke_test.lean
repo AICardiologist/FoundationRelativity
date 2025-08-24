@@ -41,4 +41,25 @@ example : Paper3Theory.Provable (Formula.atom 10) :=
 
 #eval "P4_Meta smoke test: OK!"
 
+-- Test height certificate structure is well-formed
+section HeightCertTest
+  open Papers.P4Meta
+  
+  -- Just verify the structure compiles and can be used
+  def testStep : Nat → Formula
+  | 0 => Formula.atom 300
+  | _ => Formula.atom 301
+  
+  def testCert : HeightCertificate Paper3Theory testStep (Formula.atom 300) :=
+  { n     := 1
+  , upper := by simp [ExtendIter, testStep, Extend]
+  , note  := "Test certificate"
+  }
+  
+  -- Verify the structure fields are accessible
+  #check testCert.n
+  #check testCert.upper
+  #check testCert.note
+end HeightCertTest
+
 end Papers.P4Meta.Tests

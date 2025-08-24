@@ -7,6 +7,8 @@ import Papers.P3_2CatFramework.P4_Meta.Meta_Witnesses
 import Papers.P3_2CatFramework.P4_Meta.Meta_Ladders
 import Papers.P3_2CatFramework.P4_Meta.Meta_UpperBounds
 import Papers.P3_2CatFramework.P4_Meta.Meta_LowerBounds_Axioms
+import Papers.P3_2CatFramework.P4_Meta.PartIII_Certificates
+import Papers.P3_2CatFramework.P4_Meta.PartIV_Limit
 import Papers.P3_2CatFramework.P4_Meta.PartV_Interfaces
 import Papers.P3_2CatFramework.P4_Meta.PartV_Reflection
 import Papers.P3_2CatFramework.P4_Meta.PartV_Collision

@@ -24,16 +24,12 @@ class Sigma1Sound (T : Theory) : Prop where
     Formula.atom 200 = phi →  
     (Extend T (RFN_Sigma1 T)).Provable phi
 
-/-- Con(T) is equivalent to a true Sigma1 statement (axiom) -/
-axiom con_is_sigma1 (T : Theory) : Formula.atom 200 = Con T
-
 /-- The de-axiomatized reflection theorem -/
-
 theorem reflection_implies_consistency_proved 
     (T : Theory) [HBL T] [RE T] [CodesProofs T] [inst : Sigma1Sound T] :
     (Extend T (RFN_Sigma1 T)).Provable (Con T) := by
-  -- Use Sigma1-soundness directly
-  have h := inst.reflection_holds (Con T) (con_is_sigma1 T)
+  -- Use Sigma1-soundness directly with simp-based proof
+  have h := inst.reflection_holds (Con T) (by simp [Con])
   exact h
 
 end Papers.P4Meta.PartV

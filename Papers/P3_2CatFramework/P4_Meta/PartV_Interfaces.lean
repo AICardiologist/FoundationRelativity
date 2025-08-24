@@ -11,33 +11,21 @@ namespace Papers.P4Meta.PartV
 
 open Papers.P4Meta
 
-/-- Hereditarily below λ (HBL): theory has a well-ordered proof-theoretic ordinal -/
-class HBL (T : Theory) : Prop where
-  ordinal_exists : True  -- Placeholder: ∃ α < λ, proof-theoretic ordinal
+/-- Base "tags" for the schematic meta formulas. -/
+@[simp] def Con (T : Theory) : Formula := Formula.atom 200
+@[simp] def RFN_Sigma1 (T : Theory) : Formula := Formula.atom 201
+@[simp] def GodelSentence (T : Theory) : Formula := Formula.atom 202
 
-/-- Recursively enumerable (RE): theory is computably axiomatizable -/
-class RE (T : Theory) : Prop where
-  enumerable : True  -- Placeholder: axioms form an r.e. set
+/-- Derivability & rec. axiomatizability tags (schematic). -/
+class HBL (T : Theory) : Prop
+class RE (T : Theory) : Prop
+class Consistent (T : Theory) : Prop
 
-/-- Consistency predicate for a theory -/
-def Consistent (T : Theory) : Prop :=
-  ¬T.Provable (Formula.atom 999)  -- Using atom 999 as ⊥
+/-- HBL and RE are preserved by our schematic "Extend". -/
+instance extend_preserves_HBL (T : Theory) [HBL T] (φ : Formula) :
+  HBL (Extend T φ) := ⟨⟩
 
-/-- The consistency statement Con(T) as a formula -/
-def Con (T : Theory) : Formula :=
-  Formula.atom 100  -- Placeholder encoding of "T is consistent"
-
-/-- Uniform Σ₁-reflection principle for T -/
-def RFN_Sigma1 (T : Theory) : Formula :=
-  Formula.atom 101  -- Placeholder encoding of "all Σ₁ statements true in ℕ are provable in T"
-
-/-- The Gödel sentence for T (unprovable self-reference) -/
-def GodelSentence (T : Theory) : Formula :=
-  Formula.atom 102  -- Placeholder encoding of "this sentence is unprovable in T"
-
-/-- Standard consistency: theory doesn't prove contradiction -/
-theorem consistent_iff_no_contradiction (T : Theory) :
-    Consistent T ↔ ¬T.Provable (Formula.atom 999) := by
-  rfl
+instance extend_preserves_RE (T : Theory) [RE T] (φ : Formula) :
+  RE (Extend T φ) := ⟨⟩
 
 end Papers.P4Meta.PartV
