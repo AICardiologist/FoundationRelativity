@@ -40,17 +40,20 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
 ### Formalization Status
 - **[Paper 1: Rank-One Toggle Kernel](Papers/P1_GBC/)** 🔧 **Partial Implementation + Current LaTeX Paper** - Sherman-Morrison (1 sorry), Spectrum (3 sorries stub), Fredholm/Tutorial (planned ~10 sorries)
 - **[Paper 2: WLPO ↔ BidualGap∃](Papers/P2_BidualGap/)** ✅ **Sprint E: Dual Isometry Complete (3 WLPO sorries)**
-- **[Paper 3: 2-Categorical Framework](Papers/P3_2CatFramework/)** ✅ **Phase 2 Complete: Uniformization Height Theory (0 sorries)**
+- **[Paper 3: 2-Categorical Framework](Papers/P3_2CatFramework/)** ✅ **Part I & II Core Complete: Uniformization + Positive (0 sorries)**
 - **[Paper 4: Spectral Geometry](Papers/P4_SpectralGeometry/)** 🔧 61 sorries - Discrete model 85% complete
 
 ### 🎯 **Latest Achievements**
 
-#### **Paper 3 Phase 2: Uniformization Height Theory Complete** (August 2025)
-- **What we formalized**: Complete uniformization height theory proving bidual gap has height = 1
-- **Key result**: `gap_height_eq_one : ¬Nonempty (UniformizableOn W_ge0 GapFamily) ∧ Nonempty (UniformizableOn W_ge1 GapFamily)`
-- **Technical innovation**: Robust Equiv construction avoiding dependent rewrites via helper functions
-- **Files**: Phase2_UniformHeight.lean (218 lines), Phase2_API.lean (115 lines), comprehensive tests
-- **Status**: ✅ **0 sorries**, all 301 build jobs green
+#### **Paper 3 Part I & II: Uniformization + Positive Layer Complete** (December 2024)
+- **What we formalized**: Complete uniformization height theory + positive uniformization (witness existence)
+- **Key results**: 
+  - `gap_has_height_one`: Bidual gap has uniformization height = 1
+  - `pos_gap_height_eq_one`: Gap has positive height = 1 (requires WLPO for witness existence)
+  - `stone_pos_uniform_all_k`: StoneWindowMock positively uniformizable at ALL levels
+- **Technical innovations**: Truth groupoid (Empty vs PUnit), helper lemmas for Equiv goals, bidirectional API bridges
+- **Files**: 1,459 lines across 17 files including Phase2_Positive.lean, Phase3_Positive.lean
+- **Status**: ✅ **0 sorries**, all CI green, clean import structure
 
 #### **Sprint E WLPO ↔ BidualGap∃ Complete**
 
