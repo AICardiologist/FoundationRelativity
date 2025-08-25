@@ -1,8 +1,28 @@
 # Foundation-Relativity Project Roadmap
 
-## 📍 Current Status: Phase 2 Uniformization Theory Complete
+## 📍 Current Status: P4_Meta Framework & Phase 2 Complete
 
-### Recent Achievements (August 2025)
+### Recent Achievements (December 2025)
+
+#### ✅ Paper 3 P4_Meta: Meta-theoretic Framework (Parts III-VI)
+**Status**: Complete with 0 sorries  
+**Key Components**: Theory extension mechanism, height certificates, ladder constructions  
+**Technical Achievements**:
+- ExtendIter with monotonicity lemmas for iterated extension
+- HeightCertificate structure with lifting and composition
+- Product/sup combinators for pair certificates  
+- Two-phase composition (concatSteps) with prefix/tail equality
+- ω-limit theory (Extendω) with instancewise reflection
+- Collision theorems scaffolding (HBL/RE/Consistent typeclasses)
+**Files**: P4_Meta/* (19 modules), comprehensive smoke tests
+
+#### ✅ Paper 3 Phase 2: Truth-Family Algebra  
+**Status**: Complete with 0 sorries  
+**Key Results**: 
+- Positive uniformization conjunction law using PUnit pivot
+- Pins-aware uniformization refinement (reviewer feedback)
+- Disjunction, monotonicity, and bridge lemmas
+**Files**: Phase2_PositiveTruthAlgebra.lean, Phase2_PositivePins.lean
 
 #### ✅ Paper 3 Phase 2: Uniformization Height Theory
 **Status**: Complete with 0 sorries  
@@ -22,11 +42,19 @@
 
 ## 🎯 Immediate Priorities
 
+### Paper 3 P4_Meta Extensions (1-2 weeks)
+- [ ] Interleaving composition (even ↦ A, odd ↦ B) with leftLift/rightLift
+- [ ] Strengthen N-ary aggregator with uniform stage lifting
+- [ ] Extend Part V with more typeclass capabilities
+- [ ] Granular provenance plumbing (lean | classical | hybrid)
+- [ ] Tighten ladder algebra (associativity, neutrality lemmas)
+
 ### Paper 3 Phase 3: Advanced Structures (2-3 weeks)
 - [ ] General `Level : ℕ → Foundation → Prop` with monotonicity
 - [ ] Stone window witness family (uniformizable at Level 0)
 - [ ] Functorial Obstruction Theorem skeleton
 - [ ] Integration with Papers 1 & 2 pathologies
+- [ ] Connect P4_Meta to real Paper 3 provability predicates
 
 ### Paper 1 Completion
 - [ ] Fredholm theory implementation (~10 sorries estimated)
@@ -46,10 +74,19 @@
 |-------|--------|---------|-----------------|
 | Paper 1 | 90% | 4 stubs | Sherman-Morrison complete |
 | Paper 2 | 95% | 3 WLPO | WLPO ↔ Gap equivalence |
-| Paper 3 | 40% | 0 | Uniformization height theory |
+| Paper 3 | 60% | 0 | P4_Meta framework complete, Phase 2 complete |
 | Paper 4 | 85% | 61 | Discrete spectral geometry |
 
 **Total Sorry Count**: 68 (down from 200+ at project start)
+
+### P4_Meta Framework Status
+| Component | Files | Status | Key Features |
+|-----------|-------|--------|--------------|
+| Part III Ladders | 6 | ✅ Complete | LPO/Con ladders, certificates, product/sup, concat |
+| Part IV ω-limit | 1 | ✅ Complete | Extendω, instancewise reflection, certToOmega |
+| Part V Collision | 4 | ✅ Complete | HBL/RE typeclasses, reflection, collision chain |
+| Part VI Stone | 1 | ✅ Complete | Boolean ring generalization |
+| Smoke Tests | 1 | ✅ Passing | All components tested |
 
 ---
 
@@ -105,6 +142,24 @@
 
 ---
 
-**Last Updated**: August 2025  
-**Next Review**: September 2025  
+---
+
+## 🔬 Technical Architecture Insights
+
+### Why P4_Meta Progress is Smoother
+- **Deliberate abstraction**: Schematic language (atoms only) avoids heavy unification
+- **Capabilities over commitments**: Classical dependencies isolated as axioms/typeclasses  
+- **Certificates, not derivations**: HeightCertificate enables compositional reasoning
+- **Local composability**: concatSteps, product/sup enable modular assembly
+
+### Key Design Patterns
+- **PUnit pivot technique**: Avoids cast issues in Equiv proofs
+- **Typeclass preservation**: HBL/RE preserved through Extend automatically
+- **Monotonicity infrastructure**: ExtendIter_le_mono enables systematic lifting
+- **Provenance discipline**: Classical vs Lean-proved results tracked
+
+---
+
+**Last Updated**: December 2025  
+**Next Review**: January 2026  
 **Project Lead**: Foundation-Relativity Team

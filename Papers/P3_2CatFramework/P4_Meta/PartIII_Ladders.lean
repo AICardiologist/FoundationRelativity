@@ -6,6 +6,7 @@
 -/
 import Papers.P3_2CatFramework.P4_Meta.PartIII_Certificates
 import Papers.P3_2CatFramework.P4_Meta.Meta_Signature
+import Papers.P3_2CatFramework.P4_Meta.PartIII_ProductSup
 
 namespace Papers.P4Meta
 
@@ -81,5 +82,10 @@ def lpo_filler_height2_cert (T0 : Theory) :
 , upper := lpo_filler_upper_two T0
 , note := "Upper: definitional (step 1 is filler), hence height ≤ 2."
 }
+
+/-- A bundled pair certificate for the LPO ladder: `(LPO, filler)` at stage 2. -/
+def lpo_pack_pair (T0 : Theory) :
+  HeightCertificatePair T0 (lArithSteps T0) ⟨LPO, lpoFiller⟩ :=
+combineCertificates (lpo_height1_cert T0) (lpo_filler_height2_cert T0)
 
 end Papers.P4Meta

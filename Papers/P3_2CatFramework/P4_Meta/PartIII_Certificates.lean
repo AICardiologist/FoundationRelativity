@@ -84,4 +84,50 @@ def HeightCertificate.lift
 , note := c.note ++ s!", lifted to stage {j}."
 }
 
+/-- Pointwise congruence: if `A` and `B` agree on all indices `< n`,
+    then the `n`-stage extensions coincide. -/
+theorem ExtendIter_congr
+  (T : Theory) (A B : Nat → Formula) :
+  ∀ n : Nat, (∀ i, i < n → A i = B i) →
+    ExtendIter T A n = ExtendIter T B n
+| 0, _ => rfl
+| n+1, h => by
+  -- Induction hypothesis: agreement strictly below `n`
+  have ih : ExtendIter T A n = ExtendIter T B n :=
+    ExtendIter_congr (T := T) (A := A) (B := B) n
+      (fun i hi => h i (Nat.lt_trans hi (Nat.lt_succ_self n)))
+  -- Agreement at index `n`
+  have hstep : A n = B n := h n (Nat.lt_succ_self n)
+  -- One more step
+  simpa [ExtendIter_succ, ih, hstep]
+
+/-- Transport a certificate from `A` to `B` when `A` and `B` agree
+    pointwise on all indices `< c.n`. Keeps the same height. -/
+def HeightCertificate.transport
+  {T : Theory} {A B : Nat → Formula} {φ : Formula}
+  (c : HeightCertificate T A φ)
+  (hagree : ∀ i, i < c.n → A i = B i) :
+  HeightCertificate T B φ :=
+{ n := c.n
+, upper := by
+    -- Rewrite the stage theory using pointwise congruence at `n = c.n`.
+    have hTh := congrArg (fun (Th : Theory) => Th.Provable φ)
+      (ExtendIter_congr (T := T) (A := A) (B := B) c.n hagree)
+    exact Eq.mp hTh c.upper
+, note := c.note ++ " (transported by pointwise congruence)"
+}
+
+/-- Definitional stage equality for single-certificate lift. -/
+@[simp] theorem HeightCertificate.lift_n
+  {T : Theory} {step : Nat → Formula} {φ : Formula}
+  (c : HeightCertificate T step φ) (j : Nat) (h : c.n ≤ j) :
+  (c.lift (T := T) (step := step) (φ := φ) j h).n = j := rfl
+
+/-- Definitional stage equality for single-certificate transport. -/
+@[simp] theorem HeightCertificate.transport_n
+  {T : Theory} {A B : Nat → Formula} {φ : Formula}
+  (c : HeightCertificate T A φ)
+  (hagree : ∀ i, i < c.n → A i = B i) :
+  (c.transport (T := T) (A := A) (B := B) (φ := φ) hagree).n = c.n := rfl
+
 end Papers.P4Meta
