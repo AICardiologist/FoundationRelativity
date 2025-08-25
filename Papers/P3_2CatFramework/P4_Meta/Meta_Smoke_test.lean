@@ -373,6 +373,114 @@ section OrderTests
   theoryLE_refl _
 end OrderTests
 
+-- ω+ε smoketests
+section OmegaPlusTests
+  open Papers.P4Meta
+
+  -- ω sits below ω+2
+  example :
+    Extendω Paper3Theory (lArithSteps Paper3Theory) ≤ᵀ
+    ExtendωPlus Paper3Theory (lArithSteps Paper3Theory) 2 :=
+  omega_le_omegaPlus (T := Paper3Theory) (step := lArithSteps Paper3Theory) 2
+
+  -- Stage (n+ε) embeds into ω+ε
+  example :
+    ExtendIter Paper3Theory (lArithSteps Paper3Theory) (7 + 2) ≤ᵀ
+    ExtendωPlus Paper3Theory (lArithSteps Paper3Theory) 2 :=
+  stage_le_omegaPlus (T := Paper3Theory) (step := lArithSteps Paper3Theory) 2 7
+
+  -- Monotone in ε: 1 ≤ 3 ⇒ ω+1 ≤ ω+3
+  example :
+    ExtendωPlus Paper3Theory (lArithSteps Paper3Theory) 1 ≤ᵀ
+    ExtendωPlus Paper3Theory (lArithSteps Paper3Theory) 3 :=
+  ExtendωPlus_mono (T := Paper3Theory) (step := lArithSteps Paper3Theory) (ε := 1) (ε' := 3) (by decide)
+
+  -- At ε = 0 we're literally at ω (definitional simp)
+  example :
+    ExtendωPlus Paper3Theory (lArithSteps Paper3Theory) 0
+      = Extendω Paper3Theory (lArithSteps Paper3Theory) := by
+    simp
+end OmegaPlusTests
+
+-- Congruence for ω+ε under left-nested reassociation of steps
+section OmegaPlusCongrTest
+  open Papers.P4Meta
+
+  -- Build two extension ladders that are definitionally equal by left-nesting
+  def stepA := ladderA
+  def stepB := ladderB
+  def S₁ := concatSteps 2 (concatSteps 1 stepA stepB) stepA
+  def S₂ := concatSteps 1 stepA (concatSteps (2 - 1) stepB stepA)
+
+  -- Establish pointwise equality from the function equality
+  private theorem S₁_eq_S₂ : S₁ = S₂ := by
+    simpa using
+      Papers.P4Meta.concat_left_nest_eq
+        (j := 1) (k := 2) (hjk := by decide) (A := stepA) (B := stepB) (C := stepA)
+
+  private theorem hpt : ∀ i, S₁ i = S₂ i := by
+    intro i; simpa using congrArg (fun f => f i) S₁_eq_S₂
+
+  -- Provability congruence at ω+ε
+  example (ψ : Formula) :
+    (ExtendωPlus Paper3Theory S₁ 2).Provable ψ ↔
+    (ExtendωPlus Paper3Theory S₂ 2).Provable ψ :=
+  by
+    simpa using
+      Papers.P4Meta.ExtendωPlus_provable_congr
+        (T := Paper3Theory) (A := S₁) (B := S₂) (ε := 2) hpt ψ
+
+  -- Batch push to ω+ε for PosFam
+  example :
+    (PosFam.toOmegaPlus (T := Paper3Theory) (step := lArithSteps Paper3Theory) 2 fam).length
+      = fam.length := by
+    simp
+end OmegaPlusCongrTest
+
+-- ω+ε helpers from certificates
+section OmegaPlusCertTests
+  open Papers.P4Meta
+
+  -- Using the same demo ladders and certificates as earlier tests
+  -- `concatLadder = concatSteps 2 ladderA ladderB`
+  -- `testCertA : HeightCertificate Paper3Theory ladderA (Formula.atom 400)`
+  -- `testCertB : HeightCertificate (ExtendIter Paper3Theory ladderA 2) ladderB (Formula.atom 410)`
+
+  -- ω+ε from prefix
+  example :
+    (ExtendωPlus Paper3Theory concatLadder 3).Provable (Formula.atom 400) :=
+  Papers.P4Meta.omegaPlus_of_prefixCert
+    (T := Paper3Theory) (A := ladderA) (B := ladderB) (k := 2) (ε := 3)
+    testCertA (by decide : testCertA.n ≤ 2)
+
+  -- ω+ε from tail
+  example :
+    (ExtendωPlus Paper3Theory concatLadder 3).Provable (Formula.atom 410) :=
+  Papers.P4Meta.omegaPlus_of_tailCert
+    (T := Paper3Theory) (A := ladderA) (B := ladderB) (k := 2) (ε := 3)
+    testCertB
+
+  -- ω+ε for the concatenated pair in one line
+  example :
+    (ExtendωPlus Paper3Theory concatLadder 3).Provable (Formula.atom 400) ∧
+    (ExtendωPlus Paper3Theory concatLadder 3).Provable (Formula.atom 410) :=
+  Papers.P4Meta.omegaPlus_of_concat_pair
+    (T := Paper3Theory) (A := ladderA) (B := ladderB) (k := 2) (ε := 3)
+    testCertA (by decide : testCertA.n ≤ 2) testCertB
+end OmegaPlusCertTests
+
+-- Extra ω+ε sanity checks
+section OmegaPlusExtras
+  open Papers.P4Meta
+
+  -- "ω+ε provable" ≃ "provable at some stage m ≥ ε"
+  example :
+    (ExtendωPlus Paper3Theory (lArithSteps Paper3Theory) 2).Provable LPO
+      ↔ ∃ m, 2 ≤ m ∧
+           (ExtendIter Paper3Theory (lArithSteps Paper3Theory) m).Provable LPO :=
+  Papers.P4Meta.ExtendωPlus_Provable_iff_exists_ge
+end OmegaPlusExtras
+
 -- Positive-family tests
 section PosFamTests
   open Papers.P4Meta
@@ -404,6 +512,21 @@ section PosFamTests
 
   #check famω
   #eval famω.length     -- expect 2
+
+  -- Union / stage / ω-image sanity checks
+  def fam2 : PosFam Paper3Theory (lArithSteps Paper3Theory) := [pf_lpo]
+
+  -- Stage of union = max of stages
+  example :
+    PosFam.stage (T := Paper3Theory) (step := lArithSteps Paper3Theory) (fam ⊍ fam2)
+      =
+    Nat.max (PosFam.stage (T := Paper3Theory) (step := lArithSteps Paper3Theory) fam)
+            (PosFam.stage (T := Paper3Theory) (step := lArithSteps Paper3Theory) fam2) := by
+    simp [PosFam.union_def]
+
+  -- ω-image is additive over unions (and preserves length)
+  #eval (PosFam.toOmega (T := Paper3Theory) (step := lArithSteps Paper3Theory) (fam ⊍ fam2)).length
+    -- expect 3
 end PosFamTests
 
 end Papers.P4Meta.Tests

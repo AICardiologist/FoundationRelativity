@@ -68,26 +68,37 @@
    - `concatSteps`: Two-phase ladder composition at stage k
    - Complete prefix/tail theorems with @[simp] automation
    - Normal forms (StepNF) with canonical representation
+   - Reassociation theorems: `concat_left_nest_eq`, `concat_right_nest_eq`
+   - Positive families (PosFam) with union operations
 
 2. **Product/Sup Operations**
    - `HeightCertificatePair`: Proving both goals at same stage
    - `combineCertificates`: Lifting to max stage
    - Transport operations for pointwise-equal step functions
+   - Batch operations: `certsToOmega`, `maxStageOfCerts`
 
 3. **ω-Limit Theory (Part IV)**
    - `Extendω`: Provable iff provable at some finite stage
-   - Lifting certificates and pairs to ω
-   - Instance-wise reflection theorems
+   - Theory order (≤ᵀ) and equivalence (≃ᵀ) relations
+   - Least upper bound characterization: `Extendω_is_lub`
+   - Congruence under step equality: `Extendω_provable_congr`
 
-4. **Collision Theorems (Part V)**
+4. **ω+ε Theory (Extended Part IV)**
+   - `ExtendωPlus`: Captures provability at stages n+ε
+   - Monotonicity in ε: `ExtendωPlus_mono`
+   - Stage inclusion: `stage_le_omegaPlus`
+   - Certificate lifting: `certToOmegaPlus`, `omegaPlus_of_*`
+   - Re-expression lemma: `ExtendωPlus_Provable_iff_exists_ge`
+
+5. **Collision Theorems (Part V)**
    - RFN → Con → Gödel sentence collision
    - Complexity interfaces and strictness results
 
-5. **Stone Window (Part VI)**  
+6. **Stone Window (Part VI)**  
    - Boolean ring with support ideals
    - Provenance discipline for classical vs Lean-proved
 
-**Key Achievement**: Complete sorry-free implementation with robust elementary proofs
+**Key Achievement**: Complete sorry-free implementation with robust elementary proofs and full ω+ε infrastructure
 
 **Files**: `P4_Meta/*.lean` (~20 files), `Paper3_Integration.lean`
 
