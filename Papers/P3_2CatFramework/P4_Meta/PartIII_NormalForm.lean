@@ -51,6 +51,11 @@ theorem sub_tail_index (i j k : Nat) (hjk : j ≤ k) :
   (i - j) - (k - j) = i - k := by
   simpa [Nat.sub_sub, Nat.add_sub_of_le hjk]
 
+/-- Micro-lemma: not less than for subtraction under k ≤ i -/
+lemma not_lt_sub_of_le {i j k : Nat} (hki : k ≤ i) :
+  ¬ (i - j < k - j) :=
+  Nat.not_lt.mpr (Nat.sub_le_sub_right hki j)
+
 /-- Left-nested concatenation: reassociation when j ≤ k -/
 theorem concat_left_nest_eq
   (j k : Nat) (hjk : j ≤ k) (A B C : Nat → Formula) :
@@ -70,13 +75,20 @@ theorem concat_left_nest_eq
       simp [hij, hik, this]
     · -- C-region: k ≤ i and j ≤ i
       have hki : k ≤ i := Nat.le_of_not_lt hik
-      have not_lt' : ¬ (i - j < k - j) := 
-        Nat.not_lt.mpr (Nat.sub_le_sub_right hki j)
+      have not_lt' := not_lt_sub_of_le hki
       -- Key: show the index equality
-      have idx : (i - j) - (k - j) = i - k := by
-        simp [Nat.sub_sub, Nat.add_sub_of_le hjk]
+      have idx : (i - j) - (k - j) = i - k := sub_tail_index i j k hjk
       simp [hij, hik, not_lt']
       rw [idx]
+
+/-- Stage-level corollary: ExtendIter preserves left-nested concatenation equality -/
+@[simp] theorem ExtendIter_concat_left_nest_eq
+  {T : Theory} {A B C : Nat → Formula} {j k n : Nat} (hjk : j ≤ k) :
+  ExtendIter T (concatSteps k (concatSteps j A B) C) n =
+  ExtendIter T (concatSteps j A (concatSteps (k - j) B C)) n := by
+  simpa using
+    congrArg (fun s => ExtendIter T s n)
+      (concat_left_nest_eq j k hjk A B C)
 
 /-- Simplification: concat at 0 is identity -/
 @[simp] theorem concat_zero_simp (A : Nat → Formula) (nf : StepNF) :
@@ -168,5 +180,11 @@ example :
                           (Formula.atom ∘ (· + 200))
                           (Formula.atom ∘ (· + 300))
   step1 = nf.toSteps := by simp
+
+/-- Smoketest: Stage-level corollary works directly -/
+example {T : Theory} {A B C : Nat → Formula} {j k n : Nat} (hjk : j ≤ k) :
+  ExtendIter T (concatSteps k (concatSteps j A B) C) n =
+  ExtendIter T (concatSteps j A (concatSteps (k - j) B C)) n :=
+  ExtendIter_concat_left_nest_eq hjk
 
 end Papers.P4Meta
