@@ -297,4 +297,25 @@ section RFNConTests
   example : Con Tbase := RFN_implies_Con Text Tbase h
 end RFNConTests
 
+-- UCT / Baire calibrator smoketests
+section CalibratorTests
+  open Papers.P4Meta
+
+  -- UCT at ω and ω+1 from FT
+  example : (Extendω Paper3Theory (ftSteps Paper3Theory)).Provable UCT01 := 
+    UCT_at_omega Paper3Theory
+  example : (ExtendωPlus Paper3Theory (ftSteps Paper3Theory) 1).Provable UCT01 := 
+    UCT_at_omegaPlus Paper3Theory 1
+
+  -- Baire at ω and ω+2 from DC_ω
+  example : (Extendω Paper3Theory (dcωSteps Paper3Theory)).Provable BairePinned := 
+    Baire_at_omega Paper3Theory
+  example : (ExtendωPlus Paper3Theory (dcωSteps Paper3Theory) 2).Provable BairePinned := 
+    Baire_at_omegaPlus Paper3Theory 2
+
+  -- PosFam basic checks
+  noncomputable example : UCT_posFam Paper3Theory = [⟨UCT01, uct_upper_from_FT_cert Paper3Theory⟩] := rfl
+  noncomputable example : Baire_posFam Paper3Theory = [⟨BairePinned, baire_upper_from_DCω_cert Paper3Theory⟩] := rfl
+end CalibratorTests
+
 end Papers.P4Meta.Tests

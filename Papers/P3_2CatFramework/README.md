@@ -275,6 +275,9 @@ This paper establishes:
 - `instIsSigma1Bot : IsSigma1 Bot` - Bot is Σ¹
 - `AxisIndependent` - Independence assumption for product heights
 - `StoneSurj : Type → Prop` - Stone window surjectivity predicate
+- `FT : Formula`, `DCω : Formula` - Calibrator axioms (analytic)
+- `UCT01 : Formula`, `BairePinned : Formula` - Pinned calibrator targets
+- `uct_upper_from_FT_cert`, `baire_upper_from_DCω_cert` - Named upper-bound certificates
 
 ### Paper-only (cited)
 - G1/G2 lower bounds at r.e. stages
