@@ -271,6 +271,30 @@ theorem Extendω_is_lub
           (fun i hi => (h n i hi).symm)
       rw [← hstage]; exact hn
 
+  /-- ExtendωPlus with finite ε is equivalent to Extendω.
+      This follows from monotonicity: any stage n+ε embeds into ω,
+      and ω already contains all finite stages including ε itself. -/
+  theorem ExtendωPlus_equiv_omega {T : Theory} {step : Nat → Formula} (ε : Nat) :
+    ExtendωPlus T step ε ≃ᵀ Extendω T step := by
+    constructor
+    · -- ExtendωPlus ≤ᵀ Extendω
+      intro ψ ⟨n, hn⟩
+      exact ⟨n + ε, hn⟩
+    · -- Extendω ≤ᵀ ExtendωPlus
+      intro ψ ⟨m, hm⟩
+      -- Any stage m embeds into some n+ε by choosing n large enough
+      if h : m ≥ ε then
+        refine ⟨m - ε, ?_⟩
+        have : m - ε + ε = m := Nat.sub_add_cancel h
+        rw [this]; exact hm
+      else
+        refine ⟨0, ?_⟩
+        apply ExtendIter_le_mono (T := T) (step := step)
+        · have : m < ε := Nat.lt_of_not_le h
+          simp only [Nat.zero_add]
+          exact Nat.le_of_lt this
+        · exact hm
+
   /-- Push a single certificate to `ω+ε`. -/
   theorem certToOmegaPlus
     {T : Theory} {step : Nat → Formula} {φ : Formula}
