@@ -91,6 +91,29 @@ theorem concat_left_nest_eq
     congrArg (fun s => ExtendIter T s n)
       (concat_left_nest_eq j k hjk A B C)
 
+/-- Right-nested concatenation: reassociation when `k ≤ j`. -/
+theorem concat_right_nest_eq
+  (j k : Nat) (hkj : k ≤ j) (A B C : Nat → Formula) :
+  concatSteps j (concatSteps k A B) C =
+  concatSteps k A (concatSteps (j - k) B C) :=
+by
+  -- Directly reuse the left-nested lemma with swapped indices.
+  simpa using
+    concat_left_nest_eq (j := k) (k := j) (hjk := hkj)
+      (A := A) (B := B) (C := C)
+
+/-- Stage-level corollary for right-nested concatenation:
+    if `k ≤ j`, then reassociation commutes with `ExtendIter` at every stage `n`. -/
+@[simp] theorem ExtendIter_concat_right_nest_eq
+  (T : Theory) (A B C : Nat → Formula) (j k n : Nat) (hkj : k ≤ j) :
+  ExtendIter T (concatSteps j (concatSteps k A B) C) n =
+  ExtendIter T (concatSteps k A (concatSteps (j - k) B C)) n :=
+by
+  simpa using
+    congrArg (fun s => ExtendIter T s n)
+      (concat_right_nest_eq (j := j) (k := k) (hkj := hkj)
+        (A := A) (B := B) (C := C))
+
 /-- Simplification: concat at 0 is identity -/
 @[simp] theorem concat_zero_simp (A : Nat → Formula) (nf : StepNF) :
   concatSteps 0 A nf.toSteps = nf.toSteps := by

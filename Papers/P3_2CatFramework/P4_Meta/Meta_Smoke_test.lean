@@ -305,6 +305,19 @@ section ConcatTests
   example : concatSteps 0 ladderA ladderB = ladderB := by
     -- Thanks to `@[simp] concatSteps_zero`, this is now a one-liner
     simp
+
+  -- Stage-level corollary (right-nested mirror): reassociate when k ≤ j
+  example :
+      ExtendIter Paper3Theory
+        (concatSteps 2 (concatSteps 1 ladderA ladderB) ladderA) 5
+        =
+      ExtendIter Paper3Theory
+        (concatSteps 1 ladderA (concatSteps (2 - 1) ladderB ladderA)) 5 := by
+    -- k = 1, j = 2 so k ≤ j by decide; the rest is by the corollary
+    simpa using
+      Papers.P4Meta.ExtendIter_concat_right_nest_eq
+        (T := Paper3Theory) (A := ladderA) (B := ladderB) (C := ladderA)
+        (j := 2) (k := 1) (n := 5) (hkj := by decide)
 end ConcatTests
 
 -- Test lpo_pack_pair
@@ -320,5 +333,20 @@ section LPOPackTest
   #check packedAtOmega.1  -- LPO at ω
   #check packedAtOmega.2  -- filler at ω
 end LPOPackTest
+
+-- Omega batch tests
+section OmegaBatchTests
+  open Papers.P4Meta
+  
+  -- Two ready-made certs on the LPO ladder:
+  def cs :
+    List (Σ φ, HeightCertificate Paper3Theory (lArithSteps Paper3Theory) φ) :=
+    [⟨LPO, lpo_height1_cert Paper3Theory⟩,
+     ⟨lpoFiller, lpo_filler_height2_cert Paper3Theory⟩]
+
+  def ωcs := certsToOmega (T := Paper3Theory) (step := lArithSteps Paper3Theory) cs
+  #eval ωcs.length  -- expect 2
+  #check ωcs.head?  -- sanity: elements carry ω-proofs
+end OmegaBatchTests
 
 end Papers.P4Meta.Tests

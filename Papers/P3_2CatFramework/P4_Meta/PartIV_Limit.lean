@@ -82,6 +82,13 @@ by
   -- …and push it to ω.
   simpa using pairToOmega p
 
+/-- Push a list of certificates to the ω-limit in one shot. -/
+def certsToOmega
+  {T : Theory} {step : Nat → Formula}
+  (cs : List (Σ φ, HeightCertificate T step φ)) :
+  List (PSigma fun φ => (Extendω T step).Provable φ) :=
+cs.map (fun ⟨φ, c⟩ => PSigma.mk φ (certToOmega c))
+
 /-- By definition, `ω`-provability is "provable at some finite stage". -/
 @[simp] theorem Extendω_Provable_iff
   {T : Theory} {step : Nat → Formula} {ψ : Formula} :
