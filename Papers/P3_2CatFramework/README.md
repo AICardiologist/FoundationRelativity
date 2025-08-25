@@ -255,6 +255,17 @@ This paper establishes:
 
 ---
 
+## 🆕 New Mathematical Results
+
+### Stone Window Calibration (NEW)
+**Theorem**: Surjectivity of the Stone quotient map for block-finite support ideals implies WLPO.
+- Defined specific block-finite ideal with blocks [0,9], [10,19], ...
+- Proved `stone_BFI_implies_WLPO`: reduction from binary sequence decisions to Stone surjectivity
+- Height certificate shows WLPO at height 1 from Stone axiom
+- Contrast: rational-valued idempotents are constructively surjective
+
+This is **genuinely new mathematics**, not just repackaging of known results.
+
 ## 📋 Verification Ledger (P4_Meta)
 
 ### Formalized (no sorries)

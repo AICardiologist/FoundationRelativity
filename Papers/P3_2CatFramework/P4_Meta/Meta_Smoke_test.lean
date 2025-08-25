@@ -318,6 +318,26 @@ section CalibratorTests
   noncomputable example : Baire_posFam Paper3Theory = [⟨BairePinned, baire_upper_from_DCω_cert Paper3Theory⟩] := rfl
 end CalibratorTests
 
+-- Stone window calibration test
+section StoneCalibrationTest
+  open Papers.P4Meta
+  
+  -- Check that the Stone calibration theorem type-checks
+  #check stone_BFI_implies_WLPO
+  #check stone_BFI_height_cert
+  
+  -- Verify the height certificate structure
+  example : stone_BFI_height_cert.n = 1 := rfl
+  
+  -- Check the rational constructive case
+  #check rational_stone_constructive
+  
+  -- Demonstrate that WLPO is at height 1 from Stone_BFI
+  example : ∃ n, n = 1 ∧ 
+    HeightCertificate.n (stone_BFI_height_cert) = n := by
+    exact ⟨1, rfl, rfl⟩
+end StoneCalibrationTest
+
 -- Bounded congruence test for ω+ε
 section BoundedCongruenceTest
   open Papers.P4Meta
