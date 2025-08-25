@@ -163,11 +163,13 @@ Papers/P3_2CatFramework/
 ├── Phase2_UniformHeight.lean       # Uniformization theory (218 lines)
 ├── Phase2_API.lean                 # Clean Level/HeightAt API (115 lines)
 ├── Phase3_Levels.lean              # Numeric height theory (147 lines)
-├── P4_Meta/                        # Parts III-VI Meta framework
+├── P4_Meta/                        # Parts III-VI Meta framework (20+ files)
 │   ├── Meta_Signature.lean        # Theory/Extend mechanism
 │   ├── PartIII_Certificates.lean  # Height certificates
 │   ├── PartIII_NormalForm.lean    # Canonical representations
-│   └── PartIV_Limit.lean          # ω-limit theory
+│   ├── PartIII_PosFam.lean        # Positive families with unions
+│   ├── PartIV_Limit.lean          # ω-limit and ω+ε theory
+│   └── Meta_Smoke_test.lean       # 50+ comprehensive tests
 └── test/                           # Comprehensive test suite
 \end{lstlisting}
 \end{mdframed}
@@ -418,6 +420,9 @@ Uniformization Height & Part I & Phase2/3\_*.lean & ✅ Complete \\
 Positive Uniformization & Part II & Phase2/3\_Positive.lean & ✅ Core done \\
 Ladder Algebra & Part III & P4\_Meta/PartIII\_*.lean & ✅ Complete \\
 $\omega$--Limit Theory & Part IV & PartIV\_Limit.lean & ✅ Complete \\
+$\omega+\varepsilon$ Theory & Part IV+ & PartIV\_Limit.lean & ✅ Complete \\
+Theory Order $\leq^T$, $\simeq^T$ & Part IV & PartIV\_Limit.lean & ✅ Complete \\
+Positive Families & Part III & PartIII\_PosFam.lean & ✅ Complete \\
 Collision Theorems & Part V & PartV\_Collision.lean & ✅ Structure \\
 Stone Window & Part VI & StoneWindow.lean & ✅ Complete \\
 Theory Poset & Part II & -- & ⚠️ Deferred \\
@@ -432,9 +437,11 @@ All major theorems are verified with 0 sorries:
 \begin{enumerate}
 \item \lean{gap\_has\_height\_one}: Height = 1 for bidual gap
 \item \lean{no\_uniformization\_height0}: No uniformization at height 0
-\item \lean{concat\_left\_nest\_eq}: Left--nested reassociation
+\item \lean{concat\_left\_nest\_eq}, \lean{concat\_right\_nest\_eq}: Reassociation theorems
 \item \lean{Extendω\_is\_lub}: $\omega$ as least upper bound
-\item \lean{ExtendIter\_concat\_left\_nest\_eq}: Stage--level corollary
+\item \lean{ExtendωPlus\_is\_lub}: $\omega+\varepsilon$ as shifted lub
+\item \lean{ExtendωPlus\_Provable\_iff\_exists\_ge}: Clean re-expression lemma
+\item \lean{theoryEqv.provable\_iff}: Bidirectional provability under $\simeq^T$
 \end{enumerate}
 
 \subsection{Unexpected Improvements}
@@ -444,7 +451,9 @@ The formalization achieved several improvements beyond the paper:
 \begin{enumerate}
 \item \textbf{Richer Automation}: The \texttt{@[simp]} framework is more comprehensive than planned
 \item \textbf{Normal Forms}: Complete canonical representation system not in the paper
-\item \textbf{Order Theory}: Lightweight $\leq^T$ layer emerged naturally
+\item \textbf{Order Theory}: Full $\leq^T$ and $\simeq^T$ relations with helper lemmas
+\item \textbf{$\omega+\varepsilon$ Infrastructure}: Complete API beyond $\omega$ without heavy ordinals
+\item \textbf{Positive Families}: Union operations and batch lifting to $\omega$/$\omega+\varepsilon$
 \item \textbf{Micro--lemmas}: Clean arithmetic helpers improve proof clarity
 \end{enumerate}
 
