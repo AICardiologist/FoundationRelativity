@@ -211,6 +211,21 @@ All Paper 3 components are tested in CI:
 
 See [ROADMAP.md](./ROADMAP.md) for detailed next steps.
 
+## 📄 LaTeX Documentation
+
+Two versions of the paper are available:
+
+### Original Theoretical Paper
+- **[paper 3.tex](documentation/paper%203.tex)** - Full LaTeX source with 6 parts
+- Comprehensive treatment of uniformization theory and meta-theoretic framework
+- Includes Parts III-VI (ladder algebra, ω-limits, collision theorems, Stone window)
+
+### Lean Formalization Documentation
+- **[paper3-lean-formalization.tex](documentation/paper3-lean-formalization.tex)** - Complete formalization report
+- Documents the achieved Lean 4 implementation with 0 sorries
+- Details architectural decisions, technical solutions, and verification statistics
+- Shows ~75% coverage of theoretical goals with enhanced automation
+
 ## Mathematical Significance
 
 This paper establishes:

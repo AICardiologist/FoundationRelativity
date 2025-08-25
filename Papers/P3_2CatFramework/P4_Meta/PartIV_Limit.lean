@@ -82,6 +82,13 @@ by
   -- …and push it to ω.
   simpa using pairToOmega p
 
+/-- Push a list of certificates to the ω-limit in one shot. -/
+def certsToOmega
+  {T : Theory} {step : Nat → Formula}
+  (cs : List (Σ φ, HeightCertificate T step φ)) :
+  List (PSigma fun φ => (Extendω T step).Provable φ) :=
+cs.map (fun ⟨φ, c⟩ => PSigma.mk φ (certToOmega c))
+
 /-- By definition, `ω`-provability is "provable at some finite stage". -/
 @[simp] theorem Extendω_Provable_iff
   {T : Theory} {step : Nat → Formula} {ψ : Formula} :
@@ -105,5 +112,219 @@ theorem Extendω_provable_congr
     have hstage := ExtendIter_congr (T := T) (A := B) (B := A) n hagree
     rw [← hstage]
     exact hn
+
+/-! ### Tiny order layer on theories -/
+
+/-- `T ≤ᵀ U` means: every `T`-provable sentence is `U`-provable. -/
+def theoryLE (T U : Theory) : Prop :=
+  ∀ ψ, T.Provable ψ → U.Provable ψ
+
+infix:50 " ≤ᵀ " => theoryLE
+
+@[simp] theorem theoryLE_refl (T : Theory) : T ≤ᵀ T := by
+  intro ψ h; exact h
+
+theorem theoryLE_trans {T U V : Theory}
+  (h₁ : T ≤ᵀ U) (h₂ : U ≤ᵀ V) : T ≤ᵀ V := by
+  intro ψ h; exact h₂ ψ (h₁ ψ h)
+
+/-- Monotonicity along the finite chain of stages. -/
+theorem ExtendIter_le_of_le
+  {T : Theory} {step : Nat → Formula} {i j : Nat} (hij : i ≤ j) :
+  ExtendIter T step i ≤ᵀ ExtendIter T step j := by
+  intro ψ h; exact ExtendIter_le_mono (T := T) (step := step) hij h
+
+/-- Each finite stage embeds into the ω-limit. -/
+theorem stage_le_omega {T : Theory} {step : Nat → Formula} (n : Nat) :
+  ExtendIter T step n ≤ᵀ Extendω T step := by
+  intro ψ h; exact ⟨n, h⟩
+
+/-- `Extendω T step` is the least upper bound of the chain of finite stages. -/
+theorem Extendω_is_lub
+  {T : Theory} {step : Nat → Formula} {U : Theory}
+  (hU : ∀ n, ExtendIter T step n ≤ᵀ U) :
+  Extendω T step ≤ᵀ U := by
+  intro ψ hω
+  rcases hω with ⟨n, hn⟩
+  exact hU n ψ hn
+
+  /-! ### Theory equivalence (≃ᵀ) -/
+
+  /-- `T ≃ᵀ U` means: `T ≤ᵀ U` and `U ≤ᵀ T`. -/
+  def theoryEqv (T U : Theory) : Prop := T ≤ᵀ U ∧ U ≤ᵀ T
+  infix:50 " ≃ᵀ " => theoryEqv
+
+  theorem theoryEqv_refl (T : Theory) : T ≃ᵀ T :=
+    ⟨theoryLE_refl _, theoryLE_refl _⟩
+
+  theorem theoryEqv_symm {T U : Theory} : (T ≃ᵀ U) → (U ≃ᵀ T)
+  | ⟨h₁, h₂⟩ => ⟨h₂, h₁⟩
+
+  theorem theoryEqv_trans {T U V : Theory} :
+      (T ≃ᵀ U) → (U ≃ᵀ V) → (T ≃ᵀ V)
+  | ⟨TU, UT⟩, ⟨UV, VU⟩ => ⟨theoryLE_trans TU UV, theoryLE_trans VU UT⟩
+
+  @[simp] theorem theoryEqv_iff {T U : Theory} :
+      (T ≃ᵀ U) ↔ (T ≤ᵀ U ∧ U ≤ᵀ T) := Iff.rfl
+
+
+  /-! ### A finite tail beyond ω: `ExtendωPlus` -/
+
+  /-- `ExtendωPlus T step ε` captures "provable at some stage `n + ε`".
+      This is the `ω + ε` stepping stone without committing to full ordinal machinery. -/
+  def ExtendωPlus (T : Theory) (step : Nat → Formula) (ε : Nat) : Theory :=
+  { Provable := fun ψ => ∃ n, (ExtendIter T step (n + ε)).Provable ψ }
+
+  @[simp] theorem ExtendωPlus_Provable_iff
+      {T : Theory} {step : Nat → Formula} {ε : Nat} {ψ : Formula} :
+      (ExtendωPlus T step ε).Provable ψ ↔ ∃ n, (ExtendIter T step (n + ε)).Provable ψ := Iff.rfl
+
+  /-- At `ε = 0`, `ExtendωPlus` *is* `Extendω` (definitionally). -/
+  @[simp] theorem ExtendωPlus_zero
+      {T : Theory} {step : Nat → Formula} :
+      ExtendωPlus T step 0 = Extendω T step := rfl
+
+  /-- Every ω‑provable sentence is ω+ε‑provable (monotone tail). -/
+  theorem omega_le_omegaPlus
+      {T : Theory} {step : Nat → Formula} (ε : Nat) :
+      Extendω T step ≤ᵀ ExtendωPlus T step ε :=
+  by
+    intro ψ hω
+    rcases hω with ⟨n, hn⟩
+    exact ⟨n, ExtendIter_le_mono (T := T) (step := step) (Nat.le_add_right _ _) hn⟩
+
+  /-- Monotonicity in the finite tail: `ε ≤ ε'` implies `ω+ε ≤ ω+ε'`. -/
+  theorem ExtendωPlus_mono
+      {T : Theory} {step : Nat → Formula} {ε ε' : Nat} (h : ε ≤ ε') :
+      ExtendωPlus T step ε ≤ᵀ ExtendωPlus T step ε' :=
+  by
+    intro ψ hε
+    rcases hε with ⟨n, hn⟩
+    have : n + ε ≤ n + ε' := Nat.add_le_add_left h n
+    exact ⟨n, ExtendIter_le_mono (T := T) (step := step) this hn⟩
+
+  /-- Each `(n + ε)`‑stage embeds into `ExtendωPlus _ _ ε`. -/
+  theorem stage_le_omegaPlus
+      {T : Theory} {step : Nat → Formula} (ε n : Nat) :
+      ExtendIter T step (n + ε) ≤ᵀ ExtendωPlus T step ε :=
+  by
+    intro ψ h
+    exact ⟨n, h⟩
+
+  /-- `ExtendωPlus` is the least upper bound of the shifted chain `n ↦ n+ε`. -/
+  theorem ExtendωPlus_is_lub
+      {T : Theory} {step : Nat → Formula} {ε : Nat} {U : Theory}
+      (hU : ∀ n, ExtendIter T step (n + ε) ≤ᵀ U) :
+      ExtendωPlus T step ε ≤ᵀ U :=
+  by
+    intro ψ h
+    rcases h with ⟨n, hn⟩
+    exact hU n ψ hn
+
+  /-- Congruence for ω+ε: if steps agree pointwise, provability is preserved. -/
+  @[simp] theorem ExtendωPlus_provable_congr
+    {T : Theory} {A B : Nat → Formula} (ε : Nat)
+    (h : ∀ i, A i = B i) (ψ : Formula) :
+    (ExtendωPlus T A ε).Provable ψ ↔ (ExtendωPlus T B ε).Provable ψ := by
+  constructor
+  · intro hA; rcases hA with ⟨n, hn⟩
+    refine ⟨n, ?_⟩
+    have hstage :=
+      ExtendIter_congr (T := T) (A := A) (B := B) (n := n + ε) (fun i _ => h i)
+    -- rewrite the stage theory and reuse the proof
+    rw [← hstage]; exact hn
+  · intro hB; rcases hB with ⟨n, hn⟩
+    refine ⟨n, ?_⟩
+    have hstage :=
+      ExtendIter_congr (T := T) (A := B) (B := A) (n := n + ε) (fun i _ => (h i).symm)
+    rw [← hstage]; exact hn
+
+  /-- Theory equivalence for ω+ε from step equality. -/
+  theorem ExtendωPlus_equiv_of_steps_eq
+    {T : Theory} {A B : Nat → Formula} (ε : Nat) (h : ∀ i, A i = B i) :
+    ExtendωPlus T A ε ≃ᵀ ExtendωPlus T B ε :=
+  ⟨ (by intro ψ hψ; exact (ExtendωPlus_provable_congr (T := T) (A := A) (B := B) ε h ψ).1 hψ)
+   ,(by intro ψ hψ; exact (ExtendωPlus_provable_congr (T := T) (A := A) (B := B) ε h ψ).2 hψ) ⟩
+
+  /-- Push a single certificate to `ω+ε`. -/
+  theorem certToOmegaPlus
+    {T : Theory} {step : Nat → Formula} {φ : Formula}
+    (ε : Nat) (c : HeightCertificate T step φ) :
+    (ExtendωPlus T step ε).Provable φ :=
+  by
+    refine ⟨c.n, ?_⟩
+    exact ExtendIter_le_mono (T := T) (step := step) (Nat.le_add_right _ _) c.upper
+
+  /-- Push a pair certificate to `ω+ε`. -/
+  theorem pairToOmegaPlus
+    {T : Theory} {step : Nat → Formula} {g : PairGoal}
+    (ε : Nat) (p : HeightCertificatePair T step g) :
+    (ExtendωPlus T step ε).Provable g.φ ∧
+    (ExtendωPlus T step ε).Provable g.ψ :=
+  by
+    refine ⟨?φ, ?ψ⟩
+    · refine ⟨p.n, ?_⟩
+      exact ExtendIter_le_mono (T := T) (step := step) (Nat.le_add_right _ _) p.upper_left
+    · refine ⟨p.n, ?_⟩
+      exact ExtendIter_le_mono (T := T) (step := step) (Nat.le_add_right _ _) p.upper_right
+
+  /-- From a prefix certificate `cA.n ≤ k`, conclude `ω+ε` provability on the concatenation. -/
+  theorem omegaPlus_of_prefixCert
+    {T : Theory} {A B : Nat → Formula} {φ : Formula}
+    (k ε : Nat) (cA : HeightCertificate T A φ) (hAk : cA.n ≤ k) :
+    (ExtendωPlus T (concatSteps k A B) ε).Provable φ :=
+  by
+    -- lift `cA` into the concatenation at the same stage, then bump by `ε`.
+    exact certToOmegaPlus (T := T) (step := concatSteps k A B) (ε := ε)
+      (prefixLiftCert (T := T) (A := A) (B := B) k cA hAk)
+
+  /-- From a tail certificate over `ExtendIter T A k`, conclude `ω+ε` provability on the concatenation. -/
+  theorem omegaPlus_of_tailCert
+    {T : Theory} {A B : Nat → Formula} {ψ : Formula}
+    (k ε : Nat) (cB : HeightCertificate (ExtendIter T A k) B ψ) :
+    (ExtendωPlus T (concatSteps k A B) ε).Provable ψ :=
+  by
+    -- lift the tail certificate to stage `k + cB.n` on the concatenation, then bump by `ε`.
+    exact certToOmegaPlus (T := T) (step := concatSteps k A B) (ε := ε)
+      (tailLiftCert (T := T) (A := A) (B := B) k cB)
+
+  /-- Compose prefix+tail into a pair on the concatenation and push both parts to `ω+ε`. -/
+  theorem omegaPlus_of_concat_pair
+    {T : Theory} {A B : Nat → Formula} {φ ψ : Formula}
+    (k ε : Nat)
+    (cA : HeightCertificate T A φ) (hAk : cA.n ≤ k)
+    (cB : HeightCertificate (ExtendIter T A k) B ψ) :
+    (ExtendωPlus T (concatSteps k A B) ε).Provable φ ∧
+    (ExtendωPlus T (concatSteps k A B) ε).Provable ψ :=
+  by
+    -- build the finite pair at the cut, then push the pair to `ω+ε`.
+    exact pairToOmegaPlus (T := T) (step := concatSteps k A B) (ε := ε)
+      (concatPairCert (T := T) (A := A) (B := B) k cA hAk cB)
+
+  /-- Re-express ω+ε provability as "provable at some stage `m ≥ ε`". -/
+  @[simp] theorem ExtendωPlus_Provable_iff_exists_ge
+    {T : Theory} {step : Nat → Formula} {ε : Nat} {ψ : Formula} :
+    (ExtendωPlus T step ε).Provable ψ
+      ↔ ∃ m, ε ≤ m ∧ (ExtendIter T step m).Provable ψ :=
+  by
+    constructor
+    · intro h
+      rcases h with ⟨n, hn⟩
+      have hε : ε ≤ n + ε := by
+        -- `ε ≤ ε + n` then commute addition
+        simp [Nat.add_comm, Nat.le_add_left]
+      exact ⟨n + ε, hε, hn⟩
+    · intro h
+      rcases h with ⟨m, hεm, hm⟩
+      refine ⟨m - ε, ?_⟩
+      -- because `ε ≤ m`, we can peel off the ε-tail
+      simp [Nat.sub_add_cancel hεm]
+      exact hm
+
+  /-- Under theory equivalence, provability is logically equivalent in both directions. -/
+  theorem theoryEqv.provable_iff
+    {T U : Theory} (h : T ≃ᵀ U) (ψ : Formula) :
+    T.Provable ψ ↔ U.Provable ψ :=
+  ⟨fun hT => h.left  ψ hT, fun hU => h.right ψ hU⟩
 
 end Papers.P4Meta
