@@ -246,6 +246,31 @@ theorem Extendω_is_lub
   ⟨ (by intro ψ hψ; exact (ExtendωPlus_provable_congr (T := T) (A := A) (B := B) ε h ψ).1 hψ)
    ,(by intro ψ hψ; exact (ExtendωPlus_provable_congr (T := T) (A := A) (B := B) ε h ψ).2 hψ) ⟩
 
+  /-- Congruence for ω+ε using only *bounded* agreement:
+      if `A` and `B` agree on all indices `< (n + ε)` for each witness `n`,
+      then ω+ε-provability transports. -/
+  @[simp] theorem ExtendωPlus_provable_congr_up_to
+    {T : Theory} {A B : Nat → Formula} (ε : Nat)
+    (h : ∀ n i, i < n + ε → A i = B i) (ψ : Formula) :
+    (ExtendωPlus T A ε).Provable ψ ↔ (ExtendωPlus T B ε).Provable ψ := by
+    constructor
+    · intro hA
+      rcases hA with ⟨n, hn⟩
+      refine ⟨n, ?_⟩
+      -- stagewise transport at `n+ε` using bounded pointwise equality
+      have hstage :=
+        ExtendIter_congr (T := T) (A := A) (B := B) (n := n + ε)
+          (fun i hi => h n i hi)
+      -- rewrite the stage theory and reuse the proof
+      rw [← hstage]; exact hn
+    · intro hB
+      rcases hB with ⟨n, hn⟩
+      refine ⟨n, ?_⟩
+      have hstage :=
+        ExtendIter_congr (T := T) (A := B) (B := A) (n := n + ε)
+          (fun i hi => (h n i hi).symm)
+      rw [← hstage]; exact hn
+
   /-- Push a single certificate to `ω+ε`. -/
   theorem certToOmegaPlus
     {T : Theory} {step : Nat → Formula} {φ : Formula}

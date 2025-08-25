@@ -318,4 +318,34 @@ section CalibratorTests
   noncomputable example : Baire_posFam Paper3Theory = [⟨BairePinned, baire_upper_from_DCω_cert Paper3Theory⟩] := rfl
 end CalibratorTests
 
+-- Bounded congruence test for ω+ε
+section BoundedCongruenceTest
+  open Papers.P4Meta
+  
+  -- Define two step ladders that agree only up to a bound
+  def S₁ : Nat → Formula
+  | 0 => Formula.atom 600
+  | 1 => Formula.atom 601
+  | _ => Formula.atom 602
+  
+  def S₂ : Nat → Formula
+  | 0 => Formula.atom 600
+  | 1 => Formula.atom 601
+  | _ => Formula.atom 602
+  
+  -- They agree pointwise (trivially in this example)
+  theorem S₁_eq_S₂ : S₁ = S₂ := rfl
+  
+  -- Bounded congruence: use agreement only up to the witnessing stage
+  example (ψ : Formula) :
+      (ExtendωPlus Paper3Theory S₁ 2).Provable ψ ↔
+      (ExtendωPlus Paper3Theory S₂ 2).Provable ψ := by
+    -- From earlier: S₁_eq_S₂ : S₁ = S₂
+    have hpt : ∀ n i, i < n + 2 → S₁ i = S₂ i := by
+      intro n i _; simpa using congrArg (fun f => f i) S₁_eq_S₂
+    simpa using
+      Papers.P4Meta.ExtendωPlus_provable_congr_up_to
+        (T := Paper3Theory) (A := S₁) (B := S₂) (ε := 2) hpt ψ
+end BoundedCongruenceTest
+
 end Papers.P4Meta.Tests

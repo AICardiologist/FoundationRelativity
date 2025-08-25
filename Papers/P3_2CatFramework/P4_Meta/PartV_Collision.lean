@@ -17,6 +17,11 @@ theorem Con_of_RFN_semantic (Text Tbase : Theory)
   (h : HasRFN_Sigma1 Text Tbase) : Papers.P4Meta.Con Tbase :=
   RFN_implies_Con Text Tbase h
 
+/-- Shorthand: semantic consistency from RFNΣ¹, with namespace‑qualified `Con`. -/
+@[simp] theorem Con_of_RFN (Text Tbase : Theory)
+  (h : HasRFN_Sigma1 Text Tbase) : Papers.P4Meta.Con Tbase :=
+  Con_of_RFN_semantic Text Tbase h
+
 -- (Optional) If older proofs assumed a bare `Con T`, you can now pass `Con_of_RFN Text T h`.
 -- No other changes needed here; proofs can remain as-is.
 

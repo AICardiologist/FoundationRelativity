@@ -276,6 +276,9 @@ This paper establishes:
 - `AxisIndependent` - Independence assumption for product heights
 - `StoneSurj : Type → Prop` - Stone window surjectivity predicate
 - `FT : Formula`, `DCω : Formula` - Calibrator axioms (analytic)
+
+### How to Use ω+ε in Practice
+To transport provability across step rewrites that are equal only up to a bound, use `ExtendωPlus_provable_congr_up_to ε h _`, where `h : ∀ n i, i < n + ε → A i = B i`. It specializes the full congruence to the existence-witnessed stage in the ω+ε definition and avoids global pointwise assumptions.
 - `UCT01 : Formula`, `BairePinned : Formula` - Pinned calibrator targets
 - `uct_upper_from_FT_cert`, `baire_upper_from_DCω_cert` - Named upper-bound certificates
 
