@@ -97,3 +97,15 @@ theorem finite_support_characterization (f : BoolSeq) :
   exact hf
 
 end Papers.P4Meta.StoneWindow
+
+namespace Papers.P4Meta
+
+/-! ### Stone Window (support ideals): calibration surface over BISH -/
+
+/-- Abstract predicate: "surjectivity of Φ_I" as a BISH-level proposition. -/
+opaque StoneSurj : Type → Prop
+
+/-- A calibrator-style wrapper for later height certificates (placeholder). -/
+def StoneCalibrator (I : Type) : Prop := StoneSurj I
+
+end Papers.P4Meta

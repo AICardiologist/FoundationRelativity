@@ -255,4 +255,34 @@ This paper establishes:
 
 ---
 
+## 📋 Verification Ledger (P4_Meta)
+
+### Formalized (no sorries)
+- Ladder algebra (ExtendIter, HeightCertificate, concatSteps)
+- Normal forms with reassociation theorems
+- Theory order: ≤ᵀ, ≃ᵀ with helper lemmas
+- ω-limit theory: Extendω with instance-wise reflection
+- ω+ε theory: ExtendωPlus with complete API
+- Positive families: PosFam with union operations
+- Provability congruences for step equality
+- Certificate push to ω/ω+ε: certToOmega, certToOmegaPlus
+- **RFN_Σ¹ ⇒ Con**: Schematic semantic proof (de-axiomatized)
+
+### Named Axioms/Interfaces
+- `TrueInN : Formula → Prop` - Truth in standard model
+- `Bot : Formula` - Canonical contradiction
+- `Bot_is_FalseInN : ¬ TrueInN Bot` - Bot is false in ℕ
+- `instIsSigma1Bot : IsSigma1 Bot` - Bot is Σ¹
+- `AxisIndependent` - Independence assumption for product heights
+- `StoneSurj : Type → Prop` - Stone window surjectivity predicate
+
+### Paper-only (cited)
+- G1/G2 lower bounds at r.e. stages
+- Failure of UCT under ¬FT
+- Failure of Baire under ¬DC_ω
+- Stone-surjectivity lower bounds for general support ideals
+- Model-theoretic independence results
+
+---
+
 **STATUS**: **✅ PARTS I-VI COMPLETE** - Uniformization, positive uniformization, and complete P4_Meta framework fully implemented with 0 sorries.

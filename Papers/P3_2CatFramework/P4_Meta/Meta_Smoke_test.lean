@@ -290,4 +290,11 @@ section LPOPackTest
   #check packedAtOmega.2  -- filler at ω
 end LPOPackTest
 
+-- RFN ⇒ Con smoketest (schematic)
+section RFNConTests
+  open Papers.P4Meta
+  variable (Text Tbase : Theory) (h : HasRFN_Sigma1 Text Tbase)
+  example : Con Tbase := RFN_implies_Con Text Tbase h
+end RFNConTests
+
 end Papers.P4Meta.Tests

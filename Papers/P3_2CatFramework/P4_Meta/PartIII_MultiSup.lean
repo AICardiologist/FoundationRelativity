@@ -39,4 +39,15 @@ def combineCertsSimple
   HeightCertificatePair T step ⟨φ, ψ⟩ :=
 combineCertificates cφ cψ
 
+/-! ### Axis independence (assumption surface for product heights) -/
+
+/-- Independence placeholder stating that progress on `A` up to stage `n`
+    does not already positively uniformize `B`, and conversely (symmetrically).
+    This is deliberately abstract; concrete instances are supplied by model-theoretic arguments. -/
+class AxisIndependent
+    (T : Theory) (A B : Nat → Formula) : Prop
+
+-- In later product-height lemmas, require `[AxisIndependent T A B]`.
+-- Keep existing results intact; add new refined statements that assume independence.
+
 end Papers.P4Meta
