@@ -23,5 +23,6 @@ import Papers.P3_2CatFramework.P4_Meta.PartV_Strictness
 import Papers.P3_2CatFramework.P4_Meta.StoneWindow
 import Papers.P3_2CatFramework.P4_Meta.PartVI_Calibrators
 import Papers.P3_2CatFramework.P4_Meta.PartVI_StoneCalibration
+import Papers.P3_2CatFramework.P4_Meta.PartVI_FT_to_UCT
 -- Note: P3_P4_Bridge is not imported here to avoid cycles
 -- Paper 3 files import P4_Meta, then P3_P4_Bridge separately if needed
