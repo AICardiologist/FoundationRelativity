@@ -373,4 +373,37 @@ section OrderTests
   theoryLE_refl _
 end OrderTests
 
+-- Positive-family tests
+section PosFamTests
+  open Papers.P4Meta
+
+  -- Reuse the same ladder and sample certs style as before
+  def pf_lpo :
+    Σ φ, HeightCertificate Paper3Theory (lArithSteps Paper3Theory) φ :=
+    ⟨LPO, lpo_height1_cert Paper3Theory⟩
+
+  def pf_fill :
+    Σ φ, HeightCertificate Paper3Theory (lArithSteps Paper3Theory) φ :=
+    ⟨lpoFiller, lpo_filler_height2_cert Paper3Theory⟩
+
+  -- Assemble a small family
+  def fam : PosFam Paper3Theory (lArithSteps Paper3Theory) :=
+    [pf_lpo, pf_fill]
+
+  -- Stage bookkeeping: max of {1, 2} = 2
+  #eval PosFam.stage (T := Paper3Theory) (step := lArithSteps Paper3Theory) fam  -- expect 2
+
+  -- Bag view is definitional
+  example :
+    (PosFam.toBag (T := Paper3Theory) (step := lArithSteps Paper3Theory) fam).n
+      = PosFam.stage (T := Paper3Theory) (step := lArithSteps Paper3Theory) fam := by
+    simp
+
+  -- Push the whole family to ω
+  def famω := PosFam.toOmega (T := Paper3Theory) (step := lArithSteps Paper3Theory) fam
+
+  #check famω
+  #eval famω.length     -- expect 2
+end PosFamTests
+
 end Papers.P4Meta.Tests

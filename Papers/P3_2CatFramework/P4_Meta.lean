@@ -13,6 +13,7 @@ import Papers.P3_2CatFramework.P4_Meta.PartIII_ProductSup
 import Papers.P3_2CatFramework.P4_Meta.PartIII_MultiSup
 import Papers.P3_2CatFramework.P4_Meta.PartIII_Concat
 import Papers.P3_2CatFramework.P4_Meta.PartIII_NormalForm
+import Papers.P3_2CatFramework.P4_Meta.PartIII_PosFam
 import Papers.P3_2CatFramework.P4_Meta.PartIV_Limit
 import Papers.P3_2CatFramework.P4_Meta.PartV_Interfaces
 import Papers.P3_2CatFramework.P4_Meta.PartV_Reflection
