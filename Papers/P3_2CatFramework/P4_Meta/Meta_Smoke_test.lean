@@ -274,6 +274,19 @@ section ConcatTests
   example :
     ExtendIter Paper3Theory (concatSteps 2 ladderA ladderB) (2 + 1)
       = ExtendIter (ExtendIter Paper3Theory ladderA 2) ladderB 1 := by simpa
+
+  -- Stage-level corollary: left-nested reassociation at stage n
+  example :
+      ExtendIter Paper3Theory
+        (concatSteps 2 (concatSteps 1 ladderA ladderB) ladderA) 5
+        =
+      ExtendIter Paper3Theory
+        (concatSteps 1 ladderA (concatSteps (2 - 1) ladderB ladderA)) 5 := by
+    -- j = 1, k = 2 so j ≤ k is by decide; the rest is by the corollary
+    simpa using
+      Papers.P4Meta.ExtendIter_concat_left_nest_eq
+        (T := Paper3Theory) (A := ladderA) (B := ladderB) (C := ladderA)
+        (j := 1) (k := 2) (n := 5) (hjk := by decide)
 end ConcatTests
 
 -- Test lpo_pack_pair

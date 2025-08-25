@@ -52,7 +52,7 @@ theorem sub_tail_index (i j k : Nat) (hjk : j ≤ k) :
   simpa [Nat.sub_sub, Nat.add_sub_of_le hjk]
 
 /-- Micro-lemma: not less than for subtraction under k ≤ i -/
-lemma not_lt_sub_of_le {i j k : Nat} (hki : k ≤ i) :
+theorem not_lt_sub_of_le {i j k : Nat} (hki : k ≤ i) :
   ¬ (i - j < k - j) :=
   Nat.not_lt.mpr (Nat.sub_le_sub_right hki j)
 
@@ -75,15 +75,16 @@ theorem concat_left_nest_eq
       simp [hij, hik, this]
     · -- C-region: k ≤ i and j ≤ i
       have hki : k ≤ i := Nat.le_of_not_lt hik
-      have not_lt' := not_lt_sub_of_le hki
+      have not_lt' := not_lt_sub_of_le (j := j) hki
       -- Key: show the index equality
       have idx : (i - j) - (k - j) = i - k := sub_tail_index i j k hjk
       simp [hij, hik, not_lt']
       rw [idx]
 
-/-- Stage-level corollary: ExtendIter preserves left-nested concatenation equality -/
+/-- Stage-level corollary for left-nested concatenation:
+    if `j ≤ k`, then reassociation commutes with `ExtendIter` at every stage `n`. -/
 @[simp] theorem ExtendIter_concat_left_nest_eq
-  {T : Theory} {A B C : Nat → Formula} {j k n : Nat} (hjk : j ≤ k) :
+  (T : Theory) (A B C : Nat → Formula) (j k n : Nat) (hjk : j ≤ k) :
   ExtendIter T (concatSteps k (concatSteps j A B) C) n =
   ExtendIter T (concatSteps j A (concatSteps (k - j) B C)) n := by
   simpa using
@@ -180,11 +181,5 @@ example :
                           (Formula.atom ∘ (· + 200))
                           (Formula.atom ∘ (· + 300))
   step1 = nf.toSteps := by simp
-
-/-- Smoketest: Stage-level corollary works directly -/
-example {T : Theory} {A B C : Nat → Formula} {j k n : Nat} (hjk : j ≤ k) :
-  ExtendIter T (concatSteps k (concatSteps j A B) C) n =
-  ExtendIter T (concatSteps j A (concatSteps (k - j) B C)) n :=
-  ExtendIter_concat_left_nest_eq hjk
 
 end Papers.P4Meta
