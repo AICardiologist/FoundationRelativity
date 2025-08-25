@@ -113,4 +113,39 @@ theorem Extendω_provable_congr
     rw [← hstage]
     exact hn
 
+/-! ### Tiny order layer on theories -/
+
+/-- `T ≤ᵀ U` means: every `T`-provable sentence is `U`-provable. -/
+def theoryLE (T U : Theory) : Prop :=
+  ∀ ψ, T.Provable ψ → U.Provable ψ
+
+infix:50 " ≤ᵀ " => theoryLE
+
+@[simp] theorem theoryLE_refl (T : Theory) : T ≤ᵀ T := by
+  intro ψ h; exact h
+
+theorem theoryLE_trans {T U V : Theory}
+  (h₁ : T ≤ᵀ U) (h₂ : U ≤ᵀ V) : T ≤ᵀ V := by
+  intro ψ h; exact h₂ ψ (h₁ ψ h)
+
+/-- Monotonicity along the finite chain of stages. -/
+theorem ExtendIter_le_of_le
+  {T : Theory} {step : Nat → Formula} {i j : Nat} (hij : i ≤ j) :
+  ExtendIter T step i ≤ᵀ ExtendIter T step j := by
+  intro ψ h; exact ExtendIter_le_mono (T := T) (step := step) hij h
+
+/-- Each finite stage embeds into the ω-limit. -/
+theorem stage_le_omega {T : Theory} {step : Nat → Formula} (n : Nat) :
+  ExtendIter T step n ≤ᵀ Extendω T step := by
+  intro ψ h; exact ⟨n, h⟩
+
+/-- `Extendω T step` is the least upper bound of the chain of finite stages. -/
+theorem Extendω_is_lub
+  {T : Theory} {step : Nat → Formula} {U : Theory}
+  (hU : ∀ n, ExtendIter T step n ≤ᵀ U) :
+  Extendω T step ≤ᵀ U := by
+  intro ψ hω
+  rcases hω with ⟨n, hn⟩
+  exact hU n ψ hn
+
 end Papers.P4Meta

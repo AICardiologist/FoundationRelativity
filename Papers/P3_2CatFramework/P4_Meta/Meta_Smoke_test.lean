@@ -349,4 +349,28 @@ section OmegaBatchTests
   #check ωcs.head?  -- sanity: elements carry ω-proofs
 end OmegaBatchTests
 
+-- Order-theory smoketests for theories
+section OrderTests
+  open Papers.P4Meta
+
+  -- Finite-stage monotonicity
+  example :
+    ExtendIter Paper3Theory (lArithSteps Paper3Theory) 1 ≤ᵀ
+    ExtendIter Paper3Theory (lArithSteps Paper3Theory) 4 :=
+  ExtendIter_le_of_le (T := Paper3Theory) (step := lArithSteps Paper3Theory)
+    (i := 1) (j := 4) (by decide)
+
+  -- Each stage sits below ω
+  example :
+    ExtendIter Paper3Theory (lArithSteps Paper3Theory) 2 ≤ᵀ
+    Extendω Paper3Theory (lArithSteps Paper3Theory) :=
+  stage_le_omega (T := Paper3Theory) (step := lArithSteps Paper3Theory) 2
+
+  -- ω is a lub (trivial upper bound when U = ω)
+  example :
+    Extendω Paper3Theory (lArithSteps Paper3Theory) ≤ᵀ
+    Extendω Paper3Theory (lArithSteps Paper3Theory) :=
+  theoryLE_refl _
+end OrderTests
+
 end Papers.P4Meta.Tests
