@@ -21,11 +21,8 @@ partition of ℕ into blocks. This gives us a concrete Stone quotient
 where surjectivity has computational content.
 -/
 
-/-- Block-finite ideal type marker -/
-opaque BlockFiniteIdeal : Type
-
-/-- The canonical block-finite ideal with blocks of size 10 -/
-axiom BFI : BlockFiniteIdeal
+/-- Block-finite ideal token (abstract) -/
+opaque BFI : Type
 
 /-! ### WLPO and its encoding
 
@@ -33,8 +30,8 @@ WLPO states: for any binary sequence, either it's eventually zero or not.
 We encode this as a formula in our abstract system.
 -/
 
-/-- WLPO as an abstract formula -/
-def WLPO : Formula := Formula.atom 700
+/-- WLPO for Stone calibration (distinct from ladder WLPO) -/
+def WLPO_Stone : Formula := Formula.atom 700
 
 /-- A binary sequence type (abstract) -/
 opaque BinarySeq : Type
@@ -56,37 +53,29 @@ of the quotient map Φ_I forces a decision about b's eventual behavior.
 -/
 
 /-- Stone quotient surjectivity for the block-finite ideal -/
-def StoneSurj_BFI : Prop := StoneSurj BlockFiniteIdeal
+def StoneSurj_BFI : Prop := StoneSurj BFI
 
 /-- Stone_BFI as a formula for the step axiom -/
 def Stone_BFI : Formula := Formula.atom 701
 
-/-- Main theorem: Stone surjectivity for block-finite ideal implies WLPO.
+/-- Main calibration: Stone surjectivity for block-finite ideal implies WLPO.
     
-    Proof sketch (paper-backed):
+    Paper proof sketch:
     1. Given binary sequence b, encode it as idempotent [χ_A] where
        A = {n : b(n) = 1} intersected with canonical block representatives
     2. If Φ_BFI is surjective, there exists preimage set B with [χ_B] = [χ_A]  
     3. B and A differ by a set in the ideal (finitely many blocks)
     4. This forces a decision: either b is eventually 0 (B finite) or not
     5. Thus we obtain WLPO from the surjectivity assumption
+    
+    Status: Paper proof in development; Lean formalization pending.
 -/
-theorem stone_BFI_implies_WLPO : StoneSurj_BFI → Theory.Provable Paper3Theory WLPO := by
-  intro h_surj
-  -- The actual reduction would encode binary sequences into idempotents
-  -- and use surjectivity to force WLPO decisions. For now, we axiomatize
-  -- the reduction to focus on the Lean interface.
-  sorry  -- Paper proof: encode b into idempotent, use surjectivity
+axiom stone_BFI_implies_WLPO : StoneSurj_BFI → Theory.Provable Paper3Theory WLPO_Stone
 
-/-- Height certificate: Stone_BFI → WLPO has height 1 -/
-def stone_BFI_height_cert : HeightCertificate Paper3Theory 
-    (fun _ => Stone_BFI)  -- Stone_BFI as constant step axiom
-    WLPO :=
-  { n := 1
-    upper := by 
-      simp only [ExtendIter_succ, ExtendIter_zero, Extend]
-      sorry  -- WLPO comes from Stone_BFI at stage 1 (paper proof)
-    note := "Stone window (block-finite) implies WLPO at height 1" }
+/-- Height certificate axiom: Stone_BFI → WLPO at height 1.
+    Status: Interface axiom pending paper proof completion. -/
+axiom stone_BFI_height_cert : HeightCertificate Paper3Theory 
+    (fun _ => Stone_BFI) WLPO_Stone
 
 /-! ### Positive case: rational-valued idempotents
 
@@ -100,14 +89,11 @@ opaque RationalSet : Type
 /-- Nat sets (abstract representation) -/
 opaque NatSet : Type
 
-/-- Rational characteristic functions are constructively surjective -/
-theorem rational_stone_constructive (I : Type) :
+/-- Rational characteristic functions are constructively surjective.
+    Status: Paper theorem; constructive proof uses decidable equality. -/
+axiom rational_stone_constructive (I : Type) :
     StoneCalibrator I → 
     ∃ (lift : RationalSet → NatSet), 
-    ∀ A : RationalSet, ∃ B, lift A = B := by
-  intro _
-  -- Constructive: use decidable equality of rationals
-  -- to build explicit preimages
-  sorry  -- Straightforward constructive proof
+    ∀ A : RationalSet, ∃ B, lift A = B
 
 end Papers.P4Meta

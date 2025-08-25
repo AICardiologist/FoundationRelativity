@@ -271,29 +271,27 @@ theorem Extendω_is_lub
           (fun i hi => (h n i hi).symm)
       rw [← hstage]; exact hn
 
+  /-- ExtendωPlus embeds into Extendω (reusable inclusion). -/
+  theorem ExtendωPlus_le_omega {T : Theory} {step : Nat → Formula} (ε : Nat) :
+    ExtendωPlus T step ε ≤ᵀ Extendω T step := by
+    intro ψ ⟨n, hn⟩
+    exact ⟨n + ε, hn⟩
+
+  /-- Extendω embeds into ExtendωPlus (reverse inclusion). -/
+  theorem Extendω_le_omegaPlus {T : Theory} {step : Nat → Formula} (ε : Nat) :
+    Extendω T step ≤ᵀ ExtendωPlus T step ε := by
+    intro ψ ⟨m, hm⟩
+    by_cases h : ε ≤ m
+    · exact ⟨m - ε, by simpa [Nat.sub_add_cancel h] using hm⟩
+    · exact ⟨0, ExtendIter_le_mono (T := T) (step := step)
+              (by simp only [Nat.zero_add]; exact Nat.le_of_lt (Nat.lt_of_not_le h)) hm⟩
+
   /-- ExtendωPlus with finite ε is equivalent to Extendω.
       This follows from monotonicity: any stage n+ε embeds into ω,
       and ω already contains all finite stages including ε itself. -/
   theorem ExtendωPlus_equiv_omega {T : Theory} {step : Nat → Formula} (ε : Nat) :
-    ExtendωPlus T step ε ≃ᵀ Extendω T step := by
-    constructor
-    · -- ExtendωPlus ≤ᵀ Extendω
-      intro ψ ⟨n, hn⟩
-      exact ⟨n + ε, hn⟩
-    · -- Extendω ≤ᵀ ExtendωPlus
-      intro ψ ⟨m, hm⟩
-      -- Any stage m embeds into some n+ε by choosing n large enough
-      if h : m ≥ ε then
-        refine ⟨m - ε, ?_⟩
-        have : m - ε + ε = m := Nat.sub_add_cancel h
-        rw [this]; exact hm
-      else
-        refine ⟨0, ?_⟩
-        apply ExtendIter_le_mono (T := T) (step := step)
-        · have : m < ε := Nat.lt_of_not_le h
-          simp only [Nat.zero_add]
-          exact Nat.le_of_lt this
-        · exact hm
+    ExtendωPlus T step ε ≃ᵀ Extendω T step :=
+    ⟨ExtendωPlus_le_omega ε, Extendω_le_omegaPlus ε⟩
 
   /-- Push a single certificate to `ω+ε`. -/
   theorem certToOmegaPlus

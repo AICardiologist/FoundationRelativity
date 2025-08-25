@@ -11,6 +11,7 @@ import Papers.P3_2CatFramework.P4_Meta.PartIII_Certificates
 import Papers.P3_2CatFramework.P4_Meta.PartIII_Ladders
 import Papers.P3_2CatFramework.P4_Meta.PartIII_ProductSup
 import Papers.P3_2CatFramework.P4_Meta.PartIII_MultiSup
+import Papers.P3_2CatFramework.P4_Meta.PartIII_ProductHeight
 import Papers.P3_2CatFramework.P4_Meta.PartIII_Concat
 import Papers.P3_2CatFramework.P4_Meta.PartIII_NormalForm
 import Papers.P3_2CatFramework.P4_Meta.PartIII_PosFam
