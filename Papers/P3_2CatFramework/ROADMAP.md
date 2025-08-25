@@ -78,6 +78,13 @@
 - Higher calibrators (UCT/FT, Baire/DC_ω axes)
 - Independence assumptions and model-existence arguments
 
+### 🎯 New Calibration Programs (Part VI Revised)
+- **Stone Window Calibration**: Identify WLPO/LEM requirements for support-ideal surjectivity
+- **RFN→Con De-axiomatization**: Schematic Lean proof replacing axiom
+- **UCT Calibrator**: Frontier {FT} for uniform continuity on [0,1]
+- **Baire Calibrator**: Frontier {DC_ω} for Baire category
+- **AP Calibration**: Target WLPO ↔ AP-failure equivalence
+
 ## 🎯 P4_Meta Framework Status: CAMERA-READY ✅
 
 The P4_Meta framework is now complete with all planned features implemented:
@@ -95,6 +102,31 @@ The P4_Meta framework is now complete with all planned features implemented:
 - **0 Errors**: All modules compile cleanly
 - **Minimal Warnings**: Only cosmetic linter hints
 - **Clean Architecture**: Single import surface via P4_Meta
+
+## 🚀 Immediate Action Items (Part VI Revised)
+
+### 1. Stone Window Calibration Program
+- [ ] Implement classical theorem in Lean (ZFC)
+- [ ] Document constructive caveat (BISH)
+- [ ] Prove conjecture for density-zero ideals
+- [ ] Test block ideals and principal support ideals
+
+### 2. RFN→Con De-axiomatization
+- [ ] Implement schematic interfaces (`TrueInN`, `IsSigma1`)
+- [ ] Prove `RFN_implies_Con` theorem
+- [ ] Update Part V to use theorem instead of axiom
+- [ ] Add successor-collision lemmas as corollaries
+
+### 3. New Analytic Calibrators
+- [ ] UCT: Implement `FT ⇒ UCT` upper bound in Lean
+- [ ] UCT: Document lower bound citations (BISH+¬FT)
+- [ ] Baire: Implement `DC_ω ⇒ Baire` upper bound
+- [ ] Baire: Document lower bound citations (BISH+¬DC_ω)
+
+### 4. Verification Ledger
+- [ ] Create formal separation: formalized/axiomatized/paper-only
+- [ ] Add to Introduction or dedicated appendix
+- [ ] Update documentation with provenance tracking
 
 ## 📅 Near-term Roadmap (1-2 weeks)
 

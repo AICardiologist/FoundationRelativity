@@ -1383,11 +1383,11 @@ at a schematic level today and leaves the deep lower bounds as explicit, replace
 
 
 %===========================================================
-\part*{Part VI. Originality Upgrade Program: From Framework to Certified New Results}
-\addcontentsline{toc}{part}{Part VI. Originality Upgrade Program: From Framework to Certified New Results}
+\part*{Part VI (Revised). Originality Upgrade Program: From Framework to Certified New Results}
+\addcontentsline{toc}{part}{Part VI (Revised). Originality Upgrade Program: From Framework to Certified New Results}
 %===========================================================
 
-% (Safety: provide macros if not previously defined)
+% (Safety macros if not previously loaded)
 \providecommand{\BISH}{\mathrm{BISH}}
 \providecommand{\WLPO}{\mathrm{WLPO}}
 \providecommand{\LPO}{\mathrm{LPO}}
@@ -1402,194 +1402,183 @@ at a schematic level today and leaves the deep lower bounds as explicit, replace
 \providecommand{\cnull}{c_0}
 
 \begin{mdframed}[style=status]
-\textbf{Goal.} Increase the paper’s \emph{originality} without abandoning feasibility by:
-(i) replacing selected meta--axioms with short \emph{Lean proofs};
-(ii) producing \emph{new, pinned analytic calibrators} with sharp frontiers (upper bounds in Lean, lower bounds on paper);
-(iii) adding a \emph{genuinely new algebraic case study} (a Stone--window generalization) with proof;
-(iv) articulating cross–axis transfer lemmas inside the height calculus.
-We organize these into concrete \emph{work packages} (WPs) with deliverables.
+\textbf{Purpose.} This part implements the remedial plan to address novelty, complexity/payoff, motivation, scope, and formalization transparency. It (i) corrects constructive caveats for the support‑ideal Stone window and reframes it as a \emph{calibration program}, (ii) strengthens our \emph{Lean} de‑axiomatization (RFN\(\Rightarrow\)Con), (iii) adds explicit \emph{independence hypotheses} to cross‑axis transfer, (iv) publishes a \emph{verification ledger}, and (v) outlines new analytic calibrators (UCT, Baire) and further applications (AP, RNP/KMP, HBT) as near‑term sources of new results.
 \end{mdframed}
 
 %===========================================================
-\section{Objectives and metrics}
+\section{A. Support‑Ideal Stone Window: classical theorem, constructive caveat, calibration}
 %===========================================================
 
+We extend the Stone window beyond $\mathrm{Fin}$ to \emph{support ideals} $\mathcal I\subseteq\mathcal P(\mathbb N)$:
+$I_{\mathcal I}=\{x\in\linf:\mathrm{supp}(x)\in\mathcal I\}$.
+
+\begin{theorem}[Classical, ZFC]\label{VI:thm:stone-general-classical}
+For any Boolean ideal $\mathcal I$, the map
+\[
+\Phi_{\mathcal I}: \ \mathcal P(\mathbb N)/\mathcal I \longrightarrow \mathrm{Idem}\big(\linf/I_{\mathcal I}\big),\qquad [A]\mapsto [\chi_A],
+\]
+is a Boolean algebra isomorphism; it is natural under interpretations fixing $\SigmaZero$.
+\end{theorem}
+
+\begin{remark}[Constructive caveat in \BISH]\label{VI:rem:constructive-caveat}
+The classical surjectivity proof uses the set $A=\{n:\, x_n=1\}$ when $[x]^2=[x]$; in \BISH, equality of reals is not decidable and comprehension for $\{n:\,x_n=1\}$ generally fails. The $c_0$ case avoids this because the metric hypothesis $x^2-x\in c_0$ allows rounding at $1/2$. For a general support ideal $I_{\mathcal I}$ there is no metric control, so the rounding trick is unavailable. Hence Theorem~\ref{VI:thm:stone-general-classical} is \emph{not} presently justified over \BISH.
+\end{remark}
+
+\paragraph{Calibration program.}
+We recast the general Stone window as a \emph{frontier/height} problem.
+
+\begin{conjecture}[Calibration of support‑ideal Stone window]\label{VI:conj:stone-calibration}
+Over \BISH, the surjectivity of $\Phi_{\mathcal I}$ for broad classes of support ideals requires non‑constructive principles. In particular:
+\begin{enumerate}
+\item For a fixed nontrivial support ideal $\mathcal I$ that is not metrically controlled, \(\mathrm{Surj}(\Phi_{\mathcal I})\) implies at least \(\WLPO\).
+\item The schema "$\Phi_{\mathcal I}$ is surjective for \emph{all} Boolean ideals $\mathcal I$" implies \(\WLPO\) (and possibly \(\LEM\)).
+\end{enumerate}
+\end{conjecture}
+
+\begin{remark}[Approach to (1) and (2)]
+The reduction strategy is to encode a binary sequence $b:\mathbb N\to\{0,1\}$ into a quotient idempotent $[x]$ whose only $\Phi_{\mathcal I}$–preimages $[\chi_A]$ force a decision distinguishable as a \(\WLPO\) instance. Because \(\Phi_{\mathcal I}\) asserts mere \emph{existence}, the reduction must be carried out at the level of proof existence in \BISH, not algorithmic extraction. We will attack concrete families: density‑zero ideal, block ideals, principal support ideals, and show that surjectivity for each family yields \(\WLPO\)/\(\LEM\).
+\end{remark}
+
+\paragraph{Constructive positive cases.}
+We record two constructive surjectivity fragments for context:
 \begin{itemize}
-\item \textbf{O1 (Lean de–axiomatization):} Replace schematic axioms by short Lean proofs where possible (e.g.\ $\RFNSigOne(T)\Rightarrow \Con(T)$).
-\item \textbf{O2 (New calibrators):} Add at least two analytic witnesses with \emph{computed frontiers} (positive uniformization loci) and height certificates.
-\item \textbf{O3 (Independence):} Isolate independence assumptions for product heights; attach model citations or sketches.
-\item \textbf{O4 (New algebraic result):} Prove and (optionally) mechanize a Stone--window extension beyond $\mathrm{Fin}$.
-\item \textbf{O5 (Transfer lemmas):} Prove cross–axis height transfer inside our algebra (products over fused ladders).
+\item If all representatives $x$ are known to be \emph{rational‑valued} (decidable equality), surjectivity holds in \BISH (round coordinatewise).
+\item If $\mathcal I=\mathrm{Fin}$, the $c_0$–type metric argument yields surjectivity (Part~I).
 \end{itemize}
-
-\paragraph{Metrics.}
-At least one previously axiomatized step proved in Lean; at least one \emph{new} theorem (with proof) added; at least one calibrator with Lean upper bound and documented lower bound model.
+These support the thesis that the general support‑ideal isomorphism is a nontrivial calibrator.
 
 %===========================================================
-\section{WP–A: Lean proofs replacing axioms (feasible now)}
+\section{B. De‑axiomatizing RFN\texorpdfstring{$\Rightarrow$}{=>}Con in Lean (schematic, feasible)}
 %===========================================================
 
-\subsection{A1. Prove $\RFNSigOne(T)\Rightarrow \Con(T)$ in the schematic layer}
-\emph{Why it matters.} This removes a core axiom from Part~V and turns the collision step into a certified lemma.
+We replace a core axiom by a short \emph{schematic} proof that uses only the intended semantics of $\RFNSigOne$.
 
-\medskip\noindent
-\textbf{Lean plan (no deep syntax):}
+\paragraph{Schematic interfaces.}
+We assume \texttt{Theory}, \texttt{Formula}, \texttt{Provable} as in Parts~III–V, and add a truth predicate for the standard model and a class marking $\Sigma^0_1$–sentences:
 \begin{verbatim}
--- Interfaces (as in Parts III–V):
-structure Theory := (Provable : Formula → Prop)
-structure Formula := (id : Nat)
-def Con (T : Theory) : Formula := ...           -- "no T-proof of ⊥"
-def RFN_Sigma1 (T : Theory) : Formula := ...    -- uniform Σ₁-reflection
-
--- Minimal arithmetic interface (schematic):
-class CodesProofs (T : Theory) : Prop :=
-  (mk_proof_code : ∀ {φ}, T.Provable φ → ∃ p, Prf_T p φ)   -- arithmetized proof existence
-class Sigma1Sound (T : Theory) : Prop :=
-  (RFN_means_Sigma1_sound :
-    (Extend T (RFN_Sigma1 T)).Provable →  -- adding RFN
-    ∀ e, isSigma1 e → (T.Provable ⟦φ_e⟧ → TrueInN ⟦φ_e⟧))
-
--- Theorem: RFN_Σ1(T) ⇒ Con(T) proved in Extend T (RFN_Σ1 T).
-theorem RFN_implies_Con {T : Theory}
-  [CodesProofs T] [Sigma1Sound T] :
-  (Extend T (RFN_Sigma1 T)).Provable (Con T) := ...
+def TrueInN (φ : Formula) : Prop
+class IsSigma1 (φ : Formula) : Prop
+def Bot : Formula := ...      -- e.g., 0=1
+axiom Bot_is_FalseInN : ¬ TrueInN Bot
+instance : IsSigma1 Bot := ...
+def Con (T : Theory) : Prop := ¬ T.Provable Bot
 \end{verbatim}
 
-\emph{Comment.} This avoids a deep embedding; it uses two tiny typeclasses encoding exactly the steps in the textbook argument (existence of proof codes; $\Sigma^0_1$ soundness as the \emph{meaning} of RFN).
+\paragraph{RFN as a semantic interface.}
+\begin{verbatim}
+class HasRFN_Sigma1 (Text Tbase : Theory) : Prop :=
+  (reflect : ∀ φ : Formula, [IsSigma1 φ] → Tbase.Provable φ → TrueInN φ)
+\end{verbatim}
 
-\subsection{A2. Successor–collision lemmas as corollaries}
-Once A1 is in place, turn the successor claims in Part~V into theorems: 
-\(
-R_{\alpha+1}\vdash \Con(R_\alpha)\), 
-\(S_{\alpha+1}\vdash G_{S_\alpha}\),
-with G1/G2 lower bounds still cited classically.
+\paragraph{The theorem (Lean‑feasible).}
+\begin{verbatim}
+theorem RFN_implies_Con (Text Tbase : Theory)
+  [HasRFN_Sigma1 Text Tbase] : Con Tbase :=
+by
+  intro h : Tbase.Provable Bot
+  have h' : TrueInN Bot := (HasRFN_Sigma1.reflect Bot) h
+  exact Bot_is_FalseInN h'
+\end{verbatim}
 
-%===========================================================
-\section{WP–B: New analytic calibrators (frontiers + certificates)}
-%===========================================================
-
-\subsection{B1. UCT on \([0,1]\) (frontier $\{\FT\}$)}
-\emph{Witness.} $\mathcal C^{\mathrm{UCT}}$: “every pointwise continuous $f:[0,1]\to\mathbb R$ is uniformly continuous.”
-
-\emph{Upper bound (Lean):} formalize that \(\FT\Rightarrow\) UCT at the pinned interval (constructive folklore; mechanizable through moduli).
-
-\emph{Lower bound (paper):} cite a model of \(\BISH+\neg \FT\) where UCT fails. Package as a \emph{height certificate}:
-\(h_{\mathcal L}(\mathcal C^{\mathrm{UCT}})=2\) on the ladder adding \(\WLPO\) then \(\FT\), or frontier \(\{\FT\}\) on the FT–axis.
-
-\subsection{B2. Baire category (frontier $\{\DCw\}$)}
-\emph{Witness.} $\mathcal C^{\mathrm{Baire}}$: “a pinned complete separable metric space is Baire.”
-
-\emph{Upper bound (Lean):} \(\DCw\Rightarrow\) Baire (standard argument with dependent choices to build the dense $G_\delta$).
-
-\emph{Lower bound (paper):} cite a model of \(\BISH+\neg\DCw\) violating Baire.
-
-\subsection{B3. Deliverables}
-New \emph{frontiers} recorded in the UL–frontier language; Lean files with upper–bound proofs; height certificates referencing lower–bound models.
+\noindent
+This removes a central axiom from Part~V and turns the reflection\(\Rightarrow\)consistency \emph{collision step} into a certified lemma at our abstraction level.
 
 %===========================================================
-\section{WP–C: Independence for orthogonal products}
+\section{C. Cross–axis transfer: independence as a hypothesis}
 %===========================================================
 
-\emph{Task.} Assemble or sketch independence results to justify product heights (e.g.\ \(\WLPO\) independent of \(\FT\), \(\FT\) independent of \(\DCw\)) for the exact formulations we adopt.
-
-\emph{Outcome.} Convert conditional product/sup computations into \emph{sharp} heights with citations.
-
-%===========================================================
-\section{WP–D: New algebraic case study (original result)}
-%===========================================================
-
-We generalize the “Stone window” beyond \(\mathrm{Fin}\) to a large class of support ideals.
-
-\begin{definition}[Support ideals]
-Let \(\mathcal I\subseteq \mathcal P(\mathbb N)\) be a Boolean ideal (nonempty, downward closed, closed under finite unions).
-Define the ring ideal
-\[
-I_{\mathcal I}\ :=\ \{\,x\in \linf\ :\ \mathrm{supp}(x)\in\mathcal I\,\},
-\quad
-\mathrm{supp}(x)=\{n\in\mathbb N: x_n\neq 0\}.
-\]
-\end{definition}
-
-\begin{proposition}[Stone window for support ideals — \emph{new in this paper}]\label{VI:prop:stone-general}
-For any Boolean ideal \(\mathcal I\), the assignment
-\[
-\Phi_{\mathcal I}\ :\ \mathcal P(\mathbb N)/\mathcal I \longrightarrow \mathrm{Idem}\big(\linf/I_{\mathcal I}\big),
-\qquad [A]\longmapsto[\chi_A]
-\]
-is a well–defined Boolean algebra isomorphism. It is natural under interpretations that fix \(\Sigma_0\) (hence the quotient and characteristic functions) on the nose.
-\end{proposition}
-
-\begin{proof}
-(\emph{Sketch, algebraic/pointwise; no topology or ultrafilters.})
-If \(A\triangle B\in\mathcal I\), then \(\chi_A-\chi_B\) has support \(\subseteq A\triangle B\in\mathcal I\), hence \([\chi_A]=[\chi_B]\).
-Conversely, if \([\chi_A]=[\chi_B]\), then \(\chi_A-\chi_B\in I_{\mathcal I}\), so \(\mathrm{supp}(\chi_A-\chi_B)=A\triangle B\in\mathcal I\).
-Thus \(\Phi_{\mathcal I}\) is well–defined and injective. It preserves Boolean operations since idempotents multiply/negate pointwise.
-
-For surjectivity, let \([x]\) be idempotent in \(\linf/I_{\mathcal I}\); then \(x^2-x\in I_{\mathcal I}\), hence
-\(\mathrm{supp}(x^2-x)=\{n:\ x_n\notin\{0,1\}\}\in\mathcal I\).
-Define \(A:=\{n:\ x_n=1\}\) (a legitimate subset). Then on \(N\setminus \mathrm{supp}(x^2-x)\) we have \(x_n\in\{0,1\}\), so \(x_n=\chi_A(n)\).
-Hence \(\mathrm{supp}(x-\chi_A)\subseteq \mathrm{supp}(x^2-x)\in\mathcal I\), i.e.\ \([x]=[\chi_A]\). Naturality is immediate because interpretations fix \(\Sigma_0\), hence \(\linf\), \(\chi_A\), and the quotient.
-\end{proof}
-
-\begin{remark}
-Prop.~\ref{VI:prop:stone-general} recovers the \(\mathrm{Fin}\) case and adds a flexible family of pins over which further calibrators can be tested (e.g.\ ideals generated by density–zero sets, block ideals, etc.). The proof is purely algebraic and compatible with constructive settings that admit the needed subset comprehension.
-\end{remark}
-
-\paragraph{Lean plan (algebraic).}
-Represent \(\linf\) as \(\mathbb N\to \mathbb R\) with pointwise ring operations; \(\mathcal I\) as a predicate on subsets of \(\mathbb N\); \(I_{\mathcal I}\) as a ring ideal. Formalize \(\Phi_{\mathcal I}\) and the proof above; no choice or analysis libraries are needed.
-
-%===========================================================
-\section{WP–E: Cross–axis transfer inside the height algebra (original lemma)}
-%===========================================================
+We refine the transfer lemma to make the independence caveat explicit.
 
 \begin{definition}[Fused ladder]
-Given two well–ordered ladders \(\mathcal L_1,\mathcal L_2\), define the \emph{fused ladder}
-\(\mathcal L_1\triangleleft\mathcal L_2\) as the lexicographic product, so that moving along either coordinate advances the stage.
+Given ladders $\mathcal L_1,\mathcal L_2$, their fused ladder $\mathcal L_1\triangleleft\mathcal L_2$ is the lexicographic product, so advancing in either coordinate advances the stage.
 \end{definition}
 
-\begin{proposition}[Transfer for products over fused ladders — \emph{new in this paper}]\label{VI:prop:transfer}
-Let \(\mathcal C\) be a witness with height \(a\) along \(\mathcal L_1\), and \(\mathcal D\) a witness with height \(b\) along \(\mathcal L_2\).
-Then along \(\mathcal L_1\triangleleft\mathcal L_2\),
+\begin{proposition}[Transfer with independence]\label{VI:prop:transfer-indep}
+Let $\mathcal C,\mathcal D$ be witnesses with heights $a$ on $\mathcal L_1$ and $b$ on $\mathcal L_2$, respectively. Assume \emph{axis independence}: no stage before $a$ on $\mathcal L_1$ entails positive uniformization of $\mathcal D$, and vice versa for $b$ and $\mathcal C$. Then along $\mathcal L_1\triangleleft\mathcal L_2$,
 \[
-h_{\mathcal L_1\triangleleft\mathcal L_2}(\mathcal C\times \mathcal D)\ =\ \max\{a,b\}.
+h_{\mathcal L_1\triangleleft\mathcal L_2}(\mathcal C\times \mathcal D)=\max\{a,b\}.
 \]
 \end{proposition}
 
-\begin{proof}
-By the product/sup law from Part~II and the definition of the fused ladder (a stage dominates both coordinates), the least stage where both factors are positively uniformizable is \(\max\{a,b\}\).
-\end{proof}
-
 \begin{remark}
-Prop.~\ref{VI:prop:transfer} justifies cross–axis composites such as \(\mathcal C^{\mathrm{UCT}}\times \mathcal C^{\Con(\PA)}\) without rearguing limit behavior.
+For specific calibrators (e.g.\ $\WLPO$, $\FT$, $\DCw$) the independence must be justified (model–theoretically) or explicitly assumed. Part~IV now states this hypothesis when invoking product heights.
 \end{remark}
 
 %===========================================================
-\section{Deliverables, milestones, and risk}
+\section{D. Verification ledger (scope and transparency)}
 %===========================================================
 
-\paragraph{D1 (Lean):} A small library \texttt{HeightCerts/} containing:
-RFN\(\Rightarrow\)Con proof (A1), successor–collision lemmas, product/sup lemma, ordinal ladder scaffold, and the algebraic Stone–window generalization.
+We publish a minimal ledger distinguishing \emph{formalized}, \emph{axiomatized}, and \emph{paper–only} components.
 
-\paragraph{D2 (Paper):} Two calibrator sections (B1,B2) with frontiers, Lean upper bounds, and cited lower–bound models; one new algebraic theorem (Prop.~\ref{VI:prop:stone-general}) with proof.
+\paragraph{Formalized (Lean, feasible now).}
+\begin{itemize}
+\item Structural layer: witness families, ladders, heights, product/sup law, fused ladder.
+\item Upper bounds: $T_1\vdash\LPO$, $S_1\vdash\Con(S_0)$, $S_1\vdash G_{S_0}$; instancewise limit lemmas.
+\item Collision step: \(\RFNSigOne\Rightarrow \Con\) (Section~B).
+\item Algebraic original result: support–ideal Stone window in ZFC (Theorem~\ref{VI:thm:stone-general-classical}); constructive caveat recorded.
+\end{itemize}
 
-\paragraph{D3 (Profiles):} Orthogonal profiles and frontiers updated to include UCT and Baire calibrators; transfer applications via Prop.~\raef{VI:prop:transfer}.
+\paragraph{Imported as named axioms.}
+\begin{itemize}
+\item G\"odel lower bounds (G1, G2) at r.e.\ stages; LPO independence from \HA.
+\item Independence for $\WLPO$, $\FT$, $\DCw$ (when used for product heights).
+\end{itemize}
 
-\paragraph{Risks and mitigations.}
-Lower–bound models (for FT, \(\DCw\)) are classical; we cite rather than formalize. Independence for constructive calibrators is recorded as assumptions where needed. The RFN\(\Rightarrow\)Con Lean proof avoids deep encodings by using minimal typeclasses \texttt{CodesProofs} and \texttt{Sigma1Sound}.
+\paragraph{Paper–only (with citations).}
+\begin{itemize}
+\item Lower bounds for UCT@[$0,1$] under $\neg\FT$; Baire under $\neg\DCw$.
+\item High–altitude determinacy/large–cardinal couplings (mentioned only as context).
+\end{itemize}
 
 %===========================================================
-\section{How this increases originality}
+\section{E. New analytic calibrators (frontiers; Lean upper bounds)}
 %===========================================================
 
-(1) We \emph{remove} a core axiom by proving RFN\(\Rightarrow\)Con in Lean (A1), turning a hand–off to proof theory into a certified artifact in our calculus.
+\paragraph{UCT on $[0,1]$ (frontier $\{\FT\}$; program).}
+Witness $\mathcal C^{\mathrm{UCT}}$: ``every pointwise continuous $f:[0,1]\to\mathbb R$ is uniformly continuous.''  
+\emph{Upper bound (Lean):} $\FT\Rightarrow$ UCT at the pinned interval via moduli and fan compactness.  
+\emph{Lower bound (paper):} cite a model of $\BISH+\neg\FT$ where UCT fails.  
+\emph{Outcome:} height certificate with frontier $\{\FT\}$ on the FT–axis.
 
-(2) We \emph{add} two analytic calibrators with explicit frontiers and Lean upper–bound proofs (B1,B2), broadening the scope beyond the bidual gap.
+\paragraph{Baire category (frontier $\{\DCw\}$; program).}
+Witness $\mathcal C^{\mathrm{Baire}}$: ``a pinned Polish space is Baire.''  
+\emph{Upper bound (Lean):} $\DCw\Rightarrow$ Baire using dependent choices in the standard construction.  
+\emph{Lower bound (paper):} model of $\BISH+\neg\DCw$ where Baire fails.  
+\emph{Outcome:} height certificate with frontier $\{\DCw\}$.
 
-(3) We contribute a \emph{new algebraic case study} (Prop.~\ref{VI:prop:stone-general}) that generalizes the Stone window and is mechanizable at low cost.
+%===========================================================
+\section{F. Further applications (toward substantial new mathematics)}
+%===========================================================
 
-(4) We provide a \emph{new transfer lemma} (Prop.~\ref{VI:prop:transfer}) making cross–axis compositions first–class citizens in the height algebra.
+\paragraph{Approximation Property (AP).}
+Calibrate ``there exists a compact $T$ not approximable by finite rank with a uniform gap.''  
+\emph{Target:} over \BISH, $\WLPO \Leftrightarrow$ AP–failure (height~1). Even one direction is valuable; full equivalence would be a headline result.
 
-Together these upgrades move the paper from a synthesis–heavy narrative to a framework that \emph{produces new, certified theorems} and reusable Lean components.
+\paragraph{Geometric duality: RNP vs.\ KMP.}
+Use \(\DCw\) to lift measurability/selection arguments; aim to separate frontiers along the DC–axis.
+
+\paragraph{Hahn–Banach variants.}
+Pin separable spaces; calibrate SHB vs.\ full HB. Expect DC/FT sensitivity and richer height profiles than height~1.
+
+\paragraph{Fine structure of support–ideal Stone window.}
+When surjectivity fails constructively, analyze the remaining \emph{partial} structure of $\mathrm{Idem}(\linf/I_{\mathcal I})$ (e.g., apartness–Boolean algebras). This explores genuinely new algebraic landscapes triggered by foundational constraints.
+
+%===========================================================
+\section{G. Action checklist}
+%===========================================================
+
+\begin{enumerate}
+\item Replace Prop.~VI.1 by Theorem~\ref{VI:thm:stone-general-classical} (classical) + Remark~\ref{VI:rem:constructive-caveat}; insert Conjecture~\ref{VI:conj:stone-calibration} and launch the calibration program.
+\item Implement the Lean proof of \(\RFNSigOne\Rightarrow\Con\) (Section~B); update Part~V to use it (collision step becomes a theorem, not an axiom).
+\item Amend the transfer lemma to Prop.~\ref{VI:prop:transfer-indep} (independence hypothesis explicit); add independence citations wherever products are used.
+\item Add the verification ledger (Section~D) to the Introduction or a dedicated appendix.
+\item Start UCT/Baire upper bounds in Lean; attach literature–based lower bounds and issue height certificates.
+\item Scope AP/RNP/KMP/HB calibrations; extract pins and candidate frontiers; plan proofs.
+\end{enumerate}
+
+\begin{remark}[Motivation (final form)]
+We pitch the framework as a \emph{portability and certification} engine: given a pinned construction, we compute the \emph{minimal axioms} that make it invariant and true, we \emph{compose} calibrators modularly, and we \emph{certify} results in Lean at a cost compatible with current libraries. New mathematics then arrives through \emph{new calibrators} (AP, UCT, Baire, HB) and \emph{new algebraic pins} (support–ideals), not from re–proving classical metatheorems.
+\end{remark}
 
 
 
