@@ -287,6 +287,24 @@ section ConcatTests
       Papers.P4Meta.ExtendIter_concat_left_nest_eq
         (T := Paper3Theory) (A := ladderA) (B := ladderB) (C := ladderA)
         (j := 1) (k := 2) (n := 5) (hjk := by decide)
+
+  -- Stage-level corollary (variant): re-associate with C := ladderB
+  example :
+      ExtendIter Paper3Theory
+        (concatSteps 2 (concatSteps 1 ladderA ladderB) ladderB) 5
+        =
+      ExtendIter Paper3Theory
+        (concatSteps 1 ladderA (concatSteps (2 - 1) ladderB ladderB)) 5 := by
+    -- j = 1, k = 2 so j ≤ k by decide; the rest is by the stage-level corollary
+    simpa using
+      Papers.P4Meta.ExtendIter_concat_left_nest_eq
+        (T := Paper3Theory) (A := ladderA) (B := ladderB) (C := ladderB)
+        (j := 1) (k := 2) (n := 5) (hjk := by decide)
+
+  -- Sanity: with the step-level identity for k=0, inner `concatSteps 0 _ _` clauses disappear automatically
+  example : concatSteps 0 ladderA ladderB = ladderB := by
+    -- Thanks to `@[simp] concatSteps_zero`, this is now a one-liner
+    simp
 end ConcatTests
 
 -- Test lpo_pack_pair

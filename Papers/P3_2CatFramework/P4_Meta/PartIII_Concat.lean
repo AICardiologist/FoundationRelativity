@@ -199,6 +199,12 @@ theorem concat_tail_ge_eq
     = ExtendIter (ExtendIter T A k) B n := by
   simpa using concat_tail_eq (T := T) (A := A) (B := B) (k := k) (m := n)
 
+/-- Step-level identity: splicing at `k = 0` just returns the tail ladder. -/
+@[simp] theorem concatSteps_zero (A B : Nat → Formula) :
+  concatSteps 0 A B = B := by
+  funext i
+  simp [concatSteps]
+
 /-- The combined pair certificate over a concatenation lives at `k + cB.n`. -/
 @[simp] theorem concatPairCert_n
   {T : Theory} {A B : Nat → Formula} {φ ψ : Formula}
