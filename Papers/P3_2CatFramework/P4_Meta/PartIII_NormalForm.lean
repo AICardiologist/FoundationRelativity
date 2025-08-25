@@ -51,11 +51,6 @@ theorem sub_tail_index (i j k : Nat) (hjk : j ≤ k) :
   (i - j) - (k - j) = i - k := by
   simpa [Nat.sub_sub, Nat.add_sub_of_le hjk]
 
-/-- Micro-lemma: not less than for subtraction under k ≤ i -/
-theorem not_lt_sub_of_le {i j k : Nat} (hki : k ≤ i) :
-  ¬ (i - j < k - j) :=
-  Nat.not_lt.mpr (Nat.sub_le_sub_right hki j)
-
 /-- Left-nested concatenation: reassociation when j ≤ k -/
 theorem concat_left_nest_eq
   (j k : Nat) (hjk : j ≤ k) (A B C : Nat → Formula) :
@@ -75,44 +70,13 @@ theorem concat_left_nest_eq
       simp [hij, hik, this]
     · -- C-region: k ≤ i and j ≤ i
       have hki : k ≤ i := Nat.le_of_not_lt hik
-      have not_lt' := not_lt_sub_of_le (j := j) hki
+      have not_lt' : ¬ (i - j < k - j) := 
+        Nat.not_lt.mpr (Nat.sub_le_sub_right hki j)
       -- Key: show the index equality
-      have idx : (i - j) - (k - j) = i - k := sub_tail_index i j k hjk
+      have idx : (i - j) - (k - j) = i - k := by
+        simp [Nat.sub_sub, Nat.add_sub_of_le hjk]
       simp [hij, hik, not_lt']
       rw [idx]
-
-/-- Stage-level corollary for left-nested concatenation:
-    if `j ≤ k`, then reassociation commutes with `ExtendIter` at every stage `n`. -/
-@[simp] theorem ExtendIter_concat_left_nest_eq
-  (T : Theory) (A B C : Nat → Formula) (j k n : Nat) (hjk : j ≤ k) :
-  ExtendIter T (concatSteps k (concatSteps j A B) C) n =
-  ExtendIter T (concatSteps j A (concatSteps (k - j) B C)) n := by
-  simpa using
-    congrArg (fun s => ExtendIter T s n)
-      (concat_left_nest_eq j k hjk A B C)
-
-/-- Right-nested concatenation: reassociation when `k ≤ j`. -/
-theorem concat_right_nest_eq
-  (j k : Nat) (hkj : k ≤ j) (A B C : Nat → Formula) :
-  concatSteps j (concatSteps k A B) C =
-  concatSteps k A (concatSteps (j - k) B C) :=
-by
-  -- Directly reuse the left-nested lemma with swapped indices.
-  simpa using
-    concat_left_nest_eq (j := k) (k := j) (hjk := hkj)
-      (A := A) (B := B) (C := C)
-
-/-- Stage-level corollary for right-nested concatenation:
-    if `k ≤ j`, then reassociation commutes with `ExtendIter` at every stage `n`. -/
-@[simp] theorem ExtendIter_concat_right_nest_eq
-  (T : Theory) (A B C : Nat → Formula) (j k n : Nat) (hkj : k ≤ j) :
-  ExtendIter T (concatSteps j (concatSteps k A B) C) n =
-  ExtendIter T (concatSteps k A (concatSteps (j - k) B C)) n :=
-by
-  simpa using
-    congrArg (fun s => ExtendIter T s n)
-      (concat_right_nest_eq (j := j) (k := k) (hkj := hkj)
-        (A := A) (B := B) (C := C))
 
 /-- Simplification: concat at 0 is identity -/
 @[simp] theorem concat_zero_simp (A : Nat → Formula) (nf : StepNF) :
