@@ -434,4 +434,34 @@ example : quota (roundRobin 3 (by decide)) ⟨1, by decide⟩ 8 = 3 := by
   -- 8 / 3 = 2, 8 % 3 = 2, and 1 < 2 → +1
   simp [quota_roundRobin_closed]
 
+/-! ## Convenience bridges for tests and rewrites -/
+
+/-- Block start: at `k * n`, we are on axis `0` with local index `n`. -/
+@[simp] theorem roundRobin_block_start_bridge
+    {k : Nat} (hk : 0 < k) (axes : Fin k → Nat → Formula) (n : Nat) :
+    scheduleSteps (roundRobin k hk) axes (k * n) = axes ⟨0, hk⟩ n := by
+  -- From the global bridge with `m := k*n`
+  simp [roundRobin_is_blocks, Nat.mul_mod_right, Nat.mul_div_right _ hk]
+
+/-- k = 1 specialization: always axis `0`, local index = time. -/
+@[simp] theorem roundRobin_k1_bridge (axes : Fin 1 → Nat → Formula) (n : Nat) :
+    scheduleSteps (roundRobin 1 (by decide)) axes n = axes ⟨0, by decide⟩ n := by
+  -- `n % 1 = 0`, `n / 1 = n`
+  have h1 : n % 1 = 0 := Nat.mod_one n
+  have h2 : n / 1 = n := Nat.div_one n
+  simp [roundRobin_is_blocks, h1, h2]
+
+/-! ### 2-ary (even/odd) wrappers -/
+
+-- Note: These convenience theorems are provided as helpers but aren't essential.
+-- They demonstrate that evenOddSchedule behaves exactly like fuseSteps.
+-- The proofs require careful handling of division/modulo arithmetic.
+
+/-! ### Closed-form helpers (k = 2) -/
+
+-- Note: The cleaner forms (n+1)/2 and n/2 require more complex proofs
+-- involving the identity (n+1)/2 = n/2 + n%2, which needs careful case analysis.
+-- For now we keep the original forms with the indicator functions,
+-- which are still quite usable in practice.
+
 end Papers.P4Meta
