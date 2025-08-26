@@ -6,8 +6,14 @@
   arbitrary periodic schedules.
 -/
 import Papers.P3_2CatFramework.P4_Meta.PartIII_ProductHeight
+import Mathlib.Data.Finset.Basic
+import Mathlib.Data.Finset.Card
+import Mathlib.Data.Finset.Fin
+import Mathlib.Logic.Basic
 
 namespace Papers.P4Meta
+
+open Finset
 
 /-! ### Schedule definitions
 
@@ -577,7 +583,6 @@ theorem quotas_reach_targets_packed
     · have : H - 1 + 1 = H := Nat.sub_add_cancel (Nat.pos_of_ne_zero hH)
       rw [this]
       -- Goal is now H ≤ H which is trivial
-      exact Nat.le_refl H
   · -- Non-max axis: `h i ≤ H-1`.
     have hi_ne : h i ≠ H := by
       intro hEq; exact hi ((pack i).mp hEq)
@@ -594,4 +599,204 @@ theorem quotas_reach_targets_packed
       rw [hquota]
       simp [hi]
       exact hi_le
+
+/-! ### Part 6B: Packed lower bound (Finset-free)
+
+This proves that any time strictly below k*(H-1) + S leaves at least one maximal axis short.
+The proof is constructive and elementary, avoiding Finset entirely.
+-/
+
+/-- **Packed lower bound (constructive, Finset-free).**
+If the axes with maximal demand `H` are exactly the first `S` indices (after reindexing),
+and `0 < H` and `0 < S`, then for any `n < k*(H-1) + S` there exists a maximal axis
+whose quota is still `< H`. -/
+theorem quotas_not_reached_below_packed
+    (k : Nat) (hk : 0 < k) (h : Fin k → Nat)
+    (H S : Nat) (hH : 0 < H) (hS : S ≤ k) (hSpos : 0 < S)
+    (bound : ∀ i, h i ≤ H)
+    (pack : ∀ i, (h i = H) ↔ i.val < S) :
+  ∀ {n}, n < k * (H - 1) + S →
+    ∃ i, h i = H ∧ quota (roundRobin k hk) i n < H := by
+  intro n hn
+  -- decompose n
+  obtain ⟨m, r, rfl, hr⟩ := kDecomp k hk n
+  by_cases hm : m < H - 1
+  · -- Case A: `m < H-1`
+    have hk0 : 0 < k := Nat.lt_of_lt_of_le hSpos hS
+    refine ⟨⟨0, hk0⟩, ?_, ?_⟩
+    · exact (pack ⟨0, hk0⟩).mpr hSpos
+    · have hq :=
+        quota_roundRobin_block_closed k hk ⟨0, hk0⟩ m r (Nat.le_of_lt hr)
+      by_cases h0r : (0 : Nat) < r
+      · -- quota = m+1 ≤ H-1 < H
+        simp [hq, h0r]
+        have : m + 1 ≤ H - 1 := Nat.succ_le_of_lt hm
+        exact Nat.lt_of_le_of_lt this (by
+          -- `H-1 < H` since `H>0`
+          exact Nat.sub_lt hH (by decide : 0 < 1))
+      · -- quota = m < H
+        simp [hq, h0r]
+        exact Nat.lt_trans hm (by
+          -- `H-1 < H`
+          exact Nat.sub_lt hH (by decide : 0 < 1))
+  · -- Case B: `H-1 ≤ m`
+    have hm' : H - 1 ≤ m := Nat.le_of_not_gt hm
+    -- First show `m < H`, otherwise we contradict `hn`
+    have m_lt_H : m < H := by
+      -- If `H ≤ m`, then `k*(H-1)+S ≤ k*H ≤ k*m ≤ k*m + r`, contradicting `hn`
+      by_contra hge
+      have H_le_m : H ≤ m := Nat.le_of_not_gt hge
+      -- `k*H = k*(H-1) + k`
+      have kH_eq : k * H = k * (H - 1) + k := by
+        have hEq := Nat.succ_pred_eq_of_pos hH
+        -- multiply both sides by k
+        conv_lhs => rw [← hEq]
+        rw [Nat.mul_succ]
+        simp [Nat.mul_one]
+      have kH_ge_target : k * (H - 1) + S ≤ k * H := by
+        -- `S ≤ k` ⇒ `k*(H-1)+S ≤ k*(H-1)+k = k*H`
+        simpa [kH_eq] using Nat.add_le_add_left hS (k * (H - 1))
+      have kH_le_km : k * H ≤ k * m := Nat.mul_le_mul_left _ H_le_m
+      have : k * (H - 1) + S ≤ k * m + r :=
+        Nat.le_trans (Nat.le_trans kH_ge_target kH_le_km) (Nat.le_add_right _ _)
+      exact (Nat.not_lt_of_ge this) hn
+    -- So `H-1 ≤ m < H`, hence `m = H-1`
+    have hm_eq : m = H - 1 := by
+      have : m ≤ H - 1 := by
+        have hEq := Nat.succ_pred_eq_of_pos hH
+        -- `m < H = (H-1).succ` ⇒ `m ≤ H-1`
+        rw [← hEq] at m_lt_H
+        exact Nat.lt_succ_iff.mp m_lt_H
+      exact Nat.le_antisymm this hm'
+    -- From `n < k*(H-1)+S` and `m = H-1` we get `r < S`
+    have hrS : r < S := by
+      have : k * (H - 1) + r < k * (H - 1) + S := by simpa [hm_eq] using hn
+      exact Nat.lt_of_add_lt_add_left this
+    have hrk : r < k := Nat.lt_of_lt_of_le hrS hS
+    refine ⟨⟨r, hrk⟩, ?_, ?_⟩
+    · exact (pack ⟨r, hrk⟩).mpr hrS
+    · -- quota at `k*(H-1) + r` is exactly `H-1`
+      have hq :=
+        quota_roundRobin_block_closed k hk ⟨r, hrk⟩ (H - 1) r (Nat.le_of_lt hrk)
+      -- the indicator `r < r` is false
+      -- First rewrite the LHS to `H - 1`, then close with `H - 1 < H`.
+      have qeq :
+          quota (roundRobin k hk) ⟨r, hrk⟩ (k * (H - 1) + r) = H - 1 := by
+        -- the "+ if (r<r) then 1 else 0" collapses to +0
+        simpa [hq, Nat.lt_irrefl]
+      -- now the goal is quota = H - 1, which is < H
+      exact qeq ▸ Nat.sub_lt hH (by decide : 0 < 1)
+
+/-! ### Part 6C: Exact Finish Time Characterization
+
+Now we combine the upper and lower bounds to get the exact characterization
+of the finish time in the packed case.
+-/
+
+/-- The exact finish time formula for reaching target heights.
+    When H = 0, we finish immediately. Otherwise we need k*(H-1) + S steps. -/
+def Nstar (k H S : Nat) : Nat := 
+  if H = 0 then 0 else k * (H - 1) + S
+
+/-- Quotas are monotone in time: if `a ≤ b` then `quota σ i a ≤ quota σ i b`. -/
+theorem quota_mono {k} (σ : Schedule k) (i : Fin k) :
+  ∀ {a b}, a ≤ b → quota σ i a ≤ quota σ i b := by
+  intro a b h
+  -- write b = a + d
+  obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le h
+  clear h
+  -- goal: quota σ i a ≤ quota σ i (a + d)
+  induction d with
+  | zero =>
+      simpa
+  | succ d ih =>
+      -- show a single step is monotone, then chain with `ih`
+      have step : quota σ i (a + d) ≤ quota σ i (a + (d + 1)) := by
+        have hq := quota_succ σ i (a + d)
+        by_cases h : σ.assign (a + d) = i
+        · -- RHS = quota + 1; `x ≤ x+1`
+          simpa [hq, h, Nat.add_comm, Nat.add_left_comm, Nat.add_assoc]
+            using Nat.le_succ (quota σ i (a + d))
+        · -- RHS = quota + 0 = quota; `x ≤ x`
+          simpa [hq, h] using Nat.le_refl (quota σ i (a + d))
+      exact Nat.le_trans ih step
+
+/-- **Exact finish time (packed case).**
+For axes reindexed so that the first S have maximal demand H, quotas reach all targets
+if and only if n ≥ N* = k*(H-1) + S (or N* = 0 when H = 0).
+Note: When H > 0, we require S > 0 (some axis actually attains the maximum). -/
+theorem quotas_targets_exact_packed
+    (k : Nat) (hk : 0 < k) (h : Fin k → Nat)
+    (H S : Nat) (hS : S ≤ k)
+    (bound : ∀ i, h i ≤ H)
+    (pack : ∀ i, (h i = H) ↔ i.val < S)
+    (hmax_attained : H = 0 ∨ ∃ i, h i = H) :
+  ∀ n, (∀ i, h i ≤ quota (roundRobin k hk) i n) ↔ Nstar k H S ≤ n := by
+  intro n; unfold Nstar
+  by_cases hH0 : H = 0
+  · -- trivial 0-target case
+    constructor
+    · intro _; exact Nat.zero_le _
+    · intro _ i
+      have : h i ≤ 0 := by simpa [hH0] using bound i
+      have hi0 : h i = 0 := Nat.eq_zero_of_le_zero this
+      simpa [hH0, hi0] using (Nat.zero_le (quota (roundRobin k hk) i n))
+  · -- main case: H > 0, and in packed form we also need S > 0
+    have hH : 0 < H := Nat.pos_of_ne_zero hH0
+    have hSpos : 0 < S := by
+      -- In packed form with H > 0, we need S > 0 for well-formedness
+      -- If S = 0, then by pack: (h i = H) ↔ (i.val < 0) ↔ False
+      -- So no axis would have h i = H. But H is the supremum of h values,
+      -- and with bound saying all h i ≤ H, at least one must equal H.
+      -- We assert this as a well-formedness requirement.
+      by_contra hS0
+      have hS_eq : S = 0 := Nat.eq_zero_of_not_pos hS0
+      -- Since S = 0, pack says no axis has demand H
+      have no_max : ∀ i, h i < H := by
+        intro i
+        have : h i ≠ H := by
+          intro hi_eq
+          have : i.val < S := (pack i).mp hi_eq
+          rw [hS_eq] at this
+          exact Nat.not_lt_zero _ this
+        exact Nat.lt_of_le_of_ne (bound i) this
+      -- But hmax_attained says H = 0 ∨ ∃ i, h i = H
+      cases hmax_attained with
+      | inl h0 => exact (hH0 h0).elim
+      | inr hex => 
+        obtain ⟨i, hi⟩ := hex
+        exact Nat.lt_irrefl H (no_max i ▸ hi)
+    -- `Nstar` simplifies
+    simp [hH0]
+    constructor
+    · -- forward: if all targets met at n, then n ≥ k*(H-1)+S (contradict lower bound)
+      intro hall
+      by_contra hn
+      have ⟨i, hiH, hiShort⟩ :=
+        quotas_not_reached_below_packed k hk h H S hH hS hSpos bound pack hn
+      have : h i ≤ quota (roundRobin k hk) i n := hall i
+      -- contradiction: quota i n < H but h i = H
+      exact (Nat.lt_of_le_of_lt (by simpa [hiH] using this) hiShort).elim
+    · -- backward: lift the upper bound by monotonicity
+      intro hN i
+      have base := quotas_reach_targets_packed k hk h H S hS bound pack i
+      exact Nat.le_trans base (quota_mono (roundRobin k hk) i hN)
+
+
+/-! ## Part 6C-D: General Case (Future Work)
+
+The general case requires showing that any demand vector can be
+permuted to pack maximal elements first, preserving the finish time.
+This requires Finset operations for the permutation construction.
+
+These scaffolding theorems are left as future work:
+- Packing permutation to reorder axes
+- General exact finish time characterization  
+- Integration with k-ary product framework
+- Round-robin optimality proof
+
+Note: The packed case (Part 6B) provides the core mathematical
+result. The general case extends this via permutation arguments.
+-/
+
 end Papers.P4Meta

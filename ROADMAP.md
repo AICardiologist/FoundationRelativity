@@ -16,6 +16,9 @@
 - **NEW**: concat_left_nest_eq with complete elementary proof (no sorries!)
 - **NEW**: k-ary schedule abstractions with quota invariants (0 sorries!)
 - **NEW**: Round-robin scheduling with complete bridge n ↦ (n%k, n/k)
+- **NEW**: Part 6B exact finish time characterization N* = k(H-1) + S complete
+- **NEW**: Part V RFN→Con→Gödel collision chain fully formalized
+- **NEW**: Part VI FT→UCT reduction with height certificate at level 1
 - ω-limit theory (Extendω) with omega_of_prefixCert, omega_of_tailCert helpers
 - Collision theorems scaffolding (HBL/RE/Consistent typeclasses)
 **Files**: P4_Meta/* (35+ modules), NormalForm_test.lean with 5-level composition tests
@@ -54,8 +57,10 @@
 - [x] ~~@[simp] automation for stage arithmetic~~ ✅ DONE
 
 ### Paper 3 Next Steps (1-2 weeks)
+- [x] ~~Part V: RFN→Con→Gödel collision chain~~ ✅ COMPLETE (0 sorries)
+- [x] ~~Part VI: FT→UCT reduction formalized~~ ✅ COMPLETE (0 sorries)
+- [x] ~~Part 6B: Exact finish time characterization N* = k(H-1) + S~~ ✅ COMPLETE
 - [ ] Interleaving composition (even ↦ A, odd ↦ B) with leftLift/rightLift
-- [ ] Extend Part V with more typeclass capabilities
 - [ ] Granular provenance plumbing (lean | classical | hybrid)
 - [ ] Connect normal forms to actual Paper 3 provability predicates
 

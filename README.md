@@ -53,7 +53,12 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
 - **Parts III-VI (P4_Meta)**: Meta-theoretic framework for provenance tracking
   - Deterministic Theory/Extend mechanism for meta-reasoning
   - ProofHeight calculus tracking extension complexity
-  - Part V collision theorems: reflection → consistency → Gödel
+  - **Part V**: ✅ Complete RFN→Con→Gödel collision chain (0 sorries)
+    - `reflection_implies_consistency`: RFN_Σ₁(T) proves Con(T)
+    - `collision_chain`: Two-step proof of Gödel sentence via RFN→Con
+  - **Part VI**: ✅ FT→UCT reduction formalized (0 sorries)
+    - `FT_implies_UCT`: Fan Theorem implies Uniform Continuity on [0,1]
+    - Height certificate showing UCT provable at height 1 from FT
   - Part VI Stone window: Boolean ring with support ideals
   - Provenance discipline: tracking classical vs Lean-proved results
   - **NEW**: k-ary schedule abstractions with quota invariants (PartIII_Schedule)
