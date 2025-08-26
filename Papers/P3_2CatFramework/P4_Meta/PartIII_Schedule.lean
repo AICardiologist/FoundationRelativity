@@ -231,5 +231,22 @@ theorem evenOdd_is_fuseSteps
     rw [hm]
     simp [fuseSteps_odd]
 
+/-! ### Remaining k=2 closed-form quotas -/
+
+/-- Quota for axis 0 at odd stages: ⌈(2n+1)/2⌉ = n+1. -/
+@[simp] theorem quota_evenOdd_zero_odd (n : Nat) :
+  quota evenOddSchedule (⟨0, by decide⟩ : Fin 2) (2*n+1) = n+1 := by
+  -- Step from 2n to 2n+1: axis 0 fires at position 2n
+  rw [quota_succ]
+  rw [evenOdd_assign_even]
+  rw [if_pos rfl]
+  rw [quota_evenOdd_zero_even]
+
+/-! ### k-ary round-robin bridge -/
+
+/-- General k-ary decomposition: every n can be written as k*q + r with r < k. -/
+theorem kDecomp (k : Nat) (hk : k > 0) (n : Nat) : 
+  ∃ q r, n = k * q + r ∧ r < k :=
+  ⟨n / k, n % k, (Nat.div_add_mod n k).symm, Nat.mod_lt n hk⟩
 
 end Papers.P4Meta
