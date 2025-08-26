@@ -480,4 +480,24 @@ example : quota (roundRobin 3 (by decide)) ⟨1, by decide⟩ 8 = 3 := by
 -- For now we keep the original forms with the indicator functions,
 -- which are still quite usable in practice.
 
+/-! ### Equivalence between evenOddSchedule and fuseSteps -/
+
+/-- On even stages, `evenOddSchedule` and `fuseSteps` agree. -/
+@[simp] theorem evenOdd_eq_fuseSteps_even
+    (A B : Nat → Formula) (n : Nat) :
+  scheduleSteps evenOddSchedule (fun i => if i = 0 then A else B) (2 * n)
+    = fuseSteps A B (2 * n) := by
+  -- left side picks axis 0 at local index n
+  -- right side is `fuseSteps_even`
+  simp [evenOdd_bridge_even, fuseSteps_even]
+
+/-- On odd stages, `evenOddSchedule` and `fuseSteps` agree. -/
+@[simp] theorem evenOdd_eq_fuseSteps_odd
+    (A B : Nat → Formula) (n : Nat) :
+  scheduleSteps evenOddSchedule (fun i => if i = 0 then A else B) (2 * n + 1)
+    = fuseSteps A B (2 * n + 1) := by
+  -- left side picks axis 1 at local index n
+  -- right side is `fuseSteps_odd`
+  simp [evenOdd_bridge_odd, fuseSteps_odd]
+
 end Papers.P4Meta
