@@ -59,7 +59,7 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
   - **Part VI**: ✅ FT→UCT reduction formalized (0 sorries)
     - `FT_implies_UCT`: Fan Theorem implies Uniform Continuity on [0,1]
     - Height certificate showing UCT provable at height 1 from FT
-  - Part VI Stone window: Boolean ring with support ideals
+  - Part VI Stone window: Classical Boolean ring calibration program
   - Provenance discipline: tracking classical vs Lean-proved results
   - **NEW**: k-ary schedule abstractions with quota invariants (PartIII_Schedule)
   - **NEW**: Complete proof that k=2 schedule exactly matches fuseSteps pattern
@@ -93,7 +93,7 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
 - `Papers/P2_BidualGap/HB/DirectDual.lean` - Direct construction of G for c₀ with 0 sorries
 - `Papers/P2_BidualGap/HB/WLPO_to_Gap_HB.lean` - Main equivalence theorem (witness: c₀)
 - `Papers/P2_BidualGap/HB/DualIsometriesComplete.lean` - Dual isometry with 3 WLPO sorries
-- `Papers/P2_BidualGap/Gap/Quotients.lean` - Complete quotient framework (Stone window)
+- `Papers/P2_BidualGap/Gap/Quotients.lean` - Complete quotient framework
 - `Papers/P2_BidualGap/Constructive/Ishihara.lean` - Gap → WLPO direction
 
 **Mathematical Significance**: Complete formal verification that the existential bidual gap (∃X with gap) has exactly the logical strength of WLPO, using c₀ as the witness space. The formalization avoids Banach limits and maintains constructive clarity.

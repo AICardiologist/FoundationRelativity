@@ -66,7 +66,7 @@
 
 ### Paper 3 Phase 3: Advanced Structures (2-3 weeks)
 - [ ] General `Level : ℕ → Foundation → Prop` with monotonicity
-- [ ] Stone window witness family (uniformizable at Level 0)
+- [ ] Stone calibration for witness families (measuring constructive principles)
 - [ ] Functorial Obstruction Theorem skeleton
 - [ ] Integration with Papers 1 & 2 pathologies
 - [ ] Connect P4_Meta to real Paper 3 provability predicates
@@ -103,7 +103,7 @@
 | Part III ProductSup | 2 | ✅ Complete | Pair certificates, combinators, stage bookkeeping |
 | Part IV ω-limit | 1 | ✅ Complete | Extendω, omega_of_prefixCert, omega_of_tailCert |
 | Part V Collision | 4 | ✅ Complete | HBL/RE typeclasses, reflection, collision chain |
-| Part VI Stone | 1 | ✅ Complete | Boolean ring generalization |
+| Part VI Stone | 1 | ✅ Complete | Classical correspondence as calibration |
 | Integration | 3 | ✅ Complete | Paper3_Integration, P3_Minimal, P3_P4_Bridge |
 | Tests | 2 | ✅ Passing | NormalForm_test (5-level), Meta_Smoke_test |
 

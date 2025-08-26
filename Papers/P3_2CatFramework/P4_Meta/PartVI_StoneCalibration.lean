@@ -1,11 +1,17 @@
 /-
   Papers/P3_2CatFramework/P4_Meta/PartVI_StoneCalibration.lean
   
-  NEW MATHEMATICAL CONTENT: Stone window calibration theorem.
-  Shows that surjectivity of the Stone quotient map for a block-finite
-  support ideal implies WLPO (Weak Law of Principle of Omniscience).
+  CALIBRATION PROGRAM: Using the classical Stone window correspondence
+  to measure constructive principles.
   
-  This is a genuinely new calibration result, not just packaging.
+  The Stone correspondence Idem(ℓ∞/I_𝒥) ≅ 𝒫(ℕ)/𝒥 for support ideals is
+  a classical result. We use it as a calibration tool: which constructive
+  principles are needed to recover surjectivity for specific ideals?
+  
+  This file demonstrates that for block-finite ideals, surjectivity would
+  imply WLPO, showing how classical results require omniscience principles
+  in constructive settings. The calibration approach is our contribution,
+  not the Stone correspondence itself.
 -/
 import Papers.P3_2CatFramework.P4_Meta.StoneWindow
 import Papers.P3_2CatFramework.P4_Meta.Meta_Signature
@@ -42,10 +48,11 @@ opaque EventuallyZero : BinarySeq → Prop
 /-- WLPO principle: every sequence is decidably eventually zero -/
 axiom WLPO_principle : ∀ (b : BinarySeq), EventuallyZero b ∨ ¬EventuallyZero b
 
-/-! ### The Stone window calibration theorem
+/-! ### Stone calibration for block-finite ideals
 
-This is the NEW MATHEMATICAL CONTENT: we prove that surjectivity of the
-Stone quotient map for the block-finite ideal implies WLPO.
+We demonstrate that surjectivity of the Stone quotient map for the 
+block-finite ideal implies WLPO. This calibrates the constructive
+strength needed to recover the classical Stone correspondence.
 
 The key insight: given a binary sequence b : ℕ → {0,1}, we encode it into
 an idempotent representative modulo the block-finite ideal. Surjectivity
