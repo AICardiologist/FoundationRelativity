@@ -111,9 +111,10 @@
    - Lifting certificates and pairs to ω
    - Instance-wise reflection theorems
 
-4. **Collision Theorems (Part V) ✅ COMPLETE**
-   - `reflection_implies_consistency`: RFN_Σ₁(T) proves Con(T) (0 sorries)
-   - `collision_chain`: Two-step proof of Gödel sentence via RFN→Con (0 sorries)
+4. **Collision Theorems (Part V) 🔄 HYBRID**
+   - `reflection_implies_consistency`: RFN_Σ₁(T) proves Con(T) ✅ (proven, 0 sorries)
+   - `consistency_implies_godel`: Con(T) proves Gödel sentence 📌 (axiomatized as classical result)
+   - `collision_chain`: Two-step proof combining proven RFN→Con with axiomatized Con→Gödel
    - Complexity interfaces and strictness results
 
 5. **Part VI**
@@ -233,7 +234,7 @@ All Paper 3 components are tested in CI:
 2. ✅ Height certificates with provenance tracking
 3. ✅ Two-phase composition with prefix/tail operations
 4. ✅ ω-limit theory and instance-wise reflection
-5. ✅ Collision theorems (RFN → Con → Gödel)
+5. 🔄 Collision theorems (RFN → Con proven, Con → Gödel axiomatized)
 6. ✅ Stone window Boolean rings
 
 **P4_Meta Summary**: 0 sorries, complete elementary proofs, full @[simp] automation
@@ -314,7 +315,8 @@ This represents a new calibration program with the reduction interface establish
 - Positive families: PosFam with union operations
 - Provability congruences for step equality
 - Certificate push to ω/ω+ε: certToOmega, certToOmegaPlus
-- **RFN_Σ¹ ⇒ Con**: Schematic semantic proof (de-axiomatized)
+- **RFN_Σ¹ ⇒ Con**: Proven with typeclasses (0 sorries)
+- **Con ⇒ Gödel**: Axiomatized as classical result
 
 ### Named Axioms/Interfaces
 - `TrueInN : Formula → Prop` - Truth in standard model

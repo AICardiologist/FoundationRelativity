@@ -53,9 +53,10 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
 - **Parts III-VI (P4_Meta)**: Meta-theoretic framework for provenance tracking
   - Deterministic Theory/Extend mechanism for meta-reasoning
   - ProofHeight calculus tracking extension complexity
-  - **Part V**: ✅ Complete RFN→Con→Gödel collision chain (0 sorries)
-    - `reflection_implies_consistency`: RFN_Σ₁(T) proves Con(T)
-    - `collision_chain`: Two-step proof of Gödel sentence via RFN→Con
+  - **Part V**: 🔄 Hybrid RFN→Con→Gödel collision chain
+    - `reflection_implies_consistency`: RFN_Σ₁(T) proves Con(T) ✅ (proven, 0 sorries)
+    - `consistency_implies_godel`: Con(T) proves Gödel sentence 📌 (axiomatized)
+    - `collision_chain`: Two-step proof combining proven + axiomatized steps
   - **Part VI**: ✅ FT→UCT reduction formalized (0 sorries); Stone window included as a calibration program (no constructive surjectivity claim)
     - `FT_implies_UCT`: Fan Theorem implies Uniform Continuity on [0,1]
     - Height certificate showing UCT provable at height 1 from FT

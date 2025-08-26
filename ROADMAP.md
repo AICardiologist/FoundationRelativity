@@ -17,7 +17,7 @@
 - **NEW**: k-ary schedule abstractions with quota invariants (0 sorries!)
 - **NEW**: Round-robin scheduling with complete bridge n ↦ (n%k, n/k)
 - **NEW**: Part 6B exact finish time characterization N* = k(H-1) + S complete
-- **NEW**: Part V RFN→Con→Gödel collision chain fully formalized
+- **NEW**: Part V RFN→Con→Gödel collision chain (hybrid: RFN→Con proven, Con→Gödel axiom)
 - **NEW**: Part VI FT→UCT reduction with height certificate at level 1
 - ω-limit theory (Extendω) with omega_of_prefixCert, omega_of_tailCert helpers
 - Collision theorems scaffolding (HBL/RE/Consistent typeclasses)
@@ -57,7 +57,7 @@
 - [x] ~~@[simp] automation for stage arithmetic~~ ✅ DONE
 
 ### Paper 3 Next Steps (1-2 weeks)
-- [x] ~~Part V: RFN→Con→Gödel collision chain~~ ✅ COMPLETE (0 sorries)
+- [x] ~~Part V: RFN→Con→Gödel collision chain~~ ✅ HYBRID (RFN→Con proven, Con→Gödel axiom)
 - [x] ~~Part VI: FT→UCT reduction formalized~~ ✅ COMPLETE (0 sorries)
 - [x] ~~Part 6B: Exact finish time characterization N* = k(H-1) + S~~ ✅ COMPLETE
 - [ ] Interleaving composition (even ↦ A, odd ↦ B) with leftLift/rightLift
@@ -102,7 +102,7 @@
 | Part III Certificates | 3 | ✅ Complete | Height tracking, lift/transport, pointwise congruence |
 | Part III ProductSup | 2 | ✅ Complete | Pair certificates, combinators, stage bookkeeping |
 | Part IV ω-limit | 1 | ✅ Complete | Extendω, omega_of_prefixCert, omega_of_tailCert |
-| Part V Collision | 4 | ✅ Complete | HBL/RE typeclasses, reflection, collision chain |
+| Part V Collision | 4 | 🔄 Hybrid | RFN→Con proven, Con→Gödel axiom, collision chain |
 | Part VI Stone | 1 | ✅ Complete | Classical correspondence as calibration |
 | Integration | 3 | ✅ Complete | Paper3_Integration, P3_Minimal, P3_P4_Bridge |
 | Tests | 2 | ✅ Passing | NormalForm_test (5-level), Meta_Smoke_test |
