@@ -10,14 +10,14 @@
 **Parts III-VI (P4_Meta)**: ✅ COMPLETE - Meta-theoretic framework with ladder algebra  
 **CI Status**: ✅ All core modules build | **Import Structure**: ✅ No cycles
 
-### Part 6 Schedule Mathematics (Focus Area)
+### Part 6 Schedule Mathematics ✅ COMPLETE
 | Component | Status | What's Done | What's TODO |
 |-----------|--------|-------------|-------------|
 | **Infrastructure** | ✅ | Round-robin, quotas, bridges, k=2 migration | - |
 | **Upper Bound** | ✅ | `quotas_reach_targets_packed`: N* = k(H-1) + S suffices | - |
-| **Lower Bound** | 🚧 | - | `quotas_not_reached_below_packed` proof |
-| **Exactness** | 🚧 | - | Combine upper+lower for exact N* |
-| **General Case** | 🚧 | - | Permutation lemma with Finset |
+| **Lower Bound** | ✅ | `quotas_not_reached_below_packed`: Cannot reach quotas below N* | - |
+| **Exactness** | ✅ | `quotas_targets_exact_packed`: Exact finish time N* = k(H-1) + S | - |
+| **General Case** | 🚧 | - | Permutation lemma with Finset (future work) |
 
 ### ⚠️ Known Issues (as of 2025-01-27)
 - **7 integration sorries** in Paper3_Integration.lean and P3_P4_Bridge.lean (glue code only)
@@ -91,10 +91,12 @@
      - `quota_roundRobin_block_closed`: Quota at k·n+r = n + 𝟙[i<r]
      - `quotas_reach_targets_iff`: Feasibility ↔ q(i) ≤ ⌊n/k⌋ + 𝟙[i<n mod k]
      - `quotas_reach_targets_packed`: Upper bound at N* = k(H-1) + S
-   - **Part 6B-D 🚧 IN PROGRESS**:
-     - Packed lower bound (constructive, Finset-free) - NOT YET DONE
-     - Exact finish time characterization - NOT YET DONE
-     - Permutation/packing lemma (with Finset) - NOT YET DONE
+   - **Part 6B ✅ COMPLETE**:
+     - `quotas_not_reached_below_packed`: Packed lower bound (constructive, Finset-free)
+     - `quotas_targets_exact_packed`: Exact finish time N* = k(H-1) + S
+     - `quota_mono`: Quota monotonicity in time
+   - **Part 6C-D (Future Work)**:
+     - Permutation/packing lemma (with Finset)
    - `concatSteps`: Two-phase ladder composition at stage k
    - Complete prefix/tail theorems with @[simp] automation
    - Normal forms (StepNF) with canonical representation
@@ -109,11 +111,14 @@
    - Lifting certificates and pairs to ω
    - Instance-wise reflection theorems
 
-4. **Collision Theorems (Part V)**
-   - RFN → Con → Gödel sentence collision
+4. **Collision Theorems (Part V) ✅ COMPLETE**
+   - `reflection_implies_consistency`: RFN_Σ₁(T) proves Con(T) (0 sorries)
+   - `collision_chain`: Two-step proof of Gödel sentence via RFN→Con (0 sorries)
    - Complexity interfaces and strictness results
 
-5. **Stone Window (Part VI)**  
+5. **Stone Window & FT→UCT (Part VI) ✅ COMPLETE**
+   - `FT_implies_UCT`: Fan Theorem implies Uniform Continuity on [0,1] (0 sorries)
+   - `FT_to_UCT_cert`: Height certificate showing UCT at height 1 from FT (0 sorries)
    - Boolean ring with support ideals
    - Provenance discipline for classical vs Lean-proved
 
