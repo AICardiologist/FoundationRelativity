@@ -373,4 +373,65 @@ private theorem rr_quota_prefix_rel (k : Nat) (hk : 0 < k) (i : Fin k) (n : Nat)
         rw [← eq_rw]
         exact roundRobin_block_bridge hk axes ⟨n%k, Nat.mod_lt n hk⟩ (n/k)
 
+/-! ### Closed-form and global assignment for round-robin (Finset-free) -/
+
+/-- Global assignment: round-robin picks the remainder axis. -/
+@[simp] theorem roundRobin_assign (k : Nat) (hk : 0 < k) (n : Nat) :
+    (roundRobin k hk).assign n = ⟨n % k, Nat.mod_lt n hk⟩ := by
+  apply Fin.ext
+  simp [roundRobin]
+
+/-- **Closed form for quotas.** For round-robin on `k>0`,
+    the quota on axis `i` after `n` steps is
+    `n / k + (if i.val < n % k then 1 else 0)`. -/
+@[simp] theorem quota_roundRobin_closed (k : Nat) (hk : 0 < k)
+    (i : Fin k) (n : Nat) :
+    quota (roundRobin k hk) i n
+      = n / k + (if i.val < n % k then 1 else 0) := by
+  -- decompose `n` into full blocks and remainder
+  have hn : n = k * (n / k) + n % k := (Nat.div_add_mod n k).symm
+  -- prefix relation inside the final block at base `k*(n/k)`
+  have hprefix :=
+    rr_quota_prefix_rel (k := k) (hk := hk) (i := i) (n := n / k)
+                        (r := n % k) (Nat.le_of_lt (Nat.mod_lt n hk))
+  -- base value at the block start
+  have hbase := rr_quota_at_block_start (k := k) (hk := hk) (i := i) (n := n / k)
+  
+  
+  -- assemble
+  calc quota (roundRobin k hk) i n 
+      = quota (roundRobin k hk) i (k * (n / k) + n % k) := by rw [← hn]
+    _ = quota (roundRobin k hk) i (k * (n / k)) + (if i.val < n % k then 1 else 0) := hprefix
+    _ = n / k + (if i.val < n % k then 1 else 0) := by rw [hbase]
+
+/-! ### Handy 2-ary corollaries (even/odd) -/
+
+-- Global assignment for k = 2
+@[simp] theorem evenOdd_assign_global (n : Nat) :
+    evenOddSchedule.assign n = ⟨n % 2, Nat.mod_lt n (by decide : 0 < 2)⟩ := by
+  simp [evenOddSchedule, roundRobin_assign]
+
+-- Closed form quotas for k = 2 (both axes, any `n`)
+@[simp] theorem quota_evenOdd_closed_axis0 (n : Nat) :
+    quota evenOddSchedule (⟨0, by decide⟩ : Fin 2) n
+      = n / 2 + (if 0 < n % 2 then 1 else 0) := by
+  simp [evenOddSchedule, quota_roundRobin_closed]
+
+@[simp] theorem quota_evenOdd_closed_axis1 (n : Nat) :
+    quota evenOddSchedule (⟨1, by decide⟩ : Fin 2) n
+      = n / 2 + (if 1 < n % 2 then 1 else 0) := by
+  simp [evenOddSchedule, quota_roundRobin_closed]
+
+/-! ### Tiny "examples as tests" (compile-time checks) -/
+
+-- Example: with k = 3, the 5th step hits axis 2.
+example : (roundRobin 3 (by decide)).assign 5 = ⟨2, by decide⟩ := by
+  simp [roundRobin_assign]
+
+-- Example: with k = 3, axis 1 has quota 3 at time n = 8
+-- (positions ≡ 1 mod 3 in {0,…,7} are 1,4,7).
+example : quota (roundRobin 3 (by decide)) ⟨1, by decide⟩ 8 = 3 := by
+  -- 8 / 3 = 2, 8 % 3 = 2, and 1 < 2 → +1
+  simp [quota_roundRobin_closed]
+
 end Papers.P4Meta
