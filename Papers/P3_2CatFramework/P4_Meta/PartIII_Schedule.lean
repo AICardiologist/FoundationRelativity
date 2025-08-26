@@ -453,9 +453,25 @@ example : quota (roundRobin 3 (by decide)) ⟨1, by decide⟩ 8 = 3 := by
 
 /-! ### 2-ary (even/odd) wrappers -/
 
--- Note: These convenience theorems are provided as helpers but aren't essential.
--- They demonstrate that evenOddSchedule behaves exactly like fuseSteps.
--- The proofs require careful handling of division/modulo arithmetic.
+/-- Even/odd block start: at `2 * n`, axis `0`, local index `n`. -/
+@[simp] theorem evenOdd_bridge_even (axes : Fin 2 → Nat → Formula) (n : Nat) :
+    scheduleSteps evenOddSchedule axes (2 * n) = axes ⟨0, by decide⟩ n := by
+  -- `2 * n = 2 * n + 0`, apply the block bridge with `i = 0`.
+  simp only [evenOddSchedule]
+  -- Use the already-proven roundRobin_block_start_bridge
+  exact roundRobin_block_start_bridge (by decide : 0 < 2) axes n
+
+/-- Even/odd offset: at `2 * n + 1`, axis `1`, local index `n`. -/
+@[simp] theorem evenOdd_bridge_odd (axes : Fin 2 → Nat → Formula) (n : Nat) :
+    scheduleSteps evenOddSchedule axes (2 * n + 1) = axes ⟨1, by decide⟩ n := by
+  -- This is exactly the block bridge with `i = 1` (since `i.val = 1`).
+  simp only [evenOddSchedule]
+  -- Now we have scheduleSteps (roundRobin 2 _) axes (2 * n + 1)
+  -- We need to use the general roundRobin_block_bridge theorem
+  have := @roundRobin_block_bridge 2 (by decide : 0 < 2) axes ⟨1, by decide⟩ n
+  -- roundRobin_block_bridge says: scheduleSteps ... (k*n + i.val) = axes i n
+  -- With k=2, i=1, this gives: scheduleSteps ... (2*n + 1) = axes ⟨1,_⟩ n
+  exact this
 
 /-! ### Closed-form helpers (k = 2) -/
 
