@@ -103,4 +103,31 @@ example (k n : Nat) (hk : 0 < k) (axes : Fin k → Nat → Formula) :
     scheduleSteps (roundRobin k hk) axes (k * n) = axes ⟨0, hk⟩ n := by
   exact roundRobin_block_start_bridge hk axes n
 
+/-! ### Part 6 Sanity Tests -/
+
+-- Block-closed quota, k = 3, axis 1
+example (n r : Nat) (hr : r ≤ 3) :
+    quota (roundRobin 3 (by decide)) ⟨1, by decide⟩ (3*n + r)
+      = n + (if 1 < r then 1 else 0) := by
+  exact quota_rr_block_closed 3 (by decide) ⟨1, by decide⟩ n r hr
+
+-- Feasibility form at a concrete time
+example (q : Fin 3 → Nat) :
+    (∀ i, q i ≤ quota (roundRobin 3 (by decide)) i 8)
+      ↔ (∀ i, q i ≤ 8 / 3 + (if i.val < 8 % 3 then 1 else 0)) := by
+  exact quotas_reach_targets_iff 3 (by decide) q 8
+
+-- Test packed achievability for k=3, H=5, S=2
+-- This means axes 0,1 need height 5, axis 2 needs ≤ 4
+-- Should be achievable at time 3*(5-1)+2 = 14
+example :
+    ∀ i, (if i.val < 2 then 5 else 4) ≤ quota (roundRobin 3 (by decide)) i 14 := by
+  have := @quotas_reach_targets_packed 3 (by decide : 0 < 3) 
+    (fun i => if i.val < 2 then 5 else 4) 5 2 (by decide : 2 ≤ 3)
+  have h_bound : ∀ (i : Fin 3), (if i.val < 2 then 5 else 4) ≤ 5 := by
+    intro i; by_cases h : i.val < 2 <;> simp [h]
+  have h_pack : ∀ (i : Fin 3), (if i.val < 2 then 5 else 4) = 5 ↔ i.val < 2 := by
+    intro i; by_cases h : i.val < 2 <;> simp [h]
+  exact this h_bound h_pack
+
 end Papers.P4Meta

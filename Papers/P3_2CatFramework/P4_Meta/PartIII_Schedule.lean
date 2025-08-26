@@ -519,6 +519,7 @@ enabling sharp finish-time results and generalizing the binary product height th
   exact h1
 
 /-- **Target characterization at time `n`.**
+    Rewrites feasibility at time n to a closed-form inequality in n / k and n % k.
     Writing `n = k*(n/k) + n%k`, quotas meet targets `q` iff
     each `q i` fits into the `(n/k)` full cycles plus the 1-step prefix of length `n%k`. -/
 theorem quotas_reach_targets_iff
@@ -549,5 +550,50 @@ The proof strategy:
 1. Upper bound: Show quotas reach targets at N* by placing maximal axes first
 2. Lower bound: Show any n < N* leaves at least one maximal axis short
 -/
+
+/-- **Packed achievability (reindexed, Finset-free).**
+If the axes with maximal demand `H` are exactly the first `S` indices (after reindexing),
+then at time `k*(H-1) + S` all targets are met. The case `H = 0` is trivial (time `0`). -/
+theorem quotas_reach_targets_packed
+    (k : Nat) (hk : 0 < k) (h : Fin k → Nat)
+    (H S : Nat) (hS : S ≤ k)
+    (bound : ∀ i, h i ≤ H)
+    (pack  : ∀ i, (h i = H) ↔ i.val < S) :
+  (∀ i, h i ≤ quota (roundRobin k hk) i (k * (H - 1) + S)) := by
+  intro i
+  -- Closed form inside the block whose index is (H-1) and offset S
+  have hquota :
+      quota (roundRobin k hk) i (k * (H - 1) + S)
+        = (H - 1) + (if i.val < S then 1 else 0) :=
+    quota_rr_block_closed (k := k) (hk := hk) (i := i) (n := H - 1) (r := S) hS
+  -- Is `i` one of the S maximal-demand axes?
+  by_cases hi : i.val < S
+  · -- Maximal axis: needs `H`, quota gives `(H-1)+1 = H`.
+    have hi_eq : h i = H := (pack i).mpr hi
+    rw [hquota, hi_eq]
+    simp only [hi, if_true]
+    -- Need to handle the case where H = 0 separately
+    by_cases hH : H = 0
+    · simp [hH]
+    · have : H - 1 + 1 = H := Nat.sub_add_cancel (Nat.pos_of_ne_zero hH)
+      rw [this]
+      -- Goal is now H ≤ H which is trivial
+      exact Nat.le_refl H
+  · -- Non-max axis: `h i ≤ H-1`.
+    have hi_ne : h i ≠ H := by
+      intro hEq; exact hi ((pack i).mp hEq)
+    have hi_ltH : h i < H := Nat.lt_of_le_of_ne (bound i) hi_ne
+    -- For H > 0, we have h i ≤ H - 1
+    by_cases hH : H = 0
+    · -- If H = 0, then h i = 0 (since h i ≤ H = 0)
+      have hbound : h i ≤ 0 := by rw [← hH]; exact bound i
+      have : h i = 0 := Nat.eq_zero_of_le_zero hbound
+      simp [hquota, hi, this]
+    · -- H > 0, so h i < H implies h i ≤ H - 1
+      have hi_le : h i ≤ H - 1 := Nat.le_pred_of_lt hi_ltH
+      -- quota gives `(H-1)+0 = H-1`
+      rw [hquota]
+      simp [hi]
+      exact hi_le
 
 end Papers.P4Meta
