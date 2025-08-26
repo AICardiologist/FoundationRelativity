@@ -65,6 +65,9 @@
 1. **Ladder Algebra (Part III)**
    - `ExtendIter`: Iterated single-axiom theory extension
    - `HeightCertificate`: Upper bound tracking with provenance
+   - **NEW**: `Schedule` structure for k-ary proof scheduling
+   - **NEW**: Quota invariants tracking axis appearances
+   - **NEW**: Complete proof that k=2 schedule ≡ fuseSteps (sorry-free)
    - `concatSteps`: Two-phase ladder composition at stage k
    - Complete prefix/tail theorems with @[simp] automation
    - Normal forms (StepNF) with canonical representation
@@ -106,6 +109,7 @@ Papers/P3_2CatFramework/
 │   ├── Meta_Signature.lean        # Theory/Extend mechanism
 │   ├── Meta_Ladders.lean          # ProofHeight calculus
 │   ├── PartIII_Certificates.lean  # Height certificates
+│   ├── PartIII_Schedule.lean      # k-ary schedules with quota invariants (0 sorries!)
 │   ├── PartIII_Concat.lean        # Two-phase composition
 │   ├── PartIII_NormalForm.lean    # Canonical representations (0 sorries!)
 │   ├── PartIII_ProductSup.lean    # Pair certificates
@@ -252,6 +256,54 @@ This paper establishes:
 - General ladder implementation
 - Higher axes and calibrators
 - Integration with pathology examples from Papers 1 & 2
+
+---
+
+## 🆕 New Calibration Program
+
+### Stone Window Calibration (Under Development)
+**New Result in Progress**: Surjectivity of the Stone quotient map for block-finite support ideals implies WLPO.
+- Defined specific block-finite ideal with blocks [0,9], [10,19], ...
+- Interface axiom `stone_BFI_implies_WLPO`: reduction from binary sequences to Stone surjectivity
+- Height certificate interface: WLPO at height 1 from Stone_BFI
+- Contrast theorem: rational-valued idempotents are constructively surjective
+- **Status**: Paper proof sketch complete; formal Lean proof pending
+
+This represents a new calibration program with the reduction interface established.
+
+## 📋 Verification Ledger (P4_Meta)
+
+### Formalized (no sorries)
+- Ladder algebra (ExtendIter, HeightCertificate, concatSteps)
+- Normal forms with reassociation theorems
+- Theory order: ≤ᵀ, ≃ᵀ with helper lemmas
+- ω-limit theory: Extendω with instance-wise reflection
+- ω+ε theory: ExtendωPlus with complete API
+- Positive families: PosFam with union operations
+- Provability congruences for step equality
+- Certificate push to ω/ω+ε: certToOmega, certToOmegaPlus
+- **RFN_Σ¹ ⇒ Con**: Schematic semantic proof (de-axiomatized)
+
+### Named Axioms/Interfaces
+- `TrueInN : Formula → Prop` - Truth in standard model
+- `Bot : Formula` - Canonical contradiction
+- `Bot_is_FalseInN : ¬ TrueInN Bot` - Bot is false in ℕ
+- `instIsSigma1Bot : IsSigma1 Bot` - Bot is Σ¹
+- `AxisIndependent` - Independence assumption for product heights
+- `StoneSurj : Type → Prop` - Stone window surjectivity predicate
+- `FT : Formula`, `DCω : Formula` - Calibrator axioms (analytic)
+
+### How to Use ω+ε in Practice
+To transport provability across step rewrites that are equal only up to a bound, use `ExtendωPlus_provable_congr_up_to ε h _`, where `h : ∀ n i, i < n + ε → A i = B i`. It specializes the full congruence to the existence-witnessed stage in the ω+ε definition and avoids global pointwise assumptions.
+- `UCT01 : Formula`, `BairePinned : Formula` - Pinned calibrator targets
+- `uct_upper_from_FT_cert`, `baire_upper_from_DCω_cert` - Named upper-bound certificates
+
+### Paper-only (cited)
+- G1/G2 lower bounds at r.e. stages
+- Failure of UCT under ¬FT
+- Failure of Baire under ¬DC_ω
+- Stone-surjectivity lower bounds for general support ideals
+- Model-theoretic independence results
 
 ---
 

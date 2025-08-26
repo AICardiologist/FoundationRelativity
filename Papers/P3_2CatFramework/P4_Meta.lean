@@ -11,6 +11,7 @@ import Papers.P3_2CatFramework.P4_Meta.PartIII_Certificates
 import Papers.P3_2CatFramework.P4_Meta.PartIII_Ladders
 import Papers.P3_2CatFramework.P4_Meta.PartIII_ProductSup
 import Papers.P3_2CatFramework.P4_Meta.PartIII_MultiSup
+import Papers.P3_2CatFramework.P4_Meta.PartIII_ProductHeight
 import Papers.P3_2CatFramework.P4_Meta.PartIII_Concat
 import Papers.P3_2CatFramework.P4_Meta.PartIII_NormalForm
 import Papers.P3_2CatFramework.P4_Meta.PartIII_PosFam
@@ -20,5 +21,8 @@ import Papers.P3_2CatFramework.P4_Meta.PartV_Reflection
 import Papers.P3_2CatFramework.P4_Meta.PartV_Collision
 import Papers.P3_2CatFramework.P4_Meta.PartV_Strictness
 import Papers.P3_2CatFramework.P4_Meta.StoneWindow
+import Papers.P3_2CatFramework.P4_Meta.PartVI_Calibrators
+import Papers.P3_2CatFramework.P4_Meta.PartVI_StoneCalibration
+import Papers.P3_2CatFramework.P4_Meta.PartVI_FT_to_UCT
 -- Note: P3_P4_Bridge is not imported here to avoid cycles
 -- Paper 3 files import P4_Meta, then P3_P4_Bridge separately if needed

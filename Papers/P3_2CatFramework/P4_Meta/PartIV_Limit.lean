@@ -246,6 +246,52 @@ theorem Extendω_is_lub
   ⟨ (by intro ψ hψ; exact (ExtendωPlus_provable_congr (T := T) (A := A) (B := B) ε h ψ).1 hψ)
    ,(by intro ψ hψ; exact (ExtendωPlus_provable_congr (T := T) (A := A) (B := B) ε h ψ).2 hψ) ⟩
 
+  /-- Congruence for ω+ε using only *bounded* agreement:
+      if `A` and `B` agree on all indices `< (n + ε)` for each witness `n`,
+      then ω+ε-provability transports. -/
+  @[simp] theorem ExtendωPlus_provable_congr_up_to
+    {T : Theory} {A B : Nat → Formula} (ε : Nat)
+    (h : ∀ n i, i < n + ε → A i = B i) (ψ : Formula) :
+    (ExtendωPlus T A ε).Provable ψ ↔ (ExtendωPlus T B ε).Provable ψ := by
+    constructor
+    · intro hA
+      obtain ⟨n, hn⟩ := hA
+      refine ⟨n, ?_⟩
+      -- stagewise transport at `n+ε` using bounded pointwise equality
+      have hstage :=
+        ExtendIter_congr (T := T) (A := A) (B := B) (n := n + ε)
+          (fun i hi => h n i hi)
+      -- rewrite the stage theory and reuse the proof
+      rw [← hstage]; exact hn
+    · intro hB
+      obtain ⟨n, hn⟩ := hB
+      refine ⟨n, ?_⟩
+      have hstage :=
+        ExtendIter_congr (T := T) (A := B) (B := A) (n := n + ε)
+          (fun i hi => (h n i hi).symm)
+      rw [← hstage]; exact hn
+
+  /-- ExtendωPlus embeds into Extendω (reusable inclusion). -/
+  theorem ExtendωPlus_le_omega {T : Theory} {step : Nat → Formula} (ε : Nat) :
+    ExtendωPlus T step ε ≤ᵀ Extendω T step := by
+    intro ψ ⟨n, hn⟩
+    exact ⟨n + ε, hn⟩
+
+  /-- Extendω embeds into ExtendωPlus (reverse inclusion). -/
+  theorem Extendω_le_omegaPlus {T : Theory} {step : Nat → Formula} (ε : Nat) :
+    Extendω T step ≤ᵀ ExtendωPlus T step ε := by
+    intro ψ ⟨m, hm⟩
+    by_cases h : ε ≤ m
+    · exact ⟨m - ε, by simpa [Nat.sub_add_cancel h] using hm⟩
+    · exact ⟨0, ExtendIter_le_mono (T := T) (step := step)
+              (by simp only [Nat.zero_add]; exact Nat.le_of_lt (Nat.lt_of_not_le h)) hm⟩
+
+  /-- ExtendωPlus with finite ε is equivalent to Extendω.
+      This follows from monotonicity: any stage n+ε embeds into ω,
+      and ω already contains all finite stages including ε itself. -/
+  theorem ExtendωPlus_equiv_omega {T : Theory} {step : Nat → Formula} (ε : Nat) :
+    ExtendωPlus T step ε ≃ᵀ Extendω T step :=
+    ⟨ExtendωPlus_le_omega ε, Extendω_le_omegaPlus ε⟩
   /-- Push a single certificate to `ω+ε`. -/
   theorem certToOmegaPlus
     {T : Theory} {step : Nat → Formula} {φ : Formula}

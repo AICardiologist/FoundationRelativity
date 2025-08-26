@@ -19,6 +19,11 @@
   - `ExtendIter_succ_mono`, `ExtendIter_le_mono` (stage monotonicity)
   - `ExtendIter_congr` (pointwise congruence)  
   - `HeightCertificate.lift`, `.transport` + @[simp] stage facts
+- **k-ary Schedules** (NEW):
+  - `Schedule k`: Map stages to k axes with quota tracking
+  - `roundRobin`: Axis i appears at stages k*n+i
+  - Complete proof: k=2 schedule ≡ fuseSteps pattern
+  - Quota invariants proven by induction
 - **Products/Sup**:
   - `combineCertificates` (pair) + `HeightCertificatePair.lift/.transport`
   - N-ary aggregator with max-stage summary
@@ -77,18 +82,6 @@
 - General ladder machinery and orthogonal profiles
 - Higher calibrators (UCT/FT, Baire/DC_ω axes)
 - Independence assumptions and model-existence arguments
-
-## 🎯 P4_Meta Framework Status: CAMERA-READY ✅
-
-The P4_Meta framework is now complete with all planned features implemented:
-
-### Completed Features (All Immediate Goals Achieved)
-- ✅ **Right-nest reassociation**: `concat_right_nest_eq` with stage corollary
-- ✅ **Bulk certificate operations**: `certsToOmega`, `certsToOmegaPlus`
-- ✅ **Full ω+ε infrastructure**: ExtendωPlus with complete API
-- ✅ **Theory order/equivalence**: ≤ᵀ and ≃ᵀ with helper lemmas
-- ✅ **Positive families**: PosFam with union and batch operations
-- ✅ **50+ smoke tests**: All passing with comprehensive coverage
 
 ### Build Quality
 - **0 Sorries**: Complete implementation

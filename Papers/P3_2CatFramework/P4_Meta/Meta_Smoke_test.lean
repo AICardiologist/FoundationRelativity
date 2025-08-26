@@ -290,4 +290,82 @@ section LPOPackTest
   #check packedAtOmega.2  -- filler at ω
 end LPOPackTest
 
+-- RFN ⇒ Con smoketest (schematic)
+section RFNConTests
+  open Papers.P4Meta
+  variable (Text Tbase : Theory) (h : HasRFN_Sigma1 Text Tbase)
+  example : Con Tbase := RFN_implies_Con Text Tbase h
+end RFNConTests
+
+-- UCT / Baire calibrator smoketests
+section CalibratorTests
+  open Papers.P4Meta
+
+  -- UCT at ω and ω+1 from FT
+  example : (Extendω Paper3Theory (ftSteps Paper3Theory)).Provable UCT01 := 
+    UCT_at_omega Paper3Theory
+  example : (ExtendωPlus Paper3Theory (ftSteps Paper3Theory) 1).Provable UCT01 := 
+    UCT_at_omegaPlus Paper3Theory 1
+
+  -- Baire at ω and ω+2 from DC_ω
+  example : (Extendω Paper3Theory (dcωSteps Paper3Theory)).Provable BairePinned := 
+    Baire_at_omega Paper3Theory
+  example : (ExtendωPlus Paper3Theory (dcωSteps Paper3Theory) 2).Provable BairePinned := 
+    Baire_at_omegaPlus Paper3Theory 2
+
+  -- PosFam basic checks
+  noncomputable example : UCT_posFam Paper3Theory = [⟨UCT01, uct_upper_from_FT_cert Paper3Theory⟩] := rfl
+  noncomputable example : Baire_posFam Paper3Theory = [⟨BairePinned, baire_upper_from_DCω_cert Paper3Theory⟩] := rfl
+end CalibratorTests
+
+-- Stone window calibration test
+section StoneCalibrationTest
+  open Papers.P4Meta
+  
+  -- Check that the Stone calibration theorem type-checks
+  #check stone_BFI_implies_WLPO
+  #check stone_BFI_height_cert
+  
+  -- Verify the height certificate structure
+  example : stone_BFI_height_cert.n = 1 := rfl
+  
+  -- Check the rational constructive case
+  #check rational_stone_constructive
+  
+  -- Demonstrate that WLPO is at height 1 from Stone_BFI
+  example : ∃ n, n = 1 ∧ 
+    HeightCertificate.n (stone_BFI_height_cert) = n := by
+    exact ⟨1, rfl, rfl⟩
+end StoneCalibrationTest
+
+-- Bounded congruence test for ω+ε
+section BoundedCongruenceTest
+  open Papers.P4Meta
+  
+  -- Define two step ladders that agree only up to a bound
+  def S₁ : Nat → Formula
+  | 0 => Formula.atom 600
+  | 1 => Formula.atom 601
+  | _ => Formula.atom 602
+  
+  def S₂ : Nat → Formula
+  | 0 => Formula.atom 600
+  | 1 => Formula.atom 601
+  | _ => Formula.atom 602
+  
+  -- They agree pointwise (trivially in this example)
+  theorem S₁_eq_S₂ : S₁ = S₂ := rfl
+  
+  -- Bounded congruence: use agreement only up to the witnessing stage
+  example (ψ : Formula) :
+      (ExtendωPlus Paper3Theory S₁ 2).Provable ψ ↔
+      (ExtendωPlus Paper3Theory S₂ 2).Provable ψ := by
+    -- From earlier: S₁_eq_S₂ : S₁ = S₂
+    have hpt : ∀ n i, i < n + 2 → S₁ i = S₂ i := by
+      intro n i _; simpa using congrArg (fun f => f i) S₁_eq_S₂
+    simpa using
+      Papers.P4Meta.ExtendωPlus_provable_congr_up_to
+        (T := Paper3Theory) (A := S₁) (B := S₂) (ε := 2) hpt ψ
+end BoundedCongruenceTest
+
 end Papers.P4Meta.Tests

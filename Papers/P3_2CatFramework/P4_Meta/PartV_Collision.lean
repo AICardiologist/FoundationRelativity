@@ -12,6 +12,19 @@ namespace Papers.P4Meta.PartV
 
 open Papers.P4Meta
 
+/-- Convenience wrapper: use the schematic RFNΣ¹ ⇒ Con inside collision proofs. -/
+theorem Con_of_RFN_semantic (Text Tbase : Theory)
+  (h : HasRFN_Sigma1 Text Tbase) : Papers.P4Meta.Con Tbase :=
+  RFN_implies_Con Text Tbase h
+
+/-- Shorthand: semantic consistency from RFNΣ¹, with namespace‑qualified `Con`. -/
+@[simp] theorem Con_of_RFN (Text Tbase : Theory)
+  (h : HasRFN_Sigma1 Text Tbase) : Papers.P4Meta.Con Tbase :=
+  Con_of_RFN_semantic Text Tbase h
+
+-- (Optional) If older proofs assumed a bare `Con T`, you can now pass `Con_of_RFN Text T h`.
+-- No other changes needed here; proofs can remain as-is.
+
 /-- Reflection step: Adding RFN_Σ₁(T) allows proving Con(T) -/
 theorem reflection_implies_consistency (T : Theory) [HBL T] [RE T] 
     [CodesProofs T] [Sigma1Sound T] :
