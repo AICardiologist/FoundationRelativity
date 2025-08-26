@@ -62,9 +62,11 @@ theorem quota_succ {k} (σ : Schedule k) (i : Fin k) (m : Nat) :
 
 /-! ### Even/odd schedule ↔ fuseSteps (k = 2) -/
 
-/-- Axis picker for the even/odd schedule. -/
-def evenOddAxes (A B : Nat → Formula) : Fin 2 → (Nat → Formula) :=
-  fun i => if i.val = 0 then A else B
+/-- Axis picker for the even/odd schedule using pattern matching. -/
+def evenOddAxes (A B : Nat → Formula) : Fin 2 → (Nat → Formula)
+  | ⟨0, _⟩ => A
+  | ⟨1, _⟩ => B
+  | ⟨n+2, h⟩ => absurd h (by simp : ¬(n + 2 < 2))
 
 @[simp] theorem evenOdd_assign_even (n : Nat) :
   evenOddSchedule.assign (2*n) = (⟨0, by decide⟩ : Fin 2) := by
@@ -169,19 +171,22 @@ theorem evenOdd_matches_fuseSteps_even
   (A B : Nat → Formula) (n : Nat) :
   scheduleSteps evenOddSchedule (evenOddAxes A B) (2*n) = A n := by
   -- pick axis 0 and use its quota
-  unfold scheduleSteps evenOddAxes
+  unfold scheduleSteps
   rw [evenOdd_assign_even]
-  simp only [Fin.val_zero, if_pos, quota_evenOdd_zero_even]
+  -- evenOddAxes (⟨0, _⟩) = A and quota at even stage 2n is n
+  rw [quota_evenOdd_zero_even]
+  rfl
 
 /-- Odd case: stage `2n+1` runs axis B at index `n`. -/
 theorem evenOdd_matches_fuseSteps_odd
   (A B : Nat → Formula) (n : Nat) :
   scheduleSteps evenOddSchedule (evenOddAxes A B) (2*n+1) = B n := by
   -- pick axis 1 and use its quota
-  unfold scheduleSteps evenOddAxes
+  unfold scheduleSteps
   rw [evenOdd_assign_odd]
-  have : (⟨1, by decide⟩ : Fin 2).val = 1 := rfl
-  simp only [this, if_neg (by decide : ¬(1 = 0)), quota_evenOdd_one_odd]
+  -- evenOddAxes (⟨1, _⟩) = B and quota at odd stage 2n+1 is n
+  rw [quota_evenOdd_one_odd]
+  rfl
 
 private theorem twoDecomp (n : Nat) : ∃ m, n = 2*m ∨ n = 2*m + 1 := by
   -- We know n = (n/2)*2 + n%2 and n%2 < 2
@@ -221,5 +226,6 @@ theorem evenOdd_is_fuseSteps
   · -- odd
     simpa [hm, fuseSteps_odd] using
       evenOdd_matches_fuseSteps_odd A B m
+
 
 end Papers.P4Meta

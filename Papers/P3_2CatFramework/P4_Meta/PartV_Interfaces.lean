@@ -12,9 +12,9 @@ namespace Papers.P4Meta.PartV
 open Papers.P4Meta
 
 /-- Base "tags" for the schematic meta formulas. -/
-@[simp] def Con (T : Theory) : Formula := Formula.atom 200
-@[simp] def RFN_Sigma1 (T : Theory) : Formula := Formula.atom 201
-@[simp] def GodelSentence (T : Theory) : Formula := Formula.atom 202
+@[simp] def Con (_ : Theory) : Formula := Formula.atom 200
+@[simp] def RFN_Sigma1 (_ : Theory) : Formula := Formula.atom 201
+@[simp] def GodelSentence (_ : Theory) : Formula := Formula.atom 202
 
 /-- Derivability & rec. axiomatizability tags (schematic). -/
 class HBL (T : Theory) : Prop
