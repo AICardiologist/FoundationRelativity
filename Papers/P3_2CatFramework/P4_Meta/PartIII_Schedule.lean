@@ -249,5 +249,128 @@ theorem kDecomp (k : Nat) (hk : k > 0) (n : Nat) :
   ∃ q r, n = k * q + r ∧ r < k :=
   ⟨n / k, n % k, (Nat.div_add_mod n k).symm, Nat.mod_lt n hk⟩
 
+/-! ### k-ary round-robin: block structure and global bridge (Finset-free) -/
+
+/-- On the block starting at `k*n`, time `k*n + r` (with `r < k`) selects axis `r`. -/
+@[simp] theorem rr_assign_in_block (k n r : Nat) (hr : r < k) (hk : 0 < k) :
+    (roundRobin k hk).assign (k*n + r) = ⟨r, hr⟩ := by
+  apply Fin.ext
+  simp [roundRobin, Nat.add_mod, Nat.mul_mod_right, Nat.mod_eq_of_lt hr]
+
+/-- Arithmetic step for the "prefix count within a block". -/
+private theorem step_if (a r : Nat) :
+    (if a < r then 1 else 0) + (if a = r then 1 else 0)
+      = (if a < r+1 then 1 else 0) := by
+  classical
+  by_cases hlt : a < r
+  · have : a < r+1 := Nat.lt_trans hlt (Nat.lt_succ_self _)
+    have ne : a ≠ r := fun h => (show False from Nat.lt_irrefl _ (h ▸ hlt))
+    simp [hlt, ne, this]
+  · by_cases heq : a = r
+    · have : a < r+1 := by simp [heq]
+      simp [heq]
+    · have hge : r ≤ a := Nat.le_of_not_lt hlt
+      have hgt : r < a := Nat.lt_of_le_of_ne hge (Ne.symm heq)
+      have hnot : ¬ a < r+1 := Nat.not_lt.mpr (Nat.succ_le_of_lt hgt)
+      simp [hlt, heq, hnot]
+
+/-- Fold `quota_succ` across the first `r` steps of a block, measured from `k*n`. -/
+private theorem rr_quota_prefix_rel (k : Nat) (hk : 0 < k) (i : Fin k) (n : Nat) :
+    ∀ r, r ≤ k →
+      quota (roundRobin k hk) i (k*n + r)
+        = quota (roundRobin k hk) i (k*n) + (if i.val < r then 1 else 0)
+  | 0, _ => by simp
+  | r+1, hr => by
+      have hr' : r < k := Nat.lt_of_succ_le hr
+      have ih := rr_quota_prefix_rel k hk i n r (Nat.le_of_succ_le hr)
+      have A : (roundRobin k hk).assign (k*n + r) = ⟨r, hr'⟩ :=
+        rr_assign_in_block k n r hr' hk
+      calc
+        quota (roundRobin k hk) i (k*n + (r+1))
+            = quota (roundRobin k hk) i ((k*n + r) + 1) := by
+                simp [Nat.add_assoc]
+        _   = quota (roundRobin k hk) i (k*n + r)
+              + (if (roundRobin k hk).assign (k*n + r) = i then 1 else 0) := by
+                exact quota_succ (σ := roundRobin k hk) (i := i) (m := k*n + r)
+        _   = (quota (roundRobin k hk) i (k*n)
+                + (if i.val < r then 1 else 0))
+              + (if ⟨r, hr'⟩ = i then 1 else 0) := by
+                simp [ih, A]
+        _   = quota (roundRobin k hk) i (k*n)
+              + ( (if i.val < r then 1 else 0)
+                  + (if i.val = r then 1 else 0) ) := by
+              -- turn equality of fins into equality of `val`
+              have : ((⟨r, hr'⟩ : Fin k) = i) ↔ (r = i.val) := by
+                constructor
+                · intro h; exact congrArg Fin.val h
+                · intro h; apply Fin.ext; simp [h]
+              by_cases hrv : r = i.val
+              · simp [hrv, Nat.add_comm]
+              · have neg1 : ¬(i.val = r) := fun h => hrv h.symm
+                have neg2 : ¬(⟨r, hr'⟩ : Fin k) = i := by
+                  intro h; apply hrv; exact congrArg Fin.val h
+                simp [neg1, neg2, Nat.add_comm]
+        _   = quota (roundRobin k hk) i (k*n)
+              + (if i.val < r+1 then 1 else 0) := by
+              simp only [← step_if]
+
+/-- Quota at block starts: after `k*n` steps, every axis has fired exactly `n` times. -/
+@[simp] theorem rr_quota_at_block_start (k : Nat) (hk : 0 < k) (i : Fin k) :
+    ∀ n, quota (roundRobin k hk) i (k*n) = n
+  | 0 => by simp
+  | n+1 => by
+      have h := rr_quota_prefix_rel k hk i n k (Nat.le_refl k)
+      have : (if i.val < k then 1 else 0) = 1 := by simp [i.isLt]
+      rw [this, rr_quota_at_block_start k hk i n] at h
+      -- Need to show: quota at k*(n+1) = n+1
+      -- We have: quota at k*n + k = n + 1
+      have eq : k * (n + 1) = k * n + k := by
+        simp [Nat.mul_succ, Nat.add_comm]
+      rw [eq]
+      exact h
+
+/-- Quota on your own axis inside the block: at `k*n + i.val` the local index is `n`. -/
+@[simp] theorem rr_quota_on_axis_at_boundary (k : Nat) (hk : 0 < k) (i : Fin k) (n : Nat) :
+    quota (roundRobin k hk) i (k*n + i.val) = n := by
+  have h := rr_quota_prefix_rel k hk i n i.val (Nat.le_of_lt i.isLt)
+  -- `i.val < i.val` is false
+  simp only [rr_quota_at_block_start k hk i n, Nat.lt_irrefl, if_false, Nat.add_zero] at h
+  exact h
+
+/-- **Block bridge:** at stage `k*n + i.val`, round-robin runs axis `i` at local index `n`. -/
+@[simp] theorem roundRobin_block_bridge
+    {k : Nat} (hk : 0 < k) (axes : Fin k → Nat → Formula) (i : Fin k) (n : Nat) :
+    scheduleSteps (roundRobin k hk) axes (k*n + i.val) = axes i n := by
+  -- axis chosen:
+  have A : (roundRobin k hk).assign (k*n + i.val) = i := by
+    apply Fin.ext
+    simp [roundRobin, Nat.add_mod, Nat.mul_mod_right, Nat.mod_eq_of_lt i.isLt]
+  -- local index:
+  have Q : quota (roundRobin k hk) i (k*n + i.val) = n :=
+    rr_quota_on_axis_at_boundary k hk i n
+  unfold scheduleSteps
+  simp [A, Q]
+
+/-- **Global bridge:** for any `n`, round-robin is exactly "remainder axis" with "block index".
+    At stage `n` it runs axis `n % k` at local index `n / k`. -/
+@[simp] theorem roundRobin_is_blocks
+    {k : Nat} (hk : 0 < k) (axes : Fin k → Nat → Formula) (n : Nat) :
+    scheduleSteps (roundRobin k hk) axes n
+      = axes ⟨n % k, Nat.mod_lt n hk⟩ (n / k) := by
+  -- We'll prove this using the decomposition n = k*(n/k) + n%k
+  have hn : n = k*(n / k) + n % k := (Nat.div_add_mod n k).symm
+  
+  -- Now rewrite using the decomposition
+  calc scheduleSteps (roundRobin k hk) axes n
+      = scheduleSteps (roundRobin k hk) axes (k*(n/k) + n%k) := by rw [← hn]
+    _ = axes ⟨n%k, Nat.mod_lt n hk⟩ (n/k) := by
+        -- By roundRobin_block_bridge with i = ⟨n%k, _⟩
+        -- Note: roundRobin_block_bridge takes i and yields axes i (n/k) at k*(n/k) + i.val
+        -- Here i.val = n%k
+        have eq_val : (⟨n%k, Nat.mod_lt n hk⟩ : Fin k).val = n%k := rfl
+        have eq_rw : k*(n/k) + (⟨n%k, Nat.mod_lt n hk⟩ : Fin k).val = k*(n/k) + n%k := by
+          rw [eq_val]
+        rw [← eq_rw]
+        exact roundRobin_block_bridge hk axes ⟨n%k, Nat.mod_lt n hk⟩ (n/k)
 
 end Papers.P4Meta
