@@ -115,7 +115,7 @@ A Framework Formalization with Structural Verification}
 \maketitle
 
 \begin{abstract}
-We present a Lean 4 formalization of the 2--categorical framework for foundation--relativity based on the WLPO\,$\leftrightarrow$\,Bidual Gap equivalence. This paper documents the successful mechanization of uniformization height theory, achieving the key result that the bidual gap has height exactly 1, with 0 sorries in completed components. We describe the architectural decisions, technical solutions, and unexpected improvements that emerged during formalization, including a rich automation framework with \texttt{@[simp]} tactics, complete ladder algebra with normal forms, and a lightweight order--theoretic layer. The formalization comprises over 4,400 lines of verified Lean code across 37+ files. \textbf{Status (January 27, 2025):} Parts I-VI are complete with 0 sorries, including the full Part 6B exact finish time characterization, Part V RFN→Con→Gödel collision chain, and Part VI FT→UCT reduction.
+We present a Lean 4 formalization of the 2--categorical framework for foundation--relativity based on the WLPO\,$\leftrightarrow$\,Bidual Gap equivalence. This paper documents the successful mechanization of uniformization height theory, achieving the key result that the bidual gap has height exactly 1, with 0 sorries in structural components. We describe the architectural decisions, technical solutions, and unexpected improvements that emerged during formalization, including a rich automation framework with \texttt{@[simp]} tactics, complete ladder algebra with normal forms, and a lightweight order--theoretic layer. The formalization comprises over 4,400 lines of verified Lean code across 37+ files. \textbf{Status (January 27, 2025):} Parts I-VI structural components complete, including Part 6B exact finish time characterization (0 sorries), Part V RFN→Con proven with Con→Gödel axiomatized, and Part VI FT→UCT reduction structure.
 \end{abstract}
 
 \begin{mdframed}[style=status]
@@ -435,10 +435,13 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
 \item[\textbf{TODO}] Integration with ProductHeight theorems
 \end{itemize}
 
-\subsection{Part V: Collision Theorems (COMPLETE)}
+\subsection{Part V: Collision Theorems (HYBRID)}
 
 \textbf{RFN→Con→Gödel Formalization}:
 \begin{itemize}
+\item \textbf{RFN→Con}: Fully proven with typeclasses (0 sorries)
+\item \textbf{Con→Gödel}: Axiomatized as classical result
+\item \textbf{Status}: Hybrid - first step proven, second step axiomatized
 \item[$\checkmark$] \texttt{reflection\_implies\_consistency}: RFN$_{\Sigma_1}$(T) proves Con(T) 
 \item[$\checkmark$] \texttt{collision\_chain}: Two-step proof of Gödel sentence via RFN→Con
 \item[$\checkmark$] \texttt{godel\_height\_bound}: G$_T$ has height $\leq$ 2 in double extension
