@@ -68,19 +68,29 @@ def evenOddAxes (A B : Nat → Formula) : Fin 2 → (Nat → Formula)
   | ⟨1, _⟩ => B
   | ⟨n+2, h⟩ => absurd h (by simp : ¬(n + 2 < 2))
 
+/-- Pattern matching on axis 0 selects A. -/
+@[simp] theorem evenOddAxes_zero (A B : Nat → Formula) :
+  evenOddAxes A B ⟨0, by decide⟩ = A := rfl
+
+/-- Pattern matching on axis 1 selects B. -/
+@[simp] theorem evenOddAxes_one (A B : Nat → Formula) :
+  evenOddAxes A B ⟨1, by decide⟩ = B := rfl
+
+/-- Round-robin on k=2 assigns axis 0 at even stages. -/
 @[simp] theorem evenOdd_assign_even (n : Nat) :
   evenOddSchedule.assign (2*n) = (⟨0, by decide⟩ : Fin 2) := by
   apply Fin.ext
   -- `roundRobin 2` assigns `n % 2`, so `2*n % 2 = 0`
   simp [evenOddSchedule, roundRobin, Nat.mul_mod_right]
 
+/-- Round-robin on k=2 assigns axis 1 at odd stages. -/
 @[simp] theorem evenOdd_assign_odd (n : Nat) :
   evenOddSchedule.assign (2*n+1) = (⟨1, by decide⟩ : Fin 2) := by
   apply Fin.ext
   -- `2*n+1 % 2 = 1`
   simp [evenOddSchedule, roundRobin, Nat.add_mod, Nat.mul_mod_right]
 
-/-- Across two steps, axis 0's quota increases by exactly 1 between even stages. -/
+/-- Two-step increment: axis 0's quota increases by exactly 1 between even stages. -/
 theorem quota_evenOdd_zero_step (n : Nat) :
   quota evenOddSchedule (⟨0, by decide⟩ : Fin 2) (2*n+2)
     = quota evenOddSchedule (⟨0, by decide⟩ : Fin 2) (2*n) + 1 := by
@@ -115,7 +125,7 @@ theorem quota_evenOdd_zero_step (n : Nat) :
     rw [quota_evenOdd_zero_step]
     rw [ih]
 
-/-- Across two steps, axis 1's quota increases by exactly 1 between odd stages. -/
+/-- Two-step increment: axis 1's quota increases by exactly 1 between odd stages. -/
 theorem quota_evenOdd_one_step (n : Nat) :
   quota evenOddSchedule (⟨1, by decide⟩ : Fin 2) (2*n+3)
     = quota evenOddSchedule (⟨1, by decide⟩ : Fin 2) (2*n+1) + 1 := by
@@ -167,26 +177,18 @@ def scheduleSteps {k : Nat} (σ : Schedule k) (axes : Fin k → (Nat → Formula
   fun n => axes (σ.assign n) (quota σ (σ.assign n) n)
 
 /-- Even case: stage `2n` runs axis A at index `n`. -/
-theorem evenOdd_matches_fuseSteps_even
+@[simp] theorem evenOdd_matches_fuseSteps_even
   (A B : Nat → Formula) (n : Nat) :
   scheduleSteps evenOddSchedule (evenOddAxes A B) (2*n) = A n := by
-  -- pick axis 0 and use its quota
   unfold scheduleSteps
-  rw [evenOdd_assign_even]
-  -- evenOddAxes (⟨0, _⟩) = A and quota at even stage 2n is n
-  rw [quota_evenOdd_zero_even]
-  rfl
+  simp only [evenOdd_assign_even, evenOddAxes_zero, quota_evenOdd_zero_even]
 
 /-- Odd case: stage `2n+1` runs axis B at index `n`. -/
-theorem evenOdd_matches_fuseSteps_odd
+@[simp] theorem evenOdd_matches_fuseSteps_odd
   (A B : Nat → Formula) (n : Nat) :
   scheduleSteps evenOddSchedule (evenOddAxes A B) (2*n+1) = B n := by
-  -- pick axis 1 and use its quota
   unfold scheduleSteps
-  rw [evenOdd_assign_odd]
-  -- evenOddAxes (⟨1, _⟩) = B and quota at odd stage 2n+1 is n
-  rw [quota_evenOdd_one_odd]
-  rfl
+  simp only [evenOdd_assign_odd, evenOddAxes_one, quota_evenOdd_one_odd]
 
 private theorem twoDecomp (n : Nat) : ∃ m, n = 2*m ∨ n = 2*m + 1 := by
   -- We know n = (n/2)*2 + n%2 and n%2 < 2
@@ -215,17 +217,19 @@ private theorem twoDecomp (n : Nat) : ∃ m, n = 2*m ∨ n = 2*m + 1 := by
           -- impossible: Nat.succ (Nat.succ k') < 2
           contradiction
 
-/-- The k=2 schedule (even/odd) exactly matches `fuseSteps`. -/
+/-- Bridge theorem: The k=2 schedule (even/odd) exactly matches `fuseSteps`.
+    This establishes that our general schedule framework correctly captures
+    the existing fuseSteps construction for 2-axis products. -/
 theorem evenOdd_is_fuseSteps
   {A B : Nat → Formula} (n : Nat) :
   scheduleSteps evenOddSchedule (evenOddAxes A B) n = fuseSteps A B n := by
   obtain ⟨m, hm | hm⟩ := twoDecomp n
-  · -- even
-    simpa [hm, fuseSteps_even] using
-      evenOdd_matches_fuseSteps_even A B m
-  · -- odd
-    simpa [hm, fuseSteps_odd] using
-      evenOdd_matches_fuseSteps_odd A B m
+  · -- even: n = 2*m
+    rw [hm]
+    simp [fuseSteps_even]
+  · -- odd: n = 2*m + 1
+    rw [hm]
+    simp [fuseSteps_odd]
 
 
 end Papers.P4Meta
