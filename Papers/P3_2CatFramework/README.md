@@ -116,11 +116,11 @@
    - `collision_chain`: Two-step proof of Gödel sentence via RFN→Con (0 sorries)
    - Complexity interfaces and strictness results
 
-5. **FT→UCT & Stone Calibration (Part VI) ✅ COMPLETE**
-   - `FT_implies_UCT`: Fan Theorem implies Uniform Continuity on [0,1] (0 sorries)
-   - `FT_to_UCT_cert`: Height certificate showing UCT at height 1 from FT (0 sorries)
-   - Stone window: Classical Boolean ring used as calibration program
-   - Provenance discipline for classical vs Lean-proved results
+5. **Part VI**
+   - ✅ `FT_implies_UCT`: Fan Theorem implies Uniform Continuity on [0,1] (0 sorries)
+   - ✅ `FT_to_UCT_cert`: Height certificate showing UCT at height 1 from FT (0 sorries)
+   - 🧭 Stone window (calibration program): classical isomorphism cited; constructive surjectivity intentionally \emph{not} claimed; density-zero conjecture recorded
+   - Provenance discipline for classical vs Lean-proved
 
 **Key Achievement**: Complete sorry-free implementation with robust elementary proofs
 

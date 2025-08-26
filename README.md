@@ -56,10 +56,10 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
   - **Part V**: ✅ Complete RFN→Con→Gödel collision chain (0 sorries)
     - `reflection_implies_consistency`: RFN_Σ₁(T) proves Con(T)
     - `collision_chain`: Two-step proof of Gödel sentence via RFN→Con
-  - **Part VI**: ✅ FT→UCT reduction formalized (0 sorries)
+  - **Part VI**: ✅ FT→UCT reduction formalized (0 sorries); Stone window included as a calibration program (no constructive surjectivity claim)
     - `FT_implies_UCT`: Fan Theorem implies Uniform Continuity on [0,1]
     - Height certificate showing UCT provable at height 1 from FT
-  - Part VI Stone window: Classical Boolean ring calibration program
+    - Stone window: Classical correspondence used as calibration tool
   - Provenance discipline: tracking classical vs Lean-proved results
   - **NEW**: k-ary schedule abstractions with quota invariants (PartIII_Schedule)
   - **NEW**: Complete proof that k=2 schedule exactly matches fuseSteps pattern

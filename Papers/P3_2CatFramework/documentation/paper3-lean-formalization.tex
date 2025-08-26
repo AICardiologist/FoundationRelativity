@@ -114,7 +114,7 @@ We present a Lean 4 formalization of the 2--categorical framework for foundation
 \item \textbf{Height = 1 theorem} fully verified
 \item \textbf{Part 6 complete:} Exact finish time $N^* = k(H-1) + S$ fully characterized
 \item \textbf{Part V complete:} RFN→Con→Gödel collision chain formalized
-\item \textbf{Part VI complete:} FT→UCT reduction with height certificate
+\item \textbf{Part VI:} FT→UCT reduction \textbf{complete}; Stone window included as a \emph{calibration program} (classical fact cited; constructive surjectivity left open)
 \item \textbf{7 integration sorries:} In glue code only (not proofs)
 \end{itemize}
 \textbf{Summary:} All core mathematics complete with 0 sorries, integration cleanup needed.
@@ -448,8 +448,79 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
 \item[$\checkmark$] Abstract interface avoiding heavy real number dependencies
 \end{itemize}
 
+\subsection{Stone window: classical fact and a constructive calibration (no new theorem)}
+\label{subsec:stone-window}
+
+\paragraph{Classical background (kept, cited).}
+Let $\mathcal I$ be an ideal on $\mathbb N$ and
+$I_{\mathcal I} \coloneqq \{x\in \ell^\infty : \{n : x_n\neq 0\}\in \mathcal I\}$.
+Classically one has a canonical bijection
+\[
+  \mathrm{Idem}\bigl(\ell^\infty / I_{\mathcal I}\bigr)
+  \;\cong\;
+  \mathcal P(\mathbb N)/\mathcal I,
+\]
+sending $[\chi_A]$ to the class of $A$ modulo~$\mathcal I$; idempotents in $\ell^\infty$ are precisely characteristic functions, and quotienting identifies sets that differ by an $\mathcal I$--small symmetric difference
+(see e.g.\ Gillman--Jerison, Conway, Hindman--Strauss for the classical theory). We do \emph{not} claim novelty here.
+
+\paragraph{Constructive caveat (BISH).}
+Two classical steps are delicate constructively:
+(i) from $x^2=x$ in $\mathbb R$ one infers $x\in\{0,1\}$ classically; the disjunction $x=0\vee x=1$
+can hide omniscience (WLPO/LPO) in BISH;
+(ii) surjectivity (``every idempotent class has a set representative'') selects sets from equivalence classes and can require extra uniformity/choice.
+Hence we treat the Stone window as a \emph{calibration program}, not as a new theorem.
+
+\paragraph{A concrete calibrator: the density--zero ideal.}
+Let $\mathcal Z$ be the ideal of sets of natural density~$0$.
+Fix a dyadic partition $(B_k)_{k\ge 0}$ of $\mathbb N_{\ge 1}$ into pairwise disjoint sets with densities
+$\mathrm{dens}(B_k)=2^{-(k+1)}$ (e.g.\ $B_k=\{n\ge1: v_2(n)=k\}$).
+Given a binary sequence $\alpha:\mathbb N\to\{0,1\}$, set
+$A_\alpha \coloneqq \bigcup_{\{k:\,\alpha(k)=1\}} B_k$ and $e_\alpha\coloneqq [\chi_{A_\alpha}]\in \ell^\infty/I_{\mathcal Z}$.
+
+\begin{lemma}[Dyadic encoding, constructive]
+For all $\alpha$:
+\begin{enumerate}
+\item $e_\alpha$ is idempotent;
+\item $e_\alpha=0$ iff $\forall k\,(\alpha(k)=0)$;
+\item if $\exists k\,(\alpha(k)=1)$ then $A_\alpha\notin \mathcal Z$ (hence $e_\alpha\neq 0$).
+\end{enumerate}
+\end{lemma}
+\begin{proof}[Sketch]
+Disjointness makes $\chi_{A_\alpha}$ idempotent pointwise.
+If $\alpha\equiv 0$ then $A_\alpha=\varnothing$.
+Conversely, if some $\alpha(k)=1$, then $A_\alpha$ has positive density
+($\mathrm{dens}(A_\alpha)=\sum_{k:\alpha(k)=1}2^{-(k+1)}>0$),
+so $A_\alpha\notin\mathcal Z$.
+\end{proof}
+
+\paragraph{Calibration claim (what we test).}
+We use the encoding to measure the strength of surjectivity in BISH:
+\begin{conjecture}[Surjectivity for $\mathcal Z$ needs WLPO]
+\label{conj:surj-density-zero-WLPO}
+Over BISH, the statement
+``$\forall e\in \mathrm{Idem}(\ell^\infty/I_{\mathcal Z})\ \exists A\subseteq\mathbb N,\ e=[\chi_A]$''
+implies WLPO.
+\end{conjecture}
+\emph{Plan.} Given $\alpha$, form $e_\alpha$.
+Any uniform surjectivity procedure must return $A$ with $[\chi_A]=e_\alpha$.
+Then $\alpha\equiv 0\ \Leftrightarrow\ A\in\mathcal Z$,
+which yields a WLPO--style decision without producing a witness of $\alpha(k)=1$.
+We first verify a finitary truncation (finite dyadic partition) and lift by compactness.
+
+\paragraph{Alternative (conditional) statement.}
+If one assumes a \emph{section} $s:\mathrm{Idem}(\ell^\infty/I_{\mathcal Z})\to\mathcal P(\mathbb N)$
+with $[\chi_{s(e)}]=e$ for all $e$, then the above reduction yields WLPO provided the output $A=s(e)$
+comes with a decidable density predicate.
+This makes explicit the extra uniformity the classical proof tacitly uses.
+
+\begin{mdframed}[style=status]
+\textbf{How we use the Stone window.}
+We keep the classical isomorphism as background/citation; we do \emph{not} assert a new constructive theorem.
+Instead, we use it to calibrate which constructive principles (e.g.\ WLPO) are needed to recover surjectivity for concrete ideals like $\mathcal Z$.
+\end{mdframed}
+
 \begin{mdframed}[style=achievement]
-\textbf{Achievement}: The P4\_Meta framework Parts I-VI are 100\% complete with 0 sorries, including full exact finish time characterization, collision theorems, and FT→UCT reduction.
+\textbf{Achievement}: The P4\_Meta framework Parts I-VI are 100\% complete with 0 sorries, including full exact finish time characterization, collision theorems, and FT→UCT reduction. The Stone window serves as a calibration program, not a claimed new theorem.
 \end{mdframed}
 %===========================================================
 \section{Technical Challenges and Solutions}
