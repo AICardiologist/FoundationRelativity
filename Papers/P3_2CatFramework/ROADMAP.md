@@ -1,6 +1,6 @@
 # Paper 3: Development Roadmap
 
-## 📍 Current Position (January 2025)
+## 📍 Current Position (January 27, 2025)
 
 ### ✅ Completed
 
@@ -11,7 +11,14 @@
 - **Truth groupoid**: With @[simp] automation
 - **CI integration**: All tests passing, no import cycles
 
-#### P4_Meta Framework (Parts III-VI) - COMPLETE ✅
+#### P4_Meta Framework Schedule Mathematics Status
+**Parts 1-5**: ✅ COMPLETE - Full infrastructure with round-robin, quotas, bridges
+**Part 6A**: ✅ COMPLETE - Upper bound theorems (block-closed, feasibility, packed achievability)
+**Part 6B**: 🚧 IN PROGRESS - Lower bound proof needed
+**Part 6C**: 🚧 TODO - Permutation lemma with Finset
+**Part 6D**: 🚧 TODO - Integration with ProductHeight theorems
+
+#### P4_Meta Framework (Other Parts) - COMPLETE ✅
 **Build health**: All modules compile cleanly, 0 sorries, smoke tests pass
 
 **Part III - Ladder Algebra (Complete)**
@@ -19,11 +26,21 @@
   - `ExtendIter_succ_mono`, `ExtendIter_le_mono` (stage monotonicity)
   - `ExtendIter_congr` (pointwise congruence)  
   - `HeightCertificate.lift`, `.transport` + @[simp] stage facts
-- **k-ary Schedules** (NEW):
-  - `Schedule k`: Map stages to k axes with quota tracking
-  - `roundRobin`: Axis i appears at stages k*n+i
-  - Complete proof: k=2 schedule ≡ fuseSteps pattern
-  - Quota invariants proven by induction
+- **k-ary Schedules**:
+  - **Parts 1-5 Infrastructure ✅ COMPLETE**:
+    - `Schedule k`: Map stages to k axes with quota tracking
+    - `roundRobin`: Axis i appears at stages k*n+i with `roundRobin_assign` lemma
+    - Complete proof: k=2 schedule ≡ fuseSteps pattern
+    - Quota invariants proven by induction
+    - Block/bridge lemmas for clean testing
+  - **Part 6A Mathematical Results ✅ COMPLETE**:
+    - `quota_roundRobin_block_closed`: Quota at k·n+r = n + 𝟙[i<r]
+    - `quotas_reach_targets_iff`: Feasibility ↔ q(i) ≤ ⌊n/k⌋ + 𝟙[i<n mod k]
+    - `quotas_reach_targets_packed`: Upper bound at N* = k(H-1) + S (packed setting)
+  - **Part 6B-D 🚧 IN PROGRESS**:
+    - `quotas_not_reached_below_packed`: Lower bound (TODO)
+    - Exact finish time N* = k(H-1) + S characterization (TODO)
+    - Permutation lemma for general case (TODO with Finset)
 - **Products/Sup**:
   - `combineCertificates` (pair) + `HeightCertificatePair.lift/.transport`
   - N-ary aggregator with max-stage summary
@@ -83,11 +100,94 @@
 - Higher calibrators (UCT/FT, Baire/DC_ω axes)
 - Independence assumptions and model-existence arguments
 
-### Build Quality
-- **0 Sorries**: Complete implementation
-- **0 Errors**: All modules compile cleanly
-- **Minimal Warnings**: Only cosmetic linter hints
+### Build Quality (as of 2025-01-27)
+- **Mathematical Sorries**: 0 ✅ (all theorems proven)
+- **Integration Sorries**: 7 ⚠️ (glue code only)
+- **Build Errors**: 1 (P3_AllProofs.lean export issues)
+- **Warnings**: ~15 (minor style issues)
 - **Clean Architecture**: Single import surface via P4_Meta
+
+### ⚠️ Known Issues (2025-01-27)
+1. **Integration Sorries (7 total)**:
+   - Paper3_Integration.lean: 3 encoding placeholders
+   - Phase3_Obstruction.lean: 1 encoding placeholder
+   - P3_P4_Bridge.lean: 3 bridge connections
+   
+2. **P3_AllProofs.lean Errors**:
+   - Missing exports for: uniformization_height0, gap_has_height_one, etc.
+   - Theorems exist but aren't accessible due to missing exports
+   
+3. **Minor Warnings**:
+   - 6 unused variables in proofs
+   - 7 simpa vs simp linter suggestions
+   - 2 unused simp arguments
+
+4. **Axioms (~40 intentional)**:
+   - Classical mathematics interfaces
+   - Paper-proven results as axioms
+   - Meta-theoretic facts (collision theorems, calibrators)
+
+## 🎯 Part 6 Completion Roadmap (Priority - Based on Junior Professor Review)
+
+### Immediate Next Steps (Part 6B-D)
+
+#### 1. **Packed Lower Bound** (Finset-free, constructive)
+```lean
+theorem quotas_not_reached_below_packed
+  (k : Nat) (hk : 0 < k) (h : Fin k → Nat)
+  (H S : Nat) (hS : S ≤ k)
+  (bound : ∀ i, h i ≤ H)
+  (pack : ∀ i, (h i = H) ↔ i.val < S) :
+  ∀ {n}, n < k*(H-1) + S → ∃ i, h i > quota (roundRobin k hk) i n
+```
+- Use case analysis on n = k·m + r
+- If m ≤ H-2: all quotas ≤ H-1, pick any i < S
+- If m = H-1 and r < S: pick i = r, its quota is H-1
+
+#### 2. **Exact Finish Time** (Packed Case)
+```lean
+def Nstar (k H S : Nat) : Nat := if H = 0 then 0 else k*(H-1) + S
+
+theorem quotas_targets_exact_packed ... :
+  (∀ i, h i ≤ quota (roundRobin k hk) i n) ↔ Nstar k H S ≤ n
+```
+- Combine upper bound (`quotas_reach_targets_packed`) 
+- With lower bound (`quotas_not_reached_below_packed`)
+
+#### 3. **Permutation/Packing Lemma** (Small Finset module)
+- Create `PartVI_Finset.lean` (10-20 lines)
+- Prove existence of permutation e : Fin k ≃ Fin k
+- Such that (h (e i) = H) ↔ i.val < S
+- Apply packed exactness to permuted family
+
+#### 4. **Wire into ProductHeight**
+- State exact product height for k-ary products under AxisIndependent
+- Add k=2 corollaries (reduce to familiar 2H-1/2H cases)
+
+## 🔧 Issue Resolution Plan (Priority)
+
+### Immediate (1-3 days)
+1. **Fix P3_AllProofs.lean exports**:
+   - Add proper exports to Phase2_UniformHeight.lean
+   - Export theorem names from Phase3 modules
+   - Test that P3_AllProofs.lean compiles
+
+2. **Clean up warnings**:
+   - Replace simpa with simp where suggested
+   - Remove unused variables
+   - Fix unused simp arguments
+
+### Short-term (1 week)
+3. **Replace integration sorries**:
+   - Implement proper encoding functions in Paper3_Integration.lean
+   - Complete bridge connections in P3_P4_Bridge.lean
+   - Document the encoding strategy
+
+### Medium-term (2-4 weeks)
+4. **Documentation improvements**:
+   - Add docstrings to all public theorems
+   - Create API documentation for P4_Meta
+   - Write usage examples for key features
 
 ## 📅 Near-term Roadmap (1-2 weeks)
 
