@@ -372,5 +372,226 @@ private theorem rr_quota_prefix_rel (k : Nat) (hk : 0 < k) (i : Fin k) (n : Nat)
           rw [eq_val]
         rw [← eq_rw]
         exact roundRobin_block_bridge hk axes ⟨n%k, Nat.mod_lt n hk⟩ (n/k)
+/-! ### Closed-form and global assignment for round-robin (Finset-free) -/
 
+/-- Global assignment: round-robin picks the remainder axis. -/
+@[simp] theorem roundRobin_assign (k : Nat) (hk : 0 < k) (n : Nat) :
+    (roundRobin k hk).assign n = ⟨n % k, Nat.mod_lt n hk⟩ := by
+  apply Fin.ext
+  simp [roundRobin]
+
+/-- **Closed form for quotas.** For round-robin on `k>0`,
+    the quota on axis `i` after `n` steps is
+    `n / k + (if i.val < n % k then 1 else 0)`. -/
+@[simp] theorem quota_roundRobin_closed (k : Nat) (hk : 0 < k)
+    (i : Fin k) (n : Nat) :
+    quota (roundRobin k hk) i n
+      = n / k + (if i.val < n % k then 1 else 0) := by
+  -- decompose `n` into full blocks and remainder
+  have hn : n = k * (n / k) + n % k := (Nat.div_add_mod n k).symm
+  -- prefix relation inside the final block at base `k*(n/k)`
+  have hprefix :=
+    rr_quota_prefix_rel (k := k) (hk := hk) (i := i) (n := n / k)
+                        (r := n % k) (Nat.le_of_lt (Nat.mod_lt n hk))
+  -- base value at the block start
+  have hbase := rr_quota_at_block_start (k := k) (hk := hk) (i := i) (n := n / k)
+  
+  
+  -- assemble
+  calc quota (roundRobin k hk) i n 
+      = quota (roundRobin k hk) i (k * (n / k) + n % k) := by rw [← hn]
+    _ = quota (roundRobin k hk) i (k * (n / k)) + (if i.val < n % k then 1 else 0) := hprefix
+    _ = n / k + (if i.val < n % k then 1 else 0) := by rw [hbase]
+
+/-! ### Handy 2-ary corollaries (even/odd) -/
+
+-- Global assignment for k = 2
+@[simp] theorem evenOdd_assign_global (n : Nat) :
+    evenOddSchedule.assign n = ⟨n % 2, Nat.mod_lt n (by decide : 0 < 2)⟩ := by
+  simp [evenOddSchedule, roundRobin_assign]
+
+-- Closed form quotas for k = 2 (both axes, any `n`)
+@[simp] theorem quota_evenOdd_closed_axis0 (n : Nat) :
+    quota evenOddSchedule (⟨0, by decide⟩ : Fin 2) n
+      = n / 2 + (if 0 < n % 2 then 1 else 0) := by
+  simp [evenOddSchedule, quota_roundRobin_closed]
+
+@[simp] theorem quota_evenOdd_closed_axis1 (n : Nat) :
+    quota evenOddSchedule (⟨1, by decide⟩ : Fin 2) n
+      = n / 2 + (if 1 < n % 2 then 1 else 0) := by
+  simp [evenOddSchedule, quota_roundRobin_closed]
+
+/-! ### Tiny "examples as tests" (compile-time checks) -/
+
+-- Example: with k = 3, the 5th step hits axis 2.
+example : (roundRobin 3 (by decide)).assign 5 = ⟨2, by decide⟩ := by
+  simp [roundRobin_assign]
+
+-- Example: with k = 3, axis 1 has quota 3 at time n = 8
+-- (positions ≡ 1 mod 3 in {0,…,7} are 1,4,7).
+example : quota (roundRobin 3 (by decide)) ⟨1, by decide⟩ 8 = 3 := by
+  -- 8 / 3 = 2, 8 % 3 = 2, and 1 < 2 → +1
+  simp [quota_roundRobin_closed]
+
+/-! ## Convenience bridges for tests and rewrites -/
+
+/-- Block start: at `k * n`, we are on axis `0` with local index `n`. -/
+@[simp] theorem roundRobin_block_start_bridge
+    {k : Nat} (hk : 0 < k) (axes : Fin k → Nat → Formula) (n : Nat) :
+    scheduleSteps (roundRobin k hk) axes (k * n) = axes ⟨0, hk⟩ n := by
+  -- From the global bridge with `m := k*n`
+  simp [roundRobin_is_blocks, Nat.mul_mod_right, Nat.mul_div_right _ hk]
+
+/-- k = 1 specialization: always axis `0`, local index = time. -/
+@[simp] theorem roundRobin_k1_bridge (axes : Fin 1 → Nat → Formula) (n : Nat) :
+    scheduleSteps (roundRobin 1 (by decide)) axes n = axes ⟨0, by decide⟩ n := by
+  -- `n % 1 = 0`, `n / 1 = n`
+  have h1 : n % 1 = 0 := Nat.mod_one n
+  have h2 : n / 1 = n := Nat.div_one n
+  simp [roundRobin_is_blocks, h1, h2]
+
+/-! ### 2-ary (even/odd) wrappers -/
+
+/-- Even/odd block start: at `2 * n`, axis `0`, local index `n`. -/
+@[simp] theorem evenOdd_bridge_even (axes : Fin 2 → Nat → Formula) (n : Nat) :
+    scheduleSteps evenOddSchedule axes (2 * n) = axes ⟨0, by decide⟩ n := by
+  -- `2 * n = 2 * n + 0`, apply the block bridge with `i = 0`.
+  simp only [evenOddSchedule]
+  -- Use the already-proven roundRobin_block_start_bridge
+  exact roundRobin_block_start_bridge (by decide : 0 < 2) axes n
+
+/-- Even/odd offset: at `2 * n + 1`, axis `1`, local index `n`. -/
+@[simp] theorem evenOdd_bridge_odd (axes : Fin 2 → Nat → Formula) (n : Nat) :
+    scheduleSteps evenOddSchedule axes (2 * n + 1) = axes ⟨1, by decide⟩ n := by
+  -- This is exactly the block bridge with `i = 1` (since `i.val = 1`).
+  simp only [evenOddSchedule]
+  -- Now we have scheduleSteps (roundRobin 2 _) axes (2 * n + 1)
+  -- We need to use the general roundRobin_block_bridge theorem
+  have := @roundRobin_block_bridge 2 (by decide : 0 < 2) axes ⟨1, by decide⟩ n
+  -- roundRobin_block_bridge says: scheduleSteps ... (k*n + i.val) = axes i n
+  -- With k=2, i=1, this gives: scheduleSteps ... (2*n + 1) = axes ⟨1,_⟩ n
+  exact this
+
+/-! ### Closed-form helpers (k = 2) -/
+
+-- Note: The cleaner forms (n+1)/2 and n/2 require more complex proofs
+-- involving the identity (n+1)/2 = n/2 + n%2, which needs careful case analysis.
+-- For now we keep the original forms with the indicator functions,
+-- which are still quite usable in practice.
+
+/-! ### Equivalence between evenOddSchedule and fuseSteps -/
+
+/-- On even stages, `evenOddSchedule` and `fuseSteps` agree. -/
+@[simp] theorem evenOdd_eq_fuseSteps_even
+    (A B : Nat → Formula) (n : Nat) :
+  scheduleSteps evenOddSchedule (fun i => if i = 0 then A else B) (2 * n)
+    = fuseSteps A B (2 * n) := by
+  -- left side picks axis 0 at local index n
+  -- right side is `fuseSteps_even`
+  simp [evenOdd_bridge_even, fuseSteps_even]
+
+/-- On odd stages, `evenOddSchedule` and `fuseSteps` agree. -/
+@[simp] theorem evenOdd_eq_fuseSteps_odd
+    (A B : Nat → Formula) (n : Nat) :
+  scheduleSteps evenOddSchedule (fun i => if i = 0 then A else B) (2 * n + 1)
+    = fuseSteps A B (2 * n + 1) := by
+  -- left side picks axis 1 at local index n
+  -- right side is `fuseSteps_odd`
+  simp [evenOdd_bridge_odd, fuseSteps_odd]
+
+/-! ## Part 6: Block-closed quotas & target characterization
+
+These theorems characterize exactly when a k-ary product reaches target heights,
+enabling sharp finish-time results and generalizing the binary product height theorems.
+-/
+
+/-- Closed form *inside a block*: at time `k*n + r` (with `r ≤ k`),
+    the quota for axis `i` is `n + (if i.val < r then 1 else 0)`. -/
+@[simp] theorem quota_roundRobin_block_closed
+    (k : Nat) (hk : 0 < k) (i : Fin k) (n r : Nat) (hr : r ≤ k) :
+  quota (roundRobin k hk) i (k*n + r)
+    = n + (if i.val < r then 1 else 0) := by
+  -- Use rr_quota_prefix_rel and the fact that quota at block start is n
+  have h1 := rr_quota_prefix_rel k hk i n r hr
+  have h2 := rr_quota_at_block_start k hk i n
+  simp only [h2] at h1
+  exact h1
+
+/-- **Target characterization at time `n`.**
+    Rewrites feasibility at time n to a closed-form inequality in n / k and n % k.
+    Writing `n = k*(n/k) + n%k`, quotas meet targets `q` iff
+    each `q i` fits into the `(n/k)` full cycles plus the 1-step prefix of length `n%k`. -/
+theorem quotas_reach_targets_iff
+    (k : Nat) (hk : 0 < k) (q : Fin k → Nat) (n : Nat) :
+  (∀ i, q i ≤ quota (roundRobin k hk) i n)
+    ↔ (∀ i, q i ≤ n / k + (if i.val < n % k then 1 else 0)) := by
+  -- Use the global closed form of quotas already proved.
+  simp only [quota_roundRobin_closed]
+
+-- Note: A full monotonicity proof for quotas would require careful case analysis
+-- on the relationship between a%k and b%k. For now we focus on the key
+-- characterization theorems which are sufficient for the finish-time results.
+
+/-! ### Exact Finish Time Characterization
+
+The minimal time N* to reach target heights h : Fin k → ℕ has a clean closed form:
+- Let H = max_i h(i) and S = #{i : h(i) = H} (the number of maximal axes)
+- If we can reindex axes (symmetric product), then:
+  * N* = 0 if H = 0
+  * N* = k(H-1) + S if 1 ≤ S ≤ k-1
+  * N* = kH if S = k
+  
+This generalizes the binary case where:
+- If the unique max is on axis 0, we finish at 2H-1
+- If the unique max is on axis 1, we need 2H
+
+The proof strategy:
+1. Upper bound: Show quotas reach targets at N* by placing maximal axes first
+2. Lower bound: Show any n < N* leaves at least one maximal axis short
+-/
+
+/-- **Packed achievability (reindexed, Finset-free).**
+If the axes with maximal demand `H` are exactly the first `S` indices (after reindexing),
+then at time `k*(H-1) + S` all targets are met. The case `H = 0` is trivial (time `0`). -/
+theorem quotas_reach_targets_packed
+    (k : Nat) (hk : 0 < k) (h : Fin k → Nat)
+    (H S : Nat) (hS : S ≤ k)
+    (bound : ∀ i, h i ≤ H)
+    (pack  : ∀ i, (h i = H) ↔ i.val < S) :
+  (∀ i, h i ≤ quota (roundRobin k hk) i (k * (H - 1) + S)) := by
+  intro i
+  -- Closed form inside the block whose index is (H-1) and offset S
+  have hquota :
+      quota (roundRobin k hk) i (k * (H - 1) + S)
+        = (H - 1) + (if i.val < S then 1 else 0) :=
+    quota_roundRobin_block_closed (k := k) (hk := hk) (i := i) (n := H - 1) (r := S) hS
+  -- Is `i` one of the S maximal-demand axes?
+  by_cases hi : i.val < S
+  · -- Maximal axis: needs `H`, quota gives `(H-1)+1 = H`.
+    have hi_eq : h i = H := (pack i).mpr hi
+    rw [hquota, hi_eq]
+    simp only [hi, if_true]
+    -- Need to handle the case where H = 0 separately
+    by_cases hH : H = 0
+    · simp [hH]
+    · have : H - 1 + 1 = H := Nat.sub_add_cancel (Nat.pos_of_ne_zero hH)
+      rw [this]
+      -- Goal is now H ≤ H which is trivial
+      exact Nat.le_refl H
+  · -- Non-max axis: `h i ≤ H-1`.
+    have hi_ne : h i ≠ H := by
+      intro hEq; exact hi ((pack i).mp hEq)
+    have hi_ltH : h i < H := Nat.lt_of_le_of_ne (bound i) hi_ne
+    -- For H > 0, we have h i ≤ H - 1
+    by_cases hH : H = 0
+    · -- If H = 0, then h i = 0 (since h i ≤ H = 0)
+      have hbound : h i ≤ 0 := by rw [← hH]; exact bound i
+      have : h i = 0 := Nat.eq_zero_of_le_zero hbound
+      simp [hquota, hi, this]
+    · -- H > 0, so h i < H implies h i ≤ H - 1
+      have hi_le : h i ≤ H - 1 := Nat.le_pred_of_lt hi_ltH
+      -- quota gives `(H-1)+0 = H-1`
+      rw [hquota]
+      simp [hi]
+      exact hi_le
 end Papers.P4Meta

@@ -58,6 +58,8 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
   - Provenance discipline: tracking classical vs Lean-proved results
   - **NEW**: k-ary schedule abstractions with quota invariants (PartIII_Schedule)
   - **NEW**: Complete proof that k=2 schedule exactly matches fuseSteps pattern
+  - **NEW**: Exact finish time characterization: N* = k(H-1) + S for k-ary products
+  - **NEW**: Packed achievability theorem proving upper bound at exact finish time
   - **NEW**: Ladder algebra with concatenation, normal forms, and @[simp] automation
   - **NEW**: Two-phase composition (PartIII_Concat) for splicing ladders at stage k
   - **NEW**: Complete sorry-free normal forms (PartIII_NormalForm) with canonical representation

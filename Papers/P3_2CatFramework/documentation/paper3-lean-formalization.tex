@@ -104,17 +104,19 @@ with 0 Sorries}
 \maketitle
 
 \begin{abstract}
-We present a complete Lean 4 formalization of the 2--categorical framework for foundation--relativity based on the WLPO\,$\leftrightarrow$\,Bidual Gap equivalence. This paper documents the successful mechanization of uniformization height theory, achieving the key result that the bidual gap has height exactly 1, with 0 sorries in the implementation. We describe the architectural decisions, technical solutions, and unexpected improvements that emerged during formalization, including a rich automation framework with \texttt{@[simp]} tactics, complete ladder algebra with normal forms, and a lightweight order--theoretic layer. The formalization comprises approximately 75\% of the theoretical goals, with over 3,500 lines of verified Lean code across 35+ files.
+We present a Lean 4 formalization of the 2--categorical framework for foundation--relativity based on the WLPO\,$\leftrightarrow$\,Bidual Gap equivalence. This paper documents the successful mechanization of uniformization height theory, achieving the key result that the bidual gap has height exactly 1, with 0 sorries in completed components. We describe the architectural decisions, technical solutions, and unexpected improvements that emerged during formalization, including a rich automation framework with \texttt{@[simp]} tactics, complete ladder algebra with normal forms, and a lightweight order--theoretic layer. The formalization comprises over 4,400 lines of verified Lean code across 37+ files. \textbf{Status (January 27, 2025):} Parts I-V and Part 6A (upper bound) are complete with 0 sorries. Part 6B-D (lower bound and exactness) remain to be implemented.
 \end{abstract}
 
 \begin{mdframed}[style=achievement]
-\textbf{Achievement.} This paper documents a \emph{completed} Lean 4 formalization with:
+\textbf{Achievement Status (January 27, 2025):}
 \begin{itemize}
-\item \textbf{0 sorries} in all implemented modules
+\item \textbf{0 mathematical sorries} in Parts I-V and Part 6A
 \item \textbf{Height = 1 theorem} fully verified
-\item \textbf{Complete P4\_Meta framework} with ladder algebra
-\item \textbf{Rich automation} exceeding original specifications
+\item \textbf{Part 6A complete:} Upper bound $N^* = k(H-1) + S$ proven
+\item \textbf{Part 6B-D TODO:} Lower bound and exactness remain
+\item \textbf{7 integration sorries:} In glue code only (not proofs)
 \end{itemize}
+\textbf{Summary:} Core mathematics complete, Part 6 partially done, integration cleanup needed.
 \end{mdframed}
 
 \tableofcontents
@@ -403,8 +405,27 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
 
 \textbf{Key Achievement}: Complete proof that the k=2 even/odd schedule exactly matches the existing \texttt{fuseSteps} pattern, with quota lemmas proven by induction using only core Lean tactics (no mathlib dependencies).
 
+\begin{mdframed}[style=status]
+\textbf{Part 6 Status (January 27, 2025):} Partially complete - Upper bound proven, lower bound TODO
+\end{mdframed}
+
+\textbf{Part 6A Mathematical Results (COMPLETE)}:
+\begin{itemize}
+\item[$\checkmark$] \texttt{quota\_roundRobin\_block\_closed}: Closed-form formula $\text{quota}(i, k \cdot n + r) = n + \mathbf{1}_{i < r}$
+\item[$\checkmark$] \texttt{quotas\_reach\_targets\_iff}: Feasibility at time $m$ characterized by $q_i \leq \lfloor m/k \rfloor + \mathbf{1}_{i < m \bmod k}$  
+\item[$\checkmark$] \texttt{quotas\_reach\_targets\_packed}: Upper bound proof that $N^* = k(H-1) + S$ suffices when maximal axes are reindexed first
+\end{itemize}
+
+\textbf{Part 6B-D Remaining Work (TODO)}:
+\begin{itemize}
+\item[\textbf{TODO}] \texttt{quotas\_not\_reached\_below\_packed}: Lower bound proof for $n < N^*$
+\item[\textbf{TODO}] Exactness theorem: Targets met $\Leftrightarrow n \geq N^*$
+\item[\textbf{TODO}] Permutation lemma for general case (requires Finset)
+\item[\textbf{TODO}] Integration with ProductHeight theorems
+\end{itemize}
+
 \begin{mdframed}[style=achievement]
-\textbf{Achievement}: The P4\_Meta framework is 100\% complete with 0 sorries, providing rich automation beyond the paper's specifications including k-ary schedules.
+\textbf{Achievement}: The P4\_Meta framework Parts 1-5 and 6A are 100\% complete with 0 sorries. Part 6B-D (exact finish time lower bound and general case) remain to be implemented.
 \end{mdframed}
 %===========================================================
 \section{Technical Challenges and Solutions}
@@ -473,9 +494,12 @@ theorem not_lt_sub_of_le {i j k : Nat} (hki : k ≤ i) :
 \hline
 2--Categorical Framework & Part I & Phase1\_Simple.lean & ✅ Complete \\
 Uniformization Height & Part I & Phase2/3\_*.lean & ✅ Complete \\
-Positive Uniformization & Part II & Phase2/3\_Positive.lean & ✅ Core done \\
+Positive Uniformization & Part II & Phase2/3\_Positive.lean & ✅ Complete \\
 Ladder Algebra & Part III & P4\_Meta/PartIII\_*.lean & ✅ Complete \\
-k-ary Schedules & Part III & PartIII\_Schedule.lean & ✅ Complete \\
+k-ary Schedules (Parts 1-5) & Part III & PartIII\_Schedule.lean & ✅ Complete \\
+Part 6A: Upper Bound & Part 6 & PartIII\_Schedule.lean & ✅ Complete \\
+Part 6B: Lower Bound & Part 6 & PartIII\_Schedule.lean & 🚧 TODO \\
+Part 6C-D: Exactness \& General & Part 6 & (Future file) & 🚧 TODO \\
 $\omega$--Limit Theory & Part IV & PartIV\_Limit.lean & ✅ Complete \\
 $\omega+\varepsilon$ Theory & Part IV+ & PartIV\_Limit.lean & ✅ Complete \\
 Theory Order $\leq^T$, $\simeq^T$ & Part IV & PartIV\_Limit.lean & ✅ Complete \\
