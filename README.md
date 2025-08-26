@@ -125,7 +125,7 @@ FoundationRelativity/
 │   │   ├── P4_Meta/           #    Parts III-VI: Meta-theoretic framework
 │   │   │   ├── Meta_Signature.lean # Theory/Extend mechanism
 │   │   │   ├── Meta_Ladders.lean   # ProofHeight calculus
-│   │   │   ├── PartIII_Schedule.lean # ✅ k-ary schedule with quota invariants
+│   │   │   ├── PartIII_Schedule.lean # ✅ k-ary schedule with round-robin bridge (0 sorries!)
 │   │   │   ├── PartIII_Concat.lean # Two-phase ladder composition
 │   │   │   ├── PartIII_NormalForm.lean # Canonical representations
 │   │   │   ├── PartV_*.lean       # Collision theorems
