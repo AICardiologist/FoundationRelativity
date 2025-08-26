@@ -66,7 +66,8 @@
    - `ExtendIter`: Iterated single-axiom theory extension
    - `HeightCertificate`: Upper bound tracking with provenance
    - **NEW**: `Schedule` structure for k-ary proof scheduling
-   - **NEW**: Quota invariants tracking axis appearances
+   - **NEW**: Quota invariants tracking axis appearances  
+   - **NEW**: Round-robin scheduling with complete bridge theorems (0 sorries!)
    - **NEW**: Complete proof that k=2 schedule ≡ fuseSteps (sorry-free)
    - `concatSteps`: Two-phase ladder composition at stage k
    - Complete prefix/tail theorems with @[simp] automation
@@ -109,7 +110,7 @@ Papers/P3_2CatFramework/
 │   ├── Meta_Signature.lean        # Theory/Extend mechanism
 │   ├── Meta_Ladders.lean          # ProofHeight calculus
 │   ├── PartIII_Certificates.lean  # Height certificates
-│   ├── PartIII_Schedule.lean      # k-ary schedules with quota invariants (0 sorries!)
+│   ├── PartIII_Schedule.lean      # k-ary schedules + round-robin bridge (0 sorries!)
 │   ├── PartIII_Concat.lean        # Two-phase composition
 │   ├── PartIII_NormalForm.lean    # Canonical representations (0 sorries!)
 │   ├── PartIII_ProductSup.lean    # Pair certificates

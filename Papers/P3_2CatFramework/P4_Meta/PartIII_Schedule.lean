@@ -62,23 +62,35 @@ theorem quota_succ {k} (σ : Schedule k) (i : Fin k) (m : Nat) :
 
 /-! ### Even/odd schedule ↔ fuseSteps (k = 2) -/
 
-/-- Axis picker for the even/odd schedule. -/
-def evenOddAxes (A B : Nat → Formula) : Fin 2 → (Nat → Formula) :=
-  fun i => if i.val = 0 then A else B
+/-- Axis picker for the even/odd schedule using pattern matching. -/
+def evenOddAxes (A B : Nat → Formula) : Fin 2 → (Nat → Formula)
+  | ⟨0, _⟩ => A
+  | ⟨1, _⟩ => B
+  | ⟨n+2, h⟩ => absurd h (by simp : ¬(n + 2 < 2))
 
+/-- Pattern matching on axis 0 selects A. -/
+@[simp] theorem evenOddAxes_zero (A B : Nat → Formula) :
+  evenOddAxes A B ⟨0, by decide⟩ = A := rfl
+
+/-- Pattern matching on axis 1 selects B. -/
+@[simp] theorem evenOddAxes_one (A B : Nat → Formula) :
+  evenOddAxes A B ⟨1, by decide⟩ = B := rfl
+
+/-- Round-robin on k=2 assigns axis 0 at even stages. -/
 @[simp] theorem evenOdd_assign_even (n : Nat) :
   evenOddSchedule.assign (2*n) = (⟨0, by decide⟩ : Fin 2) := by
   apply Fin.ext
   -- `roundRobin 2` assigns `n % 2`, so `2*n % 2 = 0`
   simp [evenOddSchedule, roundRobin, Nat.mul_mod_right]
 
+/-- Round-robin on k=2 assigns axis 1 at odd stages. -/
 @[simp] theorem evenOdd_assign_odd (n : Nat) :
   evenOddSchedule.assign (2*n+1) = (⟨1, by decide⟩ : Fin 2) := by
   apply Fin.ext
   -- `2*n+1 % 2 = 1`
   simp [evenOddSchedule, roundRobin, Nat.add_mod, Nat.mul_mod_right]
 
-/-- Across two steps, axis 0's quota increases by exactly 1 between even stages. -/
+/-- Two-step increment: axis 0's quota increases by exactly 1 between even stages. -/
 theorem quota_evenOdd_zero_step (n : Nat) :
   quota evenOddSchedule (⟨0, by decide⟩ : Fin 2) (2*n+2)
     = quota evenOddSchedule (⟨0, by decide⟩ : Fin 2) (2*n) + 1 := by
@@ -113,7 +125,7 @@ theorem quota_evenOdd_zero_step (n : Nat) :
     rw [quota_evenOdd_zero_step]
     rw [ih]
 
-/-- Across two steps, axis 1's quota increases by exactly 1 between odd stages. -/
+/-- Two-step increment: axis 1's quota increases by exactly 1 between odd stages. -/
 theorem quota_evenOdd_one_step (n : Nat) :
   quota evenOddSchedule (⟨1, by decide⟩ : Fin 2) (2*n+3)
     = quota evenOddSchedule (⟨1, by decide⟩ : Fin 2) (2*n+1) + 1 := by
@@ -165,23 +177,18 @@ def scheduleSteps {k : Nat} (σ : Schedule k) (axes : Fin k → (Nat → Formula
   fun n => axes (σ.assign n) (quota σ (σ.assign n) n)
 
 /-- Even case: stage `2n` runs axis A at index `n`. -/
-theorem evenOdd_matches_fuseSteps_even
+@[simp] theorem evenOdd_matches_fuseSteps_even
   (A B : Nat → Formula) (n : Nat) :
   scheduleSteps evenOddSchedule (evenOddAxes A B) (2*n) = A n := by
-  -- pick axis 0 and use its quota
-  unfold scheduleSteps evenOddAxes
-  rw [evenOdd_assign_even]
-  simp only [Fin.val_zero, if_pos, quota_evenOdd_zero_even]
+  unfold scheduleSteps
+  simp only [evenOdd_assign_even, evenOddAxes_zero, quota_evenOdd_zero_even]
 
 /-- Odd case: stage `2n+1` runs axis B at index `n`. -/
-theorem evenOdd_matches_fuseSteps_odd
+@[simp] theorem evenOdd_matches_fuseSteps_odd
   (A B : Nat → Formula) (n : Nat) :
   scheduleSteps evenOddSchedule (evenOddAxes A B) (2*n+1) = B n := by
-  -- pick axis 1 and use its quota
-  unfold scheduleSteps evenOddAxes
-  rw [evenOdd_assign_odd]
-  have : (⟨1, by decide⟩ : Fin 2).val = 1 := rfl
-  simp only [this, if_neg (by decide : ¬(1 = 0)), quota_evenOdd_one_odd]
+  unfold scheduleSteps
+  simp only [evenOdd_assign_odd, evenOddAxes_one, quota_evenOdd_one_odd]
 
 private theorem twoDecomp (n : Nat) : ∃ m, n = 2*m ∨ n = 2*m + 1 := by
   -- We know n = (n/2)*2 + n%2 and n%2 < 2
@@ -210,16 +217,160 @@ private theorem twoDecomp (n : Nat) : ∃ m, n = 2*m ∨ n = 2*m + 1 := by
           -- impossible: Nat.succ (Nat.succ k') < 2
           contradiction
 
-/-- The k=2 schedule (even/odd) exactly matches `fuseSteps`. -/
+/-- Bridge theorem: The k=2 schedule (even/odd) exactly matches `fuseSteps`.
+    This establishes that our general schedule framework correctly captures
+    the existing fuseSteps construction for 2-axis products. -/
 theorem evenOdd_is_fuseSteps
   {A B : Nat → Formula} (n : Nat) :
   scheduleSteps evenOddSchedule (evenOddAxes A B) n = fuseSteps A B n := by
   obtain ⟨m, hm | hm⟩ := twoDecomp n
-  · -- even
-    simpa [hm, fuseSteps_even] using
-      evenOdd_matches_fuseSteps_even A B m
-  · -- odd
-    simpa [hm, fuseSteps_odd] using
-      evenOdd_matches_fuseSteps_odd A B m
+  · -- even: n = 2*m
+    rw [hm]
+    simp [fuseSteps_even]
+  · -- odd: n = 2*m + 1
+    rw [hm]
+    simp [fuseSteps_odd]
+
+/-! ### Remaining k=2 closed-form quotas -/
+
+/-- Quota for axis 0 at odd stages: ⌈(2n+1)/2⌉ = n+1. -/
+@[simp] theorem quota_evenOdd_zero_odd (n : Nat) :
+  quota evenOddSchedule (⟨0, by decide⟩ : Fin 2) (2*n+1) = n+1 := by
+  -- Step from 2n to 2n+1: axis 0 fires at position 2n
+  rw [quota_succ]
+  rw [evenOdd_assign_even]
+  rw [if_pos rfl]
+  rw [quota_evenOdd_zero_even]
+
+/-! ### k-ary round-robin bridge -/
+
+/-- General k-ary decomposition: every n can be written as k*q + r with r < k. -/
+theorem kDecomp (k : Nat) (hk : k > 0) (n : Nat) : 
+  ∃ q r, n = k * q + r ∧ r < k :=
+  ⟨n / k, n % k, (Nat.div_add_mod n k).symm, Nat.mod_lt n hk⟩
+
+/-! ### k-ary round-robin: block structure and global bridge (Finset-free) -/
+
+/-- On the block starting at `k*n`, time `k*n + r` (with `r < k`) selects axis `r`. -/
+@[simp] theorem rr_assign_in_block (k n r : Nat) (hr : r < k) (hk : 0 < k) :
+    (roundRobin k hk).assign (k*n + r) = ⟨r, hr⟩ := by
+  apply Fin.ext
+  simp [roundRobin, Nat.add_mod, Nat.mul_mod_right, Nat.mod_eq_of_lt hr]
+
+/-- Arithmetic step for the "prefix count within a block". -/
+private theorem step_if (a r : Nat) :
+    (if a < r then 1 else 0) + (if a = r then 1 else 0)
+      = (if a < r+1 then 1 else 0) := by
+  classical
+  by_cases hlt : a < r
+  · have : a < r+1 := Nat.lt_trans hlt (Nat.lt_succ_self _)
+    have ne : a ≠ r := fun h => (show False from Nat.lt_irrefl _ (h ▸ hlt))
+    simp [hlt, ne, this]
+  · by_cases heq : a = r
+    · have : a < r+1 := by simp [heq]
+      simp [heq]
+    · have hge : r ≤ a := Nat.le_of_not_lt hlt
+      have hgt : r < a := Nat.lt_of_le_of_ne hge (Ne.symm heq)
+      have hnot : ¬ a < r+1 := Nat.not_lt.mpr (Nat.succ_le_of_lt hgt)
+      simp [hlt, heq, hnot]
+
+/-- Fold `quota_succ` across the first `r` steps of a block, measured from `k*n`. -/
+private theorem rr_quota_prefix_rel (k : Nat) (hk : 0 < k) (i : Fin k) (n : Nat) :
+    ∀ r, r ≤ k →
+      quota (roundRobin k hk) i (k*n + r)
+        = quota (roundRobin k hk) i (k*n) + (if i.val < r then 1 else 0)
+  | 0, _ => by simp
+  | r+1, hr => by
+      have hr' : r < k := Nat.lt_of_succ_le hr
+      have ih := rr_quota_prefix_rel k hk i n r (Nat.le_of_succ_le hr)
+      have A : (roundRobin k hk).assign (k*n + r) = ⟨r, hr'⟩ :=
+        rr_assign_in_block k n r hr' hk
+      calc
+        quota (roundRobin k hk) i (k*n + (r+1))
+            = quota (roundRobin k hk) i ((k*n + r) + 1) := by
+                simp [Nat.add_assoc]
+        _   = quota (roundRobin k hk) i (k*n + r)
+              + (if (roundRobin k hk).assign (k*n + r) = i then 1 else 0) := by
+                exact quota_succ (σ := roundRobin k hk) (i := i) (m := k*n + r)
+        _   = (quota (roundRobin k hk) i (k*n)
+                + (if i.val < r then 1 else 0))
+              + (if ⟨r, hr'⟩ = i then 1 else 0) := by
+                simp [ih, A]
+        _   = quota (roundRobin k hk) i (k*n)
+              + ( (if i.val < r then 1 else 0)
+                  + (if i.val = r then 1 else 0) ) := by
+              -- turn equality of fins into equality of `val`
+              have : ((⟨r, hr'⟩ : Fin k) = i) ↔ (r = i.val) := by
+                constructor
+                · intro h; exact congrArg Fin.val h
+                · intro h; apply Fin.ext; simp [h]
+              by_cases hrv : r = i.val
+              · simp [hrv, Nat.add_comm]
+              · have neg1 : ¬(i.val = r) := fun h => hrv h.symm
+                have neg2 : ¬(⟨r, hr'⟩ : Fin k) = i := by
+                  intro h; apply hrv; exact congrArg Fin.val h
+                simp [neg1, neg2, Nat.add_comm]
+        _   = quota (roundRobin k hk) i (k*n)
+              + (if i.val < r+1 then 1 else 0) := by
+              simp only [← step_if]
+
+/-- Quota at block starts: after `k*n` steps, every axis has fired exactly `n` times. -/
+@[simp] theorem rr_quota_at_block_start (k : Nat) (hk : 0 < k) (i : Fin k) :
+    ∀ n, quota (roundRobin k hk) i (k*n) = n
+  | 0 => by simp
+  | n+1 => by
+      have h := rr_quota_prefix_rel k hk i n k (Nat.le_refl k)
+      have : (if i.val < k then 1 else 0) = 1 := by simp [i.isLt]
+      rw [this, rr_quota_at_block_start k hk i n] at h
+      -- Need to show: quota at k*(n+1) = n+1
+      -- We have: quota at k*n + k = n + 1
+      have eq : k * (n + 1) = k * n + k := by
+        simp [Nat.mul_succ, Nat.add_comm]
+      rw [eq]
+      exact h
+
+/-- Quota on your own axis inside the block: at `k*n + i.val` the local index is `n`. -/
+@[simp] theorem rr_quota_on_axis_at_boundary (k : Nat) (hk : 0 < k) (i : Fin k) (n : Nat) :
+    quota (roundRobin k hk) i (k*n + i.val) = n := by
+  have h := rr_quota_prefix_rel k hk i n i.val (Nat.le_of_lt i.isLt)
+  -- `i.val < i.val` is false
+  simp only [rr_quota_at_block_start k hk i n, Nat.lt_irrefl, if_false, Nat.add_zero] at h
+  exact h
+
+/-- **Block bridge:** at stage `k*n + i.val`, round-robin runs axis `i` at local index `n`. -/
+@[simp] theorem roundRobin_block_bridge
+    {k : Nat} (hk : 0 < k) (axes : Fin k → Nat → Formula) (i : Fin k) (n : Nat) :
+    scheduleSteps (roundRobin k hk) axes (k*n + i.val) = axes i n := by
+  -- axis chosen:
+  have A : (roundRobin k hk).assign (k*n + i.val) = i := by
+    apply Fin.ext
+    simp [roundRobin, Nat.add_mod, Nat.mul_mod_right, Nat.mod_eq_of_lt i.isLt]
+  -- local index:
+  have Q : quota (roundRobin k hk) i (k*n + i.val) = n :=
+    rr_quota_on_axis_at_boundary k hk i n
+  unfold scheduleSteps
+  simp [A, Q]
+
+/-- **Global bridge:** for any `n`, round-robin is exactly "remainder axis" with "block index".
+    At stage `n` it runs axis `n % k` at local index `n / k`. -/
+@[simp] theorem roundRobin_is_blocks
+    {k : Nat} (hk : 0 < k) (axes : Fin k → Nat → Formula) (n : Nat) :
+    scheduleSteps (roundRobin k hk) axes n
+      = axes ⟨n % k, Nat.mod_lt n hk⟩ (n / k) := by
+  -- We'll prove this using the decomposition n = k*(n/k) + n%k
+  have hn : n = k*(n / k) + n % k := (Nat.div_add_mod n k).symm
+  
+  -- Now rewrite using the decomposition
+  calc scheduleSteps (roundRobin k hk) axes n
+      = scheduleSteps (roundRobin k hk) axes (k*(n/k) + n%k) := by rw [← hn]
+    _ = axes ⟨n%k, Nat.mod_lt n hk⟩ (n/k) := by
+        -- By roundRobin_block_bridge with i = ⟨n%k, _⟩
+        -- Note: roundRobin_block_bridge takes i and yields axes i (n/k) at k*(n/k) + i.val
+        -- Here i.val = n%k
+        have eq_val : (⟨n%k, Nat.mod_lt n hk⟩ : Fin k).val = n%k := rfl
+        have eq_rw : k*(n/k) + (⟨n%k, Nat.mod_lt n hk⟩ : Fin k).val = k*(n/k) + n%k := by
+          rw [eq_val]
+        rw [← eq_rw]
+        exact roundRobin_block_bridge hk axes ⟨n%k, Nat.mod_lt n hk⟩ (n/k)
 
 end Papers.P4Meta

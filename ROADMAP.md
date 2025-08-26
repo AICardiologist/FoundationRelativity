@@ -14,6 +14,8 @@
 - Two-phase composition (concatSteps) with complete prefix/tail theorems
 - **NEW**: Normal forms (StepNF) with canonical representation and @[simp] automation
 - **NEW**: concat_left_nest_eq with complete elementary proof (no sorries!)
+- **NEW**: k-ary schedule abstractions with quota invariants (0 sorries!)
+- **NEW**: Round-robin scheduling with complete bridge n ↦ (n%k, n/k)
 - ω-limit theory (Extendω) with omega_of_prefixCert, omega_of_tailCert helpers
 - Collision theorems scaffolding (HBL/RE/Consistent typeclasses)
 **Files**: P4_Meta/* (35+ modules), NormalForm_test.lean with 5-level composition tests
@@ -91,6 +93,7 @@
 | Component | Files | Status | Key Features |
 |-----------|-------|--------|--------------|
 | Part III Ladders | 10 | ✅ Complete | Concat, normal forms, transport, @[simp] automation |
+| Part III Schedule | 1 | ✅ Complete | k-ary schedules, quota invariants, round-robin bridge |
 | Part III Certificates | 3 | ✅ Complete | Height tracking, lift/transport, pointwise congruence |
 | Part III ProductSup | 2 | ✅ Complete | Pair certificates, combinators, stage bookkeeping |
 | Part IV ω-limit | 1 | ✅ Complete | Extendω, omega_of_prefixCert, omega_of_tailCert |
