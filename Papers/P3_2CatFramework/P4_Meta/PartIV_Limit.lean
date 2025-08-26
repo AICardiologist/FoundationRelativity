@@ -255,7 +255,7 @@ theorem Extendω_is_lub
     (ExtendωPlus T A ε).Provable ψ ↔ (ExtendωPlus T B ε).Provable ψ := by
     constructor
     · intro hA
-      rcases hA with ⟨n, hn⟩
+      obtain ⟨n, hn⟩ := hA
       refine ⟨n, ?_⟩
       -- stagewise transport at `n+ε` using bounded pointwise equality
       have hstage :=
@@ -264,7 +264,7 @@ theorem Extendω_is_lub
       -- rewrite the stage theory and reuse the proof
       rw [← hstage]; exact hn
     · intro hB
-      rcases hB with ⟨n, hn⟩
+      obtain ⟨n, hn⟩ := hB
       refine ⟨n, ?_⟩
       have hstage :=
         ExtendIter_congr (T := T) (A := B) (B := A) (n := n + ε)
@@ -292,7 +292,6 @@ theorem Extendω_is_lub
   theorem ExtendωPlus_equiv_omega {T : Theory} {step : Nat → Formula} (ε : Nat) :
     ExtendωPlus T step ε ≃ᵀ Extendω T step :=
     ⟨ExtendωPlus_le_omega ε, Extendω_le_omegaPlus ε⟩
-
   /-- Push a single certificate to `ω+ε`. -/
   theorem certToOmegaPlus
     {T : Theory} {step : Nat → Formula} {φ : Formula}

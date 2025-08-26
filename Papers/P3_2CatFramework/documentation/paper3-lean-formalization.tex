@@ -403,6 +403,9 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
 
 \textbf{Key Achievement}: Complete proof that the k=2 even/odd schedule exactly matches the existing \texttt{fuseSteps} pattern, with quota lemmas proven by induction using only core Lean tactics (no mathlib dependencies).
 
+\begin{mdframed}[style=achievement]
+\textbf{Achievement}: The P4\_Meta framework is 100\% complete with 0 sorries, providing rich automation beyond the paper's specifications including k-ary schedules.
+\end{mdframed}
 %===========================================================
 \section{Technical Challenges and Solutions}
 %===========================================================
@@ -511,6 +514,7 @@ The formalization achieved several improvements beyond the paper:
 \item \textbf{Micro--lemmas}: Clean arithmetic helpers improve proof clarity
 \item \textbf{Stone Window Calibration}: Transforms example into calibration program identifying WLPO requirement
 \item \textbf{Independence Hypotheses}: Explicit axis independence for cross--axis transfer
+\item \textbf{k-ary Schedules}: Complete quota invariants with proof that k=2 matches fuseSteps
 \end{enumerate}
 
 %===========================================================
