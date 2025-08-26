@@ -56,6 +56,8 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
   - Part V collision theorems: reflection → consistency → Gödel
   - Part VI Stone window: Boolean ring with support ideals
   - Provenance discipline: tracking classical vs Lean-proved results
+  - **NEW**: k-ary schedule abstractions with quota invariants (PartIII_Schedule)
+  - **NEW**: Complete proof that k=2 schedule exactly matches fuseSteps pattern
   - **NEW**: Ladder algebra with concatenation, normal forms, and @[simp] automation
   - **NEW**: Two-phase composition (PartIII_Concat) for splicing ladders at stage k
   - **NEW**: Complete sorry-free normal forms (PartIII_NormalForm) with canonical representation
@@ -123,6 +125,7 @@ FoundationRelativity/
 │   │   ├── P4_Meta/           #    Parts III-VI: Meta-theoretic framework
 │   │   │   ├── Meta_Signature.lean # Theory/Extend mechanism
 │   │   │   ├── Meta_Ladders.lean   # ProofHeight calculus
+│   │   │   ├── PartIII_Schedule.lean # ✅ k-ary schedule with quota invariants
 │   │   │   ├── PartIII_Concat.lean # Two-phase ladder composition
 │   │   │   ├── PartIII_NormalForm.lean # Canonical representations
 │   │   │   ├── PartV_*.lean       # Collision theorems

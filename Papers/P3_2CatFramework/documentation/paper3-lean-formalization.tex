@@ -166,6 +166,7 @@ Papers/P3_2CatFramework/
 ├── P4_Meta/                        # Parts III-VI Meta framework (20+ files)
 │   ├── Meta_Signature.lean        # Theory/Extend mechanism
 │   ├── PartIII_Certificates.lean  # Height certificates
+│   ├── PartIII_Schedule.lean      # k-ary schedules with quota invariants
 │   ├── PartIII_NormalForm.lean    # Canonical representations
 │   ├── PartIII_PosFam.lean        # Positive families with unions
 │   ├── PartIV_Limit.lean          # ω-limit and ω+ε theory
@@ -382,6 +383,26 @@ theorem ExtendωPlus_Provable_iff_exists_ge {ε : Nat} {ψ : Formula} :
 \textbf{Achievement}: The P4\_Meta framework is 100\% complete with 0 sorries, providing rich automation beyond the paper's specifications, including constructive calibration programs and $\omega+\varepsilon$ theory.
 \end{mdframed}
 
+\subsection{k-ary Schedule Abstractions}
+
+The framework now includes complete k-ary schedule abstractions with quota invariants:
+
+\begin{lstlisting}[language={}]
+-- Schedule assigns each stage to one of k axes
+structure Schedule (k : Nat) where
+  assign : Nat → Fin k
+
+-- Quota counts axis appearances before stage m  
+def quota {k} (σ : Schedule k) (i : Fin k) (m : Nat) : Nat :=
+  (List.range m).filter (fun n => σ.assign n = i) |>.length
+
+-- Round-robin: axis i appears at stages k*n + i
+def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
+{ assign := fun n => ⟨n % k, Nat.mod_lt n hk⟩ }
+\end{lstlisting}
+
+\textbf{Key Achievement}: Complete proof that the k=2 even/odd schedule exactly matches the existing \texttt{fuseSteps} pattern, with quota lemmas proven by induction using only core Lean tactics (no mathlib dependencies).
+
 %===========================================================
 \section{Technical Challenges and Solutions}
 %===========================================================
@@ -451,6 +472,7 @@ theorem not_lt_sub_of_le {i j k : Nat} (hki : k ≤ i) :
 Uniformization Height & Part I & Phase2/3\_*.lean & ✅ Complete \\
 Positive Uniformization & Part II & Phase2/3\_Positive.lean & ✅ Core done \\
 Ladder Algebra & Part III & P4\_Meta/PartIII\_*.lean & ✅ Complete \\
+k-ary Schedules & Part III & PartIII\_Schedule.lean & ✅ Complete \\
 $\omega$--Limit Theory & Part IV & PartIV\_Limit.lean & ✅ Complete \\
 $\omega+\varepsilon$ Theory & Part IV+ & PartIV\_Limit.lean & ✅ Complete \\
 Theory Order $\leq^T$, $\simeq^T$ & Part IV & PartIV\_Limit.lean & ✅ Complete \\
