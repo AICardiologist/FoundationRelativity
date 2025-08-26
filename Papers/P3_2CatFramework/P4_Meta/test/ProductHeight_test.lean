@@ -109,7 +109,7 @@ example (k n : Nat) (hk : 0 < k) (axes : Fin k → Nat → Formula) :
 example (n r : Nat) (hr : r ≤ 3) :
     quota (roundRobin 3 (by decide)) ⟨1, by decide⟩ (3*n + r)
       = n + (if 1 < r then 1 else 0) := by
-  exact quota_rr_block_closed 3 (by decide) ⟨1, by decide⟩ n r hr
+  exact quota_roundRobin_block_closed 3 (by decide) ⟨1, by decide⟩ n r hr
 
 -- Feasibility form at a concrete time
 example (q : Fin 3 → Nat) :

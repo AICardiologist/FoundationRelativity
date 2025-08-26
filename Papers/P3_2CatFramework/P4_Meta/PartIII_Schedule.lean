@@ -508,7 +508,7 @@ enabling sharp finish-time results and generalizing the binary product height th
 
 /-- Closed form *inside a block*: at time `k*n + r` (with `r ≤ k`),
     the quota for axis `i` is `n + (if i.val < r then 1 else 0)`. -/
-@[simp] theorem quota_rr_block_closed
+@[simp] theorem quota_roundRobin_block_closed
     (k : Nat) (hk : 0 < k) (i : Fin k) (n r : Nat) (hr : r ≤ k) :
   quota (roundRobin k hk) i (k*n + r)
     = n + (if i.val < r then 1 else 0) := by
@@ -565,7 +565,7 @@ theorem quotas_reach_targets_packed
   have hquota :
       quota (roundRobin k hk) i (k * (H - 1) + S)
         = (H - 1) + (if i.val < S then 1 else 0) :=
-    quota_rr_block_closed (k := k) (hk := hk) (i := i) (n := H - 1) (r := S) hS
+    quota_roundRobin_block_closed (k := k) (hk := hk) (i := i) (n := H - 1) (r := S) hS
   -- Is `i` one of the S maximal-demand axes?
   by_cases hi : i.val < S
   · -- Maximal axis: needs `H`, quota gives `(H-1)+1 = H`.
