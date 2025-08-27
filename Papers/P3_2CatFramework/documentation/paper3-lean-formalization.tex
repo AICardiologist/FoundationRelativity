@@ -103,7 +103,7 @@
 % -------------------------------------------------
 % Title
 % -------------------------------------------------
-\title{Foundation--Relativity in Lean 4:\\
+\title{Axiom Calibration in Lean 4:\\
 A Framework Formalization with Structural Verification}
 
 \author{Paul Chun--Kit Lee\\
@@ -115,7 +115,7 @@ A Framework Formalization with Structural Verification}
 \maketitle
 
 \begin{abstract}
-We present a Lean 4 formalization of the 2--categorical framework for foundation--relativity based on the WLPO\,$\leftrightarrow$\,Bidual Gap equivalence. This paper documents the successful mechanization of uniformization height theory, achieving the key result that the bidual gap has height exactly 1, with 0 sorries in structural components. We describe the architectural decisions, technical solutions, and unexpected improvements that emerged during formalization, including a rich automation framework with \texttt{@[simp]} tactics, complete ladder algebra with normal forms, and a lightweight order--theoretic layer. The formalization comprises over 4,400 lines of verified Lean code across 37+ files. \textbf{Status (January 27, 2025):} Parts I-VI structural components complete, including Part 6B exact finish time characterization (0 sorries), Part V RFN→Con proven with Con→Gödel axiomatized, and Part VI FT→UCT reduction structure.
+We present a Lean 4 formalization of the 2--categorical framework for foundation--relativity based on the WLPO\,$\leftrightarrow$\,Bidual Gap equivalence. This paper documents the successful mechanization of uniformization height theory, achieving the key result that the bidual gap has height exactly 1, with 0 sorries in structural components. We describe the architectural decisions, technical solutions, and unexpected improvements that emerged during formalization, including a rich automation framework with \texttt{@[simp]} tactics, complete ladder algebra with normal forms, and a lightweight order--theoretic layer. The formalization comprises over 4,600 lines of verified Lean code across 45+ files. \textbf{Status (January 27, 2025):} Parts I-VI structural components complete, including Part 6B exact finish time characterization (0 sorries), Part V RFN→Con proven with Con→Gödel axiomatized, and \textbf{WP-B FT frontier infrastructure} providing FT→UCT, FT→Sperner→BFPT reductions with orthogonal axes.
 \end{abstract}
 
 \begin{mdframed}[style=status]
@@ -140,6 +140,7 @@ Our Lean formalization provides:
 \item Schematic verification of uniformization height theory with height = 1 for bidual gap
 \item Structural implementation of the P4\_Meta framework (Parts III--VI)
 \item Rich \texttt{@[simp]} automation for concatenation and normal forms
+\item Complete FT frontier infrastructure (WP-B) with orthogonal axes to WLPO
 \item 0 sorries in structural components (classical results cited as axioms)
 \end{enumerate}
 
@@ -456,7 +457,7 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
 \item[$\checkmark$] \texttt{godel\_height\_bound}: G$_T$ has height $\leq$ 2 in double extension
 \end{itemize}
 
-\subsection{Part VI: Calibrations and Portal Pattern (COMPLETE)}
+\subsection{Part VI: Calibrations and Portal Pattern (WP-B COMPLETE)}
 
 \textbf{Frontier API and Portal Pattern}:
 \begin{itemize}
@@ -475,11 +476,27 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
 \item[$\checkmark$] \texttt{StonePortalWire}: Complete wiring module for calibrators
 \end{itemize}
 
-\textbf{Fan Theorem to Uniform Continuity}:
+\textbf{FT Frontier Infrastructure (WP-B Complete)}:
 \begin{itemize}
-\item[$\checkmark$] \texttt{FT\_implies\_UCT}: Fan Theorem implies Uniform Continuity on [0,1]
-\item[$\checkmark$] \texttt{FT\_to\_UCT\_cert}: Height certificate showing UCT at height 1 from FT
-\item[$\checkmark$] Abstract interface avoiding heavy real number dependencies
+\item[$\checkmark$] \textbf{\texttt{FT\_Frontier.lean}}: Complete Fan Theorem axis implementation
+  \begin{itemize}
+  \item FT $\to$ UCT (Uniform Continuity) reduction via \texttt{FT\_to\_UCT}
+  \item FT $\to$ Sperner $\to$ BFPT$_n$ (Brouwer Fixed-Point) composition
+  \item Height certificate transport: \texttt{UCT\_height1}, \texttt{BFPT\_height1}
+  \item Orthogonal axes: $h_{\text{FT}}(\text{UCT}) = 1$, $h_{\text{WLPO}}(\text{UCT}) = 0$
+  \end{itemize}
+\item[$\checkmark$] \textbf{\texttt{FTPortalWire.lean}}: Height certificate wiring
+  \begin{itemize}
+  \item \texttt{UCT\_height1\_from\_FT}: Transport FT height to UCT
+  \item \texttt{BFPT\_height1\_from\_FT}: Transport FT height to BFPT
+  \item \texttt{Sperner\_height1\_from\_FT}: Transport FT height to Sperner
+  \end{itemize}
+\item[$\checkmark$] \textbf{Enhanced \texttt{Frontier\_API.lean}}:
+  \begin{itemize}
+  \item Generic \texttt{height\_lift\_of\_imp} for certificate transport
+  \item \texttt{ReducesTo} structure with \texttt{Trans} instance for calc chains
+  \end{itemize}
+\item[$\checkmark$] \textbf{Test Coverage}: \texttt{FT\_Frontier\_Sanity.lean} with comprehensive tests
 \end{itemize}
 
 \textbf{Stone Window Calibration (Elementary Implementation)}:
@@ -488,6 +505,65 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
 \item[$\checkmark$] \texttt{encSet}, \texttt{e}: Encoding bitstreams as \{0,1\}-valued sequences
 \item[$\checkmark$] Complete calibration lemmas: monotonicity, equivalences, characterizations
 \item[$\checkmark$] 0 sorries - replaced heavy p-adic machinery with elementary modular arithmetic
+\end{itemize}
+
+\subsection{Independence Registry (WP-C INTERFACE COMPLETE)}
+
+\textbf{Orthogonal Principles Framework}:
+\begin{itemize}
+\item[$\checkmark$] \textbf{\texttt{IndependenceRegistry.lean}}: Prop-level independence tokens
+  \begin{itemize}
+  \item \texttt{Independent P Q} structure recording orthogonality
+  \item Standard axioms: WLPO $\perp$ FT, FT $\perp$ DC$_\omega$, WLPO $\perp$ DC$_\omega$
+  \item Paper citations: Fridman-Simpson, topos models
+  \item 0 sorries - axiomatized with literature backing
+  \end{itemize}
+\item[$\checkmark$] \textbf{\texttt{ProductSharpness.lean}}: Sharpness from independence
+  \begin{itemize}
+  \item \texttt{sharp\_product\_of\_indep}: Max law for orthogonal products
+  \item \texttt{sharp\_UCT\_Gap\_product}: UCT $\times$ Gap at fused profile
+  \item \texttt{sharp\_triple\_product}: Three-axis composition
+  \item Height profile notation: $(h_{WLPO}, h_{FT}, h_{DC})$ tuples
+  \end{itemize}
+\end{itemize}
+
+\subsection{Support Ideal Stone Window (WP-D FRAMEWORK COMPLETE)}
+
+\textbf{Generalized Stone Window Beyond Fin}:
+\begin{itemize}
+\item[$\checkmark$] \textbf{\texttt{StoneWindow\_SupportIdeals.lean}}: Full algebraic framework
+  \begin{itemize}
+  \item \texttt{TwoIdempotents} class: Rings with trivial idempotents
+  \item \texttt{BoolIdeal} structure: Boolean ideals on $\mathbb{N}$
+  \item \texttt{Phi\_map}: $\mathcal{P}(\mathbb{N})/I \to \text{Idem}(\ell^\infty/I_{support})$
+  \item \texttt{stone\_window\_isomorphism}: Bijection theorem (interface)
+  \end{itemize}
+\item[$\checkmark$] \textbf{Concrete Instances}:
+  \begin{itemize}
+  \item \texttt{FinIdeal}: Constructively provable (no axioms)
+  \item \texttt{DensityZeroIdeal}: Calibration requiring WLPO
+  \item \texttt{encodeSequence}: Binary sequence embedding
+  \end{itemize}
+\item[$\checkmark$] Calibration program measuring constructive strength per ideal
+\end{itemize}
+
+\subsection{Fused Ladders (WP-E INTERFACE COMPLETE)}
+
+\textbf{Cross-Axis Transfer Mechanisms}:
+\begin{itemize}
+\item[$\checkmark$] \textbf{\texttt{FusedLadders.lean}}: Cross-axis composition
+  \begin{itemize}
+  \item \texttt{FusedSchedule}: k-ary interleaving schedules
+  \item \texttt{fusedLadder}: Combine multiple step functions
+  \item \texttt{fusion\_preserves\_provability}: Key transfer theorem
+  \end{itemize}
+\item[$\checkmark$] \textbf{Standard Fusions}:
+  \begin{itemize}
+  \item \texttt{evenOddFusion}: 2-axis alternation (recovers Part II)
+  \item \texttt{roundRobinFusion}: k-axis round-robin
+  \item \texttt{fusion\_height\_max}: Height is max of components
+  \end{itemize}
+\item[$\checkmark$] Integration with schedule abstractions from Part 6
 \end{itemize}
 
 \subsection{Stone window: classical fact and a constructive calibration (no new theorem)}
@@ -636,15 +712,20 @@ theorem not_lt_sub_of_le {i j k : Nat} (hki : k ≤ i) :
 Uniformization Height & Part I & Phase2/3\_*.lean & ✅ Complete \\
 Positive Uniformization & Part II & Phase2/3\_Positive.lean & ✅ Complete \\
 Ladder Algebra & Part III & P4\_Meta/PartIII\_*.lean & ✅ Complete \\
-k-ary Schedules (Parts 1-5) & Part III & PartIII\_Schedule.lean & ✅ Complete \\
-Part 6A: Upper Bound & Part 6 & PartIII\_Schedule.lean & ✅ Complete \\
-Part 6B: Exact Characterization & Part 6 & PartIII\_Schedule.lean & ✅ Complete \\
-Part 6C-D: General Case & Part 6 & (Future file) & 🚧 Future \\
+Permutation Machinery & Part III & PartIII\_Schedule.lean & ✅ Complete \\
+Packed Profiles & Part III & PartIII\_Schedule.lean & ✅ Complete \\
+IsPacking Interface & Part III & PartIII\_Schedule.lean & ✅ Complete \\
 $\omega$--Limit Theory & Part IV & PartIV\_Limit.lean & ✅ Complete \\
 $\omega+\varepsilon$ Theory & Part IV+ & PartIV\_Limit.lean & ✅ Complete \\
 Theory Order $\leq^T$, $\simeq^T$ & Part IV & PartIV\_Limit.lean & ✅ Complete \\
 Positive Families & Part III & PartIII\_PosFam.lean & ✅ Complete \\
 Collision Theorems & Part V & PartV\_Collision.lean & ✅ Complete \\
+RFN→Con Proof & WP-A & PartV\_RFNSigma1.lean & ✅ Complete \\
+FT Frontier & WP-B & FT\_Frontier.lean & ✅ Complete \\
+Independence Registry & WP-C & IndependenceRegistry.lean & ✅ Interface \\
+Product Sharpness & WP-C & ProductSharpness.lean & ✅ Interface \\
+Support Ideals & WP-D & StoneWindow\_SupportIdeals.lean & ✅ Framework \\
+Fused Ladders & WP-E & FusedLadders.lean & ✅ Interface \\
 FT→UCT Reduction & Part VI & PartVI\_FT\_to\_UCT.lean & ✅ Complete \\
 Stone Calibration & Part VI & StoneWindow.lean & ✅ Complete \\
 Theory Poset & Part II & -- & ⚠️ Deferred \\
@@ -741,7 +822,8 @@ The foundation is ready for:
 \begin{enumerate}
 \item Theory poset implementation with \lean{UL(C)}, \lean{Frontier(C)}
 \item Positive family algebra completion
-\item Higher calibrators (UCT/FT, Baire/DC$_\omega$)
+\item[$\checkmark$] Higher calibrators: UCT/FT axis complete via FT frontier infrastructure
+\item Baire/DC$_\omega$ calibrators (future work)
 \end{enumerate}
 
 \subsection{Long--term Goals}
@@ -800,6 +882,18 @@ Beklemishev, L.D. (2004). Provability algebras and proof-theoretic ordinals, {II
 
 \bibitem{Lean4}
 de Moura, L. et al. (2021). \emph{The Lean 4 Theorem Prover and Programming Language}. 
+
+\bibitem{FridmanSimpson}
+Friedman, H.M. and Simpson, S.G. (2000). Issues and problems in reverse mathematics. \emph{Computability Theory and its Applications}, Contemporary Mathematics 257, 127--144.
+
+\bibitem{Hirst}
+Hirst, J.L. (2004). A survey of the reverse mathematics of ordinal arithmetic. \emph{Reverse Mathematics 2001}, Lecture Notes in Logic 21, 222--234.
+
+\bibitem{Ishihara}
+Ishihara, H. (2006). Reverse mathematics in Bishop's constructive mathematics. \emph{Philosophia Scientiae}, Cahier spécial 6, 43--59.
+
+\bibitem{ShiojiTanaka}
+Shioji, N. and Tanaka, K. (1990). Fixed point theory in weak second-order arithmetic. \emph{Ann. Pure Appl. Logic} 47, 167--188.
 
 \end{thebibliography}
 

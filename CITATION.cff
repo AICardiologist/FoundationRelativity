@@ -6,14 +6,14 @@ authors:
   given-names: "Paul C"
   orcid: "https://orcid.org/0000-0000-0000-0000"
   affiliation: "AICardiologist"
-title: "Foundation-Relativity"
+title: "Axiom-Calibration"
 version: v0.3.4
 doi: 10.5281/zenodo.1234567
 date-released: 2024-01-01
 url: "https://github.com/AICardiologist/FoundationRelativity"
 repository-code: "https://github.com/AICardiologist/FoundationRelativity"
 abstract: >-
-  A Lean 4 formalization exploring foundation-relativity in constructive 
+  A Lean 4 formalization exploring axiom calibration in constructive 
   mathematics. Demonstrates how mathematical pathologies behave differently 
   under BISH vs ZFC foundations, with complete ρ-hierarchy proofs showing 
   logical strength requirements (WLPO, DC_ω, DC_{ω+1}) for various constructions.
@@ -21,7 +21,7 @@ keywords:
   - "formal verification"
   - "constructive mathematics"
   - "lean4"
-  - "foundation relativity"
+  - "axiom calibration"
   - "category theory"
   - "mathematical logic"
 license: Apache-2.0

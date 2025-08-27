@@ -1117,6 +1117,28 @@ def toPackedProfile (ip : IsPacking k h π H S) :
       simpa using hi
 }
 
+  /-- From `H > 0` and `attain`, packing forces `0 < S`. -/
+  lemma s_pos_of_posH (ip : IsPacking k h π H S) (hH : 0 < H) : 0 < S := by
+    -- `attain` gives us a witness `i` with `h i = H` (since `H ≠ 0`)
+    have hHne : H ≠ 0 := Nat.ne_of_gt hH
+    rcases ip.attain with h0 | ⟨i, hi⟩
+    · cases hHne h0
+    · -- choose `j := π i`; then `h (π.symm j) = h i = H` so `j.val < S` by `block`
+      have j_lt_S : (π i).val < S := by
+        have hmax : h (π.symm (π i)) = H := by simpa using hi
+        exact (ip.block (π i)).mp hmax
+      exact Nat.lt_of_le_of_lt (Nat.zero_le _) j_lt_S
+
+  /-- A simp‑friendly orientation of the block condition. -/
+  @[simp] lemma block_iff (ip : IsPacking k h π H S) (j : Fin k) :
+      (h (π.symm j) = H) ↔ j.val < S :=
+    ip.block j
+
+  /-- The converse orientation, also simp‑friendly. -/
+  @[simp] lemma lt_iff_max (ip : IsPacking k h π H S) (j : Fin k) :
+      j.val < S ↔ (h (π.symm j) = H) :=
+    (ip.block j).symm
+
 end IsPacking
 
 /-- **General exact time via permutation.**
@@ -1142,6 +1164,42 @@ theorem targetsMet_at_Nstar_general_of_packing
     targetsMet (permuteSchedule π (roundRobin k hk)) h (Nstar k H S) := by
   have := exact_finish_time_general_of_packing (k := k) hk (h := h) (π := π) (H := H) (S := S) ip
   simpa using (this (Nstar k H S)).mpr (Nat.le_refl _)
+
+/-- **General lower bound (targetsMet view).**
+If `π` packs `h` with parameters `(H,S)` and `H>0`,
+then `h` cannot be met below `N*` on the permuted schedule. -/
+theorem not_targetsMet_below_Nstar_general_of_packing
+    {k : Nat} (hk : 0 < k) {h : Fin k → Nat} {π : Equiv (Fin k) (Fin k)} {H S : Nat}
+    (ip : IsPacking k h π H S) (hH : 0 < H) :
+    ∀ {n}, n < Nstar k H S →
+      ¬ targetsMet (permuteSchedule π (roundRobin k hk)) h n := by
+  intro n hn
+  -- Move to permuted targets: h ∘ π⁻¹ on the original schedule
+  have perm :=
+    (targetsMet_permute (π := π) (τ := roundRobin k hk) (h := h) (n := n)).trans
+      (Iff.intro (fun hmet => hmet) (fun hmet => hmet))  -- syntactic noise suppressor
+  -- Apply the packed negation lemma with the packed profile induced by `ip`
+  have pp : PackedProfile k (fun i => h (π.symm i)) H S := ip.toPackedProfile
+  have packed_fail :=
+    not_targetsMet_below_Nstar_packed_of (k := k) hk (h := fun i => h (π.symm i))
+      (H := H) (S := S) (pp := pp) hH (n := n) (by
+        -- `hn : n < Nstar …` is already in the form expected by the packed lemma
+        exact hn)
+  -- rewrite the goal with `targetsMet_permute`
+  -- `perm` is precisely `targetsMet (permute …) h n ↔ targetsMet (roundRobin …) (h ∘ π⁻¹) n`
+  simpa [perm] using packed_fail
+
+/-! ### Permutation convenience lemmas -/
+
+/-- Identity permutation leaves the schedule unchanged. -/
+@[simp] lemma permuteSchedule_id {k} (τ : Schedule k) :
+    permuteSchedule (Equiv.refl (Fin k)) τ = τ := rfl
+
+/-- Permuting by `π` and then by `ρ` equals permuting by their composition. -/
+@[simp] lemma permuteSchedule_comp {k}
+    (π ρ : Equiv (Fin k) (Fin k)) (τ : Schedule k) :
+    permuteSchedule (π.trans ρ) τ =
+      permuteSchedule π (permuteSchedule ρ τ) := rfl
 
 /-! ### General case theorem scaffolding 
 

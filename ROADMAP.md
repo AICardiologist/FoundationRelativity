@@ -1,8 +1,19 @@
-# Foundation-Relativity Project Roadmap
+# Axiom Calibration Project Roadmap
 
-## 📍 Current Status: Part 6 General Case & Portal Pattern Complete
+## 📍 Current Status: WP-B FT Frontier & Part 6 Complete
 
 ### Recent Achievements (January 2025)
+
+#### ✨ WP-B FT Frontier: Complete Analytic Calibrators
+**Status**: Complete with 0 sorries  
+**Key Achievement**: Fan Theorem axis orthogonal to WLPO with full calibrator suite
+**Technical Details**:
+- `FT_Frontier.lean`: FT → UCT (Uniform Continuity) and FT → Sperner → BFPT_n
+- `FTPortalWire.lean`: Height certificate transport along implications
+- Height assignments: h_{FT}(UCT) = 1, h_{WLPO}(UCT) = 0 (orthogonal axes)
+- Generic `height_lift_of_imp` for certificate transport
+- Full test coverage in `FT_Frontier_Sanity.lean`
+**Files**: FT_Frontier.lean, FTPortalWire.lean, Frontier_API.lean (enhanced)
 
 #### ✅ Part 6 General Case: Complete Interface
 **Status**: Complete with 0 sorries  
@@ -15,15 +26,16 @@
 - `exact_finish_time_general_of_packing`: General case via permutation
 **Files**: PartIII_Schedule.lean (1100+ lines, 0 sorries)
 
-#### ✅ Frontier API & Portal Pattern
+#### ✅ Frontier API & Portal Pattern (Enhanced)
 **Status**: Complete with compositional surface  
 **Key Achievement**: WLPO ↔ Gap portal enables automatic calibration transport
 **Technical Details**:
-- `⟶` notation for reductions with `Trans` instance for calc chains
+- `ReducesTo` structure with `Trans` instance for calc chains
 - Portal pattern: Any `P → WLPO` gives `P → Gap` and `HeightCert P`
 - `StonePortalWire`: Wiring calibrators through the portal
+- Generic `height_lift_of_imp` for transport along implications
 - Complete helper lemmas for targetsMet abstraction
-**Files**: Frontier_API.lean, StonePortalWire.lean
+**Files**: Frontier_API.lean, StonePortalWire.lean, FT_Frontier.lean (new)
 
 #### ✅ Stone Window Calibration: Elementary Implementation
 **Status**: Complete with 0 sorries  
@@ -56,7 +68,8 @@
 - Round-robin scheduling with complete bridge n ↦ (n%k, n/k)
 - Part 6B exact finish time characterization N* = k(H-1) + S complete
 - Part VI FT→UCT reduction with height certificate at level 1
-**Files**: P4_Meta/* (35+ modules), comprehensive test coverage
+- **NEW**: Complete FT frontier infrastructure (WP-B) with full calibrator suite
+**Files**: P4_Meta/* (45+ modules including FT_Frontier), comprehensive test coverage
 
 #### ✅ Paper 3 Phase 2: Truth-Family Algebra  
 **Status**: Complete with 0 sorries  
@@ -236,7 +249,7 @@
 
 ### Q4 2025: Library Integration
 - Submit operator theory components to mathlib4
-- Create tutorial materials for foundation-relativity
+- Create tutorial materials for axiom calibration
 - Develop automated proof tactics for pathology analysis
 
 ### 2026: Extensions
@@ -348,4 +361,4 @@
 
 **Last Updated**: January 2025  
 **Next Review**: February 2025  
-**Project Lead**: Foundation-Relativity Team
+**Project Lead**: Axiom Calibration Team

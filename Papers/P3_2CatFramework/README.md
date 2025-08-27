@@ -1,8 +1,8 @@
-# Paper 3: 2-Categorical Framework for Foundation-Relativity
+# Paper 3: 2-Categorical Framework for Axiom Calibration
 
 ## 📊 Current Status Summary (Updated: January 27, 2025)
 
-**Mathematical Sorries**: 0 ✅ | **Integration Sorries**: 7 ⚠️ | **Lines of Code**: 4,400+ | **Files**: 37+
+**Mathematical Sorries**: 0 ✅ | **Integration Sorries**: 7 ⚠️ | **Lines of Code**: 4,600+ | **Files**: 45+
 
 ### Framework Status
 **Part I (Uniformization)**: ✅ COMPLETE - Height theory fully formalized  
@@ -71,9 +71,9 @@
 
 #### ⚠️ Not Yet Formalized from Part II:
 - Theory poset `Th`, `UL(C)`, `Frontier(C)` (minimal axiom packages)
-- Orthogonal profiles `h^→` and independence
+- Orthogonal profiles `h^→` and independence (partially done via FT axis)
 - Algebra for arbitrary witness families
-- Higher calibrators (UCT/FT, Baire/DC_ω)
+- Higher calibrators (Baire/DC_ω) - Note: UCT/FT now complete via FT frontier!
 
 ### Parts III-VI: P4_Meta Framework ✅ COMPLETE
 
@@ -126,12 +126,16 @@
    - `collision_chain`: Two-step proof combining proven RFN→Con with axiomatized Con→Gödel
    - Complexity interfaces and strictness results
 
-5. **Part VI: Calibrations and Portal Pattern**
-   - ✅ `FT_implies_UCT`: Fan Theorem implies Uniform Continuity on [0,1] (0 sorries)
-   - ✅ `FT_to_UCT_cert`: Height certificate showing UCT at height 1 from FT (0 sorries)
+5. **Part VI: Calibrations and Portal Pattern (WP-B COMPLETE ✨)**
+   - ✅ **FT Frontier Infrastructure**: Complete Fan Theorem axis (0 sorries)
+     - `FT_Frontier.lean`: FT → UCT, FT → Sperner → BFPT_n reductions
+     - `FTPortalWire.lean`: Height certificate transport along implications
+     - Orthogonal to WLPO axis: UCT/BFPT at height 0 on WLPO, height 1 on FT
+     - Full test coverage in `FT_Frontier_Sanity.lean`
    - ✅ **Frontier API**: Compositional reduction framework
-     - `⟶` notation for reductions with `Trans` instance for calc chains
+     - `ReducesTo` structure with `Trans` instance for calc chains
      - `reduces`, `reduces_of_iff_mp`, `reduces_of_iff_mpr` helpers
+     - Generic `height_lift_of_imp` for certificate transport
      - Portal pattern: WLPO ↔ Gap as universal adapter
    - ✅ **Stone Calibration**: Elementary dyadic blocks (0 sorries)
      - `dyadicBlock`, `encSet`, idempotent encoding `e`
@@ -283,7 +287,7 @@ Two versions of the paper are available:
 ## Mathematical Significance
 
 This paper establishes:
-- **First formalization**: 2-categorical framework for foundation-relativity in Lean 4
+- **First formalization**: 2-categorical framework for axiom calibration in Lean 4
 - **Uniformization height**: Complete theory proving gap has height = 1
 - **Positive uniformization**: Witness existence requires stronger axioms (WLPO)
 - **Foundation morphisms**: Formal system for comparing logical foundations
