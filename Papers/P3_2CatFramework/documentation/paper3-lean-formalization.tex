@@ -415,24 +415,33 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
 \textbf{Part 6 Status (January 27, 2025):} COMPLETE - All theorems proven with 0 sorries
 \end{mdframed}
 
-\textbf{Part 6 Mathematical Results (COMPLETE)}:
+\textbf{Part 6 Results (COMPLETE)}:
 \begin{itemize}
-\item[$\checkmark$] \texttt{quota\_roundRobin\_block\_closed}: Closed-form formula $\text{quota}(i, k \cdot n + r) = n + \mathbf{1}_{i < r}$
-\item[$\checkmark$] \texttt{quotas\_reach\_targets\_iff}: Feasibility at time $m$ characterized by $q_i \leq \lfloor m/k \rfloor + \mathbf{1}_{i < m \bmod k}$  
-\item[$\checkmark$] \texttt{quotas\_reach\_targets\_packed}: Upper bound proof that $N^* = k(H-1) + S$ suffices when maximal axes are reindexed first
-\end{itemize}
-
-\textbf{Part 6B Results (COMPLETE)}:
-\begin{itemize}
-\item[$\checkmark$] \texttt{quotas\_not\_reached\_below\_packed}: Lower bound proof for $n < N^*$ fully formalized
-\item[$\checkmark$] \texttt{quotas\_targets\_exact\_packed}: Exact characterization $\Leftrightarrow n \geq N^*$
-\item[$\checkmark$] \texttt{quota\_mono}: Monotonicity of quota function proven by induction
+\item[$\checkmark$] \textbf{Packed Case}: Complete characterization of exact finish time $N^* = k(H-1) + S$
+  \begin{itemize}
+  \item \texttt{quotas\_not\_reached\_below\_packed}: Lower bound proof for $n < N^*$
+  \item \texttt{targetsMet\_iff\_ge\_Nstar\_packed}: Exact characterization $\Leftrightarrow n \geq N^*$
+  \item \texttt{targetsMet} abstraction with antitonicity and duality lemmas
+  \end{itemize}
+\item[$\checkmark$] \textbf{General Case Interface}: Complete permutation bridge
+  \begin{itemize}
+  \item \texttt{permuteSchedule}: Permute axis labels preserving schedule structure
+  \item \texttt{quota\_perm}: Quotas invariant under permutation
+  \item \texttt{targetsMet\_permute}: Meeting targets invariant under permutation
+  \item \texttt{IsPacking}: Specification for packing permutations
+  \item \texttt{exact\_finish\_time\_general\_of\_packing}: General case via permutation
+  \end{itemize}
+\item[$\checkmark$] \textbf{Helper Lemmas}: Complete suite of utilities
+  \begin{itemize}
+  \item \texttt{not\_targetsMet\_iff\_exists\_short}: Logical dual form
+  \item \texttt{Nstar\_lower\_bound}, \texttt{Nstar\_upper\_bound}: Bounds on $N^*$
+  \item \texttt{Nstar\_strict\_mono\_k}: Strict monotonicity when $H > 1$
+  \end{itemize}
 \end{itemize}
 
 \textbf{Future Work}:
 \begin{itemize}
-\item[\textbf{TODO}] Permutation lemma for general case (requires Finset)
-\item[\textbf{TODO}] Integration with ProductHeight theorems
+\item[\textbf{TODO}] Construct concrete packing permutation satisfying \texttt{IsPacking}
 \end{itemize}
 
 \subsection{Part V: Collision Theorems (HYBRID)}
@@ -447,13 +456,38 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
 \item[$\checkmark$] \texttt{godel\_height\_bound}: G$_T$ has height $\leq$ 2 in double extension
 \end{itemize}
 
-\subsection{Part VI: FT→UCT Reduction (COMPLETE)}
+\subsection{Part VI: Calibrations and Portal Pattern (COMPLETE)}
+
+\textbf{Frontier API and Portal Pattern}:
+\begin{itemize}
+\item[$\checkmark$] \textbf{Compositional Reduction Framework}:
+  \begin{itemize}
+  \item \texttt{ReducesTo} structure with \texttt{⟶} notation and \texttt{Trans} instance for calc chains
+  \item \texttt{reduces}, \texttt{reduces\_of\_iff\_mp/mpr} helpers for building reductions
+  \item Portal pattern: WLPO $\leftrightarrow$ Gap as universal adapter
+  \end{itemize}
+\item[$\checkmark$] \textbf{Portal Consequences}: For any calibrator proving $P \to$ WLPO:
+  \begin{itemize}
+  \item Immediate: $P \to$ Gap via \texttt{toGap\_of\_toWLPO'}
+  \item Height certificate: \texttt{HeightCert P} via transport
+  \item Equivalences: $P \leftrightarrow$ WLPO gives $P \leftrightarrow$ Gap
+  \end{itemize}
+\item[$\checkmark$] \texttt{StonePortalWire}: Complete wiring module for calibrators
+\end{itemize}
 
 \textbf{Fan Theorem to Uniform Continuity}:
 \begin{itemize}
 \item[$\checkmark$] \texttt{FT\_implies\_UCT}: Fan Theorem implies Uniform Continuity on [0,1]
 \item[$\checkmark$] \texttt{FT\_to\_UCT\_cert}: Height certificate showing UCT at height 1 from FT
 \item[$\checkmark$] Abstract interface avoiding heavy real number dependencies
+\end{itemize}
+
+\textbf{Stone Window Calibration (Elementary Implementation)}:
+\begin{itemize}
+\item[$\checkmark$] \texttt{dyadicBlock}: Elementary dyadic blocks via $n \bmod 2^{k+1} = 2^k$
+\item[$\checkmark$] \texttt{encSet}, \texttt{e}: Encoding bitstreams as \{0,1\}-valued sequences
+\item[$\checkmark$] Complete calibration lemmas: monotonicity, equivalences, characterizations
+\item[$\checkmark$] 0 sorries - replaced heavy p-adic machinery with elementary modular arithmetic
 \end{itemize}
 
 \subsection{Stone window: classical fact and a constructive calibration (no new theorem)}

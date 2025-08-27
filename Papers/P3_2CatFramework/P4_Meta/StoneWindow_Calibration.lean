@@ -101,4 +101,78 @@ lemma e_nonzero_of_exists_true {α : ℕ → Prop}
     reductions from hypothetical surjectivity procedures).
 -/
 
+/-! ### Extra calibration lemmas (no density) -/
+
+-- Membership monotonicity on encodings: if α ≤ β pointwise, then encSet α ⊆ encSet β.
+lemma encSet_mono {α β : ℕ → Prop}
+    (hαβ : ∀ k, α k → β k) :
+    encSet α ⊆ encSet β := by
+  intro n hn
+  rcases hn with ⟨k, hk, hnBk⟩
+  exact ⟨k, hαβ k hk, hnBk⟩
+
+-- Pointwise monotonicity of the 0/1 encoding.
+lemma e_mono {α β : ℕ → Prop}
+    (hαβ : ∀ k, α k → β k) (n : ℕ) :
+    e α n ≤ e β n := by
+  by_cases h : n ∈ encSet α
+  · have : n ∈ encSet β := encSet_mono hαβ h
+    -- 1 ≤ 1, and 1 ≤ 0 never happens; both cases handled by simp
+    simp [e_of_mem h, e_of_mem this]
+  · -- 0 ≤ (0 or 1)
+    simp [e_of_not_mem h]
+
+-- A clean equivalence: the encoding is everywhere 0 iff the bitstream is identically false.
+lemma e_zero_iff_all_false (α : ℕ → Prop) :
+    (∀ n, e α n = 0) ↔ (∀ k, ¬ α k) := by
+  constructor
+  · intro h k hk
+    -- If α k holds, 2^k is encoded to 1; contradicts the hypothesis.
+    have enc1 : e α (2^k) = 1 := e_of_mem ⟨k, hk, mem_B_pow k⟩
+    have enc0 : e α (2^k) = 0 := h (2^k)
+    rw [enc1] at enc0
+    -- Now enc0 says 1 = 0, which is a contradiction
+    cases enc0
+  · intro h n
+    -- Directly from `e_zero_of_all_false`.
+    exact e_zero_of_all_false h n
+
+-- Another clean equivalence: there is a 1 in the encoding iff α has a true bit.
+lemma e_exists_one_iff_exists_true (α : ℕ → Prop) :
+    (∃ n, e α n = 1) ↔ (∃ k, α k) := by
+  constructor
+  · intro ⟨n, hn⟩
+    -- If `e α n = 1`, then `n ∈ encSet α`, so ∃ k, α k.
+    by_contra hnone
+    -- `¬ (∃ k, α k)` ≡ `∀ k, ¬ α k` so encoding is everywhere 0.
+    simp only [not_exists] at hnone
+    have hzero : ∀ m, e α m = 0 := (e_zero_iff_all_false α).mpr hnone
+    -- Contradiction with `hn`
+    have : e α n = 0 := hzero n
+    rw [hn] at this
+    -- Now this says 1 = 0, which is a contradiction
+    cases this
+  · intro ⟨k, hk⟩
+    exact e_nonzero_of_exists_true ⟨k, hk⟩
+
+/-! ### Characterization lemmas -/
+
+@[simp] lemma e_eq_one_iff {α : ℕ → Prop} {n : ℕ} :
+    e α n = 1 ↔ n ∈ encSet α := by
+  classical
+  by_cases h : n ∈ encSet α
+  · simp [e, h]
+  · simp [e, h]
+
+@[simp] lemma e_eq_zero_iff {α : ℕ → Prop} {n : ℕ} :
+    e α n = 0 ↔ n ∉ encSet α := by
+  classical
+  by_cases h : n ∈ encSet α
+  · simp [e, h]
+  · simp [e, h]
+
+lemma mem_encSet_pow {α : ℕ → Prop} {k : ℕ} (hk : α k) :
+    2^k ∈ encSet α :=
+  ⟨k, hk, mem_B_pow k⟩
+
 end Papers.P4Meta
