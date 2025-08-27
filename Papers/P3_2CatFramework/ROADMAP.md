@@ -94,10 +94,26 @@
 - `NormalForm_test.lean`: Normal form and transport coverage
 - Full ω+ε certificate and congruence tests
 
+### ✅ Recently Completed (January 27, 2025)
+
+#### WP Interface Layer Hardening
+- **Independent predicate**: Changed from inductive to uninterpreted axiom (prevents misuse)
+- **WPA namespace isolation**: Removed re-exports for true isolation
+- **Performance annotations**: Added @[inline] to key definitions
+- **Axiom verification**: Minimal dependency footprint confirmed
+
+#### Track A: DCω/Baire Frontier (COMPLETE)
+- **DCw_Frontier.lean**: Core infrastructure mirroring FT pattern
+- **DCwPortalWire.lean**: Axiomatizes DCω → Baire reduction
+- **Height profiles**: Established (0,0,1) for Baire calibrator
+- **Orthogonal products**: Gap × Baire demonstrates (1,0,1) profile
+- **Independence**: DCω ⊥ WLPO ⊥ FT confirmed
+- **Build status**: 0 sorries, all tests passing
+
 ### ⚠️ Not Yet Formalized
 - Theory poset `Th`, `UL(C)`, `Frontier(C)` 
 - General ladder machinery and orthogonal profiles
-- Higher calibrators (UCT/FT, Baire/DC_ω axes)
+- Higher calibrators beyond DCω/Baire (e.g., WKL, Bolzano-Weierstrass)
 - Independence assumptions and model-existence arguments
 
 ### Build Quality (as of 2025-01-27)
