@@ -148,4 +148,20 @@ end StoneExample
     {P Q : Prop} (hP : HeightCert P) (imp : P → Q) : HeightCert Q :=
   height_mono imp hP
 
+/-! ### Height Product Combinator Note
+
+ProductSharpness.lean is already parametrized by `height_and`, so you just need
+to supply that combinator when you use it. If you have a concrete product operator
+from Part II, you can derive `height_and` as follows:
+
+Example (when you have your concrete HeightCert and product):
+```
+def my_height_and {P Q : Prop} (hP : HeightCert P) (hQ : HeightCert Q) : HeightCert (P ∧ Q) :=
+  -- Use your Part II machinery to combine certificates
+  (...) -- Replace with your actual implementation
+```
+
+Then pass `my_height_and` to the theorems in ProductSharpness.lean.
+-/
+
 end Papers.P4Meta

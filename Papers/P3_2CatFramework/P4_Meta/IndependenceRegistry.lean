@@ -9,17 +9,17 @@
 
 namespace Papers.P4Meta
 
-/-- Marker proposition: 'P and Q are independent/orthogonal' (paper-level citation). -/
-inductive Independent (P Q : Prop) : Prop | mk : Independent P Q
+/-- Uninterpreted predicate: 'P and Q are independent/orthogonal'.
+    This prevents accidental proofs via constructors. -/
+axiom Independent : Prop → Prop → Prop
 
-/-- Symmetry is immediate for the marker. -/
-theorem Independent.symm {P Q : Prop} : Independent P Q → Independent Q P :=
-  fun _ => Independent.mk
+/-- Symmetry axiom: independence is symmetric. -/
+axiom Independent.symm {P Q : Prop} : Independent P Q → Independent Q P
 
 /-- Axis tokens (or import your existing ones). -/
-constant WLPO : Prop
-constant FT   : Prop
-constant DCw  : Prop
+axiom WLPO : Prop
+axiom FT   : Prop
+axiom DCw  : Prop
 
 /-! ### Standard Independence Assumptions 
 
