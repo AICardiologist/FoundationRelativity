@@ -1,93 +1,77 @@
 /-
   File: Papers/P3_2CatFramework/P4_Meta/ProductSharpness.lean
-  
-  Purpose: WP-C Sharpness from Independence
-  - Lemmas showing that independent axes yield sharp product heights
-  - Connects independence registry to height certificates
-  - Justifies the "max" law for orthogonal products
--/
 
+  Purpose: WP-C Sharpness from Independence (interface-level, no sorries)
+  - Shows how to combine height certificates across orthogonal axes
+  - Parametrized by two combinators:
+      • height_mono : transports a certificate along an implication
+      • height_and  : combines certificates for P and Q into one for (P ∧ Q)
+  - Uses IndependenceRegistry just for tokens/axioms; proofs do not rely on them.
+-/
 import Papers.P3_2CatFramework.P4_Meta.Frontier_API
 import Papers.P3_2CatFramework.P4_Meta.IndependenceRegistry
 
 namespace Papers.P4Meta
 
-section ProductSharpness
+section
 
 variable {HeightCert : Prop → Prop}
+
+/-- Transport along implication. Supplied by your framework. -/
 variable (height_mono : ∀ {P Q}, (P → Q) → HeightCert P → HeightCert Q)
+
+/-- Conjunction combiner. You can derive this from a product operator using
+    `height_and_of_prod` (see Frontier_API.lean). -/
 variable (height_and  : ∀ {P Q}, HeightCert P → HeightCert Q → HeightCert (P ∧ Q))
 
 /-- Sharpness from orthogonality (interface-level).
-    If `C` needs WLPO and `D` needs FT, then with WLPO⊥FT the product lands at the
-    fused profile; at Prop-level we expose it as a certificate for `C ∧ D`. -/
+
+    If `C` needs WLPO and `D` needs FT, then given height-1 certs for WLPO and FT,
+    we obtain a height cert for `C ∧ D`.
+
+    Note: the `Independent WLPO FT` argument documents the intended use
+    (orthogonality), but the certificate composition itself only needs the two
+    combinators above. -/
 def sharp_product_of_indep
     {C D : Prop} {WLPO FT : Prop}
     (needs_W : WLPO → C) (needs_F : FT → D)
-    (_indep : Independent WLPO FT)
-    (w1 : HeightCert WLPO) (w2 : HeightCert FT) : HeightCert (C ∧ D) :=
-  let hC : HeightCert C := height_mono needs_W w1
-  let hD : HeightCert D := height_mono needs_F w2
+    (_h_indep : Independent WLPO FT)
+    (hW : HeightCert WLPO) (hF : HeightCert FT) : HeightCert (C ∧ D) :=
+  let hC : HeightCert C := height_mono needs_W hW
+  let hD : HeightCert D := height_mono needs_F hF
   height_and hC hD
 
-/-- Specialized version for our standard calibrators. -/
-theorem sharp_UCT_Gap_product 
-    {HeightCert : Prop → Prop}
+/-- Specialized example: combine Gap (from WLPO) with UCT (from FT). -/
+theorem sharp_UCT_Gap_product
     (height_mono : ∀ {P Q}, (P → Q) → HeightCert P → HeightCert Q)
     (height_and  : ∀ {P Q}, HeightCert P → HeightCert Q → HeightCert (P ∧ Q))
     {Gap UCT : Prop}
     (gap_from_wlpo : WLPO → Gap)
-    (uct_from_ft : FT → UCT)
-    (hw : HeightCert WLPO)
-    (hf : HeightCert FT) :
-    HeightCert (Gap ∧ UCT) := 
-  sharp_product_of_indep height_mono height_and gap_from_wlpo uct_from_ft indep_WLPO_FT hw hf
+    (uct_from_ft   : FT → UCT)
+    (hW : HeightCert WLPO) (hF : HeightCert FT) :
+    HeightCert (Gap ∧ UCT) :=
+sharp_product_of_indep (HeightCert := HeightCert)
+  height_mono height_and gap_from_wlpo uct_from_ft indep_WLPO_FT hW hF
 
-/-- Triple product with three independent axes. -/
+/-- Triple product pattern across three axes WLPO, FT, and DCω. -/
 theorem sharp_triple_product
-    {HeightCert : Prop → Prop}
     (height_mono : ∀ {P Q}, (P → Q) → HeightCert P → HeightCert Q)
     (height_and  : ∀ {P Q}, HeightCert P → HeightCert Q → HeightCert (P ∧ Q))
     {C D E : Prop}
-    (needs_W : WLPO → C)
-    (needs_F : FT → D) 
-    (needs_DC : DCw → E)
-    (hw : HeightCert WLPO)
-    (hf : HeightCert FT)
-    (hdc : HeightCert DCw) :
+    (needs_W : WLPO → C) (needs_F : FT → D) (needs_DC : DCw → E)
+    (hW : HeightCert WLPO) (hF : HeightCert FT) (hDC : HeightCert DCw) :
     HeightCert (C ∧ D ∧ E) :=
-  -- Uses all three independence assumptions
-  -- First combine C and D
-  let hCD := sharp_product_of_indep height_mono height_and needs_W needs_F indep_WLPO_FT hw hf
-  -- Then combine with E
-  height_and hCD (height_mono needs_DC hdc)
+by
+  -- Combine C (from WLPO) and D (from FT)
+  have hCD  : HeightCert (C ∧ D) :=
+    sharp_product_of_indep (HeightCert := HeightCert)
+      height_mono height_and needs_W needs_F indep_WLPO_FT hW hF
+  -- Lift DCω to E
+  have hE   : HeightCert E := height_mono needs_DC hDC
+  -- Conjoin: (C ∧ D) ∧ E
+  have hCDE : HeightCert ((C ∧ D) ∧ E) := height_and hCD hE
+  -- Reassociate: ((C ∧ D) ∧ E) → (C ∧ (D ∧ E)) ≡ (C ∧ D ∧ E)
+  exact height_mono (fun ⟨⟨c, d⟩, e⟩ => ⟨c, d, e⟩) hCDE
 
-/-! ### Height Profile Notation
-
-For documentation purposes, we record height profiles as tuples:
-- (h_WLPO, h_FT) = (0, 1) means: height 0 on WLPO axis, height 1 on FT axis
-- This corresponds to needing FT but not WLPO
--/
-
-/-- UCT has profile (0, 1): doesn't need WLPO, needs FT. -/
-example {HeightCert : Prop → Prop} {UCT : Prop} 
-    (uct_from_ft : FT → UCT)
-    (uct_without_wlpo : UCT)  -- UCT holds without WLPO
-    : True := trivial
-
-/-- Gap has profile (1, 0): needs WLPO, doesn't need FT. -/  
-example {HeightCert : Prop → Prop} {Gap : Prop}
-    (gap_from_wlpo : WLPO → Gap)
-    (gap_without_ft : Gap)  -- Gap can exist without FT
-    : True := trivial
-
-end ProductSharpness
-
-/-! ### Integration with Part II Product/Sup Law
-
-Once we have the concrete witness product type from Part II,
-replace the `∧` conjunctions above with the actual product construction
-and use the existing product/sup height lemmas.
--/
-
+end
 end Papers.P4Meta

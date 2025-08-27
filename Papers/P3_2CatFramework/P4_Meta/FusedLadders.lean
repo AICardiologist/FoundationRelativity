@@ -10,7 +10,7 @@
 namespace Papers.P4Meta
 
 /-- Abstract "height at stage n on ladder L" (façade). -/
-abbrev HeightAt (L : Type) (n : Nat) (P : Prop) := Prop
+abbrev HeightAt (_L : Type) (_n : Nat) (_P : Prop) := Prop
 
 /-- Fused ladder (lexicographic product) symbol. -/
 def fuse (L1 L2 : Type) : Type := L1 × L2
