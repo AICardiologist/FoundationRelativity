@@ -139,4 +139,13 @@ def surjDZ_equiv_Gap : SurjDZ ↔ Gap :=
 
 end StoneExample
 
+/-! ### Generic height lifting helper -/
+
+/-- Generic height lift along an implication. -/
+@[inline] def height_lift_of_imp
+    {HeightCert : Prop → Prop}
+    (height_mono : ∀ {P Q}, (P → Q) → HeightCert P → HeightCert Q)
+    {P Q : Prop} (hP : HeightCert P) (imp : P → Q) : HeightCert Q :=
+  height_mono imp hP
+
 end Papers.P4Meta
