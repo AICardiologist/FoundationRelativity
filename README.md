@@ -45,7 +45,7 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
 
 ### 🎯 **Latest Achievements**
 
-#### **Paper 3 Parts I-VI: Complete 2-Categorical Framework + Meta Layer** (December 2024)
+#### **Paper 3 Parts I-VI: Complete 2-Categorical Framework + Meta Layer** (January 2025)
 - **Part I & II**: Complete uniformization height theory + positive uniformization
   - `gap_has_height_one`: Bidual gap has uniformization height = 1
   - `pos_gap_height_eq_one`: Gap has positive height = 1 (requires WLPO)
@@ -53,24 +53,26 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
 - **Parts III-VI (P4_Meta)**: Meta-theoretic framework for provenance tracking
   - Deterministic Theory/Extend mechanism for meta-reasoning
   - ProofHeight calculus tracking extension complexity
-  - **Part V**: ✅ Complete RFN→Con→Gödel collision chain (0 sorries)
-    - `reflection_implies_consistency`: RFN_Σ₁(T) proves Con(T)
-    - `collision_chain`: Two-step proof of Gödel sentence via RFN→Con
-  - **Part VI**: ✅ FT→UCT reduction formalized (0 sorries)
-    - `FT_implies_UCT`: Fan Theorem implies Uniform Continuity on [0,1]
-    - Height certificate showing UCT provable at height 1 from FT
-  - Part VI Stone window: Boolean ring with support ideals
-  - Provenance discipline: tracking classical vs Lean-proved results
-  - **NEW**: k-ary schedule abstractions with quota invariants (PartIII_Schedule)
-  - **NEW**: Complete proof that k=2 schedule exactly matches fuseSteps pattern
-  - **NEW**: Exact finish time characterization: N* = k(H-1) + S for k-ary products
-  - **NEW**: Packed achievability theorem proving upper bound at exact finish time
-  - **NEW**: Ladder algebra with concatenation, normal forms, and @[simp] automation
-  - **NEW**: Two-phase composition (PartIII_Concat) for splicing ladders at stage k
-  - **NEW**: Complete sorry-free normal forms (PartIII_NormalForm) with canonical representation
-- **Technical innovations**: PUnit pivot for cast-free Equiv proofs, single import surface
-- **Files**: 3,500+ lines across 35+ files including enhanced P4_Meta framework
-- **Status**: ✅ **0 sorries in core framework**, completely sorry-free ladder algebra
+  - **Part V**: 🔄 Hybrid RFN→Con→Gödel collision chain
+    - `reflection_implies_consistency`: RFN_Σ₁(T) proves Con(T) ✅ (proven, 0 sorries)
+    - `consistency_implies_godel`: Con(T) proves Gödel sentence 📌 (axiomatized)
+    - `collision_chain`: Two-step proof combining proven + axiomatized steps
+  - **Part VI**: Complete scheduling theory + calibrations
+    - **Scheduling Theory**: Complete k-ary round-robin with exact finish time N* = k(H-1) + S
+    - **Permutation Bridge**: General case via `IsPacking` specification (0 sorries)
+    - **Portal Pattern**: WLPO ↔ Gap frontier with compositional reductions
+    - **Stone Calibration**: Elementary dyadic blocks with WLPO-style reduction lemmas
+    - **FT→UCT**: Fan Theorem implies Uniform Continuity at height 1
+  - **NEW**: Complete permutation machinery for general demand profiles
+  - **NEW**: `targetsMet` abstraction with antitonicity and duality lemmas
+  - **NEW**: Frontier API with `⟶` notation and `Trans` instance for calc chains
+  - **NEW**: N* bounds (lower/upper) and strict monotonicity lemmas
+- **Technical innovations**: 
+  - PUnit pivot for cast-free Equiv proofs
+  - Portal pattern for shuttling reductions through WLPO ↔ Gap
+  - Permutation-invariant quotas and targetsMet predicates
+- **Files**: 4,000+ lines across 40+ files including Frontier_API and StonePortalWire
+- **Status**: ✅ **0 sorries in entire P4_Meta framework**
 
 #### **Sprint E WLPO ↔ BidualGap∃ Complete**
 
@@ -93,7 +95,7 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
 - `Papers/P2_BidualGap/HB/DirectDual.lean` - Direct construction of G for c₀ with 0 sorries
 - `Papers/P2_BidualGap/HB/WLPO_to_Gap_HB.lean` - Main equivalence theorem (witness: c₀)
 - `Papers/P2_BidualGap/HB/DualIsometriesComplete.lean` - Dual isometry with 3 WLPO sorries
-- `Papers/P2_BidualGap/Gap/Quotients.lean` - Complete quotient framework (Stone window)
+- `Papers/P2_BidualGap/Gap/Quotients.lean` - Complete quotient framework
 - `Papers/P2_BidualGap/Constructive/Ishihara.lean` - Gap → WLPO direction
 
 **Mathematical Significance**: Complete formal verification that the existential bidual gap (∃X with gap) has exactly the logical strength of WLPO, using c₀ as the witness space. The formalization avoids Banach limits and maintains constructive clarity.

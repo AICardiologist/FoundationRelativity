@@ -78,7 +78,7 @@ A Pre--Lean Framework Based on the WLPO\,$\boldsymbol{\leftrightarrow}$\,Bidual 
 \begin{abstract}
 This paper proposes a general framework for \emph{foundation--relativity} that treats mathematically meaningful ``witness'' constructions (e.g.\ bidual gaps) as assignments varying over a category of foundations. The central structural notion is \emph{uniformizability}: when an assignment can be made invariant (up to equivalence) along interpretations that fix a small signature. We show how the equivalence from our companion paper---over \BISH, the bidual gap for $\linf$ is equivalent to \WLPO---implies a sharp \emph{no--uniformization} result at height~$0$ and a \emph{complete uniformization} at height~$1$ (i.e.\ after adding \WLPO). This defines a simple \emph{height invariant} for witness families and computes it for the gap.
 
-A second part revisits the ``Stone window'' isomorphism $\mathrm{Idem}(\linf/\cnull)\cong\mathcal{P}(\N)/\mathrm{Fin}$ as a case study supporting the framework, emphasizing naturality under interpretations that fix the base signature. Finally we discuss Lean~4 considerations: current bicategory infrastructure and practical workarounds for a near--term mechanization (strict $2$--category skeletons, thin $2$--cells, and displayed encodings).
+A second part uses the classical Stone window isomorphism $\mathrm{Idem}(\linf/\cnull)\cong\mathcal{P}(\N)/\mathrm{Fin}$ as a calibration case study, measuring which constructive principles are required to recover surjectivity for various support ideals. Finally we discuss Lean~4 considerations: current bicategory infrastructure and practical workarounds for a near--term mechanization (strict $2$--category skeletons, thin $2$--cells, and displayed encodings).
 \end{abstract}
 
 \begin{mdframed}[style=status]
@@ -105,7 +105,7 @@ Part I: Uniformization Height & $\checkmark$ Complete & 0 sorries \\
 Part II: Positive Uniformization & $\checkmark$ Complete & 0 sorries \\
 Part III: Ladder Algebra & $\checkmark$ Complete & 0 sorries \\
 Part IV: $\omega$--limit Theory & $\checkmark$ Complete & 0 sorries \\
-Part V: Collision Theorems & $\checkmark$ Structure & Axiomatized \\
+Part V: Collision Theorems & $\checkmark$ Hybrid & RFN→Con proven, Con→Gödel axiom \\
 Part VI: Stone Window & $\checkmark$ Complete & 0 sorries \\
 \hline
 \multicolumn{3}{|c|}{\textbf{k--ary Schedule Mathematics}} \\
@@ -165,7 +165,7 @@ We do not re--prove Theorem~\ref{thm:paper2}. Instead, we:
 \begin{itemize}
 \item formulate a clean \emph{no--uniformization} principle and a \emph{height} invariant for families of witness constructions;
 \item deduce from Paper~2 that the gap has height~$1$;
-\item explain why the Stone window is a natural case study at the level of \emph{assignments invariant under signature--fixing interpretations};
+\item use the classical Stone window correspondence as a calibration program to measure constructive principles needed for surjectivity;
 \item sketch realistic Lean~4 workarounds for the bicategorical ideology (strict skeletons; thin $2$--cells; displayed encodings).
 \end{itemize}
 
@@ -1077,9 +1077,11 @@ but specific principles (reflection, determinacy/regularity at high altitude) cr
 \item Congruence theorems for pointwise step equality
 \end{itemize}
 
-\textbf{Part V -- Collision Theorems (Structure Complete):}
+\textbf{Part V -- Collision Theorems (Hybrid Implementation):}
 \begin{itemize}
-\item RFN $\Rightarrow$ Con $\Rightarrow$ G\"odel sentence collision framework
+\item RFN $\Rightarrow$ Con: Fully proven with typeclasses (0 sorries)
+\item Con $\Rightarrow$ G\"odel: Axiomatized (classical result)
+\item Full collision chain framework operational
 \item Complexity interfaces and strictness results
 \end{itemize}
 
@@ -1674,7 +1676,7 @@ We pitch the framework as a \emph{portability and certification} engine: given a
 \textbf{Goal.} Increase the paper’s \emph{originality} without abandoning feasibility by:
 (i) replacing selected meta--axioms with short \emph{Lean proofs};
 (ii) producing \emph{new, pinned analytic calibrators} with sharp frontiers (upper bounds in Lean, lower bounds on paper);
-(iii) adding a \emph{genuinely new algebraic case study} (a Stone--window generalization) with proof;
+(iii) analyzing the Stone--window correspondence as a calibration case study;
 (iv) articulating cross–axis transfer lemmas inside the height calculus.
 We organize these into concrete \emph{work packages} (WPs) with deliverables.
 \end{mdframed}
@@ -1779,7 +1781,7 @@ I_{\mathcal I}\ :=\ \{\,x\in \linf\ :\ \mathrm{supp}(x)\in\mathcal I\,\},
 \]
 \end{definition}
 
-\begin{proposition}[Stone window for support ideals — \emph{new in this paper}]\label{VI:prop:stone-general}
+\begin{proposition}[Stone window for support ideals — classical]\label{VI:prop:stone-general}
 For any Boolean ideal \(\mathcal I\), the assignment
 \[
 \Phi_{\mathcal I}\ :\ \mathcal P(\mathbb N)/\mathcal I \longrightarrow \mathrm{Idem}\big(\linf/I_{\mathcal I}\big),
@@ -1841,7 +1843,7 @@ RFN\(\Rightarrow\)Con proof (A1), successor–collision lemmas, product/sup lemm
 
 \paragraph{D2 (Paper):} Two calibrator sections (B1,B2) with frontiers, Lean upper bounds, and cited lower–bound models; one new algebraic theorem (Prop.~\ref{VI:prop:stone-general}) with proof.
 
-\paragraph{D3 (Profiles):} Orthogonal profiles and frontiers updated to include UCT and Baire calibrators; transfer applications via Prop.~\raef{VI:prop:transfer}.
+\paragraph{D3 (Profiles):} Orthogonal profiles and frontiers updated to include UCT and Baire calibrators; transfer applications via Prop.~\ref{VI:prop:transfer}.
 
 \paragraph{Risks and mitigations.}
 Lower–bound models (for FT, \(\DCw\)) are classical; we cite rather than formalize. Independence for constructive calibrators is recorded as assumptions where needed. The RFN\(\Rightarrow\)Con Lean proof avoids deep encodings by using minimal typeclasses \texttt{CodesProofs} and \texttt{Sigma1Sound}.
@@ -1854,7 +1856,7 @@ Lower–bound models (for FT, \(\DCw\)) are classical; we cite rather than forma
 
 (2) We \emph{add} two analytic calibrators with explicit frontiers and Lean upper–bound proofs (B1,B2), broadening the scope beyond the bidual gap.
 
-(3) We contribute a \emph{new algebraic case study} (Prop.~\ref{VI:prop:stone-general}) that generalizes the Stone window and is mechanizable at low cost.
+(3) We use the classical Stone window correspondence (Prop.~\ref{VI:prop:stone-general}) as a calibration case study to measure the constructive principles required for surjectivity.
 
 (4) We provide a \emph{new transfer lemma} (Prop.~\ref{VI:prop:transfer}) making cross–axis compositions first–class citizens in the height algebra.
 

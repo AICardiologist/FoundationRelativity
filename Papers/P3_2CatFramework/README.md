@@ -13,11 +13,13 @@
 ### Part 6 Schedule Mathematics ✅ COMPLETE
 | Component | Status | What's Done | What's TODO |
 |-----------|--------|-------------|-------------|
-| **Infrastructure** | ✅ | Round-robin, quotas, bridges, k=2 migration | - |
-| **Upper Bound** | ✅ | `quotas_reach_targets_packed`: N* = k(H-1) + S suffices | - |
-| **Lower Bound** | ✅ | `quotas_not_reached_below_packed`: Cannot reach quotas below N* | - |
-| **Exactness** | ✅ | `quotas_targets_exact_packed`: Exact finish time N* = k(H-1) + S | - |
-| **General Case** | 🚧 | - | Permutation lemma with Finset (future work) |
+| **Infrastructure** | ✅ | Round-robin, quotas, bridges, k=2 migration, `targetsMet` abstraction | - |
+| **Packed Upper Bound** | ✅ | `quotas_reach_targets_packed`: N* = k(H-1) + S suffices | - |
+| **Packed Lower Bound** | ✅ | `quotas_not_reached_below_packed`: Cannot reach below N* | - |
+| **Packed Exactness** | ✅ | `targetsMet_iff_ge_Nstar_packed`: Exact time N* = k(H-1) + S | - |
+| **Permutation Bridge** | ✅ | `permuteSchedule`, `quota_perm`, `targetsMet_permute` | - |
+| **General Interface** | ✅ | `IsPacking` spec, `exact_finish_time_general_of_packing` | - |
+| **General Construction** | 🚧 | - | Concrete packing permutation (future work) |
 
 ### ⚠️ Known Issues (as of 2025-01-27)
 - **7 integration sorries** in Paper3_Integration.lean and P3_P4_Bridge.lean (glue code only)
@@ -95,8 +97,15 @@
      - `quotas_not_reached_below_packed`: Packed lower bound (constructive, Finset-free)
      - `quotas_targets_exact_packed`: Exact finish time N* = k(H-1) + S
      - `quota_mono`: Quota monotonicity in time
-   - **Part 6C-D (Future Work)**:
-     - Permutation/packing lemma (with Finset)
+     - `targetsMet` abstraction with monotonicity and duality lemmas
+     - N* bounds: `Nstar_lower_bound`, `Nstar_upper_bound`, `Nstar_strict_mono_k`
+   - **Part 6C-D ✅ INTERFACE COMPLETE**:
+     - `permuteSchedule`: Permute axis labels of schedule
+     - `quota_perm`: Quotas invariant under permutation
+     - `targetsMet_permute`: Meeting targets invariant under permutation
+     - `IsPacking`: Specification for packing permutations
+     - `exact_finish_time_general_of_packing`: General case via permutation
+     - Concrete packing construction left as future work
    - `concatSteps`: Two-phase ladder composition at stage k
    - Complete prefix/tail theorems with @[simp] automation
    - Normal forms (StepNF) with canonical representation
@@ -111,18 +120,27 @@
    - Lifting certificates and pairs to ω
    - Instance-wise reflection theorems
 
-4. **Collision Theorems (Part V) ✅ COMPLETE**
-   - `reflection_implies_consistency`: RFN_Σ₁(T) proves Con(T) (0 sorries)
-   - `collision_chain`: Two-step proof of Gödel sentence via RFN→Con (0 sorries)
+4. **Collision Theorems (Part V) 🔄 HYBRID**
+   - `reflection_implies_consistency`: RFN_Σ₁(T) proves Con(T) ✅ (proven, 0 sorries)
+   - `consistency_implies_godel`: Con(T) proves Gödel sentence 📌 (axiomatized as classical result)
+   - `collision_chain`: Two-step proof combining proven RFN→Con with axiomatized Con→Gödel
    - Complexity interfaces and strictness results
 
-5. **Stone Window & FT→UCT (Part VI) ✅ COMPLETE**
-   - `FT_implies_UCT`: Fan Theorem implies Uniform Continuity on [0,1] (0 sorries)
-   - `FT_to_UCT_cert`: Height certificate showing UCT at height 1 from FT (0 sorries)
-   - Boolean ring with support ideals
+5. **Part VI: Calibrations and Portal Pattern**
+   - ✅ `FT_implies_UCT`: Fan Theorem implies Uniform Continuity on [0,1] (0 sorries)
+   - ✅ `FT_to_UCT_cert`: Height certificate showing UCT at height 1 from FT (0 sorries)
+   - ✅ **Frontier API**: Compositional reduction framework
+     - `⟶` notation for reductions with `Trans` instance for calc chains
+     - `reduces`, `reduces_of_iff_mp`, `reduces_of_iff_mpr` helpers
+     - Portal pattern: WLPO ↔ Gap as universal adapter
+   - ✅ **Stone Calibration**: Elementary dyadic blocks (0 sorries)
+     - `dyadicBlock`, `encSet`, idempotent encoding `e`
+     - Calibration lemmas: monotonicity, equivalences, characterizations
+   - ✅ **StonePortalWire**: Wiring calibrators through the portal
+     - Any `P → WLPO` immediately gives `P → Gap` and `HeightCert P`
    - Provenance discipline for classical vs Lean-proved
 
-**Key Achievement**: Complete sorry-free implementation with robust elementary proofs
+**Key Achievement**: Complete sorry-free implementation with compositional portal pattern
 
 **Files**: `P4_Meta/*.lean` (~20 files), `Paper3_Integration.lean`
 
@@ -233,7 +251,7 @@ All Paper 3 components are tested in CI:
 2. ✅ Height certificates with provenance tracking
 3. ✅ Two-phase composition with prefix/tail operations
 4. ✅ ω-limit theory and instance-wise reflection
-5. ✅ Collision theorems (RFN → Con → Gödel)
+5. 🔄 Collision theorems (RFN → Con proven, Con → Gödel axiomatized)
 6. ✅ Stone window Boolean rings
 
 **P4_Meta Summary**: 0 sorries, complete elementary proofs, full @[simp] automation
@@ -314,7 +332,8 @@ This represents a new calibration program with the reduction interface establish
 - Positive families: PosFam with union operations
 - Provability congruences for step equality
 - Certificate push to ω/ω+ε: certToOmega, certToOmegaPlus
-- **RFN_Σ¹ ⇒ Con**: Schematic semantic proof (de-axiomatized)
+- **RFN_Σ¹ ⇒ Con**: Proven with typeclasses (0 sorries)
+- **Con ⇒ Gödel**: Axiomatized as classical result
 
 ### Named Axioms/Interfaces
 - `TrueInN : Formula → Prop` - Truth in standard model
