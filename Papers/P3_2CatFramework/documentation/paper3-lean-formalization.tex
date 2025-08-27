@@ -507,7 +507,7 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
 \item[$\checkmark$] 0 sorries - replaced heavy p-adic machinery with elementary modular arithmetic
 \end{itemize}
 
-\subsection{Independence Registry (WP-C INTERFACE COMPLETE)}
+\subsection{Independence Registry (WP-C INTERFACE COMPLETE - SORRY-FREE)}
 
 \textbf{Orthogonal Principles Framework}:
 \begin{itemize}
@@ -518,12 +518,14 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
   \item Paper citations: Fridman-Simpson, topos models
   \item 0 sorries - axiomatized with literature backing
   \end{itemize}
-\item[$\checkmark$] \textbf{\texttt{ProductSharpness.lean}}: Sharpness from independence
+\item[$\checkmark$] \textbf{\texttt{ProductSharpness.lean}}: Sharpness from independence (parametric)
   \begin{itemize}
   \item \texttt{sharp\_product\_of\_indep}: Max law for orthogonal products
   \item \texttt{sharp\_UCT\_Gap\_product}: UCT $\times$ Gap at fused profile
   \item \texttt{sharp\_triple\_product}: Three-axis composition
+  \item \textbf{Parametric in conjunction combinator} - no product machinery required
   \item Height profile notation: $(h_{WLPO}, h_{FT}, h_{DC})$ tuples
+  \item 0 sorries - fully interface-level implementation
   \end{itemize}
 \end{itemize}
 
@@ -547,23 +549,24 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
 \item[$\checkmark$] Calibration program measuring constructive strength per ideal
 \end{itemize}
 
-\subsection{Fused Ladders (WP-E INTERFACE COMPLETE)}
+\subsection{Fused Ladders (WP-E INTERFACE COMPLETE - SORRY-FREE)}
 
 \textbf{Cross-Axis Transfer Mechanisms}:
 \begin{itemize}
 \item[$\checkmark$] \textbf{\texttt{FusedLadders.lean}}: Cross-axis composition
   \begin{itemize}
-  \item \texttt{FusedSchedule}: k-ary interleaving schedules
-  \item \texttt{fusedLadder}: Combine multiple step functions
-  \item \texttt{fusion\_preserves\_provability}: Key transfer theorem
+  \item \texttt{HeightAt}: Abstract height at stage $n$ on ladder $L$
+  \item \texttt{fuse}: Lexicographic product of ladders
+  \item \texttt{height\_product\_on\_fuse}: Single axiom matching Proposition VI.6
+  \item Product height = max law: $h_{L_1 \times L_2}(C \land D) = \max(h_{L_1}(C), h_{L_2}(D))$
   \end{itemize}
 \item[$\checkmark$] \textbf{Standard Fusions}:
   \begin{itemize}
   \item \texttt{evenOddFusion}: 2-axis alternation (recovers Part II)
-  \item \texttt{roundRobinFusion}: k-axis round-robin
-  \item \texttt{fusion\_height\_max}: Height is max of components
+  \item \texttt{threeAxisFusion}: 3-axis round-robin
+  \item Integration with schedule abstractions from Part 6
   \end{itemize}
-\item[$\checkmark$] Integration with schedule abstractions from Part 6
+\item[$\checkmark$] 0 sorries - interface-level axiomatization
 \end{itemize}
 
 \subsection{Stone window: classical fact and a constructive calibration (no new theorem)}

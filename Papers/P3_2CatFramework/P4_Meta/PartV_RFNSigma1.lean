@@ -8,6 +8,8 @@
 
 namespace Papers.P4Meta
 
+namespace WPA  -- WP-A interface façade: namespace-isolated to prevent collisions
+
 -- Minimal type stubs for the interface
 axiom Theory : Type
 axiom Formula : Type
@@ -67,6 +69,12 @@ axiom collision_chain_two_steps (T : Theory)
     Provable (Extend (Extend T (RFN_Sigma1 T)) (Con T)) (GodelSentence T)
 
 end SuccessorCollisions
+
+end WPA
+
+-- Re-export key types for compatibility if needed
+export WPA (Theory Formula Provable Extend RFN_Sigma1 Con GodelSentence HeightCertificate
+            CodesProofs Sigma1Sound HasReflection RFN_Sigma1_implies_Consistency)
 
 /-! ### Summary for WP-A
 

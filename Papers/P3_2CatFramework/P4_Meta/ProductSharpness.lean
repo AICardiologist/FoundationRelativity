@@ -16,12 +16,7 @@ namespace Papers.P4Meta
 section
 
 variable {HeightCert : Prop → Prop}
-
-/-- Transport along implication. Supplied by your framework. -/
 variable (height_mono : ∀ {P Q}, (P → Q) → HeightCert P → HeightCert Q)
-
-/-- Conjunction combiner. You can derive this from a product operator using
-    `height_and_of_prod` (see Frontier_API.lean). -/
 variable (height_and  : ∀ {P Q}, HeightCert P → HeightCert Q → HeightCert (P ∧ Q))
 
 /-- Sharpness from orthogonality (interface-level).
