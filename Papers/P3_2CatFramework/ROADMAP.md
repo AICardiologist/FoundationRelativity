@@ -143,6 +143,72 @@
    - Paper-proven results as axioms
    - Meta-theoretic facts (collision theorems, calibrators)
 
+## 🎯 Immediate Priorities - Completing Paper 3
+
+### 🔶 Priority 1: WP-D Stone Window Support Ideals (Original Result)
+
+**Goal**: Prove the algebraic isomorphism for Boolean ideals (choice-free, constructive):
+```lean
+Φ_𝓘 : 𝓟(ℕ)/𝓘 ≅ Idem(ℓ∞/I_𝓘)
+     [A] ↦ [χ_A]
+```
+
+#### PR D1: Set Quotient & Boolean Ideal (No Rings)
+- Finalize `BoolIdeal` structure with empty_mem, downward, union_mem
+- Define symmetric difference `A △ B := (A \ B) ∪ (B \ A)`
+- Prove equivalence relation `A ≈ B ↔ A △ B ∈ 𝓘.mem`
+- Define `PowQuot 𝓘 := Quot (Setoid.mk …)`
+- Sanity test: quotient rewriting works
+
+#### PR D2: Support Ideal I_𝓘 in ℓ∞
+- Define `supp x := {n | x n ≠ 0}` for `x : Linf R`
+- Prove support lemmas: supp(0) = ∅, supp(x+y) ⊆ supp(x) ∪ supp(y)
+- Define `I_support 𝓘 : Ideal (Linf R)` via `x ∈ I_support ↔ supp x ∈ 𝓘.mem`
+- Get quotient `Linf R ⧸ I_support 𝓘`
+
+#### PR D3: The Map Φ and Isomorphism
+- Define `Idem S := {e : S | e * e = e}`
+- Implement `Φ_𝓘 : PowQuot 𝓘 → Idem(Ideal.Quotient(I_support 𝓘))`
+- Prove well-definedness: A ≈ B implies χ_A − χ_B ∈ I_support
+- Prove bijection: injective via supp(χ_A − χ_B) = A △ B, surjective via TwoIdempotents
+- Package as `stone_window_isomorphism`
+
+### 🔶 Priority 2: WP-E Replace Axiom with Proof
+
+**Goal**: Replace `height_product_on_fuse` axiom with proof from Part II product/sup law
+
+#### Implementation Steps
+1. Expose concrete `HeightCert` from Part II
+2. Provide primitive product of certificates → `height_and` corollary
+3. Define fused ladder `fuse L1 L2`
+4. Prove: `HeightAt L1 a C → HeightAt L2 b D → HeightAt (fuse L1 L2) (max a b) (C ∧ D)`
+
+#### Deliverables
+- `FusedLadders.lean`: Turn axiom into lemma
+- Sanity test: Replay Gap × UCT and Gap × Baire → max-height
+
+### 🔷 Priority 3: Profile System (Optional Enhancement)
+
+**Goal**: First-class height profile concept
+
+```lean
+structure Profile := (h_WLPO h_FT h_DCw : Nat)
+```
+
+- Auto-compute profiles from reductions to axis tokens
+- Generate profile table: Gap (1,0,0), UCT (0,1,0), Baire (0,0,1)
+- Products take componentwise max
+- Auto-generate documentation tables
+
+## 🚀 Execution Order (Concrete PRs)
+
+1. **PR D1**: Set quotient & BoolIdeal (no rings)
+2. **PR D2**: I_support ideal on Linf and quotient
+3. **PR D3**: Define Idem, implement Φ_𝓘, prove bijection + BA hom
+4. **PR E1**: Replace height_product_on_fuse axiom with proof
+5. **PR Profiles**: Introduce Profile + table generator
+6. **Tag release**: "P3 v1.0 — Tri-orthogonal frontiers (WLPO/FT/DCω)"
+
 ## 🎯 Part 6 Completion Roadmap (Priority - Based on Junior Professor Review)
 
 ### Immediate Next Steps (Part 6B-D)
@@ -240,11 +306,32 @@ theorem pos_monotone (η : ∀ F X, C.C F X → D.C F X) :
   PosUniformizableOn W C → PosUniformizableOn W D
 ```
 
+## 📚 Next Papers (After P3 Completion)
+
+### Option 1: Paper 4 - AxCal Atlas / Case Studies
+**Goal**: Curated gallery of theorems with computed profiles and frontiers
+
+- Systematic catalog of theorems on WLPO / FT / DCω axes
+- Cross-axis products and tradeoffs analysis
+- Lightweight "how-to port a theorem into AxCal" guide
+- Profile tables for common constructive principles
+- Model existence arguments for independence claims
+
+### Option 2: Paper 2 - Height Algebra Deep-Dive
+**Goal**: Self-contained exposition of uniformization/height calculus
+
+- Clean mathematical presentation (story first, code second)
+- Port key results from P3 with pedagogical focus
+- Formal proofs of fused ladder properties
+- Connection to reverse mathematics hierarchies
+- Tutorial examples with increasing complexity
+
 ## 🔭 Long-term Vision (Q2 2025+)
 
 ### Higher Axes & Calibrators
-- Extend to UCT/FT and Baire/DC_ω axes
-- `HasFT`, `HasDCω` as `Prop` tokens
+- ✅ UCT/FT axis complete (WP-B)
+- ✅ Baire/DC_ω axis complete (Track A)
+- Future: WKL, Bolzano-Weierstrass calibrators
 - Product-height results under independence
 
 ### General Ladder Machinery
