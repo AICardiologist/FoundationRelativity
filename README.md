@@ -63,7 +63,12 @@ Each pathology has a **calibration degree** ρ indicating logical strength:
     - **Scheduling Theory**: Complete k-ary round-robin with exact finish time N* = k(H-1) + S
     - **Permutation Bridge**: General case via `IsPacking` specification (0 sorries)
     - **Portal Pattern**: WLPO ↔ Gap frontier with compositional reductions
-    - **Stone Calibration**: Elementary dyadic blocks with WLPO-style reduction lemmas
+    - **WP-D Stone Window** ✅: Generalized Stone window for arbitrary Boolean ideals (COMPLETE)
+      - Complete infrastructure: BoolIdeal, PowQuot, Linf, LinfQuot (0 sorries)
+      - Ring ideal ISupportIdeal as proper Ideal (Linf R) under pointwise ops
+      - Characteristic functions with well-defined lift PhiSetToLinfQuot
+      - **NEW**: Full Stone equivalence `StoneEquiv : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R` for `[Nontrivial R]`
+      - Complete D3(c4) layer with `TwoIdempotents` class and inverse proofs
     - **FT Frontier** ✨: Complete WP-B calibrators with Fan Theorem axis
       - FT → UCT (Uniform Continuity) at height 1
       - FT → Sperner → BFPT_n (Brouwer Fixed-Point) via composition

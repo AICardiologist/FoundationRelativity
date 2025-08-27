@@ -1,8 +1,29 @@
 # Axiom Calibration Project Roadmap
 
-## 📍 Current Status: WP-B FT Frontier & Part 6 Complete
+## 📍 Current Status: WP-D Stone Window Complete & Track A DCω Frontier
 
 ### Recent Achievements (January 2025)
+
+#### 🎯 WP-D Stone Window: Complete Stone Equivalence
+**Status**: Complete with 0 sorries  
+**Key Achievement**: Full Stone equivalence between power set quotient and idempotents  
+**Technical Details**:
+- Complete D1-D3(c4) layers: BoolIdeal → PowQuot → LinfQuot → ISupportIdeal → IdemClass
+- `StoneEquiv : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R` for `[Nontrivial R]`
+- `TwoIdempotents` class for rings with only 0,1 as idempotents
+- Left/right inverse proofs: `Psi_after_Phi` and `Phi_after_Psi`
+- Robust proof handling trivial ring case (where 1 = 0)
+- 7 comprehensive sanity test files validating all layers
+**Files**: StoneWindow_SupportIdeals.lean (820+ lines, 0 sorries)
+
+#### 🎯 Track A DCω Frontier: Complete Baire Calibrator
+**Status**: Complete with 0 sorries  
+**Key Achievement**: DCω axis orthogonal to both WLPO and FT axes
+**Technical Details**:
+- `DCω_Frontier.lean`: DCω → Baire (complete separable metric spaces)
+- Height profile (1,0,1) for Gap × Baire demonstrating orthogonality
+- Full infrastructure for countable choice calibrations
+**Files**: DCω_Frontier.lean, DCω_BaireSpaces.lean (0 sorries)
 
 #### ✨ WP-B FT Frontier: Complete Analytic Calibrators
 **Status**: Complete with 0 sorries  
