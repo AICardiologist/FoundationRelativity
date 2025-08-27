@@ -1032,39 +1032,6 @@ but specific principles (reflection, determinacy/regularity at high altitude) cr
 \item[\checkmark] Positive families (\texttt{PosFam}) with union operations and stage bookkeeping
 \end{itemize}
 
-\textbf{k--ary Schedule Infrastructure (Parts 1--5): \checkmark COMPLETE}
-\begin{itemize}
-\item[\checkmark] \texttt{Schedule} structure for k--ary proof scheduling with quota invariants
-\item[\checkmark] Round--robin scheduling with \texttt{roundRobin\_assign} lemma
-\item[\checkmark] Complete proof that k=2 schedule exactly matches \texttt{fuseSteps} pattern
-\item[\checkmark] Block/bridge lemmas: \texttt{roundRobin\_block\_start\_bridge}, \texttt{roundRobin\_k1\_bridge}
-\item[\checkmark] Migration path: \texttt{evenOdd\_eq\_fuseSteps\_even/odd}
-\end{itemize}
-
-\textbf{Part 6 -- Exact Finish Time Mathematics:}
-\begin{itemize}
-\item[\checkmark] \textbf{Part 6A (Upper Bound)}: COMPLETE
-  \begin{itemize}
-  \item \texttt{quota\_roundRobin\_block\_closed}: Quota at $k \cdot n + r = n + \mathbf{1}_{i < r}$
-  \item \texttt{quotas\_reach\_targets\_iff}: Feasibility $\Leftrightarrow q_i \leq \lfloor n/k \rfloor + \mathbf{1}_{i < n \bmod k}$
-  \item \texttt{quotas\_reach\_targets\_packed}: Upper bound at $N^* = k(H-1) + S$ (packed setting)
-  \end{itemize}
-\item[\textbf{TODO}] \textbf{Part 6B (Lower Bound)}: IN PROGRESS
-  \begin{itemize}
-  \item \texttt{quotas\_not\_reached\_below\_packed}: Prove $\forall n < N^*$, $\exists i$ with $h(i) > \text{quota}(i, n)$
-  \item Strategy: Constructive case analysis on $n = k \cdot m + r$
-  \end{itemize}
-\item[\textbf{TODO}] \textbf{Part 6C (Exactness)}: NOT STARTED
-  \begin{itemize}
-  \item Define $N^*(k, H, S) := \begin{cases} 0 & H = 0 \\ k(H-1) + S & H > 0 \end{cases}$
-  \item Prove: Targets met $\Leftrightarrow n \geq N^*$ (combining 6A and 6B)
-  \end{itemize}
-\item[\textbf{TODO}] \textbf{Part 6D (General Case)}: NOT STARTED
-  \begin{itemize}
-  \item Permutation lemma using Finset (10--20 lines)
-  \item Integration with \texttt{ProductHeight} theorems under \texttt{AxisIndependent}
-  \end{itemize}
-\end{itemize}
 \end{itemize}
 
 \textbf{Part IV -- $\omega$--limit and $\omega+\varepsilon$ Theory (Complete):}
