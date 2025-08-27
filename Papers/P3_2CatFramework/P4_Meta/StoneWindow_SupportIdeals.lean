@@ -10,6 +10,7 @@
 import Mathlib.Data.Set.Basic
 import Mathlib.Data.Set.Finite.Basic
 import Mathlib.RingTheory.Ideal.Basic
+import Mathlib.RingTheory.Ideal.Quotient.Basic
 
 namespace Papers.P4Meta
 namespace StoneSupport
@@ -216,7 +217,7 @@ open Classical
 
 section D3a
 
-variable {R : Type*} [Semiring R]
+variable {R : Type*} [CommSemiring R]
 
 /-- Support (reused from D2, restated to have local typeclass context). -/
 @[reducible] def supp' (x : Linf R) : Set ℕ := {n | x n ≠ 0}
@@ -274,6 +275,27 @@ def ISupportIdeal (𝓘 : BoolIdeal) : Ideal (Linf R) where
 
 end D3a
 
+/-! ### Small inclusion lemmas -/
+
+section SmallInclusions
+open Classical
+variable {R : Type*} [CommRing R] [DecidableEq R]
+
+/-- If `x n - y n ≠ 0` then `x n ≠ y n`, pointwise; hence the support
+    of `(x - y)` is contained in `diffSet x y`. -/
+lemma supp'_sub_subset_diffSet (x y : Linf R) :
+  supp' (R := R) (x - y) ⊆ diffSet (R := R) x y := by
+  intro n hn
+  have hxmy : x n - y n ≠ 0 := by simpa [supp'] using hn
+  -- If x n = y n then x n − y n = 0, contradiction.
+  have hxy : x n ≠ y n := by
+    intro h
+    have : x n - y n = 0 := by simp [h, sub_self]
+    exact hxmy this
+  simpa [diffSet] using hxy
+
+end SmallInclusions
+
 /-! ## D3(b). Characteristic functions and the set→function quotient lift
 
 We define `chi : Set ℕ → Linf R` and show that equality modulo 𝓘 of sets
@@ -293,11 +315,15 @@ variable {R : Type*} [Zero R] [One R] [DecidableEq R]
 /-- Characteristic function of a set (values in `{0,1}` over `R`). -/
 noncomputable def chi (A : Set ℕ) : Linf R := fun n => if n ∈ A then (1 : R) else 0
 
+section ChiLemmas
+variable {R : Type*} [Zero R] [One R]
+
 @[simp] lemma chi_of_mem  {A : Set ℕ} {n : ℕ} (h : n ∈ A) :
   chi (R := R) A n = 1 := by simp [chi, h]
 
 @[simp] lemma chi_of_not_mem {A : Set ℕ} {n : ℕ} (h : n ∉ A) :
   chi (R := R) A n = 0 := by simp [chi, h]
+end ChiLemmas
 
 /-- If the characteristic values differ at `n`, then membership in `A` and `B`
 must differ at `n`. We prove this by cases on membership, without using `0 ≠ 1`. -/
@@ -343,6 +369,363 @@ noncomputable def PhiSetToLinfQuot (𝓘 : BoolIdeal) : PowQuot 𝓘 → LinfQuo
   = Quot.mk (linfEqMod (R := R) 𝓘) (chi (R := R) A) := rfl
 
 end D3b
+
+/-! ## D3(c1). Idempotents modulo the ideal (pre-ring)
+
+We explore functions that are idempotent modulo the ideal,
+that is, `f^2 - f` has support in `𝓘`.
+
+This is preparatory for building quotients that respect multiplication.
+-/
+
+section D3c1
+
+variable {R : Type*} [CommRing R] [DecidableEq R] (𝓘 : BoolIdeal)
+
+/-- A function `f : ℕ → R` is idempotent modulo `𝓘` if `f * f - f` has support in `𝓘`. -/
+def IsIdemMod (f : Linf R) : Prop :=
+  supp (R := R) (f * f - f) ∈ 𝓘.mem
+
+/-- The subtype of functions that are idempotent modulo `𝓘`. -/
+def IdemMod := {f : Linf R // IsIdemMod 𝓘 f}
+
+/-- The quotient of `IdemMod` by the equivalence `linfEqMod`. -/
+def IdemClass := Quot (fun (x y : IdemMod 𝓘) =>
+  linfEqMod (R := R) 𝓘 x.val y.val)
+
+/-! ### Characteristic functions are idempotent modulo any ideal -/
+
+/-- For any set `A`, `chi A` is idempotent modulo any ideal.
+    This is because `chi A * chi A = chi A` pointwise. -/
+lemma chi_IsIdemMod (A : Set ℕ) : IsIdemMod 𝓘 (chi (R := R) A) := by
+  unfold IsIdemMod
+  have : chi (R := R) A * chi (R := R) A = chi (R := R) A := by
+    ext n
+    simp only [chi, Pi.mul_apply]
+    by_cases h : n ∈ A
+    · simp [h]
+    · simp [h]
+  rw [this]
+  simp [supp]
+  exact 𝓘.empty_mem
+
+/-- Lift from `PowQuot` to `IdemClass` via characteristic functions. -/
+noncomputable def PhiIdemMod : PowQuot 𝓘 → IdemClass (R := R) 𝓘 :=
+  fun q => q.lift
+    (fun A => Quot.mk _ ⟨chi (R := R) A, chi_IsIdemMod 𝓘 A⟩)
+    (fun A B h => by
+      apply Quot.sound
+      show linfEqMod (R := R) 𝓘 (chi A) (chi B)
+      exact 𝓘.downward (diffSet_chi_subset_sdiff A B) h)
+
+/-! 
+This gives us:
+- A notion of idempotency modulo the ideal
+- The fact that characteristic functions are always idempotent
+- A canonical map from set quotients to idempotent quotients
+
+The next step would be to show that `IdemClass` has a natural ring structure
+when `R` is a Boolean ring or has special properties.
+-/
+
+end D3c1
+
+/-! ### D3(c1) Polish: Setoid structure and compatibility -/
+
+-- TODO: Fix universe level issues in this section
+-- The D3c1_Setoid section is commented out due to universe level issues
+-- It provides an alternative setoid-based presentation but is not needed
+-- for the main implementation
+
+/-
+-- section D3c1_Setoid
+-- def idemSetoid (𝓘 : BoolIdeal) : Setoid (IdemMod (R := R) 𝓘) where
+  r u v := diffSet (R := R) u.1 v.1 ∈ 𝓘.mem
+  iseqv := by
+    refine ⟨?refl, ?symm, ?trans⟩
+    · intro u
+      -- diffSet u u = ∅, and ∅ ∈ 𝓘
+      rw [diffSet_self]
+      exact 𝓘.empty_mem
+    · intro u v h
+      -- symmetry by diffSet_comm
+      rw [diffSet_comm]
+      exact h
+    · intro u v w huv hvw
+      -- transitivity via inclusion and ideal closure
+      have hsubset :
+          diffSet (R := R) u.1 w.1
+            ⊆ diffSet (R := R) u.1 v.1 ∪ diffSet (R := R) v.1 w.1 :=
+        diffSet_subset_union u.1 v.1 w.1
+      have hUnion :
+          diffSet (R := R) u.1 v.1 ∪ diffSet (R := R) v.1 w.1 ∈ 𝓘.mem :=
+        𝓘.union_mem huv hvw
+      exact 𝓘.downward hsubset hUnion
+
+/-- Canonical quotient of idempotent representatives. -/
+abbrev IdemClass' (𝓘 : BoolIdeal) : Type* :=
+  Quotient (idemSetoid (R := R) 𝓘)
+
+/-- The forgetful map `IdemClass' → LinfQuot` induced by `Subtype.val`. -/
+noncomputable def toLinfQuot (𝓘 : BoolIdeal) :
+    IdemClass' 𝓘 → LinfQuot (R := R) 𝓘 :=
+  Quotient.map (fun u : IdemMod (R := R) 𝓘 => u.1)
+    (by
+      intro u v huv
+      -- Respect of relations: just reuse the restricted definition
+      exact huv)
+
+/-- Compatibility: forgetting idempotent structure agrees with the D3(b) lift. -/
+noncomputable def PhiIdemMod' (𝓘 : BoolIdeal) :
+    PowQuot 𝓘 → IdemClass' 𝓘 :=
+  Quot.lift
+    (fun A : Set ℕ => Quotient.mk (idemSetoid (R := R) 𝓘)
+      ⟨chi (R := R) A, by
+        -- your `chi_IsIdemMod` proof
+        have : chi (R := R) A * chi (R := R) A = chi (R := R) A := by
+          ext n; by_cases h : n ∈ A; simp [chi, h]; simp [chi, h]
+        -- hence support of (χ^2 - χ) is empty
+        unfold IsIdemMod
+        rw [this]
+        simp [supp]
+        exact 𝓘.empty_mem⟩)
+    (by
+      intro A B hAB
+      -- well-defined: same argument as D3(b)
+      apply Quotient.sound
+      exact 𝓘.downward (diffSet_chi_subset_sdiff (R := R) A B) hAB
+    )
+
+lemma Phi_commutes (𝓘 : BoolIdeal) :
+    (toLinfQuot 𝓘) ∘ (PhiIdemMod' 𝓘)
+  = PhiSetToLinfQuot (R := R) 𝓘 := rfl
+
+-- end D3c1_Setoid
+-/
+
+/-! ## D3(c2). Algebraic Stone map scaffold -/
+
+section D3c2
+open Classical
+variable {R : Type*} [CommRing R] [DecidableEq R]
+
+/-- The ring quotient `(ℕ → R) ⧸ ISupportIdeal 𝓘`. -/
+abbrev LinfQuotRing (𝓘 : BoolIdeal) (R : Type*) [CommRing R] [DecidableEq R] : Type _ :=
+  (Linf R) ⧸ (ISupportIdeal (R := R) 𝓘)
+
+/-- The algebraic Stone map `[A] ↦ class of χ_A` into the ring quotient. -/
+noncomputable def PhiStone (𝓘 : BoolIdeal) :
+    PowQuot 𝓘 → LinfQuotRing 𝓘 R :=
+  Quot.lift
+    (fun A : Set ℕ => Ideal.Quotient.mk (ISupportIdeal (R := R) 𝓘) (chi (R := R) A))
+    (by
+      intro A B hAB
+      -- We must show (χ_A - χ_B) ∈ ISupportIdeal 𝓘.
+      -- This is equivalent to showing that the two quotient elements are equal
+      apply Ideal.Quotient.eq.mpr
+      -- Need to show: chi A - chi B ∈ ISupportIdeal 𝓘
+      rw [mem_ISupportIdeal_iff]
+      -- Need to show: supp' (chi A - chi B) ∈ 𝓘.mem
+      have h₁ : supp' (R := R) (chi (R := R) A - chi (R := R) B)
+                ⊆ diffSet (R := R) (chi (R := R) A) (chi (R := R) B) :=
+        supp'_sub_subset_diffSet (chi (R := R) A) (chi (R := R) B)
+      have h₂ :
+        diffSet (R := R) (chi (R := R) A) (chi (R := R) B)
+          ⊆ (A △ B) := diffSet_chi_subset_sdiff (R := R) A B
+      -- `supp' (...) ⊆ A △ B`, so if `A △ B ∈ 𝓘` then `supp' (...) ∈ 𝓘`.
+      have : supp' (R := R) (chi (R := R) A - chi (R := R) B) ⊆ (A △ B) :=
+        Set.Subset.trans h₁ h₂
+      exact 𝓘.downward this hAB
+    )
+
+end D3c2
+
+/-! ## D3(c3). Pack the algebraic Stone map into the idempotent subset -/
+
+section D3c3
+open Classical
+variable {R : Type*} [CommRing R] [DecidableEq R]
+
+/-- Idempotents of the ring quotient `(ℕ → R) ⧸ ISupportIdeal 𝓘`. -/
+abbrev LinfQuotRingIdem (𝓘 : BoolIdeal) (R : Type*) [CommRing R] [DecidableEq R] : Type _ :=
+  {e : LinfQuotRing 𝓘 R // e * e = e}
+
+-- Removed Coe instance to avoid universe constraint issues
+-- We use .1 explicitly where needed
+
+/-- The class of `χ_A` is idempotent in the ring quotient. -/
+lemma chi_idem_in_quot (𝓘 : BoolIdeal) (A : Set ℕ) :
+    (Ideal.Quotient.mk (ISupportIdeal (R := R) 𝓘) (chi (R := R) A) :
+      LinfQuotRing 𝓘 R)
+  *
+    Ideal.Quotient.mk (ISupportIdeal (R := R) 𝓘) (chi (R := R) A)
+  =
+    Ideal.Quotient.mk (ISupportIdeal (R := R) 𝓘) (chi (R := R) A) := by
+  -- Equality in the quotient via membership of the difference in the ideal
+  refine (Ideal.Quotient.eq (I := ISupportIdeal (R := R) 𝓘)).mpr ?_
+  -- Show `(χ_A * χ_A) - χ_A ∈ ISupportIdeal 𝓘`
+  -- It suffices to show the support lies in 𝓘.mem
+  have hχ : chi (R := R) A * chi (R := R) A = chi (R := R) A := by
+    ext n
+    by_cases h : n ∈ A
+    · simp [chi, h]
+    · simp [chi, h]
+  -- Using D3(a) unfolding lemma for ISupportIdeal
+  -- support of zero is ∅ ∈ 𝓘
+  rw [mem_ISupportIdeal_iff]
+  -- rewrite to zero, then use empty_mem
+  simp [supp', hχ]
+  exact 𝓘.empty_mem
+
+/-- Stone map into the idempotent subset of the ring quotient. -/
+noncomputable def PhiStoneIdem (𝓘 : BoolIdeal) :
+    PowQuot 𝓘 → LinfQuotRingIdem 𝓘 R :=
+  Quot.lift
+    (fun A : Set ℕ =>
+      ⟨ Ideal.Quotient.mk (ISupportIdeal (R := R) 𝓘) (chi (R := R) A),
+        chi_idem_in_quot 𝓘 A ⟩)
+    (by
+      intro A B hAB
+      -- Under the hood this is the same well-definedness as `PhiStone`
+      -- (χ_A - χ_B) ∈ ISupportIdeal 𝓘 ⇒ equal classes in the quotient
+      -- so the `Subtype` witnesses agree as elements of the quotient.
+      apply Subtype.ext -- equality of Subtype by value equality
+      -- Value equality in the quotient ring:
+      apply Ideal.Quotient.eq.mpr
+      -- As in D3(c2):
+      have h₁ : supp' (R := R) (chi (R := R) A - chi (R := R) B)
+                ⊆ diffSet (R := R) (chi (R := R) A) (chi (R := R) B) :=
+        supp'_sub_subset_diffSet (chi (R := R) A) (chi (R := R) B)
+      have h₂ : diffSet (R := R) (chi (R := R) A) (chi (R := R) B) ⊆ (A △ B) :=
+        diffSet_chi_subset_sdiff A B
+      have hsub : supp' (R := R) (chi (R := R) A - chi (R := R) B) ⊆ (A △ B) :=
+        Set.Subset.trans h₁ h₂
+      -- Downward closure to 𝓘.mem:
+      --   (A △ B) ∈ 𝓘 from `hAB`
+      -- ⇒ support ∈ 𝓘
+      rw [mem_ISupportIdeal_iff]
+      exact 𝓘.downward hsub hAB
+    )
+
+-- The following lemma shows the relationship between PhiStoneIdem and PhiStone
+-- Note: This is definitionally equal - both use Quot.lift with chi
+-- lemma PhiStoneIdem_val {R : Type*} [CommRing R] [DecidableEq R] (𝓘 : BoolIdeal) (q : PowQuot 𝓘) :
+--     (PhiStoneIdem (R := R) 𝓘 q).1 = PhiStone (R := R) 𝓘 q := rfl
+
+end D3c3
+
+/-! ## D3(c4). Two idempotents hypothesis and equivalence scaffold -/
+
+section D3c4
+open Classical
+variable {R : Type*}
+
+/-- Rings with only two idempotents, 0 and 1. -/
+class TwoIdempotents (R : Type*) [Semiring R] : Prop :=
+  (resolve : ∀ x : R, x * x = x → x = 0 ∨ x = 1)
+
+section
+variable [CommRing R] [DecidableEq R] (𝓘 : BoolIdeal) [TwoIdempotents R]
+
+/-- Extract the subset A from an idempotent representative.
+    For each n, since f(n)^2 = f(n), `TwoIdempotents.resolve` tells us f(n) ∈ {0,1}. 
+    We define A_of(f) = { n | f(n) = 1 }. -/
+noncomputable def A_of (f : Linf R) : Set ℕ := { n | f n = 1 }
+
+/-- If `f n` is idempotent, then the characteristic function of `A_of f` agrees with `f` at `n`. -/
+lemma chi_matches_of_idem_point (f : Linf R) {n : ℕ}
+    (hidem : f n * f n = f n) :
+    chi (R := R) (A_of f) n = f n := by
+  classical
+  rcases TwoIdempotents.resolve (R := R) (f n) hidem with h0 | h1
+  · -- case `f n = 0`
+    unfold chi A_of
+    simp only [Set.mem_setOf]
+    by_cases hf1 : f n = 1
+    · -- both 0 and 1 (trivial ring case)
+      have : (1 : R) = 0 := hf1.symm.trans h0
+      rw [if_pos hf1, hf1]
+    · -- `f n ≠ 1`
+      rw [if_neg hf1, h0]
+  · -- case `f n = 1`
+    unfold chi A_of
+    simp only [Set.mem_setOf]
+    rw [if_pos h1, h1]
+
+/-- "Pointwise equal off small": the support of `χ_{A_of f} − f` is contained in the
+    support of the idempotency defect `f*f − f`. -/
+lemma supp_chi_sub_subset_supp_idem (f : Linf R) :
+    supp' (R := R) (chi (R := R) (A_of f) - f)
+      ⊆ supp' (R := R) (f * f - f) := by
+  classical
+  intro n hn
+  -- contraposition on "not in RHS support"
+  by_contra hnot
+  have hz : f n * f n - f n = 0 := by simpa [supp'] using hnot
+  have hidem : f n * f n = f n := sub_eq_zero.mp hz
+  have hχ : chi (R := R) (A_of f) n = f n :=
+    chi_matches_of_idem_point (R := R) f hidem
+  have : chi (R := R) (A_of f) n - f n = 0 := by simp [hχ, sub_self]
+  simp only [supp'] at hn
+  exact hn this
+
+/-- Support of negation is the same as the support. -/
+lemma supp'_neg (f : Linf R) : supp' (R := R) (-f) = supp' (R := R) f := by
+  ext n; by_cases h : f n = 0 <;> simp [supp', h]
+
+/-- The symmetric difference of the extracted sets is supported where the representatives differ. -/
+lemma sdiff_A_of_subset_supp_sub (f g : Linf R) :
+    A_of (R := R) f △ A_of (R := R) g ⊆ supp' (R := R) (f - g) := by
+  classical
+  intro n hn
+  rcases hn with ⟨hf, hgn1⟩ | ⟨hg, hfn1⟩
+  · -- `f n = 1`, `g n ≠ 1`  ⇒  `f n ≠ g n` ⇒  `(f n - g n) ≠ 0`
+    have hneq : f n ≠ g n := fun h => hgn1 (h ▸ hf : g n = 1)
+    simp only [supp', Set.mem_setOf]
+    exact fun h => hneq (sub_eq_zero.mp h)
+  · -- `g n = 1`, `f n ≠ 1`
+    have hneq : f n ≠ g n := fun h => hfn1 (h.symm ▸ hg : f n = 1)
+    simp only [supp', Set.mem_setOf]
+    exact fun h => hneq (sub_eq_zero.mp h)
+
+/-- A canonical (noncomputable) representative of a quotient element. -/
+noncomputable def rep (q : LinfQuotRing 𝓘 R) : Linf R :=
+  Classical.choose (Quot.exists_rep q)
+
+@[simp] lemma mk_rep (q : LinfQuotRing 𝓘 R) :
+    Ideal.Quotient.mk (ISupportIdeal (R := R) 𝓘) (rep (𝓘 := 𝓘) (R := R) q) = q :=
+  Classical.choose_spec (Quot.exists_rep q)
+
+/-- The inverse-candidate: from an idempotent element of the ring-quotient to a class of sets. -/
+noncomputable def PsiStoneIdem : LinfQuotRingIdem 𝓘 R → PowQuot 𝓘 :=
+  fun e =>
+    -- pick a representative of the underlying quotient class
+    let f := rep (𝓘 := 𝓘) (R := R) e.1
+    -- return the extracted set modulo 𝓘
+    Quot.mk (sdiffSetoid 𝓘) (A_of (R := R) f)
+
+/-- Pair of maps (no inverse laws yet). This avoids sorries until inverse laws are proven. -/
+structure StoneMaps (𝓘 : BoolIdeal) (R : Type*) [CommRing R] [DecidableEq R] where
+  toIdempotents   : PowQuot 𝓘 → LinfQuotRingIdem 𝓘 R
+  fromIdempotents : LinfQuotRingIdem 𝓘 R → PowQuot 𝓘
+
+noncomputable def stoneMaps : StoneMaps 𝓘 R where
+  toIdempotents   := PhiStoneIdem 𝓘
+  fromIdempotents := PsiStoneIdem 𝓘
+
+/-
+-- TODO (D3(c4)): Once `PsiStoneIdem` is implemented (via `TwoIdempotents.resolve`),
+-- prove the inverse laws and construct:
+-- noncomputable def StoneEquiv :
+--   PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R := 
+-- { toFun := PhiStoneIdem 𝓘, 
+--   invFun := PsiStoneIdem 𝓘, 
+--   left_inv := ..., 
+--   right_inv := ... }
+-/
+
+end
+end D3c4
 
 end StoneSupport
 
