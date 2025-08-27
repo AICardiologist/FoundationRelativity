@@ -321,15 +321,38 @@ This paper establishes:
 
 ## 🆕 New Calibration Program
 
-### Stone Window Calibration (Under Development)
-**New Result in Progress**: Surjectivity of the Stone quotient map for block-finite support ideals implies WLPO.
-- Defined specific block-finite ideal with blocks [0,9], [10,19], ...
-- Interface axiom `stone_BFI_implies_WLPO`: reduction from binary sequences to Stone surjectivity
-- Height certificate interface: WLPO at height 1 from Stone_BFI
-- Contrast theorem: rational-valued idempotents are constructively surjective
-- **Status**: Paper proof sketch complete; formal Lean proof pending
+### WP-D Stone Window Support Ideals ✅ (Infrastructure Complete)
+**New Result**: Generalized Stone window for arbitrary Boolean ideals on ℕ, parameterized by rings with trivial idempotents.
 
-This represents a new calibration program with the reduction interface established.
+#### Completed Infrastructure (PR-D1 through D3b):
+- **D1: Boolean Ideals** ✅ (0 sorries)
+  - `BoolIdeal` structure with downward closure and union axioms
+  - Symmetric difference `△` with triangle inequality
+  - `PowQuot 𝓘` quotient construction via setoid
+  - `FinIdeal` example for finite sets
+  
+- **D2: Function Quotients** ✅ (0 sorries)
+  - `Linf R := ℕ → R` function space
+  - Support predicate `supp` and difference sets `diffSet`
+  - `LinfQuot 𝓘 R` quotient via difference set equivalence
+  - Bridge lemma: functions with support in 𝓘 equal zero class
+
+- **D3a: Ring Ideal Structure** ✅ (0 sorries)
+  - `ISupportIdeal 𝓘` as proper `Ideal (Linf R)` under pointwise ops
+  - Support lemmas: `supp'_zero`, `supp'_add_subset`, `supp'_mul_left_subset`
+  - Ideal axioms proven without topology or choice
+
+- **D3b: Characteristic Functions** ✅ (0 sorries)
+  - `chi : Set ℕ → Linf R` characteristic function definition
+  - Key theorem: `diffSet_chi_subset_sdiff` containment proof
+  - Well-defined lift `PhiSetToLinfQuot : PowQuot 𝓘 → LinfQuot 𝓘 R`
+
+#### Remaining (D3c): 
+- Algebraic quotient isomorphism `Φ_𝓘 : 𝒫(ℕ)/𝓘 ≅ Idem(ℓ∞/I_𝓘)`
+- `TwoIdempotents R` class and bijection proof
+- Calibration: constructive surjectivity depends on ideal choice
+
+**Status**: Infrastructure 100% complete and sorry-free; final isomorphism proof pending
 
 ## 📋 Verification Ledger (P4_Meta)
 

@@ -145,7 +145,7 @@
 
 ## 🎯 Immediate Priorities - Completing Paper 3
 
-### 🔶 Priority 1: WP-D Stone Window Support Ideals (Original Result)
+### ✅ Priority 1: WP-D Stone Window Support Ideals (Infrastructure COMPLETE)
 
 **Goal**: Prove the algebraic isomorphism for Boolean ideals (choice-free, constructive):
 ```lean
@@ -153,24 +153,33 @@
      [A] ↦ [χ_A]
 ```
 
-#### PR D1: Set Quotient & Boolean Ideal (No Rings)
-- Finalize `BoolIdeal` structure with empty_mem, downward, union_mem
-- Define symmetric difference `A △ B := (A \ B) ∪ (B \ A)`
-- Prove equivalence relation `A ≈ B ↔ A △ B ∈ 𝓘.mem`
-- Define `PowQuot 𝓘 := Quot (Setoid.mk …)`
-- Sanity test: quotient rewriting works
+#### ✅ PR D1: Set Quotient & Boolean Ideal (COMPLETE - January 27, 2025)
+- ✅ `BoolIdeal` structure with empty_mem, downward, union_mem
+- ✅ Symmetric difference `A △ B := (A \ B) ∪ (B \ A)` with lemmas
+- ✅ Equivalence relation `A ≈ B ↔ A △ B ∈ 𝓘.mem` via `sdiffSetoid`
+- ✅ `PowQuot 𝓘 := Quot (sdiffSetoid 𝓘)` construction
+- ✅ Sanity test: `Stone_SetQuot_Sanity.lean` works
 
-#### PR D2: Support Ideal I_𝓘 in ℓ∞
-- Define `supp x := {n | x n ≠ 0}` for `x : Linf R`
-- Prove support lemmas: supp(0) = ∅, supp(x+y) ⊆ supp(x) ∪ supp(y)
-- Define `I_support 𝓘 : Ideal (Linf R)` via `x ∈ I_support ↔ supp x ∈ 𝓘.mem`
-- Get quotient `Linf R ⧸ I_support 𝓘`
+#### ✅ PR D2: Function Quotient Layer (COMPLETE - January 27, 2025)
+- ✅ `Linf R := ℕ → R` function space definition
+- ✅ Support `supp x := {n | x n ≠ 0}` and difference sets `diffSet`
+- ✅ Function equivalence `linfEqMod` via difference sets
+- ✅ `LinfQuot 𝓘 R` quotient construction
+- ✅ Sanity test: `Stone_LinfQuot_Sanity.lean` works
 
-#### PR D3: The Map Φ and Isomorphism
+#### ✅ PR D3(a-b): Ring Ideal & Characteristic Functions (COMPLETE - January 27, 2025)
+- ✅ `ISupportIdeal 𝓘` as proper `Ideal (Linf R)` under pointwise ops
+- ✅ Support lemmas: zero, add_subset, mul_left_subset
+- ✅ Characteristic functions `chi : Set ℕ → Linf R`
+- ✅ Key theorem: `diffSet_chi_subset_sdiff`
+- ✅ Well-defined lift `PhiSetToLinfQuot : PowQuot 𝓘 → LinfQuot 𝓘 R`
+- ✅ Sanity tests: `Stone_ISupportIdeal_Sanity.lean`, `Stone_PhiLift_Sanity.lean`
+
+#### 🔄 PR D3(c): Final Isomorphism (TODO)
 - Define `Idem S := {e : S | e * e = e}`
-- Implement `Φ_𝓘 : PowQuot 𝓘 → Idem(Ideal.Quotient(I_support 𝓘))`
-- Prove well-definedness: A ≈ B implies χ_A − χ_B ∈ I_support
-- Prove bijection: injective via supp(χ_A − χ_B) = A △ B, surjective via TwoIdempotents
+- Define `TwoIdempotents R` class axiomatizing {0,1} classification
+- Complete algebraic quotient `(ℕ → R) ⧸ ISupportIdeal 𝓘`
+- Prove bijection using `TwoIdempotents R`
 - Package as `stone_window_isomorphism`
 
 ### 🔶 Priority 2: WP-E Replace Axiom with Proof
