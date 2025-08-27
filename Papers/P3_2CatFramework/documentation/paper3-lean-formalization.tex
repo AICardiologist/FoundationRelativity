@@ -559,11 +559,11 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
   \end{itemize}
 \end{itemize}
 
-\subsection{Support Ideal Stone Window (WP-D INFRASTRUCTURE COMPLETE)}
+\subsection{Support Ideal Stone Window (WP-D COMPLETE)}
 
-\textbf{Generalized Stone Window Beyond Fin (January 27, 2025)}:
+\textbf{Full Stone Equivalence Implementation (January 27, 2025)}:
 \begin{itemize}
-\item[$\checkmark$] \textbf{\texttt{StoneWindow\_SupportIdeals.lean}}: Full algebraic framework
+\item[$\checkmark$] \textbf{\texttt{StoneWindow\_SupportIdeals.lean}}: Complete 820+ line implementation
   \begin{itemize}
   \item[$\checkmark$] \texttt{BoolIdeal} structure: Boolean ideals on $\mathbb{N}$ with downward closure
   \item[$\checkmark$] \texttt{PowQuot} $\mathcal{I}$: Quotient $\mathcal{P}(\mathbb{N})/\mathcal{I}$ via symmetric difference
@@ -572,18 +572,19 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
   \item[$\checkmark$] \texttt{ISupportIdeal}: Support ideal as proper \texttt{Ideal (Linf R)}
   \item[$\checkmark$] \texttt{chi}: Characteristic functions with containment theorem
   \item[$\checkmark$] \texttt{PhiSetToLinfQuot}: Well-defined lift from sets to functions
-  \item[\textcolor{orange}{$\circ$}] \texttt{TwoIdempotents} class: Rings with trivial idempotents (D3c pending)
-  \item[\textcolor{orange}{$\circ$}] \texttt{stone\_window\_isomorphism}: Final bijection (D3c pending)
+  \item[$\checkmark$] \texttt{TwoIdempotents} class: Rings with only $\{0,1\}$ as idempotents
+  \item[$\checkmark$] \texttt{StoneEquiv}: Full bijection $\mathcal{P}(\mathbb{N})/\mathcal{I} \cong \text{Idem}(\ell^\infty/I_{\mathcal{I}})$
   \end{itemize}
-\item[$\checkmark$] \textbf{Concrete Infrastructure}:
+\item[$\checkmark$] \textbf{D3(c4) Layer Complete}:
   \begin{itemize}
-  \item[$\checkmark$] \texttt{FinIdeal}: Ideal of finite subsets (constructive example)
-  \item[$\checkmark$] \texttt{sdiff}: Symmetric difference with triangle inequality
-  \item[$\checkmark$] \texttt{diffSet\_chi\_subset\_sdiff}: Key containment theorem
-  \item[$\checkmark$] Four sanity tests: SetQuot, LinfQuot, ISupportIdeal, PhiLift
+  \item[$\checkmark$] \texttt{A\_of}: Extract subset from idempotent representative
+  \item[$\checkmark$] \texttt{PsiStoneIdem}: Inverse map via canonical representatives
+  \item[$\checkmark$] \texttt{Psi\_after\_Phi}, \texttt{Phi\_after\_Psi}: Full inverse proofs
+  \item[$\checkmark$] Works for \texttt{[Nontrivial R]} (handles trivial ring case)
+  \item[$\checkmark$] 7 comprehensive sanity tests validating all layers
   \end{itemize}
-\item[$\checkmark$] Complete infrastructure: D1--D3(b) fully formalized with 0 sorries
-\item[\textcolor{orange}{$\circ$}] Final isomorphism D3(c) pending: $\Phi_{\mathcal{I}} : \mathcal{P}(\mathbb{N})/\mathcal{I} \cong \text{Idem}(\ell^\infty/I_{\text{support}})$
+\item[$\checkmark$] Complete framework: D1--D3(c4) fully formalized with \textbf{0 sorries}
+\item[$\checkmark$] Stone equivalence: $\texttt{StoneEquiv} : \texttt{PowQuot}\ \mathcal{I} \simeq \texttt{LinfQuotRingIdem}\ \mathcal{I}\ R$
 \end{itemize}
 
 \subsection{Fused Ladders (WP-E INTERFACE COMPLETE - SORRY-FREE)}

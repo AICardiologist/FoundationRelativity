@@ -713,16 +713,98 @@ noncomputable def stoneMaps : StoneMaps 𝓘 R where
   toIdempotents   := PhiStoneIdem 𝓘
   fromIdempotents := PsiStoneIdem 𝓘
 
-/-
--- TODO (D3(c4)): Once `PsiStoneIdem` is implemented (via `TwoIdempotents.resolve`),
--- prove the inverse laws and construct:
--- noncomputable def StoneEquiv :
---   PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R := 
--- { toFun := PhiStoneIdem 𝓘, 
---   invFun := PsiStoneIdem 𝓘, 
---   left_inv := ..., 
---   right_inv := ... }
+/-! ### Stone Equivalence (requires Nontrivial R)
+
+In nontrivial rings, we can identify sets with their characteristic functions,
+which enables us to prove that PhiStoneIdem and PsiStoneIdem are inverses.
 -/
+
+section StoneEquivalence
+variable [Nontrivial R]
+
+/-- In a nontrivial ring, A_of(χ_A) = A. -/
+@[simp] lemma A_of_chi_eq (A : Set ℕ) :
+    A_of (R := R) (chi (R := R) A) = A := by
+  classical
+  ext n
+  simp only [A_of, Set.mem_setOf, chi]
+  by_cases h : n ∈ A <;> simp [h, zero_ne_one']
+
+/-- Left inverse: Ψ ∘ Φ = id on PowQuot 𝓘. -/
+lemma Psi_after_Phi (q : PowQuot 𝓘) :
+    PsiStoneIdem (R := R) 𝓘 (PhiStoneIdem (R := R) 𝓘 q) = q := by
+  classical
+  refine Quot.induction_on q ?_
+  intro A
+  -- Unfold the definitions
+  change Quot.mk (sdiffSetoid 𝓘) (A_of (R := R) (rep (𝓘 := 𝓘) (R := R) (PhiStoneIdem (R := R) 𝓘 (Quot.mk _ A)).1)) = Quot.mk _ A
+  -- Set up abbreviations
+  set e := PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A)
+  -- rep e.1 represents the same quotient class as e.1
+  have hrepeq : Ideal.Quotient.mk (ISupportIdeal (R := R) 𝓘) (rep (𝓘 := 𝓘) (R := R) e.1) = e.1 :=
+    mk_rep (𝓘 := 𝓘) (R := R) e.1
+  -- e.1 is the quotient class of χ_A
+  have he1 : e.1 = Ideal.Quotient.mk (ISupportIdeal (R := R) 𝓘) (chi (R := R) A) := by
+    rfl
+  -- Therefore rep e.1 - χ_A has small support
+  have hdiff : Ideal.Quotient.mk (ISupportIdeal (R := R) 𝓘) (rep (𝓘 := 𝓘) (R := R) e.1 - chi (R := R) A) = 0 := by
+    rw [RingHom.map_sub]
+    rw [hrepeq, he1]
+    simp
+  -- Convert to support membership
+  rw [Ideal.Quotient.eq_zero_iff_mem] at hdiff
+  rw [mem_ISupportIdeal_iff] at hdiff
+  -- The symmetric difference of A_of's is supported on the function difference
+  have hsub : A_of (R := R) (rep (𝓘 := 𝓘) (R := R) e.1) △ A_of (R := R) (chi (R := R) A)
+              ⊆ supp' (R := R) (rep (𝓘 := 𝓘) (R := R) e.1 - chi (R := R) A) :=
+    sdiff_A_of_subset_supp_sub (R := R) _ _
+  -- Apply downward closure
+  have hsdiff_small : A_of (R := R) (rep (𝓘 := 𝓘) (R := R) e.1) △ A_of (R := R) (chi (R := R) A) ∈ 𝓘.mem :=
+    𝓘.downward hsub hdiff
+  -- Use A_of_chi_eq to simplify
+  rw [A_of_chi_eq (R := R) A] at hsdiff_small
+  -- Conclude equality in the quotient
+  exact Quot.sound hsdiff_small
+
+/-- Right inverse: Φ ∘ Ψ = id on LinfQuotRingIdem 𝓘 R. -/
+lemma Phi_after_Psi (e : LinfQuotRingIdem 𝓘 R) :
+    PhiStoneIdem (R := R) 𝓘 (PsiStoneIdem (R := R) 𝓘 e) = e := by
+  classical
+  -- We need to show equality of subtypes
+  apply Subtype.ext
+  -- Goal: mk(χ_{A_of f}) = e.1, where f = rep e.1
+  set f := rep (𝓘 := 𝓘) (R := R) e.1
+  -- rep e.1 represents the same quotient class
+  have hrepeq : Ideal.Quotient.mk (ISupportIdeal (R := R) 𝓘) f = e.1 :=
+    mk_rep (𝓘 := 𝓘) (R := R) e.1
+  -- e is idempotent in the quotient, so f*f - f has small support
+  have h_idem_quot : e.1 * e.1 = e.1 := e.2
+  have h_idem_mod : Ideal.Quotient.mk (ISupportIdeal (R := R) 𝓘) (f * f - f) = 0 := by
+    simp only [RingHom.map_sub, RingHom.map_mul, hrepeq, h_idem_quot, sub_self]
+  rw [Ideal.Quotient.eq_zero_iff_mem, mem_ISupportIdeal_iff] at h_idem_mod
+  -- χ_{A_of f} - f is supported on f*f - f
+  have h_subset : supp' (R := R) (chi (R := R) (A_of (R := R) f) - f)
+                  ⊆ supp' (R := R) (f * f - f) :=
+    supp_chi_sub_subset_supp_idem (R := R) f
+  -- Apply downward closure
+  have h_small : supp' (R := R) (chi (R := R) (A_of (R := R) f) - f) ∈ 𝓘.mem :=
+    𝓘.downward h_subset h_idem_mod
+  -- Conclude equality in the quotient ring
+  change Ideal.Quotient.mk (ISupportIdeal (R := R) 𝓘) (chi (R := R) (A_of (R := R) f)) = e.1
+  rw [← hrepeq]
+  apply Ideal.Quotient.eq.mpr
+  rw [mem_ISupportIdeal_iff]
+  exact h_small
+
+/-- The Stone equivalence between power set quotient and idempotents of the ring quotient. -/
+noncomputable def StoneEquiv :
+    PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R :=
+{ toFun    := PhiStoneIdem (R := R) 𝓘,
+  invFun   := PsiStoneIdem (R := R) 𝓘,
+  left_inv := Psi_after_Phi (R := R) 𝓘,
+  right_inv:= Phi_after_Psi (R := R) 𝓘 }
+
+end StoneEquivalence
 
 end
 end D3c4

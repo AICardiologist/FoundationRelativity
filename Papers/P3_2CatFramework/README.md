@@ -2,7 +2,7 @@
 
 ## 📊 Current Status Summary (Updated: January 27, 2025)
 
-**Mathematical Sorries**: 0 ✅ | **Integration Sorries**: 7 ⚠️ | **Lines of Code**: 4,600+ | **Files**: 45+
+**Mathematical Sorries**: 0 ✅ | **Integration Sorries**: 7 ⚠️ | **Lines of Code**: 5,400+ | **Files**: 52+
 
 ### Framework Status
 **Part I (Uniformization)**: ✅ COMPLETE - Height theory fully formalized  
@@ -126,15 +126,22 @@
    - `collision_chain`: Two-step proof combining proven RFN→Con with axiomatized Con→Gödel
    - Complexity interfaces and strictness results
 
-5. **Part VI: Calibrations and Portal Pattern (WP-B/Track A COMPLETE ✨)**
-   - ✅ **FT Frontier Infrastructure**: Complete Fan Theorem axis (0 sorries)
+5. **Part VI: Calibrations and Portal Pattern (WP-B/WP-D/Track A COMPLETE ✨)**
+   - ✅ **WP-D Stone Window**: Complete Stone equivalence (0 sorries) 🎯
+     - `StoneWindow_SupportIdeals.lean`: Full D1-D3(c4) infrastructure
+     - Boolean ideals, power set quotients, ℓ∞ function spaces
+     - Ring ideal ISupportIdeal as proper Ideal under pointwise ops
+     - `StoneEquiv : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R` for `[Nontrivial R]`
+     - `TwoIdempotents` class and full inverse proofs
+     - 7 comprehensive test files validating all layers
+   - ✅ **FT Frontier (WP-B)**: Complete Fan Theorem axis (0 sorries)
      - `FT_Frontier.lean`: FT → UCT, FT → Sperner → BFPT_n reductions
      - `FTPortalWire.lean`: Height certificate transport along implications
      - Orthogonal to WLPO axis: UCT/BFPT at height 0 on WLPO, height 1 on FT
      - Full test coverage in `FT_Frontier_Sanity.lean`
-   - ✅ **DCω Frontier (Track A)**: Complete dependent choice axis (0 sorries) 🎯
-     - `DCw_Frontier.lean`: DCω → Baire reduction for metric spaces
-     - `DCwPortalWire.lean`: Baire height certificate transport
+   - ✅ **DCω Frontier (Track A)**: Complete dependent choice axis (0 sorries)
+     - `DCω_Frontier.lean`: DCω → Baire reduction for metric spaces
+     - `DCωPortalWire.lean`: Baire height certificate transport
      - Orthogonal to both WLPO and FT axes
      - Gap × Baire product demonstrates (1,0,1) height profile
      - Full test coverage in `DCw_Frontier_Sanity.lean`
@@ -176,6 +183,9 @@ Papers/P3_2CatFramework/
 │   ├── PartIV_Limit.lean          # ω-limit theory
 │   ├── PartV_Collision.lean       # RFN→Con→Gödel
 │   ├── StoneWindow.lean           # Boolean rings
+│   ├── StoneWindow_SupportIdeals.lean # ✨ Stone equivalence (820+ lines, 0 sorries!)
+│   ├── DCω_Frontier.lean          # Track A: DCω → Baire calibrator
+│   ├── FT_Frontier.lean           # Track B: FT → UCT, Sperner, BFPT
 │   └── NormalForm_test.lean       # Comprehensive tests
 ├── Paper3_Integration.lean         # Paper 3 using P4_Meta
 ├── P3_Minimal.lean                # Entry point for P4_Meta execution

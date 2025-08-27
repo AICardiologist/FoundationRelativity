@@ -25,6 +25,9 @@ example {R} [CommRing R] [DecidableEq R] [TwoIdempotents R]
 -- The .1 projection of PhiStoneIdem equals PhiStone by construction.
 
 -- Test that supp' of negation equals supp'
+-- Note: supp'_neg is defined in section D3c4 which has TwoIdempotents in scope,
+-- but the lemma itself doesn't use it (as the linter warns).
+-- We need to provide the TwoIdempotents instance even though it's not used.
 example {R : Type*} [CommRing R] [DecidableEq R] [TwoIdempotents R] (f : Linf R) :
     supp' (R := R) (-f) = supp' (R := R) f :=
-  supp'_neg (R := R) f
+  supp'_neg f

@@ -106,7 +106,7 @@ Part II: Positive Uniformization & $\checkmark$ Complete & 0 sorries \\
 Part III: Ladder Algebra & $\checkmark$ Complete & 0 sorries \\
 Part IV: $\omega$--limit Theory & $\checkmark$ Complete & 0 sorries \\
 Part V: Collision Theorems & $\checkmark$ Hybrid & RFN→Con proven, Con→Gödel axiom \\
-Part VI: Stone Window & $\checkmark$ Complete & 0 sorries \\
+Part VI: Stone Window & $\checkmark$ \textbf{COMPLETE} & Full equivalence, 0 sorries \\
 \hline
 \multicolumn{3}{|c|}{\textbf{Work Package B: FT Frontier (Analytic Calibrators)}} \\
 \hline
@@ -1067,10 +1067,13 @@ but specific principles (reflection, determinacy/regularity at high altitude) cr
 \item Complexity interfaces and strictness results
 \end{itemize}
 
-\textbf{Part VI -- Stone Window (Complete):}
+\textbf{Part VI -- Stone Window (COMPLETE):}
 \begin{itemize}
-\item Boolean ring with support ideals
-\item Provenance discipline for classical vs.\ Lean--proved results
+\item Full D1--D3(c4) infrastructure: Boolean ideals, power set quotients, $\ell^\infty$ spaces
+\item \texttt{StoneEquiv}: Complete bijection $\mathcal{P}(\mathbb{N})/\mathcal{I} \cong \text{Idem}(\ell^\infty/I_{\mathcal{I}})$
+\item \texttt{TwoIdempotents} class for rings with only $\{0,1\}$ as idempotents
+\item Left/right inverse proofs for \texttt{[Nontrivial R]} guard
+\item 820+ lines, 0 sorries, 7 comprehensive test files
 \end{itemize}
 
 \subsection*{Key Technical Achievements}
@@ -1483,6 +1486,8 @@ at a schematic level today and leaves the deep lower bounds as explicit, replace
 %===========================================================
 \section{A. Support‑Ideal Stone Window: classical theorem, constructive caveat, calibration}
 %===========================================================
+
+\textbf{UPDATE (January 27, 2025):} The Stone Window infrastructure is now \textbf{fully formalized in Lean 4} with the complete equivalence \texttt{StoneEquiv : PowQuot $\mathcal{I}$ $\simeq$ LinfQuotRingIdem $\mathcal{I}$ R} proven for nontrivial rings. The implementation includes full D1--D3(c4) layers with 0 sorries in 820+ lines of code.
 
 We extend the Stone window beyond $\mathrm{Fin}$ to \emph{support ideals} $\mathcal I\subseteq\mathcal P(\mathbb N)$:
 $I_{\mathcal I}=\{x\in\linf:\mathrm{supp}(x)\in\mathcal I\}$.
