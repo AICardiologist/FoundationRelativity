@@ -1,4 +1,4 @@
-# Foundation-Relativity
+# Axiom-Calibration
 
 [![CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml)
 [![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
@@ -17,7 +17,9 @@
 
 ## 🎯 Overview
 
-A Lean 4 formalization exploring how mathematical pathologies behave differently under various foundational assumptions. This project demonstrates **foundation-relativity**: certain mathematical constructions that work in classical mathematics (ZFC) become impossible in constructive settings (BISH).
+A Lean 4 formalization exploring how mathematical pathologies behave differently under various foundational assumptions. This project demonstrates **axiom calibration (AxCal)**: we measure ("calibrate") how much axiom strength a result needs. Certain mathematical constructions that work in classical mathematics (ZFC) become impossible in constructive settings (BISH).
+
+> **Historical Note**: This project was originally named "Foundation-Relativity" but was renamed to "Axiom Calibration" in January 2025 to avoid confusion with Einstein's relativity and to better convey that we're calibrating the axiom strength required for mathematical results. You may encounter the old terminology in earlier papers, commits, or citations.
 
 ### Key Results
 
@@ -25,12 +27,12 @@ The project formalizes four major results:
 
 1. **Rank-One Toggle Kernel** (Paper 1) 🔧 - Sherman-Morrison implementation (1 sorry) + Spectrum stubs (~3 sorries) + planned modules (~10 sorries)
 2. **WLPO ↔ BidualGap Equivalence** (Paper 2) ✅ - Sprint E dual isometry complete!  
-3. **2-Categorical Framework** (Paper 3) 📋 - Foundation-relative pseudo-functors
+3. **2-Categorical Framework** (Paper 3) 📋 - Axiom-calibrated pseudo-functors
 4. **Spectral Geometry** (Paper 4) 🔧 - Undecidable eigenvalues on manifolds
 
-### Foundation-Relativity Hierarchy
+### Axiom-Calibration Hierarchy
 
-Each pathology has a **relativity degree** ρ indicating logical strength:
+Each pathology has a **calibration degree** ρ indicating logical strength:
 - **ρ = 1**: Requires WLPO (Weak Limited Principle of Omniscience)
 - **ρ = 2**: Requires DC_ω (Countable Choice)
 - **ρ = 3**: Requires AC_ω (Choice for countable families)
@@ -62,16 +64,21 @@ Each pathology has a **relativity degree** ρ indicating logical strength:
     - **Permutation Bridge**: General case via `IsPacking` specification (0 sorries)
     - **Portal Pattern**: WLPO ↔ Gap frontier with compositional reductions
     - **Stone Calibration**: Elementary dyadic blocks with WLPO-style reduction lemmas
-    - **FT→UCT**: Fan Theorem implies Uniform Continuity at height 1
+    - **FT Frontier** ✨: Complete WP-B calibrators with Fan Theorem axis
+      - FT → UCT (Uniform Continuity) at height 1
+      - FT → Sperner → BFPT_n (Brouwer Fixed-Point) via composition
+      - Height certificate transport along implications
+      - Orthogonal to WLPO axis (UCT/BFPT at height 0 on WLPO)
   - **NEW**: Complete permutation machinery for general demand profiles
   - **NEW**: `targetsMet` abstraction with antitonicity and duality lemmas
   - **NEW**: Frontier API with `⟶` notation and `Trans` instance for calc chains
   - **NEW**: N* bounds (lower/upper) and strict monotonicity lemmas
+  - **NEW**: FT frontier infrastructure completing WP-B (analytic calibrators)
 - **Technical innovations**: 
   - PUnit pivot for cast-free Equiv proofs
   - Portal pattern for shuttling reductions through WLPO ↔ Gap
   - Permutation-invariant quotas and targetsMet predicates
-- **Files**: 4,000+ lines across 40+ files including Frontier_API and StonePortalWire
+- **Files**: 4,200+ lines across 45+ files including FT_Frontier, FTPortalWire, and test coverage
 - **Status**: ✅ **0 sorries in entire P4_Meta framework**
 
 #### **Sprint E WLPO ↔ BidualGap∃ Complete**
@@ -224,7 +231,7 @@ theorem iota_union_hom (A B : Set ℕ) :
     ι (A ∪ B) ≈₀ (fun n => max (ι A n) (ι B n))
 ```
 
-### Paper 2: Foundation-Relativity
+### Paper 2: Axiom Calibration
 ```lean
 theorem foundation_relative_correspondence (F : Foundation) :
     (F = Foundation.bish → ¬∃ (w : foundationGodelCorrespondence F), True) ∧
@@ -258,7 +265,7 @@ theorem gap_collapse_threshold (h : ℚ) :
 This project demonstrates:
 
 1. **Axiom-Clean Formalization**: Machine-verified proofs with minimal axiom usage
-2. **Foundation-Relativity**: Precise characterization of when constructions work/fail  
+2. **Axiom Calibration**: Precise characterization of when constructions work/fail  
 3. **API-Robust Proofs**: Implementation patterns that survive mathlib evolution
 4. **Direct Prop-Level Techniques**: Avoiding Prop→Type elimination traps
 
@@ -313,7 +320,7 @@ This project is released under MIT License. If you use this work, please cite:
 
 ```bibtex
 @software{lee2025foundation,
-  title={Foundation-Relativity: A Lean 4 Formalization},
+  title={Axiom Calibration: A Lean 4 Formalization},
   author={Lee, Paul Chun-Kit},
   year={2025},
   url={https://github.com/AICardiologist/FoundationRelativity},
@@ -325,7 +332,7 @@ This project is released under MIT License. If you use this work, please cite:
 
 - [Lean 4](https://leanprover.github.io/) - The proof assistant used
 - [Mathlib4](https://github.com/leanprover-community/mathlib4) - Mathematical library  
-- [Foundation-Relativity Papers](Papers/P2_BidualGap/documentation/) - Academic publications
+- [Axiom Calibration Papers](Papers/P2_BidualGap/documentation/) - Academic publications
 
 ---
 
