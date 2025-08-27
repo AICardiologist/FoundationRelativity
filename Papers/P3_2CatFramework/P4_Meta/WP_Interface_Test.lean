@@ -26,9 +26,9 @@ example {L1 L2 : Type} {a b : Nat} {C D : Prop}
   height_product_on_fuse hC hD
 
 /-- Test that RFN_Sigma1_implies_Consistency is available -/
-example (T : Theory) [CodesProofs T] [Sigma1Sound T] [HasReflection T] :
-    Provable (Extend T (RFN_Sigma1 T)) (Con T) :=
-  RFN_Sigma1_implies_Consistency T
+example (T : WPA.Theory) [WPA.CodesProofs T] [WPA.Sigma1Sound T] [WPA.HasReflection T] :
+    WPA.Provable (WPA.Extend T (WPA.RFN_Sigma1 T)) (WPA.Con T) :=
+  WPA.RFN_Sigma1_implies_Consistency T
 
 #print axioms Independent.symm
 -- Should show: 'Independent.symm' depends on axioms: [WLPO, FT, DCw]

@@ -72,9 +72,8 @@ end SuccessorCollisions
 
 end WPA
 
--- Re-export key types for compatibility if needed
-export WPA (Theory Formula Provable Extend RFN_Sigma1 Con GodelSentence HeightCertificate
-            CodesProofs Sigma1Sound HasReflection RFN_Sigma1_implies_Consistency)
+-- No re-exports to maintain true namespace isolation
+-- Client files should use qualified names (WPA.Theory) or open WPA locally
 
 /-! ### Summary for WP-A
 

@@ -49,4 +49,12 @@ example : HeightCert (Axiom1 ∧ Axiom2 ∧ Axiom3) :=
     axiom1_from_WLPO axiom2_from_FT axiom3_from_DCw
     wlpo_h1 ft_h1 dcw_h1
 
+/-! ### Axiom Dependency Verification -/
+
+#print axioms sharp_UCT_Gap_product
+-- Should only show interface axioms (WLPO, FT, DCw, Independent, indep_WLPO_FT)
+
+#print axioms sharp_triple_product  
+-- Should only show interface axioms (WLPO, FT, DCw, Independent, indep_WLPO_FT, indep_FT_DCw, indep_WLPO_DCw)
+
 end Papers.P4Meta

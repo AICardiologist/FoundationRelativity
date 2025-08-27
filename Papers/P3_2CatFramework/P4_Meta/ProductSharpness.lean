@@ -27,7 +27,7 @@ variable (height_and  : ∀ {P Q}, HeightCert P → HeightCert Q → HeightCert 
     Note: the `Independent WLPO FT` argument documents the intended use
     (orthogonality), but the certificate composition itself only needs the two
     combinators above. -/
-def sharp_product_of_indep
+@[inline] def sharp_product_of_indep
     {C D : Prop} {WLPO FT : Prop}
     (needs_W : WLPO → C) (needs_F : FT → D)
     (_h_indep : Independent WLPO FT)
