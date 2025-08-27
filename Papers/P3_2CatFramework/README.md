@@ -126,12 +126,18 @@
    - `collision_chain`: Two-step proof combining proven RFN→Con with axiomatized Con→Gödel
    - Complexity interfaces and strictness results
 
-5. **Part VI: Calibrations and Portal Pattern (WP-B COMPLETE ✨)**
+5. **Part VI: Calibrations and Portal Pattern (WP-B/Track A COMPLETE ✨)**
    - ✅ **FT Frontier Infrastructure**: Complete Fan Theorem axis (0 sorries)
      - `FT_Frontier.lean`: FT → UCT, FT → Sperner → BFPT_n reductions
      - `FTPortalWire.lean`: Height certificate transport along implications
      - Orthogonal to WLPO axis: UCT/BFPT at height 0 on WLPO, height 1 on FT
      - Full test coverage in `FT_Frontier_Sanity.lean`
+   - ✅ **DCω Frontier (Track A)**: Complete dependent choice axis (0 sorries) 🎯
+     - `DCw_Frontier.lean`: DCω → Baire reduction for metric spaces
+     - `DCwPortalWire.lean`: Baire height certificate transport
+     - Orthogonal to both WLPO and FT axes
+     - Gap × Baire product demonstrates (1,0,1) height profile
+     - Full test coverage in `DCw_Frontier_Sanity.lean`
    - ✅ **Frontier API**: Compositional reduction framework
      - `ReducesTo` structure with `Trans` instance for calc chains
      - `reduces`, `reduces_of_iff_mp`, `reduces_of_iff_mpr` helpers

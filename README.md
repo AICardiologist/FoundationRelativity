@@ -69,11 +69,17 @@ Each pathology has a **calibration degree** ρ indicating logical strength:
       - FT → Sperner → BFPT_n (Brouwer Fixed-Point) via composition
       - Height certificate transport along implications
       - Orthogonal to WLPO axis (UCT/BFPT at height 0 on WLPO)
+    - **DCω Frontier** 🎯: Track A complete with Baire calibrator (NEW)
+      - DCω → Baire (complete separable metric spaces)
+      - Orthogonal to WLPO and FT axes
+      - Gap × Baire product demonstrates (1,0,1) height profile
+      - 0 sorries across all DCω infrastructure
   - **NEW**: Complete permutation machinery for general demand profiles
   - **NEW**: `targetsMet` abstraction with antitonicity and duality lemmas
   - **NEW**: Frontier API with `⟶` notation and `Trans` instance for calc chains
   - **NEW**: N* bounds (lower/upper) and strict monotonicity lemmas
   - **NEW**: FT frontier infrastructure completing WP-B (analytic calibrators)
+  - **NEW**: DCω frontier with Baire calibrator completing Track A
 - **Technical innovations**: 
   - PUnit pivot for cast-free Equiv proofs
   - Portal pattern for shuttling reductions through WLPO ↔ Gap

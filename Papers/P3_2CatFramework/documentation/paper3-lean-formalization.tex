@@ -115,7 +115,7 @@ A Framework Formalization with Structural Verification}
 \maketitle
 
 \begin{abstract}
-We present a Lean 4 formalization of the 2--categorical framework for foundation--relativity based on the WLPO\,$\leftrightarrow$\,Bidual Gap equivalence. This paper documents the successful mechanization of uniformization height theory, achieving the key result that the bidual gap has height exactly 1, with 0 sorries in structural components. We describe the architectural decisions, technical solutions, and unexpected improvements that emerged during formalization, including a rich automation framework with \texttt{@[simp]} tactics, complete ladder algebra with normal forms, and a lightweight order--theoretic layer. The formalization comprises over 4,600 lines of verified Lean code across 45+ files. \textbf{Status (January 27, 2025):} Parts I-VI structural components complete, including Part 6B exact finish time characterization (0 sorries), Part V RFN→Con proven with Con→Gödel axiomatized, and \textbf{WP-B FT frontier infrastructure} providing FT→UCT, FT→Sperner→BFPT reductions with orthogonal axes.
+We present a Lean 4 formalization of the 2--categorical framework for foundation--relativity based on the WLPO\,$\leftrightarrow$\,Bidual Gap equivalence. This paper documents the successful mechanization of uniformization height theory, achieving the key result that the bidual gap has height exactly 1, with 0 sorries in structural components. We describe the architectural decisions, technical solutions, and unexpected improvements that emerged during formalization, including a rich automation framework with \texttt{@[simp]} tactics, complete ladder algebra with normal forms, and a lightweight order--theoretic layer. The formalization comprises over 4,600 lines of verified Lean code across 45+ files. \textbf{Status (January 27, 2025):} Parts I-VI structural components complete, including Part 6B exact finish time characterization (0 sorries), Part V RFN→Con proven with Con→Gödel axiomatized, \textbf{WP-B FT frontier infrastructure} providing FT→UCT, FT→Sperner→BFPT reductions with orthogonal axes, and \textbf{Track A DCω/Baire frontier} establishing third orthogonal axis with hardened interface layer.
 \end{abstract}
 
 \begin{mdframed}[style=status]
@@ -141,6 +141,8 @@ Our Lean formalization provides:
 \item Structural implementation of the P4\_Meta framework (Parts III--VI)
 \item Rich \texttt{@[simp]} automation for concatenation and normal forms
 \item Complete FT frontier infrastructure (WP-B) with orthogonal axes to WLPO
+\item DCω/Baire frontier (Track A) establishing third orthogonal axis
+\item Hardened WP interface with uninterpreted Independent predicate
 \item 0 sorries in structural components (classical results cited as axioms)
 \end{enumerate}
 
@@ -499,6 +501,34 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
 \item[$\checkmark$] \textbf{Test Coverage}: \texttt{FT\_Frontier\_Sanity.lean} with comprehensive tests
 \end{itemize}
 
+\textbf{DCω/Baire Frontier Infrastructure (Track A Complete)}:
+\begin{itemize}
+\item[$\checkmark$] \textbf{\texttt{DCw\_Frontier.lean}}: Complete DCω axis implementation
+  \begin{itemize}
+  \item DCω $\to$ Baire reduction via \texttt{DCw\_to\_Baire}
+  \item Height certificate transport: \texttt{Baire\_height1}
+  \item Orthogonal axes: $h_{\text{DCω}}(\text{Baire}) = 1$, $h_{\text{WLPO}}(\text{Baire}) = 0$, $h_{\text{FT}}(\text{Baire}) = 0$
+  \end{itemize}
+\item[$\checkmark$] \textbf{\texttt{DCwPortalWire.lean}}: Height certificate wiring
+  \begin{itemize}
+  \item \texttt{Baire\_height1\_from\_DCw}: Transport DCω height to Baire
+  \item Integration with \texttt{IndependenceRegistry} for orthogonality
+  \end{itemize}
+\item[$\checkmark$] \textbf{Test Coverage}: \texttt{DCw\_Frontier\_Sanity.lean} and \texttt{WP\_DCw\_Integration\_Test.lean}
+  \begin{itemize}
+  \item Verified Gap $\times$ Baire orthogonal product: $(1,0,1)$ height profile
+  \item All axiom dependencies minimal and explicit
+  \end{itemize}
+\end{itemize}
+
+\textbf{WP Interface Hardening}:
+\begin{itemize}
+\item[$\checkmark$] Changed \texttt{Independent} from inductive to uninterpreted axiom
+\item[$\checkmark$] Removed WPA namespace re-exports for true isolation
+\item[$\checkmark$] Added \texttt{@[inline]} performance annotations
+\item[$\checkmark$] Verified minimal axiom dependencies via \texttt{\#print axioms}
+\end{itemize}
+
 \textbf{Stone Window Calibration (Elementary Implementation)}:
 \begin{itemize}
 \item[$\checkmark$] \texttt{dyadicBlock}: Elementary dyadic blocks via $n \bmod 2^{k+1} = 2^k$
@@ -725,7 +755,8 @@ Positive Families & Part III & PartIII\_PosFam.lean & ✅ Complete \\
 Collision Theorems & Part V & PartV\_Collision.lean & ✅ Complete \\
 RFN→Con Proof & WP-A & PartV\_RFNSigma1.lean & ✅ Complete \\
 FT Frontier & WP-B & FT\_Frontier.lean & ✅ Complete \\
-Independence Registry & WP-C & IndependenceRegistry.lean & ✅ Interface \\
+DCω Frontier & Track A & DCw\_Frontier.lean & ✅ Complete \\
+Independence Registry & WP-C & IndependenceRegistry.lean & ✅ Hardened \\
 Product Sharpness & WP-C & ProductSharpness.lean & ✅ Interface \\
 Support Ideals & WP-D & StoneWindow\_SupportIdeals.lean & ✅ Framework \\
 Fused Ladders & WP-E & FusedLadders.lean & ✅ Interface \\
@@ -826,7 +857,7 @@ The foundation is ready for:
 \item Theory poset implementation with \lean{UL(C)}, \lean{Frontier(C)}
 \item Positive family algebra completion
 \item[$\checkmark$] Higher calibrators: UCT/FT axis complete via FT frontier infrastructure
-\item Baire/DC$_\omega$ calibrators (future work)
+\item[$\checkmark$] Baire/DC$_\omega$ calibrators: Track A DCω frontier complete with orthogonal axes
 \end{enumerate}
 
 \subsection{Long--term Goals}

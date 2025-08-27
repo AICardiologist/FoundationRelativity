@@ -78,7 +78,7 @@ A Pre--Lean Framework Based on the WLPO\,$\boldsymbol{\leftrightarrow}$\,Bidual 
 \begin{abstract}
 This paper proposes a general framework for \emph{axiom calibration} that treats mathematically meaningful ``witness'' constructions (e.g.\ bidual gaps) as assignments varying over a category of foundations.\footnote{This framework was originally called ``foundation-relativity'' in earlier versions but was renamed to ``axiom calibration'' (AxCal) to avoid confusion with physical relativity and to emphasize that we are calibrating the axiom strength needed for mathematical results.} The central structural notion is \emph{uniformizability}: when an assignment can be made invariant (up to equivalence) along interpretations that fix a small signature. We show how the equivalence from our companion paper---over \BISH, the bidual gap for $\linf$ is equivalent to \WLPO---implies a sharp \emph{no--uniformization} result at height~$0$ and a \emph{complete uniformization} at height~$1$ (i.e.\ after adding \WLPO). This defines a simple \emph{height invariant} for witness families and computes it for the gap.
 
-We implement a complete \textbf{FT frontier infrastructure} (WP-B) establishing that Brouwer-type fixed-point theorems live on an axis \emph{orthogonal} to WLPO, with heights $(h_{\text{WLPO}}, h_{\text{FT}}) = (0, 1)$ for UCT, Sperner's lemma, and BFPT. The classical Stone window isomorphism serves as a calibration case study. The Lean~4 formalization comprises 4,600+ lines across 45+ files with 0 sorries in structural components.
+We implement a complete \textbf{FT frontier infrastructure} (WP-B) establishing that Brouwer-type fixed-point theorems live on an axis \emph{orthogonal} to WLPO, with heights $(h_{\text{WLPO}}, h_{\text{FT}}) = (0, 1)$ for UCT, Sperner's lemma, and BFPT. Additionally, we have completed \textbf{Track A (DCω/Baire frontier)} establishing the Baire category theorem on a third orthogonal axis with height profile $(h_{\text{WLPO}}, h_{\text{FT}}, h_{\text{DCω}}) = (0, 0, 1)$. The classical Stone window isomorphism serves as a calibration case study. The Lean~4 formalization comprises 4,600+ lines across 45+ files with 0 sorries in structural components.
 \end{abstract}
 
 \begin{mdframed}[style=status]
@@ -92,7 +92,7 @@ We implement a complete \textbf{FT frontier infrastructure} (WP-B) establishing 
 %===========================================================
 
 \begin{mdframed}[style=status]
-\textbf{Current Status:} The Lean 4 formalization is mathematically complete with 0 sorries in all structural components. Part 6 (exact finish time characterization) is complete with interface and packed case. \textbf{WP-B (FT frontier)} is fully implemented with orthogonal axes.
+\textbf{Current Status:} The Lean 4 formalization is mathematically complete with 0 sorries in all structural components. Part 6 (exact finish time characterization) is complete with interface and packed case. \textbf{WP-B (FT frontier)} is fully implemented with orthogonal axes. \textbf{Track A (DCω/Baire frontier)} has been completed, establishing three orthogonal axes WLPO $\perp$ FT $\perp$ DCω with hardened interface layer.
 \end{mdframed}
 
 \subsection{Overall Completion}
@@ -136,6 +136,13 @@ The framework successfully implements:
   \item FT→UCT, FT→Sperner→BFPT reductions formalized
   \item Height profiles: $(h_{\text{WLPO}}, h_{\text{FT}}) = (0, 1)$ for UCT/BFPT
   \item Reverse mathematics classification: BFPT at WKL$_0$ level \cite{Hirst-BFPT}
+  \end{itemize}
+\item \textbf{DCω/Baire frontier}: Complete Track A with third orthogonal axis
+  \begin{itemize}
+  \item DCω→Baire reduction axiomatized
+  \item Height profiles: Gap (1,0,0), UCT (0,1,0), Baire (0,0,1)
+  \item Orthogonal products: Gap×Baire (1,0,1) verified
+  \item WP interface layer hardened with uninterpreted Independent predicate
   \end{itemize}
 \item k--ary schedule with exact finish time $N^* = k(H-1) + S$ (packed case complete)
 \item Permutation bridge: \texttt{IsPacking} specification for general case
