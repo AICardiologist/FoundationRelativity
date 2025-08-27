@@ -17,9 +17,9 @@ theorem Independent.symm {P Q : Prop} : Independent P Q → Independent Q P :=
   fun _ => Independent.mk
 
 /-- Axis tokens (or import your existing ones). -/
-constant WLPO : Prop
-constant FT   : Prop
-constant DCw  : Prop
+axiom WLPO : Prop
+axiom FT   : Prop
+axiom DCw  : Prop
 
 /-! ### Standard Independence Assumptions 
 

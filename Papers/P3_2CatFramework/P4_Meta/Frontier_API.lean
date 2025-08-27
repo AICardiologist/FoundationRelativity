@@ -148,4 +148,27 @@ end StoneExample
     {P Q : Prop} (hP : HeightCert P) (imp : P → Q) : HeightCert Q :=
   height_mono imp hP
 
+/-! ### Height Product Combinator
+
+This provides the glue to make ProductSharpness.lean turnkey.
+Once you have a Part II product/sup constructor, you can derive height_and
+and reuse it everywhere.
+-/
+
+section HeightProductGlue
+
+variable {HeightCert : Prop → Prop}
+variable (height_mono : ∀ {P Q}, (P → Q) → HeightCert P → HeightCert Q)
+variable (height_prod : ∀ {P Q}, HeightCert P → HeightCert Q → HeightCert (P × Q))
+
+/-- Derive height certificate for conjunction from product certificate.
+    
+    This adapts a product height combinator (from Part II) to work with
+    logical conjunction, making ProductSharpness.lean immediately usable. -/
+@[inline] def height_and_of_prod {P Q : Prop}
+  (hP : HeightCert P) (hQ : HeightCert Q) : HeightCert (P ∧ Q) :=
+  height_mono (fun ⟨p, q⟩ => And.intro p q) (height_prod hP hQ)
+
+end HeightProductGlue
+
 end Papers.P4Meta
