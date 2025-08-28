@@ -2069,6 +2069,27 @@ lemma mapOfLe_bot (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) :
 
 end PowQuot
 
+/-! ### Monotonicity of mapOfLe -/
+
+section MapOfLeMonotone
+
+variable {𝓘 𝓙 : BoolIdeal}
+
+/-- `mapOfLe` is monotone when `𝓘 ≤ 𝓙` (pointwise on `mem`). -/
+lemma PowQuot.mapOfLe_monotone
+  (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) :
+  Monotone (PowQuot.mapOfLe h) := by
+  intro x y hxy
+  induction x using Quot.inductionOn
+  case h A =>
+  induction y using Quot.inductionOn  
+  case h B =>
+  simp only [PowQuot.mapOfLe_mk]
+  rw [mk_le_mk] at hxy ⊢
+  exact h (A \ B) hxy
+
+end MapOfLeMonotone
+
 /-! ### Boolean algebra preservation properties
 
 The mapOfLe function preserves all Boolean operations, as shown by the lemmas above:
@@ -2077,6 +2098,7 @@ The mapOfLe function preserves all Boolean operations, as shown by the lemmas ab
 - mapOfLe_compl: preserves complement
 - mapOfLe_top: preserves top
 - mapOfLe_bot: preserves bottom
+- mapOfLe_monotone: preserves order
 
 This demonstrates that mapOfLe is a Boolean algebra homomorphism.
 
@@ -2169,6 +2191,11 @@ def PowQuot.mapOfLeBAHom
   induction x using Quot.inductionOn with | _ A =>
   rfl
 
+@[simp] lemma PowQuot.mapOfLeBAHom_monotone
+  {𝓘 𝓙 : BoolIdeal} (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) :
+  Monotone (PowQuot.mapOfLeBAHom h) :=
+  PowQuot.mapOfLe_monotone h
+
 /-! ### EqvGen → relation bridge for equality lemmas -/
 
 section EqvGenBridge
@@ -2216,6 +2243,16 @@ variable {𝓘 : BoolIdeal}
 @[simp] lemma mk_diff_mk (A B : Set ℕ) :
   PowQuot.mk 𝓘 A \ PowQuot.mk 𝓘 B = PowQuot.mk 𝓘 (A \ B) := by
   rw [PowQuot.mk_sdiff_mk, Set.diff_eq]
+
+/-- Set-first phrasing for intersection. -/
+@[simp] lemma mk_inter_mk (A B : Set ℕ) :
+  PowQuot.mk 𝓘 A ⊓ PowQuot.mk 𝓘 B = PowQuot.mk 𝓘 (A ∩ B) :=
+  rfl
+
+/-- Set-first phrasing for union. -/
+@[simp] lemma mk_union_mk (A B : Set ℕ) :
+  PowQuot.mk 𝓘 A ⊔ PowQuot.mk 𝓘 B = PowQuot.mk 𝓘 (A ∪ B) :=
+  rfl
 
 end Convenience
 
