@@ -325,6 +325,9 @@ variable {R : Type*} [Zero R] [One R]
   chi (R := R) A n = 0 := by simp [chi, h]
 end ChiLemmas
 
+section mem_xor_of_chi_ne_scoped
+variable {R : Type*} [Zero R] [One R]
+
 /-- If the characteristic values differ at `n`, then membership in `A` and `B`
 must differ at `n`. We prove this by cases on membership, without using `0 ≠ 1`. -/
 lemma mem_xor_of_chi_ne {A B : Set ℕ} {n : ℕ}
@@ -342,6 +345,8 @@ lemma mem_xor_of_chi_ne {A B : Set ℕ} {n : ℕ}
     · have : chi (R := R) A n = chi (R := R) B n := by
         simp [chi, hA, hB]
       exact (hne this).elim
+
+end mem_xor_of_chi_ne_scoped
 
 /-- Difference set of `chi A` and `chi B` is contained in the symmetric difference `A △ B`. -/
 lemma diffSet_chi_subset_sdiff (A B : Set ℕ) :
@@ -395,6 +400,9 @@ def IdemClass := Quot (fun (x y : IdemMod 𝓘) =>
 
 /-! ### Characteristic functions are idempotent modulo any ideal -/
 
+section chi_IsIdemMod_scoped
+variable {R : Type*} [CommRing R] (𝓘 : BoolIdeal)
+
 /-- For any set `A`, `chi A` is idempotent modulo any ideal.
     This is because `chi A * chi A = chi A` pointwise. -/
 lemma chi_IsIdemMod (A : Set ℕ) : IsIdemMod 𝓘 (chi (R := R) A) := by
@@ -408,6 +416,8 @@ lemma chi_IsIdemMod (A : Set ℕ) : IsIdemMod 𝓘 (chi (R := R) A) := by
   rw [this]
   simp [supp]
   exact 𝓘.empty_mem
+
+end chi_IsIdemMod_scoped
 
 /-- Lift from `PowQuot` to `IdemClass` via characteristic functions. -/
 noncomputable def PhiIdemMod : PowQuot 𝓘 → IdemClass (R := R) 𝓘 :=
@@ -553,8 +563,11 @@ abbrev LinfQuotRingIdem (𝓘 : BoolIdeal) (R : Type*) [CommRing R] [DecidableEq
 -- Removed Coe instance to avoid universe constraint issues
 -- We use .1 explicitly where needed
 
+section chi_idem_in_quot_scoped
+variable {R : Type*} [CommRing R] (𝓘 : BoolIdeal)
+
 /-- The class of `χ_A` is idempotent in the ring quotient. -/
-lemma chi_idem_in_quot (𝓘 : BoolIdeal) (A : Set ℕ) :
+lemma chi_idem_in_quot (A : Set ℕ) :
     (Ideal.Quotient.mk (ISupportIdeal (R := R) 𝓘) (chi (R := R) A) :
       LinfQuotRing 𝓘 R)
   *
@@ -576,6 +589,8 @@ lemma chi_idem_in_quot (𝓘 : BoolIdeal) (A : Set ℕ) :
   -- rewrite to zero, then use empty_mem
   simp [supp', hχ]
   exact 𝓘.empty_mem
+
+end chi_idem_in_quot_scoped
 
 /-- Stone map into the idempotent subset of the ring quotient. -/
 noncomputable def PhiStoneIdem (𝓘 : BoolIdeal) :
@@ -613,6 +628,17 @@ noncomputable def PhiStoneIdem (𝓘 : BoolIdeal) :
 --     (PhiStoneIdem (R := R) 𝓘 q).1 = PhiStone (R := R) 𝓘 q := rfl
 
 end D3c3
+
+/-! ## Support lemmas (moved from D3c4 for better accessibility) -/
+
+section SupportLemmas
+variable {R : Type*} [CommRing R] [DecidableEq R]
+
+/-- Support of negation is the same as the support. -/
+lemma supp'_neg (f : Linf R) : supp' (R := R) (-f) = supp' (R := R) f := by
+  ext n; by_cases h : f n = 0 <;> simp [supp', h]
+
+end SupportLemmas
 
 /-! ## D3(c4). Two idempotents hypothesis and equivalence scaffold -/
 
@@ -669,9 +695,8 @@ lemma supp_chi_sub_subset_supp_idem (f : Linf R) :
   simp only [supp'] at hn
   exact hn this
 
-/-- Support of negation is the same as the support. -/
-lemma supp'_neg (f : Linf R) : supp' (R := R) (-f) = supp' (R := R) f := by
-  ext n; by_cases h : f n = 0 <;> simp [supp', h]
+section sdiff_A_of_subset_supp_sub_scoped
+variable {R : Type*} [CommRing R]
 
 /-- The symmetric difference of the extracted sets is supported where the representatives differ. -/
 lemma sdiff_A_of_subset_supp_sub (f g : Linf R) :
@@ -688,10 +713,13 @@ lemma sdiff_A_of_subset_supp_sub (f g : Linf R) :
     simp only [supp', Set.mem_setOf]
     exact fun h => hneq (sub_eq_zero.mp h)
 
+end sdiff_A_of_subset_supp_sub_scoped
+
 /-- A canonical (noncomputable) representative of a quotient element. -/
 noncomputable def rep (q : LinfQuotRing 𝓘 R) : Linf R :=
   Classical.choose (Quot.exists_rep q)
 
+set_option linter.unusedSectionVars false in
 @[simp] lemma mk_rep (q : LinfQuotRing 𝓘 R) :
     Ideal.Quotient.mk (ISupportIdeal (R := R) 𝓘) (rep (𝓘 := 𝓘) (R := R) q) = q :=
   Classical.choose_spec (Quot.exists_rep q)
@@ -722,6 +750,7 @@ which enables us to prove that PhiStoneIdem and PsiStoneIdem are inverses.
 section StoneEquivalence
 variable [Nontrivial R]
 
+set_option linter.unusedSectionVars false in
 /-- In a nontrivial ring, A_of(χ_A) = A. -/
 @[simp] lemma A_of_chi_eq (A : Set ℕ) :
     A_of (R := R) (chi (R := R) A) = A := by
@@ -766,10 +795,15 @@ lemma Psi_after_Phi (q : PowQuot 𝓘) :
   -- Conclude equality in the quotient
   exact Quot.sound hsdiff_small
 
+section Phi_after_Psi_scoped
+
 /-- Right inverse: Φ ∘ Ψ = id on LinfQuotRingIdem 𝓘 R. -/
 lemma Phi_after_Psi (e : LinfQuotRingIdem 𝓘 R) :
     PhiStoneIdem (R := R) 𝓘 (PsiStoneIdem (R := R) 𝓘 e) = e := by
   classical
+  -- Bring in the instances that the proof needs but aren't in the statement
+  have _ := (inferInstance : Nontrivial R)
+  have _ := (inferInstance : TwoIdempotents R)
   -- We need to show equality of subtypes
   apply Subtype.ext
   -- Goal: mk(χ_{A_of f}) = e.1, where f = rep e.1
@@ -796,6 +830,8 @@ lemma Phi_after_Psi (e : LinfQuotRingIdem 𝓘 R) :
   rw [mem_ISupportIdeal_iff]
   exact h_small
 
+end Phi_after_Psi_scoped
+
 /-- The Stone equivalence between power set quotient and idempotents of the ring quotient. -/
 noncomputable def StoneEquiv :
     PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R :=
@@ -804,15 +840,1336 @@ noncomputable def StoneEquiv :
   left_inv := Psi_after_Phi (R := R) 𝓘,
   right_inv:= Phi_after_Psi (R := R) 𝓘 }
 
+/-! ### Extensionality via Stone equivalence (nontrivial rings) -/
+
+@[ext] lemma LinfQuotRingIdem.ext_of_psi_eq
+  {e f : LinfQuotRingIdem 𝓘 R}
+  (h : PsiStoneIdem (R := R) 𝓘 e = PsiStoneIdem (R := R) 𝓘 f) : e = f := by
+  -- Apply Φ to both sides and use Φ ∘ Ψ = id
+  simpa [Phi_after_Psi (R := R) 𝓘] using congrArg (PhiStoneIdem (R := R) 𝓘) h
+
 end StoneEquivalence
 
 end
 end D3c4
 
-end StoneSupport
+/-! ## Boolean Algebra Bridge (chi operations) -/
 
--- The interface is provided as a minimal skeleton with 0 sorries
--- Full quotient construction and isomorphism proof deferred
+section ChiBridge
+
+section chi_operations_scoped
+variable {R : Type*} [CommRing R]
+
+/-- chi of intersection. -/
+@[simp] lemma chi_inter (A B : Set ℕ) :
+    chi (R := R) (A ∩ B) = chi (R := R) A * chi (R := R) B := by
+  classical
+  ext n
+  simp only [chi, Set.mem_inter_iff]
+  by_cases hA : n ∈ A <;> by_cases hB : n ∈ B <;> simp [hA, hB, mul_zero, zero_mul]
+
+/-- chi of union. -/
+@[simp] lemma chi_union (A B : Set ℕ) :
+    chi (R := R) (A ∪ B) = chi (R := R) A + chi (R := R) B - chi (R := R) A * chi (R := R) B := by
+  classical
+  ext n
+  simp only [chi, Set.mem_union]
+  by_cases hA : n ∈ A <;> by_cases hB : n ∈ B <;> simp [hA, hB, add_zero, zero_add, mul_zero, zero_mul, sub_zero]
+
+/-- chi of complement. -/
+@[simp] lemma chi_compl (A : Set ℕ) :
+    chi (R := R) Aᶜ = 1 - chi (R := R) A := by
+  classical
+  ext n
+  simp only [chi, Set.mem_compl_iff]
+  by_cases h : n ∈ A <;> simp [h, sub_zero]
+
+/-- chi of symmetric difference. -/
+@[simp] lemma chi_sdiff (A B : Set ℕ) :
+    chi (R := R) (A △ B) = chi (R := R) A + chi (R := R) B - 2 * chi (R := R) A * chi (R := R) B := by
+  classical
+  ext n
+  simp only [chi, Pi.add_apply, Pi.sub_apply, Pi.mul_apply]
+  -- Check if n is in the symmetric difference
+  have hsym : n ∈ (A △ B) ↔ (n ∈ A ∧ n ∉ B) ∨ (n ∈ B ∧ n ∉ A) := by rfl
+  simp only [hsym]
+  by_cases hA : n ∈ A <;> by_cases hB : n ∈ B
+  all_goals simp only [hA, hB, if_true, if_false, not_false, not_true, and_true, true_and,
+                       and_false, false_and, or_false, false_or]
+  all_goals norm_num
+
+end chi_operations_scoped
+
+variable {R : Type*} [CommRing R] [DecidableEq R]
+
+set_option linter.unusedSectionVars false in
+@[simp] lemma chi_empty : chi (R := R) (∅ : Set ℕ) = 0 := by
+  classical
+  ext n; simp [chi]
+
+@[simp] lemma chi_univ {R} [CommRing R] [DecidableEq R] : chi (R := R) (Set.univ : Set ℕ) = 1 := by
+  classical
+  ext n; simp [chi]
+
+@[simp] lemma supp'_chi {R} [CommRing R] [DecidableEq R] [Nontrivial R]
+    (A : Set ℕ) :
+  supp' (R := R) (chi (R := R) A) = A := by
+  classical
+  ext n
+  by_cases h : n ∈ A
+  · simp [supp', chi, h, one_ne_zero]
+  · simp [supp', chi, h]
+
+@[simp] lemma supp'_chi_sub {R} [CommRing R] [DecidableEq R] [Nontrivial R]
+    (A B : Set ℕ) :
+  supp' (R := R) (chi (R := R) A - chi (R := R) B) = A △ B := by
+  classical
+  ext n
+  simp only [supp', chi, Pi.sub_apply]
+  -- Unfold symmetric difference
+  have hsym : n ∈ A △ B ↔ (n ∈ A ∧ n ∉ B) ∨ (n ∈ B ∧ n ∉ A) := by rfl
+  simp only [hsym]
+  by_cases hA : n ∈ A <;> by_cases hB : n ∈ B
+  · -- Both in A and B: chi A n = 1, chi B n = 1, so diff = 0
+    simp [hA, hB, sub_self]
+  · -- In A but not B: chi A n = 1, chi B n = 0, so diff = 1 ≠ 0
+    simp [hA, hB, zero_ne_one]
+  · -- Not in A but in B: chi A n = 0, chi B n = 1, so diff = -1 ≠ 0
+    simp [hA, hB, zero_sub, neg_ne_zero, zero_ne_one]
+  · -- Neither in A nor B: chi A n = 0, chi B n = 0, so diff = 0
+    simp [hA, hB, sub_self]
+
+end ChiBridge
+
+/-! ## Boolean Algebra on Idempotents -/
+
+section BooleanAlgebraOnIdempotents
+variable {R : Type*} [CommRing R] [DecidableEq R] (𝓘 : BoolIdeal)
+
+/-- Infimum on idempotents via multiplication. -/
+noncomputable def idemInf : LinfQuotRingIdem 𝓘 R → LinfQuotRingIdem 𝓘 R → LinfQuotRingIdem 𝓘 R :=
+  fun e f => ⟨e.1 * f.1, by
+    -- Need to show (e * f) * (e * f) = e * f when e^2 = e and f^2 = f
+    calc (e.1 * f.1) * (e.1 * f.1) = e.1 * (f.1 * e.1) * f.1 := by ring
+    _ = e.1 * (e.1 * f.1) * f.1 := by rw [mul_comm f.1 e.1]
+    _ = (e.1 * e.1) * f.1 * f.1 := by ring
+    _ = e.1 * f.1 * f.1 := by rw [e.2]
+    _ = e.1 * (f.1 * f.1) := by ring
+    _ = e.1 * f.1 := by rw [f.2]⟩
+
+/-- Supremum on idempotents via x + y - xy. -/
+noncomputable def idemSup : LinfQuotRingIdem 𝓘 R → LinfQuotRingIdem 𝓘 R → LinfQuotRingIdem 𝓘 R :=
+  fun e f => ⟨e.1 + f.1 - e.1 * f.1, by
+    -- Need to show (e + f - ef)^2 = e + f - ef when e^2 = e and f^2 = f
+    have he : e.1 * e.1 = e.1 := e.2
+    have hf : f.1 * f.1 = f.1 := f.2
+    -- Expand and simplify using idempotency
+    simp only [sub_mul, mul_sub, add_mul, mul_add]
+    ring_nf
+    -- Now replace all e^2 with e and f^2 with f
+    simp only [sq, he, hf]
+    ring⟩
+
+/-- Complement on idempotents via 1 - x. -/
+noncomputable def idemCompl : LinfQuotRingIdem 𝓘 R → LinfQuotRingIdem 𝓘 R :=
+  fun e => ⟨1 - e.1, by
+    -- Show (1 - e)^2 = 1 - e when e^2 = e
+    have he := e.2
+    ring_nf
+    simp only [sq, he]
+    ring⟩
+
+@[simp] lemma idemInf_val (e f : LinfQuotRingIdem 𝓘 R) :
+  (idemInf 𝓘 e f).1 = e.1 * f.1 := rfl
+
+@[simp] lemma idemSup_val (e f : LinfQuotRingIdem 𝓘 R) :
+  (idemSup 𝓘 e f).1 = e.1 + f.1 - e.1 * f.1 := rfl
+
+@[simp] lemma idemCompl_val (e : LinfQuotRingIdem 𝓘 R) :
+  (idemCompl 𝓘 e).1 = 1 - e.1 := rfl
+
+@[simp] lemma idemInf_comm (e f : LinfQuotRingIdem 𝓘 R) :
+    idemInf 𝓘 e f = idemInf 𝓘 f e := by
+  ext
+  simp only [idemInf_val]
+  ring
+
+@[simp] lemma idemSup_comm (e f : LinfQuotRingIdem 𝓘 R) :
+    idemSup 𝓘 e f = idemSup 𝓘 f e := by
+  ext
+  simp only [idemSup_val]
+  ring
+
+@[simp] lemma idemCompl_involutive (e : LinfQuotRingIdem 𝓘 R) :
+    idemCompl 𝓘 (idemCompl 𝓘 e) = e := by
+  ext
+  simp only [idemCompl_val]
+  ring
+
+/-! ### Top/Bottom idempotents and basic laws -/
+
+noncomputable def idemTop : LinfQuotRingIdem 𝓘 R := ⟨(1 : LinfQuotRing 𝓘 R), by simp⟩
+noncomputable def idemBot : LinfQuotRingIdem 𝓘 R := ⟨(0 : LinfQuotRing 𝓘 R), by simp⟩
+
+@[simp] lemma idemTop_val : (idemTop 𝓘 : LinfQuotRingIdem 𝓘 R).1 = (1 : LinfQuotRing 𝓘 R) := rfl
+@[simp] lemma idemBot_val : (idemBot 𝓘 : LinfQuotRingIdem 𝓘 R).1 = (0 : LinfQuotRing 𝓘 R) := rfl
+
+@[simp] lemma idemInf_bot_left  (e : LinfQuotRingIdem 𝓘 R) :
+  idemInf 𝓘 (idemBot 𝓘) e = idemBot 𝓘 := by
+  ext; simp [idemInf_val, idemBot_val]
+
+@[simp] lemma idemInf_bot_right (e : LinfQuotRingIdem 𝓘 R) :
+  idemInf 𝓘 e (idemBot 𝓘) = idemBot 𝓘 := by
+  ext; simp [idemInf_val, idemBot_val]
+
+@[simp] lemma idemInf_top_left  (e : LinfQuotRingIdem 𝓘 R) :
+  idemInf 𝓘 (idemTop 𝓘) e = e := by
+  ext; simp [idemInf_val, idemTop_val]
+
+@[simp] lemma idemInf_top_right (e : LinfQuotRingIdem 𝓘 R) :
+  idemInf 𝓘 e (idemTop 𝓘) = e := by
+  ext; simp [idemInf_val, idemTop_val]
+
+@[simp] lemma idemSup_top_left  (e : LinfQuotRingIdem 𝓘 R) :
+  idemSup 𝓘 (idemTop 𝓘) e = idemTop 𝓘 := by
+  ext
+  have : (1 : LinfQuotRing 𝓘 R) + e.1 - (1 * e.1) = (1 : LinfQuotRing 𝓘 R) := by ring
+  simpa [idemSup_val, idemTop_val] using this
+
+@[simp] lemma idemSup_top_right (e : LinfQuotRingIdem 𝓘 R) :
+  idemSup 𝓘 e (idemTop 𝓘) = idemTop 𝓘 := by
+  ext
+  have : e.1 + (1 : LinfQuotRing 𝓘 R) - (e.1 * 1) = (1 : LinfQuotRing 𝓘 R) := by ring
+  simpa [idemSup_val, idemTop_val] using this
+
+@[simp] lemma idemSup_bot_left  (e : LinfQuotRingIdem 𝓘 R) :
+  idemSup 𝓘 (idemBot 𝓘) e = e := by
+  ext; simp [idemSup_val, idemBot_val]
+
+@[simp] lemma idemSup_bot_right (e : LinfQuotRingIdem 𝓘 R) :
+  idemSup 𝓘 e (idemBot 𝓘) = e := by
+  ext; simp [idemSup_val, idemBot_val]
+
+/-! ### Absorption laws -/
+
+@[simp] lemma idemInf_absorb_left (e f : LinfQuotRingIdem 𝓘 R) :
+  idemInf 𝓘 e (idemSup 𝓘 e f) = e := by
+  ext
+  have he : e.1 * e.1 = e.1 := e.2
+  calc
+    e.1 * (e.1 + f.1 - e.1 * f.1)
+        = e.1 * e.1 + e.1 * f.1 - e.1 * e.1 * f.1 := by ring
+    _   = e.1 + e.1 * f.1 - e.1 * f.1 := by simpa [he]
+    _   = e.1 := by ring
+
+@[simp] lemma idemSup_absorb_left (e f : LinfQuotRingIdem 𝓘 R) :
+  idemSup 𝓘 e (idemInf 𝓘 e f) = e := by
+  ext
+  have he : e.1 * e.1 = e.1 := e.2
+  calc
+    e.1 + (e.1 * f.1) - e.1 * (e.1 * f.1)
+        = e.1 + e.1 * f.1 - (e.1 * e.1) * f.1 := by ring
+    _   = e.1 + e.1 * f.1 - e.1 * f.1 := by simpa [he]
+    _   = e.1 := by ring
+
+@[simp] lemma idemInf_absorb_right (e f : LinfQuotRingIdem 𝓘 R) :
+  idemInf 𝓘 (idemSup 𝓘 e f) e = e := by
+  simpa [idemInf_comm 𝓘] using idemInf_absorb_left e f
+
+@[simp] lemma idemSup_absorb_right (e f : LinfQuotRingIdem 𝓘 R) :
+  idemSup 𝓘 (idemInf 𝓘 e f) e = e := by
+  simpa [idemSup_comm 𝓘] using idemSup_absorb_left e f
+
+/-! ### De Morgan laws -/
+
+@[simp] lemma idemCompl_inf (e f : LinfQuotRingIdem 𝓘 R) :
+  idemCompl 𝓘 (idemInf 𝓘 e f) =
+    idemSup 𝓘 (idemCompl 𝓘 e) (idemCompl 𝓘 f) := by
+  ext
+  simp only [idemCompl_val, idemInf_val, idemSup_val]
+  -- 1 - (e f) = (1 - e) + (1 - f) - (1 - e)(1 - f)
+  ring
+
+@[simp] lemma idemCompl_sup (e f : LinfQuotRingIdem 𝓘 R) :
+  idemCompl 𝓘 (idemSup 𝓘 e f) =
+    idemInf 𝓘 (idemCompl 𝓘 e) (idemCompl 𝓘 f) := by
+  ext
+  simp only [idemCompl_val, idemSup_val, idemInf_val]
+  -- 1 - (e + f - e f) = (1 - e)(1 - f)
+  ring
+
+/-! ### Associativity and idempotency -/
+
+@[simp] lemma idemInf_assoc (e f g : LinfQuotRingIdem 𝓘 R) :
+  idemInf 𝓘 (idemInf 𝓘 e f) g = idemInf 𝓘 e (idemInf 𝓘 f g) := by
+  ext
+  simp only [idemInf_val]
+  exact mul_assoc e.1 f.1 g.1
+
+@[simp] lemma idemSup_assoc (e f g : LinfQuotRingIdem 𝓘 R) :
+  idemSup 𝓘 (idemSup 𝓘 e f) g = idemSup 𝓘 e (idemSup 𝓘 f g) := by
+  ext
+  -- (x + y - xy) + z - (x + y - xy)z = x + (y + z - yz) - x(y + z - yz)
+  simp [idemSup_val]
+  ring
+
+@[simp] lemma idemInf_idem (e : LinfQuotRingIdem 𝓘 R) :
+  idemInf 𝓘 e e = e := by
+  ext; simp [idemInf_val, e.2]
+
+@[simp] lemma idemSup_idem (e : LinfQuotRingIdem 𝓘 R) :
+  idemSup 𝓘 e e = e := by
+  -- e ⊔ e = e + e - e^2 = (2e - e) = e
+  ext
+  simp only [idemSup_val, e.2]
+  ring
+
+-- Note: Distributivity laws would go here but are omitted for now
+-- as they're not required for the current Stone equivalence proof
+
+/-! ### Complements w.r.t. ⊤/⊥ -/
+
+@[simp] lemma idemSup_compl (e : LinfQuotRingIdem 𝓘 R) :
+  idemSup 𝓘 e (idemCompl 𝓘 e) = idemTop 𝓘 := by
+  -- e + (1 - e) - e(1 - e) = 1 - (e - e^2) = 1
+  ext
+  simp only [idemSup_val, idemCompl_val, idemTop_val, mul_sub, e.2]
+  ring
+
+@[simp] lemma idemInf_compl (e : LinfQuotRingIdem 𝓘 R) :
+  idemInf 𝓘 e (idemCompl 𝓘 e) = idemBot 𝓘 := by
+  -- e(1 - e) = e - e^2 = 0
+  ext
+  simp [idemInf_val, idemCompl_val, idemBot_val, mul_sub, e.2]
+
+/-!  Complements of ⊥ and ⊤  -/
+
+@[simp] lemma idemCompl_top (𝓘 : BoolIdeal) :
+  idemCompl 𝓘 (idemTop 𝓘 : LinfQuotRingIdem 𝓘 R) = idemBot 𝓘 := by
+  ext; simp [idemCompl_val, idemTop_val, idemBot_val]
+
+@[simp] lemma idemCompl_bot (𝓘 : BoolIdeal) :
+  idemCompl 𝓘 (idemBot 𝓘 : LinfQuotRingIdem 𝓘 R) = idemTop 𝓘 := by
+  ext; simp [idemCompl_val, idemTop_val, idemBot_val]
+
+/-! ### Idempotent difference and symmetric difference -/
+
+noncomputable def idemDiff (𝓘 : BoolIdeal)
+  (e f : LinfQuotRingIdem 𝓘 R) : LinfQuotRingIdem 𝓘 R :=
+  idemInf 𝓘 e (idemCompl 𝓘 f)
+
+noncomputable def idemXor (𝓘 : BoolIdeal)
+  (e f : LinfQuotRingIdem 𝓘 R) : LinfQuotRingIdem 𝓘 R :=
+  idemSup 𝓘 (idemDiff 𝓘 e f) (idemDiff 𝓘 f e)
+
+/-- Value lemma for difference. -/
+@[simp] lemma idemDiff_val (e f : LinfQuotRingIdem 𝓘 R) :
+  (idemDiff 𝓘 e f).1 = e.1 - e.1 * f.1 := by
+  simp [idemDiff, idemInf_val, idemCompl_val, mul_sub]
+
+/-- Value lemma for symmetric difference. -/
+@[simp] lemma idemXor_val (e f : LinfQuotRingIdem 𝓘 R) :
+  (idemXor 𝓘 e f).1 = (e.1 - e.1 * f.1) + (f.1 - f.1 * e.1) - (e.1 - e.1 * f.1) * (f.1 - f.1 * e.1) := by
+  simp [idemXor, idemDiff, idemSup_val, idemInf_val, idemCompl_val, mul_sub, sub_eq_add_neg]
+  ring
+
+/-! Endpoints for difference. -/
+@[simp] lemma idemDiff_self (e : LinfQuotRingIdem 𝓘 R) :
+  idemDiff 𝓘 e e = idemBot 𝓘 := by
+  ext; simp [idemDiff, idemInf_val, idemCompl_val, idemBot_val, mul_sub, e.2]
+
+@[simp] lemma idemDiff_bot_left (e : LinfQuotRingIdem 𝓘 R) :
+  idemDiff 𝓘 (idemBot 𝓘) e = idemBot 𝓘 := by
+  ext; simp [idemDiff, idemInf_val, idemCompl_val, idemBot_val]
+
+@[simp] lemma idemDiff_bot_right (e : LinfQuotRingIdem 𝓘 R) :
+  idemDiff 𝓘 e (idemBot 𝓘) = e := by
+  ext; simp [idemDiff, idemInf_val, idemCompl_val, idemBot_val]
+
+@[simp] lemma idemDiff_top_right (e : LinfQuotRingIdem 𝓘 R) :
+  idemDiff 𝓘 e (idemTop 𝓘) = idemBot 𝓘 := by
+  ext; simp [idemDiff, idemInf_val, idemCompl_val, idemTop_val, idemBot_val, mul_sub, e.2]
+
+/-! Symmetric difference: basic endpoints. -/
+@[simp] lemma idemXor_self (e : LinfQuotRingIdem 𝓘 R) :
+  idemXor 𝓘 e e = idemBot 𝓘 := by
+  ext; simp [idemXor, idemDiff, idemSup_val, idemInf_val, idemCompl_val, idemBot_val, mul_sub, e.2]
+
+@[simp] lemma idemXor_bot_left (e : LinfQuotRingIdem 𝓘 R) :
+  idemXor 𝓘 (idemBot 𝓘) e = e := by
+  ext; simp [idemXor, idemDiff, idemSup_val, idemInf_val, idemCompl_val, idemBot_val]
+
+@[simp] lemma idemXor_bot_right (e : LinfQuotRingIdem 𝓘 R) :
+  idemXor 𝓘 e (idemBot 𝓘) = e := by
+  ext; simp [idemXor, idemDiff, idemSup_val, idemInf_val, idemCompl_val, idemBot_val]
+
+/-! ### idemDiff / idemXor: more endpoints and symmetry -/
+
+@[simp] lemma idemDiff_top_left (e : LinfQuotRingIdem 𝓘 R) :
+  idemDiff 𝓘 (idemTop 𝓘) e = idemCompl 𝓘 e := by
+  -- (⊤ \ e) = ⊤ ⊓ ¬e = ¬e
+  ext; simp [idemDiff]
+
+@[simp] lemma idemXor_top_right (e : LinfQuotRingIdem 𝓘 R) :
+  idemXor 𝓘 e (idemTop 𝓘) = idemCompl 𝓘 e := by
+  -- (e △ ⊤) = (e \ ⊤) ⊔ (⊤ \ e) = ⊥ ⊔ ¬e = ¬e
+  ext; simp [idemXor, idemDiff]
+
+@[simp] lemma idemXor_top_left (e : LinfQuotRingIdem 𝓘 R) :
+  idemXor 𝓘 (idemTop 𝓘) e = idemCompl 𝓘 e := by
+  -- (⊤ △ e) = (⊤ \ e) ⊔ (e \ ⊤) = ¬e ⊔ ⊥ = ¬e
+  ext; simp [idemXor, idemDiff]
+
+@[simp] lemma idemXor_comm (e f : LinfQuotRingIdem 𝓘 R) :
+  idemXor 𝓘 e f = idemXor 𝓘 f e := by
+  -- symmetric by construction + commutativity of ⊔ and ⊓
+  simp [idemXor, idemDiff, idemSup_comm 𝓘, idemInf_comm 𝓘]
+
+@[simp] lemma idemXor_compl_right (e : LinfQuotRingIdem 𝓘 R) :
+  idemXor 𝓘 e (idemCompl 𝓘 e) = idemTop 𝓘 := by
+  -- (e \ ¬e) ⊔ (¬e \ e) = e ⊔ ¬e = ⊤
+  ext; simp [idemXor, idemDiff]
+
+@[simp] lemma idemXor_compl_left (e : LinfQuotRingIdem 𝓘 R) :
+  idemXor 𝓘 (idemCompl 𝓘 e) e = idemTop 𝓘 := by
+  ext; simp [idemXor, idemDiff]
+
+@[simp] lemma idemDiff_compl_right (e f : LinfQuotRingIdem 𝓘 R) :
+  idemDiff 𝓘 e (idemCompl 𝓘 f) = idemInf 𝓘 e f := by
+  -- e \ ¬f = e ⊓ f
+  ext; simp [idemDiff]
+
+@[simp] lemma idemXor_top_top {R} [CommRing R] [DecidableEq R] (𝓘 : BoolIdeal) :
+  idemXor (R := R) 𝓘 (idemTop 𝓘) (idemTop 𝓘) = idemBot 𝓘 := by
+  -- ⊤ △ ⊤ = ⊥
+  ext; simp [idemXor, idemDiff]
+
+@[simp] lemma idemXor_compl_compl (e : LinfQuotRingIdem 𝓘 R) :
+  idemXor 𝓘 (idemCompl 𝓘 e) (idemCompl 𝓘 e) = idemBot 𝓘 := by
+  -- ¬e △ ¬e = ⊥
+  ext; simp [idemXor, idemDiff]
+
+end BooleanAlgebraOnIdempotents
+
+/-! ## Stone Boolean Algebra Isomorphism 
+
+This section establishes that the Stone equivalence preserves Boolean operations.
+The preservation lemmas are marked @[simp] for automatic simplification.
+Together with the value lemmas for idemInf/Sup/Compl, these provide a complete
+simp-normal form for reasoning about Boolean operations through the Stone map.
+-/
+
+section StoneBAIso
+variable {R : Type*} [CommRing R] [DecidableEq R] (𝓘 : BoolIdeal)
+variable [Nontrivial R] [TwoIdempotents R]
+
+/-- Upgraded equivalence preserving Boolean operations. -/
+noncomputable def StoneBAIso : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R := StoneEquiv 𝓘
+
+/-- The Stone map preserves intersection/infimum. -/
+@[simp] lemma stone_preserves_inf (A B : Set ℕ) :
+    PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (A ∩ B)) =
+    idemInf 𝓘 (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A))
+              (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) B)) := by
+  apply Subtype.ext
+  simp only [PhiStoneIdem, idemInf_val, chi_inter, map_mul]
+
+/-- The Stone map preserves union/supremum. -/
+@[simp] lemma stone_preserves_sup (A B : Set ℕ) :
+    PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (A ∪ B)) =
+    idemSup 𝓘 (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A))
+              (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) B)) := by
+  apply Subtype.ext
+  simp only [PhiStoneIdem, idemSup_val, chi_union, map_add, map_sub, map_mul]
+
+/-- The Stone map preserves complement. -/
+@[simp] lemma stone_preserves_compl (A : Set ℕ) :
+    PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) Aᶜ) =
+    idemCompl 𝓘 (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A)) := by
+  apply Subtype.ext
+  simp only [PhiStoneIdem, idemCompl_val, chi_compl, map_sub, map_one]
+
+@[simp] lemma PhiStoneIdem_empty
+  {R} [CommRing R] [DecidableEq R] (𝓘 : BoolIdeal) :
+  (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (∅ : Set ℕ))).1 = 0 := by
+  classical
+  simp [PhiStoneIdem, chi_empty]
+
+@[simp] lemma PhiStoneIdem_univ
+  {R} [CommRing R] [DecidableEq R] (𝓘 : BoolIdeal) :
+  (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (Set.univ : Set ℕ))).1 = 1 := by
+  classical
+  simp [PhiStoneIdem, chi_univ]
+
+/-!  More Φ-preservation at the endpoints (⊥, ⊤)  -/
+
+@[simp] lemma stone_preserves_bot
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    (𝓘 : BoolIdeal) :
+  PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (∅ : Set ℕ)) = idemBot 𝓘 := by
+  classical
+  apply Subtype.ext
+  simp [PhiStoneIdem, idemBot_val, chi_empty]
+
+@[simp] lemma stone_preserves_top
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    (𝓘 : BoolIdeal) :
+  PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (Set.univ : Set ℕ)) = idemTop 𝓘 := by
+  classical
+  apply Subtype.ext
+  simp [PhiStoneIdem, idemTop_val, chi_univ]
+
+/-!  Difference and symmetric difference under Φ  -/
+
+@[simp] lemma stone_preserves_diff
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    (𝓘 : BoolIdeal) (A B : Set ℕ) :
+  PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (A \ B)) =
+    idemInf 𝓘
+      (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A))
+      (idemCompl 𝓘 (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) B))) := by
+  classical
+  -- A \ B = A ∩ Bᶜ
+  have h : A \ B = A ∩ Bᶜ := by
+    ext n; simp [Set.mem_diff]
+  -- Push Φ through ∩ and then through complement
+  rw [h]
+  rw [stone_preserves_inf]
+  congr 2
+  exact stone_preserves_compl 𝓘 B
+
+@[simp] lemma stone_preserves_symmDiff
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    (𝓘 : BoolIdeal) (A B : Set ℕ) :
+  PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (A △ B)) =
+    idemSup 𝓘
+      (idemInf 𝓘
+        (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A))
+        (idemCompl 𝓘 (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) B))))
+      (idemInf 𝓘
+        (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) B))
+        (idemCompl 𝓘 (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A)))) := by
+  classical
+  -- Use the definitional identity A △ B = (A \ B) ∪ (B \ A)
+  have : A △ B = (A \ B) ∪ (B \ A) := by rfl
+  -- Push Φ through ∪, then rewrite both A\B and B\A via the previous lemma
+  rw [this]
+  rw [stone_preserves_sup]
+  simp only [stone_preserves_diff]
+
+/-!  Easy corollaries for endpoints under Φ (difference / symmetric difference) -/
+
+@[simp] lemma stone_preserves_diff_self
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    (𝓘 : BoolIdeal) (A : Set ℕ) :
+  PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (A \ A)) = idemBot 𝓘 := by
+  classical
+  -- Φ(A \ A) = Φ(A) ⊓ (¬Φ(A)) = ⊥
+  simpa using stone_preserves_diff (R := R) (𝓘 := 𝓘) A A
+
+@[simp] lemma stone_preserves_diff_empty
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    (𝓘 : BoolIdeal) (A : Set ℕ) :
+  PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (A \ ∅)) =
+    PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A) := by
+  classical
+  -- Φ(A \ ∅) = Φ(A) ⊓ (¬Φ(∅)) = Φ(A) ⊓ ⊤ = Φ(A)
+  simpa using stone_preserves_diff (R := R) (𝓘 := 𝓘) A ∅
+
+@[simp] lemma stone_preserves_symmDiff_self
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    (𝓘 : BoolIdeal) (A : Set ℕ) :
+  PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (A △ A)) = idemBot 𝓘 := by
+  classical
+  -- Φ(A △ A) = (Φ(A) ⊓ ¬Φ(A)) ⊔ (Φ(A) ⊓ ¬Φ(A)) = ⊥ ⊔ ⊥ = ⊥
+  simpa using stone_preserves_symmDiff (R := R) (𝓘 := 𝓘) A A
+
+@[simp] lemma stone_preserves_symmDiff_empty
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    (𝓘 : BoolIdeal) (A : Set ℕ) :
+  PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (A △ ∅)) =
+    PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A) := by
+  classical
+  -- Φ(A △ ∅) = (Φ(A) ⊓ ¬Φ(∅)) ⊔ (Φ(∅) ⊓ ¬Φ(A)) = (Φ(A) ⊓ ⊤) ⊔ (⊥ ⊓ ¬Φ(A)) = Φ(A)
+  simpa using stone_preserves_symmDiff (R := R) (𝓘 := 𝓘) A ∅
+
+/-! Φ-preservation aliases using idemDiff and idemXor -/
+
+@[simp] lemma stone_preserves_diff'
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    (𝓘 : BoolIdeal) (A B : Set ℕ) :
+  PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (A \ B)) =
+    idemDiff 𝓘
+      (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A))
+      (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) B)) := by
+  simpa [idemDiff] using stone_preserves_diff (R := R) (𝓘 := 𝓘) A B
+
+@[simp] lemma stone_preserves_symmDiff'
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    (𝓘 : BoolIdeal) (A B : Set ℕ) :
+  PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (A △ B)) =
+    idemXor 𝓘
+      (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A))
+      (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) B)) := by
+  simpa [idemXor, idemDiff] using stone_preserves_symmDiff (R := R) (𝓘 := 𝓘) A B
+
+-- Φ endpoints with univ
+@[simp] lemma stone_preserves_diff_univ
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    (𝓘 : BoolIdeal) (A : Set ℕ) :
+  PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (Set.univ \ A)) =
+    idemCompl 𝓘 (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A)) := by
+  simp [stone_preserves_diff, stone_preserves_top]
+
+@[simp] lemma stone_preserves_symmDiff_univ
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    (𝓘 : BoolIdeal) (A : Set ℕ) :
+  PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (Set.univ △ A)) =
+    idemCompl 𝓘 (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A)) := by
+  simp [stone_preserves_symmDiff, stone_preserves_top, idemXor_top_left]
+
+/-!  More Φ-endpoints with `univ` (right-hand side) -/
+
+@[simp] lemma stone_preserves_diff_univ_right
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    (𝓘 : BoolIdeal) (A : Set ℕ) :
+  PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (A \ Set.univ)) = idemBot 𝓘 := by
+  simp [Set.diff_univ, stone_preserves_bot]
+
+@[simp] lemma stone_preserves_symmDiff_univ_right
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    (𝓘 : BoolIdeal) (A : Set ℕ) :
+  PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (A △ Set.univ)) =
+    idemCompl 𝓘 (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A)) := by
+  rw [stone_preserves_symmDiff']
+  simp [idemXor_comm, stone_preserves_symmDiff_univ]
+
+-- Φ(univ \ univ) = ⊥
+@[simp] lemma stone_preserves_diff_univ_univ
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    (𝓘 : BoolIdeal) :
+  PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (Set.univ \ (Set.univ : Set ℕ))) =
+    idemBot 𝓘 := by
+  simp [Set.diff_univ]
+
+-- Φ(univ △ univ) = ⊥
+@[simp] lemma stone_preserves_symmDiff_univ_univ
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    (𝓘 : BoolIdeal) :
+  PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) ((Set.univ : Set ℕ) △ Set.univ)) =
+    idemBot 𝓘 := by
+  simp
+
+end StoneBAIso
+
+/-! ## Path A: BooleanAlgebra Transport
+
+We now implement the BooleanAlgebra structure on PowQuot 𝓘 and transport it
+to LinfQuotRingIdem 𝓘 R via the Stone equivalence.
+
+The preservation lemmas already establish that:
+- PhiStoneIdem preserves intersection (stone_preserves_inf)
+- PhiStoneIdem preserves union (stone_preserves_sup)
+- PhiStoneIdem preserves complement (stone_preserves_compl)
+- PhiStoneIdem preserves bottom/top (stone_preserves_bot, stone_preserves_top)
+-/
+
+section PathA_BooleanAlgebra
+
+variable (𝓘 : BoolIdeal)
+
+/-! ### Well-definedness lemmas for Boolean operations -/
+
+private lemma inf_well_defined (A₁ A₂ B₁ B₂ : Set ℕ) 
+    (hA : A₁ △ A₂ ∈ 𝓘.mem) (hB : B₁ △ B₂ ∈ 𝓘.mem) :
+    (A₁ ∩ B₁) △ (A₂ ∩ B₂) ∈ 𝓘.mem := by
+  -- The symmetric difference of intersections is contained in the union of symmetric differences
+  have : (A₁ ∩ B₁) △ (A₂ ∩ B₂) ⊆ (A₁ △ A₂) ∪ (B₁ △ B₂) := by
+    intro x hx
+    simp only [sdiff, Set.mem_union, Set.mem_diff, Set.mem_inter_iff] at hx ⊢
+    rcases hx with ⟨⟨hA₁, hB₁⟩, h₂⟩ | ⟨⟨hA₂, hB₂⟩, h₁⟩
+    · -- x ∈ (A₁ ∩ B₁) \ (A₂ ∩ B₂)
+      -- So x ∈ A₁, x ∈ B₁, and ¬(x ∈ A₂ ∧ x ∈ B₂)
+      push_neg at h₂
+      -- Either x ∉ A₂ or x ∉ B₂
+      by_cases hxA₂ : x ∈ A₂
+      · -- x ∈ A₁, x ∈ A₂, x ∈ B₁, x ∉ B₂
+        right; left; exact ⟨hB₁, h₂ hxA₂⟩
+      · -- x ∈ A₁, x ∉ A₂
+        left; left; exact ⟨hA₁, hxA₂⟩
+    · -- x ∈ (A₂ ∩ B₂) \ (A₁ ∩ B₁)
+      -- So x ∈ A₂, x ∈ B₂, and ¬(x ∈ A₁ ∧ x ∈ B₁)
+      push_neg at h₁
+      -- Either x ∉ A₁ or x ∉ B₁
+      by_cases hxA₁ : x ∈ A₁
+      · -- x ∈ A₁, x ∈ A₂, x ∈ B₂, x ∉ B₁
+        right; right; exact ⟨hB₂, h₁ hxA₁⟩
+      · -- x ∉ A₁, x ∈ A₂
+        left; right; exact ⟨hA₂, hxA₁⟩
+  exact 𝓘.downward this (𝓘.union_mem hA hB)
+
+private lemma sup_well_defined (A₁ A₂ B₁ B₂ : Set ℕ)
+    (hA : A₁ △ A₂ ∈ 𝓘.mem) (hB : B₁ △ B₂ ∈ 𝓘.mem) :
+    (A₁ ∪ B₁) △ (A₂ ∪ B₂) ∈ 𝓘.mem := by
+  -- Similar to inf_well_defined
+  have : (A₁ ∪ B₁) △ (A₂ ∪ B₂) ⊆ (A₁ △ A₂) ∪ (B₁ △ B₂) := by
+    intro x hx
+    simp only [sdiff, Set.mem_union, Set.mem_diff] at hx ⊢
+    rcases hx with ⟨h₁, h₂⟩ | ⟨h₂, h₁⟩
+    · rcases h₁ with hA₁ | hB₁
+      · push_neg at h₂
+        left; left; exact ⟨hA₁, h₂.1⟩
+      · push_neg at h₂
+        right; left; exact ⟨hB₁, h₂.2⟩
+    · rcases h₂ with hA₂ | hB₂
+      · push_neg at h₁
+        left; right; exact ⟨hA₂, h₁.1⟩
+      · push_neg at h₁
+        right; right; exact ⟨hB₂, h₁.2⟩
+  exact 𝓘.downward this (𝓘.union_mem hA hB)
+
+private lemma compl_well_defined (A B : Set ℕ) (h : A △ B ∈ 𝓘.mem) :
+    Aᶜ △ Bᶜ ∈ 𝓘.mem := by
+  -- Aᶜ △ Bᶜ = A △ B
+  have : Aᶜ △ Bᶜ = A △ B := by
+    ext x
+    simp only [sdiff, Set.mem_union, Set.mem_diff, Set.mem_compl_iff]
+    tauto
+  rw [this]
+  exact h
+
+/-! ### Define Boolean operations on PowQuot using Quot.liftOn -/
+
+/-- Intersection operation on PowQuot 𝓘. -/
+def PowQuot.inf (x y : PowQuot 𝓘) : PowQuot 𝓘 :=
+  Quot.liftOn₂ x y 
+    (fun A B => Quot.mk (sdiffSetoid 𝓘) (A ∩ B))
+    -- First witness: vary B, fix A
+    (fun A B B' hBB' => by
+      apply Quot.sound
+      apply inf_well_defined 𝓘 A A B B'
+      · -- A △ A = ∅ ∈ 𝓘.mem
+        rw [sdiff_self]
+        exact 𝓘.empty_mem
+      · exact hBB')
+    -- Second witness: vary A, fix B
+    (fun A A' B hAA' => by
+      apply Quot.sound
+      apply inf_well_defined 𝓘 A A' B B
+      · exact hAA'
+      · -- B △ B = ∅ ∈ 𝓘.mem
+        rw [sdiff_self]
+        exact 𝓘.empty_mem)
+
+/-- Union operation on PowQuot 𝓘. -/
+def PowQuot.sup (x y : PowQuot 𝓘) : PowQuot 𝓘 :=
+  Quot.liftOn₂ x y
+    (fun A B => Quot.mk (sdiffSetoid 𝓘) (A ∪ B))
+    -- First witness: vary B, fix A  
+    (fun A B B' hBB' => by
+      apply Quot.sound
+      apply sup_well_defined 𝓘 A A B B'
+      · -- A △ A = ∅ ∈ 𝓘.mem
+        rw [sdiff_self]
+        exact 𝓘.empty_mem
+      · exact hBB')
+    -- Second witness: vary A, fix B
+    (fun A A' B hAA' => by
+      apply Quot.sound
+      apply sup_well_defined 𝓘 A A' B B
+      · exact hAA'
+      · -- B △ B = ∅ ∈ 𝓘.mem
+        rw [sdiff_self]
+        exact 𝓘.empty_mem)
+
+/-- Complement operation on PowQuot 𝓘. -/
+def PowQuot.compl (x : PowQuot 𝓘) : PowQuot 𝓘 :=
+  Quot.liftOn x
+    (fun A => Quot.mk (sdiffSetoid 𝓘) Aᶜ)
+    (fun A B h => by
+      -- Need to show Aᶜ △ Bᶜ ∈ 𝓘.mem when A △ B ∈ 𝓘.mem
+      apply Quot.sound
+      apply compl_well_defined 𝓘 A B h)
+
+/-- Bottom element of PowQuot 𝓘. -/
+def PowQuot.bot : PowQuot 𝓘 := Quot.mk (sdiffSetoid 𝓘) ∅
+
+/-- Top element of PowQuot 𝓘. -/
+def PowQuot.top : PowQuot 𝓘 := Quot.mk (sdiffSetoid 𝓘) Set.univ
+
+/-! ### BooleanAlgebra instance for PowQuot 
+
+PowQuot has natural Boolean operations that form a Boolean algebra structure.
+The complete proof requires showing all Boolean algebra axioms hold
+using the well-definedness lemmas proven above.
+
+Note: Full BooleanAlgebra instance left as future work.
+The operations PowQuot.inf/sup/compl/bot/top are defined and well-defined.
+Standard quotient techniques would complete the instance.
+-/
+
+/-! ### Transport BooleanAlgebra to LinfQuotRingIdem 
+
+LinfQuotRingIdem inherits Boolean operations via the Stone equivalence.
+The preservation lemmas stone_preserves_inf/sup/compl establish that
+StoneEquiv (aliased as StoneBAIso) is a Boolean algebra isomorphism.
+
+Note: Transport of BooleanAlgebra structure left as future work.
+The operations idemInf/idemSup/idemCompl/idemBot/idemTop are defined.
+The preservation lemmas prove StoneEquiv preserves all Boolean operations.
+-/
+
+/-! 
+## Path A Implementation Summary
+
+The Path A groundwork is now complete:
+1. ✓ Well-definedness lemmas for Boolean operations on quotients
+2. ✓ Definitions of PowQuot.inf/sup/compl/bot/top  
+3. ✓ StoneBAIso alias restored (points to StoneEquiv)
+4. ✓ All preservation lemmas showing StoneEquiv preserves Boolean ops
+
+What remains for full Path A completion:
+- Standard BooleanAlgebra instance proofs (reduce to set identities via Quot.induction)
+- Transport along StoneEquiv using the preservation lemmas
+
+The infrastructure is fully in place for these final steps.
+-/
+
+end PathA_BooleanAlgebra
+
+/-! ## Minimal Boolean Algebra Skeleton for PowQuot
+
+These are proof-free: they're just instances that point min, max, ᶜ, ⊥, ⊤ at your
+already-defined well-defined quotient operations, plus definitional simp lemmas.
+
+Note: We use Min/Max instances as a stepping stone. Once we build the lattice
+structure (SemilatticeInf/SemilatticeSup), these will automatically promote to
+Inf/Sup and give us the proper ⊓/⊔ notation. This is the standard Lean 4/Mathlib
+approach: Min/Max → lattice structure → Inf/Sup.
+-/
+
+section PowQuotBooleanSkeleton
+
+variable (𝓘 : BoolIdeal)
+
+-- 1) Register the canonical lattice operations for PowQuot 𝓘
+-- Note: Using Min/Max for now as a stepping stone. Full lattice Inf/Sup requires
+-- the lattice structure to be built first. These will become Inf/Sup when we
+-- construct SemilatticeInf/SemilatticeSup instances.
+instance : Min (PowQuot 𝓘) := ⟨PowQuot.inf 𝓘⟩
+instance : Max (PowQuot 𝓘) := ⟨PowQuot.sup 𝓘⟩
+instance : HasCompl (PowQuot 𝓘) := ⟨PowQuot.compl 𝓘⟩
+instance : Bot (PowQuot 𝓘) := ⟨PowQuot.bot 𝓘⟩
+instance : Top (PowQuot 𝓘) := ⟨PowQuot.top 𝓘⟩
+
+-- 2) Definitional computation rules (using min/max for now)
+@[simp] lemma min_mk_mk (A B : Set ℕ) :
+    (min (Quot.mk (sdiffSetoid 𝓘) A) (Quot.mk (sdiffSetoid 𝓘) B) : PowQuot 𝓘)
+      = Quot.mk (sdiffSetoid 𝓘) (A ∩ B) := rfl
+
+@[simp] lemma max_mk_mk (A B : Set ℕ) :
+    (max (Quot.mk (sdiffSetoid 𝓘) A) (Quot.mk (sdiffSetoid 𝓘) B) : PowQuot 𝓘)
+      = Quot.mk (sdiffSetoid 𝓘) (A ∪ B) := rfl
+
+@[simp] lemma compl_mk (A : Set ℕ) :
+    ((Quot.mk (sdiffSetoid 𝓘) A)ᶜ : PowQuot 𝓘)
+      = Quot.mk (sdiffSetoid 𝓘) Aᶜ := rfl
+
+@[simp] lemma bot_def :
+    (⊥ : PowQuot 𝓘) = Quot.mk (sdiffSetoid 𝓘) (∅ : Set ℕ) := rfl
+
+@[simp] lemma top_def :
+    (⊤ : PowQuot 𝓘) = Quot.mk (sdiffSetoid 𝓘) (Set.univ : Set ℕ) := rfl
+
+-- 3) (optional) local pretty notations (will become proper ⊓/⊔ after lattice instance)
+local infixl:70 " ⊓ᵖ " => (fun x y : PowQuot 𝓘 => min x y)
+local infixl:65 " ⊔ᵖ " => (fun x y : PowQuot 𝓘 => max x y)
+local prefix:max "ᶜᵖ" => (fun x : PowQuot 𝓘 => xᶜ)
+
+-- sanity pings
+example (A B : Set ℕ) :
+    ((Quot.mk (sdiffSetoid 𝓘) A) ⊓ᵖ (Quot.mk (sdiffSetoid 𝓘) B))
+      = Quot.mk (sdiffSetoid 𝓘) (A ∩ B) := by simp
+
+example (A B : Set ℕ) :
+    ((Quot.mk (sdiffSetoid 𝓘) A) ⊔ᵖ (Quot.mk (sdiffSetoid 𝓘) B))
+      = Quot.mk (sdiffSetoid 𝓘) (A ∪ B) := by simp
+
+example (A : Set ℕ) :
+    (ᶜᵖ (Quot.mk (sdiffSetoid 𝓘) A))
+      = Quot.mk (sdiffSetoid 𝓘) Aᶜ := by simp
+
+end PowQuotBooleanSkeleton
+
+/-! ## Order Structure on PowQuot
+
+We define the order on PowQuot via "difference small": x ≤ y iff (A \ B) ∈ 𝓘.mem.
+This gives us a partial order that will support the Boolean algebra structure.
+-/
+
+/-! ## Order & Lattice structure on `PowQuot 𝓘`
+
+We equip `PowQuot 𝓘` with the "difference small" order:
+`x ≤ y`  iff for reps `A,B`,  `(A \ B) ∈ 𝓘.mem`.
+
+Key points:
+* `LE` is defined with `Quot.liftOn₂` using **two** compatibility witnesses.
+* `@[simp]` mk‑lemmas expose the reps so `simp` can reduce goals to set facts.
+* Meet/join come from your canonical operations, so `⊓/⊔` compute by `rfl`.
+* All lattice laws are proved by nested `Quot.inductionOn` + basic set algebra.
+-/
+
+section PowQuotOrder
+
+variable (𝓘 : BoolIdeal)
+
+-- Make empty_mem a simp lemma locally so simp can close goals of the form ∅ ∈ 𝓘.mem
+attribute [local simp] BoolIdeal.empty_mem
+
+/-- The order on `PowQuot`: `x ≤ y` iff the difference of reps is small. -/
+instance : LE (PowQuot 𝓘) where
+  le x y :=
+    Quot.liftOn₂ x y (fun A B : Set ℕ => (A \ B) ∈ 𝓘.mem)
+      -- vary the 2nd representative (fix A)
+      (fun A B B' (hBB' : B △ B' ∈ 𝓘.mem) => by
+        -- show (A\B) ∈ I ↔ (A\B') ∈ I
+        apply propext
+        constructor
+        · intro h
+          -- A \ B' ⊆ (A \ B) ∪ (B △ B')
+          have H : (A \ B') ⊆ (A \ B) ∪ (B △ B') := by
+            intro x hx; rcases hx with ⟨hA, hB'⟩
+            by_cases hB : x ∈ B
+            · -- x∈B, x∉B'  ⇒ x∈B△B'
+              right
+              -- B △ B' = (B \ B') ∪ (B' \ B)
+              -- and here x∈B\B'
+              exact Or.inl ⟨hB, hB'⟩
+            · -- x∉B  ⇒ x∈A\B
+              left; exact ⟨hA, hB⟩
+          exact 𝓘.downward H (𝓘.union_mem h hBB')
+        · intro h
+          -- A \ B ⊆ (A \ B') ∪ (B △ B')
+          have H : (A \ B) ⊆ (A \ B') ∪ (B △ B') := by
+            intro x hx; rcases hx with ⟨hA, hB⟩
+            by_cases hB' : x ∈ B'
+            · -- x∈B', x∉B ⇒ x∈B△B'
+              right; exact Or.inr ⟨hB', hB⟩
+            · -- x∉B' ⇒ x∈A\B'
+              left; exact ⟨hA, hB'⟩
+          exact 𝓘.downward H (𝓘.union_mem h hBB'))
+      -- vary the 1st representative (fix B)
+      (fun A A' B (hAA' : A △ A' ∈ 𝓘.mem) => by
+        apply propext
+        constructor
+        · intro h
+          -- A' \ B ⊆ (A \ B) ∪ (A △ A')
+          have H : (A' \ B) ⊆ (A \ B) ∪ (A △ A') := by
+            intro x hx; rcases hx with ⟨hA', hB⟩
+            by_cases hA : x ∈ A
+            · left;  exact ⟨hA, hB⟩
+            · right; exact Or.inr ⟨hA', hA⟩
+          exact 𝓘.downward H (𝓘.union_mem h hAA')
+        · intro h
+          -- A \ B ⊆ (A' \ B) ∪ (A △ A')
+          have H : (A \ B) ⊆ (A' \ B) ∪ (A △ A') := by
+            intro x hx; rcases hx with ⟨hA, hB⟩
+            by_cases hA' : x ∈ A'
+            · left;  exact ⟨hA', hB⟩
+            · right; exact Or.inl ⟨hA, hA'⟩
+          exact 𝓘.downward H (𝓘.union_mem h hAA'))
+
+/-- Unfolding rule for the order on representatives. -/
+@[simp] lemma mk_le_mk (A B : Set ℕ) :
+    ((Quot.mk (sdiffSetoid 𝓘) A : PowQuot 𝓘) ≤ Quot.mk (sdiffSetoid 𝓘) B) ↔
+    (A \ B) ∈ 𝓘.mem := Iff.rfl
+
+
+/-- Preorder under "difference small". -/
+instance : Preorder (PowQuot 𝓘) where
+  le := (· ≤ ·)
+  le_refl := by
+    intro x; refine Quot.inductionOn x ?_
+    intro A; simp [mk_le_mk, Set.diff_self]
+  le_trans := by
+    intro x y z hxy hyz
+    refine Quot.inductionOn x ?_ hxy
+    intro A hAy; refine Quot.inductionOn y ?_ hAy hyz
+    intro B hAB; refine Quot.inductionOn z ?_ hAB
+    intro C hAB hBC
+    -- want: (A \ C) ∈ I, given hAB : (A \ B) ∈ I, hBC : (B \ C) ∈ I
+    -- A \ C ⊆ (A \ B) ∪ (B \ C)
+    have H : (A \ C) ⊆ (A \ B) ∪ (B \ C) := by
+      intro x hx; rcases hx with ⟨hA, hC⟩
+      by_cases hB : x ∈ B
+      · right; exact ⟨hB, hC⟩
+      · left;  exact ⟨hA, hB⟩
+    exact 𝓘.downward H (𝓘.union_mem hAB hBC)
+
+/-- Partial order: antisymmetry via symmetric difference. -/
+instance : PartialOrder (PowQuot 𝓘) where
+  le_antisymm := by
+    intro x y hxy hyx
+    induction x using Quot.inductionOn with | _ A =>
+    induction y using Quot.inductionOn with | _ B =>
+    simp only [mk_le_mk] at hxy hyx
+    -- (A △ B) = (A \ B) ∪ (B \ A)
+    apply Quot.sound
+    have : A △ B = (A \ B) ∪ (B \ A) := by
+      ext n; -- elementwise set reasoning
+      simp [sdiff, Set.mem_union, Set.mem_diff]  -- uses your local `sdiff`/simp setup
+    simpa [this] using 𝓘.union_mem hxy hyx
+
+/-- Semilattice with meet: reuses your canonical `PowQuot.inf`. -/
+instance : SemilatticeInf (PowQuot 𝓘) where
+  inf := PowQuot.inf 𝓘
+  inf_le_left := by
+    intro x y; refine Quot.inductionOn x ?_
+    intro A; refine Quot.inductionOn y ?_
+    intro B; -- ((A ∩ B) \ A) ∈ I  since it's ∅
+    simp [mk_le_mk, PowQuot.inf, Set.diff_eq_empty.mpr Set.inter_subset_left]
+  inf_le_right := by
+    intro x y; refine Quot.inductionOn x ?_
+    intro A; refine Quot.inductionOn y ?_
+    intro B
+    simp [mk_le_mk, PowQuot.inf, Set.diff_eq_empty.mpr Set.inter_subset_right]
+  le_inf := by
+    intro x y z hxy hxz
+    induction x using Quot.inductionOn with | _ A =>
+    induction y using Quot.inductionOn with | _ B =>
+    induction z using Quot.inductionOn with | _ C =>
+    simp only [mk_le_mk, PowQuot.inf] at hxy hxz ⊢
+    -- want (A \ (B ∩ C)) ∈ I  and  A \ (B ∩ C) = (A \ B) ∪ (A \ C)
+    have : A \ (B ∩ C) = (A \ B) ∪ (A \ C) := by
+      ext n; simp [Set.mem_diff, Set.mem_inter_iff, Set.mem_union]; tauto
+    simpa [this] using 𝓘.union_mem hxy hxz
+
+/-- Semilattice with join: reuses your canonical `PowQuot.sup`. -/
+instance : SemilatticeSup (PowQuot 𝓘) where
+  sup := PowQuot.sup 𝓘
+  le_sup_left := by
+    intro x y; refine Quot.inductionOn x ?_
+    intro A; refine Quot.inductionOn y ?_
+    intro B
+    -- (A \ (A ∪ B)) = ∅
+    simp [mk_le_mk, PowQuot.sup, Set.diff_eq_empty.mpr (Set.subset_union_left)]
+  le_sup_right := by
+    intro x y; refine Quot.inductionOn x ?_
+    intro A; refine Quot.inductionOn y ?_
+    intro B
+    simp [mk_le_mk, PowQuot.sup, Set.diff_eq_empty.mpr (Set.subset_union_right)]
+  sup_le := by
+    intro x y z hxz hyz
+    induction x using Quot.inductionOn with | _ A =>
+    induction y using Quot.inductionOn with | _ B =>
+    induction z using Quot.inductionOn with | _ C =>
+    simp only [mk_le_mk, PowQuot.sup] at hxz hyz ⊢
+    -- ((A ∪ B) \ C) = (A \ C) ∪ (B \ C)
+    have : (A ∪ B) \ C = (A \ C) ∪ (B \ C) := by
+      ext n; simp [Set.mem_diff, Set.mem_union]; tauto
+    simpa [this] using 𝓘.union_mem hxz hyz
+
+/-- Meet and join compute definitionally on representatives. -/
+@[simp] lemma mk_inf_mk (A B : Set ℕ) :
+    ((Quot.mk (sdiffSetoid 𝓘) A) ⊓ (Quot.mk (sdiffSetoid 𝓘) B) : PowQuot 𝓘)
+      = Quot.mk (sdiffSetoid 𝓘) (A ∩ B) := rfl
+
+@[simp] lemma mk_sup_mk (A B : Set ℕ) :
+    ((Quot.mk (sdiffSetoid 𝓘) A) ⊔ (Quot.mk (sdiffSetoid 𝓘) B) : PowQuot 𝓘)
+      = Quot.mk (sdiffSetoid 𝓘) (A ∪ B) := rfl
+
+/-- Complement computes definitionally on representatives -/
+@[simp] lemma mk_compl (A : Set ℕ) :
+  ((Quot.mk (sdiffSetoid 𝓘) A : PowQuot 𝓘)ᶜ) =
+  Quot.mk (sdiffSetoid 𝓘) (Aᶜ) := rfl
+
+/-- Top element is the equivalence class of the universe -/
+@[simp] lemma mk_top :
+  (⊤ : PowQuot 𝓘) = Quot.mk (sdiffSetoid 𝓘) (Set.univ : Set ℕ) := rfl
+
+/-- Bottom element is the equivalence class of the empty set -/
+@[simp] lemma mk_bot :
+  (⊥ : PowQuot 𝓘) = Quot.mk (sdiffSetoid 𝓘) (∅ : Set ℕ) := rfl
+
+/-- Assemble the lattice & distributivity. -/
+instance : Lattice (PowQuot 𝓘) where
+  __ := (inferInstance : SemilatticeInf (PowQuot 𝓘))
+  __ := (inferInstance : SemilatticeSup (PowQuot 𝓘))
+
+instance : DistribLattice (PowQuot 𝓘) where
+  __ := (inferInstance : Lattice (PowQuot 𝓘))
+  le_sup_inf := by
+    intro x y z
+    refine Quot.inductionOn x ?_
+    intro A; refine Quot.inductionOn y ?_
+    intro B; refine Quot.inductionOn z ?_
+    intro C
+    -- After unfolding, we need to prove distributivity at the set level
+    -- The goal after simp is showing a difference is in the ideal
+    simp only [mk_le_mk, mk_sup_mk, mk_inf_mk]
+    -- Need to show: ((A ∪ B) ∩ (A ∪ C)) \ (A ∪ B ∩ C) ∈ 𝓘.mem
+    -- This is empty because (A ∪ B) ∩ (A ∪ C) ⊆ A ∪ (B ∩ C)
+    have : (A ∪ B) ∩ (A ∪ C) ⊆ A ∪ (B ∩ C) := by
+      intro n hn
+      simp [Set.mem_inter_iff, Set.mem_union] at hn ⊢
+      tauto
+    rw [Set.diff_eq_empty.mpr this]
+    exact 𝓘.empty_mem
+
+/-- Boolean algebra: `sdiff` is defined as `x ⊓ yᶜ`, other fields are already in scope. -/
+instance : BooleanAlgebra (PowQuot 𝓘) where
+  __ := (inferInstance : DistribLattice (PowQuot 𝓘))
+  compl := PowQuot.compl 𝓘
+  sdiff x y := x ⊓ yᶜ
+  top := ⊤
+  bot := ⊥
+  inf_compl_le_bot := by
+    intro x
+    refine Quot.inductionOn x ?_
+    intro A
+    show Quot.mk (sdiffSetoid 𝓘) A ⊓ (Quot.mk (sdiffSetoid 𝓘) A)ᶜ ≤ ⊥
+    simp
+  top_le_sup_compl := by
+    intro x
+    refine Quot.inductionOn x ?_
+    intro A
+    show ⊤ ≤ Quot.mk (sdiffSetoid 𝓘) A ⊔ (Quot.mk (sdiffSetoid 𝓘) A)ᶜ
+    simp
+  le_top := by
+    intro x
+    refine Quot.inductionOn x ?_
+    intro A
+    simp
+  bot_le := by
+    intro x
+    refine Quot.inductionOn x ?_
+    intro A
+    simp
+
+end PowQuotOrder
+
+/-! ## Additional @[simp] lemmas and smoke tests for PowQuot Boolean algebra -/
+
+section PowQuotBA_Polish
+
+variable (𝓘 : BoolIdeal)
+
+/-! ### Smoke tests for instance synthesis -/
+
+-- Instance synthesis checks
+#check (inferInstance : Preorder        (PowQuot 𝓘))
+#check (inferInstance : PartialOrder    (PowQuot 𝓘))
+#check (inferInstance : Lattice         (PowQuot 𝓘))
+#check (inferInstance : DistribLattice  (PowQuot 𝓘))
+#check (inferInstance : BooleanAlgebra  (PowQuot 𝓘))
+
+-- Basic law verification
+example (x y : PowQuot 𝓘) : x ⊓ y = y ⊓ x := inf_comm x y
+example (x y : PowQuot 𝓘) : x ⊔ y = y ⊔ x := sup_comm x y
+example (x : PowQuot 𝓘)   : x ⊓ xᶜ = ⊥     := inf_compl_eq_bot
+example (x : PowQuot 𝓘)   : x ⊔ xᶜ = ⊤     := sup_compl_eq_top
+
+-- Additional Boolean algebra laws
+example (x y z : PowQuot 𝓘) : x ⊓ (y ⊔ z) = (x ⊓ y) ⊔ (x ⊓ z) := inf_sup_left x y z
+example (x y z : PowQuot 𝓘) : x ⊔ (y ⊓ z) = (x ⊔ y) ⊓ (x ⊔ z) := sup_inf_left x y z
+example (x y : PowQuot 𝓘) : (x ⊔ y)ᶜ = xᶜ ⊓ yᶜ := compl_sup
+example (x y : PowQuot 𝓘) : (x ⊓ y)ᶜ = xᶜ ⊔ yᶜ := compl_inf
+example (x : PowQuot 𝓘) : xᶜᶜ = x := compl_compl x
+example (x y : PowQuot 𝓘) : x \ y = x ⊓ yᶜ := sdiff_eq
+
+end PowQuotBA_Polish
+
+/-! ## Convenience constructors and additional lemmas for PowQuot -/
+
+namespace PowQuot
+
+variable (𝓘 : BoolIdeal)
+
+/-- Canonical constructor into `PowQuot 𝓘` from a set representative. -/
+@[reducible] def mk (A : Set ℕ) : PowQuot 𝓘 :=
+  (Quot.mk (sdiffSetoid 𝓘) A : PowQuot 𝓘)
+
+-- Optional scoped quotient-brackets notation
+scoped notation "⟦" A "⟧ₚ" => PowQuot.mk _ A
+
+/-- Boolean difference computes as intersection with complement -/
+@[simp] lemma mk_sdiff_mk (A B : Set ℕ) :
+  (mk 𝓘 A \ mk 𝓘 B) = mk 𝓘 (A ∩ Bᶜ) := rfl
+-- Note: When you want `A \ B`, use `by simp [Set.diff_eq]` where
+-- `Set.diff_eq` is the standard identity `A \ B = A ∩ Bᶜ`
+
+/-- Monotonicity of the constructor w.r.t. subset -/
+lemma mk_le_mk_of_subset {A B : Set ℕ} (h : A ⊆ B) :
+  mk 𝓘 A ≤ mk 𝓘 B := by
+  -- By definition this is `(A \ B) ∈ 𝓘.mem`
+  -- But `A \ B = ∅` since `A ⊆ B`
+  simpa [Papers.P4Meta.StoneSupport.mk_le_mk, Set.diff_eq_empty.mpr h] using 
+    (𝓘.empty_mem : (∅ : Set ℕ) ∈ 𝓘.mem)
+
+/-- Two sets with small symmetric difference are equal in the quotient -/
+lemma mk_eq_of_sdiff_mem {A B : Set ℕ} (h : (A △ B) ∈ 𝓘.mem) :
+  mk 𝓘 A = mk 𝓘 B :=
+  Quot.sound h
+
+/-! ## Functoriality under ideal inclusion -/
+
+variable {𝓘 𝓙 : BoolIdeal}
+
+/-- Monotone map induced by an inclusion of ideals `𝓘 ≤ 𝓙`. -/
+def mapOfLe (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) : PowQuot 𝓘 →o PowQuot 𝓙 where
+  toFun :=
+    Quot.lift
+      (fun A : Set ℕ => (Quot.mk (sdiffSetoid 𝓙) A : PowQuot 𝓙))
+      (by
+        intro A A' hAA'
+        -- well-definedness: if A ~_𝓘 A' then also A ~_𝓙 A'
+        exact Quot.sound (h _ hAA'))
+  monotone' := by
+    intro x y hxy
+    -- unpack both sides to representatives and use `mk_le_mk`
+    induction x using Quot.inductionOn with | _ A =>
+    induction y using Quot.inductionOn with | _ B =>
+    simp only [Papers.P4Meta.StoneSupport.mk_le_mk] at hxy ⊢
+    -- order on PowQuot is "difference small", so inclusion of ideals finishes it
+    exact h _ hxy
+
+/-- On representatives, `mapOfLe` is literally the identity on sets. -/
+@[simp] lemma mapOfLe_mk (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A : Set ℕ) :
+    mapOfLe h (mk 𝓘 A) = mk 𝓙 A := rfl
+
+/-- `mapOfLe` preserves infimum -/
+lemma mapOfLe_inf (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (x y : PowQuot 𝓘) :
+    mapOfLe h (x ⊓ y) = mapOfLe h x ⊓ mapOfLe h y := by
+  induction x using Quot.inductionOn with | _ A =>
+  induction y using Quot.inductionOn with | _ B =>
+  simp [Papers.P4Meta.StoneSupport.mk_inf_mk, mapOfLe_mk]
+
+/-- `mapOfLe` preserves supremum -/
+lemma mapOfLe_sup (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (x y : PowQuot 𝓘) :
+    mapOfLe h (x ⊔ y) = mapOfLe h x ⊔ mapOfLe h y := by
+  induction x using Quot.inductionOn with | _ A =>
+  induction y using Quot.inductionOn with | _ B =>
+  simp
+
+/-- `mapOfLe` preserves complement -/
+lemma mapOfLe_compl (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (x : PowQuot 𝓘) :
+    mapOfLe h (xᶜ) = (mapOfLe h x)ᶜ := by
+  induction x using Quot.inductionOn with | _ A =>
+  simp
+
+/-- `mapOfLe` preserves top -/
+lemma mapOfLe_top (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) :
+    mapOfLe h (⊤ : PowQuot 𝓘) = (⊤ : PowQuot 𝓙) := by
+  simp
+
+/-- `mapOfLe` preserves bot -/
+lemma mapOfLe_bot (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) :
+    mapOfLe h (⊥ : PowQuot 𝓘) = (⊥ : PowQuot 𝓙) := by
+  simp
+
+end PowQuot
+
+/-! 
+### PowQuot goal reducer pattern (cheatsheet)
+
+When proving goals about `PowQuot 𝓘`:
+```lean
+refine Quot.inductionOn x ?_; intro A
+refine Quot.inductionOn y ?_; intro B
+-- now use mk-lemmas to expose reps:
+simp [mk_le_mk, mk_inf_mk, mk_sup_mk, mk_compl, mk_top, mk_bot]
+-- close with ideal facts: `𝓘.empty_mem`, `𝓘.union_mem`, `𝓘.downward`
+-- and set identities: diff_inter_union, union_diff_eq, subset_union_inter
+```
+-/
+
+/-! ## Handy set inclusion identities
+
+These are the key identities used throughout the Boolean algebra proofs.
+They enable us to apply 𝓘.union_mem and 𝓘.downward.
+Not in global simp set to avoid loops - use locally with `simp [diff_inter_union]`.
+-/
+
+section SetInclusionLemmas
+
+-- Distribution of difference over intersection
+lemma diff_inter_union {α : Type*} (A B C : Set α) : 
+  A \ (B ∩ C) = (A \ B) ∪ (A \ C) := by
+  ext x; simp [Set.mem_diff, Set.mem_inter_iff, Set.mem_union]
+  tauto
+
+-- Distribution of union over difference  
+lemma union_diff_eq {α : Type*} (A B C : Set α) :
+  (A ∪ B) \ C = (A \ C) ∪ (B \ C) := by
+  ext x; simp [Set.mem_diff, Set.mem_union]
+  tauto
+
+-- Subset relationship for distributivity
+lemma subset_union_inter {α : Type*} (A B C : Set α) :
+  A ⊆ (A ∪ B) ∩ (A ∪ C) := by
+  intro x hx
+  exact ⟨Or.inl hx, Or.inl hx⟩
+
+end SetInclusionLemmas
+
+/-!
+## Generalization Note
+
+The entire construction generalizes seamlessly from `Set ℕ` to `Set α` for any type `α`.
+When ready to generalize:
+
+1. Add parameter `{α : Type*}` at the module level
+2. Replace all occurrences of `Set ℕ` with `Set α`
+3. Update `BoolIdeal` to be parametrized by `α`:
+   ```lean
+   structure BoolIdeal (α : Type*) where
+     mem : Set (Set α)
+     empty_mem : ∅ ∈ mem
+     union_mem : ∀ {A B}, A ∈ mem → B ∈ mem → (A ∪ B) ∈ mem
+     downward : ∀ {A B}, A ⊆ B → B ∈ mem → A ∈ mem
+   ```
+4. All proofs remain identical - they only use set algebra, no special properties of ℕ
+
+The mk-lemmas, instances, and `mapOfLe` all port without changes.
+No decidability assumptions are needed for the order/lattice/Boolean algebra proofs.
+-/
+
+/-!
+## Roadmap to Full BooleanAlgebra Instance (COMPLETED ✅)
+
+Sketch (no code here, just a precise checklist):
+
+1) Define the order (choose C1 or C2).
+
+  -- C1 (order = "difference small")
+  def LE.le : PowQuot 𝓘 → PowQuot 𝓘 → Prop :=
+    Quot.liftOn₂ … (fun A B => (A \ B) ∈ 𝓘.mem) (well_defined_proof)
+
+  instance : LE (PowQuot 𝓘) := ⟨LE.le 𝓘⟩
+  instance : Preorder (PowQuot 𝓘) := { le := (· ≤ ·), le_refl := …, le_trans := … }
+  instance : PartialOrder (PowQuot 𝓘) := { le_antisymm := … }
+
+2) Build lattice instances that promote Min/Max to Inf/Sup:
+  - instance : SemilatticeInf (PowQuot 𝓘) := { inf := min, inf_le_left := ..., inf_le_right := ..., le_inf := ... }
+  - instance : SemilatticeSup (PowQuot 𝓘) := { sup := max, le_sup_left := ..., le_sup_right := ..., sup_le := ... }
+  - After these instances, Min/Max automatically become Inf/Sup (⊓/⊔) in the API
+
+3) Lattice & Distributive:
+  - Each lattice axiom is a `Quot.induction` that reduces to standard set inclusions/identities.
+  - Distributivity follows from set distributivity: A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C)
+
+4) BooleanAlgebra.mk:
+   supply:
+     inf_compl_le_bot : ∀ x, x ⊓ xᶜ ≤ ⊥       -- reduces to A ∩ Aᶜ = ∅
+     top_le_sup_compl : ∀ x, ⊤ ≤ x ⊔ xᶜ       -- reduces to A ∪ Aᶜ = univ
+     sdiff_eq         : x \ y = x ⊓ yᶜ        -- definitional for SDiff α if you register it
+     himp_eq          : x ⇨ y = xᶜ ⊔ y        -- for HImp α in Boolean algebras
+
+5) (Optional) Package the Stone map as a Boolean isomorphism: 
+   all three preservation lemmas are done.
+-/
+
+end StoneSupport
 
 /-! ### Calibration Program
 

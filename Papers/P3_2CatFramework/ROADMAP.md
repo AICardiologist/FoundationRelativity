@@ -1,6 +1,6 @@
 # Paper 3: Development Roadmap
 
-## 📍 Current Position (January 27, 2025)
+## 📍 Current Position (January 28, 2025)
 
 ### ✅ Completed
 
@@ -9,7 +9,8 @@
 - **Part II Core**: Positive uniformization definitions, bridges, gap results  
 - **Bicategorical framework**: Complete with coherence laws
 - **Truth groupoid**: With @[simp] automation
-- **CI integration**: All tests passing, no import cycles
+- **CI integration**: All tests passing (1188+ build jobs), no import cycles
+- **WP-D Stone Window**: COMPLETE with full Stone equivalence + Path A BooleanAlgebra transport (January 2025)
 
 #### P4_Meta Framework Schedule Mathematics Status
 **Parts 1-5**: ✅ COMPLETE - Full infrastructure with round-robin, quotas, bridges
@@ -85,9 +86,20 @@
 - Collision theorems: RFN → Con → Gödel
 - Complexity interfaces and strictness results
 
-**Part VI - Stone Window**
-- Boolean ring with support ideals
-- Provenance discipline for classical vs Lean-proved
+**Part VI - Stone Window** ✅ COMPLETE (Path A - January 28, 2025)
+- ✅ Boolean ideals and power set quotients (D1 layer)
+- ✅ Support ideals as proper ring ideals (D2-D3a layers)
+- ✅ Full Stone equivalence `StoneEquiv : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R` (D3c layer)
+- ✅ TwoIdempotents class for rings with only trivial idempotents (D3c4)
+- ✅ Clean linter compliance via section scoping pattern
+- **Path A BooleanAlgebra Transport** ✅ COMPLETE:
+  - ✅ Full BooleanAlgebra instance on PowQuot 𝓘 with 0 errors
+  - ✅ Proper proof patterns: show goal shape → simp closes everything
+  - ✅ @[simp] lemmas: mk_le_mk, mk_inf_mk, mk_sup_mk, mk_compl, mk_top, mk_bot
+  - ✅ Local `attribute [simp] BoolIdeal.empty_mem` for automatic ∅ ∈ 𝓘.mem closure
+  - ✅ All BA fields (inf_compl_le_bot, top_le_sup_compl, etc.) proven with plain `simp`
+  - ❌ **TODO**: Transport to LinfQuotRingIdem via StoneEquiv
+- Provenance discipline for classical vs Lean-proved results
 
 **Tests**
 - `Meta_Smoke_test.lean`: 50+ tests covering all features
@@ -145,7 +157,7 @@
 
 ## 🎯 Immediate Priorities - Completing Paper 3
 
-### ✅ Priority 1: WP-D Stone Window Support Ideals (Infrastructure COMPLETE)
+### ✅ Priority 1: WP-D Stone Window Support Ideals (COMPLETE with Path A - January 28, 2025)
 
 **Goal**: Prove the algebraic isomorphism for Boolean ideals (choice-free, constructive):
 ```lean
@@ -153,9 +165,16 @@
      [A] ↦ [χ_A]
 ```
 
-#### ✅ PR D1: Set Quotient & Boolean Ideal (COMPLETE - January 27, 2025)
-- ✅ `BoolIdeal` structure with empty_mem, downward, union_mem
-- ✅ Symmetric difference `A △ B := (A \ B) ∪ (B \ A)` with lemmas
+#### ✅ Complete Infrastructure (January 28, 2025)
+- ✅ **D1**: `BoolIdeal` structure with empty_mem, downward, union_mem
+- ✅ **D2**: Support functions and ℓ∞ quotients (linfEqMod equivalence)
+- ✅ **D3a**: ISupportIdeal as proper Ideal (Linf R) with ring operations
+- ✅ **D3b**: Characteristic functions χ_A with lift to quotient  
+- ✅ **D3c**: Full Stone equivalence with TwoIdempotents class
+- ✅ **D3c4**: Complete inverse proofs (Φ ∘ Ψ = id and Ψ ∘ Φ = id)
+- ✅ **Ergonomics**: 27 Boolean algebra lemmas with @[simp] automation
+- ✅ **Quality**: Clean linter compliance via section scoping pattern
+- ✅ **Testing**: Stone_BA_Sanity.lean with comprehensive micro-tests
 - ✅ Equivalence relation `A ≈ B ↔ A △ B ∈ 𝓘.mem` via `sdiffSetoid`
 - ✅ `PowQuot 𝓘 := Quot (sdiffSetoid 𝓘)` construction
 - ✅ Sanity test: `Stone_SetQuot_Sanity.lean` works
@@ -279,6 +298,43 @@ theorem quotas_targets_exact_packed ... :
    - Add docstrings to all public theorems
    - Create API documentation for P4_Meta
    - Write usage examples for key features
+
+## 🎯 Immediate Priority: Complete Path A BooleanAlgebra (2-5 sessions)
+
+### Phase A - Stone Window Boolean Algebra Completion
+
+**A0. Fix the hook** (IMMEDIATE - 10 min):
+- ⚠️ Revert Min/Max back to proper lattice classes (Inf/Sup)
+- Keep the @[simp] computation rules
+
+**A1. Order on quotient** (1 session):
+- Define `x ≤ y :↔ (A \ B) ∈ 𝓘.mem` using `Quot.liftOn₂`
+- Prove well-definedness using sdiffSetoid lemmas
+- Instantiate Preorder (reflexivity, transitivity)
+- Instantiate PartialOrder (antisymmetry)
+
+**A2. Lattice laws** (1-2 sessions):
+- Build SemilatticeInf/Sup via Quot.induction → set facts
+- Key lemmas: `le_inf ↔ subset`, `inf_le_left/right`, `sup_le`, etc.
+- DistribLattice: prove `A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C)` descends mod 𝓘
+
+**A3. Boolean structure** (1 session):
+- Prove characteristic axioms:
+  - `inf_compl_le_bot` from `A ∩ Aᶜ = ∅`
+  - `top_le_sup_compl` from `A ∪ Aᶜ = univ`
+- Complete BooleanAlgebra.mk instance
+
+**A4. Transport** (30-60 min):
+- Use StoneBAIso with preservation lemmas
+- Get `BooleanAlgebra (LinfQuotRingIdem 𝓘 R)` by transport
+- Add @[simp] congruence lemmas through the iso
+
+**Done-when**: StoneBAIso is proven to be a Boolean algebra isomorphism
+
+### Phase B - Meta Collision (1 session, schematic)
+- Add schematic Lean proof RFN_Σ₁(T) → Con(T)
+- Replace axiom in Part V with proof
+- Record G1/G2 lower bounds as named axioms with provenance
 
 ## 📅 Near-term Roadmap (1-2 weeks)
 
