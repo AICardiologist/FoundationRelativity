@@ -2069,6 +2069,53 @@ lemma mapOfLe_bot (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) :
 
 end PowQuot
 
+/-! ### Boolean algebra preservation properties
+
+The mapOfLe function preserves all Boolean operations, as shown by the lemmas above:
+- mapOfLe_sup: preserves supremum
+- mapOfLe_inf: preserves infimum  
+- mapOfLe_compl: preserves complement
+- mapOfLe_top: preserves top
+- mapOfLe_bot: preserves bottom
+
+This demonstrates that mapOfLe is a Boolean algebra homomorphism.
+
+Note: To package this as a formal BooleanAlgHom, additional imports would be needed.
+The preservation lemmas above already provide the key algebraic properties.
+-/
+
+/-! ### EqvGen → relation bridge for equality lemmas -/
+
+section EqvGenBridge
+
+open Relation
+
+/-- For an equivalence relation `r`, its equivalence closure `EqvGen r` is just `r`. -/
+lemma eqvGen_iff_of_equivalence {α : Type*} {r : α → α → Prop}
+    (hr : Equivalence r) {a b : α} :
+  EqvGen r a b ↔ r a b := by
+  constructor
+  · intro h
+    induction h with
+    | rel _ _ h => exact h
+    | refl a => exact hr.refl a
+    | symm _ _ _ ih => exact hr.symm ih
+    | trans _ _ _ _ _ ih₁ ih₂ => exact hr.trans ih₁ ih₂
+  · intro h; exact EqvGen.rel _ _ h
+
+/-- Equality on representatives reduces to "small" symmetric difference. -/
+@[simp] lemma mk_eq_mk_iff (𝓘 : BoolIdeal) (A B : Set ℕ) :
+  (PowQuot.mk 𝓘 A : PowQuot 𝓘) = PowQuot.mk 𝓘 B ↔
+  (A △ B) ∈ 𝓘.mem := by
+  -- Unfold to get Quot.mk equality
+  show Quot.mk (sdiffSetoid 𝓘) A = Quot.mk (sdiffSetoid 𝓘) B ↔ _
+  -- Quot.eq yields EqvGen of the underlying relation; fold it back
+  rw [Quot.eq]
+  rw [eqvGen_iff_of_equivalence (sdiffSetoid 𝓘).iseqv]
+  rfl
+
+end EqvGenBridge
+
 /-! 
 ### PowQuot goal reducer pattern (cheatsheet)
 
