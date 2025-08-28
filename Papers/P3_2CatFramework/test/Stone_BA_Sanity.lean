@@ -148,6 +148,20 @@ example {𝓘 𝓙 : BoolIdeal}
 
 end PreservationTests
 
+-- Quick sanity checks for the new threshold lemmas
+section ThresholdSanity
+  variable {𝓘 : BoolIdeal} {A B : Set ℕ}
+
+  example : (mk 𝓘 A = ⊥) ↔ A ∈ 𝓘.mem := Papers.P4Meta.StoneSupport.mk_eq_bot_iff A
+  example : (mk 𝓘 A = ⊤) ↔ Aᶜ ∈ 𝓘.mem := Papers.P4Meta.StoneSupport.mk_eq_top_iff A
+
+  example : mk 𝓘 A ⊓ mk 𝓘 B = ⊥ ↔ (A ∩ B) ∈ 𝓘.mem :=
+    Papers.P4Meta.StoneSupport.mk_inf_eq_bot_iff A B
+
+  example : mk 𝓘 A ⊔ mk 𝓘 B = ⊤ ↔ (Aᶜ ∩ Bᶜ) ∈ 𝓘.mem :=
+    Papers.P4Meta.StoneSupport.mk_sup_eq_top_iff A B
+end ThresholdSanity
+
 section BAHomTests
 
 open Papers.P4Meta.StoneSupport

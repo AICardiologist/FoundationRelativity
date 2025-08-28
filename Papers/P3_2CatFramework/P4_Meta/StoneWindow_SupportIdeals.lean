@@ -2233,6 +2233,15 @@ lemma eqvGen_iff_of_equivalence {α : Type*} {r : α → α → Prop}
 
 end EqvGenBridge
 
+/-- Mapped equality convenience lemma. -/
+@[simp] lemma mapOfLe_mk_eq_iff
+  {𝓘 𝓙 : BoolIdeal}
+  (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+  (A B : Set ℕ) :
+  PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) = PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)
+    ↔ (A △ B) ∈ 𝓙.mem := by
+  simpa [PowQuot.mapOfLe_mk] using mk_eq_mk_iff 𝓙 A B
+
 /-! ### Additional convenience lemmas -/
 
 section Convenience
@@ -2269,6 +2278,63 @@ variable {𝓘 : BoolIdeal}
   simp [mk_le_mk, mk_compl, Set.diff_eq]
 
 end MoreOrderLemmas
+
+/-! ### More `mk` ↔ smallness characterizations -/
+section TopBotIff
+  variable {𝓘 : BoolIdeal}
+
+  /-- `mk A = ⊥` iff `A` is small. -/
+  @[simp] lemma mk_eq_bot_iff (A : Set ℕ) :
+      (PowQuot.mk 𝓘 A : PowQuot 𝓘) = ⊥ ↔ A ∈ 𝓘.mem := by
+    constructor
+    · intro h
+      have : (PowQuot.mk 𝓘 A : PowQuot 𝓘) ≤ ⊥ := by simpa [h]
+      simpa [mk_bot, mk_le_mk, Set.diff_empty] using this
+    · intro hA
+      apply le_antisymm
+      · -- `mk A ≤ ⊥`
+        simpa [mk_bot, mk_le_mk, Set.diff_empty] using hA
+      · -- `⊥ ≤ mk A` since `∅ \ A = ∅ ∈ 𝓘.mem`
+        have : (∅ : Set ℕ) ∈ 𝓘.mem := 𝓘.empty_mem
+        simpa [mk_bot, mk_le_mk, Set.empty_diff]
+
+  /-- `mk A = ⊤` iff `Aᶜ` is small. -/
+  @[simp] lemma mk_eq_top_iff (A : Set ℕ) :
+      (PowQuot.mk 𝓘 A : PowQuot 𝓘) = ⊤ ↔ Aᶜ ∈ 𝓘.mem := by
+    constructor
+    · intro h
+      have : ⊤ ≤ (PowQuot.mk 𝓘 A : PowQuot 𝓘) := by simpa [h]
+      simp [mk_top, mk_le_mk] at this
+      -- this : Set.univ \ A ∈ 𝓘.mem
+      -- Need to show Aᶜ ∈ 𝓘.mem, and Aᶜ = Set.univ \ A
+      convert this
+      ext x
+      simp
+    · intro hAc
+      apply le_antisymm
+      · exact le_top
+      · -- `⊤ ≤ mk A` ↔ `(univ \ A) ∈ 𝓘.mem`
+        simp [mk_top, mk_le_mk]
+        -- Need to show Set.univ \ A ∈ 𝓘.mem, given hAc : Aᶜ ∈ 𝓘.mem
+        convert hAc
+        ext x
+        simp
+end TopBotIff
+
+section InfSupThresholds
+  variable {𝓘 : BoolIdeal}
+
+  /-- `mk A ⊓ mk B = ⊥` iff `A ∩ B` is small. -/
+  @[simp] lemma mk_inf_eq_bot_iff (A B : Set ℕ) :
+      PowQuot.mk 𝓘 A ⊓ PowQuot.mk 𝓘 B = ⊥ ↔ (A ∩ B) ∈ 𝓘.mem := by
+    simpa [mk_inf_mk] using mk_eq_bot_iff (A ∩ B)
+
+  /-- `mk A ⊔ mk B = ⊤` iff `Aᶜ ∩ Bᶜ` is small (i.e. complement of the union is small). -/
+  @[simp] lemma mk_sup_eq_top_iff (A B : Set ℕ) :
+      PowQuot.mk 𝓘 A ⊔ PowQuot.mk 𝓘 B = ⊤ ↔ (Aᶜ ∩ Bᶜ) ∈ 𝓘.mem := by
+    rw [mk_sup_mk, mk_eq_top_iff]
+    simp [Set.compl_union]
+end InfSupThresholds
 
 /-! 
 ### PowQuot goal reducer pattern (cheatsheet)
