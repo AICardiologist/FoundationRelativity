@@ -162,6 +162,28 @@ section ThresholdSanity
     Papers.P4Meta.StoneSupport.mk_sup_eq_top_iff A B
 end ThresholdSanity
 
+-- Sanity checks for disjointness and complement lemmas
+section DisjointComplSanity
+  variable {𝓘 𝓙 : BoolIdeal} {A B : Set ℕ}
+
+  example : Disjoint (mk 𝓘 A) (mk 𝓘 B) ↔ (A ∩ B) ∈ 𝓘.mem :=
+    Papers.P4Meta.StoneSupport.disjoint_mk_iff A B
+
+  example : IsCompl (mk 𝓘 A) (mk 𝓘 B) ↔ ((A ∩ B) ∈ 𝓘.mem ∧ (Aᶜ ∩ Bᶜ) ∈ 𝓘.mem) :=
+    Papers.P4Meta.StoneSupport.isCompl_mk_iff A B
+
+  -- Test mapOfLe preservation
+  example (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) :
+    Disjoint (PowQuot.mapOfLe h (mk 𝓘 A)) (PowQuot.mapOfLe h (mk 𝓘 B)) ↔
+    (A ∩ B) ∈ 𝓙.mem :=
+    Papers.P4Meta.StoneSupport.mapOfLe_disjoint_iff h A B
+
+  example (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) :
+    IsCompl (PowQuot.mapOfLe h (mk 𝓘 A)) (PowQuot.mapOfLe h (mk 𝓘 B)) ↔
+    ((A ∩ B) ∈ 𝓙.mem ∧ (Aᶜ ∩ Bᶜ) ∈ 𝓙.mem) :=
+    Papers.P4Meta.StoneSupport.mapOfLe_isCompl_iff h A B
+end DisjointComplSanity
+
 section BAHomTests
 
 open Papers.P4Meta.StoneSupport

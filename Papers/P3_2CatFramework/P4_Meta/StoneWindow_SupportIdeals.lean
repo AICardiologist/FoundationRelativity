@@ -2336,6 +2336,54 @@ section InfSupThresholds
     simp [Set.compl_union]
 end InfSupThresholds
 
+/-! ### Disjointness / complements, reduced to smallness -/
+section DisjointCompl
+  variable {𝓘 : BoolIdeal}
+
+  /-- Disjointness of representatives corresponds to a small intersection. -/
+  @[simp] lemma disjoint_mk_iff (A B : Set ℕ) :
+      Disjoint (PowQuot.mk 𝓘 A : PowQuot 𝓘) (PowQuot.mk 𝓘 B) ↔
+      (A ∩ B) ∈ 𝓘.mem := by
+    -- In a Boolean algebra: `Disjoint x y ↔ x ⊓ y = ⊥`.
+    -- Then apply your `mk_inf_eq_bot_iff`.
+    simpa [disjoint_iff, mk_inf_mk] using
+      (mk_inf_eq_bot_iff (A := A) (B := B))
+
+  /-- Complementarity of representatives corresponds to "disjoint & covers ⊤". -/
+  @[simp] lemma isCompl_mk_iff (A B : Set ℕ) :
+      IsCompl (PowQuot.mk 𝓘 A : PowQuot 𝓘) (PowQuot.mk 𝓘 B) ↔
+      ((A ∩ B) ∈ 𝓘.mem ∧ (Aᶜ ∩ Bᶜ) ∈ 𝓘.mem) := by
+    -- In a Boolean algebra: `IsCompl x y ↔ x ⊓ y = ⊥ ∧ x ⊔ y = ⊤`.
+    -- Use your `mk_inf_eq_bot_iff` and `mk_sup_eq_top_iff`.
+    simp only [isCompl_iff, mk_inf_mk, mk_sup_mk, disjoint_iff, codisjoint_iff]
+    exact ⟨fun ⟨h1, h2⟩ => ⟨mk_inf_eq_bot_iff A B |>.mp h1, mk_sup_eq_top_iff A B |>.mp h2⟩,
+           fun ⟨h1, h2⟩ => ⟨mk_inf_eq_bot_iff A B |>.mpr h1, mk_sup_eq_top_iff A B |>.mpr h2⟩⟩
+end DisjointCompl
+
+/-! ### Disjointness/complements transported along `mapOfLe` -/
+section MapOfLe_DisjointCompl
+  variable {𝓘 𝓙 : BoolIdeal}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+
+  @[simp] lemma mapOfLe_disjoint_iff (A B : Set ℕ) :
+      Disjoint (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))
+               (PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)) ↔
+      (A ∩ B) ∈ 𝓙.mem := by
+    -- Reduce to `inf = ⊥`, push `mapOfLe` through, then apply the threshold.
+    simpa [disjoint_iff, PowQuot.mapOfLe_inf, PowQuot.mapOfLe_mk]
+      using (mk_inf_eq_bot_iff (𝓘 := 𝓙) (A := A) (B := B))
+
+  @[simp] lemma mapOfLe_isCompl_iff (A B : Set ℕ) :
+      IsCompl (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))
+              (PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)) ↔
+      ((A ∩ B) ∈ 𝓙.mem ∧ (Aᶜ ∩ Bᶜ) ∈ 𝓙.mem) := by
+    -- Reduce to `(inf = ⊥) ∧ (sup = ⊤)`, push through `mapOfLe`, then use thresholds.
+    simp only [isCompl_iff, PowQuot.mapOfLe_inf, PowQuot.mapOfLe_sup, PowQuot.mapOfLe_mk,
+               disjoint_iff, codisjoint_iff]
+    exact ⟨fun ⟨h1, h2⟩ => ⟨mk_inf_eq_bot_iff A B |>.mp h1, mk_sup_eq_top_iff A B |>.mp h2⟩,
+           fun ⟨h1, h2⟩ => ⟨mk_inf_eq_bot_iff A B |>.mpr h1, mk_sup_eq_top_iff A B |>.mpr h2⟩⟩
+end MapOfLe_DisjointCompl
+
 /-! 
 ### PowQuot goal reducer pattern (cheatsheet)
 
