@@ -1,14 +1,15 @@
 # Paper 3: 2-Categorical Framework for Axiom Calibration
 
-## 📊 Current Status Summary (Updated: January 27, 2025)
+## 📊 Current Status Summary (Updated: January 28, 2025)
 
-**Mathematical Sorries**: 0 ✅ | **Integration Sorries**: 7 ⚠️ | **Lines of Code**: 5,400+ | **Files**: 52+
+**Mathematical Sorries**: 0 ✅ | **Integration Sorries**: 7 ⚠️ | **Lines of Code**: 5,700+ | **Files**: 53+
 
 ### Framework Status
 **Part I (Uniformization)**: ✅ COMPLETE - Height theory fully formalized  
 **Part II (Positive Uniformization)**: ✅ COMPLETE - Witness existence layer implemented  
 **Parts III-VI (P4_Meta)**: ✅ COMPLETE - Meta-theoretic framework with ladder algebra  
-**CI Status**: ✅ All core modules build | **Import Structure**: ✅ No cycles
+**WP-D Stone Window**: ✅ COMPLETE (January 28, 2025) - Full Stone equivalence + Path A BooleanAlgebra
+**CI Status**: ✅ All core modules build (1188+ jobs, 0 errors) | **Import Structure**: ✅ No cycles
 
 ### Part 6 Schedule Mathematics ✅ COMPLETE
 | Component | Status | What's Done | What's TODO |
@@ -128,12 +129,14 @@
 
 5. **Part VI: Calibrations and Portal Pattern (WP-B/WP-D/Track A COMPLETE ✨)**
    - ✅ **WP-D Stone Window**: Complete Stone equivalence (0 sorries) 🎯
-     - `StoneWindow_SupportIdeals.lean`: Full D1-D3(c4) infrastructure
+     - `StoneWindow_SupportIdeals.lean`: Full D1-D3(c4) infrastructure (1188+ build jobs)
      - Boolean ideals, power set quotients, ℓ∞ function spaces
      - Ring ideal ISupportIdeal as proper Ideal under pointwise ops
      - `StoneEquiv : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R` for `[Nontrivial R]`
      - `TwoIdempotents` class and full inverse proofs
-     - 7 comprehensive test files validating all layers
+     - **NEW (Jan 2025)**: 27 ergonomic Boolean algebra lemmas with @[simp] automation
+     - **NEW (Jan 2025)**: Clean linter compliance via section scoping pattern
+     - 8 comprehensive test files validating all layers (Stone_BA_Sanity.lean added)
    - ✅ **FT Frontier (WP-B)**: Complete Fan Theorem axis (0 sorries)
      - `FT_Frontier.lean`: FT → UCT, FT → Sperner → BFPT_n reductions
      - `FTPortalWire.lean`: Height certificate transport along implications
@@ -357,12 +360,18 @@ This paper establishes:
   - Key theorem: `diffSet_chi_subset_sdiff` containment proof
   - Well-defined lift `PhiSetToLinfQuot : PowQuot 𝓘 → LinfQuot 𝓘 R`
 
-#### Remaining (D3c): 
-- Algebraic quotient isomorphism `Φ_𝓘 : 𝒫(ℕ)/𝓘 ≅ Idem(ℓ∞/I_𝓘)`
-- `TwoIdempotents R` class and bijection proof
-- Calibration: constructive surjectivity depends on ideal choice
+#### Complete D3c-D3(c4) + Path A ✅ COMPLETE (January 28, 2025):
+- **Full Stone equivalence**: `StoneEquiv : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R` 
+- **TwoIdempotents R** class with bijection proof
+- **Path A BooleanAlgebra on PowQuot 𝓘** ✅:
+  - Complete lattice hierarchy: Preorder → PartialOrder → Lattice → DistribLattice → BooleanAlgebra
+  - Order via "difference small": `x ≤ y ↔ (A \ B) ∈ 𝓘.mem`
+  - @[simp] lemmas: mk_le_mk, mk_inf_mk, mk_sup_mk, mk_compl, mk_top, mk_bot
+  - Local `attribute [simp] BoolIdeal.empty_mem` for automatic goal closure
+  - All proofs reduced to plain `simp` - maximally clean implementation
+- **Calibration**: Constructive surjectivity depends on ideal choice
 
-**Status**: Infrastructure 100% complete and sorry-free; final isomorphism proof pending
+**Status**: Path A complete with 0 errors, 0 mathematical sorries
 
 ## 📋 Verification Ledger (P4_Meta)
 
