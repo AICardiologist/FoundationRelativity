@@ -2077,15 +2077,15 @@ variable {𝓘 𝓙 : BoolIdeal}
 
 /-- `mapOfLe` is monotone when `𝓘 ≤ 𝓙` (pointwise on `mem`). -/
 lemma PowQuot.mapOfLe_monotone
+  {𝓘 𝓙 : BoolIdeal}
   (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) :
   Monotone (PowQuot.mapOfLe h) := by
   intro x y hxy
   induction x using Quot.inductionOn
   case h A =>
-  induction y using Quot.inductionOn  
+  induction y using Quot.inductionOn
   case h B =>
-  simp only [PowQuot.mapOfLe_mk]
-  rw [mk_le_mk] at hxy ⊢
+  simp only [PowQuot.mapOfLe_mk, mk_le_mk] at hxy ⊢
   exact h (A \ B) hxy
 
 end MapOfLeMonotone
@@ -2255,6 +2255,20 @@ variable {𝓘 : BoolIdeal}
   rfl
 
 end Convenience
+
+section MoreOrderLemmas
+variable {𝓘 : BoolIdeal}
+
+/-- `mk A ≤ (mk B)ᶜ` iff the intersection is small. -/
+@[simp] lemma mk_le_compl_mk (A B : Set ℕ) :
+  (PowQuot.mk 𝓘 A : PowQuot 𝓘) ≤ (PowQuot.mk 𝓘 B)ᶜ ↔
+  (A ∩ B) ∈ 𝓘.mem := by
+  -- Right side: `(A ∩ B) ∈ 𝓘.mem`
+  -- Left side: `mk A ≤ mk Bᶜ` reduces to `(A \ Bᶜ) ∈ 𝓘.mem`
+  -- and `A \ Bᶜ = A ∩ B`.
+  simp [mk_le_mk, mk_compl, Set.diff_eq]
+
+end MoreOrderLemmas
 
 /-! 
 ### PowQuot goal reducer pattern (cheatsheet)

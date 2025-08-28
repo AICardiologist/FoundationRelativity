@@ -134,6 +134,18 @@ example (A B : Set ℕ) (h : (A △ B) ∈ 𝓘.mem) :
   mk 𝓘 A = mk 𝓘 B :=
   Papers.P4Meta.StoneSupport.mk_eq_mk 𝓘 A B h
 
+-- Test monotonicity directly
+example {𝓘 𝓙 : BoolIdeal}
+  (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+  (A B : Set ℕ)
+  (hAB : (A \ B) ∈ 𝓘.mem) :
+  Papers.P4Meta.StoneSupport.PowQuot.mapOfLe h (mk 𝓘 A)
+    ≤ Papers.P4Meta.StoneSupport.PowQuot.mapOfLe h (mk 𝓘 B) := by
+  -- direct use of monotonicity; reduces to smallness under `h`
+  have := Papers.P4Meta.StoneSupport.PowQuot.mapOfLe_monotone h
+  apply this
+  simpa [mk_le_mk] using hAB
+
 end PreservationTests
 
 section BAHomTests
