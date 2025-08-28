@@ -2084,6 +2084,91 @@ Note: To package this as a formal BooleanAlgHom, additional imports would be nee
 The preservation lemmas above already provide the key algebraic properties.
 -/
 
+/-! ### Local Boolean-algebra hom structure for `PowQuot` -/
+
+/-- Boolean algebra homomorphism (local to this project).
+It's the minimal structure you need: preserves `⊓`, `⊔`, `ᶜ`, `⊥`, `⊤`. -/
+structure BAHom (α β) [BooleanAlgebra α] [BooleanAlgebra β] :=
+  (toFun     : α → β)
+  (map_inf'  : ∀ x y, toFun (x ⊓ y) = toFun x ⊓ toFun y)
+  (map_sup'  : ∀ x y, toFun (x ⊔ y) = toFun x ⊔ toFun y)
+  (map_compl': ∀ x,   toFun (xᶜ)    = (toFun x)ᶜ)
+  (map_bot'  :        toFun ⊥        = ⊥)
+  (map_top'  :        toFun ⊤        = ⊤)
+
+namespace BAHom
+
+variable {α β γ : Type*} [BooleanAlgebra α] [BooleanAlgebra β] [BooleanAlgebra γ]
+
+instance : CoeFun (BAHom α β) (fun _ => α → β) where
+  coe f := f.toFun
+
+@[simp] lemma map_inf (f : BAHom α β) (x y : α) : f (x ⊓ y) = f x ⊓ f y := f.map_inf' x y
+@[simp] lemma map_sup (f : BAHom α β) (x y : α) : f (x ⊔ y) = f x ⊔ f y := f.map_sup' x y
+@[simp] lemma map_compl (f : BAHom α β) (x : α) : f (xᶜ) = (f x)ᶜ := f.map_compl' x
+@[simp] lemma map_bot (f : BAHom α β) : f ⊥ = (⊥ : β) := f.map_bot'
+@[simp] lemma map_top (f : BAHom α β) : f ⊤ = (⊤ : β) := f.map_top'
+
+/-- Identity BA hom. -/
+def id : BAHom α α where
+  toFun := fun x => x
+  map_inf' := fun x y => rfl
+  map_sup' := fun x y => rfl
+  map_compl' := fun x => rfl
+  map_bot' := rfl
+  map_top' := rfl
+
+@[simp] lemma id_apply (x : α) : (BAHom.id : BAHom α α) x = x := rfl
+
+/-- Composition of BA homs. -/
+def comp (g : BAHom β γ) (f : BAHom α β) : BAHom α γ where
+  toFun := fun x => g (f x)
+  map_inf' := by intro x y; simp
+  map_sup' := by intro x y; simp
+  map_compl' := by intro x; simp
+  map_bot' := by simp
+  map_top' := by simp
+
+@[simp] lemma comp_apply (g : BAHom β γ) (f : BAHom α β) (x : α) :
+  (g.comp f) x = g (f x) := rfl
+
+@[ext] lemma ext {f g : BAHom α β} (h : ∀ x, f x = g x) : f = g := by
+  cases f; cases g; congr; ext x; exact h x
+
+end BAHom
+
+/-- Package your `mapOfLe` into a `BAHom` without extra imports. -/
+def PowQuot.mapOfLeBAHom
+  {𝓘 𝓙 : BoolIdeal}
+  (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) : BAHom (PowQuot 𝓘) (PowQuot 𝓙) where
+  toFun      := PowQuot.mapOfLe h
+  map_inf'   := PowQuot.mapOfLe_inf h
+  map_sup'   := PowQuot.mapOfLe_sup h
+  map_compl' := PowQuot.mapOfLe_compl h
+  map_bot'   := PowQuot.mapOfLe_bot h
+  map_top'   := PowQuot.mapOfLe_top h
+
+@[simp] lemma PowQuot.mapOfLeBAHom_apply_mk
+  {𝓘 𝓙 : BoolIdeal} (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A : Set ℕ) :
+  PowQuot.mapOfLeBAHom h (PowQuot.mk 𝓘 A) = PowQuot.mk 𝓙 A := rfl
+
+/-- Functoriality (composition) in the obvious way. -/
+@[simp] lemma PowQuot.mapOfLeBAHom_comp
+  {𝓘 𝓙 𝓚 : BoolIdeal}
+  (h₁ : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+  (h₂ : ∀ S, S ∈ 𝓙.mem → S ∈ 𝓚.mem) :
+  (BAHom.comp (PowQuot.mapOfLeBAHom h₂) (PowQuot.mapOfLeBAHom h₁))
+  = PowQuot.mapOfLeBAHom (fun S hS => h₂ S (h₁ S hS)) := by
+  ext x
+  induction x using Quot.inductionOn with | _ A =>
+  rfl
+
+@[simp] lemma PowQuot.mapOfLeBAHom_id {𝓘 : BoolIdeal} :
+  PowQuot.mapOfLeBAHom (fun _ h => h) = (BAHom.id : BAHom (PowQuot 𝓘) (PowQuot 𝓘)) := by
+  ext x
+  induction x using Quot.inductionOn with | _ A =>
+  rfl
+
 /-! ### EqvGen → relation bridge for equality lemmas -/
 
 section EqvGenBridge
@@ -2114,7 +2199,25 @@ lemma eqvGen_iff_of_equivalence {α : Type*} {r : α → α → Prop}
   rw [eqvGen_iff_of_equivalence (sdiffSetoid 𝓘).iseqv]
   rfl
 
+/-- Symmetric rewrite lemma that's sometimes handier than the ↔ form. -/
+@[simp] lemma mk_eq_mk (𝓘 : BoolIdeal) (A B : Set ℕ) (h : (A △ B) ∈ 𝓘.mem) :
+  (PowQuot.mk 𝓘 A : PowQuot 𝓘) = PowQuot.mk 𝓘 B :=
+  (mk_eq_mk_iff 𝓘 A B).mpr h
+
 end EqvGenBridge
+
+/-! ### Additional convenience lemmas -/
+
+section Convenience
+
+variable {𝓘 : BoolIdeal}
+
+/-- Alias for set difference that reads naturally. -/
+@[simp] lemma mk_diff_mk (A B : Set ℕ) :
+  PowQuot.mk 𝓘 A \ PowQuot.mk 𝓘 B = PowQuot.mk 𝓘 (A \ B) := by
+  rw [PowQuot.mk_sdiff_mk, Set.diff_eq]
+
+end Convenience
 
 /-! 
 ### PowQuot goal reducer pattern (cheatsheet)

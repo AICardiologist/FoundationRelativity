@@ -125,11 +125,38 @@ example (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (x : PowQuot 𝓘) :
   (Papers.P4Meta.StoneSupport.PowQuot.mapOfLe h x)ᶜ :=
   Papers.P4Meta.StoneSupport.PowQuot.mapOfLe_compl h x
 
--- Test mk_eq_mk_iff
+-- Test mk_eq_mk_iff and mk_eq_mk
 example (A B : Set ℕ) (h : (A △ B) ∈ 𝓘.mem) :
   mk 𝓘 A = mk 𝓘 B :=
   Papers.P4Meta.StoneSupport.mk_eq_mk_iff 𝓘 A B |>.mpr h
 
+example (A B : Set ℕ) (h : (A △ B) ∈ 𝓘.mem) :
+  mk 𝓘 A = mk 𝓘 B :=
+  Papers.P4Meta.StoneSupport.mk_eq_mk 𝓘 A B h
+
 end PreservationTests
+
+section BAHomTests
+
+open Papers.P4Meta.StoneSupport
+
+variable {𝓘 𝓙 𝓚 : BoolIdeal}
+
+-- Test BAHom structure
+example (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) :
+  ∃ (f : BAHom (PowQuot 𝓘) (PowQuot 𝓙)), ∀ A, f (mk 𝓘 A) = mk 𝓙 A :=
+  ⟨PowQuot.mapOfLeBAHom h, PowQuot.mapOfLeBAHom_apply_mk h⟩
+
+-- Test composition
+example (h₁ : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (h₂ : ∀ S, S ∈ 𝓙.mem → S ∈ 𝓚.mem) :
+  BAHom.comp (PowQuot.mapOfLeBAHom h₂) (PowQuot.mapOfLeBAHom h₁) = 
+  PowQuot.mapOfLeBAHom (fun S hS => h₂ S (h₁ S hS)) :=
+  PowQuot.mapOfLeBAHom_comp h₁ h₂
+
+-- Test identity
+example : PowQuot.mapOfLeBAHom (fun _ h => h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓘.mem) = BAHom.id :=
+  PowQuot.mapOfLeBAHom_id
+
+end BAHomTests
 
 #print "✅ All clean sanity tests pass!"
