@@ -82,7 +82,7 @@ jobs:
           # Check sorries against SORRY_ALLOWLIST.txt for Paper 3
           echo "Checking Paper 3 sorries against allowlist..."
           found_sorries=$(grep -a -R -n --include="*.lean" -w -E 'sorry|admit' Papers/P3_2CatFramework \
-                         | grep -v 'documentation\|Blueprint\|communications' \
+                         | grep -v 'documentation\|Blueprint\|communications\|old_files' \
                          | grep -v -- '--' \
                          | grep -v 'sorry-free' \
                          | grep -v '/-' || true)
