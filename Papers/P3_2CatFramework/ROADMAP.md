@@ -2,6 +2,8 @@
 
 > **Prime directive:** Finish **Lean/formalization** for Paper **3A**.  
 > Only after a Lean **freeze** (no sorries, green builds, tests stable) do we switch to LaTeX authoring.
+> 
+> **Paper 3B Status**: See [documentation/P3B_STATUS.md](documentation/P3B_STATUS.md) for current proof-theoretic framework checkpoint.
 
 ## 📍 Current Position (January 29, 2025)
 
