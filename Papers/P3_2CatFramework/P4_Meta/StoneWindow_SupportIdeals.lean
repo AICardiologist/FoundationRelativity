@@ -2466,6 +2466,17 @@ section SmallHelpers
     · intro hx
       rcases hx with ⟨hB, hA⟩
       exact Or.inr ⟨hB, hA⟩
+
+  /-- If `B ⊆ A` then `A △ B = A \ B`. -/
+  lemma symmDiff_eq_diff_of_superset (hBA : B ⊆ A) : A △ B = A \ B := by
+    -- direct elementwise proof to mirror the `subset` helper
+    ext x; constructor
+    · intro hx
+      rcases hx with ⟨hA, hB⟩ | ⟨hB, hA⟩
+      · exact ⟨hA, hB⟩
+      · exact (False.elim (hA (hBA hB)))
+    · intro hx
+      exact Or.inl hx
 end SmallHelpers
 
 /-! ### Subset to order -/
