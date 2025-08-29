@@ -2069,6 +2069,895 @@ lemma mapOfLe_bot (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) :
 
 end PowQuot
 
+/-! ### Monotonicity of mapOfLe -/
+
+section MapOfLeMonotone
+
+variable {𝓘 𝓙 : BoolIdeal}
+
+/-- `mapOfLe` is monotone when `𝓘 ≤ 𝓙` (pointwise on `mem`). -/
+lemma PowQuot.mapOfLe_monotone
+  {𝓘 𝓙 : BoolIdeal}
+  (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) :
+  Monotone (PowQuot.mapOfLe h) := by
+  intro x y hxy
+  induction x using Quot.inductionOn
+  case h A =>
+  induction y using Quot.inductionOn
+  case h B =>
+  simp only [PowQuot.mapOfLe_mk, mk_le_mk] at hxy ⊢
+  exact h (A \ B) hxy
+
+end MapOfLeMonotone
+
+/-! ### Boolean algebra preservation properties
+
+The mapOfLe function preserves all Boolean operations, as shown by the lemmas above:
+- mapOfLe_sup: preserves supremum
+- mapOfLe_inf: preserves infimum  
+- mapOfLe_compl: preserves complement
+- mapOfLe_top: preserves top
+- mapOfLe_bot: preserves bottom
+- mapOfLe_monotone: preserves order
+
+This demonstrates that mapOfLe is a Boolean algebra homomorphism.
+
+Note: To package this as a formal BooleanAlgHom, additional imports would be needed.
+The preservation lemmas above already provide the key algebraic properties.
+-/
+
+/-! ### Local Boolean-algebra hom structure for `PowQuot` -/
+
+/-- Boolean algebra homomorphism (local to this project).
+It's the minimal structure you need: preserves `⊓`, `⊔`, `ᶜ`, `⊥`, `⊤`. -/
+structure BAHom (α β) [BooleanAlgebra α] [BooleanAlgebra β] :=
+  (toFun     : α → β)
+  (map_inf'  : ∀ x y, toFun (x ⊓ y) = toFun x ⊓ toFun y)
+  (map_sup'  : ∀ x y, toFun (x ⊔ y) = toFun x ⊔ toFun y)
+  (map_compl': ∀ x,   toFun (xᶜ)    = (toFun x)ᶜ)
+  (map_bot'  :        toFun ⊥        = ⊥)
+  (map_top'  :        toFun ⊤        = ⊤)
+
+namespace BAHom
+
+variable {α β γ : Type*} [BooleanAlgebra α] [BooleanAlgebra β] [BooleanAlgebra γ]
+
+instance : CoeFun (BAHom α β) (fun _ => α → β) where
+  coe f := f.toFun
+
+@[simp] lemma map_inf (f : BAHom α β) (x y : α) : f (x ⊓ y) = f x ⊓ f y := f.map_inf' x y
+@[simp] lemma map_sup (f : BAHom α β) (x y : α) : f (x ⊔ y) = f x ⊔ f y := f.map_sup' x y
+@[simp] lemma map_compl (f : BAHom α β) (x : α) : f (xᶜ) = (f x)ᶜ := f.map_compl' x
+@[simp] lemma map_bot (f : BAHom α β) : f ⊥ = (⊥ : β) := f.map_bot'
+@[simp] lemma map_top (f : BAHom α β) : f ⊤ = (⊤ : β) := f.map_top'
+
+/-- Identity BA hom. -/
+def id : BAHom α α where
+  toFun := fun x => x
+  map_inf' := fun x y => rfl
+  map_sup' := fun x y => rfl
+  map_compl' := fun x => rfl
+  map_bot' := rfl
+  map_top' := rfl
+
+@[simp] lemma id_apply (x : α) : (BAHom.id : BAHom α α) x = x := rfl
+
+/-- Composition of BA homs. -/
+def comp (g : BAHom β γ) (f : BAHom α β) : BAHom α γ where
+  toFun := fun x => g (f x)
+  map_inf' := by intro x y; simp
+  map_sup' := by intro x y; simp
+  map_compl' := by intro x; simp
+  map_bot' := by simp
+  map_top' := by simp
+
+@[simp] lemma comp_apply (g : BAHom β γ) (f : BAHom α β) (x : α) :
+  (g.comp f) x = g (f x) := rfl
+
+@[ext] lemma ext {f g : BAHom α β} (h : ∀ x, f x = g x) : f = g := by
+  cases f; cases g; congr; ext x; exact h x
+
+end BAHom
+
+/-- Package your `mapOfLe` into a `BAHom` without extra imports. -/
+def PowQuot.mapOfLeBAHom
+  {𝓘 𝓙 : BoolIdeal}
+  (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) : BAHom (PowQuot 𝓘) (PowQuot 𝓙) where
+  toFun      := PowQuot.mapOfLe h
+  map_inf'   := PowQuot.mapOfLe_inf h
+  map_sup'   := PowQuot.mapOfLe_sup h
+  map_compl' := PowQuot.mapOfLe_compl h
+  map_bot'   := PowQuot.mapOfLe_bot h
+  map_top'   := PowQuot.mapOfLe_top h
+
+@[simp] lemma PowQuot.mapOfLeBAHom_apply_mk
+  {𝓘 𝓙 : BoolIdeal} (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A : Set ℕ) :
+  PowQuot.mapOfLeBAHom h (PowQuot.mk 𝓘 A) = PowQuot.mk 𝓙 A := rfl
+
+/-- Functoriality (composition) in the obvious way. -/
+@[simp] lemma PowQuot.mapOfLeBAHom_comp
+  {𝓘 𝓙 𝓚 : BoolIdeal}
+  (h₁ : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+  (h₂ : ∀ S, S ∈ 𝓙.mem → S ∈ 𝓚.mem) :
+  (BAHom.comp (PowQuot.mapOfLeBAHom h₂) (PowQuot.mapOfLeBAHom h₁))
+  = PowQuot.mapOfLeBAHom (fun S hS => h₂ S (h₁ S hS)) := by
+  ext x
+  induction x using Quot.inductionOn with | _ A =>
+  rfl
+
+@[simp] lemma PowQuot.mapOfLeBAHom_id {𝓘 : BoolIdeal} :
+  PowQuot.mapOfLeBAHom (fun _ h => h) = (BAHom.id : BAHom (PowQuot 𝓘) (PowQuot 𝓘)) := by
+  ext x
+  induction x using Quot.inductionOn with | _ A =>
+  rfl
+
+@[simp] lemma PowQuot.mapOfLeBAHom_monotone
+  {𝓘 𝓙 : BoolIdeal} (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) :
+  Monotone (PowQuot.mapOfLeBAHom h) :=
+  PowQuot.mapOfLe_monotone h
+
+/-! ### EqvGen → relation bridge for equality lemmas -/
+
+section EqvGenBridge
+
+open Relation
+
+/-- For an equivalence relation `r`, its equivalence closure `EqvGen r` is just `r`. -/
+lemma eqvGen_iff_of_equivalence {α : Type*} {r : α → α → Prop}
+    (hr : Equivalence r) {a b : α} :
+  EqvGen r a b ↔ r a b := by
+  constructor
+  · intro h
+    induction h with
+    | rel _ _ h => exact h
+    | refl a => exact hr.refl a
+    | symm _ _ _ ih => exact hr.symm ih
+    | trans _ _ _ _ _ ih₁ ih₂ => exact hr.trans ih₁ ih₂
+  · intro h; exact EqvGen.rel _ _ h
+
+/-- Equality on representatives reduces to "small" symmetric difference. -/
+@[simp] lemma mk_eq_mk_iff (𝓘 : BoolIdeal) (A B : Set ℕ) :
+  (PowQuot.mk 𝓘 A : PowQuot 𝓘) = PowQuot.mk 𝓘 B ↔
+  (A △ B) ∈ 𝓘.mem := by
+  -- Unfold to get Quot.mk equality
+  show Quot.mk (sdiffSetoid 𝓘) A = Quot.mk (sdiffSetoid 𝓘) B ↔ _
+  -- Quot.eq yields EqvGen of the underlying relation; fold it back
+  rw [Quot.eq]
+  rw [eqvGen_iff_of_equivalence (sdiffSetoid 𝓘).iseqv]
+  rfl
+
+/-- Symmetric rewrite lemma that's sometimes handier than the ↔ form. -/
+@[simp] lemma mk_eq_mk (𝓘 : BoolIdeal) (A B : Set ℕ) (h : (A △ B) ∈ 𝓘.mem) :
+  (PowQuot.mk 𝓘 A : PowQuot 𝓘) = PowQuot.mk 𝓘 B :=
+  (mk_eq_mk_iff 𝓘 A B).mpr h
+
+end EqvGenBridge
+
+/-- Mapped equality convenience lemma. -/
+@[simp] lemma mapOfLe_mk_eq_iff
+  {𝓘 𝓙 : BoolIdeal}
+  (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+  (A B : Set ℕ) :
+  PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) = PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)
+    ↔ (A △ B) ∈ 𝓙.mem := by
+  simpa [PowQuot.mapOfLe_mk] using mk_eq_mk_iff 𝓙 A B
+
+/-! ### Additional convenience lemmas -/
+
+section Convenience
+
+variable {𝓘 : BoolIdeal}
+
+/-- Alias for set difference that reads naturally. -/
+@[simp] lemma mk_diff_mk (A B : Set ℕ) :
+  PowQuot.mk 𝓘 A \ PowQuot.mk 𝓘 B = PowQuot.mk 𝓘 (A \ B) := by
+  rw [PowQuot.mk_sdiff_mk, Set.diff_eq]
+
+/-- Set-first phrasing for intersection. -/
+@[simp] lemma mk_inter_mk (A B : Set ℕ) :
+  PowQuot.mk 𝓘 A ⊓ PowQuot.mk 𝓘 B = PowQuot.mk 𝓘 (A ∩ B) :=
+  rfl
+
+/-- Set-first phrasing for union. -/
+@[simp] lemma mk_union_mk (A B : Set ℕ) :
+  PowQuot.mk 𝓘 A ⊔ PowQuot.mk 𝓘 B = PowQuot.mk 𝓘 (A ∪ B) :=
+  rfl
+
+-- Not a simp-lemma globally; use explicitly when needed.
+lemma compl_eq_univ_sdiff {α : Type*} (A : Set α) : Aᶜ = Set.univ \ A := by
+  ext x; simp
+
+end Convenience
+
+section MoreOrderLemmas
+variable {𝓘 : BoolIdeal}
+
+/-- `mk A ≤ (mk B)ᶜ` iff the intersection is small. -/
+@[simp] lemma mk_le_compl_mk (A B : Set ℕ) :
+  (PowQuot.mk 𝓘 A : PowQuot 𝓘) ≤ (PowQuot.mk 𝓘 B)ᶜ ↔
+  (A ∩ B) ∈ 𝓘.mem := by
+  -- Right side: `(A ∩ B) ∈ 𝓘.mem`
+  -- Left side: `mk A ≤ mk Bᶜ` reduces to `(A \ Bᶜ) ∈ 𝓘.mem`
+  -- and `A \ Bᶜ = A ∩ B`.
+  simp [mk_le_mk, mk_compl, Set.diff_eq]
+
+/-- `(mk A)ᶜ ≤ mk B` iff the co-intersection is small. -/
+@[simp] lemma compl_mk_le_mk_iff (A B : Set ℕ) :
+    ((PowQuot.mk 𝓘 A)ᶜ ≤ PowQuot.mk 𝓘 B) ↔ (Aᶜ ∩ Bᶜ) ∈ 𝓘.mem := by
+  -- same pattern as the mapped lemma, but without mapOfLe
+  simpa [mk_compl, mk_le_mk, Set.diff_eq, Set.inter_comm]
+    using (compl_le_iff_compl_le :
+      ((PowQuot.mk 𝓘 A)ᶜ ≤ PowQuot.mk 𝓘 B) ↔ ((PowQuot.mk 𝓘 B)ᶜ ≤ PowQuot.mk 𝓘 A))
+
+end MoreOrderLemmas
+
+/-! ### More `mk` ↔ smallness characterizations -/
+section TopBotIff
+  variable {𝓘 : BoolIdeal}
+
+  /-- `mk A = ⊥` iff `A` is small. -/
+  @[simp] lemma mk_eq_bot_iff (A : Set ℕ) :
+      (PowQuot.mk 𝓘 A : PowQuot 𝓘) = ⊥ ↔ A ∈ 𝓘.mem := by
+    constructor
+    · intro h
+      have : (PowQuot.mk 𝓘 A : PowQuot 𝓘) ≤ ⊥ := by simpa [h]
+      simpa [mk_bot, mk_le_mk, Set.diff_empty] using this
+    · intro hA
+      apply le_antisymm
+      · -- `mk A ≤ ⊥`
+        simpa [mk_bot, mk_le_mk, Set.diff_empty] using hA
+      · -- `⊥ ≤ mk A` since `∅ \ A = ∅ ∈ 𝓘.mem`
+        have : (∅ : Set ℕ) ∈ 𝓘.mem := 𝓘.empty_mem
+        simpa [mk_bot, mk_le_mk, Set.empty_diff]
+
+  /-- `mk A = ⊤` iff `Aᶜ` is small. -/
+  @[simp] lemma mk_eq_top_iff (A : Set ℕ) :
+      (PowQuot.mk 𝓘 A : PowQuot 𝓘) = ⊤ ↔ Aᶜ ∈ 𝓘.mem := by
+    constructor
+    · intro h
+      have : ⊤ ≤ (PowQuot.mk 𝓘 A : PowQuot 𝓘) := by simpa [h]
+      simp [mk_top, mk_le_mk] at this
+      -- this : Set.univ \ A ∈ 𝓘.mem
+      -- Need to show Aᶜ ∈ 𝓘.mem, and Aᶜ = Set.univ \ A
+      convert this
+      ext x
+      simp
+    · intro hAc
+      apply le_antisymm
+      · exact le_top
+      · -- `⊤ ≤ mk A` ↔ `(univ \ A) ∈ 𝓘.mem`
+        simp [mk_top, mk_le_mk]
+        -- Need to show Set.univ \ A ∈ 𝓘.mem, given hAc : Aᶜ ∈ 𝓘.mem
+        convert hAc
+        ext x
+        simp
+end TopBotIff
+
+/-! ### Negative singletons: `mk` vs. `⊥/⊤` -/
+section TopBotNeg
+  variable {𝓘 : BoolIdeal}
+
+  @[simp] lemma mk_ne_bot_iff (A : Set ℕ) :
+      ((PowQuot.mk 𝓘 A : PowQuot 𝓘) ≠ ⊥) ↔ A ∉ 𝓘.mem := by
+    simpa using (not_congr (mk_eq_bot_iff (𝓘 := 𝓘) A))
+
+  @[simp] lemma mk_ne_top_iff (A : Set ℕ) :
+      ((PowQuot.mk 𝓘 A : PowQuot 𝓘) ≠ ⊤) ↔ Aᶜ ∉ 𝓘.mem := by
+    simpa using (not_congr (mk_eq_top_iff (𝓘 := 𝓘) A))
+end TopBotNeg
+
+section InfSupThresholds
+  variable {𝓘 : BoolIdeal}
+
+  /-- `mk A ⊓ mk B = ⊥` iff `A ∩ B` is small. -/
+  @[simp] lemma mk_inf_eq_bot_iff (A B : Set ℕ) :
+      PowQuot.mk 𝓘 A ⊓ PowQuot.mk 𝓘 B = ⊥ ↔ (A ∩ B) ∈ 𝓘.mem := by
+    simpa [mk_inf_mk] using mk_eq_bot_iff (A ∩ B)
+
+  /-- `mk A ⊔ mk B = ⊤` iff `Aᶜ ∩ Bᶜ` is small (i.e. complement of the union is small). -/
+  @[simp] lemma mk_sup_eq_top_iff (A B : Set ℕ) :
+      PowQuot.mk 𝓘 A ⊔ PowQuot.mk 𝓘 B = ⊤ ↔ (Aᶜ ∩ Bᶜ) ∈ 𝓘.mem := by
+    rw [mk_sup_mk, mk_eq_top_iff]
+    simp [Set.compl_union]
+end InfSupThresholds
+
+/-! ### Non-threshold characterizations -/
+section NonThresholds
+  variable {𝓘 : BoolIdeal}
+
+  @[simp] lemma mk_inf_ne_bot_iff (A B : Set ℕ) :
+      (PowQuot.mk 𝓘 A ⊓ PowQuot.mk 𝓘 B ≠ (⊥ : PowQuot 𝓘)) ↔
+      (A ∩ B) ∉ 𝓘.mem := by
+    -- negating your `mk_inf_eq_bot_iff`
+    have := mk_inf_eq_bot_iff (𝓘 := 𝓘) A B
+    simpa using (not_congr this)
+
+  @[simp] lemma mk_sup_ne_top_iff (A B : Set ℕ) :
+      (PowQuot.mk 𝓘 A ⊔ PowQuot.mk 𝓘 B ≠ (⊤ : PowQuot 𝓘)) ↔
+      (Aᶜ ∩ Bᶜ) ∉ 𝓘.mem := by
+    -- negating your `mk_sup_eq_top_iff`
+    have := mk_sup_eq_top_iff (𝓘 := 𝓘) A B
+    simpa using (not_congr this)
+end NonThresholds
+
+/-! ### MapOfLe order/equality lemmas -/
+section MapOfLeOrder
+  variable {𝓘 𝓙 : BoolIdeal}
+
+  /-- Inequality between mapped reps reduces to smallness in the target ideal. -/
+  @[simp] lemma mapOfLe_mk_le_mk_iff
+    (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A B : Set ℕ) :
+    PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) ≤
+      PowQuot.mapOfLe h (PowQuot.mk 𝓘 B) ↔
+    (A \ B) ∈ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_mk, mk_le_mk]
+
+  /-- Bottom/top tests after mapping, reduced to smallness in the target ideal. -/
+  @[simp] lemma mapOfLe_mk_eq_bot_iff
+    (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A : Set ℕ) :
+    PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) = ⊥ ↔ A ∈ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_mk] using (mk_eq_bot_iff (𝓘 := 𝓙) A)
+
+  @[simp] lemma mapOfLe_mk_eq_top_iff
+    (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A : Set ℕ) :
+    PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) = ⊤ ↔ Aᶜ ∈ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_mk] using (mk_eq_top_iff (𝓘 := 𝓙) A)
+end MapOfLeOrder
+
+/-! ### Thresholds for images under `mapOfLe` -/
+section MapThresholds
+  variable {𝓘 𝓙 : BoolIdeal}
+
+  @[simp] lemma mapOfLe_inf_eq_bot_iff
+      (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A B : Set ℕ) :
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) ⊓
+       PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)) = (⊥ : PowQuot 𝓙)
+      ↔ (A ∩ B) ∈ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_inf, PowQuot.mapOfLe_mk]
+      using (mk_inf_eq_bot_iff (𝓘 := 𝓙) A B)
+
+  @[simp] lemma mapOfLe_sup_eq_top_iff
+      (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A B : Set ℕ) :
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) ⊔
+       PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)) = (⊤ : PowQuot 𝓙)
+      ↔ (Aᶜ ∩ Bᶜ) ∈ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_sup, PowQuot.mapOfLe_mk]
+      using (mk_sup_eq_top_iff (𝓘 := 𝓙) A B)
+end MapThresholds
+
+/-! ### Negative singletons: images under `mapOfLe` -/
+section MapTopBotNeg
+  variable {𝓘 𝓙 : BoolIdeal}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+
+  @[simp] lemma mapOfLe_mk_ne_bot_iff (A : Set ℕ) :
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) ≠ (⊥ : PowQuot 𝓙)) ↔ A ∉ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_mk] using (not_congr (mk_eq_bot_iff (𝓘 := 𝓙) A))
+
+  @[simp] lemma mapOfLe_mk_ne_top_iff (A : Set ℕ) :
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) ≠ (⊤ : PowQuot 𝓙)) ↔ Aᶜ ∉ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_mk] using (not_congr (mk_eq_top_iff (𝓘 := 𝓙) A))
+end MapTopBotNeg
+
+/-! ### Non-thresholds for images under `mapOfLe` -/
+section MapNonThresholds
+  variable {𝓘 𝓙 : BoolIdeal}
+
+  @[simp] lemma mapOfLe_inf_ne_bot_iff
+      (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A B : Set ℕ) :
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) ⊓
+       PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)) ≠ (⊥ : PowQuot 𝓙)
+      ↔ (A ∩ B) ∉ 𝓙.mem := by
+    have := mapOfLe_inf_eq_bot_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A B
+    simpa using (not_congr this)
+
+  @[simp] lemma mapOfLe_sup_ne_top_iff
+      (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A B : Set ℕ) :
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) ⊔
+       PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)) ≠ (⊤ : PowQuot 𝓙)
+      ↔ (Aᶜ ∩ Bᶜ) ∉ 𝓙.mem := by
+    have := mapOfLe_sup_eq_top_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A B
+    simpa using (not_congr this)
+end MapNonThresholds
+
+/-! ### Small helpers -/
+section SmallHelpers
+  variable {A B : Set ℕ}
+
+  /-- If `A ⊆ B` then `A △ B = B \ A`. -/
+  lemma symmDiff_eq_diff_of_subset (hAB : A ⊆ B) : A △ B = B \ A := by
+    ext x; constructor
+    · intro hx
+      rcases hx with ⟨hA, hB⟩ | ⟨hB, hA⟩
+      · exact (False.elim (hB (hAB hA)))
+      · exact ⟨hB, hA⟩
+    · intro hx
+      rcases hx with ⟨hB, hA⟩
+      exact Or.inr ⟨hB, hA⟩
+
+  /-- If `B ⊆ A` then `A △ B = A \ B`. -/
+  lemma symmDiff_eq_diff_of_superset (hBA : B ⊆ A) : A △ B = A \ B := by
+    -- direct elementwise proof to mirror the `subset` helper
+    ext x; constructor
+    · intro hx
+      rcases hx with ⟨hA, hB⟩ | ⟨hB, hA⟩
+      · exact ⟨hA, hB⟩
+      · exact (False.elim (hA (hBA hB)))
+    · intro hx
+      exact Or.inl hx
+end SmallHelpers
+
+/-! ### Subset to order -/
+section SubsetToOrder
+  variable {𝓘 : BoolIdeal} {A B : Set ℕ}
+
+  lemma mk_le_mk_of_subset (hAB : A ⊆ B) :
+      (PowQuot.mk 𝓘 A : PowQuot 𝓘) ≤ PowQuot.mk 𝓘 B := by
+    -- `A \ B = ∅`, and `∅ ∈ 𝓘.mem`.
+    rw [mk_le_mk]
+    convert 𝓘.empty_mem
+    exact Set.diff_eq_empty.mpr hAB
+end SubsetToOrder
+
+/-! ### `mk` is monotone in the set argument -/
+section MkMonotone
+  variable {𝓘 : BoolIdeal}
+
+  /-- `mk` is monotone: from `A ⊆ B` we get `mk A ≤ mk B`. -/
+  lemma mk_monotone : Monotone (fun A : Set ℕ => (PowQuot.mk 𝓘 A : PowQuot 𝓘)) := by
+    intro A B hAB
+    exact (mk_le_mk_of_subset (𝓘 := 𝓘) (A := A) (B := B) hAB)
+
+  attribute [mono] mk_monotone
+end MkMonotone
+
+/-! ### Strict order -/
+section StrictOrder
+  variable {𝓘 : BoolIdeal}
+
+  -- Strict inequality iff `A \ B` is small but we do not have mk-equality
+  lemma mk_lt_mk_iff (A B : Set ℕ) :
+      (PowQuot.mk 𝓘 A : PowQuot 𝓘) < PowQuot.mk 𝓘 B
+      ↔ ((A \ B) ∈ 𝓘.mem ∧ (A △ B) ∉ 𝓘.mem) := by
+    constructor
+    · intro h
+      have hle : (PowQuot.mk 𝓘 A) ≤ (PowQuot.mk 𝓘 B) := le_of_lt h
+      have hneq : (PowQuot.mk 𝓘 A) ≠ (PowQuot.mk 𝓘 B) := ne_of_lt h
+      have hAB : (A \ B) ∈ 𝓘.mem := by simpa [mk_le_mk] using hle
+      have hΔ : (A △ B) ∉ 𝓘.mem := by
+        -- If it were small then mk A = mk B by `mk_eq_mk_iff`.
+        -- Contradict `hneq`.
+        intro hsmall
+        have : (PowQuot.mk 𝓘 A) = (PowQuot.mk 𝓘 B) :=
+          (mk_eq_mk_iff (𝓘 := 𝓘) A B).mpr hsmall
+        exact hneq this
+      exact ⟨hAB, hΔ⟩
+    · intro ⟨hAB, hΔ⟩
+      have hle : (PowQuot.mk 𝓘 A) ≤ (PowQuot.mk 𝓘 B) := by
+        simpa [mk_le_mk] using hAB
+      have hneq : (PowQuot.mk 𝓘 A) ≠ (PowQuot.mk 𝓘 B) := by
+        intro hEq
+        have : (A △ B) ∈ 𝓘.mem :=
+          (mk_eq_mk_iff (𝓘 := 𝓘) A B).mp hEq
+        exact hΔ this
+      exact lt_of_le_of_ne hle hneq
+end StrictOrder
+
+/-! ### Strict order under `mapOfLe` -/
+section MapStrictOrder
+  variable {𝓘 𝓙 : BoolIdeal}
+
+  @[simp] lemma mapOfLe_mk_lt_mk_iff
+      (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A B : Set ℕ) :
+      PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)
+        < PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)
+      ↔ ((A \ B) ∈ 𝓙.mem ∧ (A △ B) ∉ 𝓙.mem) := by
+    constructor
+    · intro hlt
+      have hle : PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)
+                ≤ PowQuot.mapOfLe h (PowQuot.mk 𝓘 B) := le_of_lt hlt
+      have hneq : PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)
+                ≠ PowQuot.mapOfLe h (PowQuot.mk 𝓘 B) := ne_of_lt hlt
+      have hAB : (A \ B) ∈ 𝓙.mem := by
+        simpa [PowQuot.mapOfLe_mk, mk_le_mk] using hle
+      have hΔ : (A △ B) ∉ 𝓙.mem := by
+        intro hsmall
+        have : PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)
+              = PowQuot.mapOfLe h (PowQuot.mk 𝓘 B) :=
+          (mapOfLe_mk_eq_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A B).mpr hsmall
+        exact hneq this
+      exact ⟨hAB, hΔ⟩
+    · intro ⟨hAB, hΔ⟩
+      have hle : PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)
+              ≤ PowQuot.mapOfLe h (PowQuot.mk 𝓘 B) := by
+        simpa [PowQuot.mapOfLe_mk, mk_le_mk] using hAB
+      have hneq : PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)
+                ≠ PowQuot.mapOfLe h (PowQuot.mk 𝓘 B) := by
+        intro hEq
+        have : (A △ B) ∈ 𝓙.mem :=
+          (mapOfLe_mk_eq_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A B).mp hEq
+        exact hΔ this
+      exact lt_of_le_of_ne hle hneq
+end MapStrictOrder
+
+/-! ### Subset → order/strict order in the image -/
+section MapSubsetToOrder
+  variable {𝓘 𝓙 : BoolIdeal} {A B : Set ℕ}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+
+  /-- If `A ⊆ B` then `mapOfLe h (mk A) ≤ mapOfLe h (mk B)`. -/
+  lemma mapOfLe_mk_le_mk_of_subset (hAB : A ⊆ B) :
+      PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) ≤ PowQuot.mapOfLe h (PowQuot.mk 𝓘 B) := by
+    -- `(A \ B) = ∅`, and `∅ ∈ 𝓙.mem`.
+    simpa [PowQuot.mapOfLe_mk, mk_le_mk] using
+      (show (A \ B) ∈ 𝓙.mem from by
+        simpa [Set.diff_eq_empty.mpr hAB] using (𝓙.empty_mem))
+
+  /-- Strict order from a subset when the "gap" is not small in the target ideal. -/
+  lemma mapOfLe_mk_lt_mk_of_subset_not_small
+      (hAB : A ⊆ B) (hGap : (B \ A) ∉ 𝓙.mem) :
+      PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) < PowQuot.mapOfLe h (PowQuot.mk 𝓘 B) := by
+    classical
+    have h₁ : (A \ B) ∈ 𝓙.mem := by
+      simpa [Set.diff_eq_empty.mpr hAB] using (𝓙.empty_mem)
+    have : (A △ B) = (B \ A) := symmDiff_eq_diff_of_subset hAB
+    exact (mapOfLe_mk_lt_mk_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A B).2 ⟨h₁, by simpa [this] using hGap⟩
+end MapSubsetToOrder
+
+/-! ### Order to smallness, mapped: `x ≤ (y)ᶜ` -/
+section MapOrderToSmallness
+  variable {𝓘 𝓙 : BoolIdeal}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+
+  @[simp] lemma mapOfLe_mk_le_compl_mk_iff (A B : Set ℕ) :
+      PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)
+        ≤ (PowQuot.mapOfLe h (PowQuot.mk 𝓘 B))ᶜ
+      ↔ (A ∩ B) ∈ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_mk, mk_le_compl_mk]
+end MapOrderToSmallness
+
+/-! ### Order to smallness, mapped (complement on the left) -/
+section MapOrderToSmallnessLeft
+  variable {𝓘 𝓙 : BoolIdeal}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+
+  @[simp] lemma mapOfLe_compl_mk_le_mk_iff (A B : Set ℕ) :
+      ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ
+         ≤ PowQuot.mapOfLe h (PowQuot.mk 𝓘 B))
+      ↔ (Aᶜ ∩ Bᶜ) ∈ 𝓙.mem := by
+    -- use xᶜ ≤ y ↔ yᶜ ≤ x, then reduce to mk_le_mk on the target side
+    simpa [PowQuot.mapOfLe_compl, PowQuot.mapOfLe_mk, mk_compl, mk_le_mk,
+           Set.diff_eq, Set.inter_comm]
+      using (compl_le_iff_compl_le :
+        ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ ≤ PowQuot.mapOfLe h (PowQuot.mk 𝓘 B))
+          ↔ ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 B))ᶜ ≤ PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)))
+end MapOrderToSmallnessLeft
+
+/-! ### Disjointness / complements, reduced to smallness -/
+section DisjointCompl
+  variable {𝓘 : BoolIdeal}
+
+  /-- Disjointness of representatives corresponds to a small intersection. -/
+  @[simp] lemma disjoint_mk_iff (A B : Set ℕ) :
+      Disjoint (PowQuot.mk 𝓘 A : PowQuot 𝓘) (PowQuot.mk 𝓘 B) ↔
+      (A ∩ B) ∈ 𝓘.mem := by
+    -- In a Boolean algebra: `Disjoint x y ↔ x ⊓ y = ⊥`.
+    -- Then apply your `mk_inf_eq_bot_iff`.
+    simpa [disjoint_iff, mk_inf_mk] using
+      (mk_inf_eq_bot_iff (A := A) (B := B))
+
+  /-- Complementarity of representatives corresponds to "disjoint & covers ⊤". -/
+  @[simp] lemma isCompl_mk_iff (A B : Set ℕ) :
+      IsCompl (PowQuot.mk 𝓘 A : PowQuot 𝓘) (PowQuot.mk 𝓘 B) ↔
+      ((A ∩ B) ∈ 𝓘.mem ∧ (Aᶜ ∩ Bᶜ) ∈ 𝓘.mem) := by
+    -- In a Boolean algebra: `IsCompl x y ↔ x ⊓ y = ⊥ ∧ x ⊔ y = ⊤`.
+    -- Use your `mk_inf_eq_bot_iff` and `mk_sup_eq_top_iff`.
+    simp only [isCompl_iff, mk_inf_mk, mk_sup_mk, disjoint_iff, codisjoint_iff]
+    exact ⟨fun ⟨h1, h2⟩ => ⟨mk_inf_eq_bot_iff A B |>.mp h1, mk_sup_eq_top_iff A B |>.mp h2⟩,
+           fun ⟨h1, h2⟩ => ⟨mk_inf_eq_bot_iff A B |>.mpr h1, mk_sup_eq_top_iff A B |>.mpr h2⟩⟩
+end DisjointCompl
+
+/-! ### Disjointness/complements transported along `mapOfLe` -/
+section MapOfLe_DisjointCompl
+  variable {𝓘 𝓙 : BoolIdeal}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+
+  @[simp] lemma mapOfLe_disjoint_iff (A B : Set ℕ) :
+      Disjoint (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))
+               (PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)) ↔
+      (A ∩ B) ∈ 𝓙.mem := by
+    -- Reduce to `inf = ⊥`, push `mapOfLe` through, then apply the threshold.
+    simpa [disjoint_iff, PowQuot.mapOfLe_inf, PowQuot.mapOfLe_mk]
+      using (mk_inf_eq_bot_iff (𝓘 := 𝓙) (A := A) (B := B))
+
+  @[simp] lemma mapOfLe_isCompl_iff (A B : Set ℕ) :
+      IsCompl (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))
+              (PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)) ↔
+      ((A ∩ B) ∈ 𝓙.mem ∧ (Aᶜ ∩ Bᶜ) ∈ 𝓙.mem) := by
+    -- Reduce to `(inf = ⊥) ∧ (sup = ⊤)`, push through `mapOfLe`, then use thresholds.
+    simp only [isCompl_iff, PowQuot.mapOfLe_inf, PowQuot.mapOfLe_sup, PowQuot.mapOfLe_mk,
+               disjoint_iff, codisjoint_iff]
+    exact ⟨fun ⟨h1, h2⟩ => ⟨mk_inf_eq_bot_iff A B |>.mp h1, mk_sup_eq_top_iff A B |>.mp h2⟩,
+           fun ⟨h1, h2⟩ => ⟨mk_inf_eq_bot_iff A B |>.mpr h1, mk_sup_eq_top_iff A B |>.mpr h2⟩⟩
+  
+  /-- `mapOfLe` preserves disjointness (monotone direction). -/
+  lemma mapOfLe_preserves_disjoint
+    {𝓘 𝓙 : BoolIdeal} (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+    (A B : Set ℕ) :
+    Disjoint (PowQuot.mk 𝓘 A : PowQuot 𝓘) (PowQuot.mk 𝓘 B) →
+    Disjoint (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))
+             (PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)) := by
+    intro hAB
+    have hI : (A ∩ B) ∈ 𝓘.mem := (disjoint_mk_iff (𝓘 := 𝓘) A B).1 hAB
+    have hJ : (A ∩ B) ∈ 𝓙.mem := h _ hI
+    simpa using (mapOfLe_disjoint_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A B).2 hJ
+
+  /-- `mapOfLe` preserves complementarity (monotone direction). -/
+  lemma mapOfLe_preserves_isCompl
+    {𝓘 𝓙 : BoolIdeal} (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+    (A B : Set ℕ) :
+    IsCompl (PowQuot.mk 𝓘 A : PowQuot 𝓘) (PowQuot.mk 𝓘 B) →
+    IsCompl (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))
+            (PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)) := by
+    intro hAB
+    rcases (isCompl_mk_iff (𝓘 := 𝓘) A B).1 hAB with ⟨hI1, hI2⟩
+    have hJ1 : (A ∩ B) ∈ 𝓙.mem := h _ hI1
+    have hJ2 : (Aᶜ ∩ Bᶜ) ∈ 𝓙.mem := h _ hI2
+    exact (mapOfLe_isCompl_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A B).2 ⟨hJ1, hJ2⟩
+end MapOfLe_DisjointCompl
+
+/-! ### More disjointness-with-complements -/
+section DisjointComplMore
+  variable {𝓘 : BoolIdeal} (A B : Set ℕ)
+
+  /-- Disjoint with a complement on the right. -/
+  @[simp] lemma disjoint_mk_compl_right :
+      Disjoint (PowQuot.mk 𝓘 A) ((PowQuot.mk 𝓘 B)ᶜ) ↔ (A \ B) ∈ 𝓘.mem := by
+    -- `Disjoint x y ↔ x ⊓ y = ⊥`, push `ᶜ` through and reduce to smallness.
+    simp only [disjoint_iff, mk_compl, mk_inf_mk, mk_eq_bot_iff, Set.diff_eq]
+
+  /-- Disjoint with a complement on the left. -/
+  @[simp] lemma disjoint_compl_left_mk :
+      Disjoint ((PowQuot.mk 𝓘 A)ᶜ) (PowQuot.mk 𝓘 B) ↔ (B \ A) ∈ 𝓘.mem := by
+    -- symmetric to the previous: swap roles and use `Set.diff_eq`.
+    simp only [disjoint_iff, mk_compl, mk_inf_mk, mk_eq_bot_iff, Set.diff_eq, Set.inter_comm]
+end DisjointComplMore
+
+/-! ### Disjoint as order -/
+section DisjointAsOrder
+  variable {𝓘 : BoolIdeal}
+
+  @[simp] lemma disjoint_mk_iff_le_compl (A B : Set ℕ) :
+      Disjoint (PowQuot.mk 𝓘 A) (PowQuot.mk 𝓘 B)
+      ↔ (PowQuot.mk 𝓘 A : PowQuot 𝓘) ≤ (PowQuot.mk 𝓘 B)ᶜ := by
+    -- Boolean algebra fact: `Disjoint x y ↔ x ≤ yᶜ`
+    -- Use your mk-lemmas on both sides.
+    constructor
+    · intro h
+      -- `x ⊓ y = ⊥` ⇒ `x ≤ yᶜ`; reduce with your iff lemmas
+      -- (either by general BA facts or directly by smallness).
+      -- Here we go via smallness:
+      have : (A ∩ B) ∈ 𝓘.mem := (disjoint_mk_iff (𝓘 := 𝓘) A B).1 h
+      simpa [mk_le_compl_mk] using this
+    · intro h
+      -- `x ≤ yᶜ` ⇒ `x ⊓ y = ⊥`
+      have : (A ∩ B) ∈ 𝓘.mem := by
+        simpa [mk_le_compl_mk] using h
+      exact (disjoint_mk_iff (𝓘 := 𝓘) A B).2 this
+end DisjointAsOrder
+
+/-! ### Disjoint as order, in the image -/
+section MapDisjointAsOrder
+  variable {𝓘 𝓙 : BoolIdeal}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+
+  @[simp] lemma mapOfLe_disjoint_iff_le_compl (A B : Set ℕ) :
+      Disjoint (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))
+               (PowQuot.mapOfLe h (PowQuot.mk 𝓘 B))
+      ↔ PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)
+           ≤ (PowQuot.mapOfLe h (PowQuot.mk 𝓘 B))ᶜ := by
+    -- Both sides rewrite to `(A ∩ B) ∈ 𝓙.mem`
+    have h₁ := mapOfLe_disjoint_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A B
+    have h₂ := (mk_le_compl_mk (𝓘 := 𝓙) A B)
+    -- turn the RHS order into smallness via mk-lemmas:
+    simpa [PowQuot.mapOfLe_mk] using h₁.trans h₂.symm
+end MapDisjointAsOrder
+
+/-! ### Order isomorphism when the ideals coincide on smallness -/
+section MapOrderIso
+  variable {𝓘 𝓙 : BoolIdeal}
+
+  /-- If `𝓘.mem` and `𝓙.mem` agree pointwise, the quotients are order‑isomorphic. -/
+  def mapOfLe_orderIso_of_iff
+      (hiff : ∀ S, S ∈ 𝓘.mem ↔ S ∈ 𝓙.mem) :
+      PowQuot 𝓘 ≃o PowQuot 𝓙 :=
+  { toEquiv :=
+    { toFun    := PowQuot.mapOfLe (fun S h => (hiff S).1 h)
+      invFun   := PowQuot.mapOfLe (fun S h => (hiff S).2 h)
+      left_inv := by
+        intro x; refine Quot.inductionOn x ?_; intro A
+        simp [PowQuot.mapOfLe_mk]
+      right_inv := by
+        intro y; refine Quot.inductionOn y ?_; intro A
+        simp [PowQuot.mapOfLe_mk] },
+    map_rel_iff' := by
+      intro x y; refine Quot.induction_on₂ x y ?_; intro A B
+      -- translate both sides to smallness of `(A \ B)` and use `hiff`
+      have h₁ : PowQuot.mapOfLe (fun S h => (hiff S).1 h) (PowQuot.mk 𝓘 A)
+                ≤ PowQuot.mapOfLe (fun S h => (hiff S).1 h) (PowQuot.mk 𝓘 B)
+               ↔ (A \ B) ∈ 𝓙.mem := by
+        simpa [PowQuot.mapOfLe_mk, mk_le_mk]
+      have h₂ : (PowQuot.mk 𝓘 A : PowQuot 𝓘) ≤ PowQuot.mk 𝓘 B
+               ↔ (A \ B) ∈ 𝓘.mem := by
+        simpa [mk_le_mk]
+      simpa [h₂] using h₁.trans ⟨fun h => (hiff (A \ B)).2 h, fun h => (hiff (A \ B)).1 h⟩ }
+
+  @[simp] lemma mapOfLe_orderIso_of_iff_apply_mk
+      (hiff : ∀ S, S ∈ 𝓘.mem ↔ S ∈ 𝓙.mem) (A : Set ℕ) :
+      mapOfLe_orderIso_of_iff (𝓘 := 𝓘) (𝓙 := 𝓙) hiff (PowQuot.mk 𝓘 A)
+        = PowQuot.mk 𝓙 A := by
+    simp [mapOfLe_orderIso_of_iff, PowQuot.mapOfLe_mk]
+
+  @[simp] lemma mapOfLe_orderIso_of_iff_symm_apply_mk
+      (hiff : ∀ S, S ∈ 𝓘.mem ↔ S ∈ 𝓙.mem) (A : Set ℕ) :
+      (mapOfLe_orderIso_of_iff (𝓘 := 𝓘) (𝓙 := 𝓙) hiff).symm (PowQuot.mk 𝓙 A)
+        = PowQuot.mk 𝓘 A := by
+    -- The symm of an OrderIso reverses its effect, and since forward map takes 𝓘 to 𝓙,
+    -- the backward map takes 𝓙 to 𝓘
+    apply OrderIso.injective (mapOfLe_orderIso_of_iff hiff)
+    rw [OrderIso.apply_symm_apply]
+    simp [mapOfLe_orderIso_of_iff_apply_mk]
+
+  /-- The forward map is injective when ideals agree pointwise. -/
+  lemma mapOfLe_injective_of_iff {𝓘 𝓙 : BoolIdeal}
+      (hiff : ∀ S, S ∈ 𝓘.mem ↔ S ∈ 𝓙.mem) :
+      Function.Injective (PowQuot.mapOfLe (fun S h => (hiff S).1 h)) := by
+    simpa [mapOfLe_orderIso_of_iff] using
+      (mapOfLe_orderIso_of_iff (𝓘 := 𝓘) (𝓙 := 𝓙) hiff).injective
+
+  /-- The forward map is surjective when ideals agree pointwise. -/
+  lemma mapOfLe_surjective_of_iff {𝓘 𝓙 : BoolIdeal}
+      (hiff : ∀ S, S ∈ 𝓘.mem ↔ S ∈ 𝓙.mem) :
+      Function.Surjective (PowQuot.mapOfLe (fun S h => (hiff S).1 h)) := by
+    simpa [mapOfLe_orderIso_of_iff] using
+      (mapOfLe_orderIso_of_iff (𝓘 := 𝓘) (𝓙 := 𝓙) hiff).surjective
+end MapOrderIso
+
+/-! ### Functoriality of `mapOfLe` -/
+section MapOfLeFunctoriality
+  variable {𝓘 𝓙 𝓚 : BoolIdeal}
+
+  /-- Composition: mapping `𝓘 ⟶ 𝓙 ⟶ 𝓚` equals mapping along the composed inclusion. -/
+  lemma mapOfLe_comp
+      (h₁ : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+      (h₂ : ∀ S, S ∈ 𝓙.mem → S ∈ 𝓚.mem)
+      (x : PowQuot 𝓘) :
+      PowQuot.mapOfLe h₂ (PowQuot.mapOfLe h₁ x)
+        = PowQuot.mapOfLe (fun _ h => h₂ _ (h₁ _ h)) x := by
+    refine Quot.induction_on x ?_; intro A
+    simp [PowQuot.mapOfLe_mk]
+
+  /-- Identity: mapping along the identity inclusion is the identity map. -/
+  @[simp] lemma mapOfLe_id (x : PowQuot 𝓘) :
+      PowQuot.mapOfLe (fun S (h : S ∈ 𝓘.mem) => h) x = x := by
+    refine Quot.induction_on x ?_; intro A
+    simp [PowQuot.mapOfLe_mk]
+
+  /-- Symmetric form of composition: composed inclusion equals composition of mappings. -/
+  lemma mapOfLe_comp' {𝓘 𝓙 𝓚 : BoolIdeal}
+      (h₁ : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+      (h₂ : ∀ S, S ∈ 𝓙.mem → S ∈ 𝓚.mem)
+      (x : PowQuot 𝓘) :
+      PowQuot.mapOfLe (fun S h => h₂ _ (h₁ _ h)) x
+        = PowQuot.mapOfLe h₂ (PowQuot.mapOfLe h₁ x) := 
+    (mapOfLe_comp h₁ h₂ x).symm
+end MapOfLeFunctoriality
+
+/-! ### Mapping preserves ⊥ and ⊤ -/
+section MapThresholdEnds
+  variable {𝓘 𝓙 : BoolIdeal}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+
+  @[simp] lemma mapOfLe_bot : PowQuot.mapOfLe h (⊥ : PowQuot 𝓘) = ⊥ := by
+    -- `⊥ = mk ∅`, and mapping preserves `mk` on representatives.
+    simpa [mk_bot, PowQuot.mapOfLe_mk]
+
+  @[simp] lemma mapOfLe_top : PowQuot.mapOfLe h (⊤ : PowQuot 𝓘) = ⊤ := by
+    -- `⊤ = mk univ`.
+    simpa [mk_top, PowQuot.mapOfLe_mk]
+end MapThresholdEnds
+
+/-! ### IsCompl lemmas for mk complements -/
+section IsComplMore
+  variable {𝓘 : BoolIdeal} (A : Set ℕ)
+
+  /-- The quotient complement is indeed a complement. -/
+  @[simp] lemma isCompl_mk_compl :
+      IsCompl (PowQuot.mk 𝓘 A) ((PowQuot.mk 𝓘 A)ᶜ) :=
+    isCompl_compl
+
+  /-- And identifying `(mk A)ᶜ` with `mk Aᶜ`. -/
+  @[simp] lemma isCompl_mk_mk_compl :
+      IsCompl (PowQuot.mk 𝓘 A) (PowQuot.mk 𝓘 Aᶜ) := by
+    have h := isCompl_compl (x := PowQuot.mk 𝓘 A)
+    simp only [mk_compl] at h
+    exact h
+end IsComplMore
+
+/-! ### Absorption with complements -/
+section Absorption
+  variable {𝓘 : BoolIdeal} (A : Set ℕ)
+
+  @[simp] lemma mk_inf_compl :
+      PowQuot.mk 𝓘 A ⊓ (PowQuot.mk 𝓘 A)ᶜ = (⊥ : PowQuot 𝓘) := by
+    simpa using (isCompl_mk_compl (𝓘 := 𝓘) A).inf_eq_bot
+
+  @[simp] lemma mk_sup_compl :
+      PowQuot.mk 𝓘 A ⊔ (PowQuot.mk 𝓘 A)ᶜ = (⊤ : PowQuot 𝓘) := by
+    simpa using (isCompl_mk_compl (𝓘 := 𝓘) A).sup_eq_top
+
+  @[simp] lemma mk_inf_mk_compl :
+      PowQuot.mk 𝓘 A ⊓ PowQuot.mk 𝓘 Aᶜ = (⊥ : PowQuot 𝓘) := by
+    simpa [mk_compl] using (isCompl_mk_mk_compl (𝓘 := 𝓘) A).inf_eq_bot
+
+  @[simp] lemma mk_sup_mk_compl :
+      PowQuot.mk 𝓘 A ⊔ PowQuot.mk 𝓘 Aᶜ = (⊤ : PowQuot 𝓘) := by
+    simpa [mk_compl] using (isCompl_mk_mk_compl (𝓘 := 𝓘) A).sup_eq_top
+end Absorption
+
+/-! ### Mapped disjoint-complement variants -/
+section MapOfLe_DisjointComplMore
+  variable {𝓘 𝓙 : BoolIdeal}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A B : Set ℕ)
+
+  /-- Disjoint in the image with a complement on the right. -/
+  @[simp] lemma mapOfLe_disjoint_compl_right_iff :
+      Disjoint (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))
+               ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 B))ᶜ)
+        ↔ (A \ B) ∈ 𝓙.mem := by
+    -- Reduce to `inf = ⊥`, push `mapOfLe` and `ᶜ`, then use your threshold.
+    simp only [disjoint_iff, PowQuot.mapOfLe_mk]
+    simp only [mk_compl, mk_inf_mk, mk_eq_bot_iff, Set.diff_eq]
+
+  /-- Disjoint in the image with a complement on the left. -/
+  @[simp] lemma mapOfLe_compl_left_disjoint_iff :
+      Disjoint ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ)
+               (PowQuot.mapOfLe h (PowQuot.mk 𝓘 B))
+        ↔ (B \ A) ∈ 𝓙.mem := by
+    simp only [disjoint_iff, PowQuot.mapOfLe_mk]
+    simp only [mk_compl, mk_inf_mk, mk_eq_bot_iff, Set.diff_eq, Set.inter_comm]
+end MapOfLe_DisjointComplMore
+
+/-! ### Mapped absorption forms -/
+section MapAbsorption
+  variable {𝓘 𝓙 : BoolIdeal} (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A : Set ℕ)
+
+  @[simp] lemma mapOfLe_mk_inf_compl :
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)) ⊓
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ = (⊥ : PowQuot 𝓙) := by
+    -- direct `simp`: map to `mk 𝓙 A` then use absorption above
+    simpa [PowQuot.mapOfLe_mk] using
+      (mk_inf_compl (𝓘 := 𝓙) A)
+
+  @[simp] lemma mapOfLe_mk_sup_compl :
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)) ⊔
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ = (⊤ : PowQuot 𝓙) := by
+    simpa [PowQuot.mapOfLe_mk] using
+      (mk_sup_compl (𝓘 := 𝓙) A)
+
+  @[simp] lemma mapOfLe_mk_inf_mk_compl :
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)) ⊓
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 Aᶜ)) = (⊥ : PowQuot 𝓙) := by
+    simpa [PowQuot.mapOfLe_mk] using
+      (mk_inf_mk_compl (𝓘 := 𝓙) A)
+
+  @[simp] lemma mapOfLe_mk_sup_mk_compl :
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)) ⊔
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 Aᶜ)) = (⊤ : PowQuot 𝓙) := by
+    simpa [PowQuot.mapOfLe_mk] using
+      (mk_sup_mk_compl (𝓘 := 𝓙) A)
+end MapAbsorption
+
 /-! 
 ### PowQuot goal reducer pattern (cheatsheet)
 
@@ -2179,6 +3068,35 @@ The constructive principles needed for surjectivity of Φ_I depend on I:
 - For other ideals: calibrate case by case
 
 This provides a flexible testbed for measuring constructive strength.
+-/
+
+/-!
+## PowQuot cheatsheet (via smallness in the ideal)
+
+**Thresholds**
+* `mk_eq_bot_iff A`        ↔  `A ∈ 𝓘.mem`
+* `mk_eq_top_iff A`        ↔  `Aᶜ ∈ 𝓘.mem`
+* `mk_inf_eq_bot_iff A B`  ↔  `A ∩ B ∈ 𝓘.mem`
+* `mk_sup_eq_top_iff A B`  ↔  `Aᶜ ∩ Bᶜ ∈ 𝓘.mem`
+* `mk_ne_bot_iff A`        ↔  `A ∉ 𝓘.mem`
+* `mk_ne_top_iff A`        ↔  `Aᶜ ∉ 𝓘.mem`
+
+**Equality/Order**
+* `mk_eq_mk_iff A B`       ↔  `A △ B ∈ 𝓘.mem`
+* `mk_le_mk A B`           ↔  `A \ B ∈ 𝓘.mem`
+* `mk_le_compl_mk A B`     ↔  `A ∩ B ∈ 𝓘.mem`
+* `compl_mk_le_mk_iff A B` ↔  `Aᶜ ∩ Bᶜ ∈ 𝓘.mem`
+
+**Disjoint/Compl**
+* `disjoint_mk_iff A B`    ↔  `A ∩ B ∈ 𝓘.mem`
+* `isCompl_mk_iff A B`     ↔  `(A ∩ B) ∈ 𝓘.mem ∧ (Aᶜ ∩ Bᶜ) ∈ 𝓘.mem`
+
+**Strict order**
+* `mk_lt_mk_iff A B`       ↔  `(A \ B) ∈ 𝓘.mem ∧ (A △ B) ∉ 𝓘.mem`
+
+**Mapped analogues (`𝓘 ⟶ 𝓙` via `h`)**: replace `mk 𝓘 …` by `mapOfLe h (mk 𝓘 …)`,
+  and replace membership in `𝓘.mem` with `𝓙.mem`.
+  * `mapOfLe_compl_mk_le_mk_iff A B` ↔  `Aᶜ ∩ Bᶜ ∈ 𝓙.mem` (left-complement bridge)
 -/
 
 end Papers.P4Meta
