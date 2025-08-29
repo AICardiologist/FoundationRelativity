@@ -2732,6 +2732,20 @@ section MapOrderIso
     apply OrderIso.injective (mapOfLe_orderIso_of_iff hiff)
     rw [OrderIso.apply_symm_apply]
     simp [mapOfLe_orderIso_of_iff_apply_mk]
+
+  /-- The forward map is injective when ideals agree pointwise. -/
+  lemma mapOfLe_injective_of_iff {𝓘 𝓙 : BoolIdeal}
+      (hiff : ∀ S, S ∈ 𝓘.mem ↔ S ∈ 𝓙.mem) :
+      Function.Injective (PowQuot.mapOfLe (fun S h => (hiff S).1 h)) := by
+    simpa [mapOfLe_orderIso_of_iff] using
+      (mapOfLe_orderIso_of_iff (𝓘 := 𝓘) (𝓙 := 𝓙) hiff).injective
+
+  /-- The forward map is surjective when ideals agree pointwise. -/
+  lemma mapOfLe_surjective_of_iff {𝓘 𝓙 : BoolIdeal}
+      (hiff : ∀ S, S ∈ 𝓘.mem ↔ S ∈ 𝓙.mem) :
+      Function.Surjective (PowQuot.mapOfLe (fun S h => (hiff S).1 h)) := by
+    simpa [mapOfLe_orderIso_of_iff] using
+      (mapOfLe_orderIso_of_iff (𝓘 := 𝓘) (𝓙 := 𝓙) hiff).surjective
 end MapOrderIso
 
 /-! ### Functoriality of `mapOfLe` -/
@@ -2753,7 +2767,30 @@ section MapOfLeFunctoriality
       PowQuot.mapOfLe (fun S (h : S ∈ 𝓘.mem) => h) x = x := by
     refine Quot.induction_on x ?_; intro A
     simp [PowQuot.mapOfLe_mk]
+
+  /-- Symmetric form of composition: composed inclusion equals composition of mappings. -/
+  lemma mapOfLe_comp' {𝓘 𝓙 𝓚 : BoolIdeal}
+      (h₁ : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+      (h₂ : ∀ S, S ∈ 𝓙.mem → S ∈ 𝓚.mem)
+      (x : PowQuot 𝓘) :
+      PowQuot.mapOfLe (fun S h => h₂ _ (h₁ _ h)) x
+        = PowQuot.mapOfLe h₂ (PowQuot.mapOfLe h₁ x) := 
+    (mapOfLe_comp h₁ h₂ x).symm
 end MapOfLeFunctoriality
+
+/-! ### Mapping preserves ⊥ and ⊤ -/
+section MapThresholdEnds
+  variable {𝓘 𝓙 : BoolIdeal}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+
+  @[simp] lemma mapOfLe_bot : PowQuot.mapOfLe h (⊥ : PowQuot 𝓘) = ⊥ := by
+    -- `⊥ = mk ∅`, and mapping preserves `mk` on representatives.
+    simpa [mk_bot, PowQuot.mapOfLe_mk]
+
+  @[simp] lemma mapOfLe_top : PowQuot.mapOfLe h (⊤ : PowQuot 𝓘) = ⊤ := by
+    -- `⊤ = mk univ`.
+    simpa [mk_top, PowQuot.mapOfLe_mk]
+end MapThresholdEnds
 
 /-! ### IsCompl lemmas for mk complements -/
 section IsComplMore
