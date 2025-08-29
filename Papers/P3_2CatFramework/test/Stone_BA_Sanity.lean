@@ -44,7 +44,7 @@ example : mk 𝓘 A \ mk 𝓘 B =
 
 -- Test order with subset
 example : mk 𝓘 A ≤ mk 𝓘 (A ∪ B) := by
-  apply mk_le_mk_of_subset
+  apply Papers.P4Meta.StoneSupport.mk_le_mk_of_subset
   exact Set.subset_union_left
 
 -- Test Boolean algebra laws

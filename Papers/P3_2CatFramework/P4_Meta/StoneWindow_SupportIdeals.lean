@@ -2437,6 +2437,15 @@ section SubsetToOrder
     exact Set.diff_eq_empty.mpr hAB
 end SubsetToOrder
 
+/-! ### `mk` is monotone in the set argument -/
+section MkMonotone
+  variable {𝓘 : BoolIdeal}
+
+  lemma mk_monotone : Monotone (fun A : Set ℕ => (PowQuot.mk 𝓘 A : PowQuot 𝓘)) := by
+    intro A B hAB
+    exact (mk_le_mk_of_subset (𝓘 := 𝓘) (A := A) (B := B) hAB)
+end MkMonotone
+
 /-! ### Strict order -/
 section StrictOrder
   variable {𝓘 : BoolIdeal}
@@ -2505,6 +2514,41 @@ section MapStrictOrder
         exact hΔ this
       exact lt_of_le_of_ne hle hneq
 end MapStrictOrder
+
+/-! ### Subset → order/strict order in the image -/
+section MapSubsetToOrder
+  variable {𝓘 𝓙 : BoolIdeal} {A B : Set ℕ}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+
+  /-- If `A ⊆ B` then `mapOfLe h (mk A) ≤ mapOfLe h (mk B)`. -/
+  lemma mapOfLe_mk_le_mk_of_subset (hAB : A ⊆ B) :
+      PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) ≤ PowQuot.mapOfLe h (PowQuot.mk 𝓘 B) := by
+    -- `(A \ B) = ∅`, and `∅ ∈ 𝓙.mem`.
+    simpa [PowQuot.mapOfLe_mk, mk_le_mk] using
+      (show (A \ B) ∈ 𝓙.mem from by
+        simpa [Set.diff_eq_empty.mpr hAB] using (𝓙.empty_mem))
+
+  /-- Strict order from a subset when the "gap" is not small in the target ideal. -/
+  lemma mapOfLe_mk_lt_mk_of_subset_not_small
+      (hAB : A ⊆ B) (hGap : (B \ A) ∉ 𝓙.mem) :
+      PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) < PowQuot.mapOfLe h (PowQuot.mk 𝓘 B) := by
+    classical
+    have h₁ : (A \ B) ∈ 𝓙.mem := by
+      simpa [Set.diff_eq_empty.mpr hAB] using (𝓙.empty_mem)
+    have : (A △ B) = (B \ A) := by
+      -- `A △ B = (A \ B) ∪ (B \ A)` and `(A \ B) = ∅` under `A ⊆ B`.
+      ext x
+      simp only [Set.mem_diff]
+      constructor
+      · intro h
+        rcases h with ⟨h1, h2⟩ | ⟨h1, h2⟩
+        · exact absurd (hAB h1) h2
+        · exact ⟨h1, h2⟩
+      · intro ⟨hB, hA⟩
+        right
+        exact ⟨hB, hA⟩
+    exact (mapOfLe_mk_lt_mk_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A B).2 ⟨h₁, by simpa [this] using hGap⟩
+end MapSubsetToOrder
 
 /-! ### Disjointness / complements, reduced to smallness -/
 section DisjointCompl
@@ -2635,6 +2679,52 @@ section MapDisjointAsOrder
     -- turn the RHS order into smallness via mk-lemmas:
     simpa [PowQuot.mapOfLe_mk] using h₁.trans h₂.symm
 end MapDisjointAsOrder
+
+/-! ### Order isomorphism when the ideals coincide on smallness -/
+section MapOrderIso
+  variable {𝓘 𝓙 : BoolIdeal}
+
+  /-- If `𝓘.mem` and `𝓙.mem` agree pointwise, the quotients are order‑isomorphic. -/
+  def mapOfLe_orderIso_of_iff
+      (hiff : ∀ S, S ∈ 𝓘.mem ↔ S ∈ 𝓙.mem) :
+      PowQuot 𝓘 ≃o PowQuot 𝓙 :=
+  { toEquiv :=
+    { toFun    := PowQuot.mapOfLe (fun S h => (hiff S).1 h)
+      invFun   := PowQuot.mapOfLe (fun S h => (hiff S).2 h)
+      left_inv := by
+        intro x; refine Quot.inductionOn x ?_; intro A
+        simp [PowQuot.mapOfLe_mk]
+      right_inv := by
+        intro y; refine Quot.inductionOn y ?_; intro A
+        simp [PowQuot.mapOfLe_mk] },
+    map_rel_iff' := by
+      intro x y; refine Quot.induction_on₂ x y ?_; intro A B
+      -- translate both sides to smallness of `(A \ B)` and use `hiff`
+      have h₁ : PowQuot.mapOfLe (fun S h => (hiff S).1 h) (PowQuot.mk 𝓘 A)
+                ≤ PowQuot.mapOfLe (fun S h => (hiff S).1 h) (PowQuot.mk 𝓘 B)
+               ↔ (A \ B) ∈ 𝓙.mem := by
+        simpa [PowQuot.mapOfLe_mk, mk_le_mk]
+      have h₂ : (PowQuot.mk 𝓘 A : PowQuot 𝓘) ≤ PowQuot.mk 𝓘 B
+               ↔ (A \ B) ∈ 𝓘.mem := by
+        simpa [mk_le_mk]
+      simpa [h₂] using h₁.trans ⟨fun h => (hiff (A \ B)).2 h, fun h => (hiff (A \ B)).1 h⟩ }
+
+  @[simp] lemma mapOfLe_orderIso_of_iff_apply_mk
+      (hiff : ∀ S, S ∈ 𝓘.mem ↔ S ∈ 𝓙.mem) (A : Set ℕ) :
+      mapOfLe_orderIso_of_iff (𝓘 := 𝓘) (𝓙 := 𝓙) hiff (PowQuot.mk 𝓘 A)
+        = PowQuot.mk 𝓙 A := by
+    simp [mapOfLe_orderIso_of_iff, PowQuot.mapOfLe_mk]
+
+  @[simp] lemma mapOfLe_orderIso_of_iff_symm_apply_mk
+      (hiff : ∀ S, S ∈ 𝓘.mem ↔ S ∈ 𝓙.mem) (A : Set ℕ) :
+      (mapOfLe_orderIso_of_iff (𝓘 := 𝓘) (𝓙 := 𝓙) hiff).symm (PowQuot.mk 𝓙 A)
+        = PowQuot.mk 𝓘 A := by
+    -- The symm of an OrderIso reverses its effect, and since forward map takes 𝓘 to 𝓙,
+    -- the backward map takes 𝓙 to 𝓘
+    apply OrderIso.injective (mapOfLe_orderIso_of_iff hiff)
+    rw [OrderIso.apply_symm_apply]
+    simp [mapOfLe_orderIso_of_iff_apply_mk]
+end MapOrderIso
 
 /-! ### IsCompl lemmas for mk complements -/
 section IsComplMore
