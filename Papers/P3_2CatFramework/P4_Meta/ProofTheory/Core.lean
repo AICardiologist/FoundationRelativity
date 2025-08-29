@@ -121,4 +121,15 @@ axiom Sigma1_Bot : Sigma1 Bot
 axiom Bot_is_FalseInN {T : Theory} [h : HasSigma1Reflection T] : 
   ¬h.TrueInN Bot
 
+/-! ## Schematic Tag Formulas -/
+
+/-- Schematic consistency tag at level n (not the actual Con formula) -/
+abbrev ConTag (n : Nat) : Formula := Formula.atom (600 + n)
+
+/-- Schematic reflection tag at level n (not the actual RFN formula) -/
+abbrev RfnTag (n : Nat) : Formula := Formula.atom (800 + n)
+
+/-- Schematic Gödel sentence tag at level n -/
+abbrev GTagFormula (n : Nat) : Formula := Formula.atom (700 + n)
+
 end Papers.P4Meta.ProofTheory

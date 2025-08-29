@@ -3,6 +3,13 @@
   
   Ladder constructions for consistency, reflection, and classicality hierarchies.
   These model Turing-style and Feferman-style progressions schematically.
+  
+  Axioms used in this module:
+  - LCons_arithmetization_instance: Extension preserves arithmetization
+  - LReflect_arithmetization_instance: Extension preserves arithmetization
+  - cons_tag_refines: Links ConTag to ConsistencyFormula
+  - rfn_tag_refines: Links RfnTag to RFN_Sigma1_Formula
+  - LClass_omega_eq_PA: Limit of classicality ladder
 -/
 
 import Papers.P3_2CatFramework.P4_Meta.ProofTheory.Core
@@ -12,15 +19,15 @@ namespace Papers.P4Meta.ProofTheory
 
 open Papers.P4Meta
 
-/-! ## Formula Sequences for Ladders -/
+/-! ## Schematic Tag Formulas for Ladders -/
 
-/-- Consistency formulas indexed by level -/
+/-- Schematic consistency tag indexed by level (not the actual Con formula) -/
 def consFormula : Nat → Formula
-  | n => Formula.atom (600 + n)
+  | n => ConTag n
 
-/-- Reflection formulas indexed by level -/
+/-- Schematic reflection tag indexed by level (not the actual RFN formula) -/
 def reflFormula : Nat → Formula  
-  | n => Formula.atom (800 + n)
+  | n => RfnTag n
 
 /-! ## Consistency Ladder (Turing-style) -/
 
@@ -182,10 +189,10 @@ axiom LCons_arithmetization_instance [HasArithmetization T0] (n : Nat) :
 axiom LReflect_arithmetization_instance [HasArithmetization T0] (n : Nat) : 
   HasArithmetization (LReflect T0 n)
 
-instance LCons_arithmetization [HasArithmetization T0] (n : Nat) : 
+noncomputable instance LCons_arithmetization [HasArithmetization T0] (n : Nat) : 
   HasArithmetization (LCons T0 n) := LCons_arithmetization_instance n
 
-instance LReflect_arithmetization [HasArithmetization T0] (n : Nat) : 
+noncomputable instance LReflect_arithmetization [HasArithmetization T0] (n : Nat) : 
   HasArithmetization (LReflect T0 n) := LReflect_arithmetization_instance n
 
 /-- Axiomatic refinement from schematic stage tags to semantic statements.
@@ -210,7 +217,7 @@ axiom rfn_tag_refines (T0 : Theory) [HasArithmetization T0] (n : Nat) :
   (LReflect T0 (n+1)).Provable (reflFormula n) →
   (LReflect T0 (n+1)).Provable (RFN_Sigma1_Formula (LReflect T0 n))
 
-instance [HasArithmetization T0] : RealizesCons T0 := ⟨cons_tag_refines T0⟩
-instance [HasArithmetization T0] : RealizesRFN T0 := ⟨rfn_tag_refines T0⟩
+noncomputable instance [HasArithmetization T0] : RealizesCons T0 := ⟨cons_tag_refines T0⟩
+noncomputable instance [HasArithmetization T0] : RealizesRFN T0 := ⟨rfn_tag_refines T0⟩
 
 end Papers.P4Meta.ProofTheory

@@ -119,6 +119,18 @@ example : (LReflect PA 1).Provable (consFormula 0) :=
 
 end IntegrationTests
 
+/-! ## Axiom Guards -/
+
+section AxiomGuards
+
+-- Diagnostic: Print axioms used by collision_step to track dependencies
+#print axioms collision_step
+
+-- Diagnostic: Print axioms used by RFN_implies_Con
+#print axioms RFN_implies_Con
+
+end AxiomGuards
+
 /-! ## Success Message -/
 
 #eval IO.println "✅ ProofTheory sanity tests compile successfully!"

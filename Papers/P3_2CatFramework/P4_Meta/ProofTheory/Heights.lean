@@ -3,6 +3,13 @@
   
   Height certificates for proof-theoretic hierarchies.
   Proves upper bounds constructively, axiomatizes classical lower bounds.
+  
+  Axioms used in this module:
+  - con_implies_godel: Con → G connection
+  - G1_lower, G2_lower, RFN_lower: Classical lower bounds
+  - cons_hierarchy_proper, refl_hierarchy_proper: Hierarchy strictness
+  - WLPO_height_upper, LPO_height_upper: Classicality bounds
+  - WLPO_lower, LPO_lower: Independence results
 -/
 
 import Papers.P3_2CatFramework.P4_Meta.ProofTheory.Progressions
@@ -19,9 +26,9 @@ theorem con_height_upper (T0 : Theory) :
   (LCons T0 1).Provable (consFormula 0) := by
   simp [LCons, Extend_Proves]
 
-/-- Gödel sentence formula -/
+/-- Gödel sentence tag (schematic, not the actual Gödel sentence) -/
 def godelFormula : Nat → Formula
-  | n => Formula.atom (700 + n)
+  | n => GTagFormula n
 
 /-- Gödel sentence follows from consistency (classical) -/
 axiom con_implies_godel (T : Theory) (n : Nat) :
@@ -56,17 +63,17 @@ class HBL (T : Theory) extends HasDerivability T
 /-- G2: Gödel's second incompleteness theorem (classical)
     Provenance: Gödel 1931, standard proof-theoretic result -/
 axiom G2_lower (T : Theory) [Consistent T] [HBL T] :
-  ¬(T.Provable (consFormula 0))
+  ¬(T.Provable (ConTag 0))
 
 /-- G1: Gödel's first incompleteness theorem (classical)
     Provenance: Gödel 1931, via fixed-point construction -/
 axiom G1_lower (T : Theory) [Consistent T] [HBL T] :
-  ¬(T.Provable (godelFormula 0))
+  ¬(T.Provable (GTagFormula 0))
 
 /-- Reflection does not prove its own reflection (classical)
     Provenance: Feferman 1962, iteration of reflection principles -/
 axiom RFN_lower (T : Theory) [Consistent T] [HBL T] :
-  ¬(T.Provable (reflFormula 0))
+  ¬(T.Provable (RfnTag 0))
 
 /-! ## Height Certificates -/
 
@@ -132,10 +139,10 @@ def con_n_height (T0 : Theory) [Consistent T0] [HBL T0] (n : Nat) :
 
 /-- The consistency hierarchy is proper (classical) -/
 axiom cons_hierarchy_proper (T0 : Theory) [Consistent T0] [HBL T0] (n : Nat) :
-  ¬((LCons T0 n).Provable (consFormula n))
+  ¬((LCons T0 n).Provable (ConTag n))
 
 /-- The reflection hierarchy is proper (classical) -/
 axiom refl_hierarchy_proper (T0 : Theory) [Consistent T0] [HBL T0] (n : Nat) :
-  ¬((LReflect T0 n).Provable (reflFormula n))
+  ¬((LReflect T0 n).Provable (RfnTag n))
 
 end Papers.P4Meta.ProofTheory
