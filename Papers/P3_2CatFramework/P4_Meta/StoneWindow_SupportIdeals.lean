@@ -647,8 +647,8 @@ open Classical
 variable {R : Type*}
 
 /-- Rings with only two idempotents, 0 and 1. -/
-class TwoIdempotents (R : Type*) [Semiring R] : Prop :=
-  (resolve : ∀ x : R, x * x = x → x = 0 ∨ x = 1)
+class TwoIdempotents (R : Type*) [Semiring R] : Prop where
+  resolve : ∀ x : R, x * x = x → x = 0 ∨ x = 1
 
 section
 variable [CommRing R] [DecidableEq R] (𝓘 : BoolIdeal) [TwoIdempotents R]
@@ -1034,13 +1034,13 @@ noncomputable def idemBot : LinfQuotRingIdem 𝓘 R := ⟨(0 : LinfQuotRing 𝓘
   idemSup 𝓘 (idemTop 𝓘) e = idemTop 𝓘 := by
   ext
   have : (1 : LinfQuotRing 𝓘 R) + e.1 - (1 * e.1) = (1 : LinfQuotRing 𝓘 R) := by ring
-  simpa [idemSup_val, idemTop_val] using this
+  simp [idemSup_val, idemTop_val, this]
 
 @[simp] lemma idemSup_top_right (e : LinfQuotRingIdem 𝓘 R) :
   idemSup 𝓘 e (idemTop 𝓘) = idemTop 𝓘 := by
   ext
   have : e.1 + (1 : LinfQuotRing 𝓘 R) - (e.1 * 1) = (1 : LinfQuotRing 𝓘 R) := by ring
-  simpa [idemSup_val, idemTop_val] using this
+  simp [idemSup_val, idemTop_val, this]
 
 @[simp] lemma idemSup_bot_left  (e : LinfQuotRingIdem 𝓘 R) :
   idemSup 𝓘 (idemBot 𝓘) e = e := by
@@ -1059,7 +1059,7 @@ noncomputable def idemBot : LinfQuotRingIdem 𝓘 R := ⟨(0 : LinfQuotRing 𝓘
   calc
     e.1 * (e.1 + f.1 - e.1 * f.1)
         = e.1 * e.1 + e.1 * f.1 - e.1 * e.1 * f.1 := by ring
-    _   = e.1 + e.1 * f.1 - e.1 * f.1 := by simpa [he]
+    _   = e.1 + e.1 * f.1 - e.1 * f.1 := by simp [he]
     _   = e.1 := by ring
 
 @[simp] lemma idemSup_absorb_left (e f : LinfQuotRingIdem 𝓘 R) :
@@ -1069,16 +1069,16 @@ noncomputable def idemBot : LinfQuotRingIdem 𝓘 R := ⟨(0 : LinfQuotRing 𝓘
   calc
     e.1 + (e.1 * f.1) - e.1 * (e.1 * f.1)
         = e.1 + e.1 * f.1 - (e.1 * e.1) * f.1 := by ring
-    _   = e.1 + e.1 * f.1 - e.1 * f.1 := by simpa [he]
+    _   = e.1 + e.1 * f.1 - e.1 * f.1 := by simp [he]
     _   = e.1 := by ring
 
 @[simp] lemma idemInf_absorb_right (e f : LinfQuotRingIdem 𝓘 R) :
   idemInf 𝓘 (idemSup 𝓘 e f) e = e := by
-  simpa [idemInf_comm 𝓘] using idemInf_absorb_left e f
+  simp [idemInf_comm 𝓘, idemInf_absorb_left]
 
 @[simp] lemma idemSup_absorb_right (e f : LinfQuotRingIdem 𝓘 R) :
   idemSup 𝓘 (idemInf 𝓘 e f) e = e := by
-  simpa [idemSup_comm 𝓘] using idemSup_absorb_left e f
+  simp [idemSup_comm 𝓘, idemSup_absorb_left]
 
 /-! ### De Morgan laws -/
 
@@ -1365,7 +1365,7 @@ noncomputable def StoneBAIso : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R := Stone
   PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (A \ A)) = idemBot 𝓘 := by
   classical
   -- Φ(A \ A) = Φ(A) ⊓ (¬Φ(A)) = ⊥
-  simpa using stone_preserves_diff (R := R) (𝓘 := 𝓘) A A
+  simp [stone_preserves_diff]
 
 @[simp] lemma stone_preserves_diff_empty
     {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
@@ -1374,7 +1374,7 @@ noncomputable def StoneBAIso : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R := Stone
     PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A) := by
   classical
   -- Φ(A \ ∅) = Φ(A) ⊓ (¬Φ(∅)) = Φ(A) ⊓ ⊤ = Φ(A)
-  simpa using stone_preserves_diff (R := R) (𝓘 := 𝓘) A ∅
+  simp [stone_preserves_diff]
 
 @[simp] lemma stone_preserves_symmDiff_self
     {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
@@ -1382,7 +1382,7 @@ noncomputable def StoneBAIso : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R := Stone
   PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (A △ A)) = idemBot 𝓘 := by
   classical
   -- Φ(A △ A) = (Φ(A) ⊓ ¬Φ(A)) ⊔ (Φ(A) ⊓ ¬Φ(A)) = ⊥ ⊔ ⊥ = ⊥
-  simpa using stone_preserves_symmDiff (R := R) (𝓘 := 𝓘) A A
+  simp [stone_preserves_symmDiff]
 
 @[simp] lemma stone_preserves_symmDiff_empty
     {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
@@ -1391,7 +1391,7 @@ noncomputable def StoneBAIso : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R := Stone
     PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A) := by
   classical
   -- Φ(A △ ∅) = (Φ(A) ⊓ ¬Φ(∅)) ⊔ (Φ(∅) ⊓ ¬Φ(A)) = (Φ(A) ⊓ ⊤) ⊔ (⊥ ⊓ ¬Φ(A)) = Φ(A)
-  simpa using stone_preserves_symmDiff (R := R) (𝓘 := 𝓘) A ∅
+  simp [stone_preserves_symmDiff]
 
 /-! Φ-preservation aliases using idemDiff and idemXor -/
 
@@ -1402,7 +1402,7 @@ noncomputable def StoneBAIso : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R := Stone
     idemDiff 𝓘
       (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A))
       (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) B)) := by
-  simpa [idemDiff] using stone_preserves_diff (R := R) (𝓘 := 𝓘) A B
+  simp [idemDiff, stone_preserves_diff]
 
 @[simp] lemma stone_preserves_symmDiff'
     {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
@@ -1411,7 +1411,7 @@ noncomputable def StoneBAIso : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R := Stone
     idemXor 𝓘
       (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A))
       (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) B)) := by
-  simpa [idemXor, idemDiff] using stone_preserves_symmDiff (R := R) (𝓘 := 𝓘) A B
+  simp [idemXor, idemDiff, stone_preserves_symmDiff]
 
 -- Φ endpoints with univ
 @[simp] lemma stone_preserves_diff_univ
@@ -2240,7 +2240,7 @@ end EqvGenBridge
   (A B : Set ℕ) :
   PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) = PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)
     ↔ (A △ B) ∈ 𝓙.mem := by
-  simpa [PowQuot.mapOfLe_mk] using mk_eq_mk_iff 𝓙 A B
+  simp [PowQuot.mapOfLe_mk, mk_eq_mk_iff]
 
 /-! ### Additional convenience lemmas -/
 
@@ -2289,6 +2289,11 @@ variable {𝓘 : BoolIdeal}
     using (compl_le_iff_compl_le :
       ((PowQuot.mk 𝓘 A)ᶜ ≤ PowQuot.mk 𝓘 B) ↔ ((PowQuot.mk 𝓘 B)ᶜ ≤ PowQuot.mk 𝓘 A))
 
+/-- Negative form: `¬ ((mk A)ᶜ ≤ mk B)` iff the co-intersection is not small. -/
+@[simp] lemma compl_mk_not_le_mk_iff (A B : Set ℕ) :
+  ¬ ((PowQuot.mk 𝓘 A)ᶜ ≤ PowQuot.mk 𝓘 B) ↔ (Aᶜ ∩ Bᶜ) ∉ 𝓘.mem := by
+  simpa using (not_congr (compl_mk_le_mk_iff (𝓘 := 𝓘) A B))
+
 end MoreOrderLemmas
 
 /-! ### More `mk` ↔ smallness characterizations -/
@@ -2300,7 +2305,7 @@ section TopBotIff
       (PowQuot.mk 𝓘 A : PowQuot 𝓘) = ⊥ ↔ A ∈ 𝓘.mem := by
     constructor
     · intro h
-      have : (PowQuot.mk 𝓘 A : PowQuot 𝓘) ≤ ⊥ := by simpa [h]
+      have : (PowQuot.mk 𝓘 A : PowQuot 𝓘) ≤ ⊥ := by simp [h]
       simpa [mk_bot, mk_le_mk, Set.diff_empty] using this
     · intro hA
       apply le_antisymm
@@ -2315,7 +2320,7 @@ section TopBotIff
       (PowQuot.mk 𝓘 A : PowQuot 𝓘) = ⊤ ↔ Aᶜ ∈ 𝓘.mem := by
     constructor
     · intro h
-      have : ⊤ ≤ (PowQuot.mk 𝓘 A : PowQuot 𝓘) := by simpa [h]
+      have : ⊤ ≤ (PowQuot.mk 𝓘 A : PowQuot 𝓘) := by simp [h]
       simp [mk_top, mk_le_mk] at this
       -- this : Set.univ \ A ∈ 𝓘.mem
       -- Need to show Aᶜ ∈ 𝓘.mem, and Aᶜ = Set.univ \ A
@@ -2631,6 +2636,13 @@ section MapOrderToSmallnessLeft
       using (compl_le_iff_compl_le :
         ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ ≤ PowQuot.mapOfLe h (PowQuot.mk 𝓘 B))
           ↔ ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 B))ᶜ ≤ PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)))
+
+  /-- Negative form: `¬ ((mapOfLe h (mk A))ᶜ ≤ mapOfLe h (mk B))` iff co-intersection not small. -/
+  @[simp] lemma mapOfLe_compl_mk_not_le_mk_iff (A B : Set ℕ) :
+    ¬ ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ ≤ PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)) 
+    ↔ (Aᶜ ∩ Bᶜ) ∉ 𝓙.mem := by
+    simpa using (not_congr (mapOfLe_compl_mk_le_mk_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A B))
+
 end MapOrderToSmallnessLeft
 
 /-! ### Disjointness / complements, reduced to smallness -/
@@ -2860,11 +2872,11 @@ section MapThresholdEnds
 
   @[simp] lemma mapOfLe_bot : PowQuot.mapOfLe h (⊥ : PowQuot 𝓘) = ⊥ := by
     -- `⊥ = mk ∅`, and mapping preserves `mk` on representatives.
-    simpa [mk_bot, PowQuot.mapOfLe_mk]
+    simp [mk_bot, PowQuot.mapOfLe_mk]
 
   @[simp] lemma mapOfLe_top : PowQuot.mapOfLe h (⊤ : PowQuot 𝓘) = ⊤ := by
     -- `⊤ = mk univ`.
-    simpa [mk_top, PowQuot.mapOfLe_mk]
+    simp [mk_top, PowQuot.mapOfLe_mk]
 end MapThresholdEnds
 
 /-! ### IsCompl lemmas for mk complements -/
@@ -3097,6 +3109,7 @@ This provides a flexible testbed for measuring constructive strength.
 **Mapped analogues (`𝓘 ⟶ 𝓙` via `h`)**: replace `mk 𝓘 …` by `mapOfLe h (mk 𝓘 …)`,
   and replace membership in `𝓘.mem` with `𝓙.mem`.
   * `mapOfLe_compl_mk_le_mk_iff A B` ↔  `Aᶜ ∩ Bᶜ ∈ 𝓙.mem` (left-complement bridge)
+  * `mapOfLe_compl_mk_not_le_mk_iff A B` ↔  `Aᶜ ∩ Bᶜ ∉ 𝓙.mem` (negative left-complement)
 -/
 
 end Papers.P4Meta
