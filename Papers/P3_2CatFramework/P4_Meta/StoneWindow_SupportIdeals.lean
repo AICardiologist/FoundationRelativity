@@ -2264,7 +2264,7 @@ variable {𝓘 : BoolIdeal}
   rfl
 
 -- Not a simp-lemma globally; use explicitly when needed.
-lemma compl_eq_univ_sdiff (A : Set α) : Aᶜ = Set.univ \ A := by
+lemma compl_eq_univ_sdiff {α : Type*} (A : Set α) : Aᶜ = Set.univ \ A := by
   ext x; simp
 
 end Convenience
@@ -2436,6 +2436,63 @@ section MapOfLe_DisjointCompl
     have hJ2 : (Aᶜ ∩ Bᶜ) ∈ 𝓙.mem := h _ hI2
     exact (mapOfLe_isCompl_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A B).2 ⟨hJ1, hJ2⟩
 end MapOfLe_DisjointCompl
+
+/-! ### More disjointness-with-complements -/
+section DisjointComplMore
+  variable {𝓘 : BoolIdeal} (A B : Set ℕ)
+
+  /-- Disjoint with a complement on the right. -/
+  @[simp] lemma disjoint_mk_compl_right :
+      Disjoint (PowQuot.mk 𝓘 A) ((PowQuot.mk 𝓘 B)ᶜ) ↔ (A \ B) ∈ 𝓘.mem := by
+    -- `Disjoint x y ↔ x ⊓ y = ⊥`, push `ᶜ` through and reduce to smallness.
+    simp only [disjoint_iff, mk_compl, mk_inf_mk, mk_eq_bot_iff, Set.diff_eq]
+
+  /-- Disjoint with a complement on the left. -/
+  @[simp] lemma disjoint_compl_left_mk :
+      Disjoint ((PowQuot.mk 𝓘 A)ᶜ) (PowQuot.mk 𝓘 B) ↔ (B \ A) ∈ 𝓘.mem := by
+    -- symmetric to the previous: swap roles and use `Set.diff_eq`.
+    simp only [disjoint_iff, mk_compl, mk_inf_mk, mk_eq_bot_iff, Set.diff_eq, Set.inter_comm]
+end DisjointComplMore
+
+/-! ### IsCompl lemmas for mk complements -/
+section IsComplMore
+  variable {𝓘 : BoolIdeal} (A : Set ℕ)
+
+  /-- The quotient complement is indeed a complement. -/
+  @[simp] lemma isCompl_mk_compl :
+      IsCompl (PowQuot.mk 𝓘 A) ((PowQuot.mk 𝓘 A)ᶜ) :=
+    isCompl_compl
+
+  /-- And identifying `(mk A)ᶜ` with `mk Aᶜ`. -/
+  @[simp] lemma isCompl_mk_mk_compl :
+      IsCompl (PowQuot.mk 𝓘 A) (PowQuot.mk 𝓘 Aᶜ) := by
+    have h := isCompl_compl (x := PowQuot.mk 𝓘 A)
+    simp only [mk_compl] at h
+    exact h
+end IsComplMore
+
+/-! ### Mapped disjoint-complement variants -/
+section MapOfLe_DisjointComplMore
+  variable {𝓘 𝓙 : BoolIdeal}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A B : Set ℕ)
+
+  /-- Disjoint in the image with a complement on the right. -/
+  @[simp] lemma mapOfLe_disjoint_compl_right_iff :
+      Disjoint (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))
+               ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 B))ᶜ)
+        ↔ (A \ B) ∈ 𝓙.mem := by
+    -- Reduce to `inf = ⊥`, push `mapOfLe` and `ᶜ`, then use your threshold.
+    simp only [disjoint_iff, PowQuot.mapOfLe_mk]
+    simp only [mk_compl, mk_inf_mk, mk_eq_bot_iff, Set.diff_eq]
+
+  /-- Disjoint in the image with a complement on the left. -/
+  @[simp] lemma mapOfLe_compl_left_disjoint_iff :
+      Disjoint ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ)
+               (PowQuot.mapOfLe h (PowQuot.mk 𝓘 B))
+        ↔ (B \ A) ∈ 𝓙.mem := by
+    simp only [disjoint_iff, PowQuot.mapOfLe_mk]
+    simp only [mk_compl, mk_inf_mk, mk_eq_bot_iff, Set.diff_eq, Set.inter_comm]
+end MapOfLe_DisjointComplMore
 
 /-! 
 ### PowQuot goal reducer pattern (cheatsheet)
