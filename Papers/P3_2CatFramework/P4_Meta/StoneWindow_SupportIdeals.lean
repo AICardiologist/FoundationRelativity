@@ -2296,7 +2296,10 @@ variable {𝓘 : BoolIdeal}
 
 end MoreOrderLemmas
 
-/-! ### More `mk` ↔ smallness characterizations -/
+/-! ### Thresholds: When quotient elements equal ⊥ or ⊤
+This section characterizes when quotient elements reach the Boolean algebra bounds.
+Key insight: `mk A = ⊥` precisely when A itself is small (in the ideal),
+and `mk A = ⊤` when the complement Aᶜ is small. -/
 section TopBotIff
   variable {𝓘 : BoolIdeal}
 
@@ -2387,7 +2390,9 @@ section InfSupThresholds
     simp [Set.compl_union]
 end InfSupThresholds
 
-/-! ### Non-threshold characterizations -/
+/-! ### Non-thresholds: Negative forms of threshold lemmas
+These are the negative (≠) versions of the threshold characterizations.
+Useful when goals contain inequalities rather than equalities. -/
 section NonThresholds
   variable {𝓘 : BoolIdeal}
 
@@ -2559,7 +2564,9 @@ section MkMonotone
   attribute [mono] mk_monotone
 end MkMonotone
 
-/-! ### Strict order -/
+/-! ### Strict order: Characterizing < in terms of sets
+The strict order x < y requires both x ≤ y (A \ B small) and x ≠ y (A △ B not small).
+This captures the idea that A is "strictly below" B in the quotient. -/
 section StrictOrder
   variable {𝓘 : BoolIdeal}
 
@@ -2778,7 +2785,9 @@ section DisjointComplMore
     simp only [disjoint_iff, mk_compl, mk_inf_mk, mk_eq_bot_iff, Set.diff_eq, Set.inter_comm]
 end DisjointComplMore
 
-/-! ### Disjoint as order -/
+/-! ### Disjoint as order: Bridge between disjointness and order relations
+Key theorem: Disjoint x y ↔ x ≤ yᶜ in Boolean algebras.
+This section provides the bridge lemmas connecting disjointness to order. -/
 section DisjointAsOrder
   variable {𝓘 : BoolIdeal}
 

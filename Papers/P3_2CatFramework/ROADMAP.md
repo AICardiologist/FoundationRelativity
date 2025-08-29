@@ -1,4 +1,12 @@
-# Paper 3: Development Roadmap
+# Paper 3A: Development Roadmap (Focused Scope)
+
+## 🎯 Paper 3A Focus: Framework + Two Axes + Stone Window
+
+**Goal**: Self-contained paper demonstrating AxCal framework with concrete calibration results:
+1. Framework (Categories of Foundations, Uniformizability, Height)
+2. Two orthogonal axes (WLPO via Bidual Gap, FT via UCT)  
+3. Stone Window (Classical theorem + Constructive caveat + Calibration conjecture)
+4. Lean formalization supporting all structural and classical results
 
 ## 📍 Current Position (January 29, 2025)
 
@@ -170,7 +178,69 @@
    - Paper-proven results as axioms
    - Meta-theoretic facts (collision theorems, calibrators)
 
-## 🎯 Immediate Priorities - Completing Paper 3
+## 📋 In-Scope for Paper 3A (Must-Have)
+
+### 1. Framework (Parts I-II condensed)
+- ✅ Category of Foundations, pinned signature, uniformizability
+- ✅ Height calculus, orthogonal profiles
+- ✅ Clean definitions with analysis-focused examples
+
+### 2. Axis 1 - WLPO: Bidual gap
+- ✅ Calibrated equivalence from Paper 2
+- ✅ Height = 1 on WLPO axis
+- ✅ Demonstrates positive frontier concept
+
+### 3. Axis 2 - FT (Fan Theorem): UCT
+- 🔄 Place UCT on FT axis (orthogonal to WLPO)
+- 🔄 Record profile (h_WLPO, h_FT) = (0,1)
+- 🔄 Proof sketch + Lean references
+
+### 4. Stone Window (WP-D)
+- ✅ Classical theorem for support ideals: 𝒫(ℕ)/𝓘 ≅ Idem(ℓ∞/I_𝓘)
+- ✅ Constructive caveat (failure of surjectivity in BISH)
+- 🔄 Calibration Conjecture (surjectivity for broad ideals ⇒ WLPO)
+- ✅ Lean: Complete Boolean algebra API, classical side formalized
+
+### 5. Formalization Section
+- 🔄 Summarize Lean 4 artifacts
+- 🔄 Clear pointers to paths & test files
+- ✅ "0 sorries" for shipped components
+
+## 🚫 Out-of-Scope for Paper 3A (Move to Paper 3B)
+- Proof-theory expansions (Parts III-V detailed metatheory)
+- Deeper model constructions for lower bounds
+- Additional axes (DC_ω program, Baire Category expansions)
+- Strengthening of Stone Window conjecture beyond clean statement
+
+## 🏁 Milestones & Definition of Done
+
+### M1. Scope freeze & outline lock ✅
+- ✅ Finalize 3A outline
+- ✅ Update ROADMAP.md
+- 🔄 Create LaTeX outline
+
+### M2. Math content
+- ✅ WLPO axis: integrate Paper 2 result
+- 🔄 FT axis: state UCT calibration
+- ✅ Stone Window: classical theorem + caveat
+- 🔄 Conjecture statement
+
+### M3. Lean artifacts (shippable subset)
+- ✅ PowQuot Boolean algebra API complete
+- ✅ Stone Window algebraic side in Lean
+- ✅ All tests pass, build succeeds
+
+### M4. Writing polish & figures
+- 🔄 Tighten abstract, intro, related work
+- 🔄 Add figures for orthogonal profiles
+- 🔄 Stone Window diagram
+
+### M5. Packaging
+- 🔄 Create ARTIFACTS.md
+- 🔄 Submission PDFs
+- 🔄 Release branch/tag
+
+## 🎯 Immediate Priorities - Completing Paper 3A
 
 ### ✅ Priority 1: WP-D Stone Window Support Ideals (COMPLETE with Path A - January 28, 2025)
 

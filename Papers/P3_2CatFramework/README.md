@@ -1,4 +1,13 @@
-# Paper 3: 2-Categorical Framework for Axiom Calibration
+# Paper 3A: Axiom Calibration via Non-Uniformizability
+## A Framework for Orthogonal Logical Dependencies in Analysis
+
+### 🎯 Paper 3A Focus (Streamlined Scope)
+
+This repository contains the Lean 4 formalization supporting Paper 3A, which presents:
+1. **The AxCal Framework**: Categories of Foundations, uniformizability, height calculus
+2. **Two Orthogonal Axes**: WLPO (via bidual gap) and FT (via UCT)
+3. **Stone Window Program**: Classical theorem, constructive caveat, and calibration conjecture
+4. **Complete Formalization**: 5,800+ lines of Lean 4 with 0 sorries in core components
 
 ## 📊 Current Status Summary (Updated: January 29, 2025)
 
