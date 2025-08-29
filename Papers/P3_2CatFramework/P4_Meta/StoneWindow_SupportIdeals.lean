@@ -2364,6 +2364,18 @@ section MapOfLeOrder
     simpa [PowQuot.mapOfLe_mk] using (mk_eq_top_iff (𝓘 := 𝓙) A)
 end MapOfLeOrder
 
+/-! ### Subset to order -/
+section SubsetToOrder
+  variable {𝓘 : BoolIdeal} {A B : Set ℕ}
+
+  lemma mk_le_mk_of_subset (hAB : A ⊆ B) :
+      (PowQuot.mk 𝓘 A : PowQuot 𝓘) ≤ PowQuot.mk 𝓘 B := by
+    -- `A \ B = ∅`, and `∅ ∈ 𝓘.mem`.
+    rw [mk_le_mk]
+    convert 𝓘.empty_mem
+    exact Set.diff_eq_empty.mpr hAB
+end SubsetToOrder
+
 /-! ### Disjointness / complements, reduced to smallness -/
 section DisjointCompl
   variable {𝓘 : BoolIdeal}
@@ -2471,6 +2483,27 @@ section IsComplMore
     exact h
 end IsComplMore
 
+/-! ### Absorption with complements -/
+section Absorption
+  variable {𝓘 : BoolIdeal} (A : Set ℕ)
+
+  @[simp] lemma mk_inf_compl :
+      PowQuot.mk 𝓘 A ⊓ (PowQuot.mk 𝓘 A)ᶜ = (⊥ : PowQuot 𝓘) := by
+    simpa using (isCompl_mk_compl (𝓘 := 𝓘) A).inf_eq_bot
+
+  @[simp] lemma mk_sup_compl :
+      PowQuot.mk 𝓘 A ⊔ (PowQuot.mk 𝓘 A)ᶜ = (⊤ : PowQuot 𝓘) := by
+    simpa using (isCompl_mk_compl (𝓘 := 𝓘) A).sup_eq_top
+
+  @[simp] lemma mk_inf_mk_compl :
+      PowQuot.mk 𝓘 A ⊓ PowQuot.mk 𝓘 Aᶜ = (⊥ : PowQuot 𝓘) := by
+    simpa [mk_compl] using (isCompl_mk_mk_compl (𝓘 := 𝓘) A).inf_eq_bot
+
+  @[simp] lemma mk_sup_mk_compl :
+      PowQuot.mk 𝓘 A ⊔ PowQuot.mk 𝓘 Aᶜ = (⊤ : PowQuot 𝓘) := by
+    simpa [mk_compl] using (isCompl_mk_mk_compl (𝓘 := 𝓘) A).sup_eq_top
+end Absorption
+
 /-! ### Mapped disjoint-complement variants -/
 section MapOfLe_DisjointComplMore
   variable {𝓘 𝓙 : BoolIdeal}
@@ -2493,6 +2526,36 @@ section MapOfLe_DisjointComplMore
     simp only [disjoint_iff, PowQuot.mapOfLe_mk]
     simp only [mk_compl, mk_inf_mk, mk_eq_bot_iff, Set.diff_eq, Set.inter_comm]
 end MapOfLe_DisjointComplMore
+
+/-! ### Mapped absorption forms -/
+section MapAbsorption
+  variable {𝓘 𝓙 : BoolIdeal} (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A : Set ℕ)
+
+  @[simp] lemma mapOfLe_mk_inf_compl :
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)) ⊓
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ = (⊥ : PowQuot 𝓙) := by
+    -- direct `simp`: map to `mk 𝓙 A` then use absorption above
+    simpa [PowQuot.mapOfLe_mk] using
+      (mk_inf_compl (𝓘 := 𝓙) A)
+
+  @[simp] lemma mapOfLe_mk_sup_compl :
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)) ⊔
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ = (⊤ : PowQuot 𝓙) := by
+    simpa [PowQuot.mapOfLe_mk] using
+      (mk_sup_compl (𝓘 := 𝓙) A)
+
+  @[simp] lemma mapOfLe_mk_inf_mk_compl :
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)) ⊓
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 Aᶜ)) = (⊥ : PowQuot 𝓙) := by
+    simpa [PowQuot.mapOfLe_mk] using
+      (mk_inf_mk_compl (𝓘 := 𝓙) A)
+
+  @[simp] lemma mapOfLe_mk_sup_mk_compl :
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)) ⊔
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 Aᶜ)) = (⊤ : PowQuot 𝓙) := by
+    simpa [PowQuot.mapOfLe_mk] using
+      (mk_sup_mk_compl (𝓘 := 𝓙) A)
+end MapAbsorption
 
 /-! 
 ### PowQuot goal reducer pattern (cheatsheet)
