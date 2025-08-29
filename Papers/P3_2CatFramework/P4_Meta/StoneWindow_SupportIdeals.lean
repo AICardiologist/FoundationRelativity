@@ -2425,6 +2425,22 @@ section MapNonThresholds
     simpa using (not_congr this)
 end MapNonThresholds
 
+/-! ### Small helpers -/
+section SmallHelpers
+  variable {A B : Set ℕ}
+
+  /-- If `A ⊆ B` then `A △ B = B \ A`. -/
+  lemma symmDiff_eq_diff_of_subset (hAB : A ⊆ B) : A △ B = B \ A := by
+    ext x; constructor
+    · intro hx
+      rcases hx with ⟨hA, hB⟩ | ⟨hB, hA⟩
+      · exact (False.elim (hB (hAB hA)))
+      · exact ⟨hB, hA⟩
+    · intro hx
+      rcases hx with ⟨hB, hA⟩
+      exact Or.inr ⟨hB, hA⟩
+end SmallHelpers
+
 /-! ### Subset to order -/
 section SubsetToOrder
   variable {𝓘 : BoolIdeal} {A B : Set ℕ}
@@ -2441,9 +2457,12 @@ end SubsetToOrder
 section MkMonotone
   variable {𝓘 : BoolIdeal}
 
+  /-- `mk` is monotone: from `A ⊆ B` we get `mk A ≤ mk B`. -/
   lemma mk_monotone : Monotone (fun A : Set ℕ => (PowQuot.mk 𝓘 A : PowQuot 𝓘)) := by
     intro A B hAB
     exact (mk_le_mk_of_subset (𝓘 := 𝓘) (A := A) (B := B) hAB)
+
+  attribute [mono] mk_monotone
 end MkMonotone
 
 /-! ### Strict order -/
@@ -2535,18 +2554,7 @@ section MapSubsetToOrder
     classical
     have h₁ : (A \ B) ∈ 𝓙.mem := by
       simpa [Set.diff_eq_empty.mpr hAB] using (𝓙.empty_mem)
-    have : (A △ B) = (B \ A) := by
-      -- `A △ B = (A \ B) ∪ (B \ A)` and `(A \ B) = ∅` under `A ⊆ B`.
-      ext x
-      simp only [Set.mem_diff]
-      constructor
-      · intro h
-        rcases h with ⟨h1, h2⟩ | ⟨h1, h2⟩
-        · exact absurd (hAB h1) h2
-        · exact ⟨h1, h2⟩
-      · intro ⟨hB, hA⟩
-        right
-        exact ⟨hB, hA⟩
+    have : (A △ B) = (B \ A) := symmDiff_eq_diff_of_subset hAB
     exact (mapOfLe_mk_lt_mk_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A B).2 ⟨h₁, by simpa [this] using hGap⟩
 end MapSubsetToOrder
 
@@ -2725,6 +2733,27 @@ section MapOrderIso
     rw [OrderIso.apply_symm_apply]
     simp [mapOfLe_orderIso_of_iff_apply_mk]
 end MapOrderIso
+
+/-! ### Functoriality of `mapOfLe` -/
+section MapOfLeFunctoriality
+  variable {𝓘 𝓙 𝓚 : BoolIdeal}
+
+  /-- Composition: mapping `𝓘 ⟶ 𝓙 ⟶ 𝓚` equals mapping along the composed inclusion. -/
+  lemma mapOfLe_comp
+      (h₁ : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+      (h₂ : ∀ S, S ∈ 𝓙.mem → S ∈ 𝓚.mem)
+      (x : PowQuot 𝓘) :
+      PowQuot.mapOfLe h₂ (PowQuot.mapOfLe h₁ x)
+        = PowQuot.mapOfLe (fun _ h => h₂ _ (h₁ _ h)) x := by
+    refine Quot.induction_on x ?_; intro A
+    simp [PowQuot.mapOfLe_mk]
+
+  /-- Identity: mapping along the identity inclusion is the identity map. -/
+  @[simp] lemma mapOfLe_id (x : PowQuot 𝓘) :
+      PowQuot.mapOfLe (fun S (h : S ∈ 𝓘.mem) => h) x = x := by
+    refine Quot.induction_on x ?_; intro A
+    simp [PowQuot.mapOfLe_mk]
+end MapOfLeFunctoriality
 
 /-! ### IsCompl lemmas for mk complements -/
 section IsComplMore
