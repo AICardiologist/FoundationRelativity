@@ -9,6 +9,7 @@ import Papers.P3_2CatFramework.P4_Meta.ProofTheory.Core
 import Papers.P3_2CatFramework.P4_Meta.ProofTheory.Reflection
 import Papers.P3_2CatFramework.P4_Meta.ProofTheory.Progressions
 import Papers.P3_2CatFramework.P4_Meta.ProofTheory.Heights
+import Papers.P3_2CatFramework.P4_Meta.ProofTheory.Collisions
 import Papers.P3_2CatFramework.P4_Meta.PartV_Reflection
 
 namespace Papers.P4Meta.ProofTheory.Tests
@@ -54,7 +55,7 @@ instance : HasRFN_Sigma1 MockTheory MockTheory where
 
 /-- Test that RFN implies Con compiles -/
 example : ¬MockTheory.Provable Bot := 
-  RFN_implies_Con MockTheory MockTheory
+  @RFN_implies_Con MockTheory MockTheory _
 
 /-- Test that the theorem produces the expected type -/
 example (Text Tbase : Theory) [HasRFN_Sigma1 Text Tbase] : Prop :=
@@ -91,7 +92,7 @@ example : ExtendIter HA ClassicalitySteps 1 = Extend HA (EM_Sigma 0) := by
 
 /-- Test that the collision theorem type-checks with actual theories -/
 example [HasRFN_Sigma1 PA PA] : ¬PA.Provable Bot := 
-  RFN_implies_Con PA PA
+  @RFN_implies_Con PA PA _
 
 /-- Test ladder constructions -/
 example : LCons PA 0 = PA := rfl
@@ -104,6 +105,17 @@ example : (LReflect PA 1).Provable (reflFormula 0) := LReflect_proves_RFN PA 0
 /-- Test classicality ladder -/
 example : LClass 0 = HA := rfl
 example : (LClass 1).Provable (ClassicalitySteps 0) := LClass_proves_EM 0
+
+/-- Test collision theorems -/
+example : (LReflect PA 1).Provable (consFormula 0) :=
+  collision_step PA 0
+
+example : (LReflect PA 2).Provable (consFormula 1) :=
+  collision_step PA 1
+
+/-- Test that reflection dominates consistency -/
+example : (LReflect PA 1).Provable (consFormula 0) :=
+  reflection_proves_consistency PA 0
 
 end IntegrationTests
 

@@ -172,4 +172,45 @@ theorem LReflect_as_ExtendIter (T0 : Theory) (n : Nat) :
   | succ n ih =>
     simp [LReflect, ExtendIter, reflSteps, reflFormula, ih]
 
+/-! ## Schematic-Semantic Bridge -/
+
+/-- Instance propagation for arithmetization.
+    Provenance: Standard extension preserves arithmetization; deferred for 3B. -/
+axiom LCons_arithmetization_instance [HasArithmetization T0] (n : Nat) : 
+  HasArithmetization (LCons T0 n)
+
+axiom LReflect_arithmetization_instance [HasArithmetization T0] (n : Nat) : 
+  HasArithmetization (LReflect T0 n)
+
+instance LCons_arithmetization [HasArithmetization T0] (n : Nat) : 
+  HasArithmetization (LCons T0 n) := LCons_arithmetization_instance n
+
+instance LReflect_arithmetization [HasArithmetization T0] (n : Nat) : 
+  HasArithmetization (LReflect T0 n) := LReflect_arithmetization_instance n
+
+/-- Axiomatic refinement from schematic stage tags to semantic statements.
+    These are intentionally axioms for 3B minimal surface; we can discharge later. -/
+class RealizesCons (T0 : Theory) [HasArithmetization T0] where
+  realize : ∀ n, (LCons T0 (n+1)).Provable (consFormula n) →
+    (LCons T0 (n+1)).Provable (ConsistencyFormula (LCons T0 n))
+
+class RealizesRFN (T0 : Theory) [HasArithmetization T0] where
+  realize : ∀ n, (LReflect T0 (n+1)).Provable (reflFormula n) →
+    (LReflect T0 (n+1)).Provable (RFN_Sigma1_Formula (LReflect T0 n))
+
+/-- Axiomatized: the schematic tag at step n indeed codes Con(LCons T0 n).
+    Provenance: standard arithmetization; deferred in 3B minimal surface. -/
+axiom cons_tag_refines (T0 : Theory) [HasArithmetization T0] (n : Nat) :
+  (LCons T0 (n+1)).Provable (consFormula n) →
+  (LCons T0 (n+1)).Provable (ConsistencyFormula (LCons T0 n))
+
+/-- Axiomatized: the schematic tag at step n indeed codes RFN(LReflect T0 n).
+    Provenance: standard arithmetization; deferred in 3B minimal surface. -/
+axiom rfn_tag_refines (T0 : Theory) [HasArithmetization T0] (n : Nat) :
+  (LReflect T0 (n+1)).Provable (reflFormula n) →
+  (LReflect T0 (n+1)).Provable (RFN_Sigma1_Formula (LReflect T0 n))
+
+instance [HasArithmetization T0] : RealizesCons T0 := ⟨cons_tag_refines T0⟩
+instance [HasArithmetization T0] : RealizesRFN T0 := ⟨rfn_tag_refines T0⟩
+
 end Papers.P4Meta.ProofTheory

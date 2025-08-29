@@ -20,13 +20,16 @@ class HasRFN_Sigma1 (Text Tbase : Theory) extends HasSigma1Reflection Tbase wher
   rfn_reflect : ∀ φ, Sigma1 φ → Tbase.Provable φ → TrueInN φ
 
 /-- Alternative formulation: RFN as a property -/
-def satisfies_RFN_Sigma1 (Text Tbase : Theory) [h : HasSigma1Reflection Tbase] : Prop :=
+def satisfies_RFN_Sigma1 {Text Tbase : Theory} [h : HasRFN_Sigma1 Text Tbase] : Prop :=
   ∀ φ, Sigma1 φ → Tbase.Provable φ → h.TrueInN φ
+
+/-- Convenience: single-theory reflection -/
+abbrev HasSigma1ReflectionSelf (T : Theory) := HasRFN_Sigma1 T T
 
 /-! ## The Main Collision Theorem -/
 
 /-- **Core Result**: Σ₁ reflection implies consistency (schematic proof) -/
-theorem RFN_implies_Con (Text Tbase : Theory) [h : HasRFN_Sigma1 Text Tbase] : 
+theorem RFN_implies_Con {Text Tbase : Theory} [h : HasRFN_Sigma1 Text Tbase] : 
   ¬Tbase.Provable Bot := by
   -- Suppose Tbase proves ⊥
   intro h_provable_bot
@@ -36,8 +39,9 @@ theorem RFN_implies_Con (Text Tbase : Theory) [h : HasRFN_Sigma1 Text Tbase] :
   -- But ⊥ is false in ℕ, contradiction
   exact Bot_is_FalseInN h_true_bot
 
-/-- Corollary: If Text proves RFN(Tbase), then Text proves Con(Tbase) -/
-axiom proves_RFN_implies_proves_Con (Text Tbase : Theory) 
+/-- Internalization axiom: from a Text-proof of RFN_Σ₁(Tbase) to a Text-proof of Con(Tbase).
+    Provenance: standard Gödel-Feferman internalization; deferred in 3B. -/
+axiom proves_RFN_implies_proves_Con {Text Tbase : Theory} 
   [HasArithmetization Tbase] :
   Text.Provable (RFN_Sigma1_Formula Tbase) → 
   Text.Provable (ConsistencyFormula Tbase)
@@ -52,12 +56,12 @@ axiom PA_RFN_proves_Con_PA [h : HasArithmetization PA]
 /-! ## Iterated Reflection -/
 
 /-- Reflection principle iterated n times (simplified) -/
-def RFN_iter (T : Theory) : Nat → Formula
+def RFN_iter : Nat → Formula
 | 0 => Formula.atom 800  -- Base RFN
 | n+1 => Formula.atom (800 + n + 1)  -- Iterated RFN
 
 /-- Each reflection step implies the corresponding consistency (axiomatized for now) -/
-axiom RFN_iter_implies_Con_iter (T : Theory) [HasArithmetization T] (n : Nat) :
-  (ExtendIter T (RFN_iter T) (n+1)).Provable (Formula.atom (600 + n))
+axiom RFN_iter_implies_Con_iter {T : Theory} [HasArithmetization T] (n : Nat) :
+  (ExtendIter T RFN_iter (n+1)).Provable (Formula.atom (600 + n))
 
 end Papers.P4Meta.ProofTheory
