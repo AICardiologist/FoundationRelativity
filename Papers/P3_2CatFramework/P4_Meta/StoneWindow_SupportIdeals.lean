@@ -2340,6 +2340,25 @@ section InfSupThresholds
     simp [Set.compl_union]
 end InfSupThresholds
 
+/-! ### Non-threshold characterizations -/
+section NonThresholds
+  variable {𝓘 : BoolIdeal}
+
+  @[simp] lemma mk_inf_ne_bot_iff (A B : Set ℕ) :
+      (PowQuot.mk 𝓘 A ⊓ PowQuot.mk 𝓘 B ≠ (⊥ : PowQuot 𝓘)) ↔
+      (A ∩ B) ∉ 𝓘.mem := by
+    -- negating your `mk_inf_eq_bot_iff`
+    have := mk_inf_eq_bot_iff (𝓘 := 𝓘) A B
+    simpa using (not_congr this)
+
+  @[simp] lemma mk_sup_ne_top_iff (A B : Set ℕ) :
+      (PowQuot.mk 𝓘 A ⊔ PowQuot.mk 𝓘 B ≠ (⊤ : PowQuot 𝓘)) ↔
+      (Aᶜ ∩ Bᶜ) ∉ 𝓘.mem := by
+    -- negating your `mk_sup_eq_top_iff`
+    have := mk_sup_eq_top_iff (𝓘 := 𝓘) A B
+    simpa using (not_congr this)
+end NonThresholds
+
 /-! ### MapOfLe order/equality lemmas -/
 section MapOfLeOrder
   variable {𝓘 𝓙 : BoolIdeal}
@@ -2375,6 +2394,38 @@ section SubsetToOrder
     convert 𝓘.empty_mem
     exact Set.diff_eq_empty.mpr hAB
 end SubsetToOrder
+
+/-! ### Strict order -/
+section StrictOrder
+  variable {𝓘 : BoolIdeal}
+
+  -- Strict inequality iff `A \ B` is small but we do not have mk-equality
+  lemma mk_lt_mk_iff (A B : Set ℕ) :
+      (PowQuot.mk 𝓘 A : PowQuot 𝓘) < PowQuot.mk 𝓘 B
+      ↔ ((A \ B) ∈ 𝓘.mem ∧ (A △ B) ∉ 𝓘.mem) := by
+    constructor
+    · intro h
+      have hle : (PowQuot.mk 𝓘 A) ≤ (PowQuot.mk 𝓘 B) := le_of_lt h
+      have hneq : (PowQuot.mk 𝓘 A) ≠ (PowQuot.mk 𝓘 B) := ne_of_lt h
+      have hAB : (A \ B) ∈ 𝓘.mem := by simpa [mk_le_mk] using hle
+      have hΔ : (A △ B) ∉ 𝓘.mem := by
+        -- If it were small then mk A = mk B by `mk_eq_mk_iff`.
+        -- Contradict `hneq`.
+        intro hsmall
+        have : (PowQuot.mk 𝓘 A) = (PowQuot.mk 𝓘 B) :=
+          (mk_eq_mk_iff (𝓘 := 𝓘) A B).mpr hsmall
+        exact hneq this
+      exact ⟨hAB, hΔ⟩
+    · intro ⟨hAB, hΔ⟩
+      have hle : (PowQuot.mk 𝓘 A) ≤ (PowQuot.mk 𝓘 B) := by
+        simpa [mk_le_mk] using hAB
+      have hneq : (PowQuot.mk 𝓘 A) ≠ (PowQuot.mk 𝓘 B) := by
+        intro hEq
+        have : (A △ B) ∈ 𝓘.mem :=
+          (mk_eq_mk_iff (𝓘 := 𝓘) A B).mp hEq
+        exact hΔ this
+      exact lt_of_le_of_ne hle hneq
+end StrictOrder
 
 /-! ### Disjointness / complements, reduced to smallness -/
 section DisjointCompl
@@ -2465,6 +2516,29 @@ section DisjointComplMore
     -- symmetric to the previous: swap roles and use `Set.diff_eq`.
     simp only [disjoint_iff, mk_compl, mk_inf_mk, mk_eq_bot_iff, Set.diff_eq, Set.inter_comm]
 end DisjointComplMore
+
+/-! ### Disjoint as order -/
+section DisjointAsOrder
+  variable {𝓘 : BoolIdeal}
+
+  @[simp] lemma disjoint_mk_iff_le_compl (A B : Set ℕ) :
+      Disjoint (PowQuot.mk 𝓘 A) (PowQuot.mk 𝓘 B)
+      ↔ (PowQuot.mk 𝓘 A : PowQuot 𝓘) ≤ (PowQuot.mk 𝓘 B)ᶜ := by
+    -- Boolean algebra fact: `Disjoint x y ↔ x ≤ yᶜ`
+    -- Use your mk-lemmas on both sides.
+    constructor
+    · intro h
+      -- `x ⊓ y = ⊥` ⇒ `x ≤ yᶜ`; reduce with your iff lemmas
+      -- (either by general BA facts or directly by smallness).
+      -- Here we go via smallness:
+      have : (A ∩ B) ∈ 𝓘.mem := (disjoint_mk_iff (𝓘 := 𝓘) A B).1 h
+      simpa [mk_le_compl_mk] using this
+    · intro h
+      -- `x ≤ yᶜ` ⇒ `x ⊓ y = ⊥`
+      have : (A ∩ B) ∈ 𝓘.mem := by
+        simpa [mk_le_compl_mk] using h
+      exact (disjoint_mk_iff (𝓘 := 𝓘) A B).2 this
+end DisjointAsOrder
 
 /-! ### IsCompl lemmas for mk complements -/
 section IsComplMore
