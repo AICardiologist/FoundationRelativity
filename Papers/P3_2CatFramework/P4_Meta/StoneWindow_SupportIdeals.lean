@@ -2521,13 +2521,11 @@ section SmallHelpers
       rcases hx with ⟨hA, hB⟩ | ⟨hB, hA⟩
       · exact (False.elim (hB (hAB hA)))
       · exact ⟨hB, hA⟩
-    · intro hx
-      rcases hx with ⟨hB, hA⟩
+    · rintro ⟨hB, hA⟩
       exact Or.inr ⟨hB, hA⟩
 
   /-- If `B ⊆ A` then `A △ B = A \ B`. -/
   lemma symmDiff_eq_diff_of_superset (hBA : B ⊆ A) : A △ B = A \ B := by
-    -- direct elementwise proof to mirror the `subset` helper
     ext x; constructor
     · intro hx
       rcases hx with ⟨hA, hB⟩ | ⟨hB, hA⟩

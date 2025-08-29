@@ -242,4 +242,17 @@ section MapLeftComplEndpointsSanity
     Papers.P4Meta.StoneSupport.compl_mk_eq_top_iff A
 end MapLeftComplEndpointsSanity
 
+section EndpointSimpSmoke
+  variable {𝓘 𝓙 : BoolIdeal} {A : Set ℕ}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+
+  example (hA : Aᶜ ∈ 𝓙.mem) :
+      ((PowQuot.mapOfLe h (mk 𝓘 A))ᶜ = (⊥ : PowQuot 𝓙)) := by
+    simpa using (Papers.P4Meta.StoneSupport.mapOfLe_compl_mk_eq_bot_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A).2 hA
+
+  example (hA : A ∈ 𝓘.mem) :
+      ((mk 𝓘 A)ᶜ = (⊤ : PowQuot 𝓘)) := by
+    simpa using (Papers.P4Meta.StoneSupport.compl_mk_eq_top_iff (𝓘 := 𝓘) A).2 hA
+end EndpointSimpSmoke
+
 #print "✅ All clean sanity tests pass!"
