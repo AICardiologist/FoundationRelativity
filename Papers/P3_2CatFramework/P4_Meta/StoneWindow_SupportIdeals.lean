@@ -2351,6 +2351,27 @@ section TopBotNeg
     simpa using (not_congr (mk_eq_top_iff (𝓘 := 𝓘) A))
 end TopBotNeg
 
+/-! ### ⊥/⊤ endpoints for left complements (domain) -/
+section MoreTopBotLeft
+  variable {𝓘 : BoolIdeal} (A : Set ℕ)
+
+  @[simp] lemma compl_mk_eq_bot_iff :
+      ((PowQuot.mk 𝓘 A)ᶜ = (⊥ : PowQuot 𝓘)) ↔ Aᶜ ∈ 𝓘.mem := by
+    simpa [mk_compl] using (mk_eq_bot_iff (𝓘 := 𝓘) Aᶜ)
+
+  @[simp] lemma compl_mk_eq_top_iff :
+      ((PowQuot.mk 𝓘 A)ᶜ = (⊤ : PowQuot 𝓘)) ↔ A ∈ 𝓘.mem := by
+    simpa [mk_compl] using (mk_eq_top_iff (𝓘 := 𝓘) Aᶜ)
+
+  @[simp] lemma compl_mk_ne_bot_iff :
+      ((PowQuot.mk 𝓘 A)ᶜ ≠ (⊥ : PowQuot 𝓘)) ↔ Aᶜ ∉ 𝓘.mem := by
+    simpa using (not_congr (compl_mk_eq_bot_iff (𝓘 := 𝓘) A))
+
+  @[simp] lemma compl_mk_ne_top_iff :
+      ((PowQuot.mk 𝓘 A)ᶜ ≠ (⊤ : PowQuot 𝓘)) ↔ A ∉ 𝓘.mem := by
+    simpa using (not_congr (compl_mk_eq_top_iff (𝓘 := 𝓘) A))
+end MoreTopBotLeft
+
 section InfSupThresholds
   variable {𝓘 : BoolIdeal}
 
@@ -2464,6 +2485,30 @@ section MapNonThresholds
     have := mapOfLe_sup_eq_top_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A B
     simpa using (not_congr this)
 end MapNonThresholds
+
+/-! ### ⊥/⊤ endpoints for left complements (mapped) -/
+section MapTopBotLeft
+  variable {𝓘 𝓙 : BoolIdeal}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A : Set ℕ)
+
+  @[simp] lemma mapOfLe_compl_mk_eq_bot_iff :
+      ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ = (⊥ : PowQuot 𝓙)) ↔ Aᶜ ∈ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_mk, PowQuot.mapOfLe_compl, mk_compl]
+      using (mk_eq_bot_iff (𝓘 := 𝓙) Aᶜ)
+
+  @[simp] lemma mapOfLe_compl_mk_eq_top_iff :
+      ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ = (⊤ : PowQuot 𝓙)) ↔ A ∈ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_mk, PowQuot.mapOfLe_compl, mk_compl]
+      using (mk_eq_top_iff (𝓘 := 𝓙) Aᶜ)
+
+  @[simp] lemma mapOfLe_compl_mk_ne_bot_iff :
+      ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ ≠ (⊥ : PowQuot 𝓙)) ↔ Aᶜ ∉ 𝓙.mem := by
+    simpa using (not_congr (mapOfLe_compl_mk_eq_bot_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A))
+
+  @[simp] lemma mapOfLe_compl_mk_ne_top_iff :
+      ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ ≠ (⊤ : PowQuot 𝓙)) ↔ A ∉ 𝓙.mem := by
+    simpa using (not_congr (mapOfLe_compl_mk_eq_top_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A))
+end MapTopBotLeft
 
 /-! ### Small helpers -/
 section SmallHelpers
@@ -3092,6 +3137,8 @@ This provides a flexible testbed for measuring constructive strength.
 * `mk_sup_eq_top_iff A B`  ↔  `Aᶜ ∩ Bᶜ ∈ 𝓘.mem`
 * `mk_ne_bot_iff A`        ↔  `A ∉ 𝓘.mem`
 * `mk_ne_top_iff A`        ↔  `Aᶜ ∉ 𝓘.mem`
+* `compl_mk_eq_bot_iff A`  ↔  `Aᶜ ∈ 𝓘.mem`
+* `compl_mk_eq_top_iff A`  ↔  `A ∈ 𝓘.mem`
 
 **Equality/Order**
 * `mk_eq_mk_iff A B`       ↔  `A △ B ∈ 𝓘.mem`
@@ -3110,6 +3157,8 @@ This provides a flexible testbed for measuring constructive strength.
   and replace membership in `𝓘.mem` with `𝓙.mem`.
   * `mapOfLe_compl_mk_le_mk_iff A B` ↔  `Aᶜ ∩ Bᶜ ∈ 𝓙.mem` (left-complement bridge)
   * `mapOfLe_compl_mk_not_le_mk_iff A B` ↔  `Aᶜ ∩ Bᶜ ∉ 𝓙.mem` (negative left-complement)
+  * `mapOfLe_compl_mk_eq_bot_iff A` ↔  `Aᶜ ∈ 𝓙.mem`
+  * `mapOfLe_compl_mk_eq_top_iff A` ↔  `A ∈ 𝓙.mem`
 -/
 
 end Papers.P4Meta

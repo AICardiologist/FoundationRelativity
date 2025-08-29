@@ -231,4 +231,15 @@ section MapOrderToSmallnessLeftSanity
     Papers.P4Meta.StoneSupport.mapOfLe_compl_mk_le_mk_iff h A B
 end MapOrderToSmallnessLeftSanity
 
+section MapLeftComplEndpointsSanity
+  variable {𝓘 𝓙 : BoolIdeal} {A : Set ℕ}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+
+  example : ((PowQuot.mapOfLe h (mk 𝓘 A))ᶜ = (⊥ : PowQuot 𝓙)) ↔ Aᶜ ∈ 𝓙.mem :=
+    Papers.P4Meta.StoneSupport.mapOfLe_compl_mk_eq_bot_iff h A
+
+  example : ((mk 𝓘 A)ᶜ = (⊤ : PowQuot 𝓘)) ↔ A ∈ 𝓘.mem :=
+    Papers.P4Meta.StoneSupport.compl_mk_eq_top_iff A
+end MapLeftComplEndpointsSanity
+
 #print "✅ All clean sanity tests pass!"
