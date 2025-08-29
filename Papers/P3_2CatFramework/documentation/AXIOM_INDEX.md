@@ -4,9 +4,9 @@ This document tracks all axioms used in the Paper 3B proof-theoretic framework.
 All axioms are now in the `Ax` namespace for consistent naming and easy tracking.
 
 ## Summary Statistics
-- **Total Axioms**: 22 
+- **Total Axioms**: 21
 - **Namespace**: All axioms use `Ax.` prefix for consistency
-- **Discharge Plan**: 13 axioms are placeholders for future internalization
+- **Discharge Plan**: 12 axioms are placeholders for future internalization
 - **Permanent**: 9 axioms encode classical results (Gödel, Feferman)
 
 ## Axioms by Category
@@ -59,12 +59,6 @@ All axioms are now in the `Ax` namespace for consistent naming and easy tracking
 *Discharge plan: Prove via ordinal analysis*
 
 21. `Ax.LClass_omega_eq_PA` - Limit of classicality ladder
-
-### Standard Theories (2 axioms)
-*Foundation: Base theories used throughout*
-
-22. `HA` - Heyting Arithmetic
-23. `PA` - Peano Arithmetic
 
 ## Core Theorem Dependencies
 

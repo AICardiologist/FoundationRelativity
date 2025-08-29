@@ -144,6 +144,11 @@ section AxiomGuards
 -- Diagnostic: Print axioms used by LPO_height_cert
 #print axioms LPO_height_cert
 
+-- Diagnostic: Print axioms used by the Realizes* instances
+-- These should only depend on the refinement axioms they call
+#print axioms Papers.P4Meta.ProofTheory.instRealizesCons
+#print axioms Papers.P4Meta.ProofTheory.instRealizesRFN
+
 end AxiomGuards
 
 /-! ## Success Message -/

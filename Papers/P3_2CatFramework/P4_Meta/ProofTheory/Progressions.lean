@@ -213,26 +213,38 @@ end Ax
 export Ax (LCons_arithmetization_instance LReflect_arithmetization_instance
           LClass_omega_eq_PA cons_tag_refines rfn_tag_refines)
 
-noncomputable instance LCons_arithmetization {T0 : Theory} [HasArithmetization T0] (n : Nat) : 
-  HasArithmetization (LCons T0 n) := LCons_arithmetization_instance n
+noncomputable instance LCons_arithmetization {T0 : Theory} [HasArithmetization T0] (n : Nat) :
+  HasArithmetization (LCons T0 n) :=
+  LCons_arithmetization_instance (T0:=T0) n
 
-noncomputable instance LReflect_arithmetization {T0 : Theory} [HasArithmetization T0] (n : Nat) : 
-  HasArithmetization (LReflect T0 n) := LReflect_arithmetization_instance n
+noncomputable instance LReflect_arithmetization {T0 : Theory} [HasArithmetization T0] (n : Nat) :
+  HasArithmetization (LReflect T0 n) :=
+  LReflect_arithmetization_instance (T0:=T0) n
 
-/-- Axiomatic refinement from schematic stage tags to semantic statements.
-    These are intentionally axioms for 3B minimal surface; we can discharge later. -/
+/-- Axiomatic refinement from schematic stage tags to semantic statements. -/
 class RealizesCons (T0 : Theory) [HasArithmetization T0] where
-  realize : ∀ n, (LCons T0 (n+1)).Provable (consFormula n) →
-    (LCons T0 (n+1)).Provable (ConsistencyFormula (LCons T0 n))
+  realize :
+    ∀ n, (LCons T0 (n+1)).Provable (consFormula n) →
+         (LCons T0 (n+1)).Provable (ConsistencyFormula (LCons T0 n))
 
 class RealizesRFN (T0 : Theory) [HasArithmetization T0] where
-  realize : ∀ n, (LReflect T0 (n+1)).Provable (reflFormula n) →
-    (LReflect T0 (n+1)).Provable (RFN_Sigma1_Formula (LReflect T0 n))
+  realize :
+    ∀ n, (LReflect T0 (n+1)).Provable (reflFormula n) →
+         (LReflect T0 (n+1)).Provable (RFN_Sigma1_Formula (LReflect T0 n))
 
-noncomputable instance {T0 : Theory} [HasArithmetization T0] : RealizesCons T0 := 
-  ⟨fun n => sorry⟩  -- Placeholder: needs proper instance resolution
+-- ✅ No sorries: provide the missing instance locally, then apply the axiom
+noncomputable instance {T0 : Theory} [HasArithmetization T0] : RealizesCons T0 :=
+  ⟨fun n h => by
+     -- bring the instance HasArithmetization (LCons T0 n) into scope
+     letI : HasArithmetization (LCons T0 n) :=
+       LCons_arithmetization_instance (T0:=T0) n
+     exact cons_tag_refines (T0:=T0) n h⟩
 
-noncomputable instance {T0 : Theory} [HasArithmetization T0] : RealizesRFN T0 := 
-  ⟨fun n => sorry⟩  -- Placeholder: needs proper instance resolution
+noncomputable instance {T0 : Theory} [HasArithmetization T0] : RealizesRFN T0 :=
+  ⟨fun n h => by
+     -- bring the instance HasArithmetization (LReflect T0 n) into scope
+     letI : HasArithmetization (LReflect T0 n) :=
+       LReflect_arithmetization_instance (T0:=T0) n
+     exact rfn_tag_refines (T0:=T0) n h⟩
 
 end Papers.P4Meta.ProofTheory
