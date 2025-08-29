@@ -19,6 +19,9 @@ namespace Papers.P4Meta.ProofTheory
 
 open Papers.P4Meta
 
+/-- Scoped notation for Extend to improve readability -/
+scoped notation:55 T " ⊕ " φ => Extend T φ
+
 /-! ## Schematic Tag Formulas for Ladders -/
 
 /-- Schematic consistency tag indexed by level (not the actual Con formula) -/
@@ -120,6 +123,15 @@ def LadderMorphism.comp {L1 L2 L3 : Nat → Theory}
   LadderMorphism L1 L3 :=
   { map := g.map ∘ f.map
   , preserves := fun n φ h => g.preserves (f.map n) φ (f.preserves n φ h) }
+
+@[simp]
+theorem LadderMorphism.id_map (L : Nat → Theory) (n : Nat) :
+  (LadderMorphism.id L).map n = n := rfl
+
+@[simp]
+theorem LadderMorphism.comp_map {L M N : Nat → Theory} 
+  (f : LadderMorphism L M) (g : LadderMorphism M N) (n : Nat) :
+  (LadderMorphism.comp g f).map n = g.map (f.map n) := rfl
 
 /-! ## Monotonicity Properties -/
 
@@ -231,6 +243,12 @@ class RealizesRFN (T0 : Theory) [HasArithmetization T0] where
   realize :
     ∀ n, (LReflect T0 (n+1)).Provable (reflFormula n) →
          (LReflect T0 (n+1)).Provable (RFN_Sigma1_Formula (LReflect T0 n))
+
+/-!
+  Note: `ConsistencyFormula (LCons T0 n)` and `RFN_Sigma1_Formula (LReflect T0 n)` require
+  a `HasArithmetization (… n)` instance. We introduce it locally with `letI` so that
+  Lean resolves the typeclass for the refinement axioms. This keeps the instances sorry-free.
+-/
 
 -- ✅ No sorries: provide the missing instance locally, then apply the axiom
 noncomputable instance {T0 : Theory} [HasArithmetization T0] : RealizesCons T0 :=
