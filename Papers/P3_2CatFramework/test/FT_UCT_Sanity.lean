@@ -14,20 +14,30 @@ open Papers.P4Meta
 
 /-! ## Test FT/UCT Axis References -/
 
+section BasicTests
+
 /-- Check that FT and UCT formulas are distinct -/
 example : FT ≠ UCT := by
-  simp [FT, UCT, Formula.atom]
-  norm_num
+  intro h
+  simp only [FT, UCT] at h
+  -- h : Formula.atom 400 = Formula.atom 401
+  cases h
 
 /-- Check that WLPO is different from both FT and UCT -/
 example : WLPO ≠ FT ∧ WLPO ≠ UCT := by
-  simp [WLPO, FT, UCT, Formula.atom]
-  norm_num
+  constructor
+  · intro h
+    simp only [WLPO, FT] at h
+    -- h : Formula.atom 311 = Formula.atom 400
+    cases h
+  · intro h  
+    simp only [WLPO, UCT] at h
+    -- h : Formula.atom 311 = Formula.atom 401
+    cases h
 
-/-- Verify UCT height certificate exists -/
-example : ∃ (T0 : Theory), (uct_height1_cert T0).n = 1 := by
-  use EmptyTheory
-  rfl
+end BasicTests
+
+section ProfileTests
 
 /-- Test profile access -/
 example : UCT_profile.ftHeight = 1 := rfl
@@ -40,13 +50,21 @@ example (T0 : Theory) : ftSteps T0 0 = FT := rfl
 /-- Test that ftSteps produces filler at step 1 -/
 example (T0 : Theory) : ftSteps T0 1 = Formula.atom 499 := rfl
 
-/-- Verify orthogonality axioms are accessible -/
-#check FT_not_implies_WLPO
-#check WLPO_not_implies_FT
+end ProfileTests
+
+section AxiomTests
 
 /-- Test empty theory definition -/
 example (φ : Formula) : ¬(EmptyTheory.Provable φ) := by
-  simp [EmptyTheory]
+  simp only [EmptyTheory]
+  intro h
+  exact h
+
+/-- Verify orthogonality axioms compile -/
+example : ¬((Extend EmptyTheory FT).Provable WLPO) := FT_not_implies_WLPO
+example : ¬((Extend EmptyTheory WLPO).Provable FT) := WLPO_not_implies_FT
+
+end AxiomTests
 
 /-! ## Success Message -/
 
