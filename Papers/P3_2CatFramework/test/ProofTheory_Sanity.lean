@@ -7,6 +7,8 @@
 
 import Papers.P3_2CatFramework.P4_Meta.ProofTheory.Core
 import Papers.P3_2CatFramework.P4_Meta.ProofTheory.Reflection
+import Papers.P3_2CatFramework.P4_Meta.ProofTheory.Progressions
+import Papers.P3_2CatFramework.P4_Meta.ProofTheory.Heights
 import Papers.P3_2CatFramework.P4_Meta.PartV_Reflection
 
 namespace Papers.P4Meta.ProofTheory.Tests
@@ -88,8 +90,20 @@ example : ExtendIter HA ClassicalitySteps 1 = Extend HA (EM_Sigma 0) := by
   simp [ExtendIter, ClassicalitySteps]
 
 /-- Test that the collision theorem type-checks with actual theories -/
-example [HasRFN_Sigma1 PA PA] : Con PA := 
+example [HasRFN_Sigma1 PA PA] : ¬PA.Provable Bot := 
   RFN_implies_Con PA PA
+
+/-- Test ladder constructions -/
+example : LCons PA 0 = PA := rfl
+example : (LCons PA 1).Provable (consFormula 0) := LCons_proves_Con PA 0
+
+/-- Test reflection ladder -/
+example : LReflect PA 0 = PA := rfl
+example : (LReflect PA 1).Provable (reflFormula 0) := LReflect_proves_RFN PA 0
+
+/-- Test classicality ladder -/
+example : LClass 0 = HA := rfl
+example : (LClass 1).Provable (ClassicalitySteps 0) := LClass_proves_EM 0
 
 end IntegrationTests
 
