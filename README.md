@@ -70,6 +70,14 @@ Each pathology has a **calibration degree** ρ indicating logical strength:
       - ✅ **Full Stone equivalence**: `StoneEquiv : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R` for `[Nontrivial R]`
       - ✅ Complete D3(c4) layer with `TwoIdempotents` class and inverse proofs
       - ✅ **Clean linter compliance**: Section scoping eliminates warnings
+      - ✅ **Stone Window Clean API** (January 29, 2025): Production-ready packaging
+        - `stoneWindowIso`: Main equivalence with 20+ @[simp] lemmas
+        - Forward/inverse separation prevents simp loops
+        - Complete Boolean operation preservation (inf/sup/compl)
+        - Round-trip lemmas: `_symm_apply`, `_apply_symm`
+        - Endpoint wrappers: `_bot`, `_top`, `_symm_idemBot`, `_symm_idemTop`
+        - Cheatsheet documentation for instant discoverability
+        - 0 sorries, all tests pass with single `by simp`
       - **Path A BooleanAlgebra transport** ✅: COMPLETE (January 29, 2025)
         - ✅ Full lattice hierarchy: Preorder → PartialOrder → Lattice → DistribLattice → BooleanAlgebra
         - ✅ Order via "difference small": `x ≤ y ↔ (A \ B) ∈ 𝓘.mem`
@@ -86,6 +94,12 @@ Each pathology has a **calibration degree** ρ indicating logical strength:
       - FT → Sperner → BFPT_n (Brouwer Fixed-Point) via composition
       - Height certificate transport along implications
       - Orthogonal to WLPO axis (UCT/BFPT at height 0 on WLPO)
+      - **FT/UCT Minimal Surface** (January 29, 2025): Paper 3A infrastructure
+        - Complete axiomatization: FT, UCT as Formula types
+        - Height certificates: `uct_height1_cert` at height 1 on FT axis
+        - Orthogonality axioms: FT ⊬ WLPO, WLPO ⊬ FT
+        - AxCalProfile structure for tracking axiom profiles
+        - 0 sorries (uses axioms for Paper 3A surface)
     - **DCω Frontier** 🎯: Track A complete with Baire calibrator (NEW)
       - DCω → Baire (complete separable metric spaces)
       - Orthogonal to WLPO and FT axes

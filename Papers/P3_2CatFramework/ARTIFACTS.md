@@ -64,9 +64,18 @@ lake build Papers.P3_2CatFramework.test.Stone_BA_Sanity
 - `mapOfLe_*` - 50+ functorial lemmas
 
 ### Stone Window
-- `StoneEquiv` - Main equivalence PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R
-- `Phi_after_Psi` - Φ ∘ Ψ = identity
-- `Psi_after_Phi` - Ψ ∘ Φ = identity
+- `stoneWindowIso` - Main equivalence PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R
+- `powQuotToIdem` - Forward map (Boolean algebra to idempotents)
+- `idemToPowQuot` - Inverse map (idempotents to Boolean algebra)
+- `powQuotToIdem_idemToPowQuot` - Right inverse property
+- `idemToPowQuot_powQuotToIdem` - Left inverse property
+- 27 @[simp] lemmas for automatic simplification
+
+### FT/UCT Axis
+- `uct_height1_cert` - UCT has height 1 on FT axis
+- `FT_not_implies_WLPO` - FT does not imply WLPO
+- `WLPO_not_implies_FT` - WLPO does not imply FT
+- `UCT_profile` - (ftHeight := 1, wlpoHeightIsOmega := true)
 
 ## Statistics
 

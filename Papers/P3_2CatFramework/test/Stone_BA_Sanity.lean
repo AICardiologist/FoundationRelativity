@@ -255,4 +255,113 @@ section EndpointSimpSmoke
     simpa using (Papers.P4Meta.StoneSupport.compl_mk_eq_top_iff (𝓘 := 𝓘) A).2 hA
 end EndpointSimpSmoke
 
+/-! ## Stone Window Packaging Sanity Tests
+
+Tests for the clean user-facing API that packages the Stone Window isomorphism.
+-/
+
+section StoneWindowSanity
+
+variable {R : Type*} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R] 
+variable {𝓘 : BoolIdeal}
+
+open Papers.P4Meta.StoneSupport
+
+-- Test that the forward map preserves bottom
+example : powQuotToIdem (R := R) (⊥ : PowQuot 𝓘) = idemBot 𝓘 := by simp
+
+-- Test that the forward map preserves top  
+example : powQuotToIdem (R := R) (⊤ : PowQuot 𝓘) = idemTop 𝓘 := by simp
+
+-- Test that the forward map preserves complement
+example (x : PowQuot 𝓘) : 
+    powQuotToIdem (R := R) xᶜ = idemCompl 𝓘 (powQuotToIdem x) := by simp
+
+-- Test that the forward map preserves infimum
+example (x y : PowQuot 𝓘) :
+    powQuotToIdem (R := R) (x ⊓ y) = idemInf 𝓘 (powQuotToIdem x) (powQuotToIdem y) := by simp
+
+-- Test that the forward map preserves supremum  
+example (x y : PowQuot 𝓘) :
+    powQuotToIdem (R := R) (x ⊔ y) = idemSup 𝓘 (powQuotToIdem x) (powQuotToIdem y) := by simp
+
+-- Test round-trip: PowQuot → Idem → PowQuot
+example (x : PowQuot 𝓘) :
+  idemToPowQuot (R := R) (powQuotToIdem (R := R) x) = x := by simp
+
+-- Test round-trip: Idem → PowQuot → Idem
+example (e : LinfQuotRingIdem 𝓘 R) :
+  powQuotToIdem (R := R) (idemToPowQuot (R := R) e) = e := by simp
+
+-- Test that the main isomorphism exists and is well-defined
+example : ∃ iso : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R, iso = stoneWindowIso (R := R) := ⟨_, rfl⟩
+
+-- Test Boolean preservation using the clean theorem
+example (x y : PowQuot 𝓘) :
+  stoneWindowIso (R := R) (x ⊓ y)
+    = idemInf 𝓘 (stoneWindowIso (R := R) x) (stoneWindowIso (R := R) y) := by
+  simpa using (stoneWindowIso_preserves_boolean (R := R) x y).1
+
+example (x y : PowQuot 𝓘) :
+  stoneWindowIso (R := R) (x ⊔ y)
+    = idemSup 𝓘 (stoneWindowIso (R := R) x) (stoneWindowIso (R := R) y) := by
+  simpa using (stoneWindowIso_preserves_boolean (R := R) x y).2.1
+
+example (x : PowQuot 𝓘) :
+  stoneWindowIso (R := R) xᶜ = idemCompl 𝓘 (stoneWindowIso (R := R) x) := by
+  simpa using (stoneWindowIso_preserves_boolean (R := R) x x).2.2
+
+/-! ### Tests for new simp wrappers -/
+
+-- bottom/top via iso
+example : stoneWindowIso (R := R) (⊥ : PowQuot 𝓘) = idemBot 𝓘 := by simp
+example : stoneWindowIso (R := R) (⊤ : PowQuot 𝓘) = idemTop 𝓘 := by simp
+
+-- mk and its inverse
+example (A : Set ℕ) :
+  stoneWindowIso (R := R) (PowQuot.mk 𝓘 A)
+    = PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A) := by simp
+
+example (A : Set ℕ) :
+  (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm
+      (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A))
+    = PowQuot.mk 𝓘 A := by simp
+
+-- Boolean operations via simp
+example (x y : PowQuot 𝓘) :
+  stoneWindowIso (R := R) (x ⊓ y)
+    = idemInf 𝓘 (stoneWindowIso (R := R) x) (stoneWindowIso (R := R) y) := by simp
+
+example (x y : PowQuot 𝓘) :
+  stoneWindowIso (R := R) (x ⊔ y)
+    = idemSup 𝓘 (stoneWindowIso (R := R) x) (stoneWindowIso (R := R) y) := by simp
+
+example (x : PowQuot 𝓘) :
+  stoneWindowIso (R := R) xᶜ = idemCompl 𝓘 (stoneWindowIso (R := R) x) := by simp
+
+-- inverse endpoints
+example : (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm (idemBot 𝓘) = (⊥ : PowQuot 𝓘) := by simp
+example : (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm (idemTop 𝓘) = (⊤ : PowQuot 𝓘) := by simp
+
+-- round-trip simp wrappers
+example (x : PowQuot 𝓘) :
+  (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm (stoneWindowIso (R := R) (𝓘 := 𝓘) x) = x := by simp
+example (e : LinfQuotRingIdem 𝓘 R) :
+  stoneWindowIso (R := R) (𝓘 := 𝓘) ((stoneWindowIso (R := R) (𝓘 := 𝓘)).symm e) = e := by simp
+
+-- inverse preservation tests
+example (e f : LinfQuotRingIdem 𝓘 R) :
+  (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm (idemInf 𝓘 e f)
+    = (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm e ⊓ (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm f := by simp
+
+example (e f : LinfQuotRingIdem 𝓘 R) :
+  (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm (idemSup 𝓘 e f)
+    = (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm e ⊔ (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm f := by simp
+
+example (e : LinfQuotRingIdem 𝓘 R) :
+  (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm (idemCompl 𝓘 e)
+    = ((stoneWindowIso (R := R) (𝓘 := 𝓘)).symm e)ᶜ := by simp
+
+end StoneWindowSanity
+
 #print "✅ All clean sanity tests pass!"
