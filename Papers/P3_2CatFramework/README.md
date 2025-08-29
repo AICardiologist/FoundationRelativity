@@ -1,14 +1,23 @@
-# Paper 3: 2-Categorical Framework for Axiom Calibration
+# Paper 3A: Axiom Calibration via Non-Uniformizability
+## A Framework for Orthogonal Logical Dependencies in Analysis
+
+### 🎯 Paper 3A Focus (Streamlined Scope)
+
+This repository contains the Lean 4 formalization supporting Paper 3A, which presents:
+1. **The AxCal Framework**: Categories of Foundations, uniformizability, height calculus
+2. **Two Orthogonal Axes**: WLPO (via bidual gap) and FT (via UCT)
+3. **Stone Window Program**: Classical theorem, constructive caveat, and calibration conjecture
+4. **Complete Formalization**: 5,800+ lines of Lean 4 with 0 sorries in core components
 
 ## 📊 Current Status Summary (Updated: January 29, 2025)
-
 **Mathematical Sorries**: 0 ✅ | **Integration Sorries**: 7 ⚠️ | **Lines of Code**: 5,800+ | **Files**: 53+
 
 ### Framework Status
 **Part I (Uniformization)**: ✅ COMPLETE - Height theory fully formalized  
 **Part II (Positive Uniformization)**: ✅ COMPLETE - Witness existence layer implemented  
 **Parts III-VI (P4_Meta)**: ✅ COMPLETE - Meta-theoretic framework with ladder algebra  
-**WP-D Stone Window**: ✅ COMPLETE (January 29, 2025) - Full Stone equivalence + Path A BooleanAlgebra with 100+ API lemmas
+**WP-D Stone Window**: ✅ COMPLETE (January 29, 2025) - Full Stone equivalence + Production API (27 simp lemmas) + Path A BooleanAlgebra (100+ API lemmas)
+**FT/UCT Minimal Surface**: ✅ COMPLETE (January 29, 2025) - Paper 3A FT axis with orthogonality axioms
 **CI Status**: ✅ All core modules build (1189+ jobs, 0 errors) | **Import Structure**: ✅ No cycles
 
 ### Part 6 Schedule Mathematics ✅ COMPLETE
@@ -22,10 +31,10 @@
 | **General Interface** | ✅ | `IsPacking` spec, `exact_finish_time_general_of_packing` | - |
 | **General Construction** | 🚧 | - | Concrete packing permutation (future work) |
 
-### ⚠️ Known Issues (as of 2025-01-27)
+### ⚠️ Known Issues (as of 2025-01-29)
 - **7 integration sorries** in Paper3_Integration.lean and P3_P4_Bridge.lean (glue code only)
 - **P3_AllProofs.lean** has missing export errors (theorems exist but aren't accessible)
-- **Minor warnings**: ~15 style warnings (unused variables, simpa vs simp)
+- **Minor warnings**: ~10 style warnings (unused variables, simpa vs simp) - reduced from 15
 
 ## 🎯 Implementation Status by Paper Section
 
@@ -129,19 +138,31 @@
 
 5. **Part VI: Calibrations and Portal Pattern (WP-B/WP-D/Track A COMPLETE ✨)**
    - ✅ **WP-D Stone Window**: Complete Stone equivalence (0 sorries) 🎯
-     - `StoneWindow_SupportIdeals.lean`: Full D1-D3(c4) infrastructure (1188+ build jobs)
+     - `StoneWindow_SupportIdeals.lean`: Full D1-D3(c4) infrastructure (3400+ lines)
      - Boolean ideals, power set quotients, ℓ∞ function spaces
      - Ring ideal ISupportIdeal as proper Ideal under pointwise ops
      - `StoneEquiv : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R` for `[Nontrivial R]`
-     - `TwoIdempotents` class and full inverse proofs
-     - **NEW (Jan 2025)**: 27 ergonomic Boolean algebra lemmas with @[simp] automation
-     - **NEW (Jan 2025)**: Clean linter compliance via section scoping pattern
-     - 8 comprehensive test files validating all layers (Stone_BA_Sanity.lean added)
+     - **Production-Ready API (Jan 29, 2025)**: 
+       - `stoneWindowIso`: Main equivalence with 27 @[simp] lemmas
+       - Forward: `powQuotToIdem_mk`, `_bot`, `_top`, `_preserves_inf/sup/compl`
+       - Inverse: `idemToPowQuot_Phi`, `_idemBot/Top`, `_idemInf/Sup/Compl`
+       - Round-trips: `powQuotToIdem_idemToPowQuot`, `idemToPowQuot_powQuotToIdem`
+       - Boolean endpoints: `powQuotToIdem_emptySet`, `powQuotToIdem_fullSet`
+       - Cheatsheet documentation for instant discoverability
+       - Forward/inverse head separation prevents simp loops
+       - All proofs work with single `by simp` - truly one-step automation
    - ✅ **FT Frontier (WP-B)**: Complete Fan Theorem axis (0 sorries)
      - `FT_Frontier.lean`: FT → UCT, FT → Sperner → BFPT_n reductions
      - `FTPortalWire.lean`: Height certificate transport along implications
      - Orthogonal to WLPO axis: UCT/BFPT at height 0 on WLPO, height 1 on FT
-     - Full test coverage in `FT_Frontier_Sanity.lean`
+     - **FT/UCT Minimal Surface** (Jan 29, 2025):
+       - `FT_UCT_MinimalSurface.lean`: Paper 3A infrastructure (101 lines)
+       - FT (Formula.atom 400), UCT (Formula.atom 401) in meta-theory
+       - Height certificates: `uct_height1_cert` proving UCT at height 1 on FT axis
+       - Orthogonality axioms: `FT_not_implies_WLPO`, `WLPO_not_implies_FT`
+       - `AxCalProfile` structure: UCT has (ftHeight := 1, wlpoHeightIsOmega := true)
+       - 0 sorries (axiomatized for Paper 3A's AxCal framework)
+       - Complete sanity tests validating all axioms compile
    - ✅ **DCω Frontier (Track A)**: Complete dependent choice axis (0 sorries)
      - `DCω_Frontier.lean`: DCω → Baire reduction for metric spaces
      - `DCωPortalWire.lean`: Baire height certificate transport

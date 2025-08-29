@@ -99,7 +99,7 @@ theorem ExtendIter_congr
   -- Agreement at index `n`
   have hstep : A n = B n := h n (Nat.lt_succ_self n)
   -- One more step
-  simpa [ExtendIter_succ, ih, hstep]
+  simp [ExtendIter_succ, ih, hstep]
 
 /-- Transport a certificate from `A` to `B` when `A` and `B` agree
     pointwise on all indices `< c.n`. Keeps the same height. -/

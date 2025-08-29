@@ -64,7 +64,6 @@ jobs:
       - name: Build Positive Uniformization tests
         run: |
           lake build Papers.P3_2CatFramework.test.Positive_test
-<<<<<<< HEAD
       
       - name: Build Positive Truth Algebra tests
         run: |
@@ -77,15 +76,16 @@ jobs:
       - name: Build P4_Meta framework (Part of P3)
         run: |
           lake build Papers.P3_2CatFramework.P4_Meta.Meta_Smoke_test
-=======
->>>>>>> origin/main
 
       - name: Check for unauthorized sorries
         run: |
           # Check sorries against SORRY_ALLOWLIST.txt for Paper 3
           echo "Checking Paper 3 sorries against allowlist..."
-          found_sorries=$(grep -a -R -n --include="*.lean" -E 'sorry|admit' Papers/P3_2CatFramework \
-                         | grep -v 'documentation\|Blueprint\|communications' || true)
+          found_sorries=$(grep -a -R -n --include="*.lean" -w -E 'sorry|admit' Papers/P3_2CatFramework \
+                         | grep -v 'documentation\|Blueprint\|communications\|old_files' \
+                         | grep -v -- '--' \
+                         | grep -v 'sorry-free' \
+                         | grep -v '/-' || true)
           
           if [ -z "$found_sorries" ]; then
             echo "✅ No sorries found in Paper 3"

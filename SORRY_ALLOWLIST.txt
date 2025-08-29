@@ -206,13 +206,19 @@ Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:445    # Comment documentin
 #
 # Note: Basic.lean sorries status needs verification but not included in active count
 
-# Paper 3 - 2-Categorical Framework (replaced Unit stubs with sorries)
-Papers/P3_2CatFramework/Basic.lean:28
-Papers/P3_2CatFramework/Basic.lean:33
-Papers/P3_2CatFramework/FunctorialObstruction.lean:26
-Papers/P3_2CatFramework/FunctorialObstruction.lean:37
-Papers/P3_2CatFramework/FunctorialObstruction.lean:46
-Papers/P3_2CatFramework/FunctorialObstruction.lean:54
+# Paper 3 - 2-Categorical Framework (integration and bridge code only)
+Papers/P3_2CatFramework/P4_Meta/P3_P4_Bridge.lean:73
+Papers/P3_2CatFramework/P4_Meta/P3_P4_Bridge.lean:92
+Papers/P3_2CatFramework/P4_Meta/P3_P4_Bridge.lean:147
+Papers/P3_2CatFramework/Phase3_Obstruction.lean:52
+Papers/P3_2CatFramework/Paper3_Integration.lean:60
+Papers/P3_2CatFramework/Paper3_Integration.lean:70
+Papers/P3_2CatFramework/Paper3_Integration.lean:96
+Papers/P3_2CatFramework/Paper3_Integration.lean:148
+Papers/P3_2CatFramework/old_files/FunctorialObstruction.lean:26
+Papers/P3_2CatFramework/old_files/FunctorialObstruction.lean:37
+Papers/P3_2CatFramework/old_files/FunctorialObstruction.lean:46
+Papers/P3_2CatFramework/old_files/FunctorialObstruction.lean:54
 
 # Paper 3 documentation sorries (not active code)
 Papers/P3_2CatFramework/documentation/universe_refactor_draft.lean:72

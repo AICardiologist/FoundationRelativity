@@ -647,8 +647,8 @@ open Classical
 variable {R : Type*}
 
 /-- Rings with only two idempotents, 0 and 1. -/
-class TwoIdempotents (R : Type*) [Semiring R] : Prop :=
-  (resolve : ∀ x : R, x * x = x → x = 0 ∨ x = 1)
+class TwoIdempotents (R : Type*) [Semiring R] : Prop where
+  resolve : ∀ x : R, x * x = x → x = 0 ∨ x = 1
 
 section
 variable [CommRing R] [DecidableEq R] (𝓘 : BoolIdeal) [TwoIdempotents R]
@@ -757,7 +757,7 @@ set_option linter.unusedSectionVars false in
   classical
   ext n
   simp only [A_of, Set.mem_setOf, chi]
-  by_cases h : n ∈ A <;> simp [h, zero_ne_one']
+  by_cases h : n ∈ A <;> simp [h]
 
 /-- Left inverse: Ψ ∘ Φ = id on PowQuot 𝓘. -/
 lemma Psi_after_Phi (q : PowQuot 𝓘) :
@@ -1034,13 +1034,13 @@ noncomputable def idemBot : LinfQuotRingIdem 𝓘 R := ⟨(0 : LinfQuotRing 𝓘
   idemSup 𝓘 (idemTop 𝓘) e = idemTop 𝓘 := by
   ext
   have : (1 : LinfQuotRing 𝓘 R) + e.1 - (1 * e.1) = (1 : LinfQuotRing 𝓘 R) := by ring
-  simpa [idemSup_val, idemTop_val] using this
+  simp [idemSup_val, idemTop_val, this]
 
 @[simp] lemma idemSup_top_right (e : LinfQuotRingIdem 𝓘 R) :
   idemSup 𝓘 e (idemTop 𝓘) = idemTop 𝓘 := by
   ext
   have : e.1 + (1 : LinfQuotRing 𝓘 R) - (e.1 * 1) = (1 : LinfQuotRing 𝓘 R) := by ring
-  simpa [idemSup_val, idemTop_val] using this
+  simp [idemSup_val, idemTop_val, this]
 
 @[simp] lemma idemSup_bot_left  (e : LinfQuotRingIdem 𝓘 R) :
   idemSup 𝓘 (idemBot 𝓘) e = e := by
@@ -1059,7 +1059,7 @@ noncomputable def idemBot : LinfQuotRingIdem 𝓘 R := ⟨(0 : LinfQuotRing 𝓘
   calc
     e.1 * (e.1 + f.1 - e.1 * f.1)
         = e.1 * e.1 + e.1 * f.1 - e.1 * e.1 * f.1 := by ring
-    _   = e.1 + e.1 * f.1 - e.1 * f.1 := by simpa [he]
+    _   = e.1 + e.1 * f.1 - e.1 * f.1 := by simp [he]
     _   = e.1 := by ring
 
 @[simp] lemma idemSup_absorb_left (e f : LinfQuotRingIdem 𝓘 R) :
@@ -1069,16 +1069,16 @@ noncomputable def idemBot : LinfQuotRingIdem 𝓘 R := ⟨(0 : LinfQuotRing 𝓘
   calc
     e.1 + (e.1 * f.1) - e.1 * (e.1 * f.1)
         = e.1 + e.1 * f.1 - (e.1 * e.1) * f.1 := by ring
-    _   = e.1 + e.1 * f.1 - e.1 * f.1 := by simpa [he]
+    _   = e.1 + e.1 * f.1 - e.1 * f.1 := by simp [he]
     _   = e.1 := by ring
 
 @[simp] lemma idemInf_absorb_right (e f : LinfQuotRingIdem 𝓘 R) :
   idemInf 𝓘 (idemSup 𝓘 e f) e = e := by
-  simpa [idemInf_comm 𝓘] using idemInf_absorb_left e f
+  simp [idemInf_comm 𝓘, idemInf_absorb_left]
 
 @[simp] lemma idemSup_absorb_right (e f : LinfQuotRingIdem 𝓘 R) :
   idemSup 𝓘 (idemInf 𝓘 e f) e = e := by
-  simpa [idemSup_comm 𝓘] using idemSup_absorb_left e f
+  simp [idemSup_comm 𝓘, idemSup_absorb_left]
 
 /-! ### De Morgan laws -/
 
@@ -1365,7 +1365,7 @@ noncomputable def StoneBAIso : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R := Stone
   PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (A \ A)) = idemBot 𝓘 := by
   classical
   -- Φ(A \ A) = Φ(A) ⊓ (¬Φ(A)) = ⊥
-  simpa using stone_preserves_diff (R := R) (𝓘 := 𝓘) A A
+  simp [stone_preserves_diff]
 
 @[simp] lemma stone_preserves_diff_empty
     {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
@@ -1374,7 +1374,7 @@ noncomputable def StoneBAIso : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R := Stone
     PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A) := by
   classical
   -- Φ(A \ ∅) = Φ(A) ⊓ (¬Φ(∅)) = Φ(A) ⊓ ⊤ = Φ(A)
-  simpa using stone_preserves_diff (R := R) (𝓘 := 𝓘) A ∅
+  simp [stone_preserves_diff]
 
 @[simp] lemma stone_preserves_symmDiff_self
     {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
@@ -1382,7 +1382,7 @@ noncomputable def StoneBAIso : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R := Stone
   PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) (A △ A)) = idemBot 𝓘 := by
   classical
   -- Φ(A △ A) = (Φ(A) ⊓ ¬Φ(A)) ⊔ (Φ(A) ⊓ ¬Φ(A)) = ⊥ ⊔ ⊥ = ⊥
-  simpa using stone_preserves_symmDiff (R := R) (𝓘 := 𝓘) A A
+  simp [stone_preserves_symmDiff]
 
 @[simp] lemma stone_preserves_symmDiff_empty
     {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
@@ -1391,7 +1391,7 @@ noncomputable def StoneBAIso : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R := Stone
     PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A) := by
   classical
   -- Φ(A △ ∅) = (Φ(A) ⊓ ¬Φ(∅)) ⊔ (Φ(∅) ⊓ ¬Φ(A)) = (Φ(A) ⊓ ⊤) ⊔ (⊥ ⊓ ¬Φ(A)) = Φ(A)
-  simpa using stone_preserves_symmDiff (R := R) (𝓘 := 𝓘) A ∅
+  simp [stone_preserves_symmDiff]
 
 /-! Φ-preservation aliases using idemDiff and idemXor -/
 
@@ -1402,7 +1402,7 @@ noncomputable def StoneBAIso : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R := Stone
     idemDiff 𝓘
       (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A))
       (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) B)) := by
-  simpa [idemDiff] using stone_preserves_diff (R := R) (𝓘 := 𝓘) A B
+  simp [idemDiff, stone_preserves_diff]
 
 @[simp] lemma stone_preserves_symmDiff'
     {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
@@ -1411,7 +1411,7 @@ noncomputable def StoneBAIso : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R := Stone
     idemXor 𝓘
       (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A))
       (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) B)) := by
-  simpa [idemXor, idemDiff] using stone_preserves_symmDiff (R := R) (𝓘 := 𝓘) A B
+  simp [idemXor, idemDiff, stone_preserves_symmDiff]
 
 -- Φ endpoints with univ
 @[simp] lemma stone_preserves_diff_univ
@@ -2240,7 +2240,7 @@ end EqvGenBridge
   (A B : Set ℕ) :
   PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) = PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)
     ↔ (A △ B) ∈ 𝓙.mem := by
-  simpa [PowQuot.mapOfLe_mk] using mk_eq_mk_iff 𝓙 A B
+  simp [PowQuot.mapOfLe_mk, mk_eq_mk_iff]
 
 /-! ### Additional convenience lemmas -/
 
@@ -2289,9 +2289,17 @@ variable {𝓘 : BoolIdeal}
     using (compl_le_iff_compl_le :
       ((PowQuot.mk 𝓘 A)ᶜ ≤ PowQuot.mk 𝓘 B) ↔ ((PowQuot.mk 𝓘 B)ᶜ ≤ PowQuot.mk 𝓘 A))
 
+/-- Negative form: `¬ ((mk A)ᶜ ≤ mk B)` iff the co-intersection is not small. -/
+@[simp] lemma compl_mk_not_le_mk_iff (A B : Set ℕ) :
+  ¬ ((PowQuot.mk 𝓘 A)ᶜ ≤ PowQuot.mk 𝓘 B) ↔ (Aᶜ ∩ Bᶜ) ∉ 𝓘.mem := by
+  simpa using (not_congr (compl_mk_le_mk_iff (𝓘 := 𝓘) A B))
+
 end MoreOrderLemmas
 
-/-! ### More `mk` ↔ smallness characterizations -/
+/-! ### Thresholds: When quotient elements equal ⊥ or ⊤
+This section characterizes when quotient elements reach the Boolean algebra bounds.
+Key insight: `mk A = ⊥` precisely when A itself is small (in the ideal),
+and `mk A = ⊤` when the complement Aᶜ is small. -/
 section TopBotIff
   variable {𝓘 : BoolIdeal}
 
@@ -2300,7 +2308,7 @@ section TopBotIff
       (PowQuot.mk 𝓘 A : PowQuot 𝓘) = ⊥ ↔ A ∈ 𝓘.mem := by
     constructor
     · intro h
-      have : (PowQuot.mk 𝓘 A : PowQuot 𝓘) ≤ ⊥ := by simpa [h]
+      have : (PowQuot.mk 𝓘 A : PowQuot 𝓘) ≤ ⊥ := by simp [h]
       simpa [mk_bot, mk_le_mk, Set.diff_empty] using this
     · intro hA
       apply le_antisymm
@@ -2315,7 +2323,7 @@ section TopBotIff
       (PowQuot.mk 𝓘 A : PowQuot 𝓘) = ⊤ ↔ Aᶜ ∈ 𝓘.mem := by
     constructor
     · intro h
-      have : ⊤ ≤ (PowQuot.mk 𝓘 A : PowQuot 𝓘) := by simpa [h]
+      have : ⊤ ≤ (PowQuot.mk 𝓘 A : PowQuot 𝓘) := by simp [h]
       simp [mk_top, mk_le_mk] at this
       -- this : Set.univ \ A ∈ 𝓘.mem
       -- Need to show Aᶜ ∈ 𝓘.mem, and Aᶜ = Set.univ \ A
@@ -2346,6 +2354,27 @@ section TopBotNeg
     simpa using (not_congr (mk_eq_top_iff (𝓘 := 𝓘) A))
 end TopBotNeg
 
+/-! ### ⊥/⊤ endpoints for left complements (domain) -/
+section MoreTopBotLeft
+  variable {𝓘 : BoolIdeal} (A : Set ℕ)
+
+  @[simp] lemma compl_mk_eq_bot_iff :
+      ((PowQuot.mk 𝓘 A)ᶜ = (⊥ : PowQuot 𝓘)) ↔ Aᶜ ∈ 𝓘.mem := by
+    simpa [mk_compl] using (mk_eq_bot_iff (𝓘 := 𝓘) Aᶜ)
+
+  @[simp] lemma compl_mk_eq_top_iff :
+      ((PowQuot.mk 𝓘 A)ᶜ = (⊤ : PowQuot 𝓘)) ↔ A ∈ 𝓘.mem := by
+    simpa [mk_compl] using (mk_eq_top_iff (𝓘 := 𝓘) Aᶜ)
+
+  @[simp] lemma compl_mk_ne_bot_iff :
+      ((PowQuot.mk 𝓘 A)ᶜ ≠ (⊥ : PowQuot 𝓘)) ↔ Aᶜ ∉ 𝓘.mem := by
+    simpa using (not_congr (compl_mk_eq_bot_iff (𝓘 := 𝓘) A))
+
+  @[simp] lemma compl_mk_ne_top_iff :
+      ((PowQuot.mk 𝓘 A)ᶜ ≠ (⊤ : PowQuot 𝓘)) ↔ A ∉ 𝓘.mem := by
+    simpa using (not_congr (compl_mk_eq_top_iff (𝓘 := 𝓘) A))
+end MoreTopBotLeft
+
 section InfSupThresholds
   variable {𝓘 : BoolIdeal}
 
@@ -2361,7 +2390,9 @@ section InfSupThresholds
     simp [Set.compl_union]
 end InfSupThresholds
 
-/-! ### Non-threshold characterizations -/
+/-! ### Non-thresholds: Negative forms of threshold lemmas
+These are the negative (≠) versions of the threshold characterizations.
+Useful when goals contain inequalities rather than equalities. -/
 section NonThresholds
   variable {𝓘 : BoolIdeal}
 
@@ -2460,6 +2491,30 @@ section MapNonThresholds
     simpa using (not_congr this)
 end MapNonThresholds
 
+/-! ### ⊥/⊤ endpoints for left complements (mapped) -/
+section MapTopBotLeft
+  variable {𝓘 𝓙 : BoolIdeal}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A : Set ℕ)
+
+  @[simp] lemma mapOfLe_compl_mk_eq_bot_iff :
+      ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ = (⊥ : PowQuot 𝓙)) ↔ Aᶜ ∈ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_mk, PowQuot.mapOfLe_compl, mk_compl]
+      using (mk_eq_bot_iff (𝓘 := 𝓙) Aᶜ)
+
+  @[simp] lemma mapOfLe_compl_mk_eq_top_iff :
+      ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ = (⊤ : PowQuot 𝓙)) ↔ A ∈ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_mk, PowQuot.mapOfLe_compl, mk_compl]
+      using (mk_eq_top_iff (𝓘 := 𝓙) Aᶜ)
+
+  @[simp] lemma mapOfLe_compl_mk_ne_bot_iff :
+      ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ ≠ (⊥ : PowQuot 𝓙)) ↔ Aᶜ ∉ 𝓙.mem := by
+    simpa using (not_congr (mapOfLe_compl_mk_eq_bot_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A))
+
+  @[simp] lemma mapOfLe_compl_mk_ne_top_iff :
+      ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ ≠ (⊤ : PowQuot 𝓙)) ↔ A ∉ 𝓙.mem := by
+    simpa using (not_congr (mapOfLe_compl_mk_eq_top_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A))
+end MapTopBotLeft
+
 /-! ### Small helpers -/
 section SmallHelpers
   variable {A B : Set ℕ}
@@ -2471,13 +2526,11 @@ section SmallHelpers
       rcases hx with ⟨hA, hB⟩ | ⟨hB, hA⟩
       · exact (False.elim (hB (hAB hA)))
       · exact ⟨hB, hA⟩
-    · intro hx
-      rcases hx with ⟨hB, hA⟩
+    · rintro ⟨hB, hA⟩
       exact Or.inr ⟨hB, hA⟩
 
   /-- If `B ⊆ A` then `A △ B = A \ B`. -/
   lemma symmDiff_eq_diff_of_superset (hBA : B ⊆ A) : A △ B = A \ B := by
-    -- direct elementwise proof to mirror the `subset` helper
     ext x; constructor
     · intro hx
       rcases hx with ⟨hA, hB⟩ | ⟨hB, hA⟩
@@ -2511,7 +2564,9 @@ section MkMonotone
   attribute [mono] mk_monotone
 end MkMonotone
 
-/-! ### Strict order -/
+/-! ### Strict order: Characterizing < in terms of sets
+The strict order x < y requires both x ≤ y (A \ B small) and x ≠ y (A △ B not small).
+This captures the idea that A is "strictly below" B in the quotient. -/
 section StrictOrder
   variable {𝓘 : BoolIdeal}
 
@@ -2631,6 +2686,13 @@ section MapOrderToSmallnessLeft
       using (compl_le_iff_compl_le :
         ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ ≤ PowQuot.mapOfLe h (PowQuot.mk 𝓘 B))
           ↔ ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 B))ᶜ ≤ PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)))
+
+  /-- Negative form: `¬ ((mapOfLe h (mk A))ᶜ ≤ mapOfLe h (mk B))` iff co-intersection not small. -/
+  @[simp] lemma mapOfLe_compl_mk_not_le_mk_iff (A B : Set ℕ) :
+    ¬ ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ ≤ PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)) 
+    ↔ (Aᶜ ∩ Bᶜ) ∉ 𝓙.mem := by
+    simpa using (not_congr (mapOfLe_compl_mk_le_mk_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A B))
+
 end MapOrderToSmallnessLeft
 
 /-! ### Disjointness / complements, reduced to smallness -/
@@ -2723,7 +2785,9 @@ section DisjointComplMore
     simp only [disjoint_iff, mk_compl, mk_inf_mk, mk_eq_bot_iff, Set.diff_eq, Set.inter_comm]
 end DisjointComplMore
 
-/-! ### Disjoint as order -/
+/-! ### Disjoint as order: Bridge between disjointness and order relations
+Key theorem: Disjoint x y ↔ x ≤ yᶜ in Boolean algebras.
+This section provides the bridge lemmas connecting disjointness to order. -/
 section DisjointAsOrder
   variable {𝓘 : BoolIdeal}
 
@@ -2860,11 +2924,11 @@ section MapThresholdEnds
 
   @[simp] lemma mapOfLe_bot : PowQuot.mapOfLe h (⊥ : PowQuot 𝓘) = ⊥ := by
     -- `⊥ = mk ∅`, and mapping preserves `mk` on representatives.
-    simpa [mk_bot, PowQuot.mapOfLe_mk]
+    simp [mk_bot, PowQuot.mapOfLe_mk]
 
   @[simp] lemma mapOfLe_top : PowQuot.mapOfLe h (⊤ : PowQuot 𝓘) = ⊤ := by
     -- `⊤ = mk univ`.
-    simpa [mk_top, PowQuot.mapOfLe_mk]
+    simp [mk_top, PowQuot.mapOfLe_mk]
 end MapThresholdEnds
 
 /-! ### IsCompl lemmas for mk complements -/
@@ -3080,6 +3144,8 @@ This provides a flexible testbed for measuring constructive strength.
 * `mk_sup_eq_top_iff A B`  ↔  `Aᶜ ∩ Bᶜ ∈ 𝓘.mem`
 * `mk_ne_bot_iff A`        ↔  `A ∉ 𝓘.mem`
 * `mk_ne_top_iff A`        ↔  `Aᶜ ∉ 𝓘.mem`
+* `compl_mk_eq_bot_iff A`  ↔  `Aᶜ ∈ 𝓘.mem`
+* `compl_mk_eq_top_iff A`  ↔  `A ∈ 𝓘.mem`
 
 **Equality/Order**
 * `mk_eq_mk_iff A B`       ↔  `A △ B ∈ 𝓘.mem`
@@ -3097,6 +3163,269 @@ This provides a flexible testbed for measuring constructive strength.
 **Mapped analogues (`𝓘 ⟶ 𝓙` via `h`)**: replace `mk 𝓘 …` by `mapOfLe h (mk 𝓘 …)`,
   and replace membership in `𝓘.mem` with `𝓙.mem`.
   * `mapOfLe_compl_mk_le_mk_iff A B` ↔  `Aᶜ ∩ Bᶜ ∈ 𝓙.mem` (left-complement bridge)
+  * `mapOfLe_compl_mk_not_le_mk_iff A B` ↔  `Aᶜ ∩ Bᶜ ∉ 𝓙.mem` (negative left-complement)
+  * `mapOfLe_compl_mk_eq_bot_iff A` ↔  `Aᶜ ∈ 𝓙.mem`
+  * `mapOfLe_compl_mk_eq_top_iff A` ↔  `A ∈ 𝓙.mem`
 -/
+
+namespace StoneSupport
+
+/-! ## Stone Window Packaging (Lean-robust, zero sorries) 
+
+### Cheatsheet: Stone Window API
+
+The Stone Window isomorphism provides one-step simp rewrites in both directions:
+
+**Forward direction** (`stoneWindowIso`):
+- `@[simp]` `stoneWindowIso (mk 𝓘 A) = Φ⟦A⟧` - concrete sets to idempotents  
+- `@[simp]` `stoneWindowIso ⊥ = ⊥`, `stoneWindowIso ⊤ = ⊤` - endpoints preserved
+- `@[simp]` `stoneWindowIso (x ⊓ y) = idemInf (iso x) (iso y)` - inf preservation
+- `@[simp]` `stoneWindowIso (x ⊔ y) = idemSup (iso x) (iso y)` - sup preservation  
+- `@[simp]` `stoneWindowIso xᶜ = idemCompl (iso x)` - complement preservation
+
+**Inverse direction** (`stoneWindowIso.symm`):
+- `@[simp]` `iso.symm (Φ⟦A⟧) = mk 𝓘 A` - idempotents back to sets
+- `@[simp]` `iso.symm ⊥ = ⊥`, `iso.symm ⊤ = ⊤` - endpoints preserved
+- `@[simp]` `iso.symm (idemInf e f) = iso.symm e ⊓ iso.symm f` - inf preservation
+- `@[simp]` `iso.symm (idemSup e f) = iso.symm e ⊔ iso.symm f` - sup preservation
+- `@[simp]` `iso.symm (idemCompl e) = (iso.symm e)ᶜ` - complement preservation
+
+**Round-trips**:
+- `@[simp]` `iso.symm (iso x) = x` - left inverse
+- `@[simp]` `iso (iso.symm e) = e` - right inverse
+
+All lemmas work with a single `simp` tactic, making proofs frictionless!
+-/
+
+section StoneWindowAPI
+
+variable {R : Type*} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+variable {𝓘 : BoolIdeal}
+
+/-! ### Forward / inverse maps as aliases of the proven equivalence -/
+
+/-- Forward map: `PowQuot 𝓘 → LinfQuotRingIdem 𝓘 R`,
+    packaged as an abbreviation of the established `StoneEquiv`. -/
+noncomputable abbrev powQuotToIdem : PowQuot 𝓘 → LinfQuotRingIdem 𝓘 R :=
+  (StoneEquiv (R := R) 𝓘)
+
+/-- Inverse map: `LinfQuotRingIdem 𝓘 R → PowQuot 𝓘`,
+    i.e. the inverse of `StoneEquiv`. -/
+noncomputable abbrev idemToPowQuot : LinfQuotRingIdem 𝓘 R → PowQuot 𝓘 :=
+  (StoneEquiv (R := R) 𝓘).symm
+
+/-- On representatives, the forward map is just `PhiStoneIdem`. -/
+@[simp] lemma powQuotToIdem_mk (A : Set ℕ) :
+  powQuotToIdem (R := R) (PowQuot.mk 𝓘 A)
+    = PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A) := by
+  -- `StoneEquiv` is defined with forward = Φ; this reduces by simp
+  simpa [powQuotToIdem, StoneEquiv]
+
+/-! ### Endpoint and boolean-operation preservation (reuse your existing lemmas) -/
+
+@[simp] lemma powQuotToIdem_bot :
+  powQuotToIdem (R := R) (⊥ : PowQuot 𝓘) = idemBot (𝓘 := 𝓘) (R := R) := by
+  -- ⊥ = mk ∅ ; Φ preserves ⊥
+  simpa [mk_bot, powQuotToIdem_mk] using stone_preserves_bot (R := R) 𝓘
+
+@[simp] lemma powQuotToIdem_top :
+  powQuotToIdem (R := R) (⊤ : PowQuot 𝓘) = idemTop (𝓘 := 𝓘) (R := R) := by
+  -- ⊤ = mk univ ; Φ preserves ⊤
+  simpa [mk_top, powQuotToIdem_mk] using stone_preserves_top (R := R) 𝓘
+
+@[simp] lemma powQuotToIdem_compl (x : PowQuot 𝓘) :
+  powQuotToIdem (R := R) xᶜ = idemCompl 𝓘 (powQuotToIdem (R := R) x) := by
+  -- reduce to representatives and reuse Φ-preservation
+  refine Quot.induction_on x (fun A => ?_)
+  simpa [mk_compl, powQuotToIdem_mk] using stone_preserves_compl (R := R) 𝓘 A
+
+@[simp] lemma powQuotToIdem_inf (x y : PowQuot 𝓘) :
+  powQuotToIdem (R := R) (x ⊓ y)
+    = idemInf 𝓘 (powQuotToIdem (R := R) x) (powQuotToIdem (R := R) y) := by
+  refine Quot.induction_on₂ x y (fun A B => ?_)
+  simpa [mk_inf_mk, powQuotToIdem_mk] using stone_preserves_inf (R := R) 𝓘 A B
+
+@[simp] lemma powQuotToIdem_sup (x y : PowQuot 𝓘) :
+  powQuotToIdem (R := R) (x ⊔ y)
+    = idemSup 𝓘 (powQuotToIdem (R := R) x) (powQuotToIdem (R := R) y) := by
+  refine Quot.induction_on₂ x y (fun A B => ?_)
+  simpa [mk_sup_mk, powQuotToIdem_mk] using stone_preserves_sup (R := R) 𝓘 A B
+
+/-! ### Round-trip lemmas (zero sorries) -/
+
+@[simp] lemma idemToPowQuot_powQuotToIdem (x : PowQuot 𝓘) :
+  idemToPowQuot (R := R) (powQuotToIdem (R := R) x) = x := by
+  -- (StoneEquiv).symm ((StoneEquiv) x) = x
+  simpa [powQuotToIdem, idemToPowQuot] using
+    (Equiv.symm_apply_apply (StoneEquiv (R := R) 𝓘) x)
+
+@[simp] lemma powQuotToIdem_idemToPowQuot (e : LinfQuotRingIdem 𝓘 R) :
+  powQuotToIdem (R := R) (idemToPowQuot (R := R) e) = e := by
+  -- (StoneEquiv) ((StoneEquiv).symm e) = e
+  simpa [powQuotToIdem, idemToPowQuot] using
+    (Equiv.apply_symm_apply (StoneEquiv (R := R) 𝓘) e)
+
+/-! ### The isomorphism itself (alias to the established equivalence) -/
+
+noncomputable abbrev stoneWindowIso : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R :=
+  (StoneEquiv (R := R) 𝓘)
+
+/-- Boolean preservation stated in the packaged form. -/
+theorem stoneWindowIso_preserves_boolean (x y : PowQuot 𝓘) :
+    (stoneWindowIso (R := R) (x ⊓ y)
+        = idemInf 𝓘 (stoneWindowIso (R := R) x) (stoneWindowIso (R := R) y)) ∧
+    (stoneWindowIso (R := R) (x ⊔ y)
+        = idemSup 𝓘 (stoneWindowIso (R := R) x) (stoneWindowIso (R := R) y)) ∧
+    (stoneWindowIso (R := R) xᶜ
+        = idemCompl 𝓘 (stoneWindowIso (R := R) x)) := by
+  -- this is exactly the trio of preservation lemmas above
+  refine ⟨?_, ?_, ?_⟩
+  · simpa [stoneWindowIso] using powQuotToIdem_inf (R := R) x y
+  · simpa [stoneWindowIso] using powQuotToIdem_sup (R := R) x y
+  · simpa [stoneWindowIso] using powQuotToIdem_compl (R := R) x
+
+/-- A very convenient wrapper: the iso on a concrete class is `Φ`. -/
+@[simp] lemma stoneWindowIso_mk
+    {R : Type*} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    {𝓘 : BoolIdeal} (A : Set ℕ) :
+  stoneWindowIso (R := R) (PowQuot.mk 𝓘 A)
+    = PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A) := by
+  simpa [stoneWindowIso, powQuotToIdem_mk]
+
+/-- Symmetric convenience: the inverse iso on `Φ ⟦A⟧` is just `⟦A⟧`. -/
+@[simp] lemma stoneWindowIso_symm_Phi
+    {R : Type*} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    {𝓘 : BoolIdeal} (A : Set ℕ) :
+  (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm
+      (PhiStoneIdem (R := R) 𝓘 (Quot.mk (sdiffSetoid 𝓘) A))
+    = PowQuot.mk 𝓘 A := by
+  -- This follows from Equiv.symm_apply_apply
+  simp only [stoneWindowIso]
+  exact Equiv.symm_apply_apply (StoneEquiv 𝓘) _
+
+/-- Also useful wrapper: inf preservation as simp -/
+@[simp] lemma stoneWindowIso_preserves_inf
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    {𝓘} (x y : PowQuot 𝓘) :
+  stoneWindowIso (R := R) (x ⊓ y)
+    = idemInf 𝓘 (stoneWindowIso (R := R) x) (stoneWindowIso (R := R) y) := by
+  simpa using (stoneWindowIso_preserves_boolean (R := R) x y).1
+
+/-- Sup preservation as simp -/
+@[simp] lemma stoneWindowIso_preserves_sup
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    {𝓘} (x y : PowQuot 𝓘) :
+  stoneWindowIso (R := R) (x ⊔ y)
+    = idemSup 𝓘 (stoneWindowIso (R := R) x) (stoneWindowIso (R := R) y) := by
+  simpa using (stoneWindowIso_preserves_boolean (R := R) x y).2.1
+
+/-- Complement preservation as simp -/
+@[simp] lemma stoneWindowIso_preserves_compl
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    {𝓘} (x : PowQuot 𝓘) :
+  stoneWindowIso (R := R) xᶜ
+    = idemCompl 𝓘 (stoneWindowIso (R := R) x) := by
+  simpa using (stoneWindowIso_preserves_boolean (R := R) x x).2.2
+
+/-! ### Additional endpoint and inverse lemmas for smooth downstream use -/
+
+/-- Iso on bottom as simp -/
+@[simp] lemma stoneWindowIso_bot
+    {R : Type*} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    {𝓘 : BoolIdeal} :
+  stoneWindowIso (R := R) (⊥ : PowQuot 𝓘) = idemBot (𝓘 := 𝓘) (R := R) := by
+  -- This is just the forward map on ⊥
+  simpa [stoneWindowIso] using powQuotToIdem_bot (R := R) (𝓘 := 𝓘)
+
+/-- Iso on top as simp -/
+@[simp] lemma stoneWindowIso_top
+    {R : Type*} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    {𝓘 : BoolIdeal} :
+  stoneWindowIso (R := R) (⊤ : PowQuot 𝓘) = idemTop (𝓘 := 𝓘) (R := R) := by
+  simpa [stoneWindowIso] using powQuotToIdem_top (R := R) (𝓘 := 𝓘)
+
+/-- Inverse preserves inf -/
+@[simp] lemma stoneWindowIso_symm_idemInf
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R] {𝓘}
+    (e f : LinfQuotRingIdem 𝓘 R) :
+  (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm (idemInf 𝓘 e f)
+    = (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm e ⊓ (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm f := by
+  -- Use bijectivity: apply the iso to both sides
+  apply_fun (stoneWindowIso (R := R) (𝓘 := 𝓘))
+  simp only [Equiv.apply_symm_apply, stoneWindowIso_preserves_inf]
+
+/-- Inverse preserves sup -/
+@[simp] lemma stoneWindowIso_symm_idemSup
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R] {𝓘}
+    (e f : LinfQuotRingIdem 𝓘 R) :
+  (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm (idemSup 𝓘 e f)
+    = (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm e ⊔ (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm f := by
+  -- Use bijectivity: apply the iso to both sides
+  apply_fun (stoneWindowIso (R := R) (𝓘 := 𝓘))
+  simp only [Equiv.apply_symm_apply, stoneWindowIso_preserves_sup]
+
+/-- Inverse preserves complement -/
+@[simp] lemma stoneWindowIso_symm_idemCompl
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R] {𝓘}
+    (e : LinfQuotRingIdem 𝓘 R) :
+  (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm (idemCompl 𝓘 e)
+    = ((stoneWindowIso (R := R) (𝓘 := 𝓘)).symm e)ᶜ := by
+  -- Use bijectivity: apply the iso to both sides
+  apply_fun (stoneWindowIso (R := R) (𝓘 := 𝓘))
+  simp only [Equiv.apply_symm_apply, stoneWindowIso_preserves_compl]
+
+/-! ### Inverse endpoints and round-trip lemmas -/
+
+/-- Inverse on bottom -/
+@[simp] lemma stoneWindowIso_symm_idemBot
+    {R : Type*} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    {𝓘 : BoolIdeal} :
+  (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm (idemBot (𝓘 := 𝓘) (R := R))
+    = (⊥ : PowQuot 𝓘) := by
+  -- Apply the iso and simplify
+  apply_fun (stoneWindowIso (R := R) (𝓘 := 𝓘))
+  simp
+
+/-- Inverse on top -/
+@[simp] lemma stoneWindowIso_symm_idemTop
+    {R : Type*} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R]
+    {𝓘 : BoolIdeal} :
+  (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm (idemTop (𝓘 := 𝓘) (R := R))
+    = (⊤ : PowQuot 𝓘) := by
+  apply_fun (stoneWindowIso (R := R) (𝓘 := 𝓘))
+  simp
+
+/-- Round-trip: symm after apply -/
+@[simp] lemma stoneWindowIso_symm_apply
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R] {𝓘}
+    (x : PowQuot 𝓘) :
+  (stoneWindowIso (R := R) (𝓘 := 𝓘)).symm (stoneWindowIso (R := R) (𝓘 := 𝓘) x) = x := by
+  simp [stoneWindowIso]
+
+/-- Round-trip: apply after symm -/
+@[simp] lemma stoneWindowIso_apply_symm
+    {R} [CommRing R] [DecidableEq R] [Nontrivial R] [TwoIdempotents R] {𝓘}
+    (e : LinfQuotRingIdem 𝓘 R) :
+  stoneWindowIso (R := R) (𝓘 := 𝓘) ((stoneWindowIso (R := R) (𝓘 := 𝓘)).symm e) = e := by
+  simp [stoneWindowIso]
+
+/-! ### Order transfer lemmas 
+
+Note: Order transfer lemmas would require defining a lattice structure on `LinfQuotRingIdem`.
+Since the idempotent side doesn't currently have `LE`/`Inf` instances, we work with
+the explicit `idemInf`/`idemSup` operations and equality-based reasoning instead.
+
+For now, users can transport order facts by:
+1. Converting `x ≤ y` to `x ⊓ y = x` on the PowQuot side
+2. Using the preservation lemmas to transfer to idempotent operations
+3. Working with the resulting equalities
+
+Future work: Define `instance : Lattice (LinfQuotRingIdem 𝓘 R)` using idemInf/idemSup,
+then add order transfer lemmas as OrderIso properties.
+-/
+
+end StoneWindowAPI
+
+end StoneSupport
 
 end Papers.P4Meta

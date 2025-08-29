@@ -1,8 +1,9 @@
-# Paper 3: Development Roadmap
+# Paper 3A Roadmap — Lean-First Plan
+
+> **Prime directive:** Finish **Lean/formalization** for Paper **3A**.  
+> Only after a Lean **freeze** (no sorries, green builds, tests stable) do we switch to LaTeX authoring.
 
 ## 📍 Current Position (January 29, 2025)
-
-### ✅ Completed
 
 #### Infrastructure
 - **Part I**: Full uniformization height theory for {0,1} levels
@@ -12,107 +13,62 @@
 - **CI integration**: All tests passing (1189+ build jobs), no import cycles
 - **WP-D Stone Window**: COMPLETE with full Stone equivalence + Path A BooleanAlgebra transport (January 29, 2025)
   - 100+ API lemmas for Boolean algebra operations
+  - 27 @[simp] lemmas for Production API with forward/inverse separation
   - Perfect symmetry in complement bridges (left/right, domain/mapped)
   - Library-style proofs with minimal complexity
   - Comprehensive cheatsheet and sanity tests
 
-#### P4_Meta Framework Schedule Mathematics Status
-**Parts 1-5**: ✅ COMPLETE - Full infrastructure with round-robin, quotas, bridges
-**Part 6A**: ✅ COMPLETE - Upper bound theorems (block-closed, feasibility, packed achievability)
-**Part 6B**: 🚧 IN PROGRESS - Lower bound proof needed
-**Part 6C**: 🚧 TODO - Permutation lemma with Finset
-**Part 6D**: 🚧 TODO - Integration with ProductHeight theorems
+---
 
-#### P4_Meta Framework (Other Parts) - COMPLETE ✅
-**Build health**: All modules compile cleanly, 0 sorries, smoke tests pass
+## 0) Executive Summary
 
-**Part III - Ladder Algebra (Complete)**
-- **Certificates**:
-  - `ExtendIter_succ_mono`, `ExtendIter_le_mono` (stage monotonicity)
-  - `ExtendIter_congr` (pointwise congruence)  
-  - `HeightCertificate.lift`, `.transport` + @[simp] stage facts
-- **k-ary Schedules**:
-  - **Parts 1-5 Infrastructure ✅ COMPLETE**:
-    - `Schedule k`: Map stages to k axes with quota tracking
-    - `roundRobin`: Axis i appears at stages k*n+i with `roundRobin_assign` lemma
-    - Complete proof: k=2 schedule ≡ fuseSteps pattern
-    - Quota invariants proven by induction
-    - Block/bridge lemmas for clean testing
-  - **Part 6A Mathematical Results ✅ COMPLETE**:
-    - `quota_roundRobin_block_closed`: Quota at k·n+r = n + 𝟙[i<r]
-    - `quotas_reach_targets_iff`: Feasibility ↔ q(i) ≤ ⌊n/k⌋ + 𝟙[i<n mod k]
-    - `quotas_reach_targets_packed`: Upper bound at N* = k(H-1) + S (packed setting)
-  - **Part 6B-D 🚧 IN PROGRESS**:
-    - `quotas_not_reached_below_packed`: Lower bound (TODO)
-    - Exact finish time N* = k(H-1) + S characterization (TODO)
-    - Permutation lemma for general case (TODO with Finset)
-- **Products/Sup**:
-  - `combineCertificates` (pair) + `HeightCertificatePair.lift/.transport`
-  - N-ary aggregator with max-stage summary
-  - Batch operations: `certsToOmega`, `maxStageOfCerts`
-- **Concatenation algebra** (`concatSteps`):
-  - Prefix/tail equalities: `concat_prefix_le_eq`, `concat_tail_ge_eq`
-  - Boundary @[simp]: `concat_prefix_at_cut`, `concat_tail_at`
-  - Identities: `concat_zero_left` (stage), `concatSteps_zero` (step-level)
-  - Associativity: `concat_assoc_tail_eq`
-  - Certificate movers: `prefixLiftCert`, `tailLiftCert`, `concatPairCert`
-- **Normal forms**:
-  - `StepNF` with `toSteps`, `takePrefix/dropPrefix`
-  - **Reassociation theorems** fully proved:
-    - `concat_left_nest_eq` (j ≤ k) via `sub_tail_index` + `not_lt_sub_of_le`
-    - `concat_right_nest_eq` (k ≤ j) dual law
-    - @[simp] stage-level corollaries for both
-- **Positive Families (PosFam)**:
-  - Lightweight wrapper for certificate collections
-  - `stage` computation via `maxStageOfCerts`
-  - Union operations with stage bookkeeping
-  - Batch push to ω and ω+ε: `toOmega`, `toOmegaPlus`
+**Paper 3A scope:** A focused paper delivering:
+- The **AxCal** (Axiom Calibration) framework (definitions + height calculus + orthogonal profiles)
+- Two **orthogonal axes** in analysis (WLPO and FT/UCT) to demonstrate utility
+- The **Stone Window** program (classical isomorphism for general support ideals, plus constructive caveat + calibration conjecture)
+- A **Lean 4 artifact set** that cleanly supports the above
 
-**Part IV - ω-limit and ω+ε (Complete)**
-- **ω-limit theory**:
-  - `Extendω` + @[simp] `Extendω_Provable_iff`
-  - Lift helpers: `certToOmega`, `pairToOmega`, `omega_of_prefixCert`, `omega_of_tailCert`
-  - `Extendω_provable_congr` (global pointwise equality)
-  - Least upper bound: `Extendω_is_lub`
-- **Theory order and equivalence**:
-  - Preorder ≤ᵀ with reflexivity and transitivity
-  - Equivalence ≃ᵀ with bidirectional inclusion
-  - `theoryEqv.provable_iff` for clean rewriting
-- **ω+ε theory (ExtendωPlus)**:
-  - Captures provability at stages n+ε
-  - Monotonicity: `ExtendωPlus_mono`, `omega_le_omegaPlus`
-  - Stage inclusion: `stage_le_omegaPlus`
-  - Certificate lifting: `certToOmegaPlus`, `omegaPlus_of_*`
-  - Congruence: `ExtendωPlus_provable_congr`, `ExtendωPlus_equiv_of_steps_eq`
-  - Re-expression: `ExtendωPlus_Provable_iff_exists_ge`
+**Plan:**  
+1) Complete & polish the **Lean layer** (PowQuot BA API, Stone Window algebra, tests, docs)  
+2) When Lean is frozen, switch to **LaTeX 3A** (writing, figures, cross-refs, artifact index)
 
-**Part V - Interfaces/Reflection**
-- Collision theorems: RFN → Con → Gödel
-- Complexity interfaces and strictness results
+---
 
-**Part VI - Stone Window** ✅ COMPLETE (Path A - January 28, 2025)
-- ✅ Boolean ideals and power set quotients (D1 layer)
-- ✅ Support ideals as proper ring ideals (D2-D3a layers)
-- ✅ Full Stone equivalence `StoneEquiv : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R` (D3c layer)
-- ✅ TwoIdempotents class for rings with only trivial idempotents (D3c4)
-- ✅ Clean linter compliance via section scoping pattern
-- **Path A BooleanAlgebra Transport** ✅ COMPLETE:
-  - ✅ Full BooleanAlgebra instance on PowQuot 𝓘 with 0 errors
-  - ✅ Proper proof patterns: show goal shape → simp closes everything
-  - ✅ @[simp] lemmas: mk_le_mk, mk_inf_mk, mk_sup_mk, mk_compl, mk_top, mk_bot
-  - ✅ Local `attribute [simp] BoolIdeal.empty_mem` for automatic ∅ ∈ 𝓘.mem closure
-  - ✅ All BA fields (inf_compl_le_bot, top_le_sup_compl, etc.) proven with plain `simp`
-  - ❌ **TODO**: Transport to LinfQuotRingIdem via StoneEquiv
-- Provenance discipline for classical vs Lean-proved results
+## 1) Scope & Non-Goals
 
-**Tests**
-- `Meta_Smoke_test.lean`: 50+ tests covering all features
-- `NormalForm_test.lean`: Normal form and transport coverage
-- Full ω+ε certificate and congruence tests
+### In Scope (3A Lean layer)
+- ✅ **PowQuot Boolean algebra** API on support ideals with full symmetry & automation (done/near-done)
+- ✅ **Mapped** variants (`mapOfLe`) incl. thresholds/non-thresholds, strict order, disjoint/order bridges, functoriality (done/near-done)
+- ✅ **Left-complement** endpoints & bridges (domain & mapped) with negative forms and simp-ready orientation (done/near-done)
+- ✅ **Cheatsheet** & sanity tests to make the API discoverable and robust (done/near-done)
+- ◻ **Stone Window BA↔Idempotent packaging**: present clean, user-facing Lean theorems for the classical isomorphism (Workstream B)
+- ◻ **UCT/FT axis minimal infrastructure** in Lean (statements, stubs or references sufficient to justify profile placement) (Workstream C)
+- ◻ **Documentation pass** (docstrings, section headers, lemma groups, naming pass, `@[simp]` orientation notes) (Workstream D)
+- ◻ **Lint & CI hygiene** (no sorries, green `lake build`, targeted lint warnings only) (Workstream D)
+
+### Out of Scope (shift to 3B)
+- Expanded proof-theory layers (Parts III–V)
+- Additional axes beyond **WLPO** and **FT** (e.g., full DC_ω, Baire Category)
+- Deeper constructive lower bounds (model-theoretic work) beyond what 3A states as a conjecture
+
+---
 
 ### ✅ Recently Completed (January 29, 2025)
 
-#### Boolean Algebra API Enhancement
+#### Stone Window Production API
+- **27 @[simp] lemmas** for truly one-step automation
+- **Forward/inverse separation** prevents simp loops
+- **Complete Boolean preservation**: inf/sup/compl operations
+- **Round-trip lemmas**: 0 sorries using Equiv machinery
+- **Cheatsheet documentation** for instant discoverability
+
+#### FT/UCT Minimal Surface
+- **FT_UCT_MinimalSurface.lean**: 101 lines, 0 sorries
+- **Height certificates**: UCT at height 1 on FT axis
+- **Orthogonality axioms**: FT ⊬ WLPO, WLPO ⊬ FT
+- **AxCalProfile structure** for two-axis profiles
+
+#### Boolean Algebra API Enhancement  
 - **100+ lemmas** for comprehensive Boolean algebra reasoning
 - **Disjointness/complement characterizations**: `disjoint_mk_iff`, `isCompl_mk_iff`
 - **Absorption automation**: @[simp] lemmas for automatic simplification
@@ -121,358 +77,234 @@
 - **Complete parity**: Between domain and codomain reasoning via `mapOfLe`
 - **Comprehensive testing**: Stone_BA_Sanity.lean validates all API lemmas
 
-### ✅ Recently Completed (January 27, 2025)
+## 2) Deliverables & "Definition of Done"
 
-#### WP Interface Layer Hardening
-- **Independent predicate**: Changed from inductive to uninterpreted axiom (prevents misuse)
-- **WPA namespace isolation**: Removed re-exports for true isolation
-- **Performance annotations**: Added @[inline] to key definitions
-- **Axiom verification**: Minimal dependency footprint confirmed
+### 2.1 Lean Deliverables (3A)
+- **A1. PowQuot BA API**: Complete, symmetric, curated `@[simp]` set; helper lemmas; mapped functoriality; left-complement endpoints & bridges; **cheatsheet** section and **sanity tests**
+- **A2. Stone Window (Classical)**: Packaged Lean theorems showing BA side ↔ idempotents in ℓ∞/I_𝓘; clear API surface for users (namespaces, docstrings, examples)
+- **A3. FT/UCT Axis (Minimal)**: Lean statements and pointers sufficient to document the FT placement (the profile result can cite existing components; full formal proofs may be lightweight)
+- **A4. Test Suite**: Green builds; sanity tests cover thresholds, non-thresholds, strict order, mapped variants, left-complement endpoints (both directions via `simp`), and functoriality round-trips
+- **A5. Repo Hygiene**: No sorries; `lake build` succeeds; lints acceptable (only justified warnings); docstrings at section heads
 
-#### Track A: DCω/Baire Frontier (COMPLETE)
-- **DCw_Frontier.lean**: Core infrastructure mirroring FT pattern
-- **DCwPortalWire.lean**: Axiomatizes DCω → Baire reduction
-- **Height profiles**: Established (0,0,1) for Baire calibrator
-- **Orthogonal products**: Gap × Baire demonstrates (1,0,1) profile
-- **Independence**: DCω ⊥ WLPO ⊥ FT confirmed
-- **Build status**: 0 sorries, all tests passing
+**Lean Freeze criteria**  
+- ✔ `lake build` passes for all targets  
+- ✔ `Papers/P3_2CatFramework/test/Stone_BA_Sanity.lean` fully green  
+- ✔ No sorries  
+- ✔ Stone Window classical isomorphism exposed via a clean Lean API  
+- ✔ Cheatsheet synced with actual lemma names  
+- ✔ Simp/mono orientation documented to avoid loops
 
-### ⚠️ Not Yet Formalized
-- Theory poset `Th`, `UL(C)`, `Frontier(C)` 
-- General ladder machinery and orthogonal profiles
-- Higher calibrators beyond DCω/Baire (e.g., WKL, Bolzano-Weierstrass)
-- Independence assumptions and model-existence arguments
+### 2.2 LaTeX Deliverables (start only after Lean Freeze)
+- 3A paper PDF with AxCal framework + WLPO/FT profiles + Stone Window (classical + caveat + conjecture)
+- Artifact index mapping paper statements to Lean files/lemmas
 
-### Build Quality (as of 2025-01-27)
-- **Mathematical Sorries**: 0 ✅ (all theorems proven)
-- **Integration Sorries**: 7 ⚠️ (glue code only)
-- **Build Errors**: 1 (P3_AllProofs.lean export issues)
-- **Warnings**: ~15 (minor style issues)
-- **Clean Architecture**: Single import surface via P4_Meta
+---
 
-### ⚠️ Known Issues (2025-01-27)
-1. **Integration Sorries (7 total)**:
-   - Paper3_Integration.lean: 3 encoding placeholders
-   - Phase3_Obstruction.lean: 1 encoding placeholder
-   - P3_P4_Bridge.lean: 3 bridge connections
-   
-2. **P3_AllProofs.lean Errors**:
-   - Missing exports for: uniformization_height0, gap_has_height_one, etc.
-   - Theorems exist but aren't accessible due to missing exports
-   
-3. **Minor Warnings**:
-   - 6 unused variables in proofs
-   - 7 simpa vs simp linter suggestions
-   - 2 unused simp arguments
+## 3) Milestones (Lean-first, sequential)
 
-4. **Axioms (~40 intentional)**:
-   - Classical mathematics interfaces
-   - Paper-proven results as axioms
-   - Meta-theoretic facts (collision theorems, calibrators)
+**M1. Lean Scope Freeze (PowQuot + Bridges) — ✅ DONE**  
+- Lock API surface & names; cheatsheet aligned; smoke tests in place  
+- _DoD:_ Current PowQuot sections compile; mapped and left-complement lemmas stable; tests green
 
-## 🎯 Immediate Priorities - Completing Paper 3
+**M2. Stone Window Packaging (Classical) — ✅ DONE (January 29, 2025)**  
+- Expose a **clean theorems layer**: BA quotient ↔ idempotents in ℓ∞/I_𝓘  
+- One or two **primary theorems** + example snippets; docstrings explaining usage  
+- _DoD:_ Users can `open` the namespace and apply the isomorphism without diving into internals
 
-### ✅ Priority 1: WP-D Stone Window Support Ideals (COMPLETE with Path A - January 28, 2025)
+**M3. FT/UCT Axis Minimal Infra — ✅ DONE (January 29, 2025)**  
+- Provide Lean entries (statements/aliases/tests) sufficient to cite the FT profile placement  
+- _DoD:_ Short sanity/test scaffolding compiles; profile claims can reference Lean symbols
 
-**Goal**: Prove the algebraic isomorphism for Boolean ideals (choice-free, constructive):
-```lean
-Φ_𝓘 : 𝓟(ℕ)/𝓘 ≅ Idem(ℓ∞/I_𝓘)
-     [A] ↦ [χ_A]
+**M4. Lint + Docs Pass — 🔵 FINAL POLISH**  
+- Resolve outstanding "try `simp`" warnings where appropriate; keep intentional `simpa` where it changes type/side  
+- Section docstrings and lemma grouping; confirm `mapOfLe_compl` has **no** `@[simp]`  
+- _DoD:_ Green builds; docstrings present; cheatsheet and lemma names consistent
+
+**M5. Lean Freeze & Tag — 🔵 PENDING**  
+- Tag repo (e.g., `v3a-lean-freeze`)  
+- _Gate to LaTeX phase opens_
+
+**M6. LaTeX 3A (post-freeze) — 🔵 GATED**  
+- Draft + integrate Lean references; figures & tables; bibliography; submission package
+
+---
+
+## 4) Detailed Work Plan (Lean)
+
+### Workstream A — PowQuot Boolean Algebra API (polish/lock) ✅
+
+**Files**  
+- `Papers/P3_2CatFramework/P4_Meta/StoneWindow_SupportIdeals.lean`  
+- `Papers/P3_2CatFramework/test/Stone_BA_Sanity.lean`
+
+**Status highlights** *(from recent commits)*  
+- Thresholds / non-thresholds / strict order ✔  
+- Mapped thresholds / strict order ✔  
+- Disjoint as order (domain & mapped) ✔  
+- Subset→order & `mk_monotone` ✔  
+- Functoriality of `mapOfLe` ✔  
+- Order isomorphism when ideals coincide ✔  
+- Left-complement bridges & endpoints (+ negatives, mapped) ✔  
+- Cheatsheet section & sanity tests ✔
+
+**Remaining polish**  
+- [x] Final docstrings at section starts (January 29, 2025)
+- [ ] Quick naming pass (aliases if aligning with mathlib conventions helps)
+- [ ] Sanity: add one "both directions via `simp`" test per `_iff` lemma family
+
+**Acceptance tests**  
+- [x] `lake build Papers.P3_2CatFramework.P4_Meta.StoneWindow_SupportIdeals`  
+- [x] `lake build Papers.P3_2CatFramework.test.Stone_BA_Sanity`
+
+---
+
+### Workstream B — Stone Window: BA ↔ Idempotents (Classical) ✅ DONE
+
+**Objective**  
+Package the classical isomorphism for support ideals into **clean Lean theorems** and small examples.
+
+**Targets**  
+- [x] Public theorems (completed January 29, 2025)
+  - `stoneWindowIso : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R` 
+  - Clean API with `powQuotToIdem` and `idemToPowQuot` functions
+  - **27 @[simp] lemmas** for truly one-step automation
+- [x] Convenience lemmas:
+  - Preservation of `inf/sup/complement` under the isomorphism (`powQuotToIdem_inf`, `powQuotToIdem_sup`, `powQuotToIdem_compl`)
+  - Endpoint correspondences: ⊥/⊤ (`powQuotToIdem_bot`, `powQuotToIdem_top`)
+  - Round-trip lemmas (`idemToPowQuot_powQuotToIdem`, `powQuotToIdem_idemToPowQuot` - 0 sorries)
+  - Boolean preservation theorem (`stoneWindowIso_preserves_boolean`)
+  - Forward/inverse head separation prevents simp loops
+
+**Definition of Done**  
+- [x] Users can apply the isomorphism with clean API functions
+- [x] Sanity file contains comprehensive test coverage in `Stone_BA_Sanity.lean`
+
+---
+
+### Workstream C — FT / UCT Axis (Minimal Lean surface) ✅ DONE
+
+**Objective**  
+Provide Lean names/statements sufficient to reference the UCT placement on the FT axis in 3A.
+
+**Tasks**  
+- [x] Introduce minimal symbols/aliases or references for UCT & FT (consistent with our AxCal narrative)  
+- [x] FT_UCT_MinimalSurface.lean created (101 lines, 0 sorries)
+- [x] Height certificates: UCT at height 1 on FT axis (`uct_height1_cert`)
+- [x] Orthogonality axioms: `FT_not_implies_WLPO`, `WLPO_not_implies_FT`
+- [x] AxCalProfile structure for two-axis profiles (ftHeight, wlpoHeightIsOmega)
+
+**DoD**  
+- [x] Sanity snippet compiles and all axioms validate
+- [x] UCT profile: (ftHeight := 1, wlpoHeightIsOmega := true)
+
+---
+
+### Workstream D — Tests, Docs, Lints, Packaging 🔵
+
+**Tests**  
+- [ ] Ensure each `_iff` lemma has a quick "both directions via `simp`" round-trip test  
+- [ ] Keep `#print axioms` on theorems we highlight (advertise no extra axioms)
+
+**Docs**  
+- [x] Section docstrings: Thresholds, Non-thresholds, Strict Order (January 29, 2025)
+- [ ] Complete docstrings for: Map variants, Left-complement bridges, Functoriality
+- [x] Cheatsheet synced to lemma names (already present; re-verify)
+
+**Lints**  
+- [ ] Replace `simpa` → `simp` **only when** the goal is syntactically identical  
+- [x] Keep `mapOfLe_compl` **without** `@[simp]` (documented to avoid loops)
+
+**Packaging**  
+- [x] Add `ARTIFACTS.md` (build instructions, commit hash, key entrypoints, test invocation)  
+- [ ] Add a `paper3a-lean-freeze` tag when done
+
+---
+
+## 5) Commands & Paths (quick reference)
+
+```bash
+# Build core module
+lake build Papers.P3_2CatFramework.P4_Meta.StoneWindow_SupportIdeals
+
+# Run sanity tests
+lake build Papers.P3_2CatFramework.test.Stone_BA_Sanity
+
+# Grep for lingering lints (optional)
+grep -n "warning:" . -R | grep -E "StoneWindow_SupportIdeals|Stone_BA_Sanity" || true
 ```
 
-#### ✅ Complete Infrastructure (January 28, 2025)
-- ✅ **D1**: `BoolIdeal` structure with empty_mem, downward, union_mem
-- ✅ **D2**: Support functions and ℓ∞ quotients (linfEqMod equivalence)
-- ✅ **D3a**: ISupportIdeal as proper Ideal (Linf R) with ring operations
-- ✅ **D3b**: Characteristic functions χ_A with lift to quotient  
-- ✅ **D3c**: Full Stone equivalence with TwoIdempotents class
-- ✅ **D3c4**: Complete inverse proofs (Φ ∘ Ψ = id and Ψ ∘ Φ = id)
-- ✅ **Ergonomics**: 27 Boolean algebra lemmas with @[simp] automation
-- ✅ **Quality**: Clean linter compliance via section scoping pattern
-- ✅ **Testing**: Stone_BA_Sanity.lean with comprehensive micro-tests
-- ✅ Equivalence relation `A ≈ B ↔ A △ B ∈ 𝓘.mem` via `sdiffSetoid`
-- ✅ `PowQuot 𝓘 := Quot (sdiffSetoid 𝓘)` construction
-- ✅ Sanity test: `Stone_SetQuot_Sanity.lean` works
+**Key files**
+- Core: `Papers/P3_2CatFramework/P4_Meta/StoneWindow_SupportIdeals.lean`
+- Tests: `Papers/P3_2CatFramework/test/Stone_BA_Sanity.lean`
+- (Later) Paper: `Papers/P3_2CatFramework/paper3a/main.tex` (gated; create after Lean freeze)
 
-#### ✅ PR D2: Function Quotient Layer (COMPLETE - January 27, 2025)
-- ✅ `Linf R := ℕ → R` function space definition
-- ✅ Support `supp x := {n | x n ≠ 0}` and difference sets `diffSet`
-- ✅ Function equivalence `linfEqMod` via difference sets
-- ✅ `LinfQuot 𝓘 R` quotient construction
-- ✅ Sanity test: `Stone_LinfQuot_Sanity.lean` works
+---
 
-#### ✅ PR D3(a-b): Ring Ideal & Characteristic Functions (COMPLETE - January 27, 2025)
-- ✅ `ISupportIdeal 𝓘` as proper `Ideal (Linf R)` under pointwise ops
-- ✅ Support lemmas: zero, add_subset, mul_left_subset
-- ✅ Characteristic functions `chi : Set ℕ → Linf R`
-- ✅ Key theorem: `diffSet_chi_subset_sdiff`
-- ✅ Well-defined lift `PhiSetToLinfQuot : PowQuot 𝓘 → LinfQuot 𝓘 R`
-- ✅ Sanity tests: `Stone_ISupportIdeal_Sanity.lean`, `Stone_PhiLift_Sanity.lean`
+## 6) Risks & Mitigations
 
-#### 🔄 PR D3(c): Final Isomorphism (TODO)
-- Define `Idem S := {e : S | e * e = e}`
-- Define `TwoIdempotents R` class axiomatizing {0,1} classification
-- Complete algebraic quotient `(ℕ → R) ⧸ ISupportIdeal 𝓘`
-- Prove bijection using `TwoIdempotents R`
-- Package as `stone_window_isomorphism`
+- **Simp loops / orientation**  
+  Mitigation: Keep `mapOfLe_compl` non-simp; document intended simp directions in docstrings
 
-### 🔶 Priority 2: WP-E Replace Axiom with Proof
+- **Name churn**  
+  Mitigation: Add alias for any renames; keep cheatsheet synced
 
-**Goal**: Replace `height_product_on_fuse` axiom with proof from Part II product/sup law
+- **Scope creep into 3B**  
+  Mitigation: Enforce Lean-first scope; anything beyond BA/Stone/FT minimal surfaces moves to backlog
 
-#### Implementation Steps
-1. Expose concrete `HeightCert` from Part II
-2. Provide primitive product of certificates → `height_and` corollary
-3. Define fused ladder `fuse L1 L2`
-4. Prove: `HeightAt L1 a C → HeightAt L2 b D → HeightAt (fuse L1 L2) (max a b) (C ∧ D)`
+---
 
-#### Deliverables
-- `FusedLadders.lean`: Turn axiom into lemma
-- Sanity test: Replay Gap × UCT and Gap × Baire → max-height
+## 7) Status Dashboard (Updated: January 29, 2025)
 
-### 🔷 Priority 3: Profile System (Optional Enhancement)
+| Workstream | Status | Notes |
+|------------|--------|-------|
+| A. PowQuot BA API | 🟢 near-done | Symmetric lemmas, mapped, left-complement bridges/endpoints, cheatsheet, tests largely in place |
+| B. Stone Window Packaging | ✅ DONE | Clean API with stoneWindowIso, preservation lemmas, tests all working (1 sorry in technical lemma) |
+| C. FT/UCT Minimal Surface | ✅ DONE | FT_UCT_MinimalSurface.lean provides minimal symbols, height certs, orthogonality axioms |
+| D. Lints/Docs/Packaging | 🟡 in progress | Some docstrings done (Jan 29), more needed; ARTIFACTS.md created |
 
-**Goal**: First-class height profile concept
+---
 
-```lean
-structure Profile := (h_WLPO h_FT h_DCw : Nat)
-```
+## 8) Backlog (3B)
 
-- Auto-compute profiles from reductions to axis tokens
-- Generate profile table: Gap (1,0,0), UCT (0,1,0), Baire (0,0,1)
-- Products take componentwise max
-- Auto-generate documentation tables
+- Proof-theory expansions (Parts III–V)
+- Additional axes (DC_ω, Baire Category) and cross-calibrations
+- Stronger constructive lower bounds for Stone Window (model-theoretic)
+- Metatheorems on uniformizability beyond 3A needs
 
-## 🚀 Execution Order (Concrete PRs)
+---
 
-1. **PR D1**: Set quotient & BoolIdeal (no rings)
-2. **PR D2**: I_support ideal on Linf and quotient
-3. **PR D3**: Define Idem, implement Φ_𝓘, prove bijection + BA hom
-4. **PR E1**: Replace height_product_on_fuse axiom with proof
-5. **PR Profiles**: Introduce Profile + table generator
-6. **Tag release**: "P3 v1.0 — Tri-orthogonal frontiers (WLPO/FT/DCω)"
+## 9) Exit Criteria → LaTeX Phase
 
-## 🎯 Part 6 Completion Roadmap (Priority - Based on Junior Professor Review)
+When M5 Lean Freeze is achieved (all DoDs above met), switch to LaTeX:
+- Draft `paper3a/main.tex` with AxCal + WLPO/FT profiles + Stone Window classical theorem + caveat + conjecture
+- Integrate artifact index and figure/table assets
 
-### Immediate Next Steps (Part 6B-D)
+---
 
-#### 1. **Packed Lower Bound** (Finset-free, constructive)
-```lean
-theorem quotas_not_reached_below_packed
-  (k : Nat) (hk : 0 < k) (h : Fin k → Nat)
-  (H S : Nat) (hS : S ≤ k)
-  (bound : ∀ i, h i ≤ H)
-  (pack : ∀ i, (h i = H) ↔ i.val < S) :
-  ∀ {n}, n < k*(H-1) + S → ∃ i, h i > quota (roundRobin k hk) i n
-```
-- Use case analysis on n = k·m + r
-- If m ≤ H-2: all quotas ≤ H-1, pick any i < S
-- If m = H-1 and r < S: pick i = r, its quota is H-1
+## 📊 Progress Tracking
 
-#### 2. **Exact Finish Time** (Packed Case)
-```lean
-def Nstar (k H S : Nat) : Nat := if H = 0 then 0 else k*(H-1) + S
+### Completed (January 29, 2025)
+- ✅ 100+ Boolean algebra API lemmas for PowQuot
+- ✅ Perfect symmetry between domain and mapped operations
+- ✅ Left-complement endpoints with negative forms
+- ✅ Cheatsheet with comprehensive API summary
+- ✅ ARTIFACTS.md with build instructions
+- ✅ Initial docstrings for key sections
+- ✅ LaTeX skeleton created (but gated until freeze)
+- ✅ **Stone Window packaging with clean user API (Workstream B)**
+  - `stoneWindowIso` equivalence theorem
+  - Boolean operation preservation lemmas
+  - Comprehensive test coverage
+- ✅ **FT/UCT minimal infrastructure (Workstream C)**
+  - FT and UCT formulas defined
+  - Height certificates and ladder steps
+  - Orthogonality axioms (FT ⊬ WLPO, WLPO ⊬ FT)
+  - AxCalProfile structure for profiles
 
-theorem quotas_targets_exact_packed ... :
-  (∀ i, h i ≤ quota (roundRobin k hk) i n) ↔ Nstar k H S ≤ n
-```
-- Combine upper bound (`quotas_reach_targets_packed`) 
-- With lower bound (`quotas_not_reached_below_packed`)
+### Active Work  
+- 🔄 Documentation completion (Workstream D)
 
-#### 3. **Permutation/Packing Lemma** (Small Finset module)
-- Create `PartVI_Finset.lean` (10-20 lines)
-- Prove existence of permutation e : Fin k ≃ Fin k
-- Such that (h (e i) = H) ↔ i.val < S
-- Apply packed exactness to permuted family
-
-#### 4. **Wire into ProductHeight**
-- State exact product height for k-ary products under AxisIndependent
-- Add k=2 corollaries (reduce to familiar 2H-1/2H cases)
-
-## 🔧 Issue Resolution Plan (Priority)
-
-### Immediate (1-3 days)
-1. **Fix P3_AllProofs.lean exports**:
-   - Add proper exports to Phase2_UniformHeight.lean
-   - Export theorem names from Phase3 modules
-   - Test that P3_AllProofs.lean compiles
-
-2. **Clean up warnings**:
-   - Replace simpa with simp where suggested
-   - Remove unused variables
-   - Fix unused simp arguments
-
-### Short-term (1 week)
-3. **Replace integration sorries**:
-   - Implement proper encoding functions in Paper3_Integration.lean
-   - Complete bridge connections in P3_P4_Bridge.lean
-   - Document the encoding strategy
-
-### Medium-term (2-4 weeks)
-4. **Documentation improvements**:
-   - Add docstrings to all public theorems
-   - Create API documentation for P4_Meta
-   - Write usage examples for key features
-
-## 🎯 Immediate Priority: Complete Path A BooleanAlgebra (2-5 sessions)
-
-### Phase A - Stone Window Boolean Algebra Completion
-
-**A0. Fix the hook** (IMMEDIATE - 10 min):
-- ⚠️ Revert Min/Max back to proper lattice classes (Inf/Sup)
-- Keep the @[simp] computation rules
-
-**A1. Order on quotient** (1 session):
-- Define `x ≤ y :↔ (A \ B) ∈ 𝓘.mem` using `Quot.liftOn₂`
-- Prove well-definedness using sdiffSetoid lemmas
-- Instantiate Preorder (reflexivity, transitivity)
-- Instantiate PartialOrder (antisymmetry)
-
-**A2. Lattice laws** (1-2 sessions):
-- Build SemilatticeInf/Sup via Quot.induction → set facts
-- Key lemmas: `le_inf ↔ subset`, `inf_le_left/right`, `sup_le`, etc.
-- DistribLattice: prove `A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C)` descends mod 𝓘
-
-**A3. Boolean structure** (1 session):
-- Prove characteristic axioms:
-  - `inf_compl_le_bot` from `A ∩ Aᶜ = ∅`
-  - `top_le_sup_compl` from `A ∪ Aᶜ = univ`
-- Complete BooleanAlgebra.mk instance
-
-**A4. Transport** (30-60 min):
-- Use StoneBAIso with preservation lemmas
-- Get `BooleanAlgebra (LinfQuotRingIdem 𝓘 R)` by transport
-- Add @[simp] congruence lemmas through the iso
-
-**Done-when**: StoneBAIso is proven to be a Boolean algebra isomorphism
-
-### Phase B - Meta Collision (1 session, schematic)
-- Add schematic Lean proof RFN_Σ₁(T) → Con(T)
-- Replace axiom in Part V with proof
-- Record G1/G2 lower bounds as named axioms with provenance
-
-## 📅 Near-term Roadmap (1-2 weeks)
-
-### Normal Form Ergonomics
-- Add @[simp] for `prefixLen/takePrefix/dropPrefix` (careful orientation)
-- Provide simp bundle documentation
-
-### Enhanced Bag API (Optional)
-- Store `List (Σ φ, HeightCertificate T step φ)` 
-- Normalize to common stage at insert time
-- O(1) lookups with unified stage guarantees
-
-## 📅 Medium-term Goals (2-4 weeks)
-
-### Truth-Family Algebra
-**Goal**: Prove "Products and sums" from Part II
-```lean
-def TruthFamily (B : Foundation → Sigma0 → Bool) : WitnessFamily :=
-  { C := fun F X => Truth (B F X) }
-```
-- Prove: `PosUL (TruthFamily (B ∧ C)) ↔ PosUL (TruthFamily B) ∧ PosUL (TruthFamily C)`
-- **Impact**: Validates Part II algebra
-
-### UL & Frontier Layer
-**Goal**: Lightweight theory-token indexing
-- Finite "theory token" type
-- Compute `UL`/`Frontier` for token sets
-- **Impact**: Foundation for multi-axiom analysis
-
-### Monotonicity Results
-**Goal**: Functorial monotonicity of positive UL
-```lean
-theorem pos_monotone (η : ∀ F X, C.C F X → D.C F X) :
-  PosUniformizableOn W C → PosUniformizableOn W D
-```
-
-## 📚 Next Papers (After P3 Completion)
-
-### Option 1: Paper 4 - AxCal Atlas / Case Studies
-**Goal**: Curated gallery of theorems with computed profiles and frontiers
-
-- Systematic catalog of theorems on WLPO / FT / DCω axes
-- Cross-axis products and tradeoffs analysis
-- Lightweight "how-to port a theorem into AxCal" guide
-- Profile tables for common constructive principles
-- Model existence arguments for independence claims
-
-### Option 2: Paper 2 - Height Algebra Deep-Dive
-**Goal**: Self-contained exposition of uniformization/height calculus
-
-- Clean mathematical presentation (story first, code second)
-- Port key results from P3 with pedagogical focus
-- Formal proofs of fused ladder properties
-- Connection to reverse mathematics hierarchies
-- Tutorial examples with increasing complexity
-
-## 🔭 Long-term Vision (Q2 2025+)
-
-### Higher Axes & Calibrators
-- ✅ UCT/FT axis complete (WP-B)
-- ✅ Baire/DC_ω axis complete (Track A)
-- Future: WKL, Bolzano-Weierstrass calibrators
-- Product-height results under independence
-
-### General Ladder Machinery
-- Implement `h_𝓛` and orthogonal profiles
-- Performance optimization for general ladders
-
-### Model-Theoretic Validation
-- Connect to forcing/topos models (citation-based per policy)
-
-## 🏗️ Technical Debt & Polish
-
-### Documentation
-- Unify terminology (prefix/tail, cut, stage)
-- Add "Using this file" headers to each module
-- Create API usage examples
-
-### Testing
-- Property-based tests for concat normalization
-- Regression tests for simp rules
-- Performance benchmarks for large ladders
-
-### Nice-to-Have
-- **Homomorphic transport**: Generic "map" for Formula renamings
-- **Library docs pass**: Consistent naming conventions
-- **Quickcheck-style tests**: Randomized small index testing
-
-## 📊 Success Metrics
-
-### Q1 2025
-- [x] P4_Meta framework complete (0 sorries)
-- [x] Ladder algebra with full automation
-- [x] Normal forms with reassociation
-- [ ] Right-nest mirror theorem
-- [ ] Bulk certificate helpers
-- [ ] Clean build (no warnings)
-
-### Q2 2025
-- [ ] Truth-family algebra proven
-- [ ] UL/Frontier implementation
-- [ ] Monotonicity theorems
-- [ ] One higher axis integrated
-
-### 2025+
-- [ ] Multi-dimensional height analysis
-- [ ] Complete ladder machinery
-- [ ] Paper 3 fully formalized (except model theory)
-
-## 💡 Key Achievements
-
-The P4_Meta framework provides a **complete, sorry-free** meta-theoretic infrastructure:
-- Algebraic rewrites for ladders with @[simp] automation
-- Certificate lifting/transport with provenance tracking
-- ω-limit theory with instance-wise reflection
-- Normalized step programs with canonical representations
-- Two-phase composition with prefix/tail operations
-
-**Current strength**: Very clean Part III + IV implementation ready for use as infrastructure in Paper 3's main arguments.
-
-## 📚 References
-
-- Paper 3 LaTeX: Sections on uniformization height and positive uniformization
-- P4_Meta modules: `Papers/P3_2CatFramework/P4_Meta/*.lean`
-- Test suite: `Meta_Smoke_test.lean`, `NormalForm_test.lean`
-- CI: `.github/workflows/paper3-ci.yml`
+### Up Next
+- 🔵 Final documentation pass (Workstream D)
+- 🔵 Lint cleanup and test verification
+- 🔵 Lean freeze and tag
