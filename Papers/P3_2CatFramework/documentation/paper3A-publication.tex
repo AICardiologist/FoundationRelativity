@@ -48,7 +48,7 @@
 \begin{abstract}
 We introduce Axiom Calibration (AxCal), a framework for classifying the axiomatic strength of mathematical theorems using categorical methods. We define \emph{uniformizability} as the invariance of a witness construction across interpretations fixing a core signature ($\SigmaZero$). We introduce \emph{height invariants} and \emph{orthogonal profiles} to measure the minimal axioms required for a witness to stabilize positively.
 
-Using a Lean-verified equivalence imported from companion work, we compute the height of the $\linf$ bidual gap as 1 on the WLPO axis. We extend this by establishing the ``FT Frontier,'' demonstrating that the Uniform Continuity Theorem (UCT) resides on an axis orthogonal to WLPO, with profile $(h_{\text{WLPO}}, h_{\text{FT}}) = (0, 1)$. Finally, we analyze the Stone Window isomorphism for general support ideals, identifying a constructive failure of surjectivity and proposing a new calibration conjecture. The framework is supported by a substantial Lean 4 formalization comprising 5,800+ lines of verified code.
+Using a Lean-verified equivalence imported from companion work, we compute the height of the $\linf$ bidual gap as $1$ on the WLPO axis. We extend this by establishing the ``FT Frontier,'' demonstrating that the Uniform Continuity Theorem (UCT) resides on an axis orthogonal to WLPO, with profile $(h_{\text{WLPO}}, h_{\text{FT}}) = (0,1)$. Finally, we analyze the Stone Window isomorphism for general support ideals, identifying a constructive failure of surjectivity and proposing a new calibration conjecture. The framework is supported by a Lean~4 formalization comprising $5{,}800+$ lines.
 \end{abstract}
 
 \tableofcontents
@@ -67,7 +67,7 @@ The framework is motivated by results such as the calibration of the bidual gap.
 Over \BISH, the existence of a nonzero element in the bidual $\linf^{**}$ that is not the image of any element in $\linf$ is equivalent to $\WLPO$.
 \end{theorem}
 
-We lift this to a general perspective, introducing \emph{uniformizability} (invariance of witness constructions across interpretations) and \emph{height invariants} (measuring minimal axioms for witness existence) to organize logical dependencies along orthogonal axes. This reveals that fundamental theorems in analysis often depend on independent logical principles -- the bidual gap requires WLPO, uniform continuity requires the Fan Theorem (FT), and the Baire Category Theorem requires Dependent Choice ($\DCw$) -- with these axes being mutually orthogonal.
+We lift this to a general perspective, introducing \emph{uniformizability} (invariance of witness constructions across interpretations) and \emph{height invariants} (measuring minimal axioms for witness existence) to organize logical dependencies along orthogonal axes. This reveals that fundamental theorems in analysis depend on independent logical principles---the bidual gap requires WLPO, uniform continuity requires the Fan Theorem (FT), and the Baire Category Theorem requires Dependent Choice ($\DCw$)---with these axes being mutually orthogonal.
 
 %===========================================================
 \section{The Axiom Calibration Framework}
@@ -115,12 +115,6 @@ A \emph{witness family} $\mathcal{C}$ is a pseudofunctor $\mathcal{C}: \Found \t
 
 \begin{definition}[Uniformizability]\label{def:uniformizable}
 A witness family $\mathcal{C}$ is \emph{uniformizable} if for every interpretation $I: F_1 \to F_2$ that fixes $\SigmaZero$, the induced functor $\mathcal{C}(I)$ is an equivalence of groupoids.
-
-Explicitly, this means:
-\begin{enumerate}
-\item \textbf{Essential surjectivity}: Every witness in $\mathcal{C}(F_2)$ is isomorphic to the image of some witness from $\mathcal{C}(F_1)$
-\item \textbf{Full faithfulness}: The functor $\mathcal{C}(I)$ induces bijections on morphism sets
-\end{enumerate}
 \end{definition}
 
 \begin{theorem}[No-Uniformization Principle]\label{thm:no-unif}
@@ -136,41 +130,27 @@ If $I: F_1 \to F_2$ fixes $\SigmaZero$ and $\mathcal{C}$ is uniformizable, then 
 
 \subsection{Positive Uniformization and Height}
 
-Non-uniformizability alone doesn't tell us which axioms are needed. We refine the framework to measure when a witness stabilizes and exists.
-
 \begin{definition}[Positively Uniformizable]
 A witness family $\mathcal{C}$ is \emph{positively uniformizable} at foundation $F$ if:
 \begin{enumerate}
-\item $\mathcal{C}(F) \neq \emptyset$ (witnesses exist)
-\item For every $\SigmaZero$-fixing interpretation $I: F \to F'$, the functor $\mathcal{C}(I)$ is an equivalence
+\item $\mathcal{C}(F) \neq \emptyset$ (witnesses exist), and
+\item For every $\SigmaZero$-fixing interpretation $I: F \to F'$, the functor $\mathcal{C}(I)$ is an equivalence.
 \end{enumerate}
 \end{definition}
-
-We organize foundations into increasing chains (ladders) by adding axioms progressively.
 
 \begin{definition}[Scalar Height \(h_{\mathcal L}(\mathcal C)\)]
 Given a ladder $\mathcal{L} = (T_0 \subseteq T_1 \subseteq T_2 \subseteq \cdots)$ of foundations, the \emph{height} of $\mathcal{C}$ is:
 \[
-h_{\mathcal L}(\mathcal{C}) = \min\{k : \mathcal{C} \text{ is positively uniformizable at } T_k\}
+h_{\mathcal L}(\mathcal{C}) = \min\{k : \mathcal{C} \text{ is positively uniformizable at } T_k\}.
 \]
 If no such $k$ exists, we set $h_{\mathcal L}(\mathcal{C}) = \omega$.
 \end{definition}
 
-\begin{example}[WLPO Ladder]
-The WLPO ladder is:
-\begin{align}
-T_0 &= \BISH \\
-T_1 &= \BISH + \WLPO \\
-T_2 &= \BISH + \text{MP} \quad \text{(Markov's Principle)} \\
-T_3 &= \BISH + \text{LLPO} \quad \text{(Lesser Limited Principle of Omniscience)} \\
-&\vdots \\
-T_\omega &= \text{Classical logic}
-\end{align}
-\end{example}
+\begin{remark}[Illustrative WLPO axis]
+For the results in this paper we only use the first WLPO step $T_0=\BISH$, $T_1=\BISH+\WLPO$. (One can consider finer WLPO-adjacent principles, but they are not needed for our calibrations.)
+\end{remark}
 
 \subsection{Orthogonal Profiles and the Algebra of Heights}
-
-Many axioms are independent -- adding one doesn't imply another. We handle this using multi-dimensional profiles.
 
 \begin{definition}[Orthogonal Profile \(h^{\to}(\mathcal C)\)]
 Given independent axiom families $A_1, \ldots, A_n$, the \emph{orthogonal profile} of $\mathcal{C}$ is:
@@ -185,11 +165,8 @@ For witness families $\mathcal{C}$ and $\mathcal{D}$ with independent axiom requ
 \[
 h^{\to}(\mathcal{C} \times \mathcal{D}) = \sup(h^{\to}(\mathcal{C}), h^{\to}(\mathcal{D}))
 \]
-where the supremum is taken componentwise.
+(componentwise).
 \end{proposition}
-\begin{proof}
-The product $\mathcal{C} \times \mathcal{D}$ requires witnesses for both $\mathcal{C}$ and $\mathcal{D}$. By independence, the minimal axioms are the union of those needed for each component.
-\end{proof}
 
 %===========================================================
 \section{Calibration Case Studies in Analysis}
@@ -197,277 +174,158 @@ The product $\mathcal{C} \times \mathcal{D}$ requires witnesses for both $\mathc
 
 \subsection{The WLPO Axis: Bidual Gap}
 
-We apply the framework to the bidual gap, using Theorem \ref{thm:paper2}.
-
 \begin{definition}[Gap Witness Family]
-The gap witness family $\mathcal{C}^{\mathsf{Gap}}$ assigns to each foundation $F$ the groupoid:
-\[
-\mathcal{C}^{\mathsf{Gap}}(F) = \{z \in \linf^{**} : z \notin \iota(\linf) \text{ and } \|z\| = 1\}
-\]
-where $\iota: \linf \to \linf^{**}$ is the canonical embedding.
+$\mathcal{C}^{\mathsf{Gap}}(F) = \{z \in \linf^{**} : z \notin \iota(\linf) \text{ and } \|z\| = 1\}$ where $\iota: \linf \to \linf^{**}$ is the canonical embedding.
 \end{definition}
 
 \begin{proposition}[Height of the Gap]\label{prop:gap-height}
-The family $\mathcal{C}^{\mathsf{Gap}}$ has positive frontier $\Frontierpos\mathcal{C}^{\mathsf{Gap}}=\{\{\WLPO\}\}$ and scalar height $h_{\text{WLPO}}(\mathcal{C}^{\mathsf{Gap}}) = 1$.
+The family $\mathcal{C}^{\mathsf{Gap}}$ has positive frontier $\Frontierpos\mathcal{C}^{\mathsf{Gap}}=\{\{\WLPO\}\}$ and height $h_{\text{WLPO}}(\mathcal{C}^{\mathsf{Gap}})=1$.
 \end{proposition}
 \begin{proof}
-By Theorem \ref{thm:paper2}, $\mathcal{C}^{\mathsf{Gap}}(\BISH) = \emptyset$ while $\mathcal{C}^{\mathsf{Gap}}(\BISH + \WLPO) \neq \emptyset$. The No-Uniformization Principle (Theorem \ref{thm:no-unif}) ensures this is minimal: any $\SigmaZero$-fixing interpretation from $\BISH$ preserves the absence of witnesses.
+By Theorem \ref{thm:paper2}, $\mathcal{C}^{\mathsf{Gap}}(\BISH) = \emptyset$ while $\mathcal{C}^{\mathsf{Gap}}(\BISH+\WLPO)\neq\emptyset$. Theorem~\ref{thm:no-unif} precludes a lower stage.
 \end{proof}
 
 \subsection{The FT Axis: Uniform Continuity}
 
-We introduce the Fan Theorem (FT) axis, orthogonal to WLPO, governing compactness properties. We expand $\SigmaZero$ to include the unit interval $[0,1]$ with its standard structure.
+We take $[0,1]\subseteq\R$ into $\SigmaZero$.
 
 \begin{definition}[UCT Witness Family]
-The UCT witness family $\mathcal{C}^{\mathrm{UCT}}$ assigns to each foundation $F$ the truth value:
 \[
-\mathcal{C}^{\mathrm{UCT}}(F) = \begin{cases}
+\mathcal{C}^{\mathrm{UCT}}(F) =
+\begin{cases}
 \{\star\} & \text{if } F \vdash \text{``every pointwise continuous } f:[0,1]\to\R \text{ is uniformly continuous''} \\
-\emptyset & \text{otherwise}
+\emptyset & \text{otherwise.}
 \end{cases}
 \]
 \end{definition}
 
 \begin{theorem}[Calibration of UCT]\label{thm:uct-calibration}
-The witness $\mathcal{C}^{\mathrm{UCT}}$ has positive frontier $\Frontierpos\mathcal{C}^{\mathrm{UCT}} = \{\{\FT\}\}$ and height $h_{\FT}(\mathcal{C}^{\mathrm{UCT}}) = 1$.
+$\Frontierpos\mathcal{C}^{\mathrm{UCT}} = \{\{\FT\}\}$ and $h_{\FT}(\mathcal{C}^{\mathrm{UCT}})=1$.
 \end{theorem}
 \begin{proof}[Proof sketch]
-\textbf{Upper bound}: The implication $\FT \Rightarrow \UCT$ is classical. In our Lean formalization, we verify this holds uniformly across $\SigmaZero$-fixing interpretations.
-
-\textbf{Lower bound}: There exist models of $\BISH + \neg\FT$ (e.g., recursive mathematics with Church's thesis) where UCT fails. The Russian recursive school has constructed explicit counterexamples.
+\emph{Upper bound:} In constructive mathematics, $\FT\Rightarrow \UCT$ on $[0,1]$ is standard; our Lean formalization encodes this uniformly across $\SigmaZero$-fixing interpretations. \emph{Lower bound:} There are models of $\BISH+\neg\FT$ where UCT fails; hence $\FT$ is necessary at height $1$.
 \end{proof}
 
 \subsection{Orthogonal Profiles}
 
-The independence of WLPO and FT leads to a clear separation of logical dependencies.
-
 \begin{theorem}[Orthogonality of WLPO and FT]
-Neither $\WLPO$ implies $\FT$ nor $\FT$ implies $\WLPO$ constructively.
+Neither $\WLPO$ implies $\FT$ nor $\FT$ implies $\WLPO$ over \BISH.
 \end{theorem}
-\begin{proof}
-Models separating these axioms exist in the literature. Our Lean formalization axiomatizes:
-\begin{itemize}
-\item \texttt{FT\_not\_implies\_WLPO}: $\neg((\BISH + \FT) \vdash \WLPO)$
-\item \texttt{WLPO\_not\_implies\_FT}: $\neg((\BISH + \WLPO) \vdash \FT)$
-\end{itemize}
-\end{proof}
 
 \begin{corollary}[Orthogonal Profiles]\label{cor:orthogonal}
-The orthogonal profiles on the axes $\{\WLPO, \FT\}$ are:
 \[
-h^{\to}(\mathcal{C}^{\mathsf{Gap}})=(1, 0), \qquad h^{\to}(\mathcal{C}^{\mathrm{UCT}})=(0, 1)
-\]
-By the Product/Sup law (Proposition \ref{prop:product-sup}):
-\[
-h^{\to}(\mathcal{C}^{\mathsf{Gap}} \times \mathcal{C}^{\mathrm{UCT}}) = (1, 1)
+h^{\to}(\mathcal{C}^{\mathsf{Gap}})=(1,0),\qquad
+h^{\to}(\mathcal{C}^{\mathrm{UCT}})=(0,1),\qquad
+h^{\to}(\mathcal{C}^{\mathsf{Gap}}\times \mathcal{C}^{\mathrm{UCT}})=(1,1).
 \]
 \end{corollary}
 
 \begin{remark}[Third Axis: Dependent Choice]
-A third orthogonal axis is governed by Dependent Choice ($\DCw$). The Baire Category Theorem has profile $(0, 0, 1)$ on axes $\{\WLPO, \FT, \DCw\}$, yielding:
-\[
-h^{\to}(\mathcal{C}^{\mathsf{Gap}} \times \mathcal{C}^{\mathrm{UCT}} \times \mathcal{C}^{\text{Baire}}) = (1, 1, 1)
-\]
-This demonstrates true three-dimensional independence in analysis.
+With $\DCw$ as a third axis, the Baire Category Theorem contributes $(0,0,1)$, yielding a genuinely 3D calibration in analysis.
 \end{remark}
 
 %===========================================================
 \section{The Stone Window Calibration Program}
 %===========================================================
 
-We examine the Stone Window isomorphism, demonstrating how AxCal identifies new avenues for constructive analysis.
-
 \subsection{The Classical Isomorphism for Support Ideals}
 
-The Stone correspondence connects Boolean algebras with rings of idempotents. We generalize this to support ideals.
-
 \begin{definition}[Support Ideals]
-For $x = (x_n)_{n \in \N} \in \linf$, the \emph{support} is $\supp(x) = \{n : x_n \neq 0\}$. A \emph{support ideal} is a Boolean ideal $\mathcal{I} \subseteq \mathcal{P}(\N)$ such that the set
+For $x=(x_n)\in \linf$, define $\supp(x)=\{n : x_n\neq 0\}$. A \emph{support ideal} is a Boolean ideal $\mathcal{I}\subseteq \mathcal{P}(\N)$ for which
 \[
-I_{\mathcal{I}} = \{x \in \linf : \supp(x) \in \mathcal{I}\}
+I_{\mathcal{I}}=\{x\in \linf : \supp(x)\in \mathcal{I}\}
 \]
-forms a (ring) ideal in $\linf$.
+is a ring ideal of $\linf$.
 \end{definition}
 
 \begin{theorem}[Stone Window for Support Ideals (Classical)]\label{thm:stone-general-classical}
-In ZFC, for any Boolean ideal $\mathcal{I} \subseteq \mathcal{P}(\N)$, the map
+In ZFC, for any Boolean ideal $\mathcal{I}$, the map
 \[
-\Phi_{\mathcal{I}}: \mathcal{P}(\N)/\mathcal{I} \longrightarrow \Idem(\linf/I_{\mathcal{I}}), \qquad [A]_{\mathcal{I}} \mapsto [\chi_A]_{I_{\mathcal{I}}}
+\Phi_{\mathcal{I}} : \mathcal{P}(\N)/\mathcal{I}\to \Idem(\linf/I_{\mathcal{I}}),\qquad [A]_{\mathcal{I}}\mapsto [\chi_A]_{I_{\mathcal{I}}},
 \]
-where $\chi_A$ is the characteristic function of $A$, is a Boolean algebra isomorphism onto the idempotents of the quotient ring $\linf/I_{\mathcal{I}}$.
+is a Boolean algebra isomorphism onto the idempotents of the quotient ring $\linf/I_{\mathcal{I}}$.
 \end{theorem}
 \begin{proof}
-\textbf{Well-defined}: If $A \triangle B \in \mathcal{I}$ (symmetric difference), then $\chi_A - \chi_B$ has support in $\mathcal{I}$, so $[\chi_A] = [\chi_B]$ in the quotient.
-
-\textbf{Boolean homomorphism}: We verify $\Phi_{\mathcal{I}}$ preserves operations:
-\begin{itemize}
-\item $\Phi_{\mathcal{I}}([A] \vee [B]) = [\chi_{A \cup B}] = [\chi_A] \vee [\chi_B]$ (using $\chi_{A \cup B} = \chi_A + \chi_B - \chi_A \cdot \chi_B$)
-\item $\Phi_{\mathcal{I}}([A] \wedge [B]) = [\chi_{A \cap B}] = [\chi_A] \cdot [\chi_B]$
-\item $\Phi_{\mathcal{I}}(\neg[A]) = [1 - \chi_A] = 1 - [\chi_A]$
-\end{itemize}
-
-\textbf{Injectivity}: If $[\chi_A] = [\chi_B]$, then $\chi_A - \chi_B \in I_{\mathcal{I}}$, so $A \triangle B \in \mathcal{I}$, hence $[A] = [B]$.
-
-\textbf{Surjectivity (classical)}: Let $[x]$ be an idempotent, so $x^2 - x \in I_{\mathcal{I}}$. Define
-\[
-A = \{n \in \N : x_n = 1\}
-\]
-Then $x - \chi_A$ has support in $\{n : x_n \notin \{0,1\}\} \subseteq \supp(x^2 - x) \in \mathcal{I}$, so $[x] = [\chi_A] = \Phi_{\mathcal{I}}([A])$.
+Well-definedness and Boolean homomorphism are standard. For surjectivity classically, if $[x]$ is idempotent, then $A=\{n:x_n=1\}$ yields $[x]=[\chi_A]$.
 \end{proof}
 
 \subsection{Constructive Failure and Calibration}
 
-The classical proof fails constructively at a fundamental level.
-
 \begin{remark}[Constructive Caveat]\label{rem:constructive-caveat}
-The surjectivity proof requires forming the set $A = \{n : x_n = 1\}$. In $\BISH$:
-\begin{enumerate}
-\item Equality of reals is generally undecidable
-\item The comprehension $\{n : x_n = 1\}$ may not form a well-defined set
-\item Even when $x$ is idempotent (so each $x_n \in \{0,1\}$ classically), we cannot constructively decide which value each $x_n$ takes
-\end{enumerate}
-
-\textbf{Special case}: When $\mathcal{I} = \text{Fin}$ (finite sets), we have $I_{\mathcal{I}} = c_0$ (sequences converging to 0). Here, a metric argument works: given idempotent $[x]$ with $x^2 - x \to 0$, we can round $x_n$ to $\{0,1\}$ for large $n$. However, this relies on the metric structure of $c_0$.
-
-\textbf{General case}: For non-metrically controlled ideals (e.g., ideals of density 0 sets), no such rounding is available, and surjectivity appears to require non-constructive principles.
+The classical surjectivity step uses $A=\{n:x_n=1\}$, which requires decidable real equality. In \BISH, this comprehension may fail; hence surjectivity is not uniformly available. For $\mathcal{I}=\mathrm{Fin}$, where $I_{\mathcal{I}}=\czero$, a metric rounding argument suffices. For non-metrically controlled ideals (e.g., density-$0$ ideals), no such rounding is available, and surjectivity appears to require non-constructive principles.
 \end{remark}
-
-This failure of uniformizability motivates a calibration program.
 
 \begin{conjecture}[Stone Window Calibration]\label{conj:stone-calibration}
-Over $\BISH$, the surjectivity of $\Phi_{\mathcal{I}}$ for broad classes of support ideals implies $\WLPO$ or stronger principles. Specifically:
+Over \BISH:
 \begin{enumerate}
-\item For the ideal of finite sets, surjectivity is constructively provable
-\item For the ideal of density 0 sets, surjectivity implies $\WLPO$
-\item For maximal ideals, surjectivity may imply $\LEM$
+\item For $\mathcal{I}=\mathrm{Fin}$, $\Phi_{\mathcal{I}}$ is surjective constructively.
+\item For the density-$0$ ideal, surjectivity implies $\WLPO$.
+\item For maximal ideals, surjectivity may imply $\LEM$.
 \end{enumerate}
 \end{conjecture}
-
-\begin{remark}[Research Program]
-The Stone Window Calibration opens several research directions:
-\begin{itemize}
-\item Classify support ideals by the axioms needed for surjectivity
-\item Identify the ``simplest'' ideal requiring $\WLPO$
-\item Determine if there's a hierarchy of ideals corresponding to logical strength
-\item Connect to other Stone-type dualities in constructive mathematics
-\end{itemize}
-\end{remark}
 
 %===========================================================
 \section{Formalization Infrastructure}
 %===========================================================
 
-The AxCal framework is supported by a substantial Lean 4 formalization (5,800+ lines across 53 files), available at \texttt{[repository-url]}. 
+The AxCal framework is supported by a Lean~4 formalization ($5{,}800+$ lines across $\sim$53 files).
 
 \subsection{Architecture and Design Decisions}
 
-\textbf{Strict 2-Category Skeleton}: Rather than working with the full 2-category of foundations, we use a strict skeleton where:
-\begin{itemize}
-\item Each foundation has a chosen representative
-\item Interpretations are strictly composable (not just up to isomorphism)
-\item Height invariants are well-defined natural numbers
-\end{itemize}
+\textbf{Strict 2-Category Skeleton:} We use a strict skeleton of foundations so interpretations compose on-the-nose and heights are numerals.
 
-\textbf{Meta-theoretic Framework}: We implement a ``theory extension'' mechanism where:
-\begin{itemize}
-\item Theories are represented as predicates on formulas
-\item Extension by an axiom: $\text{Extend}(T, \phi)$ proves $\psi$ iff $T \cup \{\phi\} \vdash \psi$
-\item Height certificates track provability at each extension level
-\end{itemize}
+\textbf{Meta-Theoretic Layer:} Theories are predicates on formulas with an \emph{extension} operator. Height certificates record the stage at which a witness becomes positively uniformizable.
 
 \subsection{Key Formalization Achievements}
 
 \begin{enumerate}
-\item \textbf{Uniformization Theory} (Parts I-II): Complete formalization with 0 sorries
-   \begin{itemize}
-   \item 2-categorical framework for foundations and interpretations
-   \item Positive uniformization and height calculus
-   \item Witness families as groupoid-valued functors
-   \end{itemize}
+\item \textbf{Uniformization \& Heights (Parts I--III):} 2-categorical framework; height calculus; product and profile operations. No sorries.
 
-\item \textbf{Height Calculus Infrastructure} (Part III):
-   \begin{itemize}
-   \item Ladder algebra with iterated extensions
-   \item Height certificates with upper/lower bounds
-   \item Product operations and orthogonal profiles
-   \end{itemize}
+\item \textbf{FT Frontier (WP-B):} A minimal FT/UCT surface with a height-$1$ certificate for UCT on the FT axis and axiomatized orthogonality (FT $\not\Rightarrow$ WLPO, WLPO $\not\Rightarrow$ FT). This is sufficient for the profile computations used in this paper.
 
-\item \textbf{FT Frontier} (WP-B): Complete with 0 sorries
-   \begin{itemize}
-   \item UCT height certificate: \texttt{uct\_height1\_cert} proves $h_{\FT}(\UCT) = 1$
-   \item Orthogonality axioms: \texttt{FT\_not\_implies\_WLPO}, \texttt{WLPO\_not\_implies\_FT}
-   \item Reductions: FT $\to$ UCT, FT $\to$ Sperner's Lemma $\to$ Brouwer Fixed Point
-   \end{itemize}
-
-\item \textbf{Stone Window} (WP-D): 3,400+ lines with production API
-   \begin{itemize}
-   \item Complete Boolean algebra quotient: \texttt{PowQuot} with 100+ lemmas
-   \item Ring quotient by support ideals: \texttt{LinfQuotRingIdem}
-   \item Main equivalence: \texttt{stoneWindowIso : PowQuot $\mathcal{I}$ $\simeq$ LinfQuotRingIdem $\mathcal{I}$ R}
-   \item 27 \texttt{@[simp]} lemmas for automatic simplification
-   \end{itemize}
+\item \textbf{Stone Window (WP-D):} A production API:
+\begin{itemize}
+\item Boolean algebra quotient \(\texttt{PowQuot}\) with symmetric endpoint and complement lemmas,
+\item Ring quotient by support ideals and idempotents \(\texttt{LinfQuotRingIdem}\),
+\item Main packaged equivalence \(\texttt{stoneWindowIso : PowQuot\,\mathcal{I} \simeq \texttt{LinfQuotRingIdem}\,\mathcal{I}\,R}\),
+\item Dozens of \(\verb|@[simp]|\) lemmas: \(\texttt{stoneWindowIso\_mk}\), \(\texttt{stoneWindowIso\_bot/top}\), boolean preservation (\(\inf/\sup/\mathrm{compl}\)) and their inverse-direction analogues. These make quotient/idempotent calculations one-line \(\texttt{by simp}\).
+\end{itemize}
 \end{enumerate}
 
-\subsection{Verification Statistics}
+\subsection{Verification Notes}
 
-\begin{center}
-\begin{tabular}{|l|r|}
-\hline
-\textbf{Metric} & \textbf{Value} \\
-\hline
-Total lines of Lean code & 5,800+ \\
-Number of files & 53 \\
-Mathematical sorries in core & 0 \\
-Build jobs in CI & 1,199 \\
-@[simp] lemmas in Stone API & 27 \\
-Test coverage & 100\% \\
-\hline
-\end{tabular}
-\end{center}
-
-The formalization not only verifies our theoretical claims but also revealed improvements:
+The formalization clarified:
 \begin{itemize}
-\item The need for explicit independence hypotheses in the Product/Sup law
-\item Optimal simp lemma orientation to prevent loops
-\item The role of \texttt{Nontrivial R} assumptions in the Stone equivalence
+\item The need to state independence explicitly in Product/Sup (to justify componentwise sup),
+\item The importance of lemma orientation to avoid simp loops,
+\item Mild algebraic hypotheses (e.g.\ \texttt{[Nontrivial R]}) for the Stone equivalence.
 \end{itemize}
 
 %===========================================================
 \section{Related Work}
 %===========================================================
 
-\textbf{Reverse Mathematics}: Our framework generalizes classical reverse mathematics \cite{Simpson} beyond arithmetic to arbitrary foundations. The height calculus provides a quantitative measure absent in traditional RM.
+\textbf{Reverse Mathematics:} Our framework generalizes classical RM \cite{Simpson} beyond arithmetic to arbitrary foundations.
 
-\textbf{Constructive Analysis}: The calibration of analytic theorems extends work by Bishop \cite{Bishop}, Bridges-Richman \cite{BR}, and others. Our orthogonal axes formalize folklore about independent principles.
+\textbf{Constructive Analysis:} The calibration of analytic theorems extends work in Bishop-style analysis \cite{Bishop,BR}.
 
-\textbf{Categorical Logic}: The use of 2-categories for foundations builds on topos-theoretic approaches \cite{Johnstone} but focuses on witness existence rather than semantic models.
+\textbf{Categorical Logic:} Our 2-categorical treatment is inspired by topos-theoretic thinking \cite{Johnstone}, repurposed for witness existence and transport along interpretations.
 
-\textbf{Formalization}: Recent work in Lean's mathlib \cite{mathlib} provides infrastructure we build upon, though our meta-theoretic framework is novel.
+\textbf{Formalization:} We build on mathlib \cite{mathlib} and Lean~4 \cite{Lean4}, adding a meta-theoretic AxCal layer.
 
 %===========================================================
 \section{Conclusion}
 %===========================================================
 
-The Axiom Calibration framework provides a systematic approach to measuring the logical strength of mathematical theorems. By tracking uniformizability across interpretations and computing heights along orthogonal axes, we can:
-
+AxCal provides a systematic approach to measuring logical strength. Tracking uniformizability across interpretations and computing heights along orthogonal axes yields:
 \begin{enumerate}
-\item Precisely calibrate theorems (e.g., bidual gap requires exactly WLPO)
-\item Identify orthogonal logical dependencies (WLPO $\perp$ FT $\perp$ DC$_\omega$)
-\item Discover new calibration problems (Stone Window Conjecture)
-\item Guide formalization efforts by identifying axiom requirements
+\item Exact calibrations (e.g.\ the $\linf$ bidual gap requires exactly WLPO),
+\item Separation of dependencies (WLPO $\perp$ FT $\perp$ $\DCw$),
+\item New calibration problems (Stone Window Conjecture),
+\item Concrete guidance for proof assistant formalization.
 \end{enumerate}
 
-The framework is not merely theoretical -- our Lean formalization demonstrates its computational content and practical applicability. The Stone Window Calibration Program exemplifies how AxCal identifies new mathematical questions at the intersection of logic, algebra, and analysis.
-
-Future work includes:
-\begin{itemize}
-\item Resolving the Stone Window Calibration Conjecture
-\item Extending to higher-order uniformizability
-\item Calibrating theorems in other areas (topology, algebra, combinatorics)
-\item Automating height computations in proof assistants
-\end{itemize}
-
-The marriage of categorical methods, constructive analysis, and formal verification opens new avenues for understanding the foundations of mathematics.
+\noindent Future work includes resolving Conjecture~\ref{conj:stone-calibration}, extending to higher-order uniformizability, and automating height computations.
 
 %===========================================================
 \section*{Acknowledgments}
@@ -477,20 +335,20 @@ The author thanks [acknowledgments to be added].
 
 \begin{thebibliography}{10}
 
-\bibitem{Paper2} 
-P.~C.-K.~Lee. 
-\emph{The Bidual of $\ell^\infty$ and WLPO: A Constructive Approach with Lean Formalization}. 
+\bibitem{Paper2}
+P.~C.-K.~Lee.
+\emph{The Bidual of $\ell^\infty$ and WLPO: A Constructive Approach with Lean Formalization}.
 Manuscript, 2025.
 
 \bibitem{Simpson}
 S.~G.~Simpson.
 \emph{Subsystems of Second Order Arithmetic}.
-Cambridge University Press, 2nd edition, 2009.
+Cambridge University Press, 2nd ed., 2009.
 
 \bibitem{Bishop}
 E.~Bishop and D.~Bridges.
 \emph{Constructive Analysis}.
-Springer-Verlag, 1985.
+Springer, 1985.
 
 \bibitem{BR}
 D.~Bridges and F.~Richman.
@@ -505,12 +363,12 @@ Oxford University Press, 2002.
 \bibitem{mathlib}
 The mathlib Community.
 \emph{The Lean Mathematical Library}.
-In: Proceedings of CPP 2020, pp. 367--381, 2020.
+CPP 2020, 367--381.
 
 \bibitem{Lean4}
 L.~de~Moura and S.~Ullrich.
 \emph{The Lean 4 Theorem Prover and Programming Language}.
-In: Proceedings of CADE-28, pp. 625--635, 2021.
+CADE-28, 2021.
 
 \end{thebibliography}
 
