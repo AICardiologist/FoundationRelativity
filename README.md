@@ -71,7 +71,7 @@ Each pathology has a **calibration degree** ρ indicating logical strength:
       - ✅ Complete D3(c4) layer with `TwoIdempotents` class and inverse proofs
       - ✅ **Clean linter compliance**: Section scoping eliminates warnings
       - ✅ **Stone Window Clean API** (January 29, 2025): Production-ready packaging
-        - `stoneWindowIso`: Main equivalence with 20+ @[simp] lemmas
+        - `stoneWindowIso`: Main equivalence with 27 @[simp] lemmas
         - Forward/inverse separation prevents simp loops
         - Complete Boolean operation preservation (inf/sup/compl)
         - Round-trip lemmas: `_symm_apply`, `_apply_symm`

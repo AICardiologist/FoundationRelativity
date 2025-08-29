@@ -64,7 +64,6 @@ jobs:
       - name: Build Positive Uniformization tests
         run: |
           lake build Papers.P3_2CatFramework.test.Positive_test
-<<<<<<< HEAD
       
       - name: Build Positive Truth Algebra tests
         run: |
@@ -77,8 +76,6 @@ jobs:
       - name: Build P4_Meta framework (Part of P3)
         run: |
           lake build Papers.P3_2CatFramework.P4_Meta.Meta_Smoke_test
-=======
->>>>>>> origin/main
 
       - name: Check for unauthorized sorries
         run: |

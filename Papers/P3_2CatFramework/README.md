@@ -10,14 +10,13 @@ This repository contains the Lean 4 formalization supporting Paper 3A, which pre
 4. **Complete Formalization**: 5,800+ lines of Lean 4 with 0 sorries in core components
 
 ## 📊 Current Status Summary (Updated: January 29, 2025)
-
 **Mathematical Sorries**: 0 ✅ | **Integration Sorries**: 7 ⚠️ | **Lines of Code**: 5,800+ | **Files**: 53+
 
 ### Framework Status
 **Part I (Uniformization)**: ✅ COMPLETE - Height theory fully formalized  
 **Part II (Positive Uniformization)**: ✅ COMPLETE - Witness existence layer implemented  
 **Parts III-VI (P4_Meta)**: ✅ COMPLETE - Meta-theoretic framework with ladder algebra  
-**WP-D Stone Window**: ✅ COMPLETE (January 29, 2025) - Full Stone equivalence + Production API (20+ simp lemmas)
+**WP-D Stone Window**: ✅ COMPLETE (January 29, 2025) - Full Stone equivalence + Production API (27 simp lemmas) + Path A BooleanAlgebra (100+ API lemmas)
 **FT/UCT Minimal Surface**: ✅ COMPLETE (January 29, 2025) - Paper 3A FT axis with orthogonality axioms
 **CI Status**: ✅ All core modules build (1189+ jobs, 0 errors) | **Import Structure**: ✅ No cycles
 

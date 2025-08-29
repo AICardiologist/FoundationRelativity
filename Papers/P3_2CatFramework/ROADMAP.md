@@ -3,6 +3,21 @@
 > **Prime directive:** Finish **Lean/formalization** for Paper **3A**.  
 > Only after a Lean **freeze** (no sorries, green builds, tests stable) do we switch to LaTeX authoring.
 
+## 📍 Current Position (January 29, 2025)
+
+#### Infrastructure
+- **Part I**: Full uniformization height theory for {0,1} levels
+- **Part II Core**: Positive uniformization definitions, bridges, gap results  
+- **Bicategorical framework**: Complete with coherence laws
+- **Truth groupoid**: With @[simp] automation
+- **CI integration**: All tests passing (1189+ build jobs), no import cycles
+- **WP-D Stone Window**: COMPLETE with full Stone equivalence + Path A BooleanAlgebra transport (January 29, 2025)
+  - 100+ API lemmas for Boolean algebra operations
+  - 27 @[simp] lemmas for Production API with forward/inverse separation
+  - Perfect symmetry in complement bridges (left/right, domain/mapped)
+  - Library-style proofs with minimal complexity
+  - Comprehensive cheatsheet and sanity tests
+
 ---
 
 ## 0) Executive Summary
@@ -37,6 +52,30 @@
 - Deeper constructive lower bounds (model-theoretic work) beyond what 3A states as a conjecture
 
 ---
+
+### ✅ Recently Completed (January 29, 2025)
+
+#### Stone Window Production API
+- **27 @[simp] lemmas** for truly one-step automation
+- **Forward/inverse separation** prevents simp loops
+- **Complete Boolean preservation**: inf/sup/compl operations
+- **Round-trip lemmas**: 0 sorries using Equiv machinery
+- **Cheatsheet documentation** for instant discoverability
+
+#### FT/UCT Minimal Surface
+- **FT_UCT_MinimalSurface.lean**: 101 lines, 0 sorries
+- **Height certificates**: UCT at height 1 on FT axis
+- **Orthogonality axioms**: FT ⊬ WLPO, WLPO ⊬ FT
+- **AxCalProfile structure** for two-axis profiles
+
+#### Boolean Algebra API Enhancement  
+- **100+ lemmas** for comprehensive Boolean algebra reasoning
+- **Disjointness/complement characterizations**: `disjoint_mk_iff`, `isCompl_mk_iff`
+- **Absorption automation**: @[simp] lemmas for automatic simplification
+- **Perfect symmetry**: Left/right complement bridges for domain and mapped variants
+- **Library-style proofs**: Using `compl_le_iff_compl_le` for minimal complexity
+- **Complete parity**: Between domain and codomain reasoning via `mapOfLe`
+- **Comprehensive testing**: Stone_BA_Sanity.lean validates all API lemmas
 
 ## 2) Deliverables & "Definition of Done"
 
