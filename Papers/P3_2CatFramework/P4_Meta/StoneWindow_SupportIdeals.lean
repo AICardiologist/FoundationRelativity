@@ -2325,6 +2325,19 @@ section TopBotIff
         simp
 end TopBotIff
 
+/-! ### Negative singletons: `mk` vs. `⊥/⊤` -/
+section TopBotNeg
+  variable {𝓘 : BoolIdeal}
+
+  @[simp] lemma mk_ne_bot_iff (A : Set ℕ) :
+      ((PowQuot.mk 𝓘 A : PowQuot 𝓘) ≠ ⊥) ↔ A ∉ 𝓘.mem := by
+    simpa using (not_congr (mk_eq_bot_iff (𝓘 := 𝓘) A))
+
+  @[simp] lemma mk_ne_top_iff (A : Set ℕ) :
+      ((PowQuot.mk 𝓘 A : PowQuot 𝓘) ≠ ⊤) ↔ Aᶜ ∉ 𝓘.mem := by
+    simpa using (not_congr (mk_eq_top_iff (𝓘 := 𝓘) A))
+end TopBotNeg
+
 section InfSupThresholds
   variable {𝓘 : BoolIdeal}
 
@@ -2403,6 +2416,20 @@ section MapThresholds
     simpa [PowQuot.mapOfLe_sup, PowQuot.mapOfLe_mk]
       using (mk_sup_eq_top_iff (𝓘 := 𝓙) A B)
 end MapThresholds
+
+/-! ### Negative singletons: images under `mapOfLe` -/
+section MapTopBotNeg
+  variable {𝓘 𝓙 : BoolIdeal}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+
+  @[simp] lemma mapOfLe_mk_ne_bot_iff (A : Set ℕ) :
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) ≠ (⊥ : PowQuot 𝓙)) ↔ A ∉ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_mk] using (not_congr (mk_eq_bot_iff (𝓘 := 𝓙) A))
+
+  @[simp] lemma mapOfLe_mk_ne_top_iff (A : Set ℕ) :
+      (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) ≠ (⊤ : PowQuot 𝓙)) ↔ Aᶜ ∉ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_mk] using (not_congr (mk_eq_top_iff (𝓘 := 𝓙) A))
+end MapTopBotNeg
 
 /-! ### Non-thresholds for images under `mapOfLe` -/
 section MapNonThresholds
@@ -2557,6 +2584,18 @@ section MapSubsetToOrder
     have : (A △ B) = (B \ A) := symmDiff_eq_diff_of_subset hAB
     exact (mapOfLe_mk_lt_mk_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A B).2 ⟨h₁, by simpa [this] using hGap⟩
 end MapSubsetToOrder
+
+/-! ### Order to smallness, mapped: `x ≤ (y)ᶜ` -/
+section MapOrderToSmallness
+  variable {𝓘 𝓙 : BoolIdeal}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+
+  @[simp] lemma mapOfLe_mk_le_compl_mk_iff (A B : Set ℕ) :
+      PowQuot.mapOfLe h (PowQuot.mk 𝓘 A)
+        ≤ (PowQuot.mapOfLe h (PowQuot.mk 𝓘 B))ᶜ
+      ↔ (A ∩ B) ∈ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_mk, mk_le_compl_mk]
+end MapOrderToSmallness
 
 /-! ### Disjointness / complements, reduced to smallness -/
 section DisjointCompl
@@ -2993,6 +3032,33 @@ The constructive principles needed for surjectivity of Φ_I depend on I:
 - For other ideals: calibrate case by case
 
 This provides a flexible testbed for measuring constructive strength.
+-/
+
+/-!
+## PowQuot cheatsheet (via smallness in the ideal)
+
+**Thresholds**
+* `mk_eq_bot_iff A`        ↔  `A ∈ 𝓘.mem`
+* `mk_eq_top_iff A`        ↔  `Aᶜ ∈ 𝓘.mem`
+* `mk_inf_eq_bot_iff A B`  ↔  `A ∩ B ∈ 𝓘.mem`
+* `mk_sup_eq_top_iff A B`  ↔  `Aᶜ ∩ Bᶜ ∈ 𝓘.mem`
+* `mk_ne_bot_iff A`        ↔  `A ∉ 𝓘.mem`
+* `mk_ne_top_iff A`        ↔  `Aᶜ ∉ 𝓘.mem`
+
+**Equality/Order**
+* `mk_eq_mk_iff A B`       ↔  `A △ B ∈ 𝓘.mem`
+* `mk_le_mk A B`           ↔  `A \ B ∈ 𝓘.mem`
+* `mk_le_compl_mk A B`     ↔  `A ∩ B ∈ 𝓘.mem`
+
+**Disjoint/Compl**
+* `disjoint_mk_iff A B`    ↔  `A ∩ B ∈ 𝓘.mem`
+* `isCompl_mk_iff A B`     ↔  `(A ∩ B) ∈ 𝓘.mem ∧ (Aᶜ ∩ Bᶜ) ∈ 𝓘.mem`
+
+**Strict order**
+* `mk_lt_mk_iff A B`       ↔  `(A \ B) ∈ 𝓘.mem ∧ (A △ B) ∉ 𝓘.mem`
+
+**Mapped analogues (`𝓘 ⟶ 𝓙` via `h`)**: replace `mk 𝓘 …` by `mapOfLe h (mk 𝓘 …)`,
+  and replace membership in `𝓘.mem` with `𝓙.mem`.
 -/
 
 end Papers.P4Meta
