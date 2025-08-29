@@ -2608,6 +2608,24 @@ section MapOrderToSmallness
     simpa [PowQuot.mapOfLe_mk, mk_le_compl_mk]
 end MapOrderToSmallness
 
+/-! ### Order to smallness, mapped (complement on the left) -/
+section MapOrderToSmallnessLeft
+  variable {𝓘 𝓙 : BoolIdeal}
+  variable (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+
+  @[simp] lemma mapOfLe_compl_mk_le_mk_iff (A B : Set ℕ) :
+      ((PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))ᶜ
+         ≤ PowQuot.mapOfLe h (PowQuot.mk 𝓘 B))
+      ↔ (Aᶜ ∩ Bᶜ) ∈ 𝓙.mem := by
+    -- Boolean algebra: xᶜ ≤ y ↔ yᶜ ≤ x
+    -- But we also know that yᶜ ≤ x ↔ Codisjoint x y (i.e., x ⊔ y = ⊤)
+    rw [compl_le_iff_compl_le]
+    simp only [PowQuot.mapOfLe_compl, PowQuot.mapOfLe_mk, mk_compl, mk_le_mk]
+    -- Now we have: Bᶜ \ A ∈ 𝓙.mem
+    -- Bᶜ \ A = Bᶜ ∩ Aᶜ = Aᶜ ∩ Bᶜ
+    simp only [Set.diff_eq, Set.inter_comm]
+end MapOrderToSmallnessLeft
+
 /-! ### Disjointness / complements, reduced to smallness -/
 section DisjointCompl
   variable {𝓘 : BoolIdeal}
