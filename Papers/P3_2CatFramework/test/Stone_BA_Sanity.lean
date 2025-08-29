@@ -207,4 +207,18 @@ example : PowQuot.mapOfLeBAHom (fun _ h => h : ∀ S, S ∈ 𝓘.mem → S ∈ �
 
 end BAHomTests
 
+section MapImageOrderSanity
+  variable {𝓘 𝓙 : BoolIdeal} {A B : Set ℕ} (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+
+  example : PowQuot.mapOfLe h (mk 𝓘 A) ≤ PowQuot.mapOfLe h (mk 𝓘 B)
+        ↔ (A \ B) ∈ 𝓙.mem :=
+    Papers.P4Meta.StoneSupport.mapOfLe_mk_le_mk_iff h A B
+
+  example : PowQuot.mapOfLe h (mk 𝓘 A) = ⊥ ↔ A ∈ 𝓙.mem :=
+    Papers.P4Meta.StoneSupport.mapOfLe_mk_eq_bot_iff h A
+
+  example : PowQuot.mapOfLe h (mk 𝓘 A) = ⊤ ↔ Aᶜ ∈ 𝓙.mem :=
+    Papers.P4Meta.StoneSupport.mapOfLe_mk_eq_top_iff h A
+end MapImageOrderSanity
+
 #print "✅ All clean sanity tests pass!"

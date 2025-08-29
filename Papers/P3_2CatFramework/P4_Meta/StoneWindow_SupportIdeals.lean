@@ -2263,6 +2263,10 @@ variable {𝓘 : BoolIdeal}
   PowQuot.mk 𝓘 A ⊔ PowQuot.mk 𝓘 B = PowQuot.mk 𝓘 (A ∪ B) :=
   rfl
 
+-- Not a simp-lemma globally; use explicitly when needed.
+lemma compl_eq_univ_sdiff (A : Set α) : Aᶜ = Set.univ \ A := by
+  ext x; simp
+
 end Convenience
 
 section MoreOrderLemmas
@@ -2336,6 +2340,30 @@ section InfSupThresholds
     simp [Set.compl_union]
 end InfSupThresholds
 
+/-! ### MapOfLe order/equality lemmas -/
+section MapOfLeOrder
+  variable {𝓘 𝓙 : BoolIdeal}
+
+  /-- Inequality between mapped reps reduces to smallness in the target ideal. -/
+  @[simp] lemma mapOfLe_mk_le_mk_iff
+    (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A B : Set ℕ) :
+    PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) ≤
+      PowQuot.mapOfLe h (PowQuot.mk 𝓘 B) ↔
+    (A \ B) ∈ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_mk, mk_le_mk]
+
+  /-- Bottom/top tests after mapping, reduced to smallness in the target ideal. -/
+  @[simp] lemma mapOfLe_mk_eq_bot_iff
+    (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A : Set ℕ) :
+    PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) = ⊥ ↔ A ∈ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_mk] using (mk_eq_bot_iff (𝓘 := 𝓙) A)
+
+  @[simp] lemma mapOfLe_mk_eq_top_iff
+    (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem) (A : Set ℕ) :
+    PowQuot.mapOfLe h (PowQuot.mk 𝓘 A) = ⊤ ↔ Aᶜ ∈ 𝓙.mem := by
+    simpa [PowQuot.mapOfLe_mk] using (mk_eq_top_iff (𝓘 := 𝓙) A)
+end MapOfLeOrder
+
 /-! ### Disjointness / complements, reduced to smallness -/
 section DisjointCompl
   variable {𝓘 : BoolIdeal}
@@ -2382,6 +2410,31 @@ section MapOfLe_DisjointCompl
                disjoint_iff, codisjoint_iff]
     exact ⟨fun ⟨h1, h2⟩ => ⟨mk_inf_eq_bot_iff A B |>.mp h1, mk_sup_eq_top_iff A B |>.mp h2⟩,
            fun ⟨h1, h2⟩ => ⟨mk_inf_eq_bot_iff A B |>.mpr h1, mk_sup_eq_top_iff A B |>.mpr h2⟩⟩
+  
+  /-- `mapOfLe` preserves disjointness (monotone direction). -/
+  lemma mapOfLe_preserves_disjoint
+    {𝓘 𝓙 : BoolIdeal} (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+    (A B : Set ℕ) :
+    Disjoint (PowQuot.mk 𝓘 A : PowQuot 𝓘) (PowQuot.mk 𝓘 B) →
+    Disjoint (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))
+             (PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)) := by
+    intro hAB
+    have hI : (A ∩ B) ∈ 𝓘.mem := (disjoint_mk_iff (𝓘 := 𝓘) A B).1 hAB
+    have hJ : (A ∩ B) ∈ 𝓙.mem := h _ hI
+    simpa using (mapOfLe_disjoint_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A B).2 hJ
+
+  /-- `mapOfLe` preserves complementarity (monotone direction). -/
+  lemma mapOfLe_preserves_isCompl
+    {𝓘 𝓙 : BoolIdeal} (h : ∀ S, S ∈ 𝓘.mem → S ∈ 𝓙.mem)
+    (A B : Set ℕ) :
+    IsCompl (PowQuot.mk 𝓘 A : PowQuot 𝓘) (PowQuot.mk 𝓘 B) →
+    IsCompl (PowQuot.mapOfLe h (PowQuot.mk 𝓘 A))
+            (PowQuot.mapOfLe h (PowQuot.mk 𝓘 B)) := by
+    intro hAB
+    rcases (isCompl_mk_iff (𝓘 := 𝓘) A B).1 hAB with ⟨hI1, hI2⟩
+    have hJ1 : (A ∩ B) ∈ 𝓙.mem := h _ hI1
+    have hJ2 : (Aᶜ ∩ Bᶜ) ∈ 𝓙.mem := h _ hI2
+    exact (mapOfLe_isCompl_iff (𝓘 := 𝓘) (𝓙 := 𝓙) h A B).2 ⟨hJ1, hJ2⟩
 end MapOfLe_DisjointCompl
 
 /-! 
