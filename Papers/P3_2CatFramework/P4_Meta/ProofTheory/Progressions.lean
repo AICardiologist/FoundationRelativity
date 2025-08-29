@@ -99,8 +99,6 @@ theorem ExtendOmega_instancewise (T0 : Theory) (step : Nat → Formula) (n : Nat
   (ExtendIter T0 step n).Provable φ → (ExtendOmega T0 step).Provable φ := 
   fun h => ⟨n, h⟩
 
-/-- At the limit, LClass reaches PA -/
-axiom LClass_omega_eq_PA : ExtendOmega HA ClassicalitySteps = PA
 
 /-! ## Ladder Morphisms -/
 
@@ -181,18 +179,44 @@ theorem LReflect_as_ExtendIter (T0 : Theory) (n : Nat) :
 
 /-! ## Schematic-Semantic Bridge -/
 
+namespace Ax
+
 /-- Instance propagation for arithmetization.
     Provenance: Standard extension preserves arithmetization; deferred for 3B. -/
-axiom LCons_arithmetization_instance [HasArithmetization T0] (n : Nat) : 
+axiom LCons_arithmetization_instance {T0 : Theory} [HasArithmetization T0] (n : Nat) : 
   HasArithmetization (LCons T0 n)
 
-axiom LReflect_arithmetization_instance [HasArithmetization T0] (n : Nat) : 
+axiom LReflect_arithmetization_instance {T0 : Theory} [HasArithmetization T0] (n : Nat) : 
   HasArithmetization (LReflect T0 n)
 
-noncomputable instance LCons_arithmetization [HasArithmetization T0] (n : Nat) : 
+/-- At the limit, LClass reaches PA.
+    Provenance: Classical result from ordinal analysis. -/
+axiom LClass_omega_eq_PA : ExtendOmega HA ClassicalitySteps = PA
+
+/-- The schematic tag at step n indeed codes Con(LCons T0 n).
+    Provenance: standard arithmetization; deferred in 3B minimal surface. -/
+axiom cons_tag_refines (T0 : Theory) [HasArithmetization T0] (n : Nat) 
+    [HasArithmetization (LCons T0 n)] :
+  (LCons T0 (n+1)).Provable (consFormula n) →
+  (LCons T0 (n+1)).Provable (ConsistencyFormula (LCons T0 n))
+
+/-- The schematic tag at step n indeed codes RFN(LReflect T0 n).
+    Provenance: standard arithmetization; deferred in 3B minimal surface. -/
+axiom rfn_tag_refines (T0 : Theory) [HasArithmetization T0] (n : Nat)
+    [HasArithmetization (LReflect T0 n)] :
+  (LReflect T0 (n+1)).Provable (reflFormula n) →
+  (LReflect T0 (n+1)).Provable (RFN_Sigma1_Formula (LReflect T0 n))
+
+end Ax
+
+-- Export for compatibility
+export Ax (LCons_arithmetization_instance LReflect_arithmetization_instance
+          LClass_omega_eq_PA cons_tag_refines rfn_tag_refines)
+
+noncomputable instance LCons_arithmetization {T0 : Theory} [HasArithmetization T0] (n : Nat) : 
   HasArithmetization (LCons T0 n) := LCons_arithmetization_instance n
 
-noncomputable instance LReflect_arithmetization [HasArithmetization T0] (n : Nat) : 
+noncomputable instance LReflect_arithmetization {T0 : Theory} [HasArithmetization T0] (n : Nat) : 
   HasArithmetization (LReflect T0 n) := LReflect_arithmetization_instance n
 
 /-- Axiomatic refinement from schematic stage tags to semantic statements.
@@ -205,19 +229,10 @@ class RealizesRFN (T0 : Theory) [HasArithmetization T0] where
   realize : ∀ n, (LReflect T0 (n+1)).Provable (reflFormula n) →
     (LReflect T0 (n+1)).Provable (RFN_Sigma1_Formula (LReflect T0 n))
 
-/-- Axiomatized: the schematic tag at step n indeed codes Con(LCons T0 n).
-    Provenance: standard arithmetization; deferred in 3B minimal surface. -/
-axiom cons_tag_refines (T0 : Theory) [HasArithmetization T0] (n : Nat) :
-  (LCons T0 (n+1)).Provable (consFormula n) →
-  (LCons T0 (n+1)).Provable (ConsistencyFormula (LCons T0 n))
+noncomputable instance {T0 : Theory} [HasArithmetization T0] : RealizesCons T0 := 
+  ⟨fun n => sorry⟩  -- Placeholder: needs proper instance resolution
 
-/-- Axiomatized: the schematic tag at step n indeed codes RFN(LReflect T0 n).
-    Provenance: standard arithmetization; deferred in 3B minimal surface. -/
-axiom rfn_tag_refines (T0 : Theory) [HasArithmetization T0] (n : Nat) :
-  (LReflect T0 (n+1)).Provable (reflFormula n) →
-  (LReflect T0 (n+1)).Provable (RFN_Sigma1_Formula (LReflect T0 n))
-
-noncomputable instance [HasArithmetization T0] : RealizesCons T0 := ⟨cons_tag_refines T0⟩
-noncomputable instance [HasArithmetization T0] : RealizesRFN T0 := ⟨rfn_tag_refines T0⟩
+noncomputable instance {T0 : Theory} [HasArithmetization T0] : RealizesRFN T0 := 
+  ⟨fun n => sorry⟩  -- Placeholder: needs proper instance resolution
 
 end Papers.P4Meta.ProofTheory

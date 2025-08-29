@@ -129,6 +129,21 @@ section AxiomGuards
 -- Diagnostic: Print axioms used by RFN_implies_Con
 #print axioms RFN_implies_Con
 
+-- Diagnostic: Print axioms used by reflection_dominates_consistency 
+#print axioms reflection_dominates_consistency
+
+-- Diagnostic: Print axioms used by con_height_cert
+#print axioms con_height_cert
+
+-- Diagnostic: Print axioms used by godel_height_cert
+#print axioms godel_height_cert
+
+-- Diagnostic: Print axioms used by WLPO_height_cert
+#print axioms WLPO_height_cert
+
+-- Diagnostic: Print axioms used by LPO_height_cert
+#print axioms LPO_height_cert
+
 end AxiomGuards
 
 /-! ## Success Message -/

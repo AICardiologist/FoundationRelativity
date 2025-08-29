@@ -112,14 +112,6 @@ def GodelSentence (T : Theory) [h : HasArithmetization T] : Formula :=
 def RFN_Sigma1_Formula (T : Theory) [h : HasArithmetization T] : Formula :=
   Formula.atom (800 + h.code Bot)
 
-/-! ## Properties of Bot -/
-
-/-- Bot is a Σ₁ formula -/
-axiom Sigma1_Bot : Sigma1 Bot
-
-/-- Bot is false in the standard model -/
-axiom Bot_is_FalseInN {T : Theory} [h : HasSigma1Reflection T] : 
-  ¬h.TrueInN Bot
 
 /-! ## Schematic Tag Formulas -/
 
@@ -131,5 +123,23 @@ abbrev RfnTag (n : Nat) : Formula := Formula.atom (800 + n)
 
 /-- Schematic Gödel sentence tag at level n -/
 abbrev GTagFormula (n : Nat) : Formula := Formula.atom (700 + n)
+
+/-! ## Core Axioms -/
+
+namespace Ax
+
+/-- Bot is a Σ₁ formula.
+    Provenance: Standard arithmetization, Bot is atomic. -/
+axiom Sigma1_Bot : Sigma1 Bot
+
+/-- Bot is false in the standard model.
+    Provenance: Standard arithmetization, Bot codes falsity. -/
+axiom Bot_is_FalseInN {T : Theory} [h : HasSigma1Reflection T] : 
+  ¬h.TrueInN Bot
+
+end Ax
+
+-- Export for compatibility
+export Ax (Sigma1_Bot Bot_is_FalseInN)
 
 end Papers.P4Meta.ProofTheory
