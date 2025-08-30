@@ -1,25 +1,29 @@
 # Paper 3B Axiom Index
 
-> **⚠️ AXIOM BUDGET LOCKED AT 30**: Future PRs must not increase this count. CI will fail if axioms > 30.
+> **⚠️ AXIOM BUDGET LOCKED AT 28**: Future PRs must not increase this count. CI will fail if axioms > 28.
 
 This document tracks all axioms used in the Paper 3B proof-theoretic framework.
 All axioms are now in the `Ax` namespace for consistent naming and easy tracking.
 
 ## Summary Statistics
-- **Total Axioms**: 30 (21 Paper 3B specific + 9 base theory infrastructure)
-  - **Paper 3B Specific**: 21 axioms (BUDGET LOCKED - enforced by CI)
+- **Total Axioms**: 28 (19 Paper 3B specific + 9 base theory infrastructure)
+  - **Paper 3B Specific**: 19 axioms (BUDGET LOCKED - enforced by CI)
   - **Base Theory Infrastructure**: 9 axioms (HA, PA, EA, ISigma1, etc.)
 - **Namespace**: All axioms use `Ax.` prefix for consistency
-- **Discharge Plan**: 12 axioms are placeholders for future internalization
+- **Discharge Plan**: 10 axioms are placeholders for future internalization
 - **Permanent**: 18 axioms (9 Paper 3B classical + 9 base theory)
+
+### Recent Progress (PR-1)
+- ✅ Discharged `LCons_arithmetization_instance` - now derived from Core.ExtendIter_arithmetization
+- ✅ Discharged `LReflect_arithmetization_instance` - now derived from Core.ExtendIter_arithmetization
 
 ## Axioms by Category
 
-### Instance Propagation (2 axioms)
-*Discharge plan: Show that Extend preserves arithmetization*
+### Instance Propagation (0 axioms - DISCHARGED ✅)
+*Successfully discharged in PR-1 by deriving from Core.ExtendIter_arithmetization*
 
-1. `Ax.LCons_arithmetization_instance` - Extension preserves arithmetization for LCons
-2. `Ax.LReflect_arithmetization_instance` - Extension preserves arithmetization for LReflect
+~~1. `Ax.LCons_arithmetization_instance` - Extension preserves arithmetization for LCons~~ DISCHARGED
+~~2. `Ax.LReflect_arithmetization_instance` - Extension preserves arithmetization for LReflect~~ DISCHARGED
 
 ### Schematic Tag Refinements (2 axioms)
 *Discharge plan: Connect tags to semantic formulas via arithmetization*
