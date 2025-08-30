@@ -42,12 +42,21 @@ Each pathology has a **calibration degree** ρ indicating logical strength:
 ### Formalization Status
 - **[Paper 1: Rank-One Toggle Kernel](Papers/P1_GBC/)** 🔧 **Partial Implementation + Current LaTeX Paper** - Sherman-Morrison (1 sorry), Spectrum (3 sorries stub), Fredholm/Tutorial (planned ~10 sorries)
 - **[Paper 2: WLPO ↔ BidualGap∃](Papers/P2_BidualGap/)** ✅ **Sprint E: Dual Isometry Complete (3 WLPO sorries)**
-- **[Paper 3: 2-Categorical Framework](Papers/P3_2CatFramework/)** ✅ **Parts I-VI Complete: Uniformization + P4_Meta framework (0 sorries)**
+- **[Paper 3: 2-Categorical Framework](Papers/P3_2CatFramework/)** ✅ **Parts I-VI + 3B Complete: Uniformization + P4_Meta + Proof-theoretic scaffold (0 sorries)**
 - **[Paper 4: Spectral Geometry](Papers/P4_SpectralGeometry/)** 🔧 61 sorries - Discrete model 85% complete
 
 ### 🎯 **Latest Achievements**
 
-#### **Paper 3 Parts I-VI: Complete 2-Categorical Framework + Meta Layer** (January 2025)
+#### **Paper 3B: Proof-Theoretic Framework Complete** (August 2025)
+- **Complete scaffold**: LCons/LReflect/LClass ladders with 0 sorries
+- **Core theorem**: RFN_Σ₁ → Con proved schematically (sorry-free)
+- **Axiom discipline**: All 21 axioms in `Ax` namespace with CI guard
+- **Height certificates**: Upper bounds constructive, lower bounds axiomatized
+- **Collision morphisms**: Reflection dominates consistency
+- **Documentation**: Complete axiom index with discharge roadmap
+- **Next steps**: 6 independent PRs for axiom discharge outlined
+
+#### **Paper 3 Parts I-VI: Complete 2-Categorical Framework + Meta Layer** (August 2025)
 - **Part I & II**: Complete uniformization height theory + positive uniformization
   - `gap_has_height_one`: Bidual gap has uniformization height = 1
   - `pos_gap_height_eq_one`: Gap has positive height = 1 (requires WLPO)
@@ -70,7 +79,7 @@ Each pathology has a **calibration degree** ρ indicating logical strength:
       - ✅ **Full Stone equivalence**: `StoneEquiv : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R` for `[Nontrivial R]`
       - ✅ Complete D3(c4) layer with `TwoIdempotents` class and inverse proofs
       - ✅ **Clean linter compliance**: Section scoping eliminates warnings
-      - ✅ **Stone Window Clean API** (January 29, 2025): Production-ready packaging
+      - ✅ **Stone Window Clean API** (August 29, 2025): Production-ready packaging
         - `stoneWindowIso`: Main equivalence with 27 @[simp] lemmas
         - Forward/inverse separation prevents simp loops
         - Complete Boolean operation preservation (inf/sup/compl)
