@@ -213,6 +213,10 @@ This theorem formalizes the mechanism by which the reflection axis and the consi
 %===========================================================
 We have implemented this framework in Lean 4 (P4\_Meta framework) using a ``schematic'' approach that avoids deep encoding of syntax while maintaining mathematical rigor.
 
+\begin{mdframed}[style=provenance]
+\textbf{Implementation Status (January 30, 2025):} Complete scaffold with 0 sorries. All 21 axioms organized in \texttt{Ax} namespace with CI enforcement. Core theorem \texttt{RFN\_implies\_Con} proven schematically. Full test coverage with \texttt{\#print axioms} diagnostics. See \texttt{documentation/P3B\_STATUS.md} for 6-PR discharge roadmap.
+\end{mdframed}
+
 \subsection{Schematic Interfaces}
 We treat \texttt{Theory} as an abstract type with a predicate \texttt{Provable}, avoiding deep encoding of syntax:
 

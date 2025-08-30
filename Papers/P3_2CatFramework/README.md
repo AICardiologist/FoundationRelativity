@@ -9,13 +9,14 @@ This repository contains the Lean 4 formalization supporting Paper 3A, which pre
 3. **Stone Window Program**: Classical theorem, constructive caveat, and calibration conjecture
 4. **Complete Formalization**: 5,800+ lines of Lean 4 with 0 sorries in core components
 
-## 📊 Current Status Summary (Updated: January 29, 2025)
-**Mathematical Sorries**: 0 ✅ | **Integration Sorries**: 7 ⚠️ | **Lines of Code**: 5,800+ | **Files**: 53+
+## 📊 Current Status Summary (Updated: January 30, 2025)
+**Mathematical Sorries**: 0 ✅ | **Integration Sorries**: 7 ⚠️ | **Lines of Code**: 6,500+ | **Files**: 60+
 
 ### Framework Status
 **Part I (Uniformization)**: ✅ COMPLETE - Height theory fully formalized  
 **Part II (Positive Uniformization)**: ✅ COMPLETE - Witness existence layer implemented  
 **Parts III-VI (P4_Meta)**: ✅ COMPLETE - Meta-theoretic framework with ladder algebra  
+**Paper 3B (ProofTheory)**: ✅ COMPLETE (January 30, 2025) - Proof-theoretic scaffold with 0 sorries
 **WP-D Stone Window**: ✅ COMPLETE (January 29, 2025) - Full Stone equivalence + Production API (27 simp lemmas) + Path A BooleanAlgebra (100+ API lemmas)
 **FT/UCT Minimal Surface**: ✅ COMPLETE (January 29, 2025) - Paper 3A FT axis with orthogonality axioms
 **CI Status**: ✅ All core modules build (1189+ jobs, 0 errors) | **Import Structure**: ✅ No cycles
@@ -37,6 +38,28 @@ This repository contains the Lean 4 formalization supporting Paper 3A, which pre
 - **Minor warnings**: ~10 style warnings (unused variables, simpa vs simp) - reduced from 15
 
 ## 🎯 Implementation Status by Paper Section
+
+### Paper 3B: Proof-Theoretic Framework ✅ COMPLETE (January 30, 2025)
+
+#### Fully Formalized Components:
+- **Ladder Constructions**: `LCons` (consistency), `LReflect` (reflection), `LClass` (classicality)
+- **Core Theorem**: `RFN_implies_Con` - RFN_Σ₁ → Con proved schematically (0 sorries)
+- **Height Certificates**: Upper bounds constructive, lower bounds axiomatized
+- **Collision Morphisms**: `reflection_dominates_consistency` with formal morphism structure
+- **Axiom Discipline**: All 21 axioms in `Ax` namespace with CI guard script
+
+#### Quality Metrics:
+- **0 sorries** across all ProofTheory modules
+- **21 axioms** systematically tracked (12 dischargeable, 9 classical)
+- **Complete tests** with `#print axioms` diagnostics
+- **CI guard** `.ci/check_axioms.sh` enforces namespace discipline
+
+#### Documentation:
+- `documentation/AXIOM_INDEX.md`: Complete axiom tracking
+- `documentation/P3B_STATUS.md`: Checkpoint with 6-PR discharge roadmap
+- Inline documentation of `letI` pattern and design decisions
+
+**Files**: `P4_Meta/ProofTheory/*.lean` (Core, Reflection, Progressions, Heights, Collisions)
 
 ### Part I: Uniformization Height Theory ✅ COMPLETE
 

@@ -115,7 +115,9 @@ A Framework Formalization with Structural Verification}
 \maketitle
 
 \begin{abstract}
-We present a Lean 4 formalization of the 2--categorical framework for foundation--relativity based on the WLPO\,$\leftrightarrow$\,Bidual Gap equivalence. This paper documents the successful mechanization of uniformization height theory, achieving the key result that the bidual gap has height exactly 1, with 0 sorries in structural components. We describe the architectural decisions, technical solutions, and unexpected improvements that emerged during formalization, including a rich automation framework with \texttt{@[simp]} tactics, complete ladder algebra with normal forms, and a lightweight order--theoretic layer. The formalization comprises over 5,800 lines of verified Lean code across 53+ files. \textbf{Status (January 29, 2025):} Parts I-VI structural components complete, including Part 6B exact finish time characterization (0 sorries), Part V RFN→Con proven with Con→Gödel axiomatized, \textbf{WP-B FT frontier infrastructure} providing FT→UCT, FT→Sperner→BFPT reductions with orthogonal axes, \textbf{Track A DCω/Baire frontier} establishing third orthogonal axis with hardened interface layer, and \textbf{WP-D Path A BooleanAlgebra transport} groundwork with well-definedness proofs for quotient operations.
+We present a Lean 4 formalization of the 2--categorical framework for foundation--relativity based on the WLPO\,$\leftrightarrow$\,Bidual Gap equivalence. This paper documents the successful mechanization of uniformization height theory, achieving the key result that the bidual gap has height exactly 1, with 0 sorries in structural components. We describe the architectural decisions, technical solutions, and unexpected improvements that emerged during formalization, including a rich automation framework with \texttt{@[simp]} tactics, complete ladder algebra with normal forms, and a lightweight order--theoretic layer. The formalization comprises over 6,500 lines of verified Lean code across 60+ files. 
+
+\textbf{Status (January 30, 2025):} Parts I-VI structural components complete, including Part 6B exact finish time characterization (0 sorries), Part V RFN→Con proven with Con→Gödel axiomatized, \textbf{Paper 3B ProofTheory framework} complete with LCons/LReflect/LClass ladders and 0 sorries (21 axioms in Ax namespace with CI enforcement), \textbf{WP-B FT frontier infrastructure} providing FT→UCT, FT→Sperner→BFPT reductions with orthogonal axes, \textbf{Track A DCω/Baire frontier} establishing third orthogonal axis with hardened interface layer, and \textbf{WP-D Path A BooleanAlgebra transport} groundwork with well-definedness proofs for quotient operations.
 \end{abstract>
 
 \begin{mdframed}[style=status]
@@ -459,6 +461,39 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
 \item[$\checkmark$] \texttt{collision\_chain}: Two-step proof of Gödel sentence via RFN→Con
 \item[$\checkmark$] \texttt{godel\_height\_bound}: G$_T$ has height $\leq$ 2 in double extension
 \end{itemize}
+
+\subsection{Part VI: Calibrations and Portal Pattern (WP-B COMPLETE)}
+
+\subsection{Paper 3B: Proof-Theoretic Framework (COMPLETE)}
+
+\begin{mdframed}[style=achievement]
+\textbf{Achievement (January 30, 2025):} Complete proof-theoretic scaffold with 0 sorries. All 21 axioms organized in \texttt{Ax} namespace with CI enforcement. Core theorem \texttt{RFN\_implies\_Con} proven schematically.
+\end{mdframed}
+
+\textbf{Ladder Constructions}:
+\begin{itemize}
+\item[$\checkmark$] \texttt{LCons}: Consistency ladder (Turing-style progressions)
+\item[$\checkmark$] \texttt{LReflect}: Reflection ladder (Feferman-style progressions)  
+\item[$\checkmark$] \texttt{LClass}: Classicality ladder (HA to PA via EM fragments)
+\item[$\checkmark$] \texttt{ExtendOmega}: Limit construction at $\omega$
+\end{itemize}
+
+\textbf{Core Theorems}:
+\begin{itemize}
+\item[$\checkmark$] \texttt{RFN\_implies\_Con}: RFN$_{\Sigma^0_1}$ → Con proved schematically (0 sorries)
+\item[$\checkmark$] \texttt{collision\_step}: Formal collision at each ladder stage
+\item[$\checkmark$] \texttt{reflection\_dominates\_consistency}: Ladder morphism
+\end{itemize}
+
+\textbf{Quality Infrastructure}:
+\begin{itemize}
+\item[$\checkmark$] All axioms in \texttt{Ax} namespace (21 total: 12 dischargeable, 9 classical)
+\item[$\checkmark$] CI guard script \texttt{.ci/check\_axioms.sh} enforces discipline
+\item[$\checkmark$] Comprehensive \texttt{\#print axioms} diagnostics in tests
+\item[$\checkmark$] Local \texttt{letI} pattern for instance resolution documented
+\end{itemize}
+
+\textbf{Files}: \texttt{P4\_Meta/ProofTheory/*.lean} (Core, Reflection, Progressions, Heights, Collisions)
 
 \subsection{Part VI: Calibrations and Portal Pattern (WP-B COMPLETE)}
 

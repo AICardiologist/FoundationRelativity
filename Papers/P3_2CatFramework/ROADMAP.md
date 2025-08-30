@@ -3,13 +3,14 @@
 > **Prime directive:** Finish **Lean/formalization** for Paper **3A**.  
 > Only after a Lean **freeze** (no sorries, green builds, tests stable) do we switch to LaTeX authoring.
 > 
-> **Paper 3B Status**: See [documentation/P3B_STATUS.md](documentation/P3B_STATUS.md) for current proof-theoretic framework checkpoint.
+> **Paper 3B Status**: ✅ COMPLETE (January 30, 2025) - See [documentation/P3B_STATUS.md](documentation/P3B_STATUS.md) for discharge roadmap.
 
-## 📍 Current Position (January 29, 2025)
+## 📍 Current Position (January 30, 2025)
 
 #### Infrastructure
 - **Part I**: Full uniformization height theory for {0,1} levels
 - **Part II Core**: Positive uniformization definitions, bridges, gap results  
+- **Paper 3B ProofTheory**: COMPLETE scaffold with 0 sorries, 21 axioms in Ax namespace (January 30, 2025)
 - **Bicategorical framework**: Complete with coherence laws
 - **Truth groupoid**: With @[simp] automation
 - **CI integration**: All tests passing (1189+ build jobs), no import cycles
