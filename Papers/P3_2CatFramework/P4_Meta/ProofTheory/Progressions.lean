@@ -5,11 +5,12 @@
   These model Turing-style and Feferman-style progressions schematically.
   
   Axioms used in this module:
-  - LCons_arithmetization_instance: Extension preserves arithmetization
-  - LReflect_arithmetization_instance: Extension preserves arithmetization
   - cons_tag_refines: Links ConTag to ConsistencyFormula
   - rfn_tag_refines: Links RfnTag to RFN_Sigma1_Formula
   - LClass_omega_eq_PA: Limit of classicality ladder
+  
+  Note: LCons_arithmetization and LReflect_arithmetization are now derived
+  from Core.ExtendIter_arithmetization, not axiomatized.
 -/
 
 import Papers.P3_2CatFramework.P4_Meta.ProofTheory.Core
@@ -193,14 +194,6 @@ theorem LReflect_as_ExtendIter (T0 : Theory) (n : Nat) :
 
 namespace Ax
 
-/-- Instance propagation for arithmetization.
-    Provenance: Standard extension preserves arithmetization; deferred for 3B. -/
-axiom LCons_arithmetization_instance {T0 : Theory} [HasArithmetization T0] (n : Nat) : 
-  HasArithmetization (LCons T0 n)
-
-axiom LReflect_arithmetization_instance {T0 : Theory} [HasArithmetization T0] (n : Nat) : 
-  HasArithmetization (LReflect T0 n)
-
 /-- At the limit, LClass reaches PA.
     Provenance: Classical result from ordinal analysis. -/
 axiom LClass_omega_eq_PA : ExtendOmega HA ClassicalitySteps = PA
@@ -222,16 +215,18 @@ axiom rfn_tag_refines (T0 : Theory) [HasArithmetization T0] (n : Nat)
 end Ax
 
 -- Export for compatibility
-export Ax (LCons_arithmetization_instance LReflect_arithmetization_instance
-          LClass_omega_eq_PA cons_tag_refines rfn_tag_refines)
+export Ax (LClass_omega_eq_PA cons_tag_refines rfn_tag_refines)
 
+-- These instances are now derived from Core.ExtendIter_arithmetization
 noncomputable instance LCons_arithmetization {T0 : Theory} [HasArithmetization T0] (n : Nat) :
-  HasArithmetization (LCons T0 n) :=
-  LCons_arithmetization_instance (T0:=T0) n
+  HasArithmetization (LCons T0 n) := by
+  simp only [LCons_as_ExtendIter]
+  exact ExtendIter_arithmetization consSteps n
 
 noncomputable instance LReflect_arithmetization {T0 : Theory} [HasArithmetization T0] (n : Nat) :
-  HasArithmetization (LReflect T0 n) :=
-  LReflect_arithmetization_instance (T0:=T0) n
+  HasArithmetization (LReflect T0 n) := by
+  simp only [LReflect_as_ExtendIter]
+  exact ExtendIter_arithmetization reflSteps n
 
 /-- Axiomatic refinement from schematic stage tags to semantic statements. -/
 class RealizesCons (T0 : Theory) [HasArithmetization T0] where
@@ -255,14 +250,14 @@ noncomputable instance {T0 : Theory} [HasArithmetization T0] : RealizesCons T0 :
   ⟨fun n h => by
      -- bring the instance HasArithmetization (LCons T0 n) into scope
      letI : HasArithmetization (LCons T0 n) :=
-       LCons_arithmetization_instance (T0:=T0) n
-     exact cons_tag_refines (T0:=T0) n h⟩
+       LCons_arithmetization n
+     exact cons_tag_refines T0 n h⟩
 
 noncomputable instance {T0 : Theory} [HasArithmetization T0] : RealizesRFN T0 :=
   ⟨fun n h => by
      -- bring the instance HasArithmetization (LReflect T0 n) into scope
      letI : HasArithmetization (LReflect T0 n) :=
-       LReflect_arithmetization_instance (T0:=T0) n
-     exact rfn_tag_refines (T0:=T0) n h⟩
+       LReflect_arithmetization n
+     exact rfn_tag_refines T0 n h⟩
 
 end Papers.P4Meta.ProofTheory

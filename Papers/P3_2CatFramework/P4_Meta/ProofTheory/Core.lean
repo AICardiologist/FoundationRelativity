@@ -6,6 +6,7 @@
 -/
 
 import Papers.P3_2CatFramework.P4_Meta.Meta_Signature
+import Papers.P3_2CatFramework.P4_Meta.PartIII_Certificates
 
 namespace Papers.P4Meta.ProofTheory
 
@@ -123,6 +124,26 @@ abbrev RfnTag (n : Nat) : Formula := Formula.atom (800 + n)
 
 /-- Schematic Gödel sentence tag at level n -/
 abbrev GTagFormula (n : Nat) : Formula := Formula.atom (700 + n)
+
+/-! ## Arithmetization Preservation -/
+
+/-- Extension preserves arithmetization -/
+instance [HasArithmetization T] : HasArithmetization (Extend T φ) where
+  code := fun ψ => (inferInstance : HasArithmetization T).code ψ
+  provFormula := fun ψ => (inferInstance : HasArithmetization T).provFormula ψ
+  prov_is_sigma1 := fun ψ => (inferInstance : HasArithmetization T).prov_is_sigma1 ψ
+
+/-- Iterated extension preserves arithmetization -/
+instance ExtendIter_arithmetization [HasArithmetization T] (step : Nat → Formula) (n : Nat) : 
+    HasArithmetization (ExtendIter T step n) := by
+  induction n with
+  | zero => 
+    simp only [ExtendIter]
+    exact inferInstance
+  | succ n ih => 
+    simp only [ExtendIter]
+    haveI := ih
+    exact inferInstance
 
 /-! ## Core Axioms -/
 
