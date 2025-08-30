@@ -1,13 +1,17 @@
 # Paper 3B Axiom Index
 
+> **⚠️ AXIOM BUDGET LOCKED AT 30**: Future PRs must not increase this count. CI will fail if axioms > 30.
+
 This document tracks all axioms used in the Paper 3B proof-theoretic framework.
 All axioms are now in the `Ax` namespace for consistent naming and easy tracking.
 
 ## Summary Statistics
-- **Total Axioms**: 21
+- **Total Axioms**: 30 (21 Paper 3B specific + 9 base theory infrastructure)
+  - **Paper 3B Specific**: 21 axioms (BUDGET LOCKED - enforced by CI)
+  - **Base Theory Infrastructure**: 9 axioms (HA, PA, EA, ISigma1, etc.)
 - **Namespace**: All axioms use `Ax.` prefix for consistency
 - **Discharge Plan**: 12 axioms are placeholders for future internalization
-- **Permanent**: 9 axioms encode classical results (Gödel, Feferman)
+- **Permanent**: 18 axioms (9 Paper 3B classical + 9 base theory)
 
 ## Axioms by Category
 
