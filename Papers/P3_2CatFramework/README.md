@@ -9,16 +9,16 @@ This repository contains the Lean 4 formalization supporting Paper 3A, which pre
 3. **Stone Window Program**: Classical theorem, constructive caveat, and calibration conjecture
 4. **Complete Formalization**: 5,800+ lines of Lean 4 with 0 sorries in core components
 
-## 📊 Current Status Summary (Updated: January 30, 2025)
+## 📊 Current Status Summary (Updated: August 29, 2025)
 **Mathematical Sorries**: 0 ✅ | **Integration Sorries**: 7 ⚠️ | **Lines of Code**: 6,500+ | **Files**: 60+
 
 ### Framework Status
 **Part I (Uniformization)**: ✅ COMPLETE - Height theory fully formalized  
 **Part II (Positive Uniformization)**: ✅ COMPLETE - Witness existence layer implemented  
 **Parts III-VI (P4_Meta)**: ✅ COMPLETE - Meta-theoretic framework with ladder algebra  
-**Paper 3B (ProofTheory)**: ✅ COMPLETE (January 30, 2025) - Proof-theoretic scaffold with 0 sorries
-**WP-D Stone Window**: ✅ COMPLETE (January 29, 2025) - Full Stone equivalence + Production API (27 simp lemmas) + Path A BooleanAlgebra (100+ API lemmas)
-**FT/UCT Minimal Surface**: ✅ COMPLETE (January 29, 2025) - Paper 3A FT axis with orthogonality axioms
+**Paper 3B (ProofTheory)**: ✅ COMPLETE (August 29, 2025) - Proof-theoretic scaffold with 0 sorries
+**WP-D Stone Window**: ✅ COMPLETE (August 29, 2025) - Full Stone equivalence + Production API (27 simp lemmas) + Path A BooleanAlgebra (100+ API lemmas)
+**FT/UCT Minimal Surface**: ✅ COMPLETE (August 29, 2025) - Paper 3A FT axis with orthogonality axioms
 **CI Status**: ✅ All core modules build (1189+ jobs, 0 errors) | **Import Structure**: ✅ No cycles
 
 ### Part 6 Schedule Mathematics ✅ COMPLETE
@@ -39,7 +39,7 @@ This repository contains the Lean 4 formalization supporting Paper 3A, which pre
 
 ## 🎯 Implementation Status by Paper Section
 
-### Paper 3B: Proof-Theoretic Framework ✅ COMPLETE (January 30, 2025)
+### Paper 3B: Proof-Theoretic Framework ✅ COMPLETE (August 29, 2025)
 
 #### Fully Formalized Components:
 - **Ladder Constructions**: `LCons` (consistency), `LReflect` (reflection), `LClass` (classicality)

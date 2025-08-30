@@ -47,7 +47,7 @@ Each pathology has a **calibration degree** ρ indicating logical strength:
 
 ### 🎯 **Latest Achievements**
 
-#### **Paper 3B: Proof-Theoretic Framework Complete** (January 2025)
+#### **Paper 3B: Proof-Theoretic Framework Complete** (August 2025)
 - **Complete scaffold**: LCons/LReflect/LClass ladders with 0 sorries
 - **Core theorem**: RFN_Σ₁ → Con proved schematically (sorry-free)
 - **Axiom discipline**: All 21 axioms in `Ax` namespace with CI guard
@@ -56,7 +56,7 @@ Each pathology has a **calibration degree** ρ indicating logical strength:
 - **Documentation**: Complete axiom index with discharge roadmap
 - **Next steps**: 6 independent PRs for axiom discharge outlined
 
-#### **Paper 3 Parts I-VI: Complete 2-Categorical Framework + Meta Layer** (January 2025)
+#### **Paper 3 Parts I-VI: Complete 2-Categorical Framework + Meta Layer** (August 2025)
 - **Part I & II**: Complete uniformization height theory + positive uniformization
   - `gap_has_height_one`: Bidual gap has uniformization height = 1
   - `pos_gap_height_eq_one`: Gap has positive height = 1 (requires WLPO)
@@ -79,7 +79,7 @@ Each pathology has a **calibration degree** ρ indicating logical strength:
       - ✅ **Full Stone equivalence**: `StoneEquiv : PowQuot 𝓘 ≃ LinfQuotRingIdem 𝓘 R` for `[Nontrivial R]`
       - ✅ Complete D3(c4) layer with `TwoIdempotents` class and inverse proofs
       - ✅ **Clean linter compliance**: Section scoping eliminates warnings
-      - ✅ **Stone Window Clean API** (January 29, 2025): Production-ready packaging
+      - ✅ **Stone Window Clean API** (August 29, 2025): Production-ready packaging
         - `stoneWindowIso`: Main equivalence with 27 @[simp] lemmas
         - Forward/inverse separation prevents simp loops
         - Complete Boolean operation preservation (inf/sup/compl)
