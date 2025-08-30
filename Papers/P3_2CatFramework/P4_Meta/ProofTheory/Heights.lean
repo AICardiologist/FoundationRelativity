@@ -27,8 +27,7 @@ theorem con_height_upper (T0 : Theory) :
   simp [LCons, Extend_Proves]
 
 /-- Gödel sentence tag (schematic, not the actual Gödel sentence) -/
-def godelFormula : Nat → Formula
-  | n => GTagFormula n
+abbrev godelFormula := GTagFormula
 
 namespace Ax
 
