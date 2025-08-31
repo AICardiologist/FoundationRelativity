@@ -67,25 +67,112 @@
 
 ## Next PR cards (ready to open)
 
-### PR-2A — Parametric tags (defeq → semantics)
-- **Edits:** Progressions/Heights/Collisions/test modules where ConTag/RfnTag occur.
-- **API:**
-  - `def ConTag (T : Theory) (n : Nat) : Formula := ConsistencyFormula (LCons T n)`
-  - `def RfnTag (T : Theory) (n : Nat) : Formula := RFN_Sigma1_Formula (LReflect T n)`
-  - Local abbrev for backward-compatible notation if needed.
-- **Tests:**
-  - `#print axioms` for RealizesCons/RealizesRFN → no Ax. deps.
-  - Derived collision semantic step follows from bridge removal.
-- **Docs/CI:**
-  - AXIOM_INDEX.md → 26 → 24
-  - CI budget auto-updates, guard passes.
+### PR-2A — Parametric tags (budget 26 → 24) 
 
-### PR-5 — Core definability mini-pass
-- **Target:** Sigma1_Bot, Bot_is_FalseInN (whichever is feasible first).
-- **Approach:** Use existing encoding hooks; keep proofs local to Core.lean.
-- **Tests:** `#print axioms` show no new Ax.; CI budget decrements accordingly.
+**Goal:** Remove the two tag–semantics bridge axioms by making tags theory-indexed and definitionally equal to their semantic formulas.
 
-### PR-8 — CI delta guard
-- **Idea:** In CI, compute `git diff --unified=0` on changed files and count newly added `^axiom` lines.
-- **Fail if:** total budget OK but new Ax. lines > 0 (unless label `allow-axiom-add` is present).
-- **Keeps:** contributors honest while allowing explicit exceptions.
+**Why now:** We already discharged WLPO/LPO by definitional alignment. Doing the same for tags is the fastest way to drop two axioms with minimal proof work.
+
+#### Implementation Plan (surgical diffs)
+
+**Step 1: Make tags parametric and defeq to semantics**
+
+In `Papers/P3_2CatFramework/P4_Meta/ProofTheory/Progressions.lean`:
+```lean
+/-! ## Parametric tags (definitional semantics) -/
+
+/-- Consistency tag at stage `n` for base theory `T0`. -/
+abbrev ConTag (T0 : Theory) (n : Nat) : Formula :=
+  ConsistencyFormula (LCons T0 n)
+
+/-- Σ₁-Reflection tag at stage `n` for base theory `T0`. -/
+abbrev RfnTag (T0 : Theory) (n : Nat) : Formula :=
+  RFN_Sigma1_Formula (LReflect T0 n)
+
+/-- Notation for readability. -/
+scoped notation "ConTag[" T0 "] " n => ConTag T0 n
+scoped notation "RfnTag[" T0 "] " n => RfnTag T0 n
+```
+
+**Step 2: Replace global, non-parametric usages**
+- Search/replace `ConTag n` → `ConTag[T0] n` and `RfnTag n` → `RfnTag[T0] n`
+- Redefine helper aliases:
+  ```lean
+  abbrev consFormula (T0 : Theory) (n : Nat) := ConTag[T0] n
+  abbrev reflFormula (T0 : Theory) (n : Nat) := RfnTag[T0] n
+  ```
+
+**Step 3: Delete bridge axioms and simplify instances**
+- Remove the two "tag means semantics" axioms from Progressions.lean
+- In RealizesCons/RealizesRFN, refinement proofs become:
+  ```lean
+  have h' := h
+  simpa [ConTag, ConsistencyFormula] using h'
+  ```
+
+**Step 4: Update collision stubs to parametric tags**
+In `Collisions.lean`:
+```lean
+axiom collision_tag (T0 : Theory) (n : Nat) :
+  (LReflect T0 (n+1)).Provable (RfnTag[T0] n) →
+  (LReflect T0 (n+1)).Provable (ConTag[T0] n)
+```
+
+**Step 5: Tests & CI**
+- Update `test/ProofTheory_Sanity.lean` for new parametric names
+- Run `.ci/check_axioms.sh` → expect 24
+- Update AXIOM_INDEX.md banner to "BUDGET LOCKED AT 24"
+
+**Definition of Done:**
+- Build green, 0 sorries
+- `./.ci/check_axioms.sh` reports 24 total
+- No remaining references to non-parametric tags
+- AXIOM_INDEX.md + P3B_STATUS.md updated
+
+**Files to modify:**
+- `P4_Meta/ProofTheory/Progressions.lean` — tag definitions and Realizes*
+- `P4_Meta/ProofTheory/Collisions.lean` — signatures mentioning tags
+- `P4_Meta/ProofTheory/Core.lean` — ExtendIter_arithmetization instances
+- `test/ProofTheory_Sanity.lean` — #print axioms confirmations
+- `documentation/AXIOM_INDEX.md` — update banner to 24
+
+### PR-5 — Core definability mini-pack (budget 24 → 22-23)
+
+**Goal:** Replace 1–2 "Core definability" axioms with straightforward lemmas.
+
+**Candidates (pick easiest first):**
+1. **Sigma1_Bot** — Define Bot as Σ₁ (e.g., ∃x. x ≠ x or standard Δ₀ contradiction)
+   - Prove `IsSigma1 Bot` from existing Σ₁ constructors
+2. **Bot_is_FalseInN** (stretch) — Show ℕ ⊨ Bot is false by evaluation
+
+**Definition of Done:**
+- Axiom count drops by 1–2
+- `#print axioms` for new lemmas is empty or restricted to base theory
+
+### PR-8 — CI polish (no budget change)
+
+**Goal:** Keep the guard future-proof and fast.
+
+**Enhancements:**
+- Add Lake cache step to workflow for faster rebuilds
+- Add "changed-files only" mode (env var) for PR scans
+- Make axiom guard step required in branch protections
+
+**Optional extras:**
+- Delta-aware guard: flag new `^axiom` lines in PRs
+- Performance: limit scans to touched `*.lean` under ProofTheory/
+
+## 🔎 Risks & Mitigations
+
+### API churn from parametric tags
+**Mitigation:** Add scoped notation `ConTag[T] n`, `RfnTag[T] n` and provide local `abbrev consFormula/reflFormula` wrappers. Touches are mechanical and confined to Progressions.lean, Collisions.lean, and nearby instances/tests.
+
+### Typeclass resolution for arithmetization at each stage
+**Mitigation:** Keep existing pattern: `letI : HasArithmetization (LCons T0 n) := LCons_arithmetization n` (same for LReflect). This is already in place and documented.
+
+## 📊 Status Recap & Targets
+
+- **Now:** 26 total axioms = 17 (Paper-3B) + 9 (base infra)
+- **Next milestone:** 24 (PR-2A parametric tags)
+- **Near-term stretch:** 22-23 (PR-5 definability mini-pack)
+- **Likely permanent:** ~10 axioms (collision height-comparison, classical lower bounds, ω-limit behavior)
