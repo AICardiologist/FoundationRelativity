@@ -32,12 +32,19 @@ All axioms are now in the `Ax` namespace for consistent naming and easy tracking
 4. `Ax.rfn_tag_refines` - Links RfnTag(n) to RFN_Sigma1_Formula(LReflect T0 n)
 
 ### Collision Axioms (4 axioms)
-*Discharge plan: Route through internalized RFN→Con theorem*
+*Split into cross-ladder bridge and height comparison*
 
+#### Cross-ladder bridge (2 axioms - dischargeable via PR-2)
 5. `Ax.collision_tag` - RfnTag implies ConTag at each stage
+   - Discharge path: Derive from RFN_implies_Con + tag-semantics bridge
 6. `Ax.collision_step_semantic` - Semantic version of collision
+   - Discharge path: Follow from collision_tag once tags = semantics
+
+#### Height comparison (2 axioms - likely permanent)
 7. `Ax.reflection_dominates_consistency_axiom` - Ladder morphism preservation
-8. `Ax.reflection_height_dominance` - Height comparison
+   - Encodes ω^CK_1 dominance from ordinal analysis
+8. `Ax.reflection_height_dominance` - Converse height comparison
+   - Classical result about reflection's strength
 
 ### Classical Lower Bounds (5 axioms)
 *Permanent: These encode classical proof-theoretic results*
