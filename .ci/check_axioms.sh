@@ -64,6 +64,19 @@ if [[ $axiom_count -gt $MAX_AXIOMS ]]; then
   echo "❌ AXIOM BUDGET EXCEEDED!"
   echo "   The axiom count ($axiom_count) exceeds the budget of $MAX_AXIOMS."
   echo "   Future PRs must reduce axioms, not increase them."
+  echo ""
+  echo "📊 Files contributing axioms:"
+  for f in $files; do
+    if [ -f "$f" ]; then
+      cnt=$(grep -c "^[[:space:]]*axiom\\b" "$f" 2>/dev/null || echo "0")
+      # Ensure cnt is a clean number - take only first line and trim
+      cnt=$(echo "$cnt" | head -1 | tr -d ' \r')
+      cnt=${cnt:-0}
+      if [[ "$cnt" -gt 0 ]]; then
+        printf "  %2d axioms in %s\n" "$cnt" "${f#Papers/P3_2CatFramework/P4_Meta/ProofTheory/}"
+      fi
+    fi
+  done | sort -rn
   exit 1
 fi
 
@@ -72,11 +85,23 @@ echo "✅ Axiom budget check passed ($axiom_count ≤ $MAX_AXIOMS)."
 # Check for any sorry or admit (as proof terms, not in comments)
 echo "🔍 Checking for sorries..."
 # Look for sorry/admit as proof terms, including multiline "by sorry" patterns
-if grep -rE "^\s*(by\s*)?sorry\s*$|:=\s*sorry\b|^\s*(by\s*)?admit\s*$|:=\s*admit\b" \
+sorry_files=$(grep -lE "^\s*(by\s*)?sorry\s*$|:=\s*sorry\b|^\s*(by\s*)?admit\s*$|:=\s*admit\b" \
     Papers/P3_2CatFramework/P4_Meta/ProofTheory/*.lean 2>/dev/null | \
-    grep -v "sorry-free" | grep -v "sorries" | grep -v "/--" | grep -v "^\s*--"; then
+    grep -v "sorry-free" | grep -v "sorries" || true)
+
+if [[ -n "$sorry_files" ]]; then
   echo "❌ Found sorry/admit instances!"
   echo "   No sorries are allowed in Paper 3B ProofTheory modules."
+  echo ""
+  echo "📊 Files containing sorries:"
+  for f in $sorry_files; do
+    cnt=$(grep -cE "^\s*(by\s*)?sorry\s*$|:=\s*sorry\b|^\s*(by\s*)?admit\s*$|:=\s*admit\b" "$f" 2>/dev/null || echo "0")
+    # Ensure cnt is a clean number
+    cnt=${cnt:-0}
+    if [[ "$cnt" -gt 0 ]]; then
+      printf "  %2d sorries in %s\n" "$cnt" "${f#Papers/P3_2CatFramework/P4_Meta/ProofTheory/}"
+    fi
+  done | sort -rn
   exit 1
 fi
 
