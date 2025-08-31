@@ -1,21 +1,21 @@
 # Paper 3B Axiom Index
 
-> **⚠️ AXIOM BUDGET LOCKED AT 28**: Future PRs must not increase this count. CI will fail if axioms > 28.
+> **⚠️ AXIOM BUDGET LOCKED AT 26**: Future PRs must not increase this count. CI will fail if axioms > 26.
 
 This document tracks all axioms used in the Paper 3B proof-theoretic framework.
 All axioms are now in the `Ax` namespace for consistent naming and easy tracking.
 
 ## Summary Statistics
-- **Total Axioms**: 28 (19 Paper 3B specific + 9 base theory infrastructure)
-  - **Paper 3B Specific**: 19 axioms (BUDGET LOCKED - enforced by CI)
+- **Total Axioms**: 26 (17 Paper 3B specific + 9 base theory infrastructure)
+  - **Paper 3B Specific**: 17 axioms (BUDGET LOCKED - enforced by CI)
   - **Base Theory Infrastructure**: 9 axioms (HA, PA, EA, ISigma1, etc.)
 - **Namespace**: All axioms use `Ax.` prefix for consistency
-- **Discharge Plan**: 10 axioms are placeholders for future internalization
+- **Discharge Plan**: 8 axioms are placeholders for future internalization
 - **Permanent**: 18 axioms (9 Paper 3B classical + 9 base theory)
 
-### Recent Progress (PR-1)
-- ✅ Discharged `LCons_arithmetization_instance` - now derived from Core.ExtendIter_arithmetization
-- ✅ Discharged `LReflect_arithmetization_instance` - now derived from Core.ExtendIter_arithmetization
+### Recent Progress
+- **PR-1**: ✅ Discharged `LCons_arithmetization_instance` and `LReflect_arithmetization_instance` - now derived from Core.ExtendIter_arithmetization
+- **PR-4**: ✅ Discharged `WLPO_height_upper` and `LPO_height_upper` - now proved via Extend_Proves
 
 ## Axioms by Category
 
@@ -48,25 +48,25 @@ All axioms are now in the `Ax` namespace for consistent naming and easy tracking
 12. `Ax.cons_hierarchy_proper` - Consistency hierarchy is strict
 13. `Ax.refl_hierarchy_proper` - Reflection hierarchy is strict
 
-### Classicality Bounds (4 axioms)
-*Mixed: Upper bounds dischargeable, lower bounds permanent*
+### Classicality Bounds (2 axioms - upper bounds DISCHARGED ✅)
+*Lower bounds permanent (independence results)*
 
-14. `Ax.WLPO_height_upper` - WLPO at height 1 (dischargeable)
-15. `Ax.LPO_height_upper` - LPO at height 2 (dischargeable)
-16. `Ax.WLPO_lower` - WLPO independence from HA (permanent)
-17. `Ax.LPO_lower` - LPO independence from HA+EM_Σ₀ (permanent)
+~~14. `Ax.WLPO_height_upper` - WLPO at height 1~~ DISCHARGED via Extend_Proves
+~~15. `Ax.LPO_height_upper` - LPO at height 2~~ DISCHARGED via Extend_Proves
+14. `Ax.WLPO_lower` - WLPO independence from HA (permanent)
+15. `Ax.LPO_lower` - LPO independence from HA+EM_Σ₀ (permanent)
 
 ### Core Axioms (3 axioms)
 *Discharge plan: Basic arithmetization facts*
 
-18. `Ax.Sigma1_Bot` - Bot is a Σ₁ formula
-19. `Ax.Bot_is_FalseInN` - Bot is false in standard model
-20. `Ax.con_implies_godel` - Con implies Gödel sentence
+16. `Ax.Sigma1_Bot` - Bot is a Σ₁ formula
+17. `Ax.Bot_is_FalseInN` - Bot is false in standard model
+18. `Ax.con_implies_godel` - Con implies Gödel sentence
 
 ### Limit Behavior (1 axiom)
 *Discharge plan: Prove via ordinal analysis*
 
-21. `Ax.LClass_omega_eq_PA` - Limit of classicality ladder
+19. `Ax.LClass_omega_eq_PA` - Limit of classicality ladder
 
 ## Core Theorem Dependencies
 

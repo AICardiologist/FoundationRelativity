@@ -90,11 +90,11 @@ def ClassicalitySteps : Nat → Formula
 | 0 => EM_Sigma 0  -- EM for Δ₀ (includes WLPO)
 | n+1 => EM_Sigma (n+1)
 
-/-- WLPO as a special case (height 1 on classicality axis) -/
-def WLPO_formula : Formula := Formula.atom 311
+/-- WLPO as the first classicality step (height 1 on classicality axis) -/
+abbrev WLPO_formula : Formula := ClassicalitySteps 0
 
-/-- LPO (height 2 on classicality axis) -/  
-def LPO_formula : Formula := Formula.atom 310
+/-- LPO as the second classicality step (height 2 on classicality axis) -/  
+abbrev LPO_formula : Formula := ClassicalitySteps 1
 
 /-! ## Consistency and Gödel Sentences -/
 

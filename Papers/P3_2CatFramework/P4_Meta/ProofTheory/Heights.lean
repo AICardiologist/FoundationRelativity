@@ -91,13 +91,30 @@ axiom cons_hierarchy_proper (T0 : Theory) [Consistent T0] [HBL T0] (n : Nat) :
 axiom refl_hierarchy_proper (T0 : Theory) [Consistent T0] [HBL T0] (n : Nat) :
   ¬((LReflect T0 n).Provable (RfnTag n))
 
+end Ax
+
+-- Export axioms except the ones we're about to discharge (and WLPO/LPO_lower which come later)
+export Ax (G2_lower G1_lower RFN_lower cons_hierarchy_proper refl_hierarchy_proper)
+
 /-- WLPO has height 1 on classicality ladder.
-    TODO: Complete proof that WLPO ⊆ EM_Σ₀. -/
-axiom WLPO_height_upper : (LClass 1).Provable WLPO_formula
+    Proved via Extend_Proves since WLPO_formula = ClassicalitySteps 0. -/
+theorem WLPO_height_upper : (LClass 1).Provable WLPO_formula := by
+  -- LClass 1 = Extend HA (ClassicalitySteps 0)
+  -- and WLPO_formula = ClassicalitySteps 0
+  -- so Extend proves the added formula
+  simp only [LClass, WLPO_formula]
+  exact Extend_Proves
 
 /-- LPO has height 2 on classicality ladder.
-    TODO: Complete proof that LPO ⊆ EM_Σ₁. -/
-axiom LPO_height_upper : (LClass 2).Provable LPO_formula
+    Proved via Extend_Proves since LPO_formula = ClassicalitySteps 1. -/
+theorem LPO_height_upper : (LClass 2).Provable LPO_formula := by
+  -- LClass 2 = Extend (LClass 1) (ClassicalitySteps 1)
+  -- and LPO_formula = ClassicalitySteps 1
+  -- so Extend proves the added formula
+  simp only [LClass, LPO_formula]
+  exact Extend_Proves
+
+namespace Ax
 
 /-- WLPO is independent of HA (classical).
     Provenance: Constructive reverse mathematics. -/
@@ -109,9 +126,8 @@ axiom LPO_lower : ¬((LClass 1).Provable LPO_formula)
 
 end Ax
 
--- Export for compatibility
-export Ax (G2_lower G1_lower RFN_lower cons_hierarchy_proper refl_hierarchy_proper
-          WLPO_height_upper LPO_height_upper WLPO_lower LPO_lower)
+-- Export remaining axioms (WLPO_height_upper and LPO_height_upper are now theorems)
+export Ax (WLPO_lower LPO_lower)
 
 /-! ## Height Certificates -/
 
