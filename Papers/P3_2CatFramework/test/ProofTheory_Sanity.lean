@@ -16,6 +16,22 @@ namespace Papers.P4Meta.ProofTheory.Tests
 
 open Papers.P4Meta Papers.P4Meta.ProofTheory
 
+/-! ## Axiom Discharge Verification -/
+
+section AxiomTests
+
+/-- Verify WLPO_height_upper uses no Ax. axioms (PR-4 discharge) -/
+#print axioms WLPO_height_upper
+/- Should show: 'WLPO_height_upper' depends on axioms: [HA] 
+   Note: HA is a base theory axiom, not in Ax namespace -/
+
+/-- Verify LPO_height_upper uses no Ax. axioms (PR-4 discharge) -/
+#print axioms LPO_height_upper
+/- Should show: 'LPO_height_upper' depends on axioms: [HA]
+   Note: HA is a base theory axiom, not in Ax namespace -/
+
+end AxiomTests
+
 /-! ## Test Core Definitions -/
 
 section CoreTests
