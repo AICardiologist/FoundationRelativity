@@ -32,6 +32,24 @@ section AxiomTests
 
 end AxiomTests
 
+/-! ## Collision Axiom Guards -/
+
+section CollisionTests
+
+/-- Verify collision_step depends on collision_tag -/
+#print axioms collision_step
+/- Expected: depends on [Ax.collision_tag] -/
+
+/-- Verify reflection_dominates_consistency depends on its axiom -/
+#print axioms reflection_dominates_consistency
+/- Expected: depends on [Ax.reflection_dominates_consistency_axiom] -/
+
+/-- Verify the utility lemmas don't add axioms -/
+#print axioms reflection_dominates_map
+#print axioms reflection_dominates_mono
+
+end CollisionTests
+
 /-! ## Test Core Definitions -/
 
 section CoreTests
