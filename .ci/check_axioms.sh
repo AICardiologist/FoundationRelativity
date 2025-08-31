@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 # Axiom budget guard for Paper 3B
 # Ensures all axioms are declared within namespace Ax blocks
+#
+# Notes:
+# - Requires bash (uses [[ ]], functions, etc.)
+# - Grep is POSIX ERE only (no -P), works on GNU/BSD.
 
 set -euo pipefail
+export LC_ALL=C
 
 echo "🔍 Checking axiom namespace discipline..."
 
@@ -57,6 +62,18 @@ if [[ -z "${MAX_AXIOMS:-}" ]]; then
   echo "⚠️  Could not parse budget from AXIOM_INDEX.md; falling back to default 30."
   MAX_AXIOMS=30
 fi
+
+# Helper functions
+count_axioms_file() {
+  local f="$1"
+  if [[ ! -f "$f" ]]; then printf '0'; return; fi
+  if grep -q -E '^[[:space:]]*axiom\b' -- "$f" 2>/dev/null; then
+    grep -E -c '^[[:space:]]*axiom\b' -- "$f" 2>/dev/null || printf '0'
+  else
+    printf '0'
+  fi
+}
+
 echo "   Current axiom count: $axiom_count"
 echo "   Maximum allowed: $MAX_AXIOMS (from AXIOM_INDEX.md)"
 
@@ -66,17 +83,19 @@ if [[ $axiom_count -gt $MAX_AXIOMS ]]; then
   echo "   Future PRs must reduce axioms, not increase them."
   echo ""
   echo "📊 Files contributing axioms:"
+  tmp_report="$(mktemp)"
   for f in $files; do
     if [ -f "$f" ]; then
-      cnt=$(grep -c "^[[:space:]]*axiom\\b" "$f" 2>/dev/null || echo "0")
-      # Ensure cnt is a clean number - take only first line and trim
-      cnt=$(echo "$cnt" | head -1 | tr -d ' \r')
-      cnt=${cnt:-0}
+      cnt="$(count_axioms_file "$f")"
       if [[ "$cnt" -gt 0 ]]; then
-        printf "  %2d axioms in %s\n" "$cnt" "${f#Papers/P3_2CatFramework/P4_Meta/ProofTheory/}"
+        printf "%02d %s\n" "$cnt" "${f#Papers/P3_2CatFramework/P4_Meta/ProofTheory/}" >> "$tmp_report"
       fi
     fi
-  done | sort -rn
+  done
+  if [[ -s "$tmp_report" ]]; then
+    sort -rn "$tmp_report" | sed -E 's/^([0-9]{2}) (.*)$/  \1 axioms in \2/'
+  fi
+  rm -f "$tmp_report"
   exit 1
 fi
 
@@ -84,24 +103,40 @@ echo "✅ Axiom budget check passed ($axiom_count ≤ $MAX_AXIOMS)."
 
 # Check for any sorry or admit (as proof terms, not in comments)
 echo "🔍 Checking for sorries..."
-# Look for sorry/admit as proof terms, including multiline "by sorry" patterns
-sorry_files=$(grep -lE "^\s*(by\s*)?sorry\s*$|:=\s*sorry\b|^\s*(by\s*)?admit\s*$|:=\s*admit\b" \
-    Papers/P3_2CatFramework/P4_Meta/ProofTheory/*.lean 2>/dev/null | \
-    grep -v "sorry-free" | grep -v "sorries" || true)
+# Look for sorry/admit as proof terms, skipping comments
+sorry_pattern='(^[[:space:]]*(by[[:space:]]*)?sorry[[:space:]]*$)|(:=[[:space:]]*sorry\b)|(^[[:space:]]*(by[[:space:]]*)?admit[[:space:]]*$)|(:=[[:space:]]*admit\b)'
+sorry_files=""
+for f in $files; do
+  if [ -f "$f" ]; then
+    # Check if file contains sorry/admit (not in comments)
+    if grep -qE "$sorry_pattern" "$f" 2>/dev/null; then
+      # Basic filter: skip if entire match is in a comment line
+      # (More sophisticated comment filtering would need proper parsing)
+      if ! grep -E "$sorry_pattern" "$f" 2>/dev/null | grep -q '^[[:space:]]*--'; then
+        sorry_files="${sorry_files}${f}\n"
+      fi
+    fi
+  fi
+done
 
 if [[ -n "$sorry_files" ]]; then
   echo "❌ Found sorry/admit instances!"
   echo "   No sorries are allowed in Paper 3B ProofTheory modules."
   echo ""
   echo "📊 Files containing sorries:"
-  for f in $sorry_files; do
-    cnt=$(grep -cE "^\s*(by\s*)?sorry\s*$|:=\s*sorry\b|^\s*(by\s*)?admit\s*$|:=\s*admit\b" "$f" 2>/dev/null || echo "0")
-    # Ensure cnt is a clean number
-    cnt=${cnt:-0}
-    if [[ "$cnt" -gt 0 ]]; then
-      printf "  %2d sorries in %s\n" "$cnt" "${f#Papers/P3_2CatFramework/P4_Meta/ProofTheory/}"
+  tmp_sorry="$(mktemp)"
+  echo -e "$sorry_files" | while read -r f; do
+    if [[ -n "$f" ]]; then
+      cnt=$(grep -cE "$sorry_pattern" "$f" 2>/dev/null || echo "0")
+      if [[ "$cnt" -gt 0 ]]; then
+        printf "%02d %s\n" "$cnt" "${f#Papers/P3_2CatFramework/P4_Meta/ProofTheory/}" >> "$tmp_sorry"
+      fi
     fi
-  done | sort -rn
+  done
+  if [[ -s "$tmp_sorry" ]]; then
+    sort -rn "$tmp_sorry" | sed -E 's/^([0-9]{2}) (.*)$/  \1 sorries in \2/'
+  fi
+  rm -f "$tmp_sorry"
   exit 1
 fi
 
