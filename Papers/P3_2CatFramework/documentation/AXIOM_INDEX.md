@@ -1,21 +1,22 @@
 # Paper 3B Axiom Index
 
-> **⚠️ AXIOM BUDGET LOCKED AT 26**: Future PRs must not increase this count. CI will fail if axioms > 26.
+> **⚠️ AXIOM BUDGET LOCKED AT 24**: Future PRs must not increase this count. CI will fail if axioms > 24.
 
 This document tracks all axioms used in the Paper 3B proof-theoretic framework.
 All axioms are now in the `Ax` namespace for consistent naming and easy tracking.
 
 ## Summary Statistics
-- **Total Axioms**: 26 (17 Paper 3B specific + 9 base theory infrastructure)
-  - **Paper 3B Specific**: 17 axioms (BUDGET LOCKED - enforced by CI)
+- **Total Axioms**: 24 (15 Paper 3B specific + 9 base theory infrastructure)
+  - **Paper 3B Specific**: 15 axioms (BUDGET LOCKED - enforced by CI)
   - **Base Theory Infrastructure**: 9 axioms (HA, PA, EA, ISigma1, etc.)
 - **Namespace**: All axioms use `Ax.` prefix for consistency
-- **Discharge Plan**: 8 axioms are placeholders for future internalization
+- **Discharge Plan**: 6 axioms are placeholders for future internalization
 - **Permanent**: 18 axioms (9 Paper 3B classical + 9 base theory)
 
 ### Recent Progress
 - **PR-1**: ✅ Discharged `LCons_arithmetization_instance` and `LReflect_arithmetization_instance` - now derived from Core.ExtendIter_arithmetization
 - **PR-4**: ✅ Discharged `WLPO_height_upper` and `LPO_height_upper` - now proved via Extend_Proves
+- **PR-2A**: ✅ Discharged `cons_tag_refines` and `rfn_tag_refines` - tags now parametric and defeq to semantics
 
 ## Axioms by Category
 
@@ -25,11 +26,11 @@ All axioms are now in the `Ax` namespace for consistent naming and easy tracking
 ~~1. `Ax.LCons_arithmetization_instance` - Extension preserves arithmetization for LCons~~ DISCHARGED
 ~~2. `Ax.LReflect_arithmetization_instance` - Extension preserves arithmetization for LReflect~~ DISCHARGED
 
-### Schematic Tag Refinements (2 axioms)
-*Discharge plan: Connect tags to semantic formulas via arithmetization*
+### Schematic Tag Refinements (0 axioms - DISCHARGED ✅)
+*Successfully discharged in PR-2A by making tags parametric and defeq to semantic formulas*
 
-3. `Ax.cons_tag_refines` - Links ConTag(n) to ConsistencyFormula(LCons T0 n)
-4. `Ax.rfn_tag_refines` - Links RfnTag(n) to RFN_Sigma1_Formula(LReflect T0 n)
+~~3. `Ax.cons_tag_refines` - Links ConTag(n) to ConsistencyFormula(LCons T0 n)~~ DISCHARGED
+~~4. `Ax.rfn_tag_refines` - Links RfnTag(n) to RFN_Sigma1_Formula(LReflect T0 n)~~ DISCHARGED
 
 ### Collision Axioms (4 axioms)
 *Split into cross-ladder bridge and height comparison*

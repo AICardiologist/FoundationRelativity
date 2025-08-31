@@ -39,9 +39,9 @@ namespace Ax
     2. Apply RFN_implies_Con to get ConsistencyFormula  
     3. Apply con_tag_equiv_sem inverse to get consFormula
 -/
-axiom collision_tag (T0 : Theory) (n : Nat) :
-  (LReflect T0 (n+1)).Provable (reflFormula n) →
-  (LReflect T0 (n+1)).Provable (consFormula n)
+axiom collision_tag (T0 : Theory) [HasArithmetization T0] (n : Nat) :
+  (LReflect T0 (n+1)).Provable (RfnTag[T0] n) →
+  (LReflect T0 (n+1)).Provable (ConTag[T0] n)
 
 /-- Semantic version of the collision: LReflect directly proves its own consistency.
     
@@ -66,7 +66,7 @@ axiom collision_step_semantic (T0 : Theory) (n : Nat)
     deep ordinal-theoretic relationships. Could potentially be derived from a 
     formalized ordinal analysis framework.
 -/
-axiom reflection_dominates_consistency_axiom (T0 : Theory) (n : Nat) (φ : Formula) :
+axiom reflection_dominates_consistency_axiom (T0 : Theory) [HasArithmetization T0] (n : Nat) (φ : Formula) :
   (LReflect T0 n).Provable φ → (LCons T0 (n + 1)).Provable φ
 
 /-- Reflection achieves consistency at the same height (modulo shift).
@@ -76,7 +76,7 @@ axiom reflection_dominates_consistency_axiom (T0 : Theory) (n : Nat) (φ : Formu
     **Note**: This is the converse direction - anything provable via consistency
     is achievable via reflection at the same or lower height.
 -/
-axiom reflection_height_dominance (T0 : Theory) (φ : Formula) (n : Nat) :
+axiom reflection_height_dominance (T0 : Theory) [HasArithmetization T0] (φ : Formula) (n : Nat) :
   (LCons T0 n).Provable φ → (LReflect T0 n).Provable φ ∨ ∃ m ≤ n, (LReflect T0 m).Provable φ
 
 end Ax
@@ -88,10 +88,10 @@ export Ax (collision_tag collision_step_semantic reflection_dominates_consistenc
 /-! ## Collision Theorems -/
 
 /-- The formal collision: R_{n+1} ⊢ Con(R_n) at the schematic level. -/
-theorem collision_step (T0 : Theory) (n : Nat) :
-  (LReflect T0 (n+1)).Provable (consFormula n) := by
+theorem collision_step (T0 : Theory) [HasArithmetization T0] (n : Nat) :
+  (LReflect T0 (n+1)).Provable (ConTag[T0] n) := by
   -- definitional: step n+1 adds the RFN tag at stage n
-  have hRFN : (LReflect T0 (n+1)).Provable (reflFormula n) :=
+  have hRFN : (LReflect T0 (n+1)).Provable (RfnTag[T0] n) :=
     LReflect_proves_RFN T0 n
   -- convert RFN-tag to Con-tag via the collision axiom
   exact collision_tag T0 n hRFN
@@ -107,8 +107,8 @@ def reflection_dominates_consistency (T0 : Theory) :
 , preserves := reflection_dominates_consistency_axiom T0 }
 
 /-- Special case: the collision at consistency formulas -/
-theorem reflection_proves_consistency (T0 : Theory) (n : Nat) :
-  (LReflect T0 (n+1)).Provable (consFormula n) :=
+theorem reflection_proves_consistency (T0 : Theory) [HasArithmetization T0] (n : Nat) :
+  (LReflect T0 (n+1)).Provable (ConTag[T0] n) :=
   collision_step T0 n
 
 /-! ## Height Comparison -/
