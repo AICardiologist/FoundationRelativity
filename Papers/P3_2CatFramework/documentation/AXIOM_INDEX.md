@@ -1,9 +1,24 @@
 # Paper 3B Axiom Index
 
 > **⚠️ AXIOM BUDGET LOCKED AT 26**: Future PRs must not increase this count. CI will fail if axioms > 26.
+> 
+> **Next milestone: 24** (PR-2A parametric tags)
 
 This document tracks all axioms used in the Paper 3B proof-theoretic framework.
 All axioms are now in the `Ax` namespace for consistent naming and easy tracking.
+
+## 📊 Scoreboard (Paper-3B only)
+
+| Category | Count | Status |
+|----------|------:|--------|
+| Tag–semantics bridge | **2** | PR-2A removes both |
+| Collision: cross-ladder bridge | **2** | Falls after PR-2A |
+| Collision: height comparison | **2** | Likely permanent |
+| Classical lower bounds | **5** | Permanent |
+| Hierarchy strictness | **2** | Likely permanent |
+| Core definability | **3** | 1–2 dischargeable (PR-5) |
+| Limit behavior | **1** | Likely permanent |
+| **Total Paper-3B** | **17** | Target: 15 after PR-2A |
 
 ## Summary Statistics
 - **Total Axioms**: 26 (17 Paper 3B specific + 9 base theory infrastructure)
