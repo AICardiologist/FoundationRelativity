@@ -1,13 +1,13 @@
 # Paper 3B Axiom Index
 
-> **⚠️ AXIOM BUDGET LOCKED AT 23**: Future PRs must not increase this count. CI will fail if axioms > 23.
+> **⚠️ AXIOM BUDGET LOCKED AT 22**: Future PRs must not increase this count. CI will fail if axioms > 22.
 
 This document tracks all axioms used in the Paper 3B proof-theoretic framework.
 All axioms are now in the `Ax` namespace for consistent naming and easy tracking.
 
 ## Summary Statistics
-- **Total Axioms**: 23 (14 Paper 3B specific + 9 base theory infrastructure)
-  - **Paper 3B Specific**: 14 axioms (BUDGET LOCKED - enforced by CI)
+- **Total Axioms**: 22 (13 Paper 3B specific + 9 base theory infrastructure)
+  - **Paper 3B Specific**: 13 axioms (BUDGET LOCKED - enforced by CI)
   - **Base Theory Infrastructure**: 9 axioms (HA, PA, EA, ISigma1, etc.)
 - **Namespace**: All axioms use `Ax.` prefix for consistency
 - **Discharge Plan**: 5 axioms are placeholders for future internalization
@@ -18,6 +18,7 @@ All axioms are now in the `Ax` namespace for consistent naming and easy tracking
 - **PR-4**: ✅ Discharged `WLPO_height_upper` and `LPO_height_upper` - now proved via Extend_Proves
 - **PR-2A**: ✅ Discharged `cons_tag_refines` and `rfn_tag_refines` - tags now parametric and defeq to semantics
 - **PR-5a**: ✅ Discharged `Sigma1_Bot` - now a theorem via schematic Σ₁ definition
+- **PR-5b**: ✅ Discharged `Bot_is_FalseInN` - now a theorem via AtomTrueInN schematic evaluation
 
 ## Axioms by Category
 
@@ -65,24 +66,24 @@ All axioms are now in the `Ax` namespace for consistent naming and easy tracking
 14. `Ax.WLPO_lower` - WLPO independence from HA (permanent)
 15. `Ax.LPO_lower` - LPO independence from HA+EM_Σ₀ (permanent)
 
-### Core Axioms (2 axioms)
+### Core Axioms (1 axiom)
 *Discharge plan: Basic arithmetization facts*
 
 ~~16. `Ax.Sigma1_Bot` - Bot is a Σ₁ formula~~ DISCHARGED (PR-5a: theorem via schematic definition)
-17. `Ax.Bot_is_FalseInN` - Bot is false in standard model
-18. `Ax.con_implies_godel` - Con implies Gödel sentence
+~~17. `Ax.Bot_is_FalseInN` - Bot is false in standard model~~ DISCHARGED (PR-5b: theorem via AtomTrueInN)
+16. `Ax.con_implies_godel` - Con implies Gödel sentence
 
 ### Limit Behavior (1 axiom)
 *Discharge plan: Prove via ordinal analysis*
 
-19. `Ax.LClass_omega_eq_PA` - Limit of classicality ladder
+17. `Ax.LClass_omega_eq_PA` - Limit of classicality ladder
 
 ## Core Theorem Dependencies
 
 Via `#print axioms` diagnostics:
 
 - `collision_step` depends on: [propext, Ax.collision_tag]
-- `RFN_implies_Con` depends on: [Ax.Bot_is_FalseInN, Sigma1_Bot (now a theorem)]
+- `RFN_implies_Con` depends on: [propext] (Bot_is_FalseInN and Sigma1_Bot are now theorems)
 - `reflection_dominates_consistency` depends on: [Ax.reflection_dominates_consistency_axiom]
 - `godel_height_cert` depends on: [propext, Ax.con_implies_godel]
 

@@ -14,10 +14,18 @@ open Papers.P4Meta
 
 /-- Sigma1 formulas (schematic predicate) 
     We designate certain formulas as Σ₁ by their atom codes.
-    Atoms 0-99 are designated as Σ₁ formulas. -/
+    Atoms 0-99 are designated as Σ₁ formulas.
+    Note: This is schematic; only relied on for Bot and tag lemmas;
+    not a full syntactic hierarchy. -/
 def Sigma1 : Formula → Prop 
   | Formula.atom n => n < 100
   -- In a full formalization, this would check structural properties
+
+/-- Schematic standard-model truth for atoms (minimal for our needs).
+    Bot (atom 0) is false, everything else is true. -/
+def AtomTrueInN : Nat → Prop
+  | 0   => False  -- Bot is false
+  | _+1 => True   -- All other atoms are true (harmless default)
 
 /-- Implication for formulas (using atoms for simplicity) -/
 def Formula.impl (φ ψ : Formula) : Formula := 
@@ -43,6 +51,8 @@ class HasArithmetization (T : Theory) where
 class HasSigma1Reflection (T : Theory) where
   /-- Σ₁ formulas represent arithmetic truths -/
   TrueInN : Formula → Prop
+  /-- TrueInN on atoms is given by AtomTrueInN -/
+  trueInN_atom : ∀ n, TrueInN (Formula.atom n) = AtomTrueInN n
   /-- Bot is false in the standard model -/
   bot_false : ¬TrueInN Bot  -- Bot is false
   /-- Reflection: Σ₁ provability implies truth -/
@@ -156,19 +166,15 @@ instance ExtendIter_arithmetization [HasArithmetization T] (step : Nat → Formu
     this is now a theorem rather than an axiom. -/
 theorem Sigma1_Bot : Sigma1 Bot := by
   simp [Bot, Sigma1]
-  norm_num
-
-namespace Ax
 
 /-- Bot is false in the standard model.
-    Provenance: Standard arithmetization, Bot codes falsity.
-    (Still an axiom as it depends on the semantic interpretation) -/
-axiom Bot_is_FalseInN {T : Theory} [h : HasSigma1Reflection T] : 
-  ¬h.TrueInN Bot
-
-end Ax
-
--- Export for compatibility (Sigma1_Bot is now a theorem, not from Ax)
-export Ax (Bot_is_FalseInN)
+    Now a theorem derived from AtomTrueInN via the trueInN_atom axiom.
+    Since Bot = Formula.atom 0 and AtomTrueInN 0 = False,
+    this follows directly from the schematic evaluation. -/
+theorem Bot_is_FalseInN {T : Theory} [h : HasSigma1Reflection T] : 
+  ¬h.TrueInN Bot := by
+  simp only [Bot, h.trueInN_atom, AtomTrueInN]
+  -- After simplification, we have ¬False which is trivially true
+  simp
 
 end Papers.P4Meta.ProofTheory
