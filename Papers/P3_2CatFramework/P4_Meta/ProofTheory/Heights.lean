@@ -22,8 +22,8 @@ open Papers.P4Meta
 /-! ## Upper Bounds (Constructive) -/
 
 /-- Consistency has height 1 on the consistency ladder -/
-theorem con_height_upper (T0 : Theory) :
-  (LCons T0 1).Provable (consFormula 0) := by
+theorem con_height_upper (T0 : Theory) [HasArithmetization T0] :
+  (LCons T0 1).Provable (ConTag[T0] 0) := by
   simp [LCons, Extend_Proves]
 
 /-- Gödel sentence tag (schematic, not the actual Gödel sentence) -/
@@ -33,27 +33,27 @@ namespace Ax
 
 /-- Gödel sentence follows from consistency (classical).
     Provenance: Gödel 1931, via fixed-point construction. -/
-axiom con_implies_godel (T : Theory) (n : Nat) :
-  T.Provable (consFormula n) → T.Provable (godelFormula n)
+axiom con_implies_godel (T : Theory) [HasArithmetization T] (n : Nat) :
+  T.Provable (ConTag[T] n) → T.Provable (godelFormula n)
 
 end Ax
 
 export Ax (con_implies_godel)
 
 /-- Gödel sentence has height 1 on the consistency ladder -/
-theorem godel_height_upper (T0 : Theory) :
+theorem godel_height_upper (T0 : Theory) [HasArithmetization T0] :
   (LCons T0 1).Provable (godelFormula 0) := by
   apply con_implies_godel
   exact con_height_upper T0
 
 /-- RFN has height 1 on the reflection ladder -/
-theorem rfn_height_upper (T0 : Theory) :
-  (LReflect T0 1).Provable (reflFormula 0) := by
+theorem rfn_height_upper (T0 : Theory) [HasArithmetization T0] :
+  (LReflect T0 1).Provable (RfnTag[T0] 0) := by
   simp [LReflect, Extend_Proves]
 
 /-- Iterated consistency at height n -/
-theorem con_iter_height_upper (T0 : Theory) (n : Nat) :
-  (ExtendIter T0 consSteps (n+1)).Provable (consFormula n) := by
+theorem con_iter_height_upper (T0 : Theory) [HasArithmetization T0] (n : Nat) :
+  (ExtendIter T0 (consSteps T0) (n+1)).Provable (ConTag[T0] n) := by
   rw [← LCons_as_ExtendIter]
   apply LCons_proves_Con
 
@@ -132,22 +132,22 @@ export Ax (WLPO_lower LPO_lower)
 /-! ## Height Certificates -/
 
 /-- Certificate for consistency on LCons -/
-def con_height_cert (T0 : Theory) [Consistent T0] [HBL T0] :
-  HeightCertificate T0 consSteps (consFormula 0) :=
+def con_height_cert (T0 : Theory) [HasArithmetization T0] [Consistent T0] [HBL T0] :
+  HeightCertificate T0 (consSteps T0) (ConTag[T0] 0) :=
 { n := 1
 , upper := con_height_upper T0
 , note := "Upper: definitional; Lower: G2 (classical)" }
 
 /-- Certificate for Gödel sentence on LCons -/
-def godel_height_cert (T0 : Theory) [Consistent T0] [HBL T0] :
-  HeightCertificate T0 consSteps (godelFormula 0) :=
+def godel_height_cert (T0 : Theory) [HasArithmetization T0] [Consistent T0] [HBL T0] :
+  HeightCertificate T0 (consSteps T0) (godelFormula 0) :=
 { n := 1
 , upper := godel_height_upper T0
 , note := "Upper: via Con→G; Lower: G1 (classical)" }
 
 /-- Certificate for RFN on LReflect -/
-def rfn_height_cert (T0 : Theory) [Consistent T0] [HBL T0] :
-  HeightCertificate T0 reflSteps (reflFormula 0) :=
+def rfn_height_cert (T0 : Theory) [HasArithmetization T0] [Consistent T0] [HBL T0] :
+  HeightCertificate T0 (reflSteps T0) (RfnTag[T0] 0) :=
 { n := 1
 , upper := rfn_height_upper T0
 , note := "Upper: definitional; Lower: Feferman (classical)" }
@@ -170,8 +170,8 @@ def LPO_height_cert : HeightCertificate HA ClassicalitySteps LPO_formula :=
 /-! ## Iterated Heights -/
 
 /-- Height n consistency on the consistency ladder -/
-def con_n_height (T0 : Theory) [Consistent T0] [HBL T0] (n : Nat) :
-  HeightCertificate T0 consSteps (consFormula n) :=
+def con_n_height (T0 : Theory) [HasArithmetization T0] [Consistent T0] [HBL T0] (n : Nat) :
+  HeightCertificate T0 (consSteps T0) (ConTag[T0] n) :=
 { n := n + 1
 , upper := con_iter_height_upper T0 n
 , note := s!"Upper: iteration; Lower: G2^{n+1} (classical)" }
