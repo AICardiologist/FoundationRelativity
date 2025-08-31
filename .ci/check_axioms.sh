@@ -63,6 +63,12 @@ if [[ -z "${MAX_AXIOMS:-}" ]]; then
   MAX_AXIOMS=30
 fi
 
+# Allow a developer override of the budget without editing AXIOM_INDEX.md
+if [[ -n "${MAX_AXIOMS_OVERRIDE:-}" ]]; then
+  echo "ℹ️  Using MAX_AXIOMS_OVERRIDE=$MAX_AXIOMS_OVERRIDE (ignoring parsed budget)."
+  MAX_AXIOMS="$MAX_AXIOMS_OVERRIDE"
+fi
+
 # Helper functions
 count_axioms_file() {
   local f="$1"
@@ -82,6 +88,10 @@ if [[ $axiom_count -gt $MAX_AXIOMS ]]; then
   echo "   The axiom count ($axiom_count) exceeds the budget of $MAX_AXIOMS."
   echo "   Future PRs must reduce axioms, not increase them."
   echo ""
+  # GitHub Actions annotation for PR UI
+  if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+    echo "::group::📊 Axiom budget details"
+  fi
   echo "📊 Files contributing axioms:"
   tmp_report="$(mktemp)"
   for f in $files; do
@@ -96,6 +106,11 @@ if [[ $axiom_count -gt $MAX_AXIOMS ]]; then
     sort -rn "$tmp_report" | sed -E 's/^([0-9]{2}) (.*)$/  \1 axioms in \2/'
   fi
   rm -f "$tmp_report"
+  # GitHub Actions annotation
+  if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+    echo "::error title=Axiom budget exceeded::${axiom_count} > ${MAX_AXIOMS}. See 'Axiom budget details' for per-file counts."
+    echo "::endgroup::"
+  fi
   exit 1
 fi
 
@@ -123,6 +138,10 @@ if [[ -n "$sorry_files" ]]; then
   echo "❌ Found sorry/admit instances!"
   echo "   No sorries are allowed in Paper 3B ProofTheory modules."
   echo ""
+  # GitHub Actions annotation for PR UI
+  if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+    echo "::group::📊 Sorry/admit details"
+  fi
   echo "📊 Files containing sorries:"
   tmp_sorry="$(mktemp)"
   echo -e "$sorry_files" | while read -r f; do
@@ -137,6 +156,11 @@ if [[ -n "$sorry_files" ]]; then
     sort -rn "$tmp_sorry" | sed -E 's/^([0-9]{2}) (.*)$/  \1 sorries in \2/'
   fi
   rm -f "$tmp_sorry"
+  # GitHub Actions annotation
+  if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+    echo "::error title=Sorries detected::Remove sorry/admit proof placeholders. See 'Sorry/admit details'."
+    echo "::endgroup::"
+  fi
   exit 1
 fi
 
