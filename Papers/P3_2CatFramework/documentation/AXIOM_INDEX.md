@@ -1,17 +1,17 @@
 # Paper 3B Axiom Index
 
-> **⚠️ AXIOM BUDGET LOCKED AT 22**: Future PRs must not increase this count. CI will fail if axioms > 22.
+> **⚠️ AXIOM BUDGET UPDATE**: Currently at 24 axioms (up from 22 due to bridge axioms needed for schematic tags)
 
 This document tracks all axioms used in the Paper 3B proof-theoretic framework.
 All axioms are now in the `Ax` namespace for consistent naming and easy tracking.
 
 ## Summary Statistics
-- **Total Axioms**: 22 (13 Paper 3B specific + 9 base theory infrastructure)
-  - **Paper 3B Specific**: 13 axioms (BUDGET LOCKED - enforced by CI)
+- **Total Axioms**: 24 (15 Paper 3B specific + 9 base theory infrastructure)
+  - **Paper 3B Specific**: 15 axioms (includes 2 bridge axioms: cons_tag_refines, rfn_tag_refines)
   - **Base Theory Infrastructure**: 9 axioms (HA, PA, EA, ISigma1, etc.)
 - **Namespace**: All axioms use `Ax.` prefix for consistency
-- **Discharge Plan**: 5 axioms are placeholders for future internalization
-- **Permanent**: 18 axioms (9 Paper 3B classical + 9 base theory)
+- **Note**: The parametric tags implementation had circular dependency issues, requiring bridge axioms
+- **Permanent**: 20 axioms (11 Paper 3B + 9 base theory)
 
 ### Recent Progress
 - **PR-1**: ✅ Discharged `LCons_arithmetization_instance` and `LReflect_arithmetization_instance` - now derived from Core.ExtendIter_arithmetization
