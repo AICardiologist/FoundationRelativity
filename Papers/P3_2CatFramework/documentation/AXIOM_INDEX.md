@@ -1,22 +1,22 @@
 # Paper 3B Axiom Index
 
-> **⚠️ AXIOM BUDGET UPDATE**: Currently at 24 axioms (up from 22 due to bridge axioms needed for schematic tags)
+> **⚠️ AXIOM BUDGET UPDATE**: Currently at 24 axioms (includes 2 bridge axioms: cons_tag_refines, rfn_tag_refines)
 
 This document tracks all axioms used in the Paper 3B proof-theoretic framework.
 All axioms are now in the `Ax` namespace for consistent naming and easy tracking.
 
 ## Summary Statistics
 - **Total Axioms**: 24 (15 Paper 3B specific + 9 base theory infrastructure)
-  - **Paper 3B Specific**: 15 axioms (includes 2 bridge axioms: cons_tag_refines, rfn_tag_refines)
+  - **Paper 3B Specific**: 15 axioms (includes 2 bridge axioms for schematic tags)
   - **Base Theory Infrastructure**: 9 axioms (HA, PA, EA, ISigma1, etc.)
 - **Namespace**: All axioms use `Ax.` prefix for consistency
-- **Note**: The parametric tags implementation had circular dependency issues, requiring bridge axioms
+- **Note**: Bot_is_FalseInN discharged as theorem (PR-5b), but bridge axioms added due to parametric tag issues
 - **Permanent**: 20 axioms (11 Paper 3B + 9 base theory)
 
 ### Recent Progress
 - **PR-1**: ✅ Discharged `LCons_arithmetization_instance` and `LReflect_arithmetization_instance` - now derived from Core.ExtendIter_arithmetization
 - **PR-4**: ✅ Discharged `WLPO_height_upper` and `LPO_height_upper` - now proved via Extend_Proves
-- **PR-2A**: ✅ Discharged `cons_tag_refines` and `rfn_tag_refines` - tags now parametric and defeq to semantics
+- **PR-2A**: ⚠️ Attempted parametric tags but had to revert - added `cons_tag_refines` and `rfn_tag_refines` as bridge axioms
 - **PR-5a**: ✅ Discharged `Sigma1_Bot` - now a theorem via schematic Σ₁ definition
 - **PR-5b**: ✅ Discharged `Bot_is_FalseInN` - now a theorem via AtomTrueInN schematic evaluation
 
