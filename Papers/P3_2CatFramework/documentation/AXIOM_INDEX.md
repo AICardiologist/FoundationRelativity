@@ -1,22 +1,23 @@
 # Paper 3B Axiom Index
 
-> **⚠️ AXIOM BUDGET LOCKED AT 24**: Future PRs must not increase this count. CI will fail if axioms > 24.
+> **⚠️ AXIOM BUDGET LOCKED AT 23**: Future PRs must not increase this count. CI will fail if axioms > 23.
 
 This document tracks all axioms used in the Paper 3B proof-theoretic framework.
 All axioms are now in the `Ax` namespace for consistent naming and easy tracking.
 
 ## Summary Statistics
-- **Total Axioms**: 24 (15 Paper 3B specific + 9 base theory infrastructure)
-  - **Paper 3B Specific**: 15 axioms (BUDGET LOCKED - enforced by CI)
+- **Total Axioms**: 23 (14 Paper 3B specific + 9 base theory infrastructure)
+  - **Paper 3B Specific**: 14 axioms (BUDGET LOCKED - enforced by CI)
   - **Base Theory Infrastructure**: 9 axioms (HA, PA, EA, ISigma1, etc.)
 - **Namespace**: All axioms use `Ax.` prefix for consistency
-- **Discharge Plan**: 6 axioms are placeholders for future internalization
+- **Discharge Plan**: 5 axioms are placeholders for future internalization
 - **Permanent**: 18 axioms (9 Paper 3B classical + 9 base theory)
 
 ### Recent Progress
 - **PR-1**: ✅ Discharged `LCons_arithmetization_instance` and `LReflect_arithmetization_instance` - now derived from Core.ExtendIter_arithmetization
 - **PR-4**: ✅ Discharged `WLPO_height_upper` and `LPO_height_upper` - now proved via Extend_Proves
 - **PR-2A**: ✅ Discharged `cons_tag_refines` and `rfn_tag_refines` - tags now parametric and defeq to semantics
+- **PR-5a**: ✅ Discharged `Sigma1_Bot` - now a theorem via schematic Σ₁ definition
 
 ## Axioms by Category
 
@@ -64,10 +65,10 @@ All axioms are now in the `Ax` namespace for consistent naming and easy tracking
 14. `Ax.WLPO_lower` - WLPO independence from HA (permanent)
 15. `Ax.LPO_lower` - LPO independence from HA+EM_Σ₀ (permanent)
 
-### Core Axioms (3 axioms)
+### Core Axioms (2 axioms)
 *Discharge plan: Basic arithmetization facts*
 
-16. `Ax.Sigma1_Bot` - Bot is a Σ₁ formula
+~~16. `Ax.Sigma1_Bot` - Bot is a Σ₁ formula~~ DISCHARGED (PR-5a: theorem via schematic definition)
 17. `Ax.Bot_is_FalseInN` - Bot is false in standard model
 18. `Ax.con_implies_godel` - Con implies Gödel sentence
 
@@ -81,7 +82,7 @@ All axioms are now in the `Ax` namespace for consistent naming and easy tracking
 Via `#print axioms` diagnostics:
 
 - `collision_step` depends on: [propext, Ax.collision_tag]
-- `RFN_implies_Con` depends on: [Ax.Bot_is_FalseInN, Ax.Sigma1_Bot]
+- `RFN_implies_Con` depends on: [Ax.Bot_is_FalseInN, Sigma1_Bot (now a theorem)]
 - `reflection_dominates_consistency` depends on: [Ax.reflection_dominates_consistency_axiom]
 - `godel_height_cert` depends on: [propext, Ax.con_implies_godel]
 
