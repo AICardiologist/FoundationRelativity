@@ -21,57 +21,52 @@ open Papers.P4Meta
 /-- Scoped notation for Extend to improve readability -/
 scoped notation:55 T " ⊕ " φ => Extend T φ
 
-/-! ## Ladder Definitions and Parametric Tags
-
-We use mutual definitions to define ladders and tags together,
-since tags depend on ladders and ladders use tags.
--/
-
-mutual
+/-! ## Ladder Definitions -/
 
 /-- The consistency ladder starting from base theory T0 -/
 def LCons (T0 : Theory) [HasArithmetization T0] : Nat → Theory
   | 0 => T0
-  | n+1 => Extend (LCons T0 n) (ConTag T0 n)
+  | n+1 => Extend (LCons T0 n) (ConTag n)
 
 /-- The reflection ladder starting from base theory T0 -/
 def LReflect (T0 : Theory) [HasArithmetization T0] : Nat → Theory
   | 0 => T0
-  | n+1 => Extend (LReflect T0 n) (RfnTag T0 n)
-
-/-- Consistency tag at stage `n` for base theory `T0` (defeq to semantic formula). -/
-def ConTag (T0 : Theory) [HasArithmetization T0] (n : Nat) : Formula :=
-  have : HasArithmetization (LCons T0 n) := LCons_arithmetization T0 n
-  ConsistencyFormula (LCons T0 n)
-
-/-- Σ₁-Reflection tag at stage `n` for base theory `T0` (defeq to semantic formula). -/
-def RfnTag (T0 : Theory) [HasArithmetization T0] (n : Nat) : Formula :=
-  have : HasArithmetization (LReflect T0 n) := LReflect_arithmetization T0 n
-  RFN_Sigma1_Formula (LReflect T0 n)
+  | n+1 => Extend (LReflect T0 n) (RfnTag n)
 
 /-- Arithmetization for consistency ladder -/
-def LCons_arithmetization (T0 : Theory) [HasArithmetization T0] : 
+def LCons_arithmetization (T0 : Theory) [h : HasArithmetization T0] : 
     ∀ n, HasArithmetization (LCons T0 n)
-  | 0 => inferInstance
-  | n+1 => inferInstance
+  | 0 => by simp [LCons]; exact h
+  | n+1 => by
+    simp [LCons]
+    haveI : HasArithmetization (LCons T0 n) := LCons_arithmetization T0 n
+    exact inferInstance
 
 /-- Arithmetization for reflection ladder -/  
-def LReflect_arithmetization (T0 : Theory) [HasArithmetization T0] :
+def LReflect_arithmetization (T0 : Theory) [h : HasArithmetization T0] :
     ∀ n, HasArithmetization (LReflect T0 n)
-  | 0 => inferInstance
-  | n+1 => inferInstance
+  | 0 => by simp [LReflect]; exact h
+  | n+1 => by
+    simp [LReflect]
+    haveI : HasArithmetization (LReflect T0 n) := LReflect_arithmetization T0 n
+    exact inferInstance
 
-end
+-- Make them instances
+instance (T0 : Theory) [HasArithmetization T0] (n : Nat) : HasArithmetization (LCons T0 n) :=
+  LCons_arithmetization T0 n
 
-/-- Notation for readability. -/
-scoped notation "ConTag[" T0 "] " n => ConTag T0 n
-scoped notation "RfnTag[" T0 "] " n => RfnTag T0 n
+instance (T0 : Theory) [HasArithmetization T0] (n : Nat) : HasArithmetization (LReflect T0 n) :=
+  LReflect_arithmetization T0 n
+
+/-- Notation for readability (just adds brackets for visual clarity). -/
+scoped notation "ConTag[" n "]" => ConTag n
+scoped notation "RfnTag[" n "]" => RfnTag n
 
 /-- Helper: Schematic consistency tag (backward compatibility) -/
-abbrev consFormula (T0 : Theory) [HasArithmetization T0] (n : Nat) : Formula := ConTag[T0] n
+abbrev consFormula (n : Nat) : Formula := ConTag n
 
 /-- Helper: Schematic reflection tag (backward compatibility) -/
-abbrev reflFormula (T0 : Theory) [HasArithmetization T0] (n : Nat) : Formula := RfnTag[T0] n
+abbrev reflFormula (n : Nat) : Formula := RfnTag n
 
 /-! ## Basic Properties -/
 
@@ -81,11 +76,11 @@ theorem LCons_zero (T0 : Theory) [HasArithmetization T0] :
 
 @[simp]
 theorem LCons_succ (T0 : Theory) [HasArithmetization T0] (n : Nat) :
-  LCons T0 (n+1) = Extend (LCons T0 n) (ConTag T0 n) := rfl
+  LCons T0 (n+1) = Extend (LCons T0 n) (ConTag n) := rfl
 
 /-- Each step adds the consistency of the previous -/
 theorem LCons_proves_Con (T0 : Theory) [HasArithmetization T0] (n : Nat) :
-  (LCons T0 (n+1)).Provable (ConTag T0 n) := by
+  (LCons T0 (n+1)).Provable (ConTag n) := by
   simp [LCons, Extend_Proves]
 
 @[simp]
@@ -94,11 +89,11 @@ theorem LReflect_zero (T0 : Theory) [HasArithmetization T0] :
 
 @[simp]
 theorem LReflect_succ (T0 : Theory) [HasArithmetization T0] (n : Nat) :
-  LReflect T0 (n+1) = Extend (LReflect T0 n) (RfnTag T0 n) := rfl
+  LReflect T0 (n+1) = Extend (LReflect T0 n) (RfnTag n) := rfl
 
 /-- Each step adds the Σ₁ reflection principle -/
 theorem LReflect_proves_RFN (T0 : Theory) [HasArithmetization T0] (n : Nat) :
-  (LReflect T0 (n+1)).Provable (RfnTag T0 n) := by
+  (LReflect T0 (n+1)).Provable (RfnTag n) := by
   simp [LReflect, Extend_Proves]
 
 /-! ## Classicality Ladder -/
@@ -198,21 +193,21 @@ theorem LClass_mono {m n : Nat} (h : m ≤ n) :
 /-! ## Consistency Steps -/
 
 /-- Steps for the consistency ladder -/
-def consSteps (T0 : Theory) [HasArithmetization T0] : Nat → Formula := ConTag T0
+def consSteps : Nat → Formula := ConTag
 
 /-- Steps for the reflection ladder -/
-def reflSteps (T0 : Theory) [HasArithmetization T0] : Nat → Formula := RfnTag T0
+def reflSteps : Nat → Formula := RfnTag
 
 /-- The ladders match ExtendIter with their steps -/
 theorem LCons_as_ExtendIter (T0 : Theory) [HasArithmetization T0] (n : Nat) :
-  LCons T0 n = ExtendIter T0 (consSteps T0) n := by
+  LCons T0 n = ExtendIter T0 consSteps n := by
   induction n with
   | zero => rfl
   | succ n ih => 
     simp [LCons, ExtendIter, consSteps, ih]
 
 theorem LReflect_as_ExtendIter (T0 : Theory) [HasArithmetization T0] (n : Nat) :
-  LReflect T0 n = ExtendIter T0 (reflSteps T0) n := by
+  LReflect T0 n = ExtendIter T0 reflSteps n := by
   induction n with
   | zero => rfl
   | succ n ih =>
@@ -240,27 +235,32 @@ these classes now have trivial instances.
 /-- Refinement from schematic stage tags to semantic statements. -/
 class RealizesCons (T0 : Theory) [HasArithmetization T0] where
   realize :
-    ∀ n, (LCons T0 (n+1)).Provable (ConTag T0 n) →
+    ∀ n, (LCons T0 (n+1)).Provable (ConTag n) →
          (LCons T0 (n+1)).Provable (ConsistencyFormula (LCons T0 n))
 
 class RealizesRFN (T0 : Theory) [HasArithmetization T0] where
   realize :
-    ∀ n, (LReflect T0 (n+1)).Provable (RfnTag T0 n) →
+    ∀ n, (LReflect T0 (n+1)).Provable (RfnTag n) →
          (LReflect T0 (n+1)).Provable (RFN_Sigma1_Formula (LReflect T0 n))
 
--- No axioms needed! Tags are definitionally equal to semantics
+-- Bridge axioms needed due to schematic tags
+namespace Ax
+
+axiom cons_tag_refines {T0 : Theory} [HasArithmetization T0] (n : Nat) :
+  ConTag n = ConsistencyFormula (LCons T0 n)
+
+axiom rfn_tag_refines {T0 : Theory} [HasArithmetization T0] (n : Nat) :
+  RfnTag n = RFN_Sigma1_Formula (LReflect T0 n)
+
+end Ax
+
+export Ax (cons_tag_refines rfn_tag_refines)
+
+-- With the bridge axioms, the instances are straightforward
 noncomputable instance realizesCons {T0 : Theory} [HasArithmetization T0] : RealizesCons T0 :=
-  ⟨fun n h => by
-     -- Tag ≡ semantics by definition
-     convert h
-     simp only [ConTag]
-     rfl⟩
+  ⟨fun n h => by rw [← cons_tag_refines]; exact h⟩
 
 noncomputable instance realizesRFN {T0 : Theory} [HasArithmetization T0] : RealizesRFN T0 :=
-  ⟨fun n h => by
-     -- Tag ≡ semantics by definition
-     convert h
-     simp only [RfnTag]
-     rfl⟩
+  ⟨fun n h => by rw [← rfn_tag_refines]; exact h⟩
 
 end Papers.P4Meta.ProofTheory

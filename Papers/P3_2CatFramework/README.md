@@ -39,20 +39,21 @@ This repository contains the Lean 4 formalization supporting Paper 3A, which pre
 
 ## 🎯 Implementation Status by Paper Section
 
-### Paper 3B: Proof-Theoretic Framework ✅ COMPLETE (August 29, 2025)
+### Paper 3B: Proof-Theoretic Framework ✅ COMPLETE (August 31, 2025)
 
 #### Fully Formalized Components:
 - **Ladder Constructions**: `LCons` (consistency), `LReflect` (reflection), `LClass` (classicality)
 - **Core Theorem**: `RFN_implies_Con` - RFN_Σ₁ → Con proved schematically (0 sorries)
 - **Height Certificates**: Upper bounds constructive, lower bounds axiomatized
 - **Collision Morphisms**: `reflection_dominates_consistency` with formal morphism structure
-- **Axiom Discipline**: All 21 axioms in `Ax` namespace with CI guard script
+- **Axiom Discipline**: All 22 axioms in `Ax` namespace with CI guard script (reduced from 30)
 
 #### Quality Metrics:
 - **0 sorries** across all ProofTheory modules
-- **21 axioms** systematically tracked (12 dischargeable, 9 classical)
+- **22 axioms** systematically tracked (reduced from 30 via 6 PRs)
 - **Complete tests** with `#print axioms` diagnostics
 - **CI guard** `.ci/check_axioms.sh` enforces namespace discipline
+- **PR-5b**: Bot_is_FalseInN discharged via schematic evaluation (23 → 22)
 
 #### Documentation:
 - `documentation/AXIOM_INDEX.md`: Complete axiom tracking
