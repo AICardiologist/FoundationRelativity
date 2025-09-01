@@ -1,6 +1,7 @@
 # Paper 3B Axiom Index
 
 > **⚠️ AXIOM BUDGET UPDATE**: Currently at 24 axioms (includes 2 bridge axioms: cons_tag_refines, rfn_tag_refines)
+> **BUDGET LOCKED AT 24**
 
 This document tracks all axioms used in the Paper 3B proof-theoretic framework.
 All axioms are now in the `Ax` namespace for consistent naming and easy tracking.
