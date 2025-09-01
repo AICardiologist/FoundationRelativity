@@ -40,8 +40,8 @@ namespace Ax
     3. Apply con_tag_equiv_sem inverse to get consFormula
 -/
 axiom collision_tag (T0 : Theory) [HasArithmetization T0] (n : Nat) :
-  (LReflect T0 (n+1)).Provable (RfnTag[T0] n) →
-  (LReflect T0 (n+1)).Provable (ConTag[T0] n)
+  (LReflect T0 (n+1)).Provable (RfnTag[n]) →
+  (LReflect T0 (n+1)).Provable (ConTag[n])
 
 /-- Semantic version of the collision: LReflect directly proves its own consistency.
     
@@ -89,9 +89,9 @@ export Ax (collision_tag collision_step_semantic reflection_dominates_consistenc
 
 /-- The formal collision: R_{n+1} ⊢ Con(R_n) at the schematic level. -/
 theorem collision_step (T0 : Theory) [HasArithmetization T0] (n : Nat) :
-  (LReflect T0 (n+1)).Provable (ConTag[T0] n) := by
+  (LReflect T0 (n+1)).Provable (ConTag[n]) := by
   -- definitional: step n+1 adds the RFN tag at stage n
-  have hRFN : (LReflect T0 (n+1)).Provable (RfnTag[T0] n) :=
+  have hRFN : (LReflect T0 (n+1)).Provable (RfnTag[n]) :=
     LReflect_proves_RFN T0 n
   -- convert RFN-tag to Con-tag via the collision axiom
   exact collision_tag T0 n hRFN
@@ -101,14 +101,14 @@ theorem collision_step (T0 : Theory) [HasArithmetization T0] (n : Nat) :
 
 
 /-- The collision morphism: reflection dominates consistency with shift by 1 -/
-def reflection_dominates_consistency (T0 : Theory) : 
+def reflection_dominates_consistency (T0 : Theory) [HasArithmetization T0] : 
   LadderMorphism (LReflect T0) (LCons T0) :=
 { map := fun n => n + 1
 , preserves := reflection_dominates_consistency_axiom T0 }
 
 /-- Special case: the collision at consistency formulas -/
 theorem reflection_proves_consistency (T0 : Theory) [HasArithmetization T0] (n : Nat) :
-  (LReflect T0 (n+1)).Provable (ConTag[T0] n) :=
+  (LReflect T0 (n+1)).Provable (ConTag[n]) :=
   collision_step T0 n
 
 /-! ## Height Comparison -/
@@ -119,11 +119,11 @@ section MorphismLemmas
 
 /-- The reflection dominance morphism maps index n to n+1 -/
 @[simp]
-theorem reflection_dominates_map (T0 : Theory) (n : Nat) :
+theorem reflection_dominates_map (T0 : Theory) [HasArithmetization T0] (n : Nat) :
   (reflection_dominates_consistency T0).map n = n + 1 := rfl
 
 /-- The collision morphism preserves ladder monotonicity -/
-theorem reflection_dominates_mono (T0 : Theory) {m n : Nat} (h : m ≤ n) :
+theorem reflection_dominates_mono (T0 : Theory) [HasArithmetization T0] {m n : Nat} (h : m ≤ n) :
   (reflection_dominates_consistency T0).map m ≤ (reflection_dominates_consistency T0).map n := by
   simp only [reflection_dominates_map]
   exact Nat.add_le_add_right h 1
