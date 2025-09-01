@@ -117,7 +117,7 @@ A Framework Formalization with Structural Verification}
 \begin{abstract}
 We present a Lean 4 formalization of the 2--categorical framework for foundation--relativity based on the WLPO\,$\leftrightarrow$\,Bidual Gap equivalence. This paper documents the successful mechanization of uniformization height theory, achieving the key result that the bidual gap has height exactly 1, with 0 sorries in structural components. We describe the architectural decisions, technical solutions, and unexpected improvements that emerged during formalization, including a rich automation framework with \texttt{@[simp]} tactics, complete ladder algebra with normal forms, and a lightweight order--theoretic layer. The formalization comprises over 6,500 lines of verified Lean code across 60+ files. 
 
-\textbf{Status (August 29, 2025):} Parts I-VI structural components complete, including Part 6B exact finish time characterization (0 sorries), Part V RFN→Con proven with Con→Gödel axiomatized, \textbf{Paper 3B ProofTheory framework} complete with LCons/LReflect/LClass ladders and 0 sorries (21 axioms in Ax namespace with CI enforcement), \textbf{WP-B FT frontier infrastructure} providing FT→UCT, FT→Sperner→BFPT reductions with orthogonal axes, \textbf{Track A DCω/Baire frontier} establishing third orthogonal axis with hardened interface layer, and \textbf{WP-D Path A BooleanAlgebra transport} groundwork with well-definedness proofs for quotient operations.
+\textbf{Status (August 31, 2025):} Parts I-VI structural components complete, including Part 6B exact finish time characterization (0 sorries), Part V RFN→Con proven with Con→Gödel axiomatized, \textbf{Paper 3B ProofTheory framework} complete with LCons/LReflect/LClass ladders and 0 sorries (22 axioms in Ax namespace, reduced from 30 via systematic discharge), \textbf{WP-B FT frontier infrastructure} providing FT→UCT, FT→Sperner→BFPT reductions with orthogonal axes, \textbf{Track A DCω/Baire frontier} establishing third orthogonal axis with hardened interface layer, and \textbf{WP-D Path A BooleanAlgebra transport} groundwork with well-definedness proofs for quotient operations.
 \end{abstract}
 
 \begin{mdframed}[style=status]
@@ -467,7 +467,7 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
 \subsection{Paper 3B: Proof-Theoretic Framework (COMPLETE)}
 
 \begin{mdframed}[style=achievement]
-\textbf{Achievement (August 29, 2025):} Complete proof-theoretic scaffold with 0 sorries. All 21 axioms organized in \texttt{Ax} namespace with CI enforcement. Core theorem \texttt{RFN\_implies\_Con} proven schematically.
+\textbf{Achievement (August 31, 2025):} Complete proof-theoretic scaffold with 0 sorries. All 22 axioms organized in \texttt{Ax} namespace with CI enforcement (reduced from 30 via 6 PRs). Core theorem \texttt{RFN\_implies\_Con} proven schematically. PR-5b: \texttt{Bot\_is\_FalseInN} discharged via schematic evaluation (23 → 22).
 \end{mdframed}
 
 \textbf{Ladder Constructions}:
@@ -487,7 +487,7 @@ def roundRobin (k : Nat) (hk : k > 0) : Schedule k :=
 
 \textbf{Quality Infrastructure}:
 \begin{itemize}
-\item[$\checkmark$] All axioms in \texttt{Ax} namespace (21 total: 12 dischargeable, 9 classical)
+\item[$\checkmark$] All axioms in \texttt{Ax} namespace (22 total, reduced from 30 via systematic discharge)
 \item[$\checkmark$] CI guard script \texttt{.ci/check\_axioms.sh} enforces discipline
 \item[$\checkmark$] Comprehensive \texttt{\#print axioms} diagnostics in tests
 \item[$\checkmark$] Local \texttt{letI} pattern for instance resolution documented

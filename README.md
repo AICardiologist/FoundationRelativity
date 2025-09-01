@@ -50,9 +50,10 @@ Each pathology has a **calibration degree** ρ indicating logical strength:
 #### **Paper 3B: Proof-Theoretic Framework Complete** (August 2025)
 - **Complete scaffold**: LCons/LReflect/LClass ladders with 0 sorries
 - **Core theorem**: RFN_Σ₁ → Con proved schematically (sorry-free)
-- **Axiom discipline**: All 21 axioms in `Ax` namespace with CI guard
+- **Axiom discipline**: All 22 axioms in `Ax` namespace with CI guard (reduced from 30)
 - **Height certificates**: Upper bounds constructive, lower bounds axiomatized
 - **Collision morphisms**: Reflection dominates consistency
+- **PR-5b achievement**: Bot_is_FalseInN discharged via schematic evaluation (23 → 22)
 - **Documentation**: Complete axiom index with discharge roadmap
 - **Next steps**: 6 independent PRs for axiom discharge outlined
 
