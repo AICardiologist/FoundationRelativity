@@ -171,4 +171,20 @@ lemma ft_height_2_demo (O : HeightOracle)
 #check getProfile
 #check axes_independent
 
+/-! ## Usage with Examples -/
+
+/-- 
+Example: Using the oracle pattern with concrete instances.
+
+The examples can instantiate their own oracles or use a shared one.
+See Examples/Example1_WitnessFamily.lean for usage.
+-/
+example (O : HeightOracle) : 
+  getProfile O GapFamily = ⟨some 1, some 0⟩ ∧
+  getProfile O UCTWitness = ⟨some 0, some 1⟩ := by
+  simp [getProfile]
+  exact ⟨⟨O.gap_wlpo, O.gap_ft⟩, ⟨O.uct_wlpo, O.uct_ft⟩⟩
+
+#eval "FT_Frontier: Clean API for FT axis concepts"
+
 end Papers.P3.FTFrontier

@@ -4,6 +4,9 @@
   This example demonstrates how heights compose under logical operations
   in the AxCal framework.
   
+  NOTE: These are demonstrations; mathematical profiles are established in 
+  Papers 2 and 3A text. The oracle is a parametric or demo value, not a theorem.
+  
   Compiles cleanly with 0 sorries and introduces no axioms.
 -/
 

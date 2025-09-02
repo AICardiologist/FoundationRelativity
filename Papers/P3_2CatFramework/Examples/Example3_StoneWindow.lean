@@ -4,6 +4,9 @@
   This example demonstrates the concept of the Stone Window program
   without directly using the production API (which has complex dependencies).
   
+  See production API: Papers.P3_2CatFramework.P4_Meta.StoneWindow_SupportIdeals
+  for 100+ lemmas and certified finite-support surjectivity.
+  
   Compiles cleanly with 0 sorries and introduces no axioms.
 -/
 

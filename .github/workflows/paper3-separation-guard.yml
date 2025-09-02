@@ -128,3 +128,19 @@ jobs:
           lake build Papers.P3_2CatFramework.Examples.Example2_HeightComposition
           lake build Papers.P3_2CatFramework.Examples.Example3_StoneWindow
           echo "✅ All Paper 3A examples built successfully"
+      
+      - name: Build 3A/3B aggregators
+        run: |
+          echo "Building Paper 3A and 3B aggregators..."
+          lake build Papers.P3_2CatFramework.Paper3A_Main
+          lake build Papers.P3_2CatFramework.Paper3B_Main
+          echo "✅ Both aggregators built successfully"
+      
+      - name: Ensure ProofTheory does not import 3A modules
+        run: |
+          set -euo pipefail
+          echo "Checking ProofTheory doesn't import 3A modules..."
+          BAD=$(git grep -nE '^\s*import\s+Papers\.P3_2CatFramework\.(Phase|FT_Frontier|Examples)' -- \
+            "Papers/P3_2CatFramework/P4_Meta/ProofTheory/**" || true)
+          test -z "$BAD" || { echo "❌ 3B importing 3A modules:"; echo "$BAD"; exit 1; }
+          echo "✅ No 3A imports inside ProofTheory"
