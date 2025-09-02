@@ -134,18 +134,8 @@ export Ax (WLPO_lower LPO_lower)
 /-! ## Height Certificates -/
 
 -- Height certificates require ExtendIter, which our Stage-based approach doesn't directly provide
--- These are not essential for PR-6 (discharging collision_step_semantic)
--- /-- Certificate for consistency on LCons -/
--- def con_height_cert (T0 : Theory) [HasArithmetization T0] [Consistent T0] [HBL T0] :
---   HeightCertificate T0 (consSteps T0) (ConsistencyFormula T0) := sorry
-
--- /-- Certificate for Gödel sentence on LCons -/
--- def godel_height_cert (T0 : Theory) [HasArithmetization T0] [Consistent T0] [HBL T0] :
---   HeightCertificate T0 (consSteps T0) (GodelSentence T0) := sorry
-
--- /-- Certificate for RFN on LReflect -/
--- def rfn_height_cert (T0 : Theory) [HasArithmetization T0] [Consistent T0] [HBL T0] :
---   HeightCertificate T0 (reflSteps T0) (RfnTag[T0] 0) := sorry
+-- These are not essential for PR-7 (discharging collision_tag)
+-- They can be restored later by proving equivalence between Stage-based ladders and ExtendIter
 
 /-! ## Classicality Heights -/
 
@@ -164,9 +154,7 @@ def LPO_height_cert : HeightCertificate HA ClassicalitySteps LPO_formula :=
 
 /-! ## Iterated Heights -/
 
--- /-- Height n consistency on the consistency ladder -/
--- def con_n_height (T0 : Theory) [HasArithmetization T0] [Consistent T0] [HBL T0] (n : Nat) :
---   HeightCertificate T0 (consSteps T0) (ConsistencyFormula (LCons T0 n)) := sorry
+-- Commented out: requires ExtendIter equivalence proofs
 
 
 end Papers.P4Meta.ProofTheory

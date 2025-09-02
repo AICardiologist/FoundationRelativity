@@ -39,6 +39,26 @@ theorem RFN_implies_Con {Text Tbase : Theory} [h : HasRFN_Sigma1 Text Tbase] :
   -- But ⊥ is false in ℕ, contradiction
   exact Bot_is_FalseInN h_true_bot
 
+/-! ## Formula-Level Internalization -/
+
+open Classical
+noncomputable section
+
+/-- **Internalization Axiom**: From the *formula* of uniform Σ₁-reflection for `T` proved in `U`,
+    derive the *formula* of consistency for `T` inside `U`.
+    
+    Mathematically: if `U ⊢ ∀ (Σ₁ φ), Prov_T(⌜φ⌝) → φ` then `U ⊢ ¬ Prov_T(⌜⊥⌝)`.
+    
+    This is the formula-level version of `RFN_implies_Con`.
+    
+    **Provenance**: Standard internalization of the reflection principle.
+    **Intended discharge**: Requires full internalization infrastructure (instantiation lemmas, internal logic). -/
+axiom RFN_to_Con_formula
+  (U T : Theory) [HasArithmetization U] [HasArithmetization T] :
+  U.Provable (RFN_Sigma1_Formula T) → U.Provable (ConsistencyFormula T)
+
+end -- noncomputable section
+
 /-! ## Iterated Reflection -/
 
 /-- Reflection principle iterated n times (simplified) -/
