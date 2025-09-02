@@ -1,365 +1,122 @@
-# Paper 2: WLPO ↔ BidualGap∃ Equivalence
+# Paper 2: WLPO ↔ Bidual Gap
 
-![Paper2-Minimal CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/p2-minimal.yml/badge.svg)
-[![Release](https://img.shields.io/badge/Release-p2--minimal--v0.1-blue)](https://github.com/AICardiologist/FoundationRelativity/releases/tag/p2-minimal-v0.1)
-[![arXiv](https://img.shields.io/badge/arXiv-2025.xxxxx-b31b1b.svg)](https://arxiv.org/abs/2025.xxxxx)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13356587.svg)](https://doi.org/10.5281/zenodo.13356587)
+## Overview
 
-## 🎯 SPRINT E COMPLETE: Dual Isometry Implementation with 3 WLPO Sorries!
+Paper 2 calibrates the **existence of a bidual gap** (J_X: X → X** non-surjective for some real Banach space X)
+exactly at the strength of the **Weak Limited Principle of Omniscience (WLPO)** over Bishop-style
+constructive mathematics (BISH).
 
-[![Sprint E](https://img.shields.io/badge/Sprint%20E-Complete-brightgreen)](#sprint-e-complete)
-[![Dual Isometry](https://img.shields.io/badge/Dual%20Isometry-c₀*%20≃ₗᵢ%20ℓ¹-brightgreen)](#dual-isometry)
-[![3 Sorries](https://img.shields.io/badge/Total%20Sorries-3%20WLPO-brightgreen)](#minimal-sorries)
-[![Build Status](https://img.shields.io/badge/Build-0%20Errors-brightgreen)](#zero-errors)
-[![Sorry Reduction](https://img.shields.io/badge/Sorry%20Reduction-81%25-blue)](#sorry-reduction)
+## Current Status (September 2025)
 
-**Current State**: **SPRINT E COMPLETE** ✅  
-**Main Theorem**: WLPO ↔ BidualGap∃ (∃X such that J: X → X** is not surjective)  
-**Witness Space**: Our Lean formalization uses X = c₀ (sequences vanishing at infinity)  
-**Dual Isometry**: Complete implementation (c₀ →L[ℝ] ℝ) ≃ₗᵢ ℓ¹ with only 3 WLPO sorries  
-**Technical Excellence**: Self-contained csSup approach avoiding all CompleteLattice issues
+**Total sorries: 3** (all WLPO-conditional in optional completeness module)
+- Main equivalence theorem: ✅ Complete (0 sorries)
+- Witness construction with c₀: ✅ Complete (0 sorries)  
+- Optional completeness lemmas: 3 WLPO-conditional sorries
 
-🎯 **MATHEMATICAL MILESTONE**: Sprint E completed August 19, 2025 - Complete equivalence WLPO ↔ BidualGap∃ formalized with c₀ as witness space. The ℓ∞ version is discussed at paper level; formalizing it via ℓ∞/c₀ quotient is planned future work.
+## Scope
 
-## Latest Achievement ✅
+### ✅ Completed (0 sorries)
+- **Main Theorem**: Gap_∃ ↔ WLPO fully formalized
+- **Ishihara Kernel**: Prop-level decision infrastructure
+- **Forward Direction**: Gap → WLPO via kernel construction
+- **Reverse Direction**: WLPO → Gap with c₀ witness via G(f) = Σf(eₙ)
+- **Bidual Theory**: Complete X** construction and canonical embedding
 
-### ✅ Sprint E: Dual Isometry Implementation (August 19, 2025)
-- **Sorry reduction**: 16 → 3 (81% reduction!)
-- **Build status**: 0 errors, compiles cleanly
-- **Core mathematics**: Complete dual isometry (c₀ →L[ℝ] ℝ) ≃ₗᵢ ℓ¹
-- **Key implementations**:
-  - Complete `opNorm_le_tsum_abs_coeff` with finite-support approximation
-  - Self-contained `csSup` series/sup characterization (avoids CompleteLattice issues)
-  - Robust `lp_norm_p1` via power definition fallback
-  - Clean `HasWLPO` typeclass architecture for conditional/classical modes
-- **WLPO architecture**: 
-  - All 3 remaining sorries are WLPO-conditional
-  - Classical instance provides zero-sorry mode when needed
-  - Clear separation between constructive core and WLPO track
+### 🔧 WLPO-Conditional (3 sorries)
+- **Optional Completeness**: 3 lemmas in `WLPO_to_Gap_HB.lean`
+  - `norm_tsum_basis_bounded`: Norm bound under WLPO
+  - `HilbertBasis.repr_tsum_self`: Basis representation completeness
+  - `linear_functional_continuous`: Continuity of WLPO-constructed functional
 
-### ✅ Sprint D: Bidirectional WLPO ↔ BidualGap∃ Theorem
-- **Direct construction**: G ∈ (c₀)** defined by G(f) = Σₙ f(eₙ) proving non-reflexivity of c₀
-- **Witness space**: c₀ = C₀(ℕ, ℝ) (continuous functions vanishing at infinity on discrete ℕ)
-- **Zero sorries**: DirectDual.lean complete with explicit bidual functional
-- **Universe resolution**: Theorem proven for Type 0, mathematically sufficient for existential claim
+## Module Status
 
-### ✅ Sprint B: Complete Quotient Framework
-- **Mathematical quotients**: `BooleanAtInfinity := 𝒫(ℕ)/Fin` and `SeqModC0 := (ℝ^ℕ)/c₀`
-- **`iotaBar_injective`**: Rigorous proof using ε=1/2 technique with contradiction approach
-- **Ergonomic surface API**: `qSup`, `qInf`, `qCompl` operations with proper `liftOn₂` witnesses
-- **Zero sorries**: Complete quotient framework with robust mathematical proofs
-- **Comprehensive testing**: Full smoke test coverage with 88.7% regression success
+| Module | Sorries | Status | Notes |
+|--------|---------|--------|-------|
+| `Core/HBExact.lean` | 0 | ✅ Complete | Finite Hahn-Banach |
+| `Core/Kernel.lean` | 0 | ✅ Complete | Ishihara kernel infrastructure |
+| `Bidual/*.lean` | 0 | ✅ Complete | Full bidual space theory |
+| `HB/Gap_to_WLPO_pure.lean` | 0 | ✅ Complete | Gap → WLPO direction |
+| `HB/WLPO_to_Gap_pure.lean` | 0 | ✅ Complete | WLPO → Gap core |
+| `HB/DirectDual.lean` | 0 | ✅ Complete | c₀ witness construction |
+| `HB/WLPO_to_Gap_HB.lean` | 3 | 🔧 WLPO-conditional | Optional completeness |
 
-### ✅ §3.1-3.5 Complete Equivalence Framework (Foundation)
-- **Complete equivalence chain**: `finite symmetric difference ↔ eventually zero ↔ c₀-style tail smallness`
-- **ι embedding theory**: Lattice homomorphism properties for union/intersection/complement
-- **Elegant congruence algebra**: Exact symmetric difference formulas with one-liner proofs
-- **Zero sorries**: Complete constructive proof chain throughout
-- **Fortress CI protection**: 8-stage guard system with axiom hygiene
+## Key Results
 
-### ✅ Gap → WLPO Axiom-Clean  
-- **Zero sorries**: Mathematically complete forward direction  
-- **Axiom-clean**: Uses only `Classical.choice`, `propext`, `Quot.sound`
-- **API-robust**: Proof patterns survive mathlib version drift
-- **Direct Prop-level**: Avoids witness extraction complexity
-
-### 🔬 Mathematical Innovation
-The implementation demonstrates several advanced formal verification techniques:
-
-1. **Exact symmetric difference formulas**: Crisp identities enabling one-liner congruence proofs
-2. **Modular equivalence bridges**: Clean separation between set theory and functional analysis
-3. **Pin-safe API design**: Implementation patterns stable across mathlib versions
-4. **Fortress architecture**: Comprehensive CI protection with axiom hygiene guards
-
-## Current Architecture Status
-
-### ✅ Sprint B: Complete Quotient Framework
-```
-Papers/P2_BidualGap/Gap/
-├── Quotients.lean                      # ✅ Sprint B: Complete quotient framework (767 lines)
-│   ├── BooleanAtInfinity := 𝒫(ℕ)/Fin   #    Mathematical quotient type
-│   ├── SeqModC0 := (ℝ^ℕ)/c₀           #    Mathematical quotient type  
-│   ├── iotaBar_injective              #    Rigorous ε=1/2 injectivity proof
-│   └── qSup, qInf, qCompl surface API  #    Ergonomic lattice operations
-└── QuotientsTests.lean                 # ✅ Comprehensive test suite (79 lines)
-```
-
-### ✅ §3.1-3.5 Complete Equivalence Framework (Foundation)
-```
-Papers/P2_BidualGap/Gap/
-├── IndicatorSpec.lean                   # ✅ Core spec with congruence algebra
-├── Indicator.lean                       # ✅ χ indicator function theory
-├── IndicatorEventual.lean              # ✅ finite ↔ eventually zero bridge  
-├── C0Spec.lean                         # ✅ eventually zero ↔ c₀-spec bridge
-├── Iota.lean                           # ✅ ι embedding & lattice homomorphism
-├── BooleanSubLattice.lean              # ✅ Residue class partition lemmas
-└── *Tests.lean                         # ✅ Comprehensive smoke tests
-```
-
-### ✅ Forward Direction Complete
-```
-Papers/P2_BidualGap/Constructive/Ishihara.lean
-├── exists_on_unitBall_gt_half_opNorm    # ✅ Approximate supremum selection
-├── hasOpNorm_CLF                        # ✅ Classical completeness of ℝ  
-├── WLPO_of_gap                         # ✅ Direct Prop-level theorem (axiom-clean)
-└── Universe-polymorphic kernel API      # ✅ Type _ with explicit instantiation
-```
-
-### ✅ Fortress CI System Complete
-```
-lakefile.lean                           # ✅ 8-stage guard system
-scripts/constructive_guard.sh          # ✅ Axiom hygiene protection  
-scripts/sorry_scan.sh                  # ✅ Sorry detection with robust file handling
-scripts/strip_lean_comments.awk        # ✅ Nested comment-aware filtering
-```
-
-### ✅ Reverse Direction Framework Complete
-```
-Papers/P2_BidualGap/
-├── WLPO_Equiv_Gap.lean
-│   ├── wlpo_implies_gap                # ✅ Structural framework (c₀ witness pending)
-│   └── gap_equiv_WLPO                  # ✅ Bidirectional theorem implemented
-├── Constructive/
-│   ├── QuotTools.lean                  # ✅ Clean quotient/EqvGen utilities
-│   └── AxiomHelpers.lean              # ✅ Prop-only surjectivity helpers
-└── test/Axioms.lean                    # ✅ Consistent axiom profile verification
-```
-
-## Core File Structure
-
-### **Essential Files** (Active Implementation)
-```
-Papers/P2_BidualGap/
-├── Basic.lean                         # ✅ Core definitions (BidualGapStrong, WLPO)
-├── Gap/                               # ✅ **§3.1-3.5 COMPLETE FRAMEWORK**
-│   ├── IndicatorSpec.lean             #    ✅ Core equivalence spec + congruence algebra
-│   ├── Iota.lean                      #    ✅ ι embedding + lattice homomorphism  
-│   ├── C0Spec.lean                    #    ✅ c₀-style tail smallness bridge
-│   ├── IndicatorEventual.lean         #    ✅ finite ↔ eventually zero bridge
-│   ├── Indicator.lean                 #    ✅ χ indicator function definitions
-│   ├── BooleanSubLattice.lean         #    ✅ Residue class partition theory
-│   └── *Tests.lean                    #    ✅ Comprehensive smoke test coverage
-├── Constructive/                     # ✅ Main theorem implementation  
-│   ├── Ishihara.lean                 #    ✅ **AXIOM-CLEAN** Gap → WLPO (0 sorries)
-│   ├── CReal/                        #    ✅ Constructive real analysis framework
-│   └── DualStructure.lean            #    🔧 Bridge lemmas for reverse direction
-├── WLPO_Equiv_Gap.lean               # ✅ Main equivalence (forward complete, reverse pending)
-├── documentation/                    # 📄 Current documentation
-│   ├── paper-v3.2.tex               #    📄 LaTeX paper with Lean results  
-│   ├── README.md                     #    📄 This overview
-│   └── implementation_details/       #    📄 Technical status and architecture
-├── RelativityNonFunc.lean            # 🔧 Foundation-relativity results
-└── Compat/                           # 🔧 Classical compatibility layer
-    ├── Axioms.lean                   #    ✅ Isolated axiom declarations
-    └── NonReflexive.lean             #    🔧 Classical space constructions
-```
-
-### **Historical/Infrastructure Files** (Obsolete for Core Proof)
-- `Constructive/CReal_obsolete/` - Complex constructive real infrastructure (bypassed by direct approach)
-- `Logic/WLPOBasic.lean` - Basic definitions (superseded by main files)
-- `communication/` - Historical professor correspondence (preserved for documentation)
-- `Archived/` - Previous implementation attempts (preserved for reference)
-
-## Key Theorems
-
-### §3.1-3.5 Complete Equivalence Chain ✅
+### Main Equivalence Theorem
 ```lean
--- Core equivalence: finite symmetric difference ↔ c₀-style tail smallness
-theorem indicatorEqModC0_spec_iff_c0Spec (A B : Set ℕ) :
-    indicatorEqModC0Spec A B ↔ c0Spec (fun n => χ A n - χ B n)
-
--- ι embedding with lattice homomorphism properties
-theorem iota_union_hom (A B : Set ℕ) :
-    ι (A ∪ B) ≈₀ (fun n => max (ι A n) (ι B n))
-
--- Congruence under lattice operations  
-theorem iota_union_congr_right {A B C : Set ℕ} (h : ι A ≈₀ ι B) :
-    ι (A ∪ C) ≈₀ ι (B ∪ C)
-
--- Exact symmetric difference formulas
-lemma symmDiff_union_right_eq (A B C : Set ℕ) :
-    symmDiff (A ∪ C) (B ∪ C) = symmDiff A B \ C
+theorem gap_equiv_wlpo : BidualGapStrong.{0} ↔ WLPO
 ```
 
-### Forward Direction (Axiom-Clean!) ✅
-```lean  
--- Main theorem: Strong Bidual Gap implies WLPO
-theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
-  classical
-  -- Unpack gap witness: X, canonical embedding j: X → X**, element y ∉ range j
-  -- Construct uniform gap δ = ‖y‖/2 > 0
-  -- Use approximate supremum selection for near-maximizer h* ∈ X*
-  -- Define kernel with separation property: |y(f + g α)| = 0 ∨ δ ≤ |y(f + g α)|
-  -- Conclude WLPO via decision procedure
-```
+The theorem establishes that the existence of any Banach space with a bidual gap
+is exactly equivalent to WLPO over constructive mathematics.
 
-**Key Features**:
-- **§3.1-3.5 equivalence**: Complete formal proof chain with elegant algebra
-- **Axiom usage**: Only `Classical.choice`, `propext`, `Quot.sound`  
-- **Mathematical depth**: Approximate supremum selection, lattice homomorphism theory
-- **Technical innovation**: Exact formulas enabling one-liner congruence proofs
-- **Fortress protection**: 8-stage CI system with axiom hygiene guards
+### Witness Space
+The formalization uses **c₀** (sequences vanishing at infinity) as the witness space,
+with the bidual functional G : (c₀)** defined by G(f) = Σₙ f(eₙ) where (eₙ) is the standard basis.
 
-### Helper Lemmas (Complete) ✅
-```lean
--- Approximate supremum selection (functional analysis core)
-lemma exists_on_unitBall_gt_half_opNorm {E} [NormedAddCommGroup E] [NormedSpace ℝ E] 
-  [CompleteSpace E] (T : E →L[ℝ] ℝ) (hT : T ≠ 0) :
-  ∃ x : E, ‖x‖ ≤ 1 ∧ (‖T‖ / 2) < ‖T x‖
+### Technical Innovations
+- **Ishihara Kernel**: Prop-level construction avoiding computational overhead
+- **Option-B Bridge**: Abstract pattern for gap construction
+- **Robust csSup**: Direct suprema approach avoiding fragile instance resolution
 
--- Operator norm existence (classical completeness)  
-lemma hasOpNorm_CLF {X} [NormedAddCommGroup X] [NormedSpace ℝ X] (h : X →L[ℝ] ℝ) :
-  OpNorm.HasOpNorm (X:=X) h
-```
-
-### Reverse Direction (Pending) 🔧
-```lean
--- WLPO → BidualGap construction (classical, needs implementation)
-lemma wlpo_implies_gap : WLPO → BidualGapStrong := by
-  intro hWLPO
-  -- TODO: Use dual_is_banach_of_WLPO for constructive dual structure
-  -- Construct c₀/ℓ∞ spaces with canonical embedding
-  -- Show non-surjectivity using WLPO
-  sorry
-```
-
-## Mathematical Significance
-
-This paper establishes:
-
-- **First axiom-clean proof**: Gap → WLPO in Lean 4 with minimal axiom usage
-- **Technical innovation**: Direct Prop-level proofs avoiding extraction issues  
-- **API robustness**: Proof patterns resistant to mathlib evolution
-- **Foundation-relativity**: Precise characterization of constructive vs classical behavior
-
-## Axiom Usage
-
-### Forward Direction (Gap → WLPO)
-- **`Classical.choice`**: Standard axiom of choice (required for classical completeness)
-- **`propext`**: Propositional extensionality (standard)  
-- **`Quot.sound`**: Quotient soundness (standard)
-- **No `sorryAx`**: Completely proof-complete
-
-### Verification
-```bash
-# Check axioms used in main theorem
-lake env lean Scripts/AxiomCheck.lean
-
-# Expected output:
-# 'Papers.P2.Constructive.WLPO_of_gap' depends on axioms: [propext, Classical.choice, Quot.sound]
-```
-
-## Implementation Roadmap  
-
-### ✅ **Completed**: LaTeX-Lean Alignment Verified
-
-**Section 2 - Constructive finite scaffolding** ✅ **COMPLETE**
-- [x] Cesàro toolkit / "Finite Hahn-Banach" surrogate: `Basics/FiniteCesaro.lean` (sorry-free)
-- [x] Dyadic jump bound: Combinatorial backbone implemented  
-- [x] Infinite limit obstruction: Sketched in LaTeX, ready for Prop-level encoding
-
-**Section 3 - Main equivalence: indicators, c₀, and lattice algebra** ✅ **COMPLETE**  
-- [x] §3.1 equivalence chain: `finite △ ↔ EventuallyZero ↔ c₀Spec` fully verified
-- [x] §3.2/3.4/3.5 ι-embedding & lattice laws: Complete with exact △ formulas
-- [x] Files: `Indicator.lean`, `IndicatorSpec.lean`, `IndicatorEventual.lean`, `C0Spec.lean`, `Iota.lean` + tests
-
-**Section 4 - Kernel proof technique & Gap ⇒ WLPO** ✅ **AXIOM-VERIFIED**
-- [x] Gap ⇒ WLPO: `Papers.P2.Constructive.WLPO_of_gap` (axioms: propext, Classical.choice, Quot.sound)
-- [x] Helper lemma implementation (approximate supremum, operator norm existence)  
-- [x] Direct Prop-level main theorem with universe polymorphism
-- [x] Axiom hygiene verification via fortress CI
-
-### 📋 **Sprint A-D Plan**: Complete Paper 2
-
-**Sprint A (spec-quotients, 1 day)** ✅ **COMPLETE**
-- [x] File: `Gap/Quotients.lean` (767 lines)
-- [x] Setoid on Set ℕ by finite △; Setoid on ℕ → ℝ by ≈₀
-- [x] Define `BooleanAtInfinity` and `SeqModC0` quotient types
-- [x] Show ι descends: `iotaBar : BooleanAtInfinity → SeqModC0`
-
-**Sprint B (quotient framework + injectivity, 1-2 days)** ✅ **COMPLETE**
-- [x] File: `Gap/Quotients.lean` - Complete quotient framework implementation
-- [x] Ergonomic surface API: `qSup`, `qInf`, `qCompl` with proper `liftOn₂` witnesses
-- [x] **`iotaBar_injective`**: Rigorous proof using ε=1/2 technique
-- [x] Comprehensive test suite: `Gap/QuotientsTests.lean` (79 lines)
-
-**Sprint C (Gap ⇒ WLPO axiom audit, 0.5-1 day)** ✅ **COMPLETE**  
-- [x] Axiom audit completed: Optimal baseline `[propext, Classical.choice, Quot.sound]`
-- [x] Mathematical justification documented in `SPRINT_C_AXIOM_ANALYSIS.md`
-- [x] Prop-level approach confirmed mathematically minimal
-
-**Sprint D (WLPO ⇒ Gap reverse direction, 2-3 days)** ✅ **COMPLETE**
-- [x] Direct construction G = S ∘ Φ₁ in c₀** demonstrating non-reflexivity
-- [x] Strategic pivot from Hahn-Banach to direct construction approach
-- [x] Zero sorries in `DirectDual.lean` with signVector_eval technique
-- [x] Bidirectional `gap_equiv_wlpo : BidualGapStrong.{0} ↔ WLPO` theorem
-- [x] Universe resolution: Type 0 witness mathematically sufficient
-- [x] Professor approval: Option A (universe-0 version) accepted
-
-### 📋 **Future**: Extensions and Polish
-- [ ] Optional Sprint E: Genuine ℓ∞/c₀ spaces (mathlib upgrade)
-- [ ] Generalization to `IsROrC` scalar fields (ℝ and ℂ)
-- [ ] Paper cross-references (LaTeX ↔ Lean symbol mapping)
-
-## Build Instructions
+## Build Commands
 
 ```bash
-# Build Sprint B quotient framework
-lake build Papers.P2_BidualGap.Gap.Quotients
-lake build Papers.P2_BidualGap.Gap.QuotientsTests
+# Main theorem modules (0 sorries)
+lake build Papers.P2_BidualGap.HB.Gap_to_WLPO_pure
+lake build Papers.P2_BidualGap.HB.WLPO_to_Gap_pure
+lake build Papers.P2_BidualGap.HB.DirectDual
 
-# Build the complete §3.1-3.5 equivalence framework
-lake build Papers.P2_BidualGap.Gap.Iota
-lake build Papers.P2_BidualGap.Gap.IndicatorSpec
+# Optional completeness module (3 WLPO-conditional sorries)
+lake build Papers.P2_BidualGap.HB.WLPO_to_Gap_HB
 
-# Build the main forward direction theorem  
-lake build Papers.P2_BidualGap.Constructive.Ishihara
-
-# Run fortress CI system (8-stage guard with axiom hygiene)
-lake run fullGuard
-
-# Check axiom usage
-lake env lean Scripts/AxiomCheck.lean
-
-# Run all Paper 2 components
+# Full paper (includes all modules)
 lake build Papers.P2_BidualGap
 ```
 
-## 🔧 Reproducibility
+## Mathematical Overview
 
-### Using the Release Tag
+### The Bidual Gap Problem
+For a Banach space X, the canonical embedding J: X → X** maps each x ∈ X to the
+evaluation functional J(x)(f) = f(x). Whether J is surjective depends on the
+foundational setting:
+- **Classical (ZFC)**: Hahn-Banach implies gaps exist for ℓ∞, c₀
+- **Constructive (BISH)**: Gap existence unprovable without additional axioms
 
-```bash
-# Clone and checkout the specific release
-git clone https://github.com/AICardiologist/FoundationRelativity.git
-cd FoundationRelativity
-git checkout p2-minimal-v0.1
-
-# Build the minimal target (0 sorries)
-lake build Papers.P2_BidualGap.P2_Minimal
-
-# Verify no sorries
-./scripts/no_sorry_p2_minimal.sh
+### WLPO (Weak Limited Principle of Omniscience)
+For any binary sequence α: ℕ → {0,1}:
+```
+(∀n, α(n) = 0) ∨ ¬(∀n, α(n) = 0)
 ```
 
-### Latest Development
+WLPO is strictly weaker than LEM but not provable in BISH. It captures the
+minimal decision strength needed to determine whether a sequence is identically zero.
 
-```bash
-# Use main branch for latest changes
-git checkout main
-lake build Papers.P2_BidualGap.P2_Minimal
-```
+### Forward Direction: Gap → WLPO
+Given a gap witness y ∈ X** \ J(X), we construct an Ishihara kernel that
+decides WLPO instances through a dichotomy property on evaluation values.
 
-## Related Documentation
+### Reverse Direction: WLPO → Gap
+Using WLPO's decision power, we:
+1. Separate c₀ from its complement in bounded sequences
+2. Construct G(f) = Σf(eₙ) on (c₀)*
+3. Prove G ∉ J(c₀) using WLPO's discrimination
 
-- **[LaTeX Paper v3.2](documentation/paper-v3.2.tex)**: Academic paper with Lean results
-- **[Technical Status](documentation/technical_status/)**: Implementation details and progress
-- **[Roadmap v3.2](../../docs/planning/ROADMAP-v3.2.md)**: Project roadmap and next steps
-- **[Main README](../../README.md)**: Overall project status and quick start
-- **[Release Notes](RELEASE_NOTES_v0.1.md)**: Details about p2-minimal-v0.1
+## Documentation
 
----
+- **[LaTeX Paper](documentation/paper-final.tex)**: Full mathematical development
+- **[Repository](https://github.com/AICardiologist/FoundationRelativity)**: Complete formalization
+- **[Zenodo Archive](https://doi.org/10.5281/zenodo.13356587)**: Citable artifact
 
-**STATUS**: **SPRINT E COMPLETE** ✅ - Dual isometry implementation with 3 WLPO sorries.  
-**ACHIEVEMENT**: Complete dual isometry (c₀ →L[ℝ] ℝ) ≃ₗᵢ ℓ¹ with 81% sorry reduction.  
-**RELEASE**: p2-minimal-v0.1 published with Option-B core (0 sorries).
+## Connection to Other Papers
+
+- **Paper 1**: Provides operator-theoretic foundations with rank-one toggle kernel
+- **Paper 3A**: Stone Window theorem (Boolean algebra at infinity) now maintained there
+- **Paper 4**: Alternative spectral approach (suspended due to mathematical issues)
+
+## Upstream Strategy
+
+Planned mathlib4 contributions:
+1. **Ishihara kernel**: Prop-level decision infrastructure for constructive reverse mathematics
+2. **Bidual theory**: General bidual space constructions  
+3. **HasWLPO typeclass**: Lightweight axiom management pattern for conditional results
