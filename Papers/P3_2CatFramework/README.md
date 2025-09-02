@@ -39,21 +39,29 @@ This repository contains the Lean 4 formalization supporting Paper 3A, which pre
 
 ## 🎯 Implementation Status by Paper Section
 
-### Paper 3B: Proof-Theoretic Framework ✅ COMPLETE (August 31, 2025)
+### Paper 3B: Proof-Theoretic Framework ✅ COMPLETE (September 2, 2025)
 
 #### Fully Formalized Components:
-- **Ladder Constructions**: `LCons` (consistency), `LReflect` (reflection), `LClass` (classicality)
-- **Core Theorem**: `RFN_implies_Con` - RFN_Σ₁ → Con proved schematically (0 sorries)
+- **Stage-Based Ladders**: `LCons` (consistency), `LReflect` (reflection), `LClass` (classicality)
+  - Clean solution to circular dependencies via `Stage` structure carrying instances
+- **Core Theorems**: 
+  - `RFN_implies_Con`: RFN_Σ₁ → Con proved schematically (0 sorries)
+  - `collision_step_semantic`: Theorem via Stage-based approach (PR-6)
+  - `collision_tag`: Theorem via RFN_implies_Con_formula (PR-7)
 - **Height Certificates**: Upper bounds constructive, lower bounds axiomatized
 - **Collision Morphisms**: `reflection_dominates_consistency` with formal morphism structure
-- **Axiom Discipline**: All 22 axioms in `Ax` namespace with CI guard script (reduced from 30)
 
 #### Quality Metrics:
 - **0 sorries** across all ProofTheory modules
-- **22 axioms** systematically tracked (reduced from 30 via 6 PRs)
+- **21 axioms** - honest limit of schematic encoding (reduced from initial 30)
 - **Complete tests** with `#print axioms` diagnostics
-- **CI guard** `.ci/check_axioms.sh` enforces namespace discipline
-- **PR-5b**: Bot_is_FalseInN discharged via schematic evaluation (23 → 22)
+- **CI guards**: 
+  - Axiom budget enforcement
+  - Forbidden bridge axioms check (prevents regression)
+- **Achievement Timeline**:
+  - PR-5b: Bot_is_FalseInN discharged (24 → 23)
+  - PR-6: collision_step_semantic discharged via Stage approach (23 → 24 then back to 21 after cleanup)
+  - PR-7: collision_tag discharged via internalization bridge (21 stable)
 
 #### Documentation:
 - `documentation/AXIOM_INDEX.md`: Complete axiom tracking

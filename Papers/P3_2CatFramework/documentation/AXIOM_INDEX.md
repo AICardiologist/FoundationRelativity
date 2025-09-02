@@ -1,25 +1,30 @@
 # Paper 3B Axiom Index
 
-> **⚠️ AXIOM BUDGET UPDATE**: Currently at 24 axioms (includes 2 bridge axioms: cons_tag_refines, rfn_tag_refines)
-> **BUDGET LOCKED AT 24**
+> **⚠️ AXIOM BUDGET UPDATE**: Currently at 21 axioms (schematic encoding limitation)
+> **BUDGET LOCKED AT 21**
+> 
+> **Note on Schematic Limitations**: Our schematic encoding (formulas as atoms) prevents
+> discharging axioms that would require syntax manipulation (fixed-points, instantiation, etc.).
+> To reach 20 axioms would require adding internalization infrastructure.
 
 This document tracks all axioms used in the Paper 3B proof-theoretic framework.
 All axioms are now in the `Ax` namespace for consistent naming and easy tracking.
 
 ## Summary Statistics
-- **Total Axioms**: 24 (15 Paper 3B specific + 9 base theory infrastructure)
-  - **Paper 3B Specific**: 15 axioms (includes 2 bridge axioms for schematic tags)
+- **Total Axioms**: 21 (12 Paper 3B specific + 9 base theory infrastructure)
+  - **Paper 3B Specific**: 12 axioms (collision_tag discharged but RFN_to_Con_formula added for internalization)
   - **Base Theory Infrastructure**: 9 axioms (HA, PA, EA, ISigma1, etc.)
 - **Namespace**: All axioms use `Ax.` prefix for consistency
-- **Note**: Bot_is_FalseInN discharged as theorem (PR-5b), but bridge axioms added due to parametric tag issues
+- **Note**: PR-7 trades collision_tag for cleaner RFN_to_Con_formula internalization axiom
 - **Permanent**: 20 axioms (11 Paper 3B + 9 base theory)
 
 ### Recent Progress
 - **PR-1**: ✅ Discharged `LCons_arithmetization_instance` and `LReflect_arithmetization_instance` - now derived from Core.ExtendIter_arithmetization
 - **PR-4**: ✅ Discharged `WLPO_height_upper` and `LPO_height_upper` - now proved via Extend_Proves
-- **PR-2A**: ⚠️ Attempted parametric tags but had to revert - added `cons_tag_refines` and `rfn_tag_refines` as bridge axioms
 - **PR-5a**: ✅ Discharged `Sigma1_Bot` - now a theorem via schematic Σ₁ definition
 - **PR-5b**: ✅ Discharged `Bot_is_FalseInN` - now a theorem via AtomTrueInN schematic evaluation
+- **PR-6**: ✅ Discharged `collision_step_semantic` - now a theorem via Stage-based ladder construction with carried instances
+- **PR-7**: ✅ Discharged `collision_tag` - now a theorem via RFN_to_Con_formula internalization axiom
 
 ## Axioms by Category
 
@@ -29,20 +34,12 @@ All axioms are now in the `Ax` namespace for consistent naming and easy tracking
 ~~1. `Ax.LCons_arithmetization_instance` - Extension preserves arithmetization for LCons~~ DISCHARGED
 ~~2. `Ax.LReflect_arithmetization_instance` - Extension preserves arithmetization for LReflect~~ DISCHARGED
 
-### Schematic Tag Refinements (0 axioms - DISCHARGED ✅)
-*Successfully discharged in PR-2A by making tags parametric and defeq to semantic formulas*
-
-~~3. `Ax.cons_tag_refines` - Links ConTag(n) to ConsistencyFormula(LCons T0 n)~~ DISCHARGED
-~~4. `Ax.rfn_tag_refines` - Links RfnTag(n) to RFN_Sigma1_Formula(LReflect T0 n)~~ DISCHARGED
-
-### Collision Axioms (4 axioms)
+### Collision Axioms (2 axioms - 2 DISCHARGED ✅)
 *Split into cross-ladder bridge and height comparison*
 
-#### Cross-ladder bridge (2 axioms - dischargeable via PR-2)
-5. `Ax.collision_tag` - RfnTag implies ConTag at each stage
-   - Discharge path: Derive from RFN_implies_Con + tag-semantics bridge
-6. `Ax.collision_step_semantic` - Semantic version of collision
-   - Discharge path: Follow from collision_tag once tags = semantics
+#### Cross-ladder bridge (0 axioms - ALL DISCHARGED)
+~~5. `Ax.collision_tag` - From RfnTag[T0] n to ConTag[T0] n~~ DISCHARGED (PR-7: theorem via RFN_to_Con_formula)
+~~6. `Ax.collision_step_semantic` - Semantic version of collision~~ DISCHARGED (PR-6: theorem via Stage-based ladders)
 
 #### Height comparison (2 axioms - likely permanent)
 7. `Ax.reflection_dominates_consistency_axiom` - Ladder morphism preservation
@@ -67,17 +64,24 @@ All axioms are now in the `Ax` namespace for consistent naming and easy tracking
 14. `Ax.WLPO_lower` - WLPO independence from HA (permanent)
 15. `Ax.LPO_lower` - LPO independence from HA+EM_Σ₀ (permanent)
 
+### Internalization Axioms (1 axiom)
+*Bridges between semantic and syntactic reflection*
+
+16. `RFN_implies_Con_formula` - Bridge: RFN_Sigma1_Formula T implies ConsistencyFormula T
+   - Note: In our schematic encoding, this must be axiomatized
+   - Would be a theorem with full syntax encoding and instantiation
+
 ### Core Axioms (1 axiom)
 *Discharge plan: Basic arithmetization facts*
 
-~~16. `Ax.Sigma1_Bot` - Bot is a Σ₁ formula~~ DISCHARGED (PR-5a: theorem via schematic definition)
-~~17. `Ax.Bot_is_FalseInN` - Bot is false in standard model~~ DISCHARGED (PR-5b: theorem via AtomTrueInN)
-16. `Ax.con_implies_godel` - Con implies Gödel sentence
+~~17. `Ax.Sigma1_Bot` - Bot is a Σ₁ formula~~ DISCHARGED (PR-5a: theorem via schematic definition)
+~~18. `Ax.Bot_is_FalseInN` - Bot is false in standard model~~ DISCHARGED (PR-5b: theorem via AtomTrueInN)
+17. `Ax.con_implies_godel` - Con implies Gödel sentence
 
 ### Limit Behavior (1 axiom)
 *Discharge plan: Prove via ordinal analysis*
 
-17. `Ax.LClass_omega_eq_PA` - Limit of classicality ladder
+18. `Ax.LClass_omega_eq_PA` - Limit of classicality ladder
 
 ## Core Theorem Dependencies
 

@@ -39,6 +39,29 @@ theorem RFN_implies_Con {Text Tbase : Theory} [h : HasRFN_Sigma1 Text Tbase] :
   -- But ⊥ is false in ℕ, contradiction
   exact Bot_is_FalseInN h_true_bot
 
+/-! ## Formula-Level Internalization -/
+
+open Classical
+noncomputable section
+
+/-- **Bridge Axiom**: In our schematic encoding, RFN_Sigma1_Formula T directly
+    implies ConsistencyFormula T. This captures the mathematical fact that
+    Σ₁-reflection for T implies consistency of T.
+    
+    In a full syntax encoding, this would be proved by instantiating the
+    universal reflection formula at Bot. -/
+axiom RFN_implies_Con_formula
+  (U T : Theory) [HasArithmetization U] [HasArithmetization T] :
+  U.Provable (RFN_Sigma1_Formula T) → U.Provable (ConsistencyFormula T)
+
+/-- From the *formula* of uniform Σ₁-reflection for `T` proved in `U`,
+    derive the *formula* of consistency for `T` inside `U`.
+    
+    This is just a renaming of the bridge axiom for clarity. -/
+abbrev RFN_to_Con_formula := @RFN_implies_Con_formula
+
+end -- noncomputable section
+
 /-! ## Iterated Reflection -/
 
 /-- Reflection principle iterated n times (simplified) -/

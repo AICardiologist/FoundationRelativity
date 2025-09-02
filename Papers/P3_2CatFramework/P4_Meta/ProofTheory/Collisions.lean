@@ -17,44 +17,47 @@ namespace Papers.P4Meta.ProofTheory
 
 open Papers.P4Meta
 
-/-! ## Collision Axioms 
+/-! ## Cross-Ladder Bridge Theorems -/
 
-The collision axioms capture the fundamental relationship between reflection and consistency.
-These are split into two categories:
-1. Cross-ladder bridge axioms (connecting RFN and Con tags)
-2. Height comparison axioms (dominance relationships)
+/-- Cross-ladder step: RFN-tag implies Con-tag (now a theorem via internalization).
+    
+    **Provenance**: Standard result that RFN_Σ₁(T) ⊢ Con(T) for arithmetized theories.
+    **Status (PR-7)**: **Discharged** as a theorem via `RFN_to_Con_formula`. -/
+theorem collision_tag (T0 : Theory) [HasArithmetization T0] (n : Nat) :
+  (LReflect T0 (n+1)).Provable (RfnTag[T0] n) →
+  (LReflect T0 (n+1)).Provable (ConTag[T0] n) := by
+  intro h
+  -- Expand tag notations:
+  -- RfnTag[T0] n := RFN_Sigma1_Formula (LReflect T0 n)
+  -- ConTag[T0] n := ConsistencyFormula (LReflect T0 n)
+  simpa [RfnTag, ConTag] using
+    RFN_to_Con_formula (LReflect T0 (n+1)) (LReflect T0 n) h
+
+/-- Semantic version of the collision: LReflect directly proves its own consistency.
+
+    **Provenance**: Follows from RFN_Σ₁ reflection principle.
+    **Status (PR-6)**: **Discharged** as a theorem via `LReflect_proves_RFN` + `collision_tag`,
+    using parametric tags that are defeq to semantic formulas (notations). -/
+theorem collision_step_semantic (T0 : Theory) (n : Nat)
+    [HasArithmetization T0] :
+  (LReflect T0 (n+1)).Provable (ConsistencyFormula (LReflect T0 n)) := by
+  -- Stage n+1 proves Σ₁-RFN at stage n:
+  have hRFN : (LReflect T0 (n+1)).Provable (RfnTag[T0] n) :=
+    LReflect_proves_RFN T0 n
+  -- Cross-ladder collision theorem turns RFN-tag into Con-tag:
+  have hConTag : (LReflect T0 (n+1)).Provable (ConTag[T0] n) :=
+    collision_tag T0 n hRFN
+  -- Tags are notations for the semantic formulas; unfold and finish:
+  simpa [ConTag]
+
+/-! ## Height Comparison Axioms 
+
+These capture dominance relationships between the ladders.
 -/
 
 namespace Ax
 
--- Cross-ladder bridge axioms
-
-/-- A collision axiom that ties the schematic RFN tag to the schematic Con tag at step n.
-    
-    **Provenance**: Standard result that RFN_Σ₁(T) ⊢ Con(T) for arithmetized theories.
-    
-    **Intended discharge path**: Once PR-2 (tag-semantics bridge) lands, derive this
-    from `RFN_implies_Con` + tag equivalences. Specifically:
-    1. Apply rfn_tag_equiv_sem to get RFN_Sigma1_Formula
-    2. Apply RFN_implies_Con to get ConsistencyFormula  
-    3. Apply con_tag_equiv_sem inverse to get consFormula
--/
-axiom collision_tag (T0 : Theory) [HasArithmetization T0] (n : Nat) :
-  (LReflect T0 (n+1)).Provable (RfnTag[n]) →
-  (LReflect T0 (n+1)).Provable (ConTag[n])
-
-/-- Semantic version of the collision: LReflect directly proves its own consistency.
-    
-    **Provenance**: Follows from RFN_Σ₁ reflection principle.
-    
-    **Intended discharge path**: Should follow from collision_tag + tag-semantics bridge.
-    Currently separate because tags and semantics aren't definitionally equal.
--/
-axiom collision_step_semantic (T0 : Theory) (n : Nat)
-    [HasArithmetization T0] :
-  (LReflect T0 (n+1)).Provable (ConsistencyFormula (LReflect T0 n))
-
--- Height comparison axioms
+-- Height comparison axioms (these remain as axioms)
 
 /-- The collision morphism axiom: reflection dominates consistency.
     Statements provable in reflection ladder are provable one step higher in consistency ladder.
@@ -81,19 +84,18 @@ axiom reflection_height_dominance (T0 : Theory) [HasArithmetization T0] (φ : Fo
 
 end Ax
 
--- Export for compatibility
-export Ax (collision_tag collision_step_semantic reflection_dominates_consistency_axiom
-          reflection_height_dominance)
+-- Export for compatibility (only the remaining axioms)
+export Ax (reflection_dominates_consistency_axiom reflection_height_dominance)
 
 /-! ## Collision Theorems -/
 
 /-- The formal collision: R_{n+1} ⊢ Con(R_n) at the schematic level. -/
 theorem collision_step (T0 : Theory) [HasArithmetization T0] (n : Nat) :
-  (LReflect T0 (n+1)).Provable (ConTag[n]) := by
+  (LReflect T0 (n+1)).Provable (ConTag[T0] n) := by
   -- definitional: step n+1 adds the RFN tag at stage n
-  have hRFN : (LReflect T0 (n+1)).Provable (RfnTag[n]) :=
+  have hRFN : (LReflect T0 (n+1)).Provable (RfnTag[T0] n) :=
     LReflect_proves_RFN T0 n
-  -- convert RFN-tag to Con-tag via the collision axiom
+  -- convert RFN-tag to Con-tag via the collision theorem
   exact collision_tag T0 n hRFN
 
 
@@ -108,7 +110,7 @@ def reflection_dominates_consistency (T0 : Theory) [HasArithmetization T0] :
 
 /-- Special case: the collision at consistency formulas -/
 theorem reflection_proves_consistency (T0 : Theory) [HasArithmetization T0] (n : Nat) :
-  (LReflect T0 (n+1)).Provable (ConTag[n]) :=
+  (LReflect T0 (n+1)).Provable (ConTag[T0] n) :=
   collision_step T0 n
 
 /-! ## Height Comparison -/

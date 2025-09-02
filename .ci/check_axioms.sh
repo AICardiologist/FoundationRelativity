@@ -106,3 +106,17 @@ if [[ -n "$sorry_files" ]]; then
 fi
 
 echo "✅ No sorries found in ProofTheory modules."
+
+# Check for forbidden bridge axioms that should not be reintroduced
+echo "🔍 Checking for forbidden bridge axioms..."
+forbidden_axioms="cons_tag_refines|rfn_tag_refines"
+if grep -qE "$forbidden_axioms" Papers/P3_2CatFramework/P4_Meta/ProofTheory/*.lean 2>/dev/null; then
+  echo "❌ Found forbidden bridge axioms!"
+  echo "   The following axioms must not be reintroduced:"
+  echo "   - cons_tag_refines"
+  echo "   - rfn_tag_refines"
+  echo "   These were discharged in PR-6/PR-7 via Stage-based ladders."
+  grep -nE "$forbidden_axioms" Papers/P3_2CatFramework/P4_Meta/ProofTheory/*.lean
+  exit 1
+fi
+echo "✅ No forbidden bridge axioms found."

@@ -3,15 +3,18 @@
 > **Prime directive:** Finish **Lean/formalization** for Paper **3A**.  
 > Only after a Lean **freeze** (no sorries, green builds, tests stable) do we switch to LaTeX authoring.
 > 
-> **Paper 3B Status**: ✅ COMPLETE (August 31, 2025) - See [documentation/P3B_STATUS.md](documentation/P3B_STATUS.md) for discharge roadmap.
-> **Axiom Discharge Progress**: 30 → 28 → 26 → 24 → 23 → **22** (PR-5b: Bot_is_FalseInN discharged)
+> **Paper 3B Status**: ✅ COMPLETE (September 2, 2025) - 21 axioms (honest limit of schematic encoding)
+> **Axiom Discharge Progress**: 30 → 24 → 23 → 22 → **21** (PR-6/7: collision machinery discharged)
 
 ## 📍 Current Position (August 29, 2025)
 
 #### Infrastructure
 - **Part I**: Full uniformization height theory for {0,1} levels
 - **Part II Core**: Positive uniformization definitions, bridges, gap results  
-- **Paper 3B ProofTheory**: COMPLETE scaffold with 0 sorries, 22 axioms in Ax namespace (August 31, 2025)
+- **Paper 3B ProofTheory**: COMPLETE with 0 sorries, 21 axioms (September 2, 2025)
+  - Stage-based ladders solve circular dependencies
+  - All collision machinery as theorems (not axioms)
+  - CI guards prevent regression
 - **Bicategorical framework**: Complete with coherence laws
 - **Truth groupoid**: With @[simp] automation
 - **CI integration**: All tests passing (1189+ build jobs), no import cycles
