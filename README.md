@@ -53,15 +53,19 @@ A Lean 4 formalization project that calibrates the exact logical strength requir
 
 ### Axiom Calibration Methodology
 
-We measure the exact logical strength of classical theorems:
-- **Height 0**: Provable constructively (no extra axioms)
-- **Height 1**: Requires WLPO (Weak Limited Principle of Omniscience)
-- **Height 2+**: Higher principles (e.g., DC_ω, choice schemata)
+We measure the logical strength of a statement by its height along a chosen axis. Heights are per-axis; a theorem has an orthogonal profile (one height per axis).
+- **Height 0 (on an axis)**: Provable constructively (no use of that axis)
+- **Height 1 (on an axis)**: Requires the first step on that axis
+  (e.g., WLPO on the WLPO axis; FT on the FT axis)
+- **Height ≥ 2 (on an axis)**: Requires iterates/stronger fragments on that same axis
+  (e.g., stronger omniscience or bar/choice schemes, depending on the axis)
 
 Our framework provides orthogonal calibration axes:
-- **WLPO axis**: Bidual gap, double-dual embedding issues
-- **FT axis**: Fan theorem, uniform continuity theorems
+- **WLPO axis**: Bidual gap, double-dual embedding phenomena
+- **FT axis**: Fan Theorem, uniform continuity theorems (UCT)
 - **DC_ω axis**: Work package for Paper 3C (axiomatized, not in CI)
+
+Examples: Bidual gap has profile (WLPO, FT, DC_ω) = (1, 0, 0); UCT has (0, 1, 0).
 
 ## 📚 Papers & Formalization Status
 
