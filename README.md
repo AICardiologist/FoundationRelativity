@@ -2,68 +2,104 @@
 
 [![CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml)
 [![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
-[![Version](https://img.shields.io/badge/Version-v3.2--axiomatic-brightgreen)](https://github.com/AICardiologist/FoundationRelativity/releases)
-[![Lean 4.22.0-rc4](https://img.shields.io/badge/Lean-4.22.0--rc4-blue)](https://github.com/leanprover/lean4)
-[![Paper 1 Status](https://img.shields.io/badge/Paper%201%20Status-~14%20sorries-yellow)](docs/planning/project-status.md)
-[![Paper 2 Gap→WLPO](https://img.shields.io/badge/Paper%202%20Gap%E2%86%92WLPO-Axiom%20Clean-brightgreen)](Papers/P2_BidualGap/)
-[![Paper 4 Status](https://img.shields.io/badge/Paper%204%20Discrete%20CPW-85%25-green)](Papers/P4_SpectralGeometry/)
+[![Paper 3A/3B Complete](https://img.shields.io/badge/Paper%203A%2F3B-Complete-brightgreen)](Papers/P3_2CatFramework/)
+[![Paper 2 WLPO↔Gap](https://img.shields.io/badge/Paper%202%20WLPO%E2%86%94Gap-3%20sorries-green)](Papers/P2_BidualGap/)
+[![Paper 1 Rank-One](https://img.shields.io/badge/Paper%201%20Rank--One-14%20sorries-yellow)](Papers/P1_GBC/)
 
-> **🎯 SPRINT E COMPLETE (2025-08-19)**: Dual Isometry with 3 WLPO Sorries!
-> - Paper 1: Sherman-Morrison complete (1 sorry), Spectrum stubs (~3 sorries), Fredholm/Tutorial planned (~10 sorries)
-> - **Paper 2: Complete dual isometry (c₀* ≃ₗᵢ ℓ¹)** ✅ - Only 3 WLPO sorries remain!
-> - **New**: Self-contained csSup approach avoiding CompleteLattice issues
-> - **Achievement**: 81% sorry reduction (16 → 3), clean WLPO architecture
-> - Paper 4: Discrete CPW Model (Phase 1B) - 85% complete (61 sorries) 🚀
+> **🎯 Current Status (September 2025)**:
+> - **Paper 3A/3B**: ✅ Complete axiom calibration framework (0 sorries)
+>   - 3A: AxCal framework with WLPO/FT calibrated axes (active)
+>   - 3B: Proof-theoretic scaffold with 21 axioms (frozen)
+> - **Paper 2**: WLPO ↔ Bidual Gap equivalence (3 WLPO sorries)
+> - **Paper 1**: Rank-one toggle kernel (~14 sorries)
+> - **Paper 4**: ⚠️ SUSPENDED due to mathematical issues
 
 ## 🎯 Overview
 
-A Lean 4 formalization exploring how mathematical pathologies behave differently under various foundational assumptions. This project demonstrates **axiom calibration (AxCal)**: we measure ("calibrate") how much axiom strength a result needs. Certain mathematical constructions that work in classical mathematics (ZFC) become impossible in constructive settings (BISH).
+A Lean 4 formalization project that calibrates the exact logical strength required for mathematical theorems. The project demonstrates **axiom calibration (AxCal)**: measuring precisely which axioms are needed for classical results that fail constructively.
 
-> **Historical Note**: This project was originally named "Foundation-Relativity" but was renamed to "Axiom Calibration" in January 2025 to avoid confusion with Einstein's relativity and to better convey that we're calibrating the axiom strength required for mathematical results. You may encounter the old terminology in earlier papers, commits, or citations.
+> **Key Insight**: Many classical theorems become unprovable in constructive mathematics (BISH). We formalize exact equivalences between analytical "pathologies" and logical principles, providing precise calibrations of their axiom requirements.
 
-### Key Results
+### Papers and Results
 
-The project formalizes four major results:
+1. **Paper 1: Rank-One Toggle on Hilbert Spaces** 🔧
+   - Minimal operator-theoretic core around orthogonal projections
+   - Sherman-Morrison inverse formula for rank-one perturbations
+   - Lean formalization: ~14 sorries (pending mathlib updates)
 
-1. **Rank-One Toggle Kernel** (Paper 1) 🔧 - Sherman-Morrison implementation (1 sorry) + Spectrum stubs (~3 sorries) + planned modules (~10 sorries)
-2. **WLPO ↔ BidualGap Equivalence** (Paper 2) ✅ - Sprint E dual isometry complete!  
-3. **Axiom Calibration Framework** (Papers 3A & 3B) ✅ - Two-paper series:
-   - **Paper 3A**: AxCal framework with WLPO/FT axes (active development)
-   - **Paper 3B**: Proof-theoretic scaffold with 21 axioms (❄️ FROZEN - complete)
-4. **Spectral Geometry** (Paper 4) 🔧 - Undecidable eigenvalues on manifolds
+2. **Paper 2: WLPO ↔ Bidual Gap Equivalence** ✅
+   - Main theorem: Detecting bidual gap has exactly WLPO strength
+   - Complete Lean 4 formalization with only 3 WLPO-conditional sorries
+   - Constructive finite-dimensional surrogates via Cesàro means
 
-### Axiom-Calibration Hierarchy
+3. **Papers 3A & 3B: Axiom Calibration Framework** ✅ **COMPLETE**
+   - **Paper 3A**: Framework measuring logical strength via uniformizability
+     - Two calibrated axes: WLPO (bidual gap) and FT (fan theorem)
+     - Stone Window: Open program for Boolean algebra exploration
+   - **Paper 3B**: Proof-theoretic scaffold (21 axioms, FROZEN)
+     - Stage-based ladders solving circular dependencies
+     - RFN_Σ₁ → Con proven schematically
 
-Each pathology has a **calibration degree** ρ indicating logical strength:
-- **ρ = 1**: Requires WLPO (Weak Limited Principle of Omniscience)
-- **ρ = 2**: Requires DC_ω (Countable Choice)
-- **ρ = 3**: Requires AC_ω (Choice for countable families)
+4. **Paper 4: Spectral Geometry** ⚠️ **SUSPENDED**
+   - Original goal: Undecidable eigenvalues on manifolds
+   - Status: Suspended due to mathematical issues in the approach
 
-## 📚 Papers & Lean Status
+### Axiom Calibration Methodology
 
-### Formalization Status
-- **[Paper 1: Rank-One Toggle Kernel](Papers/P1_GBC/)** 🔧 **Partial Implementation + Current LaTeX Paper** - Sherman-Morrison (1 sorry), Spectrum (3 sorries stub), Fredholm/Tutorial (planned ~10 sorries)
-- **[Paper 2: WLPO ↔ BidualGap∃](Papers/P2_BidualGap/)** ✅ **Sprint E: Dual Isometry Complete (3 WLPO sorries)**
-- **[Papers 3A & 3B: Axiom Calibration](Papers/P3_2CatFramework/)** ✅ **Complete Framework (0 sorries)**
-  - **3A**: AxCal framework, WLPO/FT axes, Stone Window API (active)
-  - **3B**: ProofTheory with 21 axioms, RFN→Con theorems (frozen)
-  - **🚨 SEPARATION GUIDE**: See [`MASTER_DEPENDENCY_CHART.md`](Papers/P3_2CatFramework/documentation/MASTER_DEPENDENCY_CHART.md)
-  - **Clean imports**: Use `Paper3A_Main.lean` or `Paper3B_Main.lean` aggregators
-- **[Paper 4: Spectral Geometry](Papers/P4_SpectralGeometry/)** 🔧 61 sorries - Discrete model 85% complete
+We measure the exact logical strength of classical theorems:
+- **Height 0**: Provable constructively (no extra axioms)
+- **Height 1**: Requires WLPO (Weak Limited Principle of Omniscience)
+- **Height 2+**: Requires stronger principles (DC_ω, AC_ω, etc.)
 
-### 🎯 **Latest Achievements**
+Our framework provides orthogonal calibration axes:
+- **WLPO axis**: Bidual gap, double-dual embedding issues
+- **FT axis**: Fan theorem, uniform continuity theorems
+- **DC_ω axis**: Baire category, completeness properties
 
-#### **Paper 3B: Proof-Theoretic Framework COMPLETE** (September 2025)
-- **Final status**: **21 axioms** - honest limit of schematic encoding
-- **Stage-based ladders**: Clean solution to circular dependencies (PR-6)
-- **Cross-ladder bridge**: All collision machinery as theorems (PR-7)
-  - `collision_step_semantic`: Theorem via Stage-based approach
-  - `collision_tag`: Theorem via RFN_implies_Con_formula
-- **Core theorem**: RFN_Σ₁ → Con proved schematically (sorry-free)
-- **Height certificates**: Upper bounds constructive, lower bounds axiomatized
-- **Axiom discipline**: All axioms in `Ax` namespace with CI guards
-- **Schematic limitation**: Formula-level implications require internalization
-- **Path to 20 axioms**: Add micro-internalization layer (~50-100 LoC)
+## 📚 Papers & Formalization Status
+
+### Complete Papers
+- **[Papers 3A & 3B: Axiom Calibration Framework](Papers/P3_2CatFramework/)** ✅ **COMPLETE (0 sorries)**
+  - **Paper 3A**: AxCal framework with calibrated WLPO/FT axes (active development)
+  - **Paper 3B**: Proof-theoretic scaffold with 21 axioms (❄️ FROZEN)
+  - **🚨 IMPORTANT**: See [`MASTER_DEPENDENCY_CHART.md`](Papers/P3_2CatFramework/documentation/MASTER_DEPENDENCY_CHART.md) for separation guide
+  - Use `Paper3A_Main.lean` or `Paper3B_Main.lean` aggregators (NOT both)
+
+### Nearly Complete
+- **[Paper 2: WLPO ↔ Bidual Gap](Papers/P2_BidualGap/)** ✅ **Main theorem complete (3 conditional sorries)**
+  - Full equivalence: Gap_∃ ↔ WLPO formalized
+  - Witness space: c₀ (sequences vanishing at infinity)
+  - Remaining sorries: Only in optional completeness module
+
+### In Progress
+- **[Paper 1: Rank-One Toggle Kernel](Papers/P1_GBC/)** 🔧 **Core complete (~14 sorries)**
+  - Sherman-Morrison formula verified
+  - Spectrum/Fredholm sections pending mathlib updates
+
+### Suspended
+- **[Paper 4: Spectral Geometry](Papers/P4_SpectralGeometry/)** ⚠️ **SUSPENDED**
+  - Mathematical issues detected in approach
+  - Work halted pending theoretical resolution
+
+### 🎯 Latest Achievements (September 2025)
+
+#### **Papers 3A/3B Separation Complete**
+- Clean separation between Paper 3A (active) and Paper 3B (frozen)
+- Separate aggregator files prevent cross-contamination
+- CI validation ensures no accidental modifications to frozen components
+- Complete migration guide and documentation
+
+#### **Paper 3B: Proof-Theoretic Scaffold** ✅
+- **21 axioms**: Honest limit of schematic encoding
+- **RFN_Σ₁ → Con**: Proven as theorem (not axiom)
+- **Stage-based ladders**: Solve circular dependencies
+- **Status**: FROZEN - no further changes needed
+
+#### **Paper 3A: Axiom Calibration Framework** ✅
+- Complete uniformizability height theory
+- Two calibrated axes: WLPO and FT (orthogonal)
+- Stone Window: 100+ Boolean algebra lemmas
+- Active development continues
 
 #### **Paper 3 Parts I-VI: Complete 2-Categorical Framework + Meta Layer** (August 2025)
 - **Part I & II**: Complete uniformization height theory + positive uniformization
