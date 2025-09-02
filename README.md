@@ -122,7 +122,7 @@ FoundationRelativity/
     └── reference/
 ```
 
-**Repo hygiene**: Legacy files with sorries live under `Papers/P3_2CatFramework/archive/` and are excluded from CI checks.
+**Repo hygiene**: `archive/` is CI-excluded and MUST NOT be imported. The separation guard enforces (i) no 3A↔3B cross-imports, (ii) no sorries/axioms in 3A, and (iii) aggregator builds succeed.
 
 ## 🚀 Quick Start
 
@@ -147,6 +147,9 @@ lake exe cache get || true
 # Build per-paper targets (recommended)
 lake build Papers.P3_2CatFramework.Paper3A_Main   # Paper 3A: Axiom Calibration Framework (active)
 lake build Papers.P3_2CatFramework.Paper3B_Main   # Paper 3B: Proof-Theoretic Scaffold (frozen)
+
+# Fast Paper 3A loop (aggregator + FT_Frontier + examples)
+./scripts/dev-3a.sh
 
 # Optional: build everything (may include archived components)
 # lake build

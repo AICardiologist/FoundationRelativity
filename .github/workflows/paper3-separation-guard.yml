@@ -144,3 +144,22 @@ jobs:
             "Papers/P3_2CatFramework/P4_Meta/ProofTheory/**" || true)
           test -z "$BAD" || { echo "❌ 3B importing 3A modules:"; echo "$BAD"; exit 1; }
           echo "✅ No 3A imports inside ProofTheory"
+      
+      - name: Ensure archive/ is never imported
+        run: |
+          set -euo pipefail
+          echo "Checking that no Lean file imports from archive/..."
+          BAD=$(git grep -nE '^\s*import\s+Papers\.P3_2CatFramework\.archive' -- \
+            "Papers/**/*.lean" || true)
+          if [ -n "$BAD" ]; then
+            echo "❌ Found imports from archive/:"
+            echo "$BAD"
+            exit 1
+          fi
+          echo "✅ No imports from archive/ detected"
+      
+      - name: Build Paper 3A re-export API (smoke)
+        run: |
+          echo "Building Paper 3A re-export API..."
+          lake build Papers.P3_2CatFramework.Paper3A_API
+          echo "✅ Paper 3A API built successfully"

@@ -18,10 +18,18 @@ This master chart clearly separates Paper 3A (Axiom Calibration Framework) from 
 
 ### Main Entry Points
 ```
-Paper3A_Main.lean  ← NEW: Paper 3A ONLY aggregator (to be created)
-Paper3B_Main.lean  ← NEW: Paper 3B ONLY aggregator (to be created)
-P3_Minimal.lean    ← LEGACY: Combined entry (deprecate after split)
+Paper3A_Main.lean  ← Paper 3A ONLY aggregator (ACTIVE)
+Paper3B_Main.lean  ← Paper 3B ONLY aggregator (FROZEN)
+Paper3A_API.lean   ← Clean re-export API for Paper 3A
 ```
+
+### Archived Files (excluded from CI sorry/axiom checks)
+```
+Papers/P3_2CatFramework/archive/** ← Legacy prototypes and notes (MUST NOT be imported)
+```
+
+### One-stop API Import
+Use `import Papers.P3_2CatFramework.Paper3A_API` for a clean, re-exported surface (Phase 1-3 + FT_Frontier).
 
 ## 🔷 Paper 3A Components (ACTIVE DEVELOPMENT)
 
