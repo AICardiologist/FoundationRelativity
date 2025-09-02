@@ -75,7 +75,7 @@ jobs:
 
       - name: Build P4_Meta framework (Part of P3)
         run: |
-          lake build Papers.P3_2CatFramework.P4_Meta.Meta_Smoke_test
+          lake build Papers.P3_2CatFramework.P4_Meta
 
       - name: Check for unauthorized sorries
         run: |
