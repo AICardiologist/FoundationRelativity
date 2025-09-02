@@ -63,8 +63,9 @@ All axioms are now in the `Ax` namespace for consistent naming and easy tracking
 ### Internalization Axioms (1 axiom)
 *Bridges between semantic and syntactic reflection*
 
-16. `RFN_to_Con_formula` - Internalization: RFN_Sigma1_Formula T implies ConsistencyFormula T
-   - Discharge path: Requires full internalization infrastructure
+16. `RFN_implies_Con_formula` - Bridge: RFN_Sigma1_Formula T implies ConsistencyFormula T
+   - Note: In our schematic encoding, this must be axiomatized
+   - Would be a theorem with full syntax encoding and instantiation
 
 ### Core Axioms (1 axiom)
 *Discharge plan: Basic arithmetization facts*
