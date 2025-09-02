@@ -4,6 +4,7 @@
 > **Objective:** Complete final polish for Paper 3A publication as framework + two calibrated case studies.
 > 
 > **Paper 3B Status**: ✅ COMPLETE (September 2, 2025) - 21 axioms (honest limit of schematic encoding)
+> **Axiom Discharge Progress**: 30 → 24 → 23 → 22 → **21** (PR-6/7: collision machinery discharged)
 > **Paper 3A LaTeX**: Updated with new framing (framework + demos + open program + 3C roadmap)
 
 ## 📍 Current Position (September 2025 - RESUMING)
