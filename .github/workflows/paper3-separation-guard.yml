@@ -65,3 +65,48 @@ jobs:
           fi
           
           echo "✅ Frozen status markers checked"
+      
+      - name: Enforce 3A does not import ProofTheory (deep check)
+        run: |
+          set -euo pipefail
+          echo "Deep check: ensuring no 3A files import ProofTheory..."
+          
+          # Check across all tracked Lean files, excluding Paper3B and ProofTheory itself
+          BAD=$(git grep -nE '^\s*import\s+Papers\.P3_2CatFramework\.P4_Meta\.ProofTheory' -- \
+            "Papers/P3_2CatFramework/**/*.lean" \
+            ":!Papers/P3_2CatFramework/Paper3B_Main.lean" \
+            ":!Papers/P3_2CatFramework/P4_Meta/ProofTheory/**" \
+            ":!Papers/P3_2CatFramework/P4_Meta/PartV_*.lean" || true)
+          
+          if [ -n "$BAD" ]; then
+            echo "❌ Cross-import detected in 3A files:"
+            echo "$BAD"
+            exit 1
+          fi
+          
+          echo "✅ No ProofTheory imports found in 3A files"
+      
+      - name: No sorries/admit in Paper 3A
+        run: |
+          set -euo pipefail
+          echo "Checking for sorry/admit in Paper 3A files..."
+          
+          # Exclude 3B (ProofTheory) and test files
+          if git grep -nE '\b(sorry|admit)\b' -- \
+            "Papers/P3_2CatFramework/**/*.lean" \
+            ":!Papers/P3_2CatFramework/P4_Meta/ProofTheory/**" \
+            ":!Papers/P3_2CatFramework/test/**" \
+            ":!Papers/P3_2CatFramework/old_3b_*/**"; then
+            echo "❌ Found 'sorry'/'admit' in Paper 3A files."
+            exit 1
+          fi
+          
+          echo "✅ No sorry/admit found in Paper 3A"
+      
+      - name: Build Paper 3A examples (smoke test)
+        run: |
+          echo "Building Paper 3A example modules..."
+          lake build Papers.P3_2CatFramework.Examples.Example1_WitnessFamily
+          lake build Papers.P3_2CatFramework.Examples.Example2_HeightComposition
+          lake build Papers.P3_2CatFramework.Examples.Example3_StoneWindow
+          echo "✅ All Paper 3A examples built successfully"

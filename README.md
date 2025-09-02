@@ -36,11 +36,12 @@ A Lean 4 formalization project that calibrates the exact logical strength requir
 
 **Papers 3A & 3B: Axiom Calibration Framework** ✅ **CORE STABLE**
 
-• Paper 3A (Framework): Active
+• Paper 3A (Framework): Active, **axiom-free**
   – Uniformizability + height theory complete
   – WLPO axis (bidual gap) and FT axis (uniform continuity) calibrated
   – Stone Window API: 100+ Boolean algebra lemmas
-  – DC_ω/Baire: Work package (axiomatized), earmarked for future 3C; not in CI
+  – Assumption-parametric demo modules (Examples/, FT_Frontier) showcase profiles without axioms
+  – DC_ω/Baire: Work package earmarked for future 3C; not in CI
 
 • Paper 3B (Scaffold): ❄️ Frozen at 21 axioms
   – Stage-based ladders resolve circularities

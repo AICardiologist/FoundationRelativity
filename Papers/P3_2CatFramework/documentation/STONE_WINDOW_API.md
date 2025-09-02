@@ -3,6 +3,8 @@
 **Status**: Production-ready API with 100+ lemmas  
 **Module**: `Papers.P3_2CatFramework.P4_Meta.StoneWindow_SupportIdeals`
 
+**Certification Note**: Constructive surjectivity is fully certified for the finite support ideal. Non-metric ideals are handled as calibration targets; the API supports reasoning on both sides uniformly, but CI only certifies finite support constructively.
+
 ## Overview
 
 The Stone Window provides a complete Boolean algebra API for idempotents in ℓ∞/c₀, with extensive simp automation and a calibration framework for surjectivity results.
