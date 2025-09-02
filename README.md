@@ -27,7 +27,9 @@ The project formalizes four major results:
 
 1. **Rank-One Toggle Kernel** (Paper 1) 🔧 - Sherman-Morrison implementation (1 sorry) + Spectrum stubs (~3 sorries) + planned modules (~10 sorries)
 2. **WLPO ↔ BidualGap Equivalence** (Paper 2) ✅ - Sprint E dual isometry complete!  
-3. **2-Categorical Framework** (Paper 3) 📋 - Axiom-calibrated pseudo-functors
+3. **Axiom Calibration Framework** (Papers 3A & 3B) ✅ - Two-paper series:
+   - **Paper 3A**: AxCal framework with WLPO/FT axes (active development)
+   - **Paper 3B**: Proof-theoretic scaffold with 21 axioms (❄️ FROZEN - complete)
 4. **Spectral Geometry** (Paper 4) 🔧 - Undecidable eigenvalues on manifolds
 
 ### Axiom-Calibration Hierarchy
@@ -42,7 +44,11 @@ Each pathology has a **calibration degree** ρ indicating logical strength:
 ### Formalization Status
 - **[Paper 1: Rank-One Toggle Kernel](Papers/P1_GBC/)** 🔧 **Partial Implementation + Current LaTeX Paper** - Sherman-Morrison (1 sorry), Spectrum (3 sorries stub), Fredholm/Tutorial (planned ~10 sorries)
 - **[Paper 2: WLPO ↔ BidualGap∃](Papers/P2_BidualGap/)** ✅ **Sprint E: Dual Isometry Complete (3 WLPO sorries)**
-- **[Paper 3: 2-Categorical Framework](Papers/P3_2CatFramework/)** ✅ **Parts I-VI + 3B Complete: Uniformization + P4_Meta + Proof-theoretic scaffold (0 sorries)**
+- **[Papers 3A & 3B: Axiom Calibration](Papers/P3_2CatFramework/)** ✅ **Complete Framework (0 sorries)**
+  - **3A**: AxCal framework, WLPO/FT axes, Stone Window API (active)
+  - **3B**: ProofTheory with 21 axioms, RFN→Con theorems (frozen)
+  - **🚨 SEPARATION GUIDE**: See [`MASTER_DEPENDENCY_CHART.md`](Papers/P3_2CatFramework/documentation/MASTER_DEPENDENCY_CHART.md)
+  - **Clean imports**: Use `Paper3A_Main.lean` or `Paper3B_Main.lean` aggregators
 - **[Paper 4: Spectral Geometry](Papers/P4_SpectralGeometry/)** 🔧 61 sorries - Discrete model 85% complete
 
 ### 🎯 **Latest Achievements**
@@ -161,42 +167,18 @@ Each pathology has a **calibration degree** ρ indicating logical strength:
 ```
 FoundationRelativity/
 ├── Papers/                     # 📚 Main academic results
-│   ├── P1_GBC/                # ✅ Rank-One Toggle Kernel (Sherman-Morrison COMPLETE!)
-│   │   ├── RankOneToggle/     #    🔧 Core Lean modules (~14 sorries)  
-│   │   │   ├── Projection.lean    #    ✅ Orthogonal projection API (0 sorries)
-│   │   │   ├── Toggle.lean        #    ✅ G(c) operator definition (0 sorries)
-│   │   │   ├── Spectrum.lean      #    🔧 Spectral stubs (3 sorries) 
-│   │   │   ├── ShermanMorrison.lean # 🔧 Inverse formulas + robust norm bounds (1 sorry)
-│   │   │   ├── FredholmAlt.lean   #    ✅ Alternative algebra-free approach (0 sorries)
-│   │   │   ├── Fredholm.lean      #    🔧 Index theory (5 sorries)
-│   │   │   └── Tutorial.lean      #    🔧 Usage examples (4 sorries)
-│   │   └── documentation/      #    📄 Work plan and papers
-│   ├── P2_BidualGap/          # ✅ WLPO ↔ BidualGap COMPLETE!
-│   │   ├── Basic.lean         # ✅ Core definitions (BidualGapStrong, WLPO)
-│   │   ├── Gap/               # ✅ §3.1-3.5 Complete equivalence framework
-│   │   │   ├── IndicatorSpec.lean  # ✅ Core spec with congruence algebra
-│   │   │   ├── Iota.lean          # ✅ ι embedding & lattice homomorphism
-│   │   │   ├── C0Spec.lean        # ✅ c₀-style tail smallness bridge
-│   │   │   └── *.lean            # ✅ Complete indicator function theory
-│   │   ├── Constructive/      # ✅ Main theorem implementation
-│   │   │   ├── Ishihara.lean      # ✅ Gap → WLPO (axiom-clean proof)
-│   │   │   └── CReal/            # ✅ Constructive real analysis
-│   │   └── documentation/     # 📄 Papers, reports, technical status
-│   │       └── paper-v3.2.tex     # LaTeX paper with Lean results
-│   ├── P3_2CatFramework/      # ✅ 2-Categorical Framework (0 sorries!)
-│   │   ├── Phase1_Simple.lean #    Part I: Basic bicategorical structure
-│   │   ├── Phase2_*.lean     #    Part II: Uniformization height theory
-│   │   ├── Phase2_Positive*.lean # Positive uniformization + truth algebra
-│   │   ├── P4_Meta/           #    Parts III-VI: Meta-theoretic framework
-│   │   │   ├── Meta_Signature.lean # Theory/Extend mechanism
-│   │   │   ├── Meta_Ladders.lean   # ProofHeight calculus
-│   │   │   ├── PartIII_Schedule.lean # ✅ k-ary schedule with round-robin bridge (0 sorries!)
-│   │   │   ├── PartIII_Concat.lean # Two-phase ladder composition
-│   │   │   ├── PartIII_NormalForm.lean # Canonical representations
-│   │   │   ├── PartV_*.lean       # Collision theorems
-│   │   │   └── StoneWindow.lean   # Part VI Boolean rings
-│   │   ├── Paper3_Integration.lean # Paper 3 using P4_Meta machinery
-│   │   └── P4_Meta.lean       #    Single import surface
+│   ├── P1_GBC/                # 🔧 Paper 1: Rank-One Toggle Kernel
+│   ├── P2_BidualGap/          # ✅ Paper 2: WLPO ↔ BidualGap
+│   ├── P3_2CatFramework/      # ✅ Papers 3A & 3B: Axiom Calibration
+│   │   ├── Paper3A_Main.lean      # 📘 Paper 3A aggregator (active)
+│   │   ├── Paper3B_Main.lean      # 📙 Paper 3B aggregator (frozen)
+│   │   ├── MASTER_DEPENDENCY_CHART.md # 📊 Complete separation guide
+│   │   ├── Phase1-3_*.lean        # Paper 3A framework
+│   │   ├── P4_Meta/               # Shared meta-theory
+│   │   │   ├── ProofTheory/       # ❄️ Paper 3B (21 axioms, frozen)
+│   │   │   ├── StoneWindow_SupportIdeals.lean # Paper 3A (100+ lemmas)
+│   │   │   └── FT_UCT_*.lean      # Paper 3A (FT axis)
+│   │   └── documentation/          # Papers and charts
 │   └── P4_SpectralGeometry/   # 🔧 Spectral Geometry (61 sorries)
 │       ├── Discrete/          # 🔧 Fast-track CPW model (85% complete)
 │       │   ├── NeckGraph.lean      #    Discrete n×n torus
@@ -230,17 +212,17 @@ lake build          # Build all formalized papers
 
 ### Explore the Results
 ```bash
-# Paper 1: Sherman-Morrison Complete Implementation (0 sorries!)
+# Paper 1: Sherman-Morrison Complete Implementation
 lake build Papers.P1_GBC.RankOneToggle.ShermanMorrison
 
 # Paper 2: Gap → WLPO (axiom-clean!)  
 lake build Papers.P2_BidualGap.Constructive.Ishihara
 
-# Check axioms used in main theorem
-lake env lean Scripts/AxiomCheck.lean
+# Paper 3A: Axiom Calibration Framework (active)
+lake build Papers.P3_2CatFramework.Paper3A_Main
 
-# Paper 3: 2-Categorical Framework
-lake build Papers.P3_2CatFramework.FunctorialObstruction
+# Paper 3B: Proof-Theoretic Scaffold (frozen, complete)
+lake build Papers.P3_2CatFramework.Paper3B_Main
 
 # Paper 4: Discrete CPW Model
 lake build Papers.P4_SpectralGeometry.Discrete

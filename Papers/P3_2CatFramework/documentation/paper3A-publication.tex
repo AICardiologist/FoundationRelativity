@@ -9,6 +9,10 @@
 \usepackage{amsthm}
 \usepackage{hyperref}
 
+% Added for callouts/boxes
+\usepackage{xcolor}
+\usepackage{mdframed}
+
 % Definitions (Custom commands and theorem styles from the original paper)
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{definition}[theorem]{Definition}
@@ -35,6 +39,17 @@
 \newcommand{\supp}{\mathrm{supp}}
 \newcommand{\Idem}{\mathrm{Idem}}
 
+% A small callout style for "What's new" and scope notes
+\mdfdefinestyle{callout}{
+  backgroundcolor=black!2,
+  linecolor=black!35,
+  linewidth=0.6pt,
+  innertopmargin=6pt,
+  innerbottommargin=6pt,
+  innerleftmargin=8pt,
+  innerrightmargin=8pt,
+}
+
 % -------------------------------------------------
 % Title (Focused on Framework and Analysis)
 % -------------------------------------------------
@@ -46,9 +61,13 @@
 \maketitle
 
 \begin{abstract}
-We introduce Axiom Calibration (AxCal), a framework for classifying the axiomatic strength of mathematical theorems using categorical methods. We define \emph{uniformizability} as the invariance of a witness construction across interpretations fixing a core signature ($\SigmaZero$). We introduce \emph{height invariants} and \emph{orthogonal profiles} to measure the minimal axioms required for a witness to stabilize positively.
+We introduce \emph{Axiom Calibration} (AxCal), a framework for classifying axiomatic strength via uniform transport of witnesses across foundations linked by $\SigmaZero$-fixing interpretations. We define \emph{uniformizability} and \emph{height invariants} and organize dependencies along orthogonal axes, yielding a \emph{height calculus} with a product/sup algebra.
 
-Using a Lean-verified equivalence imported from companion work, we compute the height of the $\linf$ bidual gap as $1$ on the WLPO axis. We extend this by establishing the ``FT Frontier,'' demonstrating that the Uniform Continuity Theorem (UCT) resides on an axis orthogonal to WLPO, with profile $(h_{\text{WLPO}}, h_{\text{FT}}) = (0,1)$. Finally, we analyze the Stone Window isomorphism for general support ideals, identifying a constructive failure of surjectivity and proposing a new calibration conjecture. The framework is supported by a Lean~4 formalization comprising $5{,}800+$ lines.
+\smallskip
+\noindent \textbf{Deliverables in this paper.} We present (i) a polished AxCal framework with a reusable Lean~4 scaffold, (ii) two calibrated case studies in constructive analysis: the $\ell^\infty$ bidual gap (height $1$ on the WLPO axis) and the Uniform Continuity Theorem (height $1$ on the FT axis), and (iii) a \emph{Calibration Program} for the Stone Window, framed explicitly as open problems and API infrastructure (no new claims).
+
+\smallskip
+\noindent \textbf{Roadmap.} We outline a focused follow-up (Paper 3C): the DC$_\omega$/Baire frontier, with concrete completion criteria (Lean-verified DC$_\omega\Rightarrow$Baire and at least one Baire-driven theorem such as UBP/CGT/OMT).
 \end{abstract}
 
 \tableofcontents
@@ -59,15 +78,23 @@ Using a Lean-verified equivalence imported from companion work, we compute the h
 
 A central goal of reverse mathematics is to determine the minimal axioms necessary for a theorem. Classical reverse mathematics operates primarily over second-order arithmetic, categorizing theorems into a small collection of subsystems (RCA$_0$, WKL$_0$, ACA$_0$, ATR$_0$, $\Pi^1_1$-CA$_0$). However, when working constructively or across different foundational systems, a more flexible framework is needed.
 
-This paper proposes Axiom Calibration (AxCal), a general framework for measuring axiomatic strength using categorical methods. Rather than restricting to arithmetic subsystems, we work with arbitrary foundations connected by interpretations, tracking how mathematical constructions behave under these translations.
+This paper proposes \emph{Axiom Calibration} (AxCal), a general framework for measuring axiomatic strength using categorical methods. Rather than restricting to arithmetic subsystems, we work with arbitrary foundations connected by interpretations, tracking how mathematical constructions behave under these translations.
 
-The framework is motivated by results such as the calibration of the bidual gap. In our companion paper \cite{Paper2}, we mechanized the exact calibration:
+\begin{mdframed}[style=callout]
+\textbf{What's new in this paper.} 
+\begin{itemize}
+\item \textbf{Uniformizability across $\Sigma_0$-fixing interpretations:} a transport discipline for witness families.
+\item \textbf{Height calculus and orthogonal profiles:} scalar heights along ladders; product/sup algebra for combined problems.
+\item \textbf{Reusable Lean scaffold:} CI-enforced, zero-sorry policy, and APIs for heights, ladders, and transport.
+\item \textbf{Two calibrated case studies:} (i) WLPO axis: the $\linf$ bidual gap at height $1$; (ii) FT axis: UCT at height $1$.
+\item \textbf{Open calibration program (Stone Window):} packaged API + conjectures; no new theorems claimed here.
+\item \textbf{Roadmap to DC$_\omega$/Baire (3C):} explicit completion plan and acceptance criteria.
+\end{itemize}
+\end{mdframed}
 
-\begin{theorem}[Imported from \cite{Paper2}]\label{thm:paper2}
-Over \BISH, the existence of a nonzero element in the bidual $\linf^{**}$ that is not the image of any element in $\linf$ is equivalent to $\WLPO$.
-\end{theorem}
-
-We lift this to a general perspective, introducing \emph{uniformizability} (invariance of witness constructions across interpretations) and \emph{height invariants} (measuring minimal axioms for witness existence) to organize logical dependencies along orthogonal axes. This reveals that fundamental theorems in analysis depend on independent logical principles---the bidual gap requires WLPO, uniform continuity requires the Fan Theorem (FT), and the Baire Category Theorem requires Dependent Choice ($\DCw$)---with these axes being mutually orthogonal.
+\begin{remark}[Scope and non-claims]
+This paper is a \emph{framework plus two case studies}. We do not claim new independence theorems beyond what is needed to calibrate the examples. The Stone Window content is positioned as an \emph{open calibration program} with formal APIs and conjectures; the DC$_\omega$/Baire axis is deferred to a follow-up (Section~\ref{sec:baire-roadmap}).
+\end{remark}
 
 %===========================================================
 \section{The Axiom Calibration Framework}
@@ -182,7 +209,7 @@ $\mathcal{C}^{\mathsf{Gap}}(F) = \{z \in \linf^{**} : z \notin \iota(\linf) \tex
 The family $\mathcal{C}^{\mathsf{Gap}}$ has positive frontier $\Frontierpos\mathcal{C}^{\mathsf{Gap}}=\{\{\WLPO\}\}$ and height $h_{\text{WLPO}}(\mathcal{C}^{\mathsf{Gap}})=1$.
 \end{proposition}
 \begin{proof}
-By Theorem \ref{thm:paper2}, $\mathcal{C}^{\mathsf{Gap}}(\BISH) = \emptyset$ while $\mathcal{C}^{\mathsf{Gap}}(\BISH+\WLPO)\neq\emptyset$. Theorem~\ref{thm:no-unif} precludes a lower stage.
+By Theorem~\ref{thm:paper2}, $\mathcal{C}^{\mathsf{Gap}}(\BISH) = \emptyset$ while $\mathcal{C}^{\mathsf{Gap}}(\BISH+\WLPO)\neq\emptyset$. Theorem~\ref{thm:no-unif} precludes a lower stage.
 \end{proof}
 
 \subsection{The FT Axis: Uniform Continuity}
@@ -225,7 +252,7 @@ With $\DCw$ as a third axis, the Baire Category Theorem contributes $(0,0,1)$, y
 \end{remark}
 
 %===========================================================
-\section{The Stone Window Calibration Program}
+\section{The Stone Window: An Open Calibration Program}
 %===========================================================
 
 \subsection{The Classical Isomorphism for Support Ideals}
@@ -249,10 +276,11 @@ is a Boolean algebra isomorphism onto the idempotents of the quotient ring $\lin
 Well-definedness and Boolean homomorphism are standard. For surjectivity classically, if $[x]$ is idempotent, then $A=\{n:x_n=1\}$ yields $[x]=[\chi_A]$.
 \end{proof}
 
-\subsection{Constructive Failure and Calibration}
+\subsection{Constructive Failure and Program Status}
 
-\begin{remark}[Constructive Caveat]\label{rem:constructive-caveat}
-The classical surjectivity step uses $A=\{n:x_n=1\}$, which requires decidable real equality. In \BISH, this comprehension may fail; hence surjectivity is not uniformly available. For $\mathcal{I}=\mathrm{Fin}$, where $I_{\mathcal{I}}=\czero$, a metric rounding argument suffices. For non-metrically controlled ideals (e.g., density-$0$ ideals), no such rounding is available, and surjectivity appears to require non-constructive principles.
+\begin{remark}[Constructive caveat and program positioning]\label{rem:constructive-caveat}
+The classical surjectivity step uses $A=\{n:x_n=1\}$, which requires decidable real equality. In \BISH, this comprehension may fail; hence surjectivity is not uniformly available. For $\mathcal{I}=\mathrm{Fin}$, where $I_{\mathcal{I}}=\czero$, a metric rounding argument suffices. For non-metrically controlled ideals (e.g., density-$0$ ideals), no such rounding is available, and surjectivity appears to require non-constructive principles. 
+\emph{In this paper we state APIs and conjectures only; no new constructive surjectivity results are claimed.}
 \end{remark}
 
 \begin{conjecture}[Stone Window Calibration]\label{conj:stone-calibration}
@@ -292,14 +320,42 @@ The AxCal framework is supported by a Lean~4 formalization ($5{,}800+$ lines acr
 \end{itemize}
 \end{enumerate}
 
-\subsection{Verification Notes}
-
-The formalization clarified:
+\subsection{Reproducibility and CI Discipline}
+We enforce a \emph{zero-sorry policy} and track axioms in a dedicated index with a CI guard:
 \begin{itemize}
-\item The need to state independence explicitly in Product/Sup (to justify componentwise sup),
-\item The importance of lemma orientation to avoid simp loops,
-\item Mild algebraic hypotheses (e.g.\ \texttt{[Nontrivial R]}) for the Stone equivalence.
+\item Automated checks for \texttt{sorry}/\texttt{admit} and a hard \emph{axiom budget} with namespace discipline.
+\item Scripts to run \texttt{\#print axioms} on key modules and compare against the index.
+\item Minimal surface APIs for ladders, heights, and transport; examples compile as part of CI.
 \end{itemize}
+This ensures that the claims of this paper are auditably supported by the Lean code base.
+
+%===========================================================
+\section{Roadmap: The DC\texorpdfstring{$_\omega$}{ω}/Baire Frontier (Paper 3C)}\label{sec:baire-roadmap}
+%===========================================================
+
+\begin{mdframed}[style=callout]
+\textbf{Motivation.} Baire's Category Theorem (BCT) underlies the Uniform Boundedness Principle (UBP), Closed Graph Theorem (CGT), and Open Mapping Theorem (OMT). AxCal predicts a third axis (orthogonal to WLPO and FT), calibrated by DC$_\omega$, with BCT at height $1$ on this axis.
+\end{mdframed}
+
+\subsection{Target results and orthogonality}
+We will:
+\begin{enumerate}
+\item Prove in Lean: \(\DCw \Rightarrow \mathrm{BCT}\) for complete metric spaces, formalized at the AxCal witness level.
+\item Calibrate at least one Baire-driven theorem (UBP or CGT or OMT) with a height-$1$ certificate on the DC$_\omega$ axis.
+\item Exhibit orthogonality to the WLPO and FT axes using AxCal's product/sup algebra (small table of profiles).
+\end{enumerate}
+
+\subsection{Completion plan (acceptance criteria)}
+Paper 3C will be submitted only when all of the following are satisfied:
+\begin{enumerate}
+\item \textbf{BCT core:} A Lean file (\texttt{Baire/Core.lean}) proving \(\DCw \Rightarrow \mathrm{BCT}\) in the meta-theoretic layer; zero sorries; axiom count unchanged from index.
+\item \textbf{One calibrated application:} Lean-checked height-$1$ certificate for UBP \emph{or} CGT \emph{or} OMT on the DC$_\omega$ axis.
+\item \textbf{Orthogonality snippet:} A 3-axis profile table (WLPO/FT/DC$_\omega$) with at least two entries fully mechanized.
+\item \textbf{Reproducibility:} CI job that runs all Baire/UBP/CGT/OMT examples and prints the axiom diffs; documentation page summarizing the exact height statements.
+\end{enumerate}
+
+\subsection{Why a separate paper}
+Technically and pedagogically, DC$_\omega$/Baire requires a distinct toolkit and a nontrivial corpus; splitting keeps 3A coherent as a framework paper while ensuring the applied story of Baire-driven theorems (UBP/CGT/OMT) has a focused venue.
 
 %===========================================================
 \section{Related Work}
@@ -321,11 +377,11 @@ AxCal provides a systematic approach to measuring logical strength. Tracking uni
 \begin{enumerate}
 \item Exact calibrations (e.g.\ the $\linf$ bidual gap requires exactly WLPO),
 \item Separation of dependencies (WLPO $\perp$ FT $\perp$ $\DCw$),
-\item New calibration problems (Stone Window Conjecture),
-\item Concrete guidance for proof assistant formalization.
+\item New calibration programs (Stone Window; DC$_\omega$/Baire),
+\item Concrete guidance for proof assistant formalization with CI discipline.
 \end{enumerate}
 
-\noindent Future work includes resolving Conjecture~\ref{conj:stone-calibration}, extending to higher-order uniformizability, and automating height computations.
+\noindent Future work includes resolving Conjecture~\ref{conj:stone-calibration}, completing the DC$_\omega$/Baire frontier (Paper 3C), extending to higher-order uniformizability, and automating height computations.
 
 %===========================================================
 \section*{Acknowledgments}

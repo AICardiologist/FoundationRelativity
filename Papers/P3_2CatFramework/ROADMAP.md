@@ -1,12 +1,12 @@
-# Paper 3A Roadmap — Lean-First Plan
+# Paper 3A Roadmap — Resuming for Publication
 
-> **Prime directive:** Finish **Lean/formalization** for Paper **3A**.  
-> Only after a Lean **freeze** (no sorries, green builds, tests stable) do we switch to LaTeX authoring.
+> **Current Phase:** Resuming Paper 3A after Paper 3B completion.  
+> **Objective:** Complete final polish for Paper 3A publication as framework + two calibrated case studies.
 > 
 > **Paper 3B Status**: ✅ COMPLETE (September 2, 2025) - 21 axioms (honest limit of schematic encoding)
-> **Axiom Discharge Progress**: 30 → 24 → 23 → 22 → **21** (PR-6/7: collision machinery discharged)
+> **Paper 3A LaTeX**: Updated with new framing (framework + demos + open program + 3C roadmap)
 
-## 📍 Current Position (August 29, 2025)
+## 📍 Current Position (September 2025 - RESUMING)
 
 #### Infrastructure
 - **Part I**: Full uniformization height theory for {0,1} levels
@@ -29,15 +29,18 @@
 
 ## 0) Executive Summary
 
-**Paper 3A scope:** A focused paper delivering:
-- The **AxCal** (Axiom Calibration) framework (definitions + height calculus + orthogonal profiles)
-- Two **orthogonal axes** in analysis (WLPO and FT/UCT) to demonstrate utility
-- The **Stone Window** program (classical isomorphism for general support ideals, plus constructive caveat + calibration conjecture)
-- A **Lean 4 artifact set** that cleanly supports the above
+**Paper 3A Updated Scope (as per new LaTeX):**
+- **Framework**: AxCal (Axiom Calibration) with uniformizability, height calculus, orthogonal profiles
+- **Two Calibrated Case Studies**: 
+  - WLPO axis: ℓ∞ bidual gap at height 1
+  - FT axis: UCT at height 1
+- **Open Calibration Program**: Stone Window (APIs + conjectures, no new theorems claimed)
+- **Future Roadmap**: DC_ω/Baire frontier explicitly deferred to Paper 3C
 
-**Plan:**  
-1) Complete & polish the **Lean layer** (PowQuot BA API, Stone Window algebra, tests, docs)  
-2) When Lean is frozen, switch to **LaTeX 3A** (writing, figures, cross-refs, artifact index)
+**Remaining Work:**  
+1) Final **documentation polish** in Lean (docstrings, section headers)
+2) **Lean freeze** milestone (tag repo, confirm all tests green)
+3) **LaTeX finalization** with artifact index and bibliography
 
 ---
 
@@ -107,7 +110,7 @@
 
 ---
 
-## 3) Milestones (Lean-first, sequential)
+## 3) Milestones (Updated for Resumption)
 
 **M1. Lean Scope Freeze (PowQuot + Bridges) — ✅ DONE**  
 - Lock API surface & names; cheatsheet aligned; smoke tests in place  
@@ -122,17 +125,20 @@
 - Provide Lean entries (statements/aliases/tests) sufficient to cite the FT profile placement  
 - _DoD:_ Short sanity/test scaffolding compiles; profile claims can reference Lean symbols
 
-**M4. Lint + Docs Pass — 🔵 FINAL POLISH**  
-- Resolve outstanding "try `simp`" warnings where appropriate; keep intentional `simpa` where it changes type/side  
-- Section docstrings and lemma grouping; confirm `mapOfLe_compl` has **no** `@[simp]`  
-- _DoD:_ Green builds; docstrings present; cheatsheet and lemma names consistent
+**M4. Lint + Docs Pass — 🟢 ACTIVE (September 2025)**  
+- Complete remaining docstrings for Map variants, Left-complement bridges, Functoriality
+- Verify all tests pass with current Lean/mathlib versions
+- _DoD:_ Green builds; comprehensive docstrings; no critical lints
 
-**M5. Lean Freeze & Tag — 🔵 PENDING**  
-- Tag repo (e.g., `v3a-lean-freeze`)  
-- _Gate to LaTeX phase opens_
+**M5. Lean Freeze & Tag — 🔵 NEXT**  
+- Tag repo (e.g., `v3a-lean-freeze-sept2025`)  
+- Create artifact index mapping LaTeX claims to Lean files
+- _Gate to final LaTeX polish_
 
-**M6. LaTeX 3A (post-freeze) — 🔵 GATED**  
-- Draft + integrate Lean references; figures & tables; bibliography; submission package
+**M6. LaTeX 3A Finalization — 🔵 FINAL**  
+- Integrate Lean artifact references into LaTeX
+- Add acknowledgments and final bibliography
+- Prepare submission package with reproducibility instructions
 
 ---
 
@@ -260,14 +266,14 @@ grep -n "warning:" . -R | grep -E "StoneWindow_SupportIdeals|Stone_BA_Sanity" ||
 
 ---
 
-## 7) Status Dashboard (Updated: January 29, 2025)
+## 7) Status Dashboard (Updated: September 2025 - RESUMPTION)
 
 | Workstream | Status | Notes |
 |------------|--------|-------|
-| A. PowQuot BA API | 🟢 near-done | Symmetric lemmas, mapped, left-complement bridges/endpoints, cheatsheet, tests largely in place |
-| B. Stone Window Packaging | ✅ DONE | Clean API with stoneWindowIso, preservation lemmas, tests all working (1 sorry in technical lemma) |
-| C. FT/UCT Minimal Surface | ✅ DONE | FT_UCT_MinimalSurface.lean provides minimal symbols, height certs, orthogonality axioms |
-| D. Lints/Docs/Packaging | 🟡 in progress | Some docstrings done (Jan 29), more needed; ARTIFACTS.md created |
+| A. PowQuot BA API | ✅ DONE | 100+ lemmas, full symmetry, cheatsheet, comprehensive tests |
+| B. Stone Window Packaging | ✅ DONE | Clean API with stoneWindowIso, 27 @[simp] lemmas, 0 sorries |
+| C. FT/UCT Minimal Surface | ✅ DONE | FT_UCT_MinimalSurface.lean with orthogonality axioms |
+| D. Lints/Docs/Packaging | 🟢 ACTIVE | Final docstring completion needed; tests verification |
 
 ---
 
@@ -290,28 +296,27 @@ When M5 Lean Freeze is achieved (all DoDs above met), switch to LaTeX:
 
 ## 📊 Progress Tracking
 
-### Completed (January 29, 2025)
-- ✅ 100+ Boolean algebra API lemmas for PowQuot
-- ✅ Perfect symmetry between domain and mapped operations
-- ✅ Left-complement endpoints with negative forms
-- ✅ Cheatsheet with comprehensive API summary
-- ✅ ARTIFACTS.md with build instructions
-- ✅ Initial docstrings for key sections
-- ✅ LaTeX skeleton created (but gated until freeze)
-- ✅ **Stone Window packaging with clean user API (Workstream B)**
-  - `stoneWindowIso` equivalence theorem
-  - Boolean operation preservation lemmas
+### ✅ Completed (Through September 2025)
+- ✅ **100+ Boolean algebra API lemmas** for PowQuot with perfect symmetry
+- ✅ **Stone Window packaging** with clean user API:
+  - `stoneWindowIso` equivalence theorem (0 sorries)
+  - 27 @[simp] lemmas for one-step automation
+  - Boolean operation preservation (inf/sup/compl)
   - Comprehensive test coverage
-- ✅ **FT/UCT minimal infrastructure (Workstream C)**
-  - FT and UCT formulas defined
-  - Height certificates and ladder steps
-  - Orthogonality axioms (FT ⊬ WLPO, WLPO ⊬ FT)
-  - AxCalProfile structure for profiles
+- ✅ **FT/UCT minimal infrastructure**:
+  - FT_UCT_MinimalSurface.lean (101 lines, 0 sorries)
+  - Height certificates: UCT at height 1 on FT axis
+  - Orthogonality axioms: FT ⊬ WLPO, WLPO ⊬ FT
+  - AxCalProfile structure for two-axis profiles
+- ✅ **Paper 3B ProofTheory**: Complete with 21 axioms
+- ✅ **LaTeX paper updated** with new framing (framework + demos + program)
 
-### Active Work  
-- 🔄 Documentation completion (Workstream D)
+### 🟢 Active Work (September 2025)
+- 📝 Final documentation pass (remaining docstrings)
+- 🧪 Test verification with current Lean/mathlib
+- 📋 Artifact index preparation
 
-### Up Next
-- 🔵 Final documentation pass (Workstream D)
-- 🔵 Lint cleanup and test verification
-- 🔵 Lean freeze and tag
+### 🔵 Next Steps
+- **Lean Freeze**: Tag repo once docs/tests complete
+- **LaTeX finalization**: Integrate artifact references
+- **Submission preparation**: Reproducibility package

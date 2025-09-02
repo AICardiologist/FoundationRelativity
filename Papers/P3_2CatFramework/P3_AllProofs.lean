@@ -4,16 +4,22 @@
   Comprehensive file that calls ALL Paper 3 + P4_Meta proofs.
   This serves as both a verification that everything compiles
   and a single point to check all theorems.
+  
+  UPDATED: September 2025 - Now uses separated aggregators
 -/
 
-import Papers.P3_2CatFramework.P3_Minimal
+-- Use the transition aggregator during migration
+-- TODO: After full migration, split this into P3A_AllProofs and P3B_AllProofs
+import Papers.P3_2CatFramework.Paper3_Transition
 import Papers.P3_2CatFramework.Phase3_Positive
 import Papers.P3_2CatFramework.Phase2_PositivePins
 import Papers.P3_2CatFramework.P4_Meta.PartIII_Schedule
 import Papers.P3_2CatFramework.P4_Meta.PartIII_NormalForm
 import Papers.P3_2CatFramework.P4_Meta.PartIII_PosFam
 import Papers.P3_2CatFramework.P4_Meta.PartVI_StoneCalibration
-import Papers.P3_2CatFramework.P4_Meta.PartVI_FT_to_UCT
+-- Note: PartVI_FT_to_UCT has conflicts with FT_UCT_MinimalSurface
+-- Comment out for now to avoid duplication
+-- import Papers.P3_2CatFramework.P4_Meta.PartVI_FT_to_UCT
 
 namespace Papers.P3.AllProofs
 
