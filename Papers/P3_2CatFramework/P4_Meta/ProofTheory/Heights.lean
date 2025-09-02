@@ -33,7 +33,10 @@ abbrev godelFormula := GTagFormula
 namespace Ax
 
 /-- Gödel sentence follows from consistency (classical).
-    Provenance: Gödel 1931, via fixed-point construction. -/
+    Provenance: Gödel 1931, via fixed-point construction.
+    
+    Note: In our schematic encoding without syntax, this must remain an axiom.
+    With proper syntax encoding, this would be provable via diagonalization. -/
 axiom con_implies_godel (T : Theory) [HasArithmetization T] :
   T.Provable (ConsistencyFormula T) → T.Provable (GodelSentence T)
 

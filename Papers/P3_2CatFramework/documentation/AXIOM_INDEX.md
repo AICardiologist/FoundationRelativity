@@ -1,7 +1,11 @@
 # Paper 3B Axiom Index
 
-> **⚠️ AXIOM BUDGET UPDATE**: Currently at 21 axioms (PR-7: collision_tag discharged, replaced by RFN_to_Con_formula)
+> **⚠️ AXIOM BUDGET UPDATE**: Currently at 21 axioms (schematic encoding limitation)
 > **BUDGET LOCKED AT 21**
+> 
+> **Note on Schematic Limitations**: Our schematic encoding (formulas as atoms) prevents
+> discharging axioms that would require syntax manipulation (fixed-points, instantiation, etc.).
+> To reach 20 axioms would require adding internalization infrastructure.
 
 This document tracks all axioms used in the Paper 3B proof-theoretic framework.
 All axioms are now in the `Ax` namespace for consistent naming and easy tracking.
