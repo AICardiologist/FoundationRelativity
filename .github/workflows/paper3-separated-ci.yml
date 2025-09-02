@@ -54,7 +54,7 @@ jobs:
       - name: Verify Paper 3A doesn't import ProofTheory
         run: |
           echo "Checking Paper 3A isolation..."
-          ! grep -r "import.*ProofTheory" Papers/P3_2CatFramework/Paper3A_Main.lean || \
+          ! grep "^import.*ProofTheory" Papers/P3_2CatFramework/Paper3A_Main.lean || \
             (echo "ERROR: Paper 3A imports frozen ProofTheory files!" && exit 1)
           echo "✅ Paper 3A correctly isolated from Paper 3B"
 
@@ -106,7 +106,7 @@ jobs:
       - name: Verify Paper 3B doesn't import Stone/FT
         run: |
           echo "Checking Paper 3B isolation..."
-          ! grep -E "import.*(StoneWindow|FT_UCT)" Papers/P3_2CatFramework/Paper3B_Main.lean || \
+          ! grep -E "^import.*(StoneWindow|FT_UCT)" Papers/P3_2CatFramework/Paper3B_Main.lean || \
             (echo "ERROR: Paper 3B imports Paper 3A components!" && exit 1)
           echo "✅ Paper 3B correctly isolated from Paper 3A"
 
