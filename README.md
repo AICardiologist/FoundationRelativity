@@ -47,15 +47,17 @@ Each pathology has a **calibration degree** ρ indicating logical strength:
 
 ### 🎯 **Latest Achievements**
 
-#### **Paper 3B: Proof-Theoretic Framework Complete** (August 2025)
-- **Complete scaffold**: LCons/LReflect/LClass ladders with 0 sorries
+#### **Paper 3B: Proof-Theoretic Framework COMPLETE** (September 2025)
+- **Final status**: **21 axioms** - honest limit of schematic encoding
+- **Stage-based ladders**: Clean solution to circular dependencies (PR-6)
+- **Cross-ladder bridge**: All collision machinery as theorems (PR-7)
+  - `collision_step_semantic`: Theorem via Stage-based approach
+  - `collision_tag`: Theorem via RFN_implies_Con_formula
 - **Core theorem**: RFN_Σ₁ → Con proved schematically (sorry-free)
-- **Axiom discipline**: All 22 axioms in `Ax` namespace with CI guard (reduced from 30)
 - **Height certificates**: Upper bounds constructive, lower bounds axiomatized
-- **Collision morphisms**: Reflection dominates consistency
-- **PR-5b achievement**: Bot_is_FalseInN discharged via schematic evaluation (23 → 22)
-- **Documentation**: Complete axiom index with discharge roadmap
-- **Next steps**: 6 independent PRs for axiom discharge outlined
+- **Axiom discipline**: All axioms in `Ax` namespace with CI guards
+- **Schematic limitation**: Formula-level implications require internalization
+- **Path to 20 axioms**: Add micro-internalization layer (~50-100 LoC)
 
 #### **Paper 3 Parts I-VI: Complete 2-Categorical Framework + Meta Layer** (August 2025)
 - **Part I & II**: Complete uniformization height theory + positive uniformization

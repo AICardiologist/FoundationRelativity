@@ -44,7 +44,7 @@
 % -------------------------------------------------
 \title{Axiom Calibration of Meta-Mathematical Hierarchies: Formal Collisions and the Structure of Consistency and Reflection}
 \author{Paul Chun--Kit Lee}
-\date{August 2025}
+\date{September 2025}
 
 \begin{document}
 \maketitle
@@ -214,7 +214,7 @@ This theorem formalizes the mechanism by which the reflection axis and the consi
 We have implemented this framework in Lean 4 (P4\_Meta framework) using a ``schematic'' approach that avoids deep encoding of syntax while maintaining mathematical rigor.
 
 \begin{mdframed}[style=provenance]
-\textbf{Implementation Status (August 31, 2025):} Complete scaffold with 0 sorries. All 22 axioms organized in \texttt{Ax} namespace with CI enforcement (reduced from 30 via systematic discharge). Core theorem \texttt{RFN\_implies\_Con} proven schematically. Full test coverage with \texttt{\#print axioms} diagnostics. PR-5b: \texttt{Bot\_is\_FalseInN} discharged via schematic evaluation (23 → 22). See \texttt{documentation/AXIOM\_INDEX.md} for complete tracking.
+\textbf{Implementation Status (September 2, 2025):} Complete scaffold with 0 sorries. All 21 axioms organized in \texttt{Ax} namespace with CI enforcement (reduced from 30 via systematic discharge including collision machinery). Core theorem \texttt{RFN\_implies\_Con} proven schematically. Stage-based ladders solve circular dependencies. Full test coverage with \texttt{\#print axioms} diagnostics. PR-6/PR-7: collision machinery discharged as theorems (22 → 21). See \texttt{documentation/AXIOM\_INDEX.md} for complete tracking.
 \end{mdframed}
 
 \subsection{Schematic Interfaces}
