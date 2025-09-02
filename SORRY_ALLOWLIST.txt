@@ -206,6 +206,13 @@ Papers/P2_BidualGap/Constructive/CReal/Quotient.lean:445    # Comment documentin
 #
 # Note: Basic.lean sorries status needs verification but not included in active count
 
+# Paper 1 - Rank-One Toggle (Sherman-Morrison and Spectrum modules)
+Papers/P1_GBC/P1_Minimal.lean:5
+Papers/P1_GBC/RankOneToggle/ShermanMorrison.lean:13
+Papers/P1_GBC/RankOneToggle/Spectrum.lean:90
+Papers/P1_GBC/RankOneToggle/Spectrum.lean:99
+Papers/P1_GBC/RankOneToggle/Spectrum.lean:109
+
 # Paper 3 - 2-Categorical Framework (integration and bridge code only)
 Papers/P3_2CatFramework/P4_Meta/P3_P4_Bridge.lean:73
 Papers/P3_2CatFramework/P4_Meta/P3_P4_Bridge.lean:92
@@ -219,6 +226,31 @@ Papers/P3_2CatFramework/old_files/FunctorialObstruction.lean:26
 Papers/P3_2CatFramework/old_files/FunctorialObstruction.lean:37
 Papers/P3_2CatFramework/old_files/FunctorialObstruction.lean:46
 Papers/P3_2CatFramework/old_files/FunctorialObstruction.lean:54
+
+# Paper 3 false positives (comments mentioning "sorry-free")
+Papers/P3_2CatFramework/P4_Meta/Meta_Signature.lean:3
+Papers/P3_2CatFramework/P4_Meta/Meta_Ladders.lean:3
+Papers/P3_2CatFramework/P4_Meta/Meta_UpperBounds.lean:3
+Papers/P3_2CatFramework/P4_Meta/Meta_LowerBounds_Axioms.lean:14
+
+# Paper 4 - Spectral Geometry (SUSPENDED - mathematical issues)
+Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:42
+Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:47
+Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:55
+Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:60
+Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:69
+Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:86
+Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:114
+Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:116
+Papers/P4_SpectralGeometry/Discrete/MainTheorem.lean:123
+Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:33
+Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:37
+Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:41
+Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:45
+Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:49
+Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:53
+Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:59
+Papers/P4_SpectralGeometry/Discrete/Pi1Encoding.lean:71
 
 # Paper 3 documentation sorries (not active code)
 Papers/P3_2CatFramework/documentation/universe_refactor_draft.lean:72
