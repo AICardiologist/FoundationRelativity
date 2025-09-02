@@ -12,56 +12,49 @@ import Papers.P3_2CatFramework.Paper3A_Main
 namespace Papers.P3.Examples
 
 open Papers.P3.Phase2
-open Papers.P3.Phase3
+open Papers.P3.FTFrontier  -- Axis, HeightOracle
 
-/-- Example: Product of witness families -/
-def ProductExample (W₁ W₂ : WitnessFamily) : WitnessFamily := {
-  C := fun foundation => W₁.C foundation × W₂.C foundation
-  size := fun foundation => W₁.size foundation + W₂.size foundation
-}
+/-- Product of witness families (toy). -/
+def ProductExample (W₁ W₂ : WitnessFamily) : WitnessFamily :=
+  { C := fun F X => W₁.C F X × W₂.C F X }
 
-/-- Example: Disjunction (Sup) of witness families -/
-def SupExample (W₁ W₂ : WitnessFamily) : WitnessFamily := {
-  C := fun foundation => W₁.C foundation ∨ W₂.C foundation
-  size := fun foundation => max (W₁.size foundation) (W₂.size foundation)
-}
+/-- Disjunction (sup) of witness families (toy). -/
+def SupExample (W₁ W₂ : WitnessFamily) : WitnessFamily :=
+  { C := fun F X => (W₁.C F X) ⊕ (W₂.C F X) }
+
+def GapWitness : WitnessFamily := { C := fun _ _ => PUnit }
+def UCTWitness : WitnessFamily := { C := fun _ _ => PUnit }
 
 section CompositionDemonstration
--- Assume the API provides these composition rules
-variable
-  (height_product_rule : ∀ (W₁ W₂ : WitnessFamily) (axis : Axis),
-    HeightAt axis (ProductExample W₁ W₂) = 
-    max (HeightAt axis W₁) (HeightAt axis W₂))
-  (height_sup_rule : ∀ (W₁ W₂ : WitnessFamily) (axis : Axis),
-    HeightAt axis (SupExample W₁ W₂) = 
-    max (HeightAt axis W₁) (HeightAt axis W₂))
+  variable (O : HeightOracle)
 
--- Check that these rules exist in the API
-#check height_product_rule
-#check height_sup_rule
+  -- Assume the composition rules for heights (axis-wise max)
+  variable
+    (height_product_rule :
+      ∀ (W₁ W₂ : WitnessFamily) (axis : Axis),
+        O.heightAt axis (ProductExample W₁ W₂)
+        = max (O.heightAt axis W₁) (O.heightAt axis W₂))
+    (height_sup_rule :
+      ∀ (W₁ W₂ : WitnessFamily) (axis : Axis),
+        O.heightAt axis (SupExample W₁ W₂)
+        = max (O.heightAt axis W₁) (O.heightAt axis W₂))
 
-/-- Define what it means for Gap ∨ UCT to have profile (1,1) -/
-def SupProfileProperty : Prop :=
-  (HeightAt WLPO_axis (SupExample GapWitness UCTWitness) = some 1) ∧
-  (HeightAt FT_axis (SupExample GapWitness UCTWitness) = some 1)
+  -- Concrete heights for Gap/UCT on the two axes (assumed inputs)
+  variable
+    (h_gap_WLPO : O.heightAt WLPO_axis GapWitness = some 1)
+    (h_gap_FT   : O.heightAt FT_axis GapWitness = some 0)
+    (h_uct_WLPO : O.heightAt WLPO_axis UCTWitness = some 0)
+    (h_uct_FT   : O.heightAt FT_axis UCTWitness = some 1)
 
--- If we had the specific height values, we could compute:
-section ConcreteExample
-variable
-  (h_gap_WLPO : HeightAt WLPO_axis GapWitness = some 1)
-  (h_gap_FT   : HeightAt FT_axis GapWitness = some 0)
-  (h_uct_WLPO : HeightAt WLPO_axis UCTWitness = some 0)
-  (h_uct_FT   : HeightAt FT_axis UCTWitness = some 1)
+  -- We keep this as a property rather than forcing arithmetic on Option Nat
+  def SupProfileProperty : Prop :=
+    (O.heightAt WLPO_axis (SupExample GapWitness UCTWitness) = some 1) ∧
+    (O.heightAt FT_axis (SupExample GapWitness UCTWitness) = some 1)
 
--- The sup would have max on each axis
--- WLPO axis: max(1,0) = 1
--- FT axis: max(0,1) = 1
--- This demonstrates the componentwise maximum behavior
-
-#check SupExample GapWitness UCTWitness
-
-end ConcreteExample
-
+  -- Just #check the rules are in scope (and the examples compile)
+  #check height_product_rule
+  #check height_sup_rule
+  #check SupExample GapWitness UCTWitness
 end CompositionDemonstration
 
 #eval "Example 2: Heights compose via max under both product and disjunction"

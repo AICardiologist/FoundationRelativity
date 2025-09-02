@@ -2,7 +2,9 @@
 
 [![CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml)
 [![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
-[![Paper 3A/3B Complete](https://img.shields.io/badge/Paper%203A%2F3B-Complete-brightgreen)](Papers/P3_2CatFramework/)
+[![3A/3B Separation Guard](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/paper3-separation-guard.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/paper3-separation-guard.yml)
+[![Paper 3A Axiom-Free](https://img.shields.io/badge/Paper%203A-Axiom--Free-brightgreen)](Papers/P3_2CatFramework/)
+[![Paper 3B Frozen](https://img.shields.io/badge/Paper%203B-21%20axioms%20(frozen)-blue)](Papers/P3_2CatFramework/)
 [![Paper 2 WLPO↔Gap](https://img.shields.io/badge/Paper%202%20WLPO%E2%86%94Gap-3%20sorries-green)](Papers/P2_BidualGap/)
 [![Paper 1 Rank-One](https://img.shields.io/badge/Paper%201%20Rank--One-14%20sorries-yellow)](Papers/P1_GBC/)
 

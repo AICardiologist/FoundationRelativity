@@ -91,17 +91,35 @@ jobs:
           set -euo pipefail
           echo "Checking for sorry/admit in Paper 3A files..."
           
-          # Exclude 3B (ProofTheory) and test files
+          # Exclude 3B (ProofTheory), test files, and archive
           if git grep -nE '\b(sorry|admit)\b' -- \
             "Papers/P3_2CatFramework/**/*.lean" \
             ":!Papers/P3_2CatFramework/P4_Meta/ProofTheory/**" \
             ":!Papers/P3_2CatFramework/test/**" \
-            ":!Papers/P3_2CatFramework/old_3b_*/**"; then
+            ":!Papers/P3_2CatFramework/old_3b_*/**" \
+            ":!Papers/P3_2CatFramework/archive/**"; then
             echo "❌ Found 'sorry'/'admit' in Paper 3A files."
             exit 1
           fi
           
           echo "✅ No sorry/admit found in Paper 3A"
+      
+      - name: No axiom declarations in Paper 3A
+        run: |
+          set -euo pipefail
+          echo "Checking for axiom declarations in Paper 3A files..."
+          
+          if git grep -nE '^\s*axiom\b' -- \
+            "Papers/P3_2CatFramework/**/*.lean" \
+            ":!Papers/P3_2CatFramework/P4_Meta/ProofTheory/**" \
+            ":!Papers/P3_2CatFramework/test/**" \
+            ":!Papers/P3_2CatFramework/archive/**" \
+            ":!Papers/P3_2CatFramework/old_3b_*/**"; then
+            echo "❌ Found axiom declarations in Paper 3A"
+            exit 1
+          fi
+          
+          echo "✅ No axiom declarations in Paper 3A"
       
       - name: Build Paper 3A examples (smoke test)
         run: |

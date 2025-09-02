@@ -46,6 +46,11 @@ end HeightDemonstration
 
 3A modules are axiom-free; independence and per-axis heights are supplied via assumption-parametric oracles in demo modules. No ProofTheory axioms are imported in 3A.
 
+## Key Demo Modules
+
+- **[FT_Frontier.lean](../FT_Frontier.lean)**: Demonstrates the HeightOracle pattern for multi-axis calibration
+- **[Examples/](../Examples/)**: Three assumption-parametric demos showing height profiles without axioms
+
 ## Comparison with Paper 3B
 
 Paper 3B (frozen) has 21 axioms for proof-theoretic scaffolding.

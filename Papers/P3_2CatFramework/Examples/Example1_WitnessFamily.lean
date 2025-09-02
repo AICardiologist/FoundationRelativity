@@ -12,51 +12,34 @@ import Papers.P3_2CatFramework.Paper3A_Main
 namespace Papers.P3.Examples
 
 open Papers.P3.Phase2
-
-/-- Example: The bidual gap as a witness family -/
-def GapWitness : WitnessFamily := {
-  C := fun _ => Type  -- Placeholder for actual bidual gap property
-  size := fun _ => 1  -- Single witness needed
-}
-
-/-- Example: Uniform Continuity Theorem (UCT) as a witness family -/
-def UCTWitness : WitnessFamily := {
-  C := fun _ => Type  -- Placeholder for UCT statement
-  size := fun _ => 1
-}
+open Papers.P3.FTFrontier  -- bring in Axis, WLPO_axis, FT_axis, HeightOracle, getProfile
 
 section HeightDemonstration
--- Treat these as inputs to the demo (no proof obligations here)
-variable
-  (h_gap_WLPO : HeightAt WLPO_axis GapWitness = some 1)
-  (h_gap_FT   : HeightAt FT_axis GapWitness = some 0)
-  (h_uct_WLPO : HeightAt WLPO_axis UCTWitness = some 0)
-  (h_uct_FT   : HeightAt FT_axis UCTWitness = some 1)
+  -- Use an oracle to demonstrate heights without axioms
+  variable (O : HeightOracle)
+  
+  /-- Gap has orthogonal profile (1,0) under the standard oracle. -/
+  theorem gap_profile_demo : 
+    getProfile O GapFamily = ⟨some 1, some 0⟩ := by
+    simp [getProfile, O.gap_wlpo, O.gap_ft]
 
-/-- Bundle the orthogonal profile of Gap: (1,0) -/
-def GapProfile : Prop := 
-  (HeightAt WLPO_axis GapWitness = some 1) ∧
-  (HeightAt FT_axis GapWitness = some 0)
+  /-- UCT has orthogonal profile (0,1) under the standard oracle. -/
+  theorem uct_profile_demo : 
+    getProfile O UCTWitness = ⟨some 0, some 1⟩ := by
+    simp [getProfile, O.uct_wlpo, O.uct_ft]
 
-/-- Bundle the orthogonal profile of UCT: (0,1) -/
-def UCTProfile : Prop := 
-  (HeightAt WLPO_axis UCTWitness = some 0) ∧
-  (HeightAt FT_axis UCTWitness = some 1)
+  /-- We can demonstrate orthogonality without axioms. -/
+  theorem orthogonality_demo (O : HeightOracle) :
+    (getProfile O GapFamily).wlpo_height = some 1 ∧
+    (getProfile O GapFamily).ft_height = some 0 ∧
+    (getProfile O UCTWitness).wlpo_height = some 0 ∧
+    (getProfile O UCTWitness).ft_height = some 1 := by
+    simp [getProfile, O.gap_wlpo, O.gap_ft, O.uct_wlpo, O.uct_ft]
 
-/-- Demonstration that Gap has profile (1,0) -/
-def gapProfileDemo : GapProfile := 
-  And.intro h_gap_WLPO h_gap_FT
-
-/-- Demonstration that UCT has profile (0,1) -/
-def uctProfileDemo : UCTProfile := 
-  And.intro h_uct_WLPO h_uct_FT
-
--- Runtime checks to verify the API
-#check h_gap_WLPO
-#check h_gap_FT
-#check gapProfileDemo
-#check uctProfileDemo
-
+  -- Sanity checks
+  #check gap_profile_demo
+  #check uct_profile_demo
+  #check orthogonality_demo
 end HeightDemonstration
 
 #eval "Example 1: Witness families demonstrate orthogonal height profiles"
