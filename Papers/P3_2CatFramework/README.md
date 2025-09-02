@@ -1,6 +1,26 @@
 # Paper 3A: Axiom Calibration via Non-Uniformizability
 ## A Framework for Orthogonal Logical Dependencies in Analysis
 
+## 🚨 IMPORTANT: Paper 3A/3B Separation Guide Available
+
+**MUST READ FIRST**: [`documentation/MASTER_DEPENDENCY_CHART.md`](documentation/MASTER_DEPENDENCY_CHART.md)
+
+This guide shows:
+- ✅ Which files belong to Paper 3A (active development)
+- ❄️ Which files are FROZEN for Paper 3B (DO NOT MODIFY)
+- 📦 How to use the aggregator files correctly
+- 🔵 Which infrastructure is shared
+
+**Quick Start**:
+```lean
+-- For Paper 3A work, use:
+import Papers.P3_2CatFramework.Paper3A_Main
+
+-- Never import Paper3B_Main or ProofTheory/* in Paper 3A code!
+```
+
+---
+
 ### 🎯 Paper 3A Focus (Streamlined Scope)
 
 This repository contains the Lean 4 formalization supporting Paper 3A, which presents:
@@ -9,7 +29,15 @@ This repository contains the Lean 4 formalization supporting Paper 3A, which pre
 3. **Stone Window Program**: Classical theorem, constructive caveat, and calibration conjecture
 4. **Complete Formalization**: 5,800+ lines of Lean 4 with 0 sorries in core components
 
-## 📊 Current Status Summary (Updated: August 29, 2025)
+### 📦 Aggregator Files (September 2025)
+
+| File | Purpose | Usage |
+|------|---------|-------|
+| [`Paper3A_Main.lean`](Paper3A_Main.lean) | Paper 3A ONLY imports | `import Papers.P3_2CatFramework.Paper3A_Main` |
+| [`Paper3B_Main.lean`](Paper3B_Main.lean) | Paper 3B ONLY imports (FROZEN) | `import Papers.P3_2CatFramework.Paper3B_Main` |
+| [`MASTER_DEPENDENCY_CHART.md`](documentation/MASTER_DEPENDENCY_CHART.md) | **MUST READ** - Complete separation guide | Documentation |
+
+## 📊 Current Status Summary (Updated: September 2025)
 **Mathematical Sorries**: 0 ✅ | **Integration Sorries**: 7 ⚠️ | **Lines of Code**: 6,500+ | **Files**: 60+
 
 ### Framework Status
@@ -36,6 +64,33 @@ This repository contains the Lean 4 formalization supporting Paper 3A, which pre
 - **7 integration sorries** in Paper3_Integration.lean and P3_P4_Bridge.lean (glue code only)
 - **P3_AllProofs.lean** has missing export errors (theorems exist but aren't accessible)
 - **Minor warnings**: ~10 style warnings (unused variables, simpa vs simp) - reduced from 15
+
+## 📁 File Organization & Frozen Components
+
+### Paper 3A Components (Active Development)
+```lean
+import Papers.P3_2CatFramework.Paper3A_Main  -- Use this aggregator
+```
+- ✅ Phase1_Simple.lean - Phase3_*.lean (Framework)
+- ✅ P4_Meta/StoneWindow_SupportIdeals.lean (100+ lemmas)
+- ✅ P4_Meta/FT_UCT_MinimalSurface.lean (FT axis)
+- ✅ All test files in test/ directory
+
+### Paper 3B Components (❄️ FROZEN - DO NOT MODIFY)
+```lean
+import Papers.P3_2CatFramework.Paper3B_Main  -- Frozen aggregator
+```
+- ❄️ P4_Meta/ProofTheory/Core.lean
+- ❄️ P4_Meta/ProofTheory/Reflection.lean
+- ❄️ P4_Meta/ProofTheory/Heights.lean
+- ❄️ P4_Meta/ProofTheory/Progressions.lean
+- ❄️ P4_Meta/ProofTheory/Collisions.lean
+
+### Shared Infrastructure (Use Carefully)
+- Core/*.lean (Foundation types)
+- P4_Meta/PartIII_*.lean (Ladder algebra)
+- P4_Meta/PartIV_*.lean (Limits)
+- P4_Meta/PartV_*.lean (Collision theory)
 
 ## 🎯 Implementation Status by Paper Section
 
@@ -244,7 +299,10 @@ Papers/P3_2CatFramework/
 │   ├── FT_Frontier.lean           # Track B: FT → UCT, Sperner, BFPT
 │   └── NormalForm_test.lean       # Comprehensive tests
 ├── Paper3_Integration.lean         # Paper 3 using P4_Meta
-├── P3_Minimal.lean                # Entry point for P4_Meta execution
+├── Paper3A_Main.lean              # Entry point for Paper 3A (active)
+├── Paper3B_Main.lean              # Entry point for Paper 3B (frozen)
+├── Paper3_Transition.lean         # Migration helper (temporary)
+├── P3_Minimal.lean                # DEPRECATED - use Paper3A/3B_Main
 ├── P4_Meta.lean                   # Single import surface
 ├── Core/                          # Infrastructure
 │   ├── Prelude.lean              # Universe setup

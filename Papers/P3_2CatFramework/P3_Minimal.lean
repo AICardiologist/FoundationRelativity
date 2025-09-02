@@ -1,10 +1,33 @@
 /-
   Papers/P3_2CatFramework/P3_Minimal.lean
   
-  Minimal entry point for Paper 3.
-  When you run Paper 3, it executes P4_Meta proof machinery.
+  ⚠️ DEPRECATED - DO NOT USE FOR NEW WORK ⚠️
+  
+  This file is deprecated as of September 2025.
+  It has been replaced by separate aggregators for Papers 3A and 3B.
+  
+  MIGRATION GUIDE:
+  ================
+  Instead of importing this file, use:
+  
+  For Paper 3A work (active development):
+    import Papers.P3_2CatFramework.Paper3A_Main
+  
+  For Paper 3B reference (frozen):
+    import Papers.P3_2CatFramework.Paper3B_Main
+  
+  For transition period only:
+    import Papers.P3_2CatFramework.Paper3_Transition
+  
+  See documentation/MASTER_DEPENDENCY_CHART.md for details.
+  
+  This file will be removed after full migration is complete.
 -/
+
+-- DEPRECATED: This import is kept for backwards compatibility only
 import Papers.P3_2CatFramework.Paper3_Integration
+
+#print "WARNING: P3_Minimal.lean is deprecated. Use Paper3A_Main.lean or Paper3B_Main.lean instead."
 
 namespace Papers.P3.Minimal
 
