@@ -38,11 +38,12 @@ A Lean 4 formalization project that calibrates the exact logical strength requir
 
 **Papers 3A & 3B: Axiom Calibration Framework** ✅ **CORE STABLE**
 
-• Paper 3A (Framework): Active, **axiom-free**
+• Paper 3A (Framework): Active, **axiom-free** (no `axiom` declarations; demos may use noncomputable reasoning)
   – Uniformizability + height theory complete
   – WLPO axis (bidual gap) and FT axis (uniform continuity) calibrated
   – Stone Window API: 100+ Boolean algebra lemmas
   – Assumption-parametric demo modules (Examples/, FT_Frontier) showcase profiles without axioms
+  – Examples and FT Frontier build in CI (smoke tests)
   – DC_ω/Baire: Work package earmarked for future 3C; not in CI
 
 • Paper 3B (Scaffold): ❄️ Frozen at 21 axioms
@@ -108,6 +109,9 @@ FoundationRelativity/
 │       ├── Paper3B_Main.lean          # 📙 Paper 3B aggregator (FROZEN)
 │       ├── MASTER_DEPENDENCY_CHART.md
 │       ├── Phase1-3_*.lean            # 3A framework
+│       ├── Examples/                   # 3A demos (sorry-free)
+│       ├── FT_Frontier.lean           # 3A FT axis API
+│       ├── archive/                   # Legacy files with sorries (excluded from CI)
 │       ├── P4_Meta/
 │       │   ├── ProofTheory/           # ❄️ 3B (21 axioms; frozen)
 │       │   ├── StoneWindow_SupportIdeals.lean  # 3A (100+ lemmas)
@@ -117,6 +121,8 @@ FoundationRelativity/
     ├── planning/
     └── reference/
 ```
+
+**Repo hygiene**: Legacy files with sorries live under `Papers/P3_2CatFramework/archive/` and are excluded from CI checks.
 
 ## 🚀 Quick Start
 

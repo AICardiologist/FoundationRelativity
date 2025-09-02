@@ -6,7 +6,9 @@
 
 ## Overview
 
-**Paper 3A is completely axiom-free.** All independence results and height characterizations are demonstrated through assumption-parametric patterns without introducing axioms to the framework.
+**Paper 3A is completely axiom-free (no `axiom` declarations).** All independence results and height characterizations are demonstrated through assumption-parametric patterns without introducing axioms to the framework.
+
+**Implementation note**: Certain demos may use noncomputable classical reasoning locally; this does not add axioms to the framework.
 
 ## Implementation Strategy
 

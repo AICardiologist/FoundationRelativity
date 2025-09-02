@@ -1,0 +1,18 @@
+# CODEOWNERS for Foundation Relativity
+# These users/teams will be automatically requested for review
+
+# Paper 3B (frozen - requires careful review)
+Papers/P3_2CatFramework/P4_Meta/ProofTheory/**   @AICardiologist
+Papers/P3_2CatFramework/Paper3B_Main.lean        @AICardiologist
+
+# CI workflows (protect separation guard)
+.github/workflows/paper3-separation-guard.yml    @AICardiologist
+.github/workflows/ci.yml                         @AICardiologist
+
+# Core framework files
+Papers/P3_2CatFramework/Paper3A_Main.lean        @AICardiologist
+Papers/P3_2CatFramework/Phase*.lean              @AICardiologist
+
+# Documentation
+*.md                                              @AICardiologist
+Papers/P3_2CatFramework/documentation/**         @AICardiologist
