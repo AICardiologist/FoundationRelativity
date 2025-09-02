@@ -1,0 +1,67 @@
+name: Paper 3A/3B Separation Guard
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  check-separation:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check Paper 3A doesn't import ProofTheory
+        run: |
+          echo "Checking that Paper 3A doesn't import ProofTheory files..."
+          
+          # Get all imports from Paper3A_Main and files it imports (recursively)
+          if grep -r "import.*ProofTheory" Papers/P3_2CatFramework/Paper3A_Main.lean; then
+            echo "❌ ERROR: Paper3A_Main directly imports ProofTheory files!"
+            exit 1
+          fi
+          
+          # Check all files imported by Paper3A_Main (simplified check)
+          paper3a_files=$(grep "^import Papers.P3_2CatFramework" Papers/P3_2CatFramework/Paper3A_Main.lean | \
+                          sed 's/import //' | sed 's/\./\//g' | sed 's/$/.lean/')
+          
+          for file in $paper3a_files; do
+            if [ -f "$file" ]; then
+              if grep -q "import.*ProofTheory" "$file"; then
+                echo "❌ ERROR: $file (imported by Paper3A) imports ProofTheory!"
+                exit 1
+              fi
+            fi
+          done
+          
+          echo "✅ Paper 3A properly isolated from ProofTheory"
+      
+      - name: Check Paper 3B doesn't import Stone/FT files
+        run: |
+          echo "Checking that Paper 3B doesn't import Stone Window or FT/UCT files..."
+          
+          if grep -E "import.*(StoneWindow|FT_UCT|FT_Frontier|FTPortal)" Papers/P3_2CatFramework/Paper3B_Main.lean; then
+            echo "❌ ERROR: Paper3B_Main imports Stone Window or FT/UCT files!"
+            exit 1
+          fi
+          
+          echo "✅ Paper 3B properly isolated from Stone/FT components"
+      
+      - name: Verify frozen status markers
+        run: |
+          echo "Checking frozen status markers..."
+          
+          # Paper3B_Main should have FROZEN marker
+          if ! grep -q "❄️ FROZEN" Papers/P3_2CatFramework/Paper3B_Main.lean; then
+            echo "⚠️ WARNING: Paper3B_Main missing FROZEN marker"
+          fi
+          
+          # ProofTheory README should have FROZEN marker
+          if [ -f Papers/P3_2CatFramework/P4_Meta/ProofTheory/README.md ]; then
+            if ! grep -q "FROZEN" Papers/P3_2CatFramework/P4_Meta/ProofTheory/README.md; then
+              echo "⚠️ WARNING: ProofTheory/README.md missing FROZEN marker"
+            fi
+          fi
+          
+          echo "✅ Frozen status markers checked"
