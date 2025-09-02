@@ -41,6 +41,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-lake-
 
+      - name: Download mathlib cache
+        run: |
+          echo "Downloading mathlib cache..."
+          lake exe cache get || true
+
       - name: Build Paper 3A Framework
         run: |
           echo "Building Paper 3A (AxCal Framework)..."
@@ -87,6 +92,11 @@ jobs:
           key: ${{ runner.os }}-lake-3b-${{ hashFiles('lean-toolchain', 'lake-manifest.json') }}
           restore-keys: |
             ${{ runner.os }}-lake-
+
+      - name: Download mathlib cache
+        run: |
+          echo "Downloading mathlib cache..."
+          lake exe cache get || true
 
       - name: Build Paper 3B (Frozen)
         run: |
