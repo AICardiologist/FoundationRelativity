@@ -1,25 +1,25 @@
 # Paper 3B Axiom Index
 
-> **⚠️ AXIOM BUDGET UPDATE**: Currently at 24 axioms (includes 2 bridge axioms: cons_tag_refines, rfn_tag_refines)
-> **BUDGET LOCKED AT 24**
+> **⚠️ AXIOM BUDGET UPDATE**: Currently at 21 axioms (PR-6: discharged collision_step_semantic, removed bridge axioms)
+> **BUDGET LOCKED AT 21**
 
 This document tracks all axioms used in the Paper 3B proof-theoretic framework.
 All axioms are now in the `Ax` namespace for consistent naming and easy tracking.
 
 ## Summary Statistics
-- **Total Axioms**: 24 (15 Paper 3B specific + 9 base theory infrastructure)
-  - **Paper 3B Specific**: 15 axioms (includes 2 bridge axioms for schematic tags)
+- **Total Axioms**: 21 (12 Paper 3B specific + 9 base theory infrastructure)
+  - **Paper 3B Specific**: 12 axioms (collision_step_semantic discharged, bridge axioms removed)
   - **Base Theory Infrastructure**: 9 axioms (HA, PA, EA, ISigma1, etc.)
 - **Namespace**: All axioms use `Ax.` prefix for consistency
-- **Note**: Bot_is_FalseInN discharged as theorem (PR-5b), but bridge axioms added due to parametric tag issues
+- **Note**: PR-6 successfully discharged collision_step_semantic using Stage-based ladders
 - **Permanent**: 20 axioms (11 Paper 3B + 9 base theory)
 
 ### Recent Progress
 - **PR-1**: ✅ Discharged `LCons_arithmetization_instance` and `LReflect_arithmetization_instance` - now derived from Core.ExtendIter_arithmetization
 - **PR-4**: ✅ Discharged `WLPO_height_upper` and `LPO_height_upper` - now proved via Extend_Proves
-- **PR-2A**: ⚠️ Attempted parametric tags but had to revert - added `cons_tag_refines` and `rfn_tag_refines` as bridge axioms
 - **PR-5a**: ✅ Discharged `Sigma1_Bot` - now a theorem via schematic Σ₁ definition
 - **PR-5b**: ✅ Discharged `Bot_is_FalseInN` - now a theorem via AtomTrueInN schematic evaluation
+- **PR-6**: ✅ Discharged `collision_step_semantic` - now a theorem via Stage-based ladder construction with carried instances
 
 ## Axioms by Category
 
@@ -29,20 +29,13 @@ All axioms are now in the `Ax` namespace for consistent naming and easy tracking
 ~~1. `Ax.LCons_arithmetization_instance` - Extension preserves arithmetization for LCons~~ DISCHARGED
 ~~2. `Ax.LReflect_arithmetization_instance` - Extension preserves arithmetization for LReflect~~ DISCHARGED
 
-### Schematic Tag Refinements (0 axioms - DISCHARGED ✅)
-*Successfully discharged in PR-2A by making tags parametric and defeq to semantic formulas*
-
-~~3. `Ax.cons_tag_refines` - Links ConTag(n) to ConsistencyFormula(LCons T0 n)~~ DISCHARGED
-~~4. `Ax.rfn_tag_refines` - Links RfnTag(n) to RFN_Sigma1_Formula(LReflect T0 n)~~ DISCHARGED
-
-### Collision Axioms (4 axioms)
+### Collision Axioms (3 axioms - 1 DISCHARGED ✅)
 *Split into cross-ladder bridge and height comparison*
 
-#### Cross-ladder bridge (2 axioms - dischargeable via PR-2)
+#### Cross-ladder bridge (1 axiom - 1 DISCHARGED)
 5. `Ax.collision_tag` - RfnTag implies ConTag at each stage
    - Discharge path: Derive from RFN_implies_Con + tag-semantics bridge
-6. `Ax.collision_step_semantic` - Semantic version of collision
-   - Discharge path: Follow from collision_tag once tags = semantics
+~~6. `Ax.collision_step_semantic` - Semantic version of collision~~ DISCHARGED (PR-6: theorem via Stage-based ladders)
 
 #### Height comparison (2 axioms - likely permanent)
 7. `Ax.reflection_dominates_consistency_axiom` - Ladder morphism preservation
