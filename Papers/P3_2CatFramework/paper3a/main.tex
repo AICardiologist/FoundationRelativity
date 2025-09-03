@@ -7,6 +7,7 @@
 \geometry{margin=1in}
 \usepackage{amsmath,amssymb,mathtools}
 \usepackage{amsthm}
+\usepackage{booktabs}  % For professional tables
 \usepackage{hyperref}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning}
@@ -27,7 +28,6 @@
 \newcommand{\WLPO}{\mathrm{WLPO}}
 \newcommand{\FT}{\mathrm{FT}}
 \newcommand{\DCw}{\mathrm{DC}_\omega}
-\newcommand{\DCo}{\mathrm{DC}_\omega}
 \newcommand{\ACw}{\mathrm{AC}_\omega}
 \newcommand{\ACR}{\mathrm{AC}_{\mathbb{R}}}
 \newcommand{\DCR}{\mathrm{DC}_{\mathbb{R}}}
@@ -55,7 +55,7 @@ A Framework for Orthogonal Logical Dependencies in Analysis}
 \maketitle
 
 \begin{abstract}
-We present Axiom Calibration (AxCal), a categorical framework for measuring the axiomatic strength of mathematical theorems via uniformizability and height invariants. Using uniformizability—the invariance of witness constructions across foundations fixing a core signature—we establish a precise calculus for logical dependencies. We compute orthogonal logical profiles along three independent axes central to constructive analysis: WLPO, the Fan Theorem (FT), and Dependent Choice ($\DCo$). Using a Lean-verified equivalence imported from companion work, the bidual gap in $\linf$ calibrates at height 1 on the WLPO axis, while the Uniform Continuity Theorem on $[0,1]$ calibrates at height 1 on the FT axis, and Baire Category for $\N^\N$ calibrates at height 1 on the $\DCo$ axis (Paper 3C), yielding profiles $(1,0,0)$, $(0,1,0)$, and $(0,0,1)$ respectively. We further analyze the Stone Window for general support ideals, proving the classical Boolean algebra isomorphism and identifying a constructive caveat that motivates a calibration conjecture linking surjectivity to WLPO. Our Lean 4 artifacts provide a complete Boolean algebra API for the quotient space with 100+ lemmas, functorial mapping of ideals, and automation-ready endpoint lemmas that reduce quotient reasoning to smallness in the ideal.
+We present Axiom Calibration (AxCal), a categorical framework for measuring the axiomatic strength of mathematical theorems via uniformizability and height invariants. Using uniformizability—the invariance of witness constructions across foundations fixing a core signature—we establish a precise calculus for logical dependencies. We compute orthogonal logical profiles along three independent axes central to constructive analysis: WLPO, the Fan Theorem (FT), and Dependent Choice ($\DCw$). Using a Lean-verified equivalence imported from companion work, the bidual gap in $\linf$ calibrates at height 1 on the WLPO axis, while the Uniform Continuity Theorem on $[0,1]$ calibrates at height 1 on the FT axis, and Baire Category for $\N^\N$ calibrates at height 1 on the $\DCw$ axis (Paper 3C), yielding profiles $(1,0,0)$, $(0,1,0)$, and $(0,0,1)$ respectively. We further analyze the Stone Window for general support ideals, proving the classical Boolean algebra isomorphism and identifying a constructive caveat that motivates a calibration conjecture linking surjectivity to WLPO. Our Lean 4 artifacts provide a complete Boolean algebra API for the quotient space with 100+ lemmas, functorial mapping of ideals, and automation-ready endpoint lemmas that reduce quotient reasoning to smallness in the ideal.
 \end{abstract}
 
 \tableofcontents
@@ -91,7 +91,7 @@ This paper makes the following contributions:
 \begin{enumerate}
 \item \textbf{Axiom Calibration Framework}: We introduce uniformizability as a precise criterion for measuring axiomatic dependencies, along with height invariants that quantify the logical strength needed for theorems.
 
-\item \textbf{Orthogonal Logical Profiles}: We demonstrate that logical principles can be organized along orthogonal axes, with the bidual gap residing purely on the WLPO axis, the Uniform Continuity Theorem on the Fan Theorem axis, and Baire Category on the $\DCo$ axis, establishing three fully independent dimensions.
+\item \textbf{Orthogonal Logical Profiles}: We demonstrate that logical principles can be organized along orthogonal axes, with the bidual gap residing purely on the WLPO axis, the Uniform Continuity Theorem on the Fan Theorem axis, and Baire Category on the $\DCw$ axis, establishing three fully independent dimensions.
 
 \item \textbf{Stone Window Analysis}: We analyze the Stone isomorphism for general support ideals, identifying where the classical proof fails constructively and proposing a calibration conjecture linking surjectivity to WLPO.
 
@@ -236,10 +236,10 @@ Many fundamental theorems of functional analysis require forms of choice or comp
 \toprule
 \textbf{Physics/Analysis Result} & \textbf{Axiomatic Requirement} \\
 \midrule
-Hellinger-Toeplitz Theorem & \ACw{} or stronger \\
-Open Mapping Theorem & Baire Category \\
-Closed Graph Theorem & Baire Category \\
-Uniform Boundedness & Baire Category \\
+Hellinger-Toeplitz Theorem & From CGT or UBP; \ACw{} suffices \\
+Open Mapping Theorem & Standard route via BCT; choiceless/\ACw{} variants exist \\
+Closed Graph Theorem & Standard route via BCT; choiceless/\ACw{} variants exist \\
+Uniform Boundedness & Standard proof via BCT; \ACw{} often suffices in separable settings \\
 Spectral Theorem (unbounded) & \ACw{} + completeness \\
 \bottomrule
 \end{tabular}
@@ -247,13 +247,13 @@ Spectral Theorem (unbounded) & \ACw{} + completeness \\
 \label{tab:physics-analysis}
 \end{table}
 
-The Baire Category Theorem (\BCT{}) is particularly crucial for operator theory. In $\mathsf{ZF}$, \BCT{} is \emph{equivalent} to \DCo{} (see \cite{blair1977axiom}). This motivates our third calibration axis:
+The Baire Category Theorem (\BCT{}) is particularly crucial for operator theory. In $\mathsf{ZF}$, \BCT{} is \emph{equivalent} to \DCw{} (see \cite{blair1977axiom}). This motivates our third calibration axis:
 
-\begin{theorem}[$\DCo{} Calibration]
+\begin{theorem}[$\DCw{} Calibration]
 The witness family $\mathcal{C}^{\BCT}$ for the Baire Category Theorem has:
 \begin{itemize}
-\item Height along the $\DCo{}$ axis: $h_{\DCo}(\mathcal{C}^{\BCT}) = 1$
-\item Orthogonal profile: $(0, 0, 1)$ on axes $(\WLPO, \FT, \DCo)$
+\item Height along the $\DCw{}$ axis: $h_{\DCw}(\mathcal{C}^{\BCT}) = 1$
+\item Orthogonal profile: $(0, 0, 1)$ on axes $(\WLPO, \FT, \DCw)$
 \end{itemize}
 \end{theorem}
 
@@ -268,10 +268,10 @@ This gives us three orthogonal calibrators spanning distinct aspects of classica
 \subsection{Broader Axiomatic Landscape}\label{sec:axes-survey}
 %===========================================================
 
-Our three axes $(\WLPO, \FT, \DCo)$ sit within a richer landscape of choice and induction principles:
+Our three axes $(\WLPO, \FT, \DCw)$ sit within a richer landscape of choice and induction principles:
 
 \begin{enumerate}
-\item \textbf{Countable Choice} (\ACw): Often sufficient for separable functional analysis. Stronger than \DCo{} but weaker than full AC.
+\item \textbf{Countable Choice} (\ACw): Often sufficient for separable functional analysis. Weaker than \DCw{}; \DCw{} implies \ACw{}.
 
 \item \textbf{Weak König's Lemma} (\WKLz): From reverse mathematics, captures compactness of $2^{\mathbb{N}}$. Independent of our axes but related to completeness phenomena.
 
@@ -412,11 +412,11 @@ Height calculus & \checkmark & \texttt{Phase2\_UniformHeight.lean} \\
 WLPO $\leftrightarrow$ Gap & \checkmark & \texttt{P2\_BidualGap/} \\
 Stone quotient API & \checkmark & \texttt{StoneWindow\_SupportIdeals.lean} \\
 FT/UCT infrastructure & \checkmark & \texttt{FT\_UCT\_MinimalSurface.lean} \\
-\DCo{} $\rightarrow$ BCT & \checkmark & \texttt{DCw\_Skeleton.lean} \\
+\DCw{} $\rightarrow$ BCT & \checkmark & \texttt{DCw\_Frontier.lean} \\
 \midrule
 \multicolumn{3}{l}{\textit{Cited from Literature}} \\
 FT $\rightarrow$ UCT & \cite{bridges2007} & Classical result \\
-BCT $\leftrightarrow$ \DCo{} (in ZF) & \cite{blair1977axiom} & Reverse direction \\
+BCT $\leftrightarrow$ \DCw{} (in ZF) & \cite{blair1977axiom} & Reverse direction \\
 WLPO $\perp$ FT & \cite{bridges2007} & Independence \\
 Stone duality (general) & \cite{johnstone1982stone} & Classical theory \\
 \bottomrule

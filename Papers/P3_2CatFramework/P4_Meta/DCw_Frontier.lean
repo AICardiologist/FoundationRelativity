@@ -11,7 +11,7 @@
   
   Dependent Choice (DC_ω) occupies a crucial position in the axiomatic landscape:
   - Equivalent to Baire Category Theorem over ZF (Blair 1977)
-  - Weaker than full Countable Choice (AC_ω)
+  - Stronger than Countable Choice (AC_ω); DC_ω implies AC_ω
   - Independent of WLPO (decidability) and FT (compactness)
   - Stronger than weak forms like DC_ℝ (dependent choice on reals)
   
