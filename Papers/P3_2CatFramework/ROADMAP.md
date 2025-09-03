@@ -9,6 +9,8 @@
 
 ## 📍 Current Position (September 2025 - RESUMING)
 
+**Note on Paper 3C Location**: Paper 3C materials are located at `Papers/P3_2CatFramework/P3C_DCwAxis/` (moved from `Papers/P3C_DCwAxis/` for consolidation)
+
 #### Infrastructure
 - **Part I**: Full uniformization height theory for {0,1} levels
 - **Part II Core**: Positive uniformization definitions, bridges, gap results  
