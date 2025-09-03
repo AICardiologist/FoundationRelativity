@@ -15,6 +15,18 @@ structure Cyl where
   stem : List Nat
 deriving Repr, Inhabited
 
+namespace Cyl
+  /-- Extend a cylinder by one symbol. -/
+  def extend (C : Cyl) (a : Nat) : Cyl := ⟨C.stem ++ [a]⟩
+
+  @[simp] theorem extend_stem (C : Cyl) (a : Nat) :
+      (C.extend a).stem = C.stem ++ [a] := rfl
+
+  @[simp] theorem extend_length (C : Cyl) (a : Nat) :
+      (C.extend a).stem.length = C.stem.length + 1 := by simp
+
+end Cyl
+
 /-- A sequence lies in a cylinder if it agrees with its stem on all positions. -/
 def Cyl.mem (C : Cyl) (x : Seq) : Prop :=
   ∀ i : Fin C.stem.length, x i = C.stem.get i
@@ -39,6 +51,24 @@ theorem step_exists (U : Nat → DenseOpen) :
     ∃ a, C'.stem = C.stem ++ [a] ∧ (U n).hit C' := by
   -- TODO(3C): derive from (U n).dense, then pick an exact one-symbol extension.
   intro C n; sorry
+
+/-- DCω state for the construction: stage counter paired with a cylinder. -/
+structure State where
+  n : Nat
+  C : Cyl
+
+/-- The DCω relation: go from `(n,C)` to `(n+1,C')` forcing `stepRAt U n C C'`. -/
+def R (U : Nat → DenseOpen) (s s' : State) : Prop :=
+  s'.n = s.n + 1 ∧ stepRAt U s.n s.C s'.C
+
+/-- Totality of `R` from any state, delegated to `step_exists`. -/
+theorem R_total (U : Nat → DenseOpen) :
+  ∀ s : State, ∃ s' : State, R U s s' := by
+  intro s
+  -- Use `step_exists` at stage `s.n`
+  rcases step_exists U s.C s.n with ⟨C', a, hEq, hHit⟩
+  refine ⟨⟨s.n + 1, C'⟩, ?_⟩
+  exact ⟨rfl, ⟨a, hEq, hHit⟩⟩
 
 /-- Build an infinite indexed chain of refinements via DCω. -/
 theorem chain_of_DCω (hDC : DCω) (U : Nat → DenseOpen) (C0 : Cyl) :
@@ -66,15 +96,13 @@ theorem limit_mem (U : Nat → DenseOpen) {F : Nat → Cyl}
 
 theorem step_length_succ {U : Nat → DenseOpen} {n : Nat} {C C' : Cyl} :
   stepRAt U n C C' → C'.stem.length = C.stem.length + 1 := by
-  intro h
-  rcases h with ⟨a, h_eq, _⟩
-  rw [h_eq]
-  simp
+  intro h; rcases h with ⟨a, hEq, _⟩; simp [hEq]
 
 theorem step_prefix {C C' : Cyl} {a : Nat} :
   C'.stem = C.stem ++ [a] → C'.stem.take C.stem.length = C.stem := by
-  intro h
-  rw [h]
-  simp
+  intro h; simp [h]
+
+@[simp] theorem mem_nil (x : Seq) : (⟨[]⟩ : Cyl).mem x := by
+  intro i; exact Fin.elim0 i
 
 end Papers.P3C.DCw
