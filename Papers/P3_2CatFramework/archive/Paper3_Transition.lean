@@ -13,7 +13,7 @@
 -- Import shared components needed by both papers
 -- Note: Can't import both aggregators due to conflicts
 -- This is why we need the separation!
-import Papers.P3_2CatFramework.Paper3_Integration
+-- import Papers.P3_2CatFramework.Paper3_Integration  -- Moved to archive
 
 -- For transition, users should migrate to use ONE of:
 -- import Papers.P3_2CatFramework.Paper3A_Main (for 3A work)
