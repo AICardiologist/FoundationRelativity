@@ -5,12 +5,13 @@
 % -------------------------------------------------
 \usepackage{geometry}
 \geometry{margin=1in}
-\usepackage{amsmath,amssymb,mathtools}
-\usepackage{amsthm}
-\usepackage{booktabs}  % For professional tables
-\usepackage{hyperref}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning}
+\usepackage{amsmath,amssymb}
+%\usepackage{mathtools}  % Commented out - not essential
+%\usepackage{amsthm}     % Commented out - using theorem environment directly
+%\usepackage{booktabs}   % Commented out - using standard tables
+%\usepackage{hyperref}   % Commented out - not essential for compilation
+%\usepackage{tikz}       % Commented out - not used in this document
+%\usetikzlibrary{arrows.meta,positioning}  % Commented out with tikz
 
 % Theorem environments
 \newtheorem{theorem}{Theorem}[section]
@@ -20,6 +21,9 @@
 \newtheorem{conjecture}[theorem]{Conjecture}
 \newtheorem{remark}[theorem]{Remark}
 \newtheorem{example}[theorem]{Example}
+
+% Define proof environment manually since amsthm is not available
+\newenvironment{proof}[1][Proof]{\noindent\textbf{#1.}\hspace{0.5em}}{\hfill$\square$\par}
 
 % Custom commands
 \newcommand{\N}{\mathbb{N}}
@@ -233,23 +237,23 @@ Many fundamental theorems of functional analysis require forms of choice or comp
 \begin{table}[h]
 \centering
 \begin{tabular}{ll}
-\toprule
+\hline
 \textbf{Physics/Analysis Result} & \textbf{Axiomatic Requirement} \\
-\midrule
-Hellinger-Toeplitz Theorem & From CGT or UBP; \ACw{} suffices \\
-Open Mapping Theorem & Standard route via BCT; choiceless/\ACw{} variants exist \\
-Closed Graph Theorem & Standard route via BCT; choiceless/\ACw{} variants exist \\
-Uniform Boundedness & Standard proof via BCT; \ACw{} often suffices in separable settings \\
-Spectral Theorem (unbounded) & \ACw{} + completeness \\
-\bottomrule
+\hline
+Hellinger-Toeplitz Theorem & From CGT or UBP; $\ACw{}$ suffices \\
+Open Mapping Theorem & Standard route via BCT; choiceless/$\ACw{}$ variants exist \\
+Closed Graph Theorem & Standard route via BCT; choiceless/$\ACw{}$ variants exist \\
+Uniform Boundedness & Standard proof via BCT; $\ACw{}$ often suffices in separable settings \\
+Spectral Theorem (unbounded) & $\ACw{}$ + completeness \\
+\hline
 \end{tabular}
 \caption{Core functional analysis theorems and their non-constructive requirements}
 \label{tab:physics-analysis}
 \end{table}
 
-The Baire Category Theorem (\BCT{}) is particularly crucial for operator theory. In $\mathsf{ZF}$, \BCT{} is \emph{equivalent} to \DCw{} (see \cite{blair1977axiom}). This motivates our third calibration axis:
+The Baire Category Theorem ($\BCT{}$) is particularly crucial for operator theory. In $\mathsf{ZF}$, $\BCT{}$ is \emph{equivalent} to $\DCw{}$ (see \cite{Blair77}). This motivates our third calibration axis:
 
-\begin{theorem}[$\DCw{} Calibration]
+\begin{theorem}[$\DCw{}$ Calibration]
 The witness family $\mathcal{C}^{\BCT}$ for the Baire Category Theorem has:
 \begin{itemize}
 \item Height along the $\DCw{}$ axis: $h_{\DCw}(\mathcal{C}^{\BCT}) = 1$
@@ -271,9 +275,9 @@ This gives us three orthogonal calibrators spanning distinct aspects of classica
 Our three axes $(\WLPO, \FT, \DCw)$ sit within a richer landscape of choice and induction principles:
 
 \begin{enumerate}
-\item \textbf{Countable Choice} (\ACw): Often sufficient for separable functional analysis. Weaker than \DCw{}; \DCw{} implies \ACw{}.
+\item \textbf{Countable Choice} ($\ACw{}$): Often sufficient for separable functional analysis. Weaker than $\DCw{}$; $\DCw{}$ implies $\ACw{}$.
 
-\item \textbf{Weak König's Lemma} (\WKLz): From reverse mathematics, captures compactness of $2^{\mathbb{N}}$. Independent of our axes but related to completeness phenomena.
+\item \textbf{Weak König's Lemma} ($\WKLz{}$): From reverse mathematics, captures compactness of $2^{\mathbb{N}}$. Independent of our axes but related to completeness phenomena.
 
 \item \textbf{Bar Induction} (BI): The intuitionistic counterpart to transfinite induction. In some models, BI can derive FT while remaining constructive.
 
@@ -376,7 +380,7 @@ Formalized in \texttt{P4\_Meta/} modules:
 
 \subsection{Artifact Availability}
 
-All code is available at: \url{https://github.com/[repository]}
+All code is available at: https://github.com/[repository]
 
 Build instructions:
 \begin{verbatim}
@@ -403,23 +407,23 @@ We distinguish between results fully formalized in our Lean 4 development and th
 \begin{table}[h]
 \centering
 \begin{tabular}{llc}
-\toprule
+\hline
 \textbf{Result} & \textbf{Status} & \textbf{Location} \\
-\midrule
+\hline
 \multicolumn{3}{l}{\textit{Fully Formalized in Lean 4}} \\
 AxCal framework & \checkmark & \texttt{Phase1\_Simple.lean} \\
 Height calculus & \checkmark & \texttt{Phase2\_UniformHeight.lean} \\
 WLPO $\leftrightarrow$ Gap & \checkmark & \texttt{P2\_BidualGap/} \\
 Stone quotient API & \checkmark & \texttt{StoneWindow\_SupportIdeals.lean} \\
 FT/UCT infrastructure & \checkmark & \texttt{FT\_UCT\_MinimalSurface.lean} \\
-\DCw{} $\rightarrow$ BCT & \checkmark & \texttt{DCw\_Frontier.lean} \\
-\midrule
+$\DCw{}$ $\rightarrow$ BCT & \checkmark & \texttt{DCw\_Frontier.lean} \\
+\hline
 \multicolumn{3}{l}{\textit{Cited from Literature}} \\
 FT $\rightarrow$ UCT & \cite{bridges2007} & Classical result \\
-BCT $\leftrightarrow$ \DCw{} (in ZF) & \cite{blair1977axiom} & Reverse direction \\
+BCT $\leftrightarrow$ $\DCw{}$ (in ZF) & \cite{Blair77} & Reverse direction \\
 WLPO $\perp$ FT & \cite{bridges2007} & Independence \\
-Stone duality (general) & \cite{johnstone1982stone} & Classical theory \\
-\bottomrule
+Stone duality (general) & \cite{Johnstone82} & Classical theory \\
+\hline
 \end{tabular}
 \caption{Formalization status: \checkmark{} indicates complete Lean 4 formalization with 0 sorries}
 \label{tab:verification}
@@ -427,7 +431,7 @@ Stone duality (general) & \cite{johnstone1982stone} & Classical theory \\
 
 Our Lean formalization comprises approximately 15,000 lines of code across 50+ files, available at:
 \begin{center}
-\url{https://github.com/YourRepo/AxiomCalibration}
+https://github.com/YourRepo/AxiomCalibration
 \end{center}
 
 %===========================================================
@@ -454,7 +458,7 @@ Future work includes:
 \begin{thebibliography}{10}
 \bibitem{Paper2} P.C.-K. Lee. \emph{The Bidual Gap and WLPO: A Complete Calibration}. Companion paper, 2025.
 
-\bibitem{blair1977axiom} C.E. Blair. The Baire category theorem implies the principle of dependent choices. \emph{Bulletin de l'Académie Polonaise des Sciences}, 25(10):933--934, 1977.
+\bibitem{Blair77} C.E. Blair. The Baire category theorem implies the principle of dependent choices. \emph{Bulletin de l'Académie Polonaise des Sciences}, 25(10):933--934, 1977.
 
 \bibitem{bridges2007} D. Bridges and F. Richman. \emph{Varieties of Constructive Mathematics}. Cambridge University Press, 1987.
 
@@ -462,7 +466,7 @@ Future work includes:
 
 \bibitem{Ishihara} H. Ishihara. \emph{Constructive Functional Analysis}. World Scientific, 2020.
 
-\bibitem{johnstone1982stone} P.T. Johnstone. \emph{Stone Spaces}. Cambridge Studies in Advanced Mathematics. Cambridge University Press, 1982.
+\bibitem{Johnstone82} P.T. Johnstone. \emph{Stone Spaces}. Cambridge Studies in Advanced Mathematics. Cambridge University Press, 1982.
 
 \bibitem{Mines} R. Mines, F. Richman, W. Ruitenburg. \emph{A Course in Constructive Algebra}. Springer, 1988.
 

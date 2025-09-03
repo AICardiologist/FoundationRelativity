@@ -50,19 +50,51 @@ Paper3_Lean_Formalization.tex
 - **Verification Ledger**: Added to distinguish formalized vs cited results
 - **Bibliography**: Updated with Blair 1977, Johnstone 1982, and other references
 
+## Shared Resources
+
+- **paper3-macros.tex** - Shared macro definitions for consistency
+- **Makefile** - Automated building with proper dependencies  
+- **.latexmkrc** - Configuration for latexmk builds
+
 ## Building LaTeX Documents
 
+### Using Make (Recommended)
+```bash
+# Build all documents
+make all
+
+# Build individual documents
+make paper3        # Build Paper3_Main.pdf
+make paper3a       # Build Paper3A_Publication.pdf
+make paper3b       # Build Paper3B_Publication.pdf
+make formalization # Build Paper3_Lean_Formalization.pdf
+
+# Quick single-pass build (no bibliography)
+make quick-Paper3A_Publication
+
+# Clean auxiliary files
+make clean
+
+# Show all options
+make help
+```
+
+### Using latexmk
+```bash
+# Build with automatic dependency tracking
+latexmk -pdf Paper3A_Publication.tex
+
+# Watch mode (auto-rebuild on changes)
+latexmk -pdf -pvc Paper3A_Publication.tex
+```
+
+### Manual compilation
 ```bash
 # Standard pdflatex compilation
 pdflatex Paper3_Main.tex
-pdflatex Paper3A_Publication.tex
-pdflatex Paper3B_Publication.tex
-
-# Or with bibliography (if using bibtex)
-pdflatex Paper3A_Publication.tex
-bibtex Paper3A_Publication
-pdflatex Paper3A_Publication.tex
-pdflatex Paper3A_Publication.tex
+bibtex Paper3_Main
+pdflatex Paper3_Main.tex
+pdflatex Paper3_Main.tex
 ```
 
 ## Related Locations
