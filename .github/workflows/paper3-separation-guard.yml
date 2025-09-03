@@ -76,7 +76,10 @@ jobs:
             "Papers/P3_2CatFramework/**/*.lean" \
             ":!Papers/P3_2CatFramework/Paper3B_Main.lean" \
             ":!Papers/P3_2CatFramework/P4_Meta/ProofTheory/**" \
-            ":!Papers/P3_2CatFramework/P4_Meta/PartV_*.lean" || true)
+            ":!Papers/P3_2CatFramework/P4_Meta/PartV_*.lean" \
+            ":!Papers/P3_2CatFramework/test/ProofTheory_Sanity.lean" \
+            ":!Papers/P3_2CatFramework/test/Bot_is_FalseInN_test.lean" \
+            ":!Papers/P3_2CatFramework/test/Sigma1Bot_test.lean" || true)
           
           if [ -n "$BAD" ]; then
             echo "❌ Cross-import detected in 3A files:"
