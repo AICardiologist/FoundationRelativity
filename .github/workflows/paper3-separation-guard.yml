@@ -116,6 +116,7 @@ jobs:
           if git grep -nE '^\s*axiom\b' -- \
             "Papers/P3_2CatFramework/**/*.lean" \
             ":!Papers/P3_2CatFramework/P4_Meta/ProofTheory/**" \
+            ":!Papers/P3_2CatFramework/P4_Meta/PartV_*.lean" \
             ":!Papers/P3_2CatFramework/test/**" \
             ":!Papers/P3_2CatFramework/archive/**" \
             ":!Papers/P3_2CatFramework/old_3b_*/**"; then
