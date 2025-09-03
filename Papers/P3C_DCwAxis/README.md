@@ -1,75 +1,69 @@
-# Paper 3C: DC_ω Axis Calibration
+# Paper 3C: DCω → Baire Calibrator
 
-**Status**: Early Development  
-**Target**: DC_ω → Baire formal proof  
-**Location**: Isolated from 3A/3B for clean CI
+The third orthogonal axis of the Axiom Calibration (AxCal) framework.
 
-## Overview
-
-Paper 3C extends the AxCal framework with a third orthogonal axis based on Dependent Choice (DC_ω). This axis captures principles related to sequential construction and completeness properties.
-
-## Key Results
-
-1. **DC_ω → Baire**: Formal proof that countable dependent choice implies the Baire category theorem for ℕ^ℕ
-2. **Orthogonality**: DC_ω axis is independent of WLPO and FT axes
-3. **Height Calibration**: Baire principle has profile (WLPO, FT, DC_ω) = (0, 0, 1)
-
-## Module Structure
+## Structure
 
 ```
-P3C_DCwAxis/                      # Paper 3C root (outside 3A CI)
-├── README.md                      # This file
-├── Paper3C_Main.lean             # Main aggregator
-├── DCw_Frontier_Interface.lean   # Precise DCω and BaireNN definitions
-└── DCw_Baire.lean                # DCω → Baire calibrator (skeleton)
-
-P3_2CatFramework/P4_Meta/         # Shared with 3A/3B
-└── DCw_Frontier.lean             # DC_ω axis API (tokens only)
+P3C_DCwAxis/
+├── DCw_Frontier_Interface.lean   # DCω definition + opaque BaireNN token
+├── DCw_Skeleton.lean             # Complete proof (0 sorries)
+├── DCw_Baire.lean               # Main theorem (1 intentional sorry)
+├── DCw_TopBinding_Complete.lean # Adapter stub (awaiting mathlib)
+├── DCw_Complete.lean            # Semantic proof outline
+├── DCw_TopBinding.lean.future   # Ready-to-paste adapter
+└── DCw_Baire_Complete.lean.future # Ready-to-paste final theorem
 ```
 
-## Precise Interface
+## Build Instructions
 
-The calibrator is coded against the `BaireFromDCωStatement` token, defined as:
-- **DCω**: Standard dependent choice for countable sequences
-- **BaireNN**: Simplified Baire property for ℕ^ℕ (placeholder for full topology)
-- **Target**: `DCω → BaireNN`
-
-This keeps Paper 3C development isolated from 3A, allowing sorries/axioms in 3C while 3A remains axiom-free.
-
-## Development Status
-
-- [x] DC_ω axis definition
-- [x] Baire space formalization  
-- [ ] Step relation for closed balls
-- [ ] Main theorem proof
-- [ ] Height certificate
-- [ ] Integration with profile machinery
-
-## Building
-
+### Core (always green)
 ```bash
-lake build Papers.P3C_DCwAxis.Paper3C_Main
+lake build Papers.P3C_DCwAxis.DCw_Skeleton Papers.P3C_DCwAxis.DCw_Baire
 ```
 
-## Key Theorems
-
-```lean
--- DC_ω principle
-def DCω : Prop :=
-  ∀ (X : Type) [Inhabited X] (R : X → X → Prop),
-    (∀ x, ∃ y, R x y) →
-    ∃ f : ℕ → X, ∀ n, R (f n) (f (n + 1))
-
--- Main calibration
-theorem dcω_implies_baire : DCω → Baire
-
--- Height profile
-theorem baire_profile : 
-  getProfile oracle BaireWitness = ⟨0, 0, 1⟩
+### With binding stubs
+```bash
+lake build Papers.P3C_DCwAxis
 ```
 
-## References
+## Mathematical Content
 
-- Kohlenbach (2008): Applied Proof Theory, Chapter 3
-- Simpson (2009): Subsystems of Second Order Arithmetic, Chapter V.4
-- Standard reverse mathematics proof via nested closed balls
+### Proven (0 sorries)
+- **`chain_of_DCω`**: Given DCω and countable DenseOpen family, builds indexed chain
+- **`limit_mem`**: Diagonal limit belongs to every cylinder in the chain
+- **Helper lemmas**: Length monotonicity, prefix stability, digit extraction
+
+### Key Innovation
+Stage-indexed refinement ensures hitting U_n at stage n specifically, enabling clean diagonal construction.
+
+## Completing the Binding
+
+When mathlib topology is available:
+
+1. Replace stub with adapter:
+```bash
+cp DCw_TopBinding.lean.future DCw_TopBinding.lean
+```
+
+2. Replace theorem with complete version:
+```bash
+cp DCw_Baire_Complete.lean.future DCw_Baire.lean
+# (or just replace the theorem body)
+```
+
+3. Build complete axis:
+```bash
+lake build Papers.P3C_DCwAxis
+```
+
+Expected: 0 sorries.
+
+## Paper Integration
+
+This establishes the third calibrator axis:
+- **Paper 3A**: BI → WKL (Lindenbaum)
+- **Paper 3B**: Con(PA) → RFN(Σ₁) (Gödel)  
+- **Paper 3C**: DCω → Baire (Dependent Choice)
+
+All three axes are orthogonal, demonstrating distinct calibration pathways.
