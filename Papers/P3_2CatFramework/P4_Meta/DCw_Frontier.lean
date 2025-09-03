@@ -6,6 +6,25 @@
   - Provide one-line reduction (DCω ⇒ Baire)
   - Lift height certificates along the implication
   This mirrors FT_Frontier.lean and uses the same Frontier_API.
+  
+  ## Axiomatic Context
+  
+  Dependent Choice (DC_ω) occupies a crucial position in the axiomatic landscape:
+  - Equivalent to Baire Category Theorem over ZF (Blair 1977)
+  - Weaker than full Countable Choice (AC_ω)
+  - Independent of WLPO (decidability) and FT (compactness)
+  - Stronger than weak forms like DC_ℝ (dependent choice on reals)
+  
+  ## Physics Applications
+  
+  Theorems requiring DC_ω or Baire Category:
+  - Open Mapping Theorem
+  - Closed Graph Theorem
+  - Uniform Boundedness Principle
+  - Various completeness results in functional analysis
+  
+  The Baire Category Theorem is fundamental for operator theory and
+  the structural theory of Banach spaces.
 -/
 import Papers.P3_2CatFramework.P4_Meta.Frontier_API
 
