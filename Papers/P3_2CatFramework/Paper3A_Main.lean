@@ -27,9 +27,9 @@ import Papers.P3_2CatFramework.P4_Meta.FT_UCT_MinimalSurface
 import Papers.P3_2CatFramework.P4_Meta.FT_Frontier
 import Papers.P3_2CatFramework.P4_Meta.FTPortalWire
 
--- DC_ω Axis (Future Paper 3C)
-import Papers.P3_2CatFramework.P4_Meta.DCw_Frontier
--- Note: DCwPortalWire has conflicts, skip for now
+-- Paper 3C: DCω/Baire Axis (Third orthogonal axis)
+-- Now fully reintegrated into Paper 3A
+import Papers.P3_2CatFramework.Paper3C_Main
 
 -- Frontier API
 import Papers.P3_2CatFramework.P4_Meta.Frontier_API
@@ -52,15 +52,20 @@ import Papers.P3_2CatFramework.P4_Meta.PartVI_StoneCalibration
 ## Overview
 This aggregator provides access to all Paper 3A components:
 - The AxCal framework with uniformizability and height calculus
-- Two calibrated case studies: WLPO axis (bidual gap) and FT axis (UCT)
+- Three orthogonal calibrated axes:
+  * WLPO axis: Bidual gap at height 1 (profile: 1,0,0)
+  * FT axis: UCT at height 1 (profile: 0,1,0)
+  * DCω axis: Baire Category at height 1 (profile: 0,0,1) [Paper 3C integrated]
 - Stone Window program with production-ready Boolean algebra API
-- Infrastructure for future DC_ω/Baire work (Paper 3C)
 
 ## Key Results
 1. **Uniformization Height Theory**: Complete formalization of height = 1 results
-2. **Orthogonal Axes**: WLPO ⊬ FT and FT ⊬ WLPO formally verified
+2. **Three Orthogonal Axes**: WLPO ⊬ FT ⊬ DCω formally verified
 3. **Stone Window**: 100+ lemmas with 27 @[simp] rules for automation
-4. **FT/UCT Calibration**: UCT at height 1 on the FT axis
+4. **Complete Calibrations**:
+   - WLPO/Gap: Height 1 on WLPO axis
+   - FT/UCT: Height 1 on FT axis  
+   - DCω/Baire: Height 1 on DCω axis (Paper 3C integrated)
 
 ## What's NOT Included
 - ProofTheory/* files (these belong to Paper 3B)

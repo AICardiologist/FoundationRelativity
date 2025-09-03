@@ -5,6 +5,23 @@
   This provides just enough Lean surface to reference the FT axis 
   placement and UCT calibration in the paper.
   
+  ## Axiomatic Context
+  
+  The Fan Theorem (FT) sits within a broader landscape of choice and
+  compactness principles:
+  - FT captures compactness phenomena orthogonal to WLPO (decidability)
+  - Related to WKL₀ (Weak König's Lemma) in reverse mathematics
+  - Can be derived from Bar Induction (BI) in some intuitionistic settings
+  - Independent of countable choice (AC_ω) and dependent choice (DC_ω)
+  
+  ## Physics Applications
+  
+  Theorems requiring FT or related compactness principles:
+  - Uniform continuity on [0,1]
+  - Brouwer Fixed Point Theorem
+  - Sperner's Lemma
+  - Various compactness results in functional analysis
+  
   Part of Workstream C from ROADMAP.md
 -/
 

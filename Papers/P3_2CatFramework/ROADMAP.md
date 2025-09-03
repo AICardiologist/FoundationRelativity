@@ -5,9 +5,11 @@
 > 
 > **Paper 3B Status**: ✅ COMPLETE (September 2, 2025) - 21 axioms (honest limit of schematic encoding)
 > **Axiom Discharge Progress**: 30 → 24 → 23 → 22 → **21** (PR-6/7: collision machinery discharged)
-> **Paper 3A LaTeX**: Updated with new framing (framework + demos + open program + 3C roadmap)
+> **Paper 3A LaTeX**: Updated with complete three-axis framework (WLPO, FT, DCω integrated)
 
 ## 📍 Current Position (September 2025 - RESUMING)
+
+**Note on Paper 3C Integration**: Paper 3C (DCω/Baire axis) is now fully integrated into Paper 3A as the third orthogonal axis. The aggregator `Paper3C_Main.lean` is imported by `Paper3A_Main.lean`.
 
 #### Infrastructure
 - **Part I**: Full uniformization height theory for {0,1} levels
@@ -36,7 +38,7 @@
   - WLPO axis: ℓ∞ bidual gap at height 1
   - FT axis: UCT at height 1
 - **Open Calibration Program**: Stone Window (APIs + conjectures, no new theorems claimed)
-- **Future Roadmap**: DC_ω/Baire frontier explicitly deferred to Paper 3C
+- **Complete Three-Axis Framework**: DCω/Baire axis fully integrated (formerly Paper 3C)
 
 **Remaining Work:**  
 1) Final **documentation polish** in Lean (docstrings, section headers)
