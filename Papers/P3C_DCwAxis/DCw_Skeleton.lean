@@ -4,45 +4,57 @@ import Papers.P3C_DCwAxis.DCw_Frontier_Interface
   Paper 3C: Proof skeleton for DCω → Baire.
   
   This file provides the waypoints for the classical proof via dependent choice
-  on cylinders. All lemmas are stubbed with `sorry` (allowed in 3C).
+  on cylinders. Only substantive proof steps use `sorry` (allowed in 3C).
 -/
 
 namespace Papers.P3C.DCw
 
 abbrev Seq := Nat → Nat
-structure Cyl where stem : List Nat
 
-/-- Membership: a sequence lies in a cylinder if it has the given stem as prefix. -/
+structure Cyl where
+  stem : List Nat
+deriving Repr, Inhabited
+
+/-- A sequence lies in a cylinder if it agrees with its stem on all positions. -/
 def Cyl.mem (C : Cyl) (x : Seq) : Prop :=
-  ∀ i : Nat, i < C.stem.length → x i = C.stem.get ⟨i, sorry⟩
+  ∀ i : Fin C.stem.length, x i = C.stem.get i
 
-/-- A (placeholder) "dense open" predicate on cylinders.
-    Later you'll replace these with mathlib's topology. -/
+/-- Dense-open placeholder on cylinders (to be replaced by topology later). -/
 structure DenseOpen where
-  hit : Cyl → Prop
-  dense : ∀ C : Cyl, ∃ C', C'.stem.length ≥ C.stem.length ∧ hit C'
-  open_like : True  -- placeholder; keep shape for later
+  hit   : Cyl → Prop
+  dense : ∀ C : Cyl, ∃ C' : Cyl, C'.stem.length ≥ C.stem.length ∧ hit C'
+  open_like : True  -- placeholder
 
-/-- Given a sequence of dense opens U n, every cylinder has a refinement
-    that hits U n at stage n. -/
+/-- One refinement step: extend by one symbol and meet some U n. -/
+def stepR (U : Nat → DenseOpen) (C C' : Cyl) : Prop :=
+  ∃ n a, C'.stem = C.stem ++ [a] ∧ (U n).hit C'
+
+/-- "F is a chain" for U: every step refines. -/
+def isChain (U : Nat → DenseOpen) (F : Nat → Cyl) : Prop :=
+  ∀ n, stepR U (F n) (F (n+1))
+
+/-- For each stage n and cylinder C, you can refine C by one symbol hitting U n. -/
 theorem step_exists (U : Nat → DenseOpen) :
-    ∀ (C : Cyl) (n : Nat), ∃ (C' : Cyl), C'.stem.length = C.stem.length + 1 ∧ (U n).hit C' := by
-  -- TODO(3C): implement with actual density; placeholder shape:
+  ∀ (C : Cyl) (n : Nat), ∃ (C' : Cyl),
+    C'.stem.length = C.stem.length + 1 ∧ (U n).hit C' := by
+  -- TODO(3C): derive from (U n).dense; pick an extension of length+1 and show it hits.
+  intro C n; sorry
+
+/-- Build an infinite chain of refinements via DCω. -/
+theorem chain_of_DCω (hDC : DCω) (U : Nat → DenseOpen) (C0 : Cyl) :
+  ∃ F : Nat → Cyl, F 0 = C0 ∧ isChain U F := by
+  -- TODO(3C): standard DCω on the relation "extend by one and hit U n".
   sorry
 
-/-- Dependent-choice step relation over cylinders. -/
-def stepR (U : Nat → DenseOpen) : Cyl → Cyl → Prop :=
-  fun C C' => ∃ n, C'.stem.length = C.stem.length + 1 ∧ (U n).hit C'
+/-- Placeholder limit of a chain (real version: diagonalize the stems). -/
+def limit_of_chain (_ : Nat → Cyl) : Seq :=
+  fun _ => 0
 
-/-- Build an infinite chain of cylinders by DCω. -/
-theorem chain_of_DCω (hDC : DCω) (U : Nat → DenseOpen) :
-    ∀ C0, ∃ F : Nat → Cyl, F 0 = C0 ∧ ∀ n, stepR U (F n) (F (n+1)) := by
-  -- Standard DCω application to `stepR`; fill later
-  sorry
-
-/-- From a chain of refining cylinders, extract a limit point in ℕ^ℕ. -/
-def limit_of_chain : (Nat → Cyl) → Seq := 
-  fun _ => fun _ => 0  -- Placeholder implementation
-  -- Standard diagonal construction from stems; fill later
+/-- The limit realizes every finite stem in the chain. -/
+theorem limit_mem (U : Nat → DenseOpen) {F : Nat → Cyl}
+    (h0 : True) (hchain : isChain U F) :
+    ∀ n, (F n).mem (limit_of_chain F) := by
+  -- TODO(3C): prove by stem compatibility along the chain.
+  intro n; sorry
 
 end Papers.P3C.DCw
