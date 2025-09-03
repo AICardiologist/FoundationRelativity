@@ -14,6 +14,14 @@ This master chart clearly separates Paper 3A (Axiom Calibration Framework) from 
 - ❄️ Frozen components (Paper 3B - DO NOT MODIFY)
 - 🟢 Active development areas (Paper 3A)
 
+## 📄 LaTeX Documents
+
+All LaTeX documents are now consolidated in `Papers/P3_2CatFramework/latex/`:
+- Paper3_Main.tex (Mother document)
+- Paper3A_Publication.tex (Includes Paper 3C)
+- Paper3B_Publication.tex (Proof-theoretic)
+- Paper3_Lean_Formalization.tex (Technical details)
+
 ## 📦 Aggregator Files
 
 ### Main Entry Points

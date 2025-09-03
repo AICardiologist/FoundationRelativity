@@ -1,6 +1,17 @@
 # Paper 3A: Axiom Calibration via Non-Uniformizability
 ## A Framework for Orthogonal Logical Dependencies in Analysis
 
+## 📄 LaTeX Documents Location
+
+**All LaTeX documents have been consolidated in:** [`latex/`](latex/)
+
+- **Paper3_Main.tex** - Comprehensive Paper 3 (mother document)
+- **Paper3A_Publication.tex** - Paper 3A publication version (includes integrated Paper 3C)
+- **Paper3B_Publication.tex** - Paper 3B publication version
+- **Paper3_Lean_Formalization.tex** - Lean formalization documentation
+
+See [`latex/README.md`](latex/README.md) for complete details.
+
 ## 🚨 IMPORTANT: Paper 3A/3B Separation Guide Available
 
 **MUST READ FIRST**: [`documentation/MASTER_DEPENDENCY_CHART.md`](documentation/MASTER_DEPENDENCY_CHART.md)
@@ -297,6 +308,11 @@ import Papers.P3_2CatFramework.Paper3B_Main  -- Frozen aggregator
 
 ```
 Papers/P3_2CatFramework/
+├── latex/                          # 📄 All LaTeX documents (consolidated)
+│   ├── Paper3_Main.tex            # Mother document (comprehensive)
+│   ├── Paper3A_Publication.tex    # Paper 3A (includes Paper 3C)
+│   ├── Paper3B_Publication.tex    # Paper 3B (proof-theoretic)
+│   └── Paper3_Lean_Formalization.tex # Formalization docs
 ├── Phase1_Simple.lean              # Bicategorical foundation (105 lines)
 ├── Phase2_UniformHeight.lean       # Uniformization theory (218 lines)
 ├── Phase2_API.lean                 # Clean Level/HeightAt API (115 lines)

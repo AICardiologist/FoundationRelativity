@@ -22,6 +22,14 @@ A Lean 4 formalization project that calibrates the exact logical strength requir
 
 > **Key Insight**: Many classical theorems become unprovable in constructive mathematics (BISH). We formalize exact equivalences between analytical "pathologies" and logical principles, providing precise calibrations of their axiom requirements.
 
+### 📄 LaTeX Documents
+
+All Paper 3 LaTeX documents are consolidated in [`Papers/P3_2CatFramework/latex/`](Papers/P3_2CatFramework/latex/):
+- **Paper3_Main.tex** - Comprehensive framework document
+- **Paper3A_Publication.tex** - Paper 3A with integrated DCω axis
+- **Paper3B_Publication.tex** - Paper 3B proof-theoretic scaffold
+- **Paper3_Lean_Formalization.tex** - Technical formalization details
+
 ### Papers and Results
 
 1. **Paper 1: Rank-One Toggle on Hilbert Spaces** 🔧
@@ -101,6 +109,7 @@ FoundationRelativity/
 │   ├── P1_GBC/                    # 🔧 Paper 1 (rank-one; WIP)
 │   ├── P2_BidualGap/              # ✅ Paper 2 (WLPO ↔ BidualGap)
 │   └── P3_2CatFramework/          # 3A/3B/3C codebase
+│       ├── latex/                     # 📄 ALL LaTeX documents (consolidated)
 │       ├── Paper3A_Main.lean          # 📘 Paper 3A aggregator (ACTIVE)
 │       ├── Paper3B_Main.lean          # 📙 Paper 3B aggregator (FROZEN)
 │       ├── MASTER_DEPENDENCY_CHART.md
