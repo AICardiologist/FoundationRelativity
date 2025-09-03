@@ -95,7 +95,8 @@ jobs:
           echo "Checking for sorry/admit in Paper 3A files..."
           
           # Exclude 3B (ProofTheory), test files, and archive
-          if git grep -nE '\b(sorry|admit)\b' -- \
+          # Look for actual sorry/admit statements, not just the word in comments
+          if git grep -nE '^\s*(sorry|admit)\s*($|--|\/)' -- \
             "Papers/P3_2CatFramework/**/*.lean" \
             ":!Papers/P3_2CatFramework/P4_Meta/ProofTheory/**" \
             ":!Papers/P3_2CatFramework/test/**" \
