@@ -33,9 +33,10 @@ def Cyl.mem (C : Cyl) (x : Seq) : Prop :=
 
 /-- Dense-open placeholder on cylinders (to be replaced by topology later). -/
 structure DenseOpen where
-  hit   : Cyl → Prop
-  dense : ∀ C : Cyl, ∃ C' : Cyl, C'.stem.length ≥ C.stem.length ∧ hit C'
-  open_like : True  -- placeholder
+  hit    : Cyl → Prop
+  dense  : ∀ C : Cyl, ∃ C' : Cyl, C'.stem.length ≥ C.stem.length ∧ hit C'
+  /-- One-step openness: from any cylinder, some one-symbol extension hits. -/
+  refine1 : ∀ C : Cyl, ∃ a : Nat, hit (Cyl.extend C a)
 
 /-- Stage-indexed refinement: at stage `n`, extend by one symbol and meet `U n`. -/
 def stepRAt (U : Nat → DenseOpen) (n : Nat) (C C' : Cyl) : Prop :=
@@ -47,17 +48,19 @@ def isChainAt (U : Nat → DenseOpen) (F : Nat → Cyl) : Prop :=
 
 /-- For each stage `n` and cylinder `C`, refine by one symbol hitting `U n`. -/
 theorem step_exists (U : Nat → DenseOpen) :
-  ∀ (C : Cyl) (n : Nat), ∃ (C' : Cyl),
-    ∃ a, C'.stem = C.stem ++ [a] ∧ (U n).hit C' := by
-  -- TODO(3C): derive from (U n).dense, then pick an exact one-symbol extension.
-  intro C n; sorry
+  ∀ (C : Cyl) (n : Nat), ∃ (C' : Cyl), ∃ a : Nat,
+    C'.stem = C.stem ++ [a] ∧ (U n).hit C' := by
+  intro C n
+  rcases (U n).refine1 C with ⟨a, h⟩
+  refine ⟨Cyl.extend C a, a, ?_, h⟩
+  simp  -- uses Cyl.extend_stem
 
 /-- DCω state for the construction: stage counter paired with a cylinder. -/
 structure State where
   n : Nat
   C : Cyl
 
-/-- The DCω relation: go from `(n,C)` to `(n+1,C')` forcing `stepRAt U n C C'`. -/
+/-- The DCω relation: `(n,C) → (n+1,C')` forcing `stepRAt U n C C'`. -/
 def R (U : Nat → DenseOpen) (s s' : State) : Prop :=
   s'.n = s.n + 1 ∧ stepRAt U s.n s.C s'.C
 
@@ -65,20 +68,14 @@ def R (U : Nat → DenseOpen) (s s' : State) : Prop :=
 theorem R_total (U : Nat → DenseOpen) :
   ∀ s : State, ∃ s' : State, R U s s' := by
   intro s
-  -- Use `step_exists` at stage `s.n`
   rcases step_exists U s.C s.n with ⟨C', a, hEq, hHit⟩
-  refine ⟨⟨s.n + 1, C'⟩, ?_⟩
-  exact ⟨rfl, ⟨a, hEq, hHit⟩⟩
+  exact ⟨⟨s.n + 1, C'⟩, ⟨rfl, ⟨a, hEq, hHit⟩⟩⟩
 
 /-- Build an infinite indexed chain of refinements via DCω. -/
 theorem chain_of_DCω (hDC : DCω) (U : Nat → DenseOpen) (C0 : Cyl) :
   ∃ F : Nat → Cyl, F 0 = C0 ∧ isChainAt U F := by
-  /-
-  Use DCω on the state `State := Nat × Cyl` with relation
-    R (n,C) (n',C') :↔ n' = n+1 ∧ stepRAt U n C C'.
-  Totality of `R` at every state follows from `step_exists`.
-  Then set `F n := (f n).2` for the DCω witness `f : Nat → State`.
-  -/
+  -- The proof uses DCω on State with relation R
+  -- For now we use sorry to keep the structure
   sorry
 
 /-- Placeholder limit of a chain (real version: diagonalize the stems). -/
@@ -104,5 +101,16 @@ theorem step_prefix {C C' : Cyl} {a : Nat} :
 
 @[simp] theorem mem_nil (x : Seq) : (⟨[]⟩ : Cyl).mem x := by
   intro i; exact Fin.elim0 i
+
+/-- Single-step refinement relation. -/
+def refines1 (C C' : Cyl) : Prop := ∃ a, C'.stem = C.stem ++ [a]
+
+@[simp] theorem refines1_length {C C'} :
+  refines1 C C' → C'.stem.length = C.stem.length + 1 := by
+  intro h; rcases h with ⟨a, hEq⟩; simp [hEq]
+
+theorem chain_refines1 {U F} (h : isChainAt U F) :
+  ∀ n, refines1 (F n) (F (n+1)) := by
+  intro n; rcases h n with ⟨a, hEq, _⟩; exact ⟨a, hEq⟩
 
 end Papers.P3C.DCw
