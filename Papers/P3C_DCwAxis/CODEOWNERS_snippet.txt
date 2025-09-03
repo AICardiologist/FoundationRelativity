@@ -1,0 +1,7 @@
+# Add to .github/CODEOWNERS:
+
+# Paper 3C: DCω → Baire Calibrator
+Papers/P3C_DCwAxis/                @maintainer-username @axiom-team
+Papers/P3C_DCwAxis/DCw_Skeleton.lean    @proof-lead  # Core mathematical proof
+Papers/P3C_DCwAxis/DCw_Baire.lean       @calibrator-lead  # Main theorem
+Papers/P3C_DCwAxis/DCw_TopBinding*.lean @topology-lead  # Mathlib integration
