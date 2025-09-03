@@ -1,43 +1,43 @@
-# Paper 3 Framework PR Checklist
+## Description
+<!-- Provide a brief description of the changes in this PR -->
 
-## Summary
-<!-- Brief description of changes -->
+## Type of Change
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Documentation update
+- [ ] Refactoring
 
-## Pre-submission Requirements
+## Paper 3A/3B Guard
+- [ ] 3A does not import ProofTheory
+- [ ] 3B does not import 3A modules (Phase*, FT_Frontier, Examples)
+- [ ] No `sorry`/`admit` outside `archive/`
+- [ ] No `axiom` declarations in 3A
+- [ ] Aggregators build (Paper3A_Main + Paper3B_Main)
 
-### Build & Tests
-- [ ] Builds locally with `lake build Papers.P3_2CatFramework.Basic`
-- [ ] `./scripts/guard_vacuity.sh` passes
-- [ ] CI tests compile:
-  - [ ] `Papers/P3_2CatFramework/test/Interp_simp_test.lean`  
-  - [ ] `Papers/P3_2CatFramework/test/TwoCell_simp_test.lean`
+## Testing
+- [ ] Lake build passes locally
+- [ ] Pre-commit hooks pass
+- [ ] CI expected to pass
 
-### Code Quality
-- [ ] No new `sorry`/`admit` outside whitelist:
-  - ✅ Allowed: `Papers/P3_2CatFramework/Blueprint/`
-  - ✅ Allowed: `Papers/P3_2CatFramework/FunctorialObstruction.lean`
-  - ❌ Not allowed: Core framework files
-- [ ] No vacuous implications (e.g., `AssocHolds → ...`) in code (docs excluded)
-- [ ] All placeholders remain non-trivial (empty inductives, no constructors)
+## Paper-Specific Checks
+### If modifying Paper 1:
+- [ ] Sherman-Morrison tests pass
+- [ ] Sorries documented in README
 
-### Framework Integrity  
-- [ ] `TwoCell` orientation is `φ.map_obj x = ψ.map_obj x` (source = target)
-- [ ] Scoped notation hints present in both:
-  - [ ] `Papers/P3_2CatFramework/Core/Coherence.lean`
-  - [ ] `Papers/P3_2CatFramework/Core/Prelude.lean`
-- [ ] Exported simp lemmas use collision-safe names (`id_vcomp`, `vcomp_id`, `vcomp_assoc`)
-- [ ] @[simp] lemmas for TwoCell operations are definitional (`:= rfl`)
+### If modifying Paper 2:
+- [ ] Bidual gap equivalence preserved
+- [ ] Only 3 WLPO-conditional sorries remain
 
-### Documentation
-- [ ] Changes align with Paper 3 non-vacuous placeholder principles
-- [ ] Any new framework components documented in commit message
-- [ ] Blueprint files clearly marked as development/experimental
+### If modifying Paper 3A:
+- [ ] Framework remains axiom-free
+- [ ] Examples compile without sorries
+- [ ] HeightOracle pattern maintained
 
-## Testing Notes
-<!-- Describe any manual testing performed -->
+### If modifying Paper 3B:
+- [ ] No new axioms added (frozen at 21)
+- [ ] ProofTheory changes reviewed carefully
+- [ ] Frozen markers preserved
 
-## Related Issues
-<!-- Link to relevant GitHub issues -->
-
----
-*This PR contributes to the Paper 3: 2-Categorical Framework implementation. All items must be checked before merge.*
+## Additional Notes
+<!-- Any additional information that reviewers should know -->

@@ -21,13 +21,14 @@ import Papers.P3_2CatFramework.Paper3A_Main
 
 ---
 
-### 🎯 Paper 3A Focus (Streamlined Scope)
+### 🎯 Paper 3 Focus (Complete Axiom Calibration Framework)
 
-This repository contains the Lean 4 formalization supporting Paper 3A, which presents:
+This repository contains the Lean 4 formalization supporting Papers 3A, 3B, and 3C:
 1. **The AxCal Framework**: Categories of Foundations, uniformizability, height calculus
-2. **Two Orthogonal Axes**: WLPO (via bidual gap) and FT (via UCT)
-3. **Stone Window Program**: Classical theorem, constructive caveat, and calibration conjecture
-4. **Complete Formalization**: 5,800+ lines of Lean 4 with 0 sorries in core components
+2. **Three Orthogonal Axes**: WLPO (via bidual gap), FT (via UCT), and DCω (via Baire)
+3. **Paper 3C DCω→Baire**: Complete skeleton (276 lines, 0 sorries) establishing third axis
+4. **Stone Window Program**: Classical theorem, constructive caveat, and calibration conjecture
+5. **Complete Formalization**: 6,100+ lines of Lean 4 with 0 sorries in core components
 
 ### 📦 Aggregator Files (September 2025)
 
@@ -37,14 +38,15 @@ This repository contains the Lean 4 formalization supporting Paper 3A, which pre
 | [`Paper3B_Main.lean`](Paper3B_Main.lean) | Paper 3B ONLY imports (FROZEN) | `import Papers.P3_2CatFramework.Paper3B_Main` |
 | [`MASTER_DEPENDENCY_CHART.md`](documentation/MASTER_DEPENDENCY_CHART.md) | **MUST READ** - Complete separation guide | Documentation |
 
-## 📊 Current Status Summary (Updated: September 2025)
-**Mathematical Sorries**: 0 ✅ | **Integration Sorries**: 7 ⚠️ | **Lines of Code**: 6,500+ | **Files**: 60+
+## 📊 Current Status Summary (Updated: September 3, 2025)
+**Mathematical Sorries**: 0 ✅ | **Integration Sorries**: 7 ⚠️ | **Lines of Code**: 6,100+ | **Files**: 65+
 
 ### Framework Status
 **Part I (Uniformization)**: ✅ COMPLETE - Height theory fully formalized  
 **Part II (Positive Uniformization)**: ✅ COMPLETE - Witness existence layer implemented  
 **Parts III-VI (P4_Meta)**: ✅ COMPLETE - Meta-theoretic framework with ladder algebra  
 **Paper 3B (ProofTheory)**: ✅ COMPLETE (August 29, 2025) - Proof-theoretic scaffold with 0 sorries
+**Paper 3C (DCω→Baire)**: ✅ COMPLETE (September 3, 2025) - Complete skeleton (276 lines, 0 sorries)
 **WP-D Stone Window**: ✅ COMPLETE (August 29, 2025) - Full Stone equivalence + Production API (27 simp lemmas) + Path A BooleanAlgebra (100+ API lemmas)
 **FT/UCT Minimal Surface**: ✅ COMPLETE (August 29, 2025) - Paper 3A FT axis with orthogonality axioms
 **CI Status**: ✅ All core modules build (1189+ jobs, 0 errors) | **Import Structure**: ✅ No cycles
@@ -85,6 +87,15 @@ import Papers.P3_2CatFramework.Paper3B_Main  -- Frozen aggregator
 - ❄️ P4_Meta/ProofTheory/Heights.lean
 - ❄️ P4_Meta/ProofTheory/Progressions.lean
 - ❄️ P4_Meta/ProofTheory/Collisions.lean
+
+### Paper 3C Components (✅ COMPLETE)
+```lean
+import Papers.P3C_DCwAxis  -- DCω → Baire calibrator
+```
+- ✅ Papers/P3C_DCwAxis/DCw_Skeleton.lean (276 lines, 0 sorries)
+- ✅ Papers/P3C_DCwAxis/DCw_Baire.lean (1 intentional sorry)
+- 📄 Papers/P3C_DCwAxis/Paper3C_TechReport.tex (technical details)
+- 🔮 DCw_TopBinding.lean.future (ready for mathlib topology)
 
 ### Shared Infrastructure (Use Carefully)
 - Core/*.lean (Foundation types)

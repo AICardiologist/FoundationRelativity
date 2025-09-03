@@ -3,7 +3,7 @@
   Main aggregator for Paper 3A components ONLY
   
   This file imports ONLY the components needed for Paper 3A.
-  It does NOT import any ProofTheory files (those belong to Paper 3B).
+  It does NOT import any Paper 3B specific files.
   
   Last Updated: September 2025 (Resumption for publication)
 -/
@@ -63,7 +63,7 @@ This aggregator provides access to all Paper 3A components:
 4. **FT/UCT Calibration**: UCT at height 1 on the FT axis
 
 ## What's NOT Included
-- ProofTheory/* files (these belong to Paper 3B)
+- Paper 3B scaffold files (21 axioms, frozen)
 - Paper 3B specific tests and infrastructure
 
 ## Usage

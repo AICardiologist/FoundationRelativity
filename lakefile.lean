@@ -11,10 +11,10 @@ require mathlib from git
 
 -- Essential smoke test executables
 lean_exe Paper1SmokeTest where
-  root := `Papers.P1_GBC.P1_Minimal
+  root := `Papers.P1_GBC.SmokeTest
 
 lean_exe Paper2SmokeTest where
-  root := `Papers.P2_BidualGap.P2_Minimal
+  root := `Papers.P2_BidualGap.SmokeTest
 
 lean_exe Paper3SmokeTest where
   root := `Papers.P3_2CatFramework.SmokeTest

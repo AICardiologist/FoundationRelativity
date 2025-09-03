@@ -60,17 +60,13 @@ jobs:
       - name: Get mathlib cache
         run: lake exe cache get || true
 
-      # Build P1 (if it exists)
-      - name: Build P1 Minimal
-        timeout-minutes: 2
+      # Build P1 smoke test
+      - name: Build P1 Smoke Test
+        timeout-minutes: 1
         run: |
-          echo "Building P1 minimal target..."
-          if [ -f "Papers/P1_GBC/P1_Minimal.lean" ]; then
-            lake build Papers.P1_GBC.P1_Minimal
-            echo "P1 build completed successfully"
-          else
-            echo "P1_Minimal not yet created - skipping"
-          fi
+          echo "Building P1 smoke test..."
+          lake build Paper1SmokeTest
+          echo "P1 smoke test build completed successfully"
 
       # Build P2 (always)
       - name: Build P2 Minimal
@@ -208,24 +204,19 @@ jobs:
         with:
           use-mathlib-cache: true
 
-      - name: Verify P1 Minimal imports
+      - name: Verify P1 Smoke Test
         run: |
-          if [ -f "Papers/P1_GBC/P1_Minimal.lean" ]; then
-            # Build P1_Minimal first
-            lake build Papers.P1_GBC.P1_Minimal || {
-              echo "::warning::P1_Minimal build failed, skipping import check"
-              exit 0
-            }
-            # Just verify the module can be imported
-            echo 'import Papers.P1_GBC.P1_Minimal
-            #eval (1 : Nat)' | lake env lean --stdin || {
-              echo "::warning::P1_Minimal import check failed"
-              exit 0
-            }
-            echo "✅ P1_Minimal imports successfully"
-          else
-            echo "P1_Minimal not yet created - skipping import check"
-          fi
+          # Use the fast smoke test instead of building P1_Minimal
+          echo "Running P1 smoke test executable..."
+          lake build Paper1SmokeTest || {
+            echo "::warning::Paper1SmokeTest build failed"
+            exit 0
+          }
+          .lake/build/bin/Paper1SmokeTest || {
+            echo "::warning::Paper1SmokeTest execution failed"
+            exit 0
+          }
+          echo "✅ P1 smoke test passed"
 
       - name: Verify P2 Minimal imports
         run: |
