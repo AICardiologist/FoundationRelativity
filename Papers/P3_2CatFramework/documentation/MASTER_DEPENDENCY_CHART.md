@@ -44,8 +44,9 @@ P3_Minimal.lean    ← LEGACY: Combined entry (deprecate after split)
 ✅ P4_Meta/FT_UCT_MinimalSurface.lean      # FT axis infrastructure
 ✅ P4_Meta/FT_Frontier.lean                # FT→UCT, Sperner, BFPT
 ✅ P4_Meta/FTPortalWire.lean               # FT height transport
-✅ P4_Meta/DCw_Frontier.lean               # DC_ω axis (future 3C)
+✅ P4_Meta/DCw_Frontier.lean               # DC_ω axis (Paper 3C integrated)
 ✅ P4_Meta/DCwPortalWire.lean              # DC_ω transport
+✅ Paper3C_Main.lean                       # Paper 3C aggregator (imported by 3A)
 ✅ P4_Meta/Frontier_API.lean               # Frontier infrastructure
 ```
 
