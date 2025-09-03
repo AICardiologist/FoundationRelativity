@@ -37,20 +37,24 @@
 - **Build Status**: 0 errors, compiles cleanly
 - **Mathematical Status**: Core mathematics complete, existential claim fully verified
 
-### ✅ Paper 3: 2-Categorical Framework with P4_Meta
+### ✅ Paper 3: Axiom Calibration Framework (3A, 3B, 3C)
 - **Status**: COMPLETE - 0 sorries across entire framework ✅
-- **Location**: `Papers/P3_2CatFramework/`
-- **Latest Achievement** (January 2025): Complete P4_Meta meta-theoretic framework
+- **Location**: `Papers/P3_2CatFramework/` and `Papers/P3C_DCwAxis/`
+- **Latest Achievement** (September 3, 2025): Paper 3C DCω→Baire complete
 - **Key Components**:
-  - ✅ **Parts I-II**: Uniformization height theory + positive uniformization
-  - ✅ **Parts III-VI (P4_Meta)**: Complete meta-theoretic framework
-    - k-ary schedule abstractions with quota invariants
-    - Exact finish time characterization: N* = k(H-1) + S
-    - Ladder algebra with concatenation and normal forms
-    - ω-limit and ω+ε theory with certificate lifting
-    - Stone window Boolean ring with support ideals
+  - ✅ **Paper 3A**: Uniformization height theory + three orthogonal axes
+    - WLPO axis: Bidual gap at height (1,0,0)
+    - FT axis: UCT at height (0,1,0)
+    - Stone window Boolean algebra with 100+ API lemmas
+  - ✅ **Paper 3B**: Complete proof-theoretic framework (21 axioms)
+    - Stage-based ladders solve circular dependencies
+    - Consistency/Reflection hierarchies formalized
+  - ✅ **Paper 3C**: DCω→Baire calibrator (276 lines, 0 sorries)
+    - Complete skeleton independent of topology
+    - Establishes third orthogonal axis at height (0,0,1)
+    - Topology adapter ready for mathlib integration
   - ✅ **Build Status**: 0 compilation errors, all tests passing
-- **Mathematical Innovation**: Genuine new results including finish time theorems
+- **Mathematical Innovation**: Three orthogonal logical axes established
 
 ### 📋 Paper 4: Spectral Geometry (In Progress)
 - **Status**: Phase 1A Complete - Discrete CPW Infrastructure ✅
@@ -73,19 +77,21 @@
 |-----------|-------|-------------|---------------|-------------------|
 | **Paper 1 (Sherman-Morrison)** | **9+ files** | **0** | ✅ **Complete + Enhanced** | **100%** |
 | Paper 2 | 7+ files | **3** | ✅ **Nearly Complete** | **~95%** |
-| **Paper 3 + P4_Meta** | **35+ files** | **0** | ✅ **Complete** | **100%** |
+| **Paper 3A + 3B** | **35+ files** | **0** | ✅ **Complete** | **100%** |
+| **Paper 3C (DCω→Baire)** | **5 files** | **0** | ✅ **Complete skeleton** | **100%** |
 | Paper 4 (Discrete) | 15+ files | 71 | 🔧 In Progress | ~30% |
 | **Infrastructure** | 20+ files | 5 | ✅ Complete | Complete |
-| **Total Papers 1-4** | **66+ files** | **79** | **Strong** | **~81%** |
-| **Total Project** | **86+ files** | **79** | **Strong Progress** | **~75%** |
+| **Total Papers 1-4** | **71+ files** | **79** | **Strong** | **~82%** |
+| **Total Project** | **91+ files** | **79** | **Strong Progress** | **~76%** |
 
-### Key Updates (January 2025):
+### Key Updates (September 2025):
 - Paper 2 sorry count: 11 → **3** (Sprint E dual isometry complete)
 - Paper 3 sorry count: 6 → **0** (Complete P4_Meta framework implementation)
-- Paper 3 files: 3 → **35+** (Full P4_Meta framework added)
+- Paper 3 files: 3 → **40+** (Full P4_Meta + Paper 3C added)
+- **Paper 3C**: DCω→Baire complete (September 3, 2025) - 276 lines, 0 sorries
 - Total project sorries: 104 → **79** (Major reduction through completions)
-- **NEW**: Part 6 mathematics - Exact finish time characterization theorems
-- **Achievement**: Papers 1 & 3 are 100% complete, Paper 2 is 95% complete
+- **NEW**: Three orthogonal logical axes established (WLPO, FT, DCω)
+- **Achievement**: Papers 1 & 3 (all parts) are 100% complete, Paper 2 is 95% complete
 
 ## Technical Infrastructure Status
 
