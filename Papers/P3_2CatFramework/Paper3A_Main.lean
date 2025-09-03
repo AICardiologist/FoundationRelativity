@@ -33,7 +33,6 @@ import Papers.P3_2CatFramework.P4_Meta.DCw_Frontier
 
 -- Frontier API
 import Papers.P3_2CatFramework.P4_Meta.Frontier_API
-import Papers.P3_2CatFramework.FT_Frontier  -- Clean API for FT axis concepts
 
 -- Shared meta infrastructure (needed for height calculus)
 import Papers.P3_2CatFramework.P4_Meta.Meta_Signature

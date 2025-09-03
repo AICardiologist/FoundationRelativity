@@ -5,14 +5,16 @@
 [![3A/3B Separation Guard](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/paper3-separation-guard.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/paper3-separation-guard.yml)
 [![Paper 3A Axiom-Free](https://img.shields.io/badge/Paper%203A-Axiom--Free-brightgreen)](Papers/P3_2CatFramework/)
 [![Paper 3B Frozen](https://img.shields.io/badge/Paper%203B-21%20axioms%20(frozen)-blue)](Papers/P3_2CatFramework/)
+[![Paper 3C Complete](https://img.shields.io/badge/Paper%203C%20DC%CF%89-Complete-brightgreen)](Papers/P3C_DCwAxis/)
 [![Paper 2 WLPO↔Gap](https://img.shields.io/badge/Paper%202%20WLPO%E2%86%94Gap-3%20sorries-green)](Papers/P2_BidualGap/)
 [![Paper 1 Rank-One](https://img.shields.io/badge/Paper%201%20Rank--One-14%20sorries-yellow)](Papers/P1_GBC/)
 
 🎯 Current Status (September 2025)
 
-• Paper 3A/3B core framework: ✅ Stable, 0 sorries on 3A/3B code paths
-  – Paper 3A (Framework & Calibrators): active development (WLPO/FT axes complete)
+• Paper 3A/3B/3C framework: ✅ Complete with three orthogonal axes
+  – Paper 3A (Framework & Calibrators): WLPO/FT axes complete (active development)
   – Paper 3B (Proof-theoretic scaffold): ❄️ FROZEN at 21 axioms (RFN_Σ₁ ⇒ Con proved)
+  – Paper 3C (DCω → Baire): ✅ COMPLETE (276 lines, 0 sorries)
 
 • Paper 2 (WLPO ↔ Bidual Gap): ✅ Main equivalence done; 3 WLPO-conditional sorries remain
 • Paper 1 (Rank-One Toggle Kernel): 🔧 ~14 sorries (mathlib-dependent sections)
