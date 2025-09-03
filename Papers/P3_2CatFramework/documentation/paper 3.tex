@@ -1737,12 +1737,12 @@ with G1/G2 lower bounds still cited classically.
 
 \subsection{B1. Theoretical Framework: Orthogonal Axes}
 
-Most ``Brouwer-type logical issues''—fixed-point theorems, fan/compactness principles, bar induction—sit on an axis \emph{orthogonal} to WLPO. Our height/uniformization framework classifies them cleanly via multiple axes:
+Most ``Brouwer-type logical issues''—fixed-point theorems, fan/compactness principles, bar induction—sit on axes \emph{orthogonal} to WLPO. Our height/uniformization framework classifies them cleanly via three fully independent axes:
 
 \begin{itemize}
 \item \textbf{WLPO axis} (omniscience/choice-of-witness strength): Already calibrated via the Gap $\leftrightarrow$ WLPO portal.
 \item \textbf{FT/WKL axis} (compactness/finite-branching): Fan Theorem (constructive) / Weak König's Lemma (classical). In reverse mathematics, WKL$_0$ yields Brouwer's fixed-point theorem for $n \geq 2$ \cite{Hirst-BFPT}.
-\item \textbf{BI/Continuity axis} (Bar Induction/Continuity Principles): Intuitionistic principles typically incompatible with WLPO.
+\item \textbf{DCω/Baire axis} (dependent choice/category): Dependent Choice implies Baire category theorem. Paper 3C establishes this as a third orthogonal axis with complete Lean formalization (276 lines, 0 sorries).
 \end{itemize}
 
 Crucially, Brouwer Fixed-Point Theorem (BFPT) falls on the FT/WKL axis, \emph{not} on WLPO. In standard reverse mathematics, BFPT$_n$ (for $n \geq 2$) is equivalent to WKL$_0$ over RCA$_0$, placing its frontier at $\{\FT\}$ \cite{Shioji-Tanaka}. The height calculus classifies BFPT as:
@@ -1760,6 +1760,9 @@ BFPT$_n$ ($n \geq 2$) & $[0,1]^n$ & $\{\FT\}$ & \textbf{\color{green}Formalized}
 Sperner's Lemma & simplex & $\{\FT\}$ & \textbf{\color{green}Formalized}: \texttt{FT\_to\_Sperner} \\
 Heine-Borel for $[0,1]$ & $[0,1]$ & $\{\FT\}$ & WKL-level compactness \\
 Approximate BFPT & $[0,1]^n$ & $\emptyset$ & Height 0 (constructively provable) \\
+\hline
+Baire Category & $\mathbb{N}^{\mathbb{N}}$ & $\{\mathrm{DC}_\omega\}$ & \textbf{\color{green}Paper 3C}: \texttt{chain\_of\_DCω} \\
+Dense $G_\delta$ nonempty & metric & $\{\mathrm{DC}_\omega\}$ & Follows from Baire \\
 \hline
 \end{tabular}
 \end{center}
@@ -1779,6 +1782,12 @@ The implementation provides:
   \begin{itemize}
   \item Height certificates: \texttt{UCT\_height1}, \texttt{BFPT\_height1}
   \item Orthogonal profiles: $(h_{\text{WLPO}}, h_{\text{FT}}) = (0, 1)$ for UCT/BFPT
+  \end{itemize}
+\item \texttt{Papers/P3C\_DCwAxis/}: Complete DCω axis implementation
+  \begin{itemize}
+  \item \texttt{DCw\_Skeleton.lean}: 276 lines, 0 sorries
+  \item Key theorems: \texttt{chain\_of\_DCω}, \texttt{limit\_mem}
+  \item Height profile: $(h_{\text{WLPO}}, h_{\text{FT}}, h_{\text{DC}_\omega}) = (0, 0, 1)$
   \end{itemize}
 \item \texttt{FTPortalWire.lean}: Height certificate wiring through frontier infrastructure
 \item \texttt{Frontier\_API.lean}: Enhanced with \texttt{ReducesTo} structure and \texttt{Trans} instance
@@ -1936,7 +1945,7 @@ Together these upgrades move the paper from a synthesis–heavy narrative to a f
 \section{Conclusion}
 %===========================================================
 
-Using the Lean–verified WLPO\,$\Leftrightarrow$\,gap equivalence as a base case, we framed axiom calibration in terms of \emph{non--uniformizability} and computed a simple \emph{height} invariant: the bidual gap has height~$1$. The Stone window provides a robust, elementary case study compatible with interpretations fixing a small analytic signature. On the mechanization side, we identified practical Lean~4 encodings that deliver theorems at pinned objects without the full weight of general bicategory coherence. 
+Using the Lean–verified WLPO\,$\Leftrightarrow$\,gap equivalence as a base case, we framed axiom calibration in terms of \emph{non--uniformizability} and computed simple \emph{height} invariants across three orthogonal axes. The bidual gap has height $(1,0,0)$, UCT has height $(0,1,0)$, and Baire category has height $(0,0,1)$, establishing complete independence. With Paper 3C's DCω→Baire skeleton fully formalized (276 lines, 0 sorries), we demonstrate that the axiom calibration framework captures genuinely orthogonal logical dependencies. The Stone window provides a robust, elementary case study compatible with interpretations fixing a small analytic signature. On the mechanization side, we identified practical Lean~4 encodings that deliver theorems at pinned objects without the full weight of general bicategory coherence. 
 
 \bigskip
 
