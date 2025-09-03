@@ -5,6 +5,13 @@
 
 **MUST READ FIRST**: [`documentation/MASTER_DEPENDENCY_CHART.md`](documentation/MASTER_DEPENDENCY_CHART.md)
 
+## 📍 Paper 3C Location Note (September 2025)
+
+**Paper 3C (DCω/Baire axis) materials are now located at:**
+- LaTeX/Documentation: `Papers/P3_2CatFramework/P3C_DCwAxis/` 
+- Lean implementation: `Papers/P3_2CatFramework/P4_Meta/DCw_Frontier.lean` and `DCwPortalWire.lean`
+- **Note**: P3C_DCwAxis folder was moved from `Papers/P3C_DCwAxis/` to `Papers/P3_2CatFramework/P3C_DCwAxis/` to consolidate all Paper 3 materials in one location
+
 This guide shows:
 - ✅ Which files belong to Paper 3A (active development)
 - ❄️ Which files are FROZEN for Paper 3B (DO NOT MODIFY)

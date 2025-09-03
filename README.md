@@ -100,15 +100,17 @@ FoundationRelativity/
 ├── Papers/
 │   ├── P1_GBC/                    # 🔧 Paper 1 (rank-one; WIP)
 │   ├── P2_BidualGap/              # ✅ Paper 2 (WLPO ↔ BidualGap)
-│   └── P3_2CatFramework/          # 3A/3B codebase
+│   └── P3_2CatFramework/          # 3A/3B/3C codebase
 │       ├── Paper3A_Main.lean          # 📘 Paper 3A aggregator (ACTIVE)
 │       ├── Paper3B_Main.lean          # 📙 Paper 3B aggregator (FROZEN)
 │       ├── MASTER_DEPENDENCY_CHART.md
 │       ├── Phase1-3_*.lean            # 3A framework
+│       ├── P3C_DCwAxis/               # 📗 Paper 3C materials (DCω/Baire)
 │       ├── P4_Meta/
 │       │   ├── ProofTheory/           # ❄️ 3B (21 axioms; frozen)
 │       │   ├── StoneWindow_SupportIdeals.lean  # 3A (100+ lemmas)
-│       │   └── FT_UCT_*.lean          # 3A FT axis
+│       │   ├── FT_UCT_*.lean          # 3A FT axis
+│       │   └── DCw_*.lean             # 3C DCω/Baire infrastructure
 │       └── documentation/
 └── docs/
     ├── planning/

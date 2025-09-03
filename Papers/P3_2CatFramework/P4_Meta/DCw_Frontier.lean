@@ -1,5 +1,9 @@
 /-
   File: Papers/P3_2CatFramework/P4_Meta/DCw_Frontier.lean
+  
+  Part of Paper 3C: DCω/Baire axis calibration
+  Note: Paper 3C LaTeX materials are located at Papers/P3_2CatFramework/P3C_DCwAxis/
+        (moved from Papers/P3C_DCwAxis/ in September 2025 for consolidation)
 
   Purpose:
   - Add a DCω axis and wire the Baire calibrator as a Prop-level token
