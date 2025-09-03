@@ -158,6 +158,24 @@ jobs:
           fi
           echo "✅ No imports from archive/ detected"
       
+      - name: Ensure 3A does not import Paper 3C
+        run: |
+          set -euo pipefail
+          echo "Checking 3A files don't import Papers/P3C_DCwAxis..."
+          BAD=$(git grep -nE '^\s*import\s+Papers\.P3C_DCwAxis(\.|/)' -- \
+            "Papers/P3_2CatFramework/**/*.lean" || true)
+          test -z "$BAD" || { echo "❌ 3A importing 3C modules:"; echo "$BAD"; exit 1; }
+          echo "✅ No 3A→3C imports"
+      
+      - name: Ensure 3B does not import Paper 3C
+        run: |
+          set -euo pipefail
+          echo "Checking ProofTheory doesn't import Papers/P3C_DCwAxis..."
+          BAD=$(git grep -nE '^\s*import\s+Papers\.P3C_DCwAxis(\.|/)' -- \
+            "Papers/P3_2CatFramework/P4_Meta/ProofTheory/**" || true)
+          test -z "$BAD" || { echo "❌ 3B importing 3C modules:"; echo "$BAD"; exit 1; }
+          echo "✅ No 3B→3C imports"
+      
       - name: Build Paper 3A re-export API (smoke)
         run: |
           echo "Building Paper 3A re-export API..."

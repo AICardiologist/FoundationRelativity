@@ -1,7 +1,8 @@
 # Paper 3C: DC_ω Axis Calibration
 
 **Status**: Early Development  
-**Target**: DC_ω → Baire formal proof
+**Target**: DC_ω → Baire formal proof  
+**Location**: Isolated from 3A/3B for clean CI
 
 ## Overview
 
@@ -16,19 +17,24 @@ Paper 3C extends the AxCal framework with a third orthogonal axis based on Depen
 ## Module Structure
 
 ```
-P3C_DCwAxis/
-├── README.md                 # This file
-├── Paper3C_Main.lean        # Main aggregator
-└── Core/
-    ├── DCw_Definition.lean  # DC_ω principle definition
-    ├── Baire_Space.lean     # Baire space formalization
-    └── DCw_Baire_Proof.lean # Main theorem
+P3C_DCwAxis/                      # Paper 3C root (outside 3A CI)
+├── README.md                      # This file
+├── Paper3C_Main.lean             # Main aggregator
+├── DCw_Frontier_Interface.lean   # Precise DCω and BaireNN definitions
+└── DCw_Baire.lean                # DCω → Baire calibrator (skeleton)
 
-P3_2CatFramework/P4_Meta/    # Shared with 3A/3B
-├── DCw_Frontier.lean        # DC_ω axis API
-├── DCw_Baire.lean          # DC_ω → Baire proof
-└── DCwPortalWire.lean      # Height transport
+P3_2CatFramework/P4_Meta/         # Shared with 3A/3B
+└── DCw_Frontier.lean             # DC_ω axis API (tokens only)
 ```
+
+## Precise Interface
+
+The calibrator is coded against the `BaireFromDCωStatement` token, defined as:
+- **DCω**: Standard dependent choice for countable sequences
+- **BaireNN**: Simplified Baire property for ℕ^ℕ (placeholder for full topology)
+- **Target**: `DCω → BaireNN`
+
+This keeps Paper 3C development isolated from 3A, allowing sorries/axioms in 3C while 3A remains axiom-free.
 
 ## Development Status
 
