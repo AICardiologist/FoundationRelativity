@@ -25,25 +25,30 @@ structure DenseOpen where
   dense : ∀ C : Cyl, ∃ C' : Cyl, C'.stem.length ≥ C.stem.length ∧ hit C'
   open_like : True  -- placeholder
 
-/-- One refinement step: extend by one symbol and meet some U n. -/
-def stepR (U : Nat → DenseOpen) (C C' : Cyl) : Prop :=
-  ∃ n a, C'.stem = C.stem ++ [a] ∧ (U n).hit C'
+/-- Stage-indexed refinement: at stage `n`, extend by one symbol and meet `U n`. -/
+def stepRAt (U : Nat → DenseOpen) (n : Nat) (C C' : Cyl) : Prop :=
+  ∃ a, C'.stem = C.stem ++ [a] ∧ (U n).hit C'
 
-/-- "F is a chain" for U: every step refines. -/
-def isChain (U : Nat → DenseOpen) (F : Nat → Cyl) : Prop :=
-  ∀ n, stepR U (F n) (F (n+1))
+/-- "F is an indexed chain": the (n+1)-th cylinder refines the n-th meeting `U n`. -/
+def isChainAt (U : Nat → DenseOpen) (F : Nat → Cyl) : Prop :=
+  ∀ n, stepRAt U n (F n) (F (n+1))
 
-/-- For each stage n and cylinder C, you can refine C by one symbol hitting U n. -/
+/-- For each stage `n` and cylinder `C`, refine by one symbol hitting `U n`. -/
 theorem step_exists (U : Nat → DenseOpen) :
   ∀ (C : Cyl) (n : Nat), ∃ (C' : Cyl),
-    C'.stem.length = C.stem.length + 1 ∧ (U n).hit C' := by
-  -- TODO(3C): derive from (U n).dense; pick an extension of length+1 and show it hits.
+    ∃ a, C'.stem = C.stem ++ [a] ∧ (U n).hit C' := by
+  -- TODO(3C): derive from (U n).dense, then pick an exact one-symbol extension.
   intro C n; sorry
 
-/-- Build an infinite chain of refinements via DCω. -/
+/-- Build an infinite indexed chain of refinements via DCω. -/
 theorem chain_of_DCω (hDC : DCω) (U : Nat → DenseOpen) (C0 : Cyl) :
-  ∃ F : Nat → Cyl, F 0 = C0 ∧ isChain U F := by
-  -- TODO(3C): standard DCω on the relation "extend by one and hit U n".
+  ∃ F : Nat → Cyl, F 0 = C0 ∧ isChainAt U F := by
+  /-
+  Use DCω on the state `State := Nat × Cyl` with relation
+    R (n,C) (n',C') :↔ n' = n+1 ∧ stepRAt U n C C'.
+  Totality of `R` at every state follows from `step_exists`.
+  Then set `F n := (f n).2` for the DCω witness `f : Nat → State`.
+  -/
   sorry
 
 /-- Placeholder limit of a chain (real version: diagonalize the stems). -/
@@ -52,9 +57,24 @@ def limit_of_chain (_ : Nat → Cyl) : Seq :=
 
 /-- The limit realizes every finite stem in the chain. -/
 theorem limit_mem (U : Nat → DenseOpen) {F : Nat → Cyl}
-    (h0 : True) (hchain : isChain U F) :
+    (h0 : True) (hchain : isChainAt U F) :
     ∀ n, (F n).mem (limit_of_chain F) := by
   -- TODO(3C): prove by stem compatibility along the chain.
   intro n; sorry
+
+-- Helper lemmas for finishing the proof later
+
+theorem step_length_succ {U : Nat → DenseOpen} {n : Nat} {C C' : Cyl} :
+  stepRAt U n C C' → C'.stem.length = C.stem.length + 1 := by
+  intro h
+  rcases h with ⟨a, h_eq, _⟩
+  rw [h_eq]
+  simp
+
+theorem step_prefix {C C' : Cyl} {a : Nat} :
+  C'.stem = C.stem ++ [a] → C'.stem.take C.stem.length = C.stem := by
+  intro h
+  rw [h]
+  simp
 
 end Papers.P3C.DCw
