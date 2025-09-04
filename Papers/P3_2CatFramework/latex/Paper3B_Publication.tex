@@ -61,7 +61,13 @@ The core structural contribution is the formalization of ``Collisions'' between 
 \section{Introduction}
 %===========================================================
 The organization of mathematical theories by consistency strength and reflective power is central to proof theory, tracing back to Turing \cite{Turing1939} and Feferman \cite{Feferman1962}. We apply the Axiom Calibration (AxCal) framework (introduced in the companion Paper 3A \cite{Paper3a}) to provide a uniform structural account of these hierarchies.
-Our account complements and abstracts the ordinal-analytic viewpoint developed via iterated reflection and the polymodal provability logic GLP/provability algebras; see especially Beklemishev’s analyses \cite{Beklemishev2003,Beklemishev2004} (and the survey \cite{ArtemovBeklemishev2004}).
+Our account complements and abstracts the ordinal-analytic viewpoint developed via iterated reflection and the polymodal provability logic GLP/provability algebras; see especially Beklemishev's analyses \cite{Beklemishev2003,Beklemishev2004} (and the survey \cite{ArtemovBeklemishev2004}).
+
+\begin{remark}[Terminology harmonization with Paper 3A]
+We use "height" and "ladder morphism (collision)" in the same technical sense as Paper~3A.
+All imported classical lower bounds (e.g.\ G1/G2) are treated as external inputs; schematic upper bounds
+and collision steps are certified inside our Lean~4 framework.
+\end{remark}
 
 \begin{mdframed}[style=provenance]
 \textbf{Provenance Note.} The proof-theoretic results analyzed here are classical. Our contribution is the integration of these hierarchies into the structural framework of the Height Calculus, the identification of ``Formal Collisions,'' and the supporting Lean 4 infrastructure.
@@ -77,6 +83,14 @@ We adapt the AxCal framework from \cite{Paper3a} to the meta-mathematical settin
 For a sentence $\varphi$ and a theory $F$, the witness $\mathcal C^\varphi_F$ is a singleton groupoid if $F\vdash \varphi$, and empty otherwise.
 \end{definition}
 ``Positive Uniformization'' means the statement becomes provable throughout the locus. The height of a witness $\mathcal{C}$ along a ladder $\mathcal{L}$ is the least stage where $\mathcal{C}$ becomes positively uniformized (transitions from empty to nonempty).
+
+\begin{remark}[Guide to ``height'' in the proof-theoretic setting]
+Fix a ladder $(T_\alpha)_\alpha$ (e.g.\ $\LCons$ or $\LReflect$). For a sentence $\varphi$,
+$h(\mathcal C^\varphi)$ is the least $\alpha$ such that $T_\alpha \vdash \varphi$ and, moreover,
+for all $\beta\ge \alpha$ the restriction maps $\mathcal C^\varphi_{T_\beta}\to \mathcal C^\varphi_{T_\alpha}$
+are isomorphisms (the witness ``stabilizes''). Intuitively: the first rung where the theorem becomes
+permanently available. This mirrors the AxCal notion used in Paper 3A.
+\end{remark}
 
 \subsection{Ladders}
 We define specific ladders based on iterated axioms.
@@ -113,32 +127,53 @@ We assume standard Hilbert-Bernays-Löb (HBL) derivability conditions for the ba
 
 \subsection{The Classicality Axis}
 \begin{theorem}[Classical Principles Calibration]
-Along $\LClass$, specific classical principles achieve positive uniformization at predictable heights:
+Along $\LClass$ (with $T_{n+1}=T_n+\EM_{\Sigma^0_n}$ and $T_0=\HA$):
 \begin{itemize}
-\item $\WLPO$ has height $1$ (requires $\EM_{\Delta^0_0}$)
-\item $\LPO$ has height $2$ (requires $\EM_{\Sigma^0_1}$)
-\item Full classical logic has height $\omega$
+\item $\WLPO$ has height $2$ (requires $\EM_{\Sigma^0_1}\!\equiv\!\EM_{\Pi^0_1}$ over $\HA$),
+\item $\LPO$ has height $2$ (requires $\EM_{\Sigma^0_1}$),
+\item Full classical logic has height $\omega$.
 \end{itemize}
 \end{theorem}
-\begin{proof}
-Upper bounds follow from the ladder construction. Lower bounds use independence results from constructive reverse mathematics.
+
+\begin{proof}[Proof sketch]
+\emph{Upper bounds.} $\EM_{\Sigma^0_1}$ suffices for both $\WLPO$ and $\LPO$ because each instance
+reduces to $\Sigma^0_1$ (or, equivalently over $\HA$, $\Pi^0_1$) excluded middle about a decidable
+predicate on~$\N$. Thus $T_2=T_1+\EM_{\Sigma^0_1}$ proves both. Full classical logic appears at
+$T_\omega=\PA$ by construction.
+
+\emph{Lower bounds.} In $T_1=T_0+\EM_{\Delta^0_0}$ (bounded classicality) neither $\WLPO$ nor $\LPO$
+is derivable; standard Kripke/realizability models validate $T_1$ while refuting $\WLPO$ and $\LPO$
+(see e.g.\ \cite[§I.2–I.3]{HajekPudlak}). Hence height $\ge 2$ for both. The $\omega$ bound for full
+classical logic is immediate from the ladder definition.
 \end{proof}
 
 \subsection{The Consistency Axis (G1 and G2)}
 \begin{theorem}[G2 Calibration (Classical)]
-Assume $S_0$ is consistent. $\mathcal C^{\Con(S_0)}$ has height $1$ along $\LCons$.
+Assume $S_0$ is consistent and satisfies the HBL derivability conditions.
+Then $\mathcal C^{\Con(S_0)}$ has height $1$ along $\LCons$.
 \end{theorem}
-\begin{proof}
-Upper bound: $S_1 = S_0 + \Con(S_0) \vdash \Con(S_0)$ by construction. 
-Lower bound: By Gödel's second incompleteness theorem (G2), $S_0 \nvdash \Con(S_0)$.
+
+\begin{proof}[Proof sketch]
+\emph{Upper bound.} By definition $S_1=S_0+\Con(S_0)$, so $S_1\vdash\Con(S_0)$.
+
+\emph{Lower bound.} Gödel's second incompleteness theorem (G2) yields $S_0\nvdash\Con(S_0)$ provided
+$S_0$ is consistent and meets HBL. Therefore the least stage proving $\Con(S_0)$ is exactly~$1$.
 \end{proof}
 
+\begin{mdframed}[style=provenance]
+\textbf{Provenance.} The lower bound invokes classical G2; in our Lean scaffold it is tracked as a named import.
+\end{mdframed}
+
 \begin{theorem}[G1 Calibration (Classical)]
-Assume $S_0$ is consistent. $\mathcal C^{G_{S_0}}$ (the Gödel sentence) has height $1$ along $\LCons$.
+Assume $S_0$ is consistent and satisfies HBL. Then the Gödel sentence $G_{S_0}$
+has height $1$ along $\LCons$.
 \end{theorem}
-\begin{proof}
-Upper bound: Classically $S_0 \vdash \Con(S_0) \to G_{S_0}$, so $S_1 \vdash G_{S_0}$. 
-Lower bound: By Gödel's first incompleteness theorem (G1), $S_0 \nvdash G_{S_0}$.
+
+\begin{proof}[Proof sketch]
+\emph{Upper bound.} Classically $S_0\vdash \Con(S_0)\to G_{S_0}$. Hence $S_1=S_0+\Con(S_0)\vdash G_{S_0}$.
+
+\emph{Lower bound.} Gödel's first incompleteness theorem (G1) gives $S_0\nvdash G_{S_0}$ if $S_0$ is consistent.
+Thus the minimal stage at which $G_{S_0}$ holds is exactly $1$.
 \end{proof}
 
 %===========================================================
@@ -147,10 +182,13 @@ Lower bound: By Gödel's first incompleteness theorem (G1), $S_0 \nvdash G_{S_0}
 
 \subsection{Iterated Consistency}
 \begin{theorem}[Height $n$ Calibration (Classical)]
-Along $\LCons$, $h(\mathcal C^{\Con(S_{n-1})}) = n$ for each finite $n$.
+For each finite $n\ge 1$, along $\LCons$ we have $h\!\left(\mathcal C^{\Con(S_{n-1})}\right)=n$.
 \end{theorem}
-\begin{proof}
-By induction on $n$, using iterative application of G2.
+
+\begin{proof}[Proof sketch by induction on $n$]
+Base $n=1$ is the previous theorem. For the step, assume
+$h(\mathcal C^{\Con(S_{k-1})})=k$. Then $S_k\nvdash \Con(S_k)$ by G2 (applied to $S_k$),
+but $S_{k+1}=S_k+\Con(S_k)\vdash\Con(S_k)$. Hence $h(\mathcal C^{\Con(S_k)})=k+1$.
 \end{proof}
 
 \subsection{Limit Behavior: $\omega$ vs. $\omega+1$}
@@ -159,10 +197,18 @@ The framework precisely captures the distinction between instancewise provabilit
 Consider $\psi = \forall n \in \mathbb{N}.\ \Con(S_n)$.
 
 \begin{theorem}[Uniform Consistency at $\omega+1$ (Classical)]
-The witness $\mathcal{C}^\psi$ has height $\omega+1$ along $\LCons$.
+Let $\psi \equiv \forall n\,\Con(S_n)$. Then $\mathcal C^\psi$ has height $\omega+1$ along $\LCons$.
 \end{theorem}
-\begin{proof}[Sketch]
-$S_\omega$ proves each instance $\Con(S_n)$ for concrete $n$, but not the universal statement $\psi$ (which is $\Pi^0_1$). However, $S_{\omega+1} = S_\omega + \Con(S_\omega)$ proves $\psi$ by formalizing the argument that each $S_n$ is contained in $S_\omega$. This behavior is standard \cite{Feferman1962}; see also Beklemishev’s analyses of reflection/consistency progressions and limit behavior via provability algebras \cite{Beklemishev2004}.
+
+\begin{proof}[Proof sketch]
+\emph{Upper bound ($\le \omega{+}1$).} In $S_{\omega+1}=S_\omega+\Con(S_\omega)$ we can show that
+each $S_n$ is a subtheory of $S_\omega$; since $S_{\omega+1}$ proves $\Con(S_\omega)$, it proves
+$\Con(S_n)$ for all $n$, hence $\psi$.
+
+\emph{Lower bound ($\not\le \omega$).} Each $S_n$ is included in $S_\omega$, so $S_\omega$ proves
+every \emph{instance} $\Con(S_n)$, but if $S_\omega$ proved the \emph{universal} $\psi$ then a standard
+formalized argument would yield $\Con(S_\omega)$ in $S_\omega$, contradicting G2 for $S_\omega$.
+Therefore $S_\omega\nvdash\psi$. Combining, the least stage is $\omega+1$.
 \end{proof}
 
 %===========================================================
@@ -178,14 +224,30 @@ We rely on two classical implications, which we verify formally in our Lean infr
 For any base theory $B$ capable of formalizing $\Sigma^0_1$ reasoning (e.g., $\EA = \mathrm{I}\Delta_0 + \mathrm{Exp}$ or $\ISigma$), we have:
 $$B \vdash \RFNSigOne(T) \Rightarrow \Con(T)$$
 \end{theorem}
-\begin{proof}[Proof idea]
-$\RFNSigOne(T)$ states that all $\Sigma^0_1$ sentences provable in $T$ are true. Since $\bot$ is $\Sigma^0_1$ and false, $T$ cannot prove $\bot$.
+\begin{proof}[Proof sketch]
+Work in a base $B$ (e.g.\ $\EA$ or $\ISigma$) able to arithmetize proofs and verify HBL for $T$.
+Let $\sigma_0$ be a fixed \emph{false} $\Sigma^0_1$ sentence, say $\exists p\,(p=1\wedge p\neq 1)$.
+If $T$ were inconsistent, then $T\vdash \bot$ and hence (by ex falso) $T\vdash \sigma_0$.
+By $\RFNSigOne(T)$, from $T\vdash \sigma_0$ we infer $\sigma_0$ is \emph{true}, contradicting the
+base arithmetic in $B$. Therefore $T$ is consistent. Formally: $B\vdash \RFNSigOne(T)\to\Con(T)$.
 \end{proof}
 
 \begin{theorem}[Consistency $\Rightarrow$ Gödel]\label{thm:Con-implies-G}
-For theories satisfying HBL conditions:
-$$T \vdash \Con(T) \Rightarrow G_T$$
+Assume $T$ satisfies the HBL derivability conditions. Then
+$T \vdash \Con(T) \Rightarrow G_T.$
 \end{theorem}
+
+\begin{proof}[Proof sketch]
+Let $G_T$ be the fixed point $G_T \leftrightarrow \neg \Prov_T(\ulcorner G_T\urcorner)$.
+In $T$ we show: $\Con(T)\to \neg \Prov_T(\ulcorner G_T\urcorner)$ (otherwise $T$ proves $G_T$,
+whence by HBL and the fixed point $T$ proves $\bot$). From $\neg \Prov_T(\ulcorner G_T\urcorner)$
+and the fixed point we get $G_T$. Thus $T\vdash \Con(T)\to G_T$.
+\end{proof}
+
+\begin{mdframed}[style=provenance]
+\textbf{Provenance.} This is the standard "Hilbert–Bernays–Löb" route via the fixed point and derivability
+conditions; our Lean scaffold formalizes the ladder‑morphism consequences (collision) schematically.
+\end{mdframed}
 
 \begin{remark}
 The base $B$ must be able to:
