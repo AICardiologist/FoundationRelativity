@@ -16,7 +16,7 @@
 
 • Paper 2 (WLPO ↔ Bidual Gap): ✅ Main equivalence done; 3 WLPO-conditional sorries remain
 • Paper 1 (Rank-One Toggle Kernel): ✅ Major progress! Down to 4 sorries (from 14)
-• Paper 4 (Spectral Geometry): ⚠️ SUSPENDED (archived code: ~61 sorries; not built in CI)
+• Paper 4 (Quantum Spectra): 📐 NEW - Axiom calibration for spectral theory (planning phase)
 
 ## 🎯 Overview
 
@@ -59,9 +59,10 @@ All Paper 3 LaTeX documents are consolidated in [`Papers/P3_2CatFramework/latex/
   – RFN_Σ₁ → Con: proved schematically
   – Con → Gödel: axiomatized (documented in AXIOM_INDEX.md)
 
-4. **Paper 4: Spectral Geometry** ⚠️ **SUSPENDED**
-   - Original goal: Undecidable eigenvalues on manifolds
-   - Status: Suspended due to mathematical issues in the approach
+4. **Paper 4: Axiom Calibration for Quantum Spectra** 📐 **NEW DIRECTION**
+   - Applies AxCal framework to quantum spectral theory
+   - Calibrates height of spectral results (S0-S4)
+   - Identifies WLPO portal, MP frontier, DCω upper bounds
 
 ### Axiom Calibration Methodology
 
@@ -99,11 +100,11 @@ Examples: Bidual gap has profile (WLPO, FT, DC_ω) = (1, 0, 0); UCT has (0, 1, 0
   - Sherman-Morrison formula verified
   - Spectrum/Fredholm sections pending mathlib updates
 
-### Suspended
-- **[Paper 4: Spectral Geometry](Papers/P4_SpectralGeometry/)** ⚠️ **SUSPENDED**
-  - Mathematical issues detected in approach
-  - Archived code exists (~61 sorries) but not built in CI
-  - Work halted pending theoretical resolution
+### New Development
+- **[Paper 4: Quantum Spectra](Papers/P4_SpectralGeometry/)** 📐 **NEW**
+  - Complete direction change (September 2025)
+  - Old spectral geometry work archived
+  - New focus: Axiom calibration for quantum spectral theory
 
 ## 🏗️ Project Structure
 
@@ -201,8 +202,9 @@ lake build Papers.P3_2CatFramework.Paper3A_Main
 # Paper 3B: Proof-Theoretic Scaffold (use aggregator)
 lake build Papers.P3_2CatFramework.Paper3B_Main
 
-# Paper 4: Spectral Geometry (SUSPENDED; not built in CI)
-# See docs for archived paths; building is unsupported at present.
+# Paper 4: Quantum Spectra (NEW - planning phase)
+# LaTeX: Papers/P4_SpectralGeometry/Paper4_QuantumSpectra.tex
+# Lean modules to be developed in Papers/P4_SpectralGeometry/Spectral/
 ```
 
 **Note**: We recommend building per-paper targets during development. `lake build` builds everything, including archived code, and is not necessary for day-to-day work.
