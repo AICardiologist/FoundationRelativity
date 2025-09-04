@@ -39,6 +39,11 @@
   linewidth=0.5pt,
 }
 
+% --- Reproducibility macros (Paper 3B)
+\providecommand{\leanRepo}{\url{https://github.com/AICardiologist/FoundationRelativity}}
+\providecommand{\pThreeBTag}{p3b-collisions-v0.1} % set to your GitHub release tag
+\providecommand{\pThreeBDOI}{10.5281/zenodo.TBD}  % replace after Zenodo mints DOI
+
 % -------------------------------------------------
 % Title (Focused on Proof Theory and Structure)
 % -------------------------------------------------
@@ -348,6 +353,33 @@ Our Lean formalization provides:
 \textbf{Iterated Reflection and Provability Algebras:} Beklemishev’s program develops ordinal analyses via iterated reflection principles and the polymodal provability logic GLP, yielding “provability algebras” and calibrations of Turing/Feferman-style progressions \cite{Beklemishev2003,Beklemishev2004}. Our ladders and collision morphisms give a schematic, category‑style interface that is compatible with, but agnostic about, specific ordinal notation systems; see also \cite{ArtemovBeklemishev2004} for a survey of provability logic and reflection principles.
 
 \textbf{Formalization:} Previous formalizations of Gödel's theorems (e.g., in Isabelle \cite{Paulson}) focus on specific proofs. Our approach provides a general framework for organizing proof-theoretic hierarchies.
+
+%===========================================================
+\subsection{Reproducibility Box}
+%===========================================================
+
+\begin{mdframed}[backgroundcolor=gray!10]
+\textbf{Minimal artifact (CI)}
+\begin{itemize}
+  \item \textbf{Repository}: \leanRepo
+  \item \textbf{Project tag}: \texttt{\pThreeBTag} (\emph{GitHub release})
+  \item \textbf{Lean toolchain}: as specified in \texttt{lean-toolchain} at the tag
+  \item \textbf{CI target}: \texttt{lake build Papers.P3\_2CatFramework.Paper3B\_Main}
+  \item \textbf{Axiom audit}: CI runs \texttt{\#print axioms} on the aggregator target
+        (see CI logs for the axiom inventory).
+  \item \textbf{No-sorry guard}: \texttt{scripts/no\_sorry\_p3b.sh}
+\end{itemize}
+
+\textbf{Full witness (local)}
+\begin{itemize}
+  \item \textbf{Local target}: \texttt{lake build Papers.P3\_2CatFramework}
+  \item \textbf{Witness modules}: 
+    \texttt{P4\_Meta/PartIII\_Ladders.lean} (ladders),
+    \texttt{P4\_Meta/IndependenceRegistry.lean} (axiom registry),
+    \texttt{PartV\_Collision.lean} (\emph{RFN} $\Rightarrow$ \emph{Con} $\Rightarrow$ Gödel).
+  \item \textbf{Artifact DOI}: \texttt{\pThreeBDOI}.
+\end{itemize}
+\end{mdframed}
 
 %===========================================================
 \section{Conclusion}

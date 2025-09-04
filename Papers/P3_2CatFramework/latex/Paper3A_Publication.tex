@@ -47,6 +47,12 @@
 \newcommand{\LEM}{\mathrm{LEM}}
 \newcommand{\UCT}{\mathrm{UCT}}
 
+% --- Reproducibility box deps (Paper 3A)
+% Note: xcolor, mdframed may need to be uncommented if not available
+\providecommand{\leanRepo}{\texttt{https://github.com/AICardiologist/FoundationRelativity}}
+\providecommand{\pThreeATag}{p3a-three-axes-v0.1} % set to your GitHub release tag
+\providecommand{\pThreeADOI}{10.5281/zenodo.TBD}  % replace after Zenodo mints DOI
+
 % -------------------------------------------------
 % Title
 % -------------------------------------------------
@@ -530,6 +536,35 @@ Stone duality (general) & \cite{Johnstone82} & Classical theory \\
 Our Lean formalization comprises approximately 15,000 lines of code across 50+ files, available at:
 \begin{center}
 https://github.com/AICardiologist/FoundationRelativity
+\end{center}
+
+%===========================================================
+\subsection{Reproducibility Box}
+%===========================================================
+
+% Note: If mdframed is not available, use a simple framed environment
+\begin{center}
+\fbox{\begin{minipage}{0.95\textwidth}
+\textbf{Minimal artifact (CI)}
+\begin{itemize}
+  \item \textbf{Repository}: \leanRepo
+  \item \textbf{Project tag}: \texttt{\pThreeATag} (\emph{GitHub release})
+  \item \textbf{Lean toolchain}: as specified in \texttt{lean-toolchain} at the tag
+  \item \textbf{CI target}: \texttt{lake build Papers.P3\_2CatFramework.Paper3A\_Main}
+  \item \textbf{Doc build}: \texttt{pdflatex -interaction=nonstopmode latex/Paper3A\_Publication.tex}
+  \item \textbf{No-sorry guard}: \texttt{scripts/no\_sorry\_p3a.sh}
+\end{itemize}
+
+\textbf{Full witness (local)}
+\begin{itemize}
+  \item \textbf{Local target}: \texttt{lake build Papers.P3\_2CatFramework}
+  \item \textbf{Witness modules}: 
+    \texttt{P4\_Meta/FT\_UCT\_MinimalSurface.lean} (FT axis),
+    \texttt{P4\_Meta/DCw\_Frontier.lean} (DC$\omega$ axis),
+    \texttt{StoneWindow\_SupportIdeals.lean} (Stone API).
+  \item \textbf{Artifact DOI}: \texttt{\pThreeADOI}.
+\end{itemize}
+\end{minipage}}
 \end{center}
 
 %===========================================================

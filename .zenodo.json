@@ -1,0 +1,19 @@
+{
+  "title": "Foundation Relativity: AxCal Papers 3A/3B (Lean 4 Artifacts)",
+  "upload_type": "software",
+  "description": "Lean 4 artifacts for Paper 3A (three-axis AxCal with DCω/Baire integrated) and Paper 3B (proof-theoretic ladders and collisions).",
+  "creators": [
+    {"name": "Lee, Paul Chun-Kit", "orcid": "0000-0000-0000-0000"}
+  ],
+  "keywords": ["Lean4", "Constructive Mathematics", "Reverse Mathematics", "Proof Theory", "Baire Category"],
+  "access_right": "open",
+  "license": "MIT",
+  "related_identifiers": [
+    {
+      "scheme": "url",
+      "identifier": "https://github.com/AICardiologist/FoundationRelativity",
+      "relation": "isSupplementTo"
+    }
+  ],
+  "notes": "Release generated from GitHub tag. Paper 3A target: Papers.P3_2CatFramework.Paper3A_Main. Paper 3B target: Papers.P3_2CatFramework.Paper3B_Main."
+}

@@ -6,24 +6,25 @@ authors:
   given-names: "Paul C"
   orcid: "https://orcid.org/0000-0000-0000-0000"
   affiliation: "AICardiologist"
-title: "Axiom-Calibration"
-version: v0.3.4
-doi: 10.5281/zenodo.1234567
-date-released: 2024-01-01
+title: "Foundation Relativity: AxCal Papers 3A/3B (Lean 4 Artifacts)"
+version: 0.1.0
+doi: 10.5281/zenodo.TBD
+date-released: 2025-09-04
 url: "https://github.com/AICardiologist/FoundationRelativity"
 repository-code: "https://github.com/AICardiologist/FoundationRelativity"
 abstract: >-
-  A Lean 4 formalization exploring axiom calibration in constructive 
-  mathematics. Demonstrates how mathematical pathologies behave differently 
-  under BISH vs ZFC foundations, with complete ρ-hierarchy proofs showing 
-  logical strength requirements (WLPO, DC_ω, DC_{ω+1}) for various constructions.
+  Lean 4 artifacts for Paper 3A (three-axis AxCal framework with DCω/Baire integrated) 
+  and Paper 3B (proof-theoretic ladders and collisions). Demonstrates axiom calibration 
+  via uniformizability and height invariants, including WLPO ↔ Bidual Gap, FT axis 
+  (UCT, Sperner, BFPT), and DCω axis (Baire Category Theorem).
 keywords:
-  - "formal verification"
+  - "Lean4"
   - "constructive mathematics"
-  - "lean4"
+  - "reverse mathematics"
+  - "proof theory"
+  - "Baire category"
   - "axiom calibration"
-  - "category theory"
-  - "mathematical logic"
+  - "uniformizability"
 license: Apache-2.0
 references:
   - type: software

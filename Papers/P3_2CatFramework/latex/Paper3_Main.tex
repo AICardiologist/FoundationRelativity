@@ -72,6 +72,11 @@
 
 \newcommand{\SigmaZero}{\Sigma_{0}}
 
+% --- Reproducibility macros (Paper 3)
+\providecommand{\leanRepo}{\url{https://github.com/AICardiologist/FoundationRelativity}}
+\providecommand{\pThreeTag}{p3-main-v0.1} % set to your GitHub release tag
+\providecommand{\pThreeDOI}{10.5281/zenodo.TBD}  % replace after Zenodo mints DOI
+
 % -------------------------------------------------
 % Title
 % -------------------------------------------------
@@ -2059,6 +2064,32 @@ Our Lean formalization comprises approximately 15,000 lines of code across 50+ f
 \begin{center}
 \url{https://github.com/AICardiologist/FoundationRelativity}
 \end{center}
+
+%===========================================================
+\subsection{Reproducibility Box}
+%===========================================================
+
+\begin{mdframed}[backgroundcolor=gray!10]
+\textbf{Minimal artifact (CI)}
+\begin{itemize}
+  \item \textbf{Repository}: \leanRepo
+  \item \textbf{Project tag}: \texttt{\pThreeTag} (\emph{GitHub release})
+  \item \textbf{Lean toolchain}: as specified in \texttt{lean-toolchain} at the tag
+  \item \textbf{CI target}: \texttt{lake build Papers.P3\_2CatFramework}
+  \item \textbf{Doc build}: \texttt{pdflatex -interaction=nonstopmode latex/Paper3\_Main.tex}
+  \item \textbf{No-sorry guard}: \texttt{scripts/no\_sorry\_p3.sh}
+\end{itemize}
+
+\textbf{Full witness (local)}
+\begin{itemize}
+  \item \textbf{Local target}: \texttt{lake build Papers.P3\_2CatFramework}
+  \item \textbf{Witness modules}: 
+    \texttt{Phase1\_Simple.lean} (core framework),
+    \texttt{Phase2\_UniformHeight.lean} (height calculus),
+    \texttt{P4\_Meta/} (complete meta-framework).
+  \item \textbf{Artifact DOI}: \texttt{\pThreeDOI}.
+\end{itemize}
+\end{mdframed}
 
 %===========================================================
 \section{Conclusion}
