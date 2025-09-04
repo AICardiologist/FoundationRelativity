@@ -1,0 +1,40 @@
+name: Paper4 Smoke
+
+on:
+  push:
+    paths:
+      - "Papers/P4_SpectralGeometry/**"
+      - "scripts/no_sorry_p4.sh"
+      - "lakefile.lean"
+      - "lean-toolchain"
+  pull_request:
+    paths:
+      - "Papers/P4_SpectralGeometry/**"
+      - "scripts/no_sorry_p4.sh"
+      - "lakefile.lean"
+      - "lean-toolchain"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan (Lean toolchain manager)
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Print toolchain versions
+        run: |
+          lean --version
+          lake --version
+
+      - name: Resolve deps
+        run: lake update
+
+      - name: Build Paper 4 smoke target
+        run: lake build Papers.P4_SpectralGeometry.Smoke
+
+      - name: No-sorry guard (Paper 4)
+        run: ./scripts/no_sorry_p4.sh

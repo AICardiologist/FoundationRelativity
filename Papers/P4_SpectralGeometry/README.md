@@ -1,6 +1,8 @@
 # Paper 4: Axiom Calibration for Quantum Spectra
 
-## Status: New Direction - Planning Phase
+[![Paper 4 Smoke](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/p4-smoke.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/p4-smoke.yml)
+
+## Status: Implemented - Zero Sorries
 
 **Transition Date**: September 4, 2025  
 **New Direction Defined**: September 4, 2025
