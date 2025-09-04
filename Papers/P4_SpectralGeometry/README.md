@@ -57,12 +57,13 @@ structure SeparationRoute_W : WitnessFamily
 3. **DCω upper bound** (S2): Locale point extraction
 4. **WLPO portal** (S3): Connect to Paper 2's bidual gap
 
-### Implementation Priorities
-1. ✅ Define axiom tokens for extended axes (MP, ACω, etc.)
-2. ⬜ Formalize spectral witness families S0-S4
-3. ⬜ Prove height 0 results (S0, S4)
-4. ⬜ Connect S3 to Paper 2's WLPO ↔ Gap equivalence
-5. ⬜ Literature axiomatization for S1 reversal
+### Implementation Status
+1. ✅ Define axiom tokens for extended axes (MP, ACω, etc.) - DONE
+2. ✅ Formalize spectral witness families S0-S4 - DONE
+3. ✅ Prove height 0 results (S0, S4) - DONE (as trivial witnesses)
+4. ✅ Upper bounds for S1 (MP), S2 (DCω), S3 (WLPO) - DONE
+5. ⬜ Connect S3 to Paper 2's WLPO ↔ Gap equivalence (future work)
+6. ⬜ Literature axiomatization for S1 reversal (future work)
 
 ### Physics Connection
 The calibration reveals which quantum mechanical results are:
@@ -74,10 +75,11 @@ The calibration reveals which quantum mechanical results are:
 ```
 P4_SpectralGeometry/
 ├── README.md                    # This file
-├── Paper4_QuantumSpectra.tex    # Main LaTeX document
+├── Paper4_QuantumSpectra.tex    # Main LaTeX document (with reproducibility box)
 ├── TRANSITION_NOTICE.md         # Historical record
-├── Spectral/                    # New Lean modules (to be created)
-│   ├── Basic.lean              # Hilbert space setup
+├── Smoke.lean                   # CI target (0 sorries)
+├── Spectral/                    # Lean modules (✅ implemented)
+│   ├── Basic.lean              # Foundation tokens + witness interface
 │   ├── CompactApprox.lean      # S0: Height 0 approximations
 │   ├── MarkovSpectrum.lean     # S1: MP frontier
 │   ├── LocaleSpatiality.lean   # S2: DCω upper bound
@@ -85,3 +87,4 @@ P4_SpectralGeometry/
 │   └── QHO.lean                # S4: Quantum harmonic oscillator
 └── archive/
     └── old_spectral_geometry_2025/  # Previous work (preserved)
+```
