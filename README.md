@@ -203,9 +203,8 @@ lake build Papers.P3_2CatFramework.Paper3A_Main
 # Paper 3B: Proof-Theoretic Scaffold (use aggregator)
 lake build Papers.P3_2CatFramework.Paper3B_Main
 
-# Paper 4: Quantum Spectra (NEW - planning phase)
-# LaTeX: Papers/P4_SpectralGeometry/Paper4_QuantumSpectra.tex
-# Lean modules to be developed in Papers/P4_SpectralGeometry/Spectral/
+# Paper 4: Quantum Spectra (CI smoke test)
+lake build Papers.P4_SpectralGeometry.Smoke && ./scripts/no_sorry_p4.sh
 ```
 
 **Note**: We recommend building per-paper targets during development. `lake build` builds everything, including archived code, and is not necessary for day-to-day work.

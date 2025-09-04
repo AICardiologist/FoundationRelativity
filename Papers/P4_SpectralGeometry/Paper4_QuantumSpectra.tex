@@ -104,11 +104,12 @@ A verification ledger distinguishes Lean--feasible upper bounds, literature--lev
 \ReproBox{
 \textbf{Reproducibility Infrastructure:} This paper calibrates quantum spectral results using the AxCal framework from Paper 3A.
 \begin{itemize}[leftmargin=*]
-  \item \textbf{Paper URL:} \url{https://github.com/AICardiologist/FoundationRelativity}
-  \item \textbf{Framework Import:} \LeanTarget{Papers.P3\_2CatFramework.Paper3A\_Main}
-  \item \textbf{Spectral Modules:} \LeanTarget{Papers.P4\_SpectralGeometry.Spectral.*} (planned)
-  \item \textbf{Build:} \texttt{lake build Papers.P4\_SpectralGeometry} (once modules created)
-  \item \textbf{CI:} Currently in planning phase; will integrate when Lean modules ready
+  \item \textbf{Repository:} \url{https://github.com/AICardiologist/FoundationRelativity}
+  \item \textbf{Paper 4 CI status:} \href{https://github.com/AICardiologist/FoundationRelativity/actions/workflows/p4-smoke.yml}{\texttt{p4-smoke.yml}} (badge on repo README)
+  \item \textbf{Lean toolchain:} as specified in \texttt{lean-toolchain} at the commit/tag
+  \item \textbf{CI target:} \LeanTarget{lake build Papers.P4\_SpectralGeometry.Smoke}
+  \item \textbf{No-sorry guard:} \texttt{./scripts/no\_sorry\_p4.sh} (excludes \texttt{archive/}, \texttt{.lake/}, \texttt{lake-packages/})
+  \item \textbf{Aggregator (optional):} \LeanTarget{lake build Papers.P4\_SpectralGeometry}
 \end{itemize}
 }
 
