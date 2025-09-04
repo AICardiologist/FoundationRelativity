@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml)
 [![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
+[![Paper 4 Smoke](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/p4-smoke.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/p4-smoke.yml)
 [![Paper 3A/3B Complete](https://img.shields.io/badge/Paper%203A%2F3B-Complete-brightgreen)](Papers/P3_2CatFramework/)
 [![Paper 2 WLPO↔Gap](https://img.shields.io/badge/Paper%202%20WLPO%E2%86%94Gap-3%20sorries-green)](Papers/P2_BidualGap/)
 [![Paper 1 Rank-One](https://img.shields.io/badge/Paper%201%20Rank--One-4%20sorries-green)](Papers/P1_GBC/)
@@ -202,9 +203,8 @@ lake build Papers.P3_2CatFramework.Paper3A_Main
 # Paper 3B: Proof-Theoretic Scaffold (use aggregator)
 lake build Papers.P3_2CatFramework.Paper3B_Main
 
-# Paper 4: Quantum Spectra (NEW - planning phase)
-# LaTeX: Papers/P4_SpectralGeometry/Paper4_QuantumSpectra.tex
-# Lean modules to be developed in Papers/P4_SpectralGeometry/Spectral/
+# Paper 4: Quantum Spectra (CI smoke test)
+lake build Papers.P4_SpectralGeometry.Smoke && ./scripts/no_sorry_p4.sh
 ```
 
 **Note**: We recommend building per-paper targets during development. `lake build` builds everything, including archived code, and is not necessary for day-to-day work.
