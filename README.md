@@ -4,7 +4,7 @@
 [![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
 [![Paper 3A/3B Complete](https://img.shields.io/badge/Paper%203A%2F3B-Complete-brightgreen)](Papers/P3_2CatFramework/)
 [![Paper 2 WLPO↔Gap](https://img.shields.io/badge/Paper%202%20WLPO%E2%86%94Gap-3%20sorries-green)](Papers/P2_BidualGap/)
-[![Paper 1 Rank-One](https://img.shields.io/badge/Paper%201%20Rank--One-14%20sorries-yellow)](Papers/P1_GBC/)
+[![Paper 1 Rank-One](https://img.shields.io/badge/Paper%201%20Rank--One-4%20sorries-green)](Papers/P1_GBC/)
 [![DOI Paper 3A](https://zenodo.org/badge/DOI/10.5281/zenodo.17054050.svg)](https://doi.org/10.5281/zenodo.17054050)
 [![DOI Paper 3B](https://zenodo.org/badge/DOI/10.5281/zenodo.17054155.svg)](https://doi.org/10.5281/zenodo.17054155)
 
@@ -15,7 +15,7 @@
   – Paper 3B (Proof-theoretic scaffold): ❄️ FROZEN at 21 axioms (RFN_Σ₁ ⇒ Con proved)
 
 • Paper 2 (WLPO ↔ Bidual Gap): ✅ Main equivalence done; 3 WLPO-conditional sorries remain
-• Paper 1 (Rank-One Toggle Kernel): 🔧 ~14 sorries (mathlib-dependent sections)
+• Paper 1 (Rank-One Toggle Kernel): ✅ Major progress! Down to 4 sorries (from 14)
 • Paper 4 (Spectral Geometry): ⚠️ SUSPENDED (archived code: ~61 sorries; not built in CI)
 
 ## 🎯 Overview
@@ -34,10 +34,12 @@ All Paper 3 LaTeX documents are consolidated in [`Papers/P3_2CatFramework/latex/
 
 ### Papers and Results
 
-1. **Paper 1: Rank-One Toggle on Hilbert Spaces** 🔧
+1. **Paper 1: Rank-One Toggle on Hilbert Spaces** ✅
    - Minimal operator-theoretic core around orthogonal projections
-   - Sherman-Morrison inverse formula for rank-one perturbations
-   - Lean formalization: ~14 sorries (pending mathlib updates)
+   - Sherman-Morrison inverse formula: **COMPLETE** (0 sorries)
+   - Fredholm theory: Nearly complete (1 sorry for quotient dimension)
+   - Spectrum characterization: 3 sorries (awaiting mathlib spectrum API)
+   - **Major milestone**: Reduced from 14 to just 4 sorries!
 
 2. **Paper 2: WLPO ↔ Bidual Gap Equivalence** ✅
    - Main theorem: Detecting bidual gap has exactly WLPO strength
