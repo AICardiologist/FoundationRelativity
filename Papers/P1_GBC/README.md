@@ -6,28 +6,28 @@ Paper 1 delivers a minimal, reusable operator-theory core around the rank-one to
 G(c) := id - c·P on Hilbert spaces. We provide a clean formalization of orthogonal projections,
 toggle operators, and the Sherman-Morrison formula for rank-one perturbations.
 
-## Current Status (September 2025)
+## Current Status (September 4, 2025)
 
-**Total sorries: 13** distributed across:
-- ShermanMorrison: 1 (optional norm bound)
-- Spectrum: 3 (pending mathlib operator algebra API)
-- Fredholm: 5 (numeric index computation)
-- Tutorial: 4 (examples)
+**Major Achievement: Reduced from 14 sorries to just 4!**
+
+**Total sorries: 4** distributed across:
+- Fredholm: 1 (quotient space dimension H/K^⊥ ≅ K)
+- Spectrum: 3 (pending mathlib operator spectrum API)
 
 ## Scope
 
 ### ✅ Completed (0 sorries)
 - **Projection API**: Orthogonal projection onto line spanned by unit vector
 - **Toggle Operator**: G(c) := id - (if c then 1 else 0) • P with ker/range characterization
-- **FredholmAlt**: Lightweight "index-zero spec" (algebra-free characterization)
+- **Sherman-Morrison**: Complete inverse formulas and norm bounds - FULLY PROVEN!
+- **Fredholm Theory** (mostly): Kernel/range characterization, closedness, finite-dimensionality
 
 ### 🔧 Nearly Complete (1 sorry)
-- **Sherman-Morrison**: Formula proven, one optional norm bound remains
+- **Fredholm**: Cokernel dimension requires H/K^⊥ ≅ K isomorphism (deep Hilbert space theory)
 
-### 📋 Pending Mathlib Update
-- **Spectrum**: 3 sorries - awaiting operator algebra instances in mathlib
-- **Fredholm**: 5 sorries - numeric index requires finrank/quotient APIs
-- **Tutorial**: 4 sorries - pedagogical examples
+### ⏳ Blocked by Mathlib (3 sorries)
+- **Spectrum**: Awaiting operator spectrum API in mathlib
+  - Need: `spectrum_one`, `mem_spectrum_iff_not_isUnit`, algebra structure for `H →L[𝕜] H`
 
 ## Module Status
 
@@ -35,11 +35,9 @@ toggle operators, and the Sherman-Morrison formula for rank-one perturbations.
 |--------|---------|--------|-------|
 | `Projection.lean` | 0 | ✅ Complete | P² = P, P* = P, ‖P‖ = 1 |
 | `Toggle.lean` | 0 | ✅ Complete | ker/range, injectivity ↔ surjectivity |
-| `FredholmAlt.lean` | 0 | ✅ Complete | Algebra-free index spec |
-| `ShermanMorrison.lean` | 1 | 🔧 Nearly complete | Formula proven, norm bound pending |
-| `Spectrum.lean` | 3 | 📋 Stub | σ(G₀) = {1}, σ(G₁) = {0,1} documented |
-| `Fredholm.lean` | 5 | 📋 Planned | Numeric index computation |
-| `Tutorial.lean` | 4 | 📋 Examples | Pedagogical demonstrations |
+| `ShermanMorrison.lean` | 0 | ✅ Complete | Full inverse formulas and norm bounds proven! |
+| `Fredholm.lean` | 1 | 🔧 Nearly complete | Only cokernel dimension needs H/K^⊥ ≅ K |
+| `Spectrum.lean` | 3 | ⏳ Blocked | Needs mathlib spectrum API for operators |
 
 ## Key Results
 
