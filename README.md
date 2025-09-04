@@ -5,6 +5,8 @@
 [![Paper 3A/3B Complete](https://img.shields.io/badge/Paper%203A%2F3B-Complete-brightgreen)](Papers/P3_2CatFramework/)
 [![Paper 2 WLPO↔Gap](https://img.shields.io/badge/Paper%202%20WLPO%E2%86%94Gap-3%20sorries-green)](Papers/P2_BidualGap/)
 [![Paper 1 Rank-One](https://img.shields.io/badge/Paper%201%20Rank--One-14%20sorries-yellow)](Papers/P1_GBC/)
+[![DOI Paper 3A](https://zenodo.org/badge/DOI/10.5281/zenodo.17054050.svg)](https://doi.org/10.5281/zenodo.17054050)
+[![DOI Paper 3B](https://zenodo.org/badge/DOI/10.5281/zenodo.17054155.svg)](https://doi.org/10.5281/zenodo.17054155)
 
 🎯 Current Status (September 2025)
 
@@ -124,6 +126,34 @@ FoundationRelativity/
 └── docs/
     ├── planning/
     └── reference/
+```
+
+## 📚 Citation
+
+If you use this formalization in your research, please cite:
+
+### Paper 3A: Three Orthogonal Axes
+```bibtex
+@software{lee2025axcal3a,
+  author = {Lee, Paul Chun-Kit},
+  title = {Foundation Relativity: AxCal Paper 3A - Three Orthogonal Axes (Lean 4 Artifacts)},
+  version = {0.2.0},
+  year = {2025},
+  doi = {10.5281/zenodo.17054050},
+  url = {https://doi.org/10.5281/zenodo.17054050}
+}
+```
+
+### Paper 3B: Proof-Theoretic Collisions
+```bibtex
+@software{lee2025axcal3b,
+  author = {Lee, Paul Chun-Kit},
+  title = {Foundation Relativity: AxCal Paper 3B - Proof-Theoretic Collisions (Lean 4 Artifacts)},
+  version = {0.2.0},
+  year = {2025},
+  doi = {10.5281/zenodo.17054155},
+  url = {https://doi.org/10.5281/zenodo.17054155}
+}
 ```
 
 ## 🚀 Quick Start

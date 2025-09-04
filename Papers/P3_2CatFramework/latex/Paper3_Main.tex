@@ -95,6 +95,15 @@ We implement a complete \textbf{FT frontier infrastructure} (WP-B) establishing 
 \textbf{Status.} This is a \emph{pre--Lean} conceptual paper. We \emph{import} from the companion work (Paper~2) the Lean--verified result that, over \BISH, the bidual gap for $\linf$ is equivalent to \WLPO. No new formalization is claimed here; we outline a mechanization plan and discuss Lean~4 workarounds.
 \end{mdframed}
 
+\begin{mdframed}[style=status]
+\textbf{Reproducibility Box} \\[0.3em]
+\textbf{Artifact Availability:} Lean~4 formalization at \url{https://github.com/AICardiologist/FoundationRelativity}.\\
+\textbf{Zenodo DOIs:} Paper 3A: \href{https://doi.org/10.5281/zenodo.17054050}{10.5281/zenodo.17054050}, Paper 3B: \href{https://doi.org/10.5281/zenodo.17054155}{10.5281/zenodo.17054155}\\
+\textbf{CI Status:} All core modules compile with 0 sorries (verified by GitHub Actions)\\
+\textbf{Build Command:} \texttt{lake build Papers.P3\_2CatFramework}\\
+\textbf{Verification:} \texttt{./scripts/no\_sorry\_p3a.sh} checks all witness modules
+\end{mdframed}
+
 \tableofcontents
 
 %===========================================================

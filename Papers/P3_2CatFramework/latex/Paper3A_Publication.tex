@@ -60,6 +60,13 @@ A Framework for Orthogonal Logical Dependencies in Analysis}
 
 \begin{abstract}
 We present Axiom Calibration (AxCal), a categorical framework for measuring the axiomatic strength of mathematical theorems via uniformizability and height invariants. Using uniformizability—the invariance of witness constructions across foundations fixing a core signature—we establish a precise calculus for logical dependencies. We compute orthogonal logical profiles along three independent axes central to constructive analysis: WLPO, the Fan Theorem (FT), and Dependent Choice ($\DCw$). Using a Lean-verified equivalence imported from companion work, the bidual gap in $\linf$ calibrates at height 1 on the WLPO axis, while the Uniform Continuity Theorem on $[0,1]$ calibrates at height 1 on the FT axis, and Baire Category for $\N^\N$ calibrates at height 1 on the $\DCw$ axis (Paper 3C), yielding profiles $(1,0,0)$, $(0,1,0)$, and $(0,0,1)$ respectively. We further analyze the Stone Window for general support ideals, proving the classical Boolean algebra isomorphism and identifying a constructive caveat that motivates a calibration conjecture linking surjectivity to WLPO. Our Lean 4 artifacts provide a complete Boolean algebra API for the quotient space with 100+ lemmas, functorial mapping of ideals, and automation-ready endpoint lemmas that reduce quotient reasoning to smallness in the ideal.
+
+\vspace{1em}
+\noindent\textbf{Artifact Availability:} Lean~4 formalization at \url{https://github.com/AICardiologist/FoundationRelativity}\\
+\textbf{Zenodo DOI:} \href{https://doi.org/10.5281/zenodo.17054050}{10.5281/zenodo.17054050}\\
+\textbf{CI Status:} All core modules compile with 0 sorries (verified by GitHub Actions)\\
+\textbf{Build Command:} \texttt{lake build Papers.P3\_2CatFramework}\\
+\textbf{Verification:} \texttt{./scripts/no\_sorry\_p3a.sh} checks all witness modules
 \end{abstract}
 
 \tableofcontents
