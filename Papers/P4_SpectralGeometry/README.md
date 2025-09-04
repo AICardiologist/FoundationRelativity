@@ -87,3 +87,4 @@ P4_SpectralGeometry/
 │   └── QHO.lean                # S4: Quantum harmonic oscillator
 └── archive/
     └── old_spectral_geometry_2025/  # Previous work (preserved)
+```
