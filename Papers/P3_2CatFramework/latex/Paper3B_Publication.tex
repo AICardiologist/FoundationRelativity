@@ -52,7 +52,14 @@
 \begin{abstract}
 We apply the Axiom Calibration (AxCal) framework to classical proof theory, developing a structural ``Height Calculus'' to organize the hierarchies of consistency strength and reflection principles. We model Turing-style consistency progressions and Feferman-style reflection progressions as ``ladders.''
 
-The core structural contribution is the formalization of ``Collisions'' between these ladders. We demonstrate that the classical implications (Reflection $\Rightarrow$ Consistency, and Consistency $\Rightarrow$ Gödel Sentence) function as formal morphisms between the respective ladders, explaining how these axes systematically couple. We analyze the behavior at limit ordinals, capturing the distinction between instancewise provability ($\omega$) and universal closure ($\omega+1$). We detail a Lean 4 implementation (P4\_Meta framework) that certifies these structural relationships schematically, including a formalized proof of Reflection $\Rightarrow$ Consistency, and situate our constructions alongside Beklemishev’s program on iterated reflection and provability algebras \cite{Beklemishev2003,Beklemishev2004}.
+The core structural contribution is the formalization of ``Collisions'' between these ladders. We demonstrate that the classical implications (Reflection $\Rightarrow$ Consistency, and Consistency $\Rightarrow$ Gödel Sentence) function as formal morphisms between the respective ladders, explaining how these axes systematically couple. We analyze the behavior at limit ordinals, capturing the distinction between instancewise provability ($\omega$) and universal closure ($\omega+1$). We detail a Lean 4 implementation (P4\_Meta framework) that certifies these structural relationships schematically, including a formalized proof of Reflection $\Rightarrow$ Consistency, and situate our constructions alongside Beklemishev's program on iterated reflection and provability algebras \cite{Beklemishev2003,Beklemishev2004}.
+
+\vspace{1em}
+\noindent\textbf{Artifact Availability:} Lean~4 formalization at \url{https://github.com/AICardiologist/FoundationRelativity}\\
+\textbf{Zenodo DOI:} \href{https://doi.org/10.5281/zenodo.17054155}{10.5281/zenodo.17054155}\\
+\textbf{CI Status:} All core modules compile with 0 sorries (verified by GitHub Actions)\\
+\textbf{Build Command:} \texttt{lake build Papers.P3\_2CatFramework}\\
+\textbf{Verification:} \texttt{./scripts/no\_sorry\_p3b.sh} checks proof-theoretic modules
 \end{abstract}
 
 \tableofcontents
