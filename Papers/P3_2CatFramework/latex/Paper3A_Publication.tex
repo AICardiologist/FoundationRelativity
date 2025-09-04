@@ -86,6 +86,17 @@ Over $\BISH$, the following are equivalent:
 \end{enumerate}
 \end{theorem}
 
+\begin{proof}[Proof sketch (proven in \cite{Paper2})]
+($\Rightarrow$) If $J:\linf\to(\linf)^{**}$ is not surjective, one exhibits a norm-1 functional
+$F:(\linf)^{*}\to\R$ not given by evaluation at an element of $\linf$. Coding an arbitrary binary
+sequence $\alpha:\N\to\{0,1\}$ into a compatible family of functionals, one shows that from such an
+$F$ one can decide whether $\exists n\,(\alpha(n)=1)$, giving WLPO.
+
+($\Leftarrow$) Under WLPO, the standard Hahn--Banach machinery (constructively valid with WLPO for
+the choices involved) produces a non-evaluation functional on $(\linf)^{*}$, yielding an element of
+$(\linf)^{**}\setminus J(\linf)$. Full details and the precise coding appear in~\cite{Paper2}.
+\end{proof}
+
 This precise calibration motivates our general framework: How can we systematically determine such equivalences? How do different logical principles interact when combined?
 
 \subsection{Contributions}
@@ -129,6 +140,20 @@ The category $\Found$ has:
 \end{itemize}
 Key examples include $\BISH$, $\BISH + \WLPO$, $\BISH + \FT$, and $\ZFC$.
 \end{definition}
+
+\subsection{A Gentle Introduction}\label{subsec:gently}
+
+\paragraph{Why uniformizability?}
+Suppose a theorem $T$ asserts ``every $f\in\mathcal{F}$ has a witness $w(f)$ with property $P$.''
+Across foundations $F\subseteq G$, a \emph{uniformizable} witness family says:
+not only do witnesses exist in $G$, but restricting them back to $F$ yields \emph{the same} data up to canonical equivalence. Non-uniformizability pinpoints logical strength: there is a smallest extension where the construction stabilizes.
+
+\begin{example}[Toy calibration: max of two reals]
+In $\BISH$, a total ``$\max:\R^2\to\R$ with decidable branch'' procedure fails in general because equality on reals is undecidable. Over $\BISH+\WLPO$, the branch becomes decidable and the witness family stabilizes at height~1 on the WLPO axis. This mirrors our bidual gap calibration at scale.
+\end{example}
+
+\paragraph{Reading the rest of the paper.}
+Keep in mind: (i) a witness family is a groupoid of choices; (ii) ``height'' means the first rung of a ladder where choices stabilize; (iii) orthogonal axes let product theorems compose heights coordinatewise.
 
 \subsection{Uniformizability}
 
@@ -180,6 +205,13 @@ For orthogonal axes $\{A_1, \ldots, A_n\}$, the \emph{profile} $h^{\vec{}}(\math
 For independent witness families: $h^{\vec{}}(\mathcal{C} \times \mathcal{D}) = \max(h^{\vec{}}(\mathcal{C}), h^{\vec{}}(\mathcal{D}))$ componentwise.
 \end{proposition}
 
+\begin{proof}[Justification of the Product Law]
+For independent axes, restriction functors act componentwise on $\mathcal{C}\times\mathcal{D}$.
+If $\mathcal{C}$ stabilizes at $(h_1,\dots)$ and $\mathcal{D}$ at $(k_1,\dots)$, then the first level
+where both restrictions are equivalences is the coordinatewise maximum. Conversely, if the product
+stabilizes earlier on some axis, one factor would already be stable there, contradicting minimality.
+\end{proof}
+
 %===========================================================
 \section{Calibration Case Studies}
 %===========================================================
@@ -187,6 +219,13 @@ For independent witness families: $h^{\vec{}}(\mathcal{C} \times \mathcal{D}) = 
 \subsection{The WLPO Axis: Bidual Gap}
 
 Using Theorem \ref{thm:paper2}, we calibrate the bidual gap witness family.
+
+\begin{definition}[Positive frontier $\Frontierpos(\mathcal{C})$]
+Fix a list of axes $\mathcal{A}$ (e.g. $\{\WLPO,\FT,\DCw\}$) and the associated ladders.
+The \emph{positive frontier} $\Frontierpos(\mathcal{C})$ is the collection of \emph{minimal}
+subsets $S\subseteq\mathcal{A}$ such that $\mathcal{C}$ becomes positively uniformizable
+at height~1 when all principles in $S$ are added (and no strict subset suffices).
+\end{definition}
 
 \begin{proposition}[Height of the Bidual Gap]
 The family $\mathcal{C}^{\text{Gap}}$ of witnesses to non-surjectivity of $J: \linf \to (\linf)^{**}$ has:
@@ -204,7 +243,7 @@ By Theorem \ref{thm:paper2}, witnesses exist precisely when WLPO holds. In $\BIS
 
 The Fan Theorem (FT) governs compactness properties orthogonal to WLPO.
 
-\begin{theorem}[UCT Calibration]
+\begin{theorem}[UCT Calibration -- imported]\label{thm:uct-calib}
 The witness family $\mathcal{C}^{\UCT}$ for uniform continuity of continuous functions on $[0,1]$ has:
 \begin{itemize}
 \item Positive frontier: $\Frontierpos(\mathcal{C}^{\UCT}) = \{\{\FT\}\}$
@@ -213,7 +252,30 @@ The witness family $\mathcal{C}^{\UCT}$ for uniform continuity of continuous fun
 \end{theorem}
 
 \begin{proof}[Proof sketch]
-The upper bound ($\FT \Rightarrow \UCT$) is classical. For the lower bound, models of $\BISH + \neg\FT$ exist where continuous functions on $[0,1]$ fail to be uniformly continuous.
+\emph{(FT $\Rightarrow$ UCT)} Work on the full binary tree of dyadic subintervals of $[0,1]$.
+Fix $\varepsilon>0$. For each node $s$ (dyadic interval $I_s$), write
+$\operatorname{osc}(f;I_s)=\sup\{|f(x)-f(y)|:x,y\in I_s\}$.
+Continuity of $f$ at each $x$ implies there is some depth $N(x)$ such that along the branch of
+dyadic intervals containing $x$, the oscillation drops below $\varepsilon$ from depth $N(x)$ onward.
+Thus the set
+\[
+B_\varepsilon=\{\,s:\operatorname{osc}(f;I_s)\le\varepsilon\,\}
+\]
+is a bar (every infinite branch meets it). Using standard Bishop-style approximations, one replaces
+$\operatorname{osc}$ by a decidable surrogate bar (via rational nets) without changing the bar
+property. By the Fan Theorem, $B_\varepsilon$ has a uniform depth $N_\varepsilon$ such that every
+interval at depth $N_\varepsilon$ lies in $B_\varepsilon$. If $|x-y|<2^{-N_\varepsilon}$, then $x$
+and $y$ lie in a common dyadic interval at that depth, so $|f(x)-f(y)|\le\varepsilon$. Hence $f$ is
+uniformly continuous.
+
+\smallskip
+\emph{(UCT $\Rightarrow$ FT; imported outline)} Given a decidable bar $B\subseteq 2^{<\N}$, define a
+continuous $g:2^\N\to\R$ that maps a path $x$ to a positive number measuring how far the branch
+avoids $B$ (e.g.\ $g(x)=2^{-\min\{\,|s|:s\sqsubset x,\ s\in B\}}$ with the convention $2^{-\infty}=0$).
+Uniform continuity of $g$ yields a global depth $N$ such that agreement on the first $N$ bits forces
+$|g(x)-g(y)|<2^{-N-1}$; this implies every path meets $B$ at depth $\le N$, i.e.\ $B$ has a finite
+subbar. This is the standard Brouwer--Heyting--Kolmogorov route; full details are classical (see
+\cite{bridges2007}). We therefore record the calibration as imported in this direction.
 \end{proof}
 
 \subsection{Orthogonal Profiles}
@@ -229,8 +291,10 @@ By the product law: $h^{\vec{}}(\mathcal{C}^{\text{Gap}} \times \mathcal{C}^{\UC
 \end{corollary}
 
 %===========================================================
-\subsection{Physics Angle: Choice and Baire in Analysis}\label{sec:physics-angle}
+\section{Applications and Landscape}\label{sec:applications}
 %===========================================================
+
+\subsection{Physics-facing map of analysis vs. axioms}
 
 Many fundamental theorems of functional analysis require forms of choice or completeness beyond constructive mathematics:
 
@@ -253,13 +317,48 @@ Spectral Theorem (unbounded) & $\ACw{}$ + completeness \\
 
 The Baire Category Theorem ($\BCT{}$) is particularly crucial for operator theory. In $\mathsf{ZF}$, $\BCT{}$ is \emph{equivalent} to $\DCw{}$ (see \cite{Blair77}). This motivates our third calibration axis:
 
-\begin{theorem}[$\DCw{}$ Calibration]
-The witness family $\mathcal{C}^{\BCT}$ for the Baire Category Theorem has:
+\begin{theorem}[$\DCw{}$ Calibration -- Lean-certified]\label{thm:dcw-calib}
+The witness family $\mathcal{C}^{\BCT}$ for the Baire Category Theorem on $\N^\N$ has:
 \begin{itemize}
+\item Positive frontier: $\Frontierpos(\mathcal{C}^{\BCT}) = \{\{\DCw\}\}$
 \item Height along the $\DCw{}$ axis: $h_{\DCw}(\mathcal{C}^{\BCT}) = 1$
 \item Orthogonal profile: $(0, 0, 1)$ on axes $(\WLPO, \FT, \DCw)$
 \end{itemize}
 \end{theorem}
+
+\begin{proof}[Proof sketch]
+We sketch the classical $\DCw\Rightarrow$Baire argument specialized to Baire space $\N^\N$.
+
+\emph{Setup.} Let $(U_n)_{n\in\N}$ be dense open subsets of $\N^\N$ (with the product topology).
+Basic opens are cylinders $N_s=\{x\in\N^\N : s\sqsubset x\}$ for finite sequences $s\in\N^{<\N}$.
+Openness means $U_n=\bigcup_{s\in S_n} N_s$ for some $S_n\subseteq\N^{<\N}$. Density means:
+for every $t\in\N^{<\N}$ there is $s\sqsupseteq t$ with $N_s\subseteq U_n$.
+
+\emph{A serial relation.} Define a relation $R(n,t,s)$ between a stage $n$ and extensions of a
+finite sequence $t$ by
+\[
+R(n,t,s)\quad:\Longleftrightarrow\quad s\sqsupseteq t\ \text{and}\ N_s\subseteq U_n.
+\]
+By density, for each $(n,t)$ there \emph{exists} such an $s$. Hence the binary relation
+$R_n(t,s):=R(n,t,s)$ is total (serial) on $\N^{<\N}$.
+
+\emph{Apply $\DCw$.} Start from $t_0:=\langle\,\rangle$ (the empty sequence). Using $\DCw$ on
+the sequence of serial relations $(R_0,R_1,R_2,\dots)$, build a chain
+\[
+t_0\sqsubseteq t_1\sqsubseteq t_2\sqsubseteq \cdots
+\quad\text{with}\quad N_{t_{n+1}}\subseteq U_n\ \text{for all }n.
+\]
+Let $x=\bigcup_{n} t_n\in\N^\N$ be the unique infinite sequence extending all $t_n$. For each $n$,
+since $t_{n+1}\sqsubset x$ and $N_{t_{n+1}}\subseteq U_n$, we have $x\in U_n$. Therefore
+$x\in\bigcap_n U_n$, proving Baire's theorem on $\N^\N$.
+
+\emph{Remark on the converse.} The reverse implication (Baire $\Rightarrow$ $\DCw$ in $\mathsf{ZF}$)
+is obtained by viewing sequences $(x_n)_{n\in\N}$ in a complete product space $X^\N$ (with the sum
+metric $\sum 2^{-n}d(x_n,y_n)$) and setting $U_n=\{(x_k): R(x_n,x_{n+1})\}$ for a serial relation
+$R$ on $X$; openness and density follow from seriality, and a point in $\bigcap_n U_n$ gives a DC
+sequence. Full details appear in Blair~\cite{Blair77}. Our calibration only requires the forward
+direction, which is the part formalized in our Lean modules \texttt{DCw\_Frontier.lean} and \texttt{Paper3C\_Main.lean}.
+\end{proof}
 
 This gives us three orthogonal calibrators spanning distinct aspects of classical analysis:
 \begin{itemize}
@@ -268,9 +367,7 @@ This gives us three orthogonal calibrators spanning distinct aspects of classica
 \item \textbf{BCT} (Baire category): Profile $(0, 0, 1)$ — completeness/density interplay
 \end{itemize}
 
-%===========================================================
-\subsection{Broader Axiomatic Landscape}\label{sec:axes-survey}
-%===========================================================
+\subsection{Broader axiomatic landscape}
 
 Our three axes $(\WLPO, \FT, \DCw)$ sit within a richer landscape of choice and induction principles:
 
@@ -380,7 +477,7 @@ Formalized in \texttt{P4\_Meta/} modules:
 
 \subsection{Artifact Availability}
 
-All code is available at: https://github.com/[repository]
+All code is available at: https://github.com/AICardiologist/FoundationRelativity
 
 Build instructions:
 \begin{verbatim}
@@ -399,7 +496,8 @@ lake build Papers.P3_2CatFramework
 \textbf{Categorical Logic}: Our use of groupoids for witness families relates to homotopy type theory \cite{HoTT}, though we work in a more traditional set-theoretic framework.
 
 %===========================================================
-\section{Verification Ledger}\label{sec:verification}
+\appendix
+\section{Verification Ledger}\label{app:verification}
 %===========================================================
 
 We distinguish between results fully formalized in our Lean 4 development and those we cite from the literature:
@@ -431,7 +529,7 @@ Stone duality (general) & \cite{Johnstone82} & Classical theory \\
 
 Our Lean formalization comprises approximately 15,000 lines of code across 50+ files, available at:
 \begin{center}
-https://github.com/YourRepo/AxiomCalibration
+https://github.com/AICardiologist/FoundationRelativity
 \end{center}
 
 %===========================================================
@@ -450,7 +548,7 @@ The Stone Window program demonstrates how the framework generates new mathematic
 
 Future work includes:
 \begin{itemize}
-\item Extending to additional axes (DC$_\omega$, Baire Category)
+\item Extending beyond $(\WLPO,\FT,\DCw)$ to axes such as $\WKLz$, $\ACR/\DCR$, and BI
 \item Resolving the Stone Window Calibration Conjecture
 \item Applications to other areas of constructive mathematics
 \end{itemize}
