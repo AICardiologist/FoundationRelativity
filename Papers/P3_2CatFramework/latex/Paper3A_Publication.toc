@@ -1,0 +1,32 @@
+\contentsline {section}{\numberline {1}Introduction}{2}{}%
+\contentsline {subsection}{\numberline {1.1}Motivating Example: The Bidual Gap}{2}{}%
+\contentsline {subsection}{\numberline {1.2}Contributions}{3}{}%
+\contentsline {section}{\numberline {2}The Axiom Calibration Framework}{3}{}%
+\contentsline {subsection}{\numberline {2.1}The Category of Foundations}{3}{}%
+\contentsline {subsection}{\numberline {2.2}A Gentle Introduction}{4}{}%
+\contentsline {paragraph}{Why uniformizability?}{4}{}%
+\contentsline {paragraph}{Reading the rest of the paper.}{4}{}%
+\contentsline {subsection}{\numberline {2.3}Uniformizability}{4}{}%
+\contentsline {section}{\numberline {3}The Height Calculus}{4}{}%
+\contentsline {subsection}{\numberline {3.1}Positive Uniformization and Height}{4}{}%
+\contentsline {subsection}{\numberline {3.2}Orthogonal Profiles}{5}{}%
+\contentsline {section}{\numberline {4}Calibration Case Studies}{5}{}%
+\contentsline {subsection}{\numberline {4.1}The WLPO Axis: Bidual Gap}{5}{}%
+\contentsline {subsection}{\numberline {4.2}The FT Axis: Uniform Continuity}{5}{}%
+\contentsline {subsection}{\numberline {4.3}Orthogonal Profiles}{6}{}%
+\contentsline {section}{\numberline {5}Applications and Landscape}{6}{}%
+\contentsline {subsection}{\numberline {5.1}Physics-facing map of analysis vs. axioms}{6}{}%
+\contentsline {subsection}{\numberline {5.2}Broader axiomatic landscape}{7}{}%
+\contentsline {section}{\numberline {6}The Stone Window Program}{8}{}%
+\contentsline {subsection}{\numberline {6.1}Classical Isomorphism for Support Ideals}{8}{}%
+\contentsline {subsection}{\numberline {6.2}Constructive Failure}{8}{}%
+\contentsline {subsection}{\numberline {6.3}Calibration Conjecture}{8}{}%
+\contentsline {section}{\numberline {7}Formalization Infrastructure}{9}{}%
+\contentsline {subsection}{\numberline {7.1}Lean 4 Implementation}{9}{}%
+\contentsline {subsection}{\numberline {7.2}Key Formalized Components}{9}{}%
+\contentsline {subsubsection}{\numberline {7.2.1}Boolean Algebra API}{9}{}%
+\contentsline {subsubsection}{\numberline {7.2.2}Height Calculus}{9}{}%
+\contentsline {subsection}{\numberline {7.3}Artifact Availability}{9}{}%
+\contentsline {section}{\numberline {8}Related Work}{9}{}%
+\contentsline {section}{\numberline {A}Verification Ledger}{10}{}%
+\contentsline {section}{\numberline {B}Conclusion}{10}{}%
