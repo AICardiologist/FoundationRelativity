@@ -32,6 +32,7 @@ find . -name "*.lean" -type f -not -path "./.lake/*" -exec grep -Hn "sorry" {} \
     grep -v "docs/" | \
     grep -v "old_files/" | \
     grep -v "Archived/" | \
+    grep -v "Papers/P4_SpectralGeometry/archive/" | \
     grep -v "communication/" | \
     grep -v "documentation/" | \
     grep -v "WIP/" | \
