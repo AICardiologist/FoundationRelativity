@@ -175,6 +175,12 @@ Future extensions to the framework:
 
 A typical instance of axiom calibration is the classical fact that the canonical embedding $J:\linf\to(\linf)^{**}$ is not surjective (the \emph{bidual gap}). Over Bishop--style constructive mathematics (\BISH), this non--surjectivity cannot be proved without additional logical strength. In our companion paper (\emph{Paper~2}), we mechanize in Lean~4 the exact calibration:
 
+\begin{remark}[Terminology harmonization with Papers 3A and 3B]
+We use "height", "uniformizability", and "ladder morphism (collision)" in the same technical sense throughout Papers 3, 3A, and 3B.
+All imported classical lower bounds (e.g.\ G1/G2) are treated as external inputs; schematic upper bounds
+and collision steps are certified inside our Lean~4 framework.
+\end{remark}
+
 \begin{theorem}[Imported from Paper~2]\label{thm:paper2}
 Over \BISH, the following are equivalent:
 \begin{enumerate}
@@ -740,19 +746,23 @@ in Part~V.
 Let \(\mathcal C^{\LPO}\) be the witness for \(\LPO\) in the proof--theoretic semantics.
 \end{definition}
 
-\begin{theorem}[\(\LPO\) has height \(1\) along \(\LArith\) (\emph{classical})]\label{III:thm:LPO-height1-new}
-Along \(\LArith\), \(\mathcal C^{\LPO}\) has height \(1\).
+\begin{theorem}[\(\LPO\) has height \(2\) along \(\LClass\) (\emph{classical})]\label{III:thm:LPO-height1-new}
+Along \(\LClass\) (with \(T_{n+1}=T_n+\EM_{\Sigma^0_n}\) and \(T_0=\HA\)), \(\LPO\) has height \(2\) (requires \(\EM_{\Sigma^0_1}\)).
 \end{theorem}
 
-\begin{proof}[Sketch and provenance]
-Upper bound: \(T_1=T_0+\LPO\vdash\LPO\) by definition. Lower bound: \(\LPO\) is unprovable in \(\HA\);
-this is standard via realizability/sheaf models (see Bridges--Richman \cite{BridgesRichman}, Ishihara \cite{Ishihara06}).
-Thus at \(T_0\) the witness can be empty; positive uniformization fails at height \(0\).
+\begin{proof}[Proof sketch]
+\emph{Upper bound.} \(\EM_{\Sigma^0_1}\) suffices for \(\LPO\) because each instance
+reduces to \(\Sigma^0_1\) excluded middle about a decidable predicate on~\(\N\). 
+Thus \(T_2=T_1+\EM_{\Sigma^0_1}\) proves \(\LPO\). 
+
+\emph{Lower bound.} In \(T_1=T_0+\EM_{\Delta^0_0}\) (bounded classicality) \(\LPO\) 
+is not derivable; standard Kripke/realizability models validate \(T_1\) while refuting \(\LPO\)
+(see Bridges--Richman \cite{BridgesRichman}, Ishihara \cite{Ishihara06}). Hence height \(\ge 2\).
 \end{proof}
 
 \begin{remark}
-Replacing \(\LPO\) by \(\WLPO\) matches the analytic calibration of Part~I (\(\linf\) bidual gap);
-the same argument yields height \(1\) with \(T_1=T_0+\WLPO\).
+\(\WLPO\) also has height \(2\) along \(\LClass\), requiring \(\EM_{\Sigma^0_1}\!\equiv\!\EM_{\Pi^0_1}\) over \(\HA\).
+This matches the analytic calibration of Part~I (\(\linf\) bidual gap) when properly interpreted.
 \end{remark}
 
 %===========================================================
@@ -773,13 +783,15 @@ Let \(\mathcal C^{\Con(S_0)}\) be the witness for \(\Con(S_0)\).
 \end{definition}
 
 \begin{theorem}[G2 as height \(1\) along \(\LCons\) (\emph{classical})]\label{III:thm:G2-height1-new}
-Assume \(S_0\) is consistent. Then \(\mathcal C^{\Con(S_0)}\) has height \(1\) along \(\LCons\).
+Assume \(S_0\) is consistent and satisfies the HBL derivability conditions.
+Then \(\mathcal C^{\Con(S_0)}\) has height \(1\) along \(\LCons\).
 \end{theorem}
 
-\begin{proof}
-Upper bound: \(S_1=S_0+\Con(S_0)\vdash \Con(S_0)\).
-Lower bound: by G\"odel's second incompleteness theorem, \(S_0\nvdash \Con(S_0)\)
-(assuming \(\Con(S_0)\)); hence the witness may be empty at \(S_0\).
+\begin{proof}[Proof sketch]
+\emph{Upper bound.} By definition \(S_1=S_0+\Con(S_0)\), so \(S_1\vdash\Con(S_0)\).
+
+\emph{Lower bound.} G\"odel's second incompleteness theorem (G2) yields \(S_0\nvdash\Con(S_0)\) provided
+\(S_0\) is consistent and meets HBL. Therefore the least stage proving \(\Con(S_0)\) is exactly~\(1\).
 \end{proof}
 
 \subsection{G\"odel--1 (G\"odel sentence) at height \(1\)}
@@ -789,23 +801,28 @@ Let \(G_{S_0}\) be the G\"odel sentence for \(S_0\); let \(\mathcal C^{G_{S_0}}\
 \end{definition}
 
 \begin{lemma}[\(S_0\vdash \Con(S_0)\to G_{S_0}\) (\emph{classical})]\label{III:lem:Con-implies-G-new}
-Under Assumption~\ref{III:ass:HBL-new}, \(S_0\vdash \Con(S_0)\to G_{S_0}\).
+Assume \(S_0\) satisfies the HBL derivability conditions. Then
+\(S_0 \vdash \Con(S_0) \to G_{S_0}.\)
 \end{lemma}
 
-\begin{proof}[Sketch]
-By the diagonal lemma, \(S_0\vdash G_{S_0}\leftrightarrow \neg\Prov_{S_0}(\ulcorner G_{S_0}\urcorner)\).
-Using HBL, \(S_0\) proves \(\Con(S_0)\to \neg\Prov_{S_0}(\ulcorner G_{S_0}\urcorner)\), hence \(\Con(S_0)\to G_{S_0}\).
+\begin{proof}[Proof sketch]
+Let \(G_{S_0}\) be the fixed point \(G_{S_0} \leftrightarrow \neg \Prov_{S_0}(\ulcorner G_{S_0}\urcorner)\).
+In \(S_0\) we show: \(\Con(S_0)\to \neg \Prov_{S_0}(\ulcorner G_{S_0}\urcorner)\) (otherwise \(S_0\) proves \(G_{S_0}\),
+whence by HBL and the fixed point \(S_0\) proves \(\bot\)). From \(\neg \Prov_{S_0}(\ulcorner G_{S_0}\urcorner)\)
+and the fixed point we get \(G_{S_0}\). Thus \(S_0\vdash \Con(S_0)\to G_{S_0}\).
 (See \cite[§I.2]{HajekPudlak}.)
 \end{proof}
 
 \begin{theorem}[G1 (specific sentence) as height \(1\) along \(\LCons\) (\emph{classical})]\label{III:thm:G1-height1-new}
-Assume \(S_0\) is consistent and satisfies Assumption~\ref{III:ass:HBL-new}.
-Then \(\mathcal C^{G_{S_0}}\) has height \(1\) along \(\LCons\).
+Assume \(S_0\) is consistent and satisfies HBL. Then the G\"odel sentence \(G_{S_0}\)
+has height \(1\) along \(\LCons\).
 \end{theorem}
 
-\begin{proof}
-Upper bound: \(S_1=S_0+\Con(S_0)\vdash G_{S_0}\) by Lemma~\ref{III:lem:Con-implies-G-new}.
-Lower bound: by G\"odel--1, \(S_0\nvdash G_{S_0}\).
+\begin{proof}[Proof sketch]
+\emph{Upper bound.} Classically \(S_0\vdash \Con(S_0)\to G_{S_0}\) (Lemma~\ref{III:lem:Con-implies-G-new}). Hence \(S_1=S_0+\Con(S_0)\vdash G_{S_0}\).
+
+\emph{Lower bound.} G\"odel's first incompleteness theorem (G1) gives \(S_0\nvdash G_{S_0}\) if \(S_0\) is consistent.
+Thus the minimal stage at which \(G_{S_0}\) holds is exactly \(1\).
 \end{proof}
 
 \subsection{The G1 theorem (schema) at height \(0\) along \texorpdfstring{\LArith}{LArith}}
@@ -1004,16 +1021,14 @@ S_{n+1}\ :=\ S_n\,+\,\Con(S_n),\qquad n\in\mathbb N.
 Let $\mathcal C^{\Con(S_{k})}$ be the witness for $\Con(S_k)$ in the proof--theoretic semantics of Part~III.
 
 \begin{theorem}[Height $n$ for $\Con(S_{n-1})$ along \LCons\ (\emph{classical})]\label{IV:thm:finite-Con}
-Assume each $S_k$ is recursively axiomatized and consistent. Then along \LCons,
-\[
-h(\mathcal C^{\Con(S_{n-1})})\ =\ n.
-\]
+For each finite $n\ge 1$, along $\LCons$ we have $h\!\left(\mathcal C^{\Con(S_{n-1})}\right)=n$.
 \end{theorem}
 
-\begin{proof}[Sketch and provenance]
-Upper bound is definitional: $S_n=S_{n-1}+\Con(S_{n-1})\vdash \Con(S_{n-1})$.
-Lower bound: by G\"odel's second incompleteness theorem (G2), $S_{n-1}\nvdash\Con(S_{n-1})$
-(assuming $\Con(S_{n-1})$). See standard references \cite{HajekPudlak}.
+\begin{proof}[Proof sketch by induction on $n$]
+Base $n=1$ is proven in Part III. For the step, assume
+$h(\mathcal C^{\Con(S_{k-1})})=k$. Then $S_k\nvdash \Con(S_k)$ by G2 (applied to $S_k$),
+but $S_{k+1}=S_k+\Con(S_k)\vdash\Con(S_k)$. Hence $h(\mathcal C^{\Con(S_k)})=k+1$.
+See standard references \cite{HajekPudlak}.
 \end{proof}
 
 \subsection{Logical axes: arithmetical EM and products of calibrators}
@@ -1047,15 +1062,19 @@ Let $S_{n+1}=S_n+\Con(S_n)$ and $S_\omega=\bigcup_{n<\omega} S_n$. Consider
 \]
 
 \begin{theorem}[Uniform consistency appears at $\omega{+}1$]\label{IV:thm:omega-plus-one}
-For each finite $k$, $S_k\nvdash \psi$. Moreover, $S_{\omega+1}:=S_\omega+\Con(S_\omega)\vdash \psi$.
+Let $\psi \equiv \forall n\,\Con(S_n)$. Then $\mathcal C^\psi$ has height $\omega+1$ along $\LCons$.
 \end{theorem}
 
-\begin{proof}[Sketch and provenance]
-Lower bound: $\psi\Rightarrow \Con(S_{k+1})$, which $S_k$ cannot prove by G2.
-Upper bound: in $S_{\omega+1}$, from $\Con(S_\omega)$ and monotonicity
-$U\subseteq V\ \wedge\ \Con(V)\Rightarrow \Con(U)$, together with $S_n\subseteq S_\omega$,
-we derive each $\Con(S_n)$, hence $\forall n\,\Con(S_n)$. This behavior is standard in consistency progressions
-(see \cite{Feferman1962,HajekPudlak}).
+\begin{proof}[Proof sketch]
+\emph{Upper bound ($\le \omega{+}1$).} In $S_{\omega+1}=S_\omega+\Con(S_\omega)$ we can show that
+each $S_n$ is a subtheory of $S_\omega$; since $S_{\omega+1}$ proves $\Con(S_\omega)$, it proves
+$\Con(S_n)$ for all $n$, hence $\psi$.
+
+\emph{Lower bound ($\not\le \omega$).} Each $S_n$ is included in $S_\omega$, so $S_\omega$ proves
+every \emph{instance} $\Con(S_n)$, but if $S_\omega$ proved the \emph{universal} $\psi$ then a standard
+formalized argument would yield $\Con(S_\omega)$ in $S_\omega$, contradicting G2 for $S_\omega$.
+Therefore $S_\omega\nvdash\psi$. Combining, the least stage is $\omega+1$.
+This behavior is standard in consistency progressions (see \cite{Feferman1962,HajekPudlak}).
 \end{proof}
 
 \subsection{Reflection progression: instancewise reflection at \texorpdfstring{$\omega$}{ω} (\emph{classical})}
@@ -1315,18 +1334,25 @@ The HBL derivability conditions for \(\Prov_T\) hold in \(B\).
 In the base \(B\) one proves \(\ B\vdash \RFNSigOne(T)\ \Rightarrow\ \Con(T)\).
 \end{theorem}
 
-\begin{proof}[Idea (formalizable in \(B\))]
-If \(T\) were inconsistent then \(T\vdash 0=1\), hence \(T\vdash \exists p\,\mathrm{Prf}_T(p,\ulcorner 0=1\urcorner)\).
-The \(\Sigma^0_1\)-sentence \(\exists p(\mathrm{Prf}_T(p,\ulcorner 0=1\urcorner)\wedge 0=1)\) would then be provable in \(T\) but false in \(\mathbb N\), contradicting \(\RFNSigOne(T)\). See \cite[§I]{HajekPudlak}.
+\begin{proof}[Proof sketch]
+Work in a base \(B\) (e.g.\ \(\EA\) or \(\ISigma\)) able to arithmetize proofs and verify HBL for \(T\).
+Let \(\sigma_0\) be a fixed \emph{false} \(\Sigma^0_1\) sentence, say \(\exists p\,(p=1\wedge p\neq 1)\).
+If \(T\) were inconsistent, then \(T\vdash \bot\) and hence (by ex falso) \(T\vdash \sigma_0\).
+By \(\RFNSigOne(T)\), from \(T\vdash \sigma_0\) we infer \(\sigma_0\) is \emph{true}, contradicting the
+base arithmetic in \(B\). Therefore \(T\) is consistent. Formally: \(B\vdash \RFNSigOne(T)\to\Con(T)\).
+See \cite[§I]{HajekPudlak}.
 \end{proof}
 
 \begin{theorem}[Consistency $\Rightarrow$ G\"odel]\label{V:thm:Con-implies-G}
-Assume~\ref{V:ass:HBL}. Then \(B\vdash \Con(T)\ \Rightarrow\ G_T\), and in particular \(T+\Con(T)\vdash G_T\).
+Assume \(T\) satisfies the HBL derivability conditions. Then
+\(B \vdash \Con(T) \Rightarrow G_T\), and in particular \(T+\Con(T)\vdash G_T\).
 \end{theorem}
 
-\begin{proof}[Idea]
-By the diagonal lemma, \(B\vdash G_T\leftrightarrow \neg\Prov_T(\ulcorner G_T\urcorner)\).
-Using HBL, \(B\) proves \(\Con(T)\to \neg\Prov_T(\ulcorner G_T\urcorner)\), hence \(\Con(T)\to G_T\); cf.\ \cite{HajekPudlak}.
+\begin{proof}[Proof sketch]
+Let \(G_T\) be the fixed point \(G_T \leftrightarrow \neg \Prov_T(\ulcorner G_T\urcorner)\).
+In \(B\) we show: \(\Con(T)\to \neg \Prov_T(\ulcorner G_T\urcorner)\) (otherwise \(T\) proves \(G_T\),
+whence by HBL and the fixed point \(T\) proves \(\bot\)). From \(\neg \Prov_T(\ulcorner G_T\urcorner)\)
+and the fixed point we get \(G_T\). Thus \(B\vdash \Con(T)\to G_T\); cf.\ \cite{HajekPudlak}.
 \end{proof}
 
 These are the basic engines of \emph{collision}: logical reflection forces consistency; consistency forces a logical theorem.
