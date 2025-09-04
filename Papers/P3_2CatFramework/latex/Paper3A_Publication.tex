@@ -86,6 +86,17 @@ Over $\BISH$, the following are equivalent:
 \end{enumerate}
 \end{theorem}
 
+\begin{proof}[Proof sketch (proven in \cite{Paper2})]
+($\Rightarrow$) If $J:\linf\to(\linf)^{**}$ is not surjective, one exhibits a norm-1 functional
+$F:(\linf)^{*}\to\R$ not given by evaluation at an element of $\linf$. Coding an arbitrary binary
+sequence $\alpha:\N\to\{0,1\}$ into a compatible family of functionals, one shows that from such an
+$F$ one can decide whether $\exists n\,(\alpha(n)=1)$, giving WLPO.
+
+($\Leftarrow$) Under WLPO, the standard Hahn--Banach machinery (constructively valid with WLPO for
+the choices involved) produces a non-evaluation functional on $(\linf)^{*}$, yielding an element of
+$(\linf)^{**}\setminus J(\linf)$. Full details and the precise coding appear in~\cite{Paper2}.
+\end{proof}
+
 This precise calibration motivates our general framework: How can we systematically determine such equivalences? How do different logical principles interact when combined?
 
 \subsection{Contributions}
@@ -240,9 +251,31 @@ The witness family $\mathcal{C}^{\UCT}$ for uniform continuity of continuous fun
 \end{itemize}
 \end{theorem}
 
-\begin{proof}[Provenance]
-Upper bound $\FT\Rightarrow\UCT$ and separations are standard; see Bridges--Richman~\cite{bridges2007}.
-We import this equivalence as background, aligning the Lean infrastructure to consume it.
+\begin{proof}[Proof sketch]
+\emph{(FT $\Rightarrow$ UCT)} Work on the full binary tree of dyadic subintervals of $[0,1]$.
+Fix $\varepsilon>0$. For each node $s$ (dyadic interval $I_s$), write
+$\operatorname{osc}(f;I_s)=\sup\{|f(x)-f(y)|:x,y\in I_s\}$.
+Continuity of $f$ at each $x$ implies there is some depth $N(x)$ such that along the branch of
+dyadic intervals containing $x$, the oscillation drops below $\varepsilon$ from depth $N(x)$ onward.
+Thus the set
+\[
+B_\varepsilon=\{\,s:\operatorname{osc}(f;I_s)\le\varepsilon\,\}
+\]
+is a bar (every infinite branch meets it). Using standard Bishop-style approximations, one replaces
+$\operatorname{osc}$ by a decidable surrogate bar (via rational nets) without changing the bar
+property. By the Fan Theorem, $B_\varepsilon$ has a uniform depth $N_\varepsilon$ such that every
+interval at depth $N_\varepsilon$ lies in $B_\varepsilon$. If $|x-y|<2^{-N_\varepsilon}$, then $x$
+and $y$ lie in a common dyadic interval at that depth, so $|f(x)-f(y)|\le\varepsilon$. Hence $f$ is
+uniformly continuous.
+
+\smallskip
+\emph{(UCT $\Rightarrow$ FT; imported outline)} Given a decidable bar $B\subseteq 2^{<\N}$, define a
+continuous $g:2^\N\to\R$ that maps a path $x$ to a positive number measuring how far the branch
+avoids $B$ (e.g.\ $g(x)=2^{-\min\{\,|s|:s\sqsubset x,\ s\in B\}}$ with the convention $2^{-\infty}=0$).
+Uniform continuity of $g$ yields a global depth $N$ such that agreement on the first $N$ bits forces
+$|g(x)-g(y)|<2^{-N-1}$; this implies every path meets $B$ at depth $\le N$, i.e.\ $B$ has a finite
+subbar. This is the standard Brouwer--Heyting--Kolmogorov route; full details are classical (see
+\cite{bridges2007}). We therefore record the calibration as imported in this direction.
 \end{proof}
 
 \subsection{Orthogonal Profiles}
@@ -293,11 +326,38 @@ The witness family $\mathcal{C}^{\BCT}$ for the Baire Category Theorem on $\N^\N
 \end{itemize}
 \end{theorem}
 
-\begin{proof}[Lean provenance]
-Certified in \texttt{Papers/P3\_2CatFramework/P4\_Meta/DCw\_Frontier.lean} and aggregated by
-\texttt{Paper3C\_Main.lean}. The classical equivalence $\BCT\leftrightarrow\DCw$ over $\mathsf{ZF}$
-is due to Blair~\cite{Blair77}; our Lean artifact uses $\DCw$ to construct a point in the
-intersection of a countable family of dense open sets.
+\begin{proof}[Proof sketch]
+We sketch the classical $\DCw\Rightarrow$Baire argument specialized to Baire space $\N^\N$.
+
+\emph{Setup.} Let $(U_n)_{n\in\N}$ be dense open subsets of $\N^\N$ (with the product topology).
+Basic opens are cylinders $N_s=\{x\in\N^\N : s\sqsubset x\}$ for finite sequences $s\in\N^{<\N}$.
+Openness means $U_n=\bigcup_{s\in S_n} N_s$ for some $S_n\subseteq\N^{<\N}$. Density means:
+for every $t\in\N^{<\N}$ there is $s\sqsupseteq t$ with $N_s\subseteq U_n$.
+
+\emph{A serial relation.} Define a relation $R(n,t,s)$ between a stage $n$ and extensions of a
+finite sequence $t$ by
+\[
+R(n,t,s)\quad:\Longleftrightarrow\quad s\sqsupseteq t\ \text{and}\ N_s\subseteq U_n.
+\]
+By density, for each $(n,t)$ there \emph{exists} such an $s$. Hence the binary relation
+$R_n(t,s):=R(n,t,s)$ is total (serial) on $\N^{<\N}$.
+
+\emph{Apply $\DCw$.} Start from $t_0:=\langle\,\rangle$ (the empty sequence). Using $\DCw$ on
+the sequence of serial relations $(R_0,R_1,R_2,\dots)$, build a chain
+\[
+t_0\sqsubseteq t_1\sqsubseteq t_2\sqsubseteq \cdots
+\quad\text{with}\quad N_{t_{n+1}}\subseteq U_n\ \text{for all }n.
+\]
+Let $x=\bigcup_{n} t_n\in\N^\N$ be the unique infinite sequence extending all $t_n$. For each $n$,
+since $t_{n+1}\sqsubset x$ and $N_{t_{n+1}}\subseteq U_n$, we have $x\in U_n$. Therefore
+$x\in\bigcap_n U_n$, proving Baire's theorem on $\N^\N$.
+
+\emph{Remark on the converse.} The reverse implication (Baire $\Rightarrow$ $\DCw$ in $\mathsf{ZF}$)
+is obtained by viewing sequences $(x_n)_{n\in\N}$ in a complete product space $X^\N$ (with the sum
+metric $\sum 2^{-n}d(x_n,y_n)$) and setting $U_n=\{(x_k): R(x_n,x_{n+1})\}$ for a serial relation
+$R$ on $X$; openness and density follow from seriality, and a point in $\bigcap_n U_n$ gives a DC
+sequence. Full details appear in Blair~\cite{Blair77}. Our calibration only requires the forward
+direction, which is the part formalized in our Lean modules \texttt{DCw\_Frontier.lean} and \texttt{Paper3C\_Main.lean}.
 \end{proof}
 
 This gives us three orthogonal calibrators spanning distinct aspects of classical analysis:
