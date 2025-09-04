@@ -12,6 +12,9 @@ import Papers.P4_SpectralGeometry.Spectral.Profiles
 import Papers.P4_SpectralGeometry.Spectral.Certificates
 import Papers.P4_SpectralGeometry.Spectral.RouteFlags
 import Papers.P4_SpectralGeometry.Spectral.ProfileUpper
+import Papers.P4_SpectralGeometry.Spectral.ProfileInference
+import Papers.P4_SpectralGeometry.Spectral.CompositionExamples
+import Papers.P4_SpectralGeometry.Spectral.AxCalShowcase
 
 namespace Papers.P4_SpectralGeometry
 
@@ -43,6 +46,24 @@ def pMax : Profile := Profile.max pDC pWL
 -- has max-profile as promised by the product law:
 def composed_ok : True := True.intro
 -- (We don't need to *use* `S2_S3_ProfileUpper` here; building it typechecks the law.)
+
+-- Advanced framework demonstrations:
+-- Test profile inference
+def inferred_profile_demo : Profile := S0_S2_inferred
+
+-- Test composition examples  
+def binary_comp_demo : Profile := S0_S2_profile
+def triple_comp_demo : Profile := S0_S2_S3_profile
+def full_comp_demo : Profile := all_spectral_profile
+
+-- Test AxCal showcase capabilities
+def complexity_demo : Nat := S2_S3_profile.complexity
+def description_demo : String := S2_S3_profile.describe
+
+-- Verify key composition laws work
+example : S0_S2_profile = Profile.DCω_only := S0_S2_requires_DCω
+example : S0_S3_profile = Profile.WLPO_only := S0_S3_requires_WLPO
+example : S0_S4_profile = Profile.all_zero := S0_S4_is_height0
 
 /-- The smoke target returns `True` to anchor a definition. -/
 def ok : True := True.intro
