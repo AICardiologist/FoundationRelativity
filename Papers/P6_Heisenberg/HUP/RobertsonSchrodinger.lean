@@ -1,21 +1,41 @@
 /-
-Paper 6: Heisenberg Uncertainty Principle AxCal Analysis
-Robertson-Schrödinger Inequality (Height 0)
-
-Demonstrates that preparation uncertainty is fully constructive.
+Paper 6: Robertson-Schrödinger inequality shell
+Predicate structure for Height 0 constructive proof
+Based on technical guidance for mathlib-free implementation
 -/
 
-import Papers.P6_Heisenberg.HUP.Basic
+import Papers.P6_Heisenberg.HUP.HilbertSig
+import Papers.P6_Heisenberg.HUP.AxCalCore
 
--- Main theorem: Robertson-Schrödinger inequality (axiomatized for now)
-axiom robertson_schrodinger : ∀ (A B : Operator) (ψ : H), 
-  IsUnit ψ → IsSelfAdjoint A → IsSelfAdjoint B →
-  σ_A(ψ) * σ_B(ψ) ≥ (1/2) * (⟨ψ, [A, B] ψ⟩).norm
+namespace Papers.P6_Heisenberg.HUP
 
--- Height 0 certificate: this is fully constructive
-def HUP_RS_ProfileUpper : ProfileUpper all_zero HUP_RS_W :=
-  fun F _ => robertson_schrodinger
+/-- RS inequality predicate shell over a signature.
+    This is where we will later spell out σ_A σ_B ≥ (1/2)|⟨[A,B]⟩| using only S/O fields. -/
+def RS_Ineq (S : HilbertSig) : Prop :=
+  ∀ (A B : OperatorSig S) (ψ : S.ψ),
+    -- Self-adjoint constraint (placeholder structure)
+    (True) → (True) → -- Will be: A.selfAdj → B.selfAdj →
+    -- Normalized state constraint
+    (S.norm ψ = real_one) →
+    -- RS inequality: σ_A σ_B ≥ (1/2)|⟨[A,B]⟩|
+    -- Placeholder for actual inequality using variance product and commutator expectation
+    True -- Will be replaced with concrete inequality over S operations
 
--- Specific instance: position-momentum uncertainty (placeholder)
-axiom position_momentum_uncertainty : ∀ (ψ : H), 
-  IsUnit ψ → σ_position(ψ) * σ_momentum(ψ) ≥ 1/2
+/-- Witness family: RS holds (Height 0 target). -/
+def HUP_RS_W (S : HilbertSig) : WitnessFamily Unit := {
+  property := fun _ => RS_Ineq S,
+  witness_exists := ⟨(), by 
+    -- Placeholder: RS_Ineq S should be provable constructively
+    -- Will be replaced with actual proof
+    sorry⟩
+}
+
+/-- Height 0 certificate for RS (constructive proof target) -/  
+def HUP_RS_ProfileUpper (S : HilbertSig) : 
+  ProfileUpper height_zero_profile := {
+  wlpo_cert := fun _ => True.intro,
+  ft_cert := fun _ => True.intro,
+  dc_cert := True.intro
+}
+
+end Papers.P6_Heisenberg.HUP

@@ -42,8 +42,8 @@ jobs:
           lean --version
           lake --version
 
-      - name: Build Paper 6 Heisenberg target (mathlib-free)
-        run: lake build Papers.P6_Heisenberg.Smoke
+      - name: Build Paper 6 Heisenberg library target (mathlib-free)
+        run: lake build Papers.P6_Heisenberg.Main
 
       - name: No-sorry guard (Paper 6) 
         run: ./scripts/no_sorry_p6.sh
