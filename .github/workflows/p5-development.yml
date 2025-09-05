@@ -54,12 +54,12 @@ jobs:
 
       - name: Test Paper 5 imports
         run: |
-          echo "Testing Paper 5 can import frozen paper infrastructure..."
-          # Test that P5 can access the frozen AxCal framework
+          echo "Testing Paper 5 import..."
+          # Test that P5 aggregator compiles
           echo 'import Papers.P5_GeneralRelativity' | lake env lean --stdin
-          echo 'import Papers.P3_2CatFramework.Paper3A_Main' | lake env lean --stdin
-          echo 'import Papers.P4_SpectralGeometry.Smoke' | lake env lean --stdin
-          echo "✅ All infrastructure imports verified"
+          echo "✅ Paper 5 import verified"
+          echo ""
+          echo "Note: Infrastructure imports (P3A/P4) tested in other workflows"
 
       - name: Verify frozen papers remain unchanged
         run: |
