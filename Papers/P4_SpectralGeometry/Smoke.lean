@@ -15,6 +15,7 @@ import Papers.P4_SpectralGeometry.Spectral.ProfileUpper
 import Papers.P4_SpectralGeometry.Spectral.ProfileInference
 import Papers.P4_SpectralGeometry.Spectral.CompositionExamples
 import Papers.P4_SpectralGeometry.Spectral.AxCalShowcase
+import Papers.P4_SpectralGeometry.Spectral.ProfilesMP
 
 namespace Papers.P4_SpectralGeometry
 
@@ -64,6 +65,19 @@ def description_demo : String := S2_S3_profile.describe
 example : S0_S2_profile = Profile.DCω_only := S0_S2_requires_DCω
 example : S0_S3_profile = Profile.WLPO_only := S0_S3_requires_WLPO
 example : S0_S4_profile = Profile.all_zero := S0_S4_is_height0
+
+-- Test foldPackages functionality
+def folded_demo : WitnessPackage := S0_S2_S3_folded
+def folded_ok : True := True.intro
+
+-- Test MP composition system
+def s1s2_demo_cert := S1_S2_ProfileUpperX
+
+-- RequiresX reduces to the expected shapes:
+example (F : Spectral.Foundation) :
+    RequiresX F ⟨Profile.all_zero, false⟩ ↔ True := by simp
+example (F : Spectral.Foundation) :
+    RequiresX F ⟨Profile.all_zero, true⟩ ↔ HasMP F := by simp
 
 /-- The smoke target returns `True` to anchor a definition. -/
 def ok : True := True.intro

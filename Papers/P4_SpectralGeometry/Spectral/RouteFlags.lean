@@ -18,16 +18,11 @@ but provides a place to hang "portal" implications.
 namespace Papers.P4_SpectralGeometry.Spectral
 
 /-- Flag: a route that applies separation in a non-separable context. -/
-def UsesSeparationNonSep (F : Foundation) : Prop := True
+def UsesSeparationNonSep : Foundation → Prop := fun _ => True
 
 /-- Portal lemma shape: using that route demands WLPO to discharge the witness. -/
 def PortalRequiresWLPO :
   UpperBound (fun F => HasWLPO F ∧ UsesSeparationNonSep F) SeparationRoute_W :=
-by
-  refine ⟨?_⟩
-  intro F h
-  -- SeparationRoute_W is `fromToken HasWLPO`, so its witness at F is `HasWLPO F`.
-  -- From h : HasWLPO F ∧ UsesSeparationNonSep F, take left component.
-  exact h.left
+⟨fun _ h => h.left⟩
 
 end Papers.P4_SpectralGeometry.Spectral

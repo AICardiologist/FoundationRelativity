@@ -84,4 +84,31 @@ example : S2_profile.describe = "Requires: DCω" := rfl
 example : S3_profile.describe = "Requires: WLPO" := rfl
 example : S2_S3_profile.describe = "Requires: DCω, WLPO" := rfl
 
+/-! ### Automatic Certificate Composition -/
+
+/-- Fold a list of witness packages into a single composed package with certificate. -/
+def foldPackages : List WitnessPackage → WitnessPackage
+| [] =>
+  -- Neutral: height-0 witness with all_zero profile
+  { witness     := WitnessFamily.height0
+  , profile     := Profile.all_zero
+  , certificate := ⟨fun _ _ => True.intro⟩ }
+| (w :: ws) =>
+  let acc := foldPackages ws
+  { witness     := WitnessFamily.and acc.witness w.witness
+  , profile     := Profile.max acc.profile w.profile
+  , certificate := acc.certificate.and w.certificate }
+
+/-- Example: Fold S0, S2, S3 packages automatically. -/
+def S0_S2_S3_folded : WitnessPackage := 
+  foldPackages [S0_package, S2_package, S3_package]
+
+/-- The folded profile equals the expected composition via associativity/commutativity. -/
+example :
+  (foldPackages [S0_package, S2_package, S3_package]).profile
+    = Profile.max S0_profile (Profile.max S2_profile S3_profile) := by
+  simp [foldPackages, S0_package, S2_package, S3_package]
+  simp [S0_profile, S2_profile, S3_profile]
+  simp [Profile.max_comm]
+
 end Papers.P4_SpectralGeometry.Spectral

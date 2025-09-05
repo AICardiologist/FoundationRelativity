@@ -49,6 +49,7 @@ def max : Height → Height → Height
 
 @[simp] theorem max_h0 (h : Height) : max h0 h = h := by cases h <;> rfl
 @[simp] theorem h0_max (h : Height) : max h h0 = h := by cases h <;> rfl
+@[simp] theorem max_self (h : Height) : max h h = h := by cases h <;> rfl
 
 theorem max_comm (a b : Height) : max a b = max b a := by
   cases a <;> cases b <;> rfl
@@ -86,6 +87,13 @@ def WLPO_only : Profile := ⟨Height.h1, Height.h0, Height.h0⟩
 def FT_only   : Profile := ⟨Height.h0, Height.h1, Height.h0⟩
 def DCω_only  : Profile := ⟨Height.h0, Height.h0, Height.h1⟩
 def all_zero  : Profile := ⟨Height.h0, Height.h0, Height.h0⟩
+
+@[simp] theorem max_all_zero_left  (p : Profile) : max all_zero p = p := by
+  cases p with
+  | mk hW hF hD => simp [max, all_zero, Height.max_h0]
+@[simp] theorem max_all_zero_right (p : Profile) : max p all_zero = p := by
+  cases p with
+  | mk hW hF hD => simp [max, all_zero, Height.h0_max]
 
 end Profile
 

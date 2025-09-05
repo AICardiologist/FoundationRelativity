@@ -61,6 +61,14 @@ theorem requires_max {F : Foundation} (p q : Profile) (P : TokenPack F) :
   cases p; cases q; cases P
   simp [Requires, Profile.max, need_max, and_assoc, and_left_comm]
 
+@[simp] theorem requires_all_zero_iff {F : Foundation} (P : TokenPack F) :
+  Requires Profile.all_zero P ↔ True := by
+  cases P; simp [Requires, Profile.all_zero, need]
+
+@[simp] theorem requires_all_zero_default_iff (F : Foundation) :
+  Requires Profile.all_zero (defaultPack F) ↔ True := by
+  simp
+
 /-- A profile-based upper bound certificate. -/
 structure ProfileUpper (p : Profile) (W : WitnessFamily) : Prop where
   prove : ∀ F, Requires p (defaultPack F) → W.Witness F
@@ -125,5 +133,17 @@ S1 (Specₐpprox = Spec) is calibrated by a separate axis (MP). We keep its
 coordinates here as height-0 (`all_zero`) to emphasize orthogonality.
 -/
 def S1_profile : Profile := Profile.all_zero
+
+/-! ### FT axis demonstration (completeness) -/
+
+/-- Demo witness for FT axis. -/
+def FTPortal_W : WitnessFamily := WitnessFamily.fromToken (fun F => HasFT F)
+
+@[simp] theorem requires_FT_only {F} :
+  Requires Profile.FT_only (defaultPack F) ↔ HasFT F := by 
+  simp [Profile.FT_only, Requires, need, defaultPack]
+
+def S5_ProfileUpper : ProfileUpper Profile.FT_only FTPortal_W :=
+  ⟨fun F h => (requires_FT_only (F := F)).mp h⟩
 
 end Papers.P4_SpectralGeometry.Spectral
