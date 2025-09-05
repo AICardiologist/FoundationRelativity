@@ -8,6 +8,12 @@ Based on technical guidance for mathlib-free implementation
 -- Note: This creates a dependency on Paper 4, but that's intentional
 -- to reuse the established AxCal infrastructure
 
+-- Foundation type for AxCal framework compatibility  
+axiom Foundation : Type
+
+-- DCω capability token
+class HasDCω (F : Foundation) : Prop
+
 -- Core AxCal types (reproduced from Paper 4 pattern)
 inductive AxCalHeight where
   | zero : AxCalHeight      -- Height 0 (fully constructive)

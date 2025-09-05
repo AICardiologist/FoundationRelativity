@@ -16,15 +16,15 @@ import Papers.P6_Heisenberg.HUP.Witnesses
 open Papers.P6_Heisenberg.HUP
 
 -- Main theorem: Paper 6 claims summary (axiomatized for now)
-axiom paper6_main_claims : 
+axiom paper6_main_claims :
   -- HUP-RS is at Height 0 (fully constructive)
-  (∃ H : HilbertSig, ∃ w : WitnessFamily Unit, True) ∧
+  (∃ H : HilbertSig, ∃ O : OperatorSig H, ∃ w : WitnessFamily Unit, True) ∧
   -- HUP-M is ≤ DCω (requires dependent choice)  
   (∃ H : HilbertSig, ∃ O : OperatorSig H, ∃ w : WitnessFamily Unit, True)
 
 -- Export key definitions for external use
 export HilbertSig (ψ add scalar_mul zero inner norm)
-export OperatorSig (A expect variance)
+export OperatorSig (Operator apply selfAdj expect variance)
 export AxCalHeight (zero finite omega)
 export AxCalProfile (wlpo_height ft_height dc_height)
 

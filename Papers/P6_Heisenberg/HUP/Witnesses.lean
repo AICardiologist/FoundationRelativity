@@ -7,12 +7,11 @@ Based on technical guidance for mathlib-free implementation
 import Papers.P6_Heisenberg.HUP.HilbertSig
 import Papers.P6_Heisenberg.HUP.AxCalCore
 import Papers.P6_Heisenberg.HUP.DComega
+import Papers.P6_Heisenberg.Axioms.Ledger  -- use HUPM_stream_axiom
 
 namespace Papers.P6_Heisenberg.HUP
 
--- A schematic "history" type. This can be refined later.
-structure History (S : HilbertSig) (O : OperatorSig S) where
-  len : Nat
+-- History type is defined in Axioms.Ledger
 
 /-- A trivial serial relation over histories (extend length by 1). -/
 def measSerial (S : HilbertSig) (O : OperatorSig S) : SerialRel (History S O) where
@@ -23,11 +22,9 @@ def measSerial (S : HilbertSig) (O : OperatorSig S) : SerialRel (History S O) wh
 
 /-- Measurement witness family: DCω lets us produce an infinite sequence of histories. -/
 def HUP_M_W (S : HilbertSig) (O : OperatorSig S) : WitnessFamily Unit := {
-  property := fun _ => ∀ (F : Foundation) [HasDCω F], ∃ f : Nat → History S O, True,
-  witness_exists := ⟨(), by 
-    -- Placeholder: will use dcω_stream to construct infinite sequence
-    -- TypeClass inference for HasDCω is tricky, so using sorry for now
-    sorry⟩
+  property := fun _ => ∀ (F : Foundation), [HasDCω F] → ∃ f : Nat → History S O, True,
+  witness_exists := ⟨(), by
+    intro F _inst; exact HUPM_stream_axiom S O F⟩
 }
 
 /-- DCω upper bound certificate (now uses the dcω_stream axiom). -/

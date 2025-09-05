@@ -2,19 +2,15 @@
 Paper 6 — Dependent Choice (DCω) eliminator for serial relations.
 Prop-only: no instances or executable defs.
 -/
+import Papers.P6_Heisenberg.HUP.AxCalCore
 
 namespace Papers.P6_Heisenberg.HUP
+open Papers.P6_Heisenberg.HUP  -- brings Foundation, HasDCω into scope from AxCalCore
 
 /-- A serial relation: every node has a successor. -/
 structure SerialRel (α : Type) : Type where
   R      : α → α → Prop
   serial : ∀ a, ∃ b, R a b
-
-/-- Foundation type for AxCal framework compatibility -/  
-axiom Foundation : Type
-
-/-- DCω capability token -/
-class HasDCω (F : Foundation) : Prop
 
 /-- DCω builds an infinite sequence along any serial relation, from any seed. -/
 axiom dcω_stream {F : Foundation} [HasDCω F]

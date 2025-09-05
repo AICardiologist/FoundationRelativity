@@ -22,14 +22,20 @@ structure HilbertSig where
   
 -- Observable signature  
 structure OperatorSig (H : HilbertSig) where
-  -- Self-adjoint operator
-  A : H.ψ → H.ψ
+  -- Operator type
+  Operator : Type
+  
+  -- Operator action on states
+  apply : Operator → H.ψ → H.ψ
+  
+  -- Self-adjoint predicate
+  selfAdj : Operator → Prop
   
   -- Expectation value
-  expect : H.ψ → ℝ
+  expect : Operator → H.ψ → ℝ
   
-  -- Variance
-  variance : H.ψ → ℝ
+  -- Variance  
+  variance : Operator → H.ψ → ℝ
 
 -- Key Hilbert space properties (Prop-only)
 axiom inner_linear_left (H : HilbertSig) : ∀ (ψ φ χ : H.ψ) (c : ℂ),
@@ -46,16 +52,16 @@ axiom norm_from_inner (H : HilbertSig) : ∀ (ψ : H.ψ),
   real_mul (H.norm ψ) (H.norm ψ) = complex_norm_sq (H.inner ψ ψ)
 
 -- Observable properties (Prop-only)
-axiom expect_def (H : HilbertSig) (A : OperatorSig H) : ∀ (ψ : H.ψ),
-  real_to_complex (A.expect ψ) = H.inner ψ (H.scalar_mul complex_one (A.A ψ))
+axiom expect_def (H : HilbertSig) (O : OperatorSig H) (op : O.Operator) : ∀ (ψ : H.ψ),
+  real_to_complex (O.expect op ψ) = H.inner ψ (H.scalar_mul complex_one (O.apply op ψ))
 
-axiom variance_def (H : HilbertSig) (A : OperatorSig H) : ∀ (ψ : H.ψ),
-  A.variance ψ = real_add 
-    (A.expect (H.scalar_mul complex_one (A.A (A.A ψ))))
-    (real_neg (real_mul (A.expect ψ) (A.expect ψ)))
+axiom variance_def (H : HilbertSig) (O : OperatorSig H) (op : O.Operator) : ∀ (ψ : H.ψ),
+  O.variance op ψ = real_add 
+    (O.expect op (H.scalar_mul complex_one (O.apply op (O.apply op ψ))))
+    (real_neg (real_mul (O.expect op ψ) (O.expect op ψ)))
 
 -- Canonical commutation relation (signature only, no instances)  
 axiom position_momentum_commutator (H : HilbertSig) 
-  (X : OperatorSig H) (P : OperatorSig H) : ∀ (ψ : H.ψ),
-  H.inner ψ (X.A (P.A ψ)) = 
-  complex_add (H.inner ψ (P.A (X.A ψ))) (H.inner ψ (H.scalar_mul complex_i ψ))
+  (O : OperatorSig H) (X P : O.Operator) : ∀ (ψ : H.ψ),
+  H.inner ψ (O.apply X (O.apply P ψ)) = 
+  complex_add (H.inner ψ (O.apply P (O.apply X ψ))) (H.inner ψ (H.scalar_mul complex_i ψ))
