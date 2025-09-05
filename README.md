@@ -12,14 +12,15 @@
 
 🎯 Current Status (September 2025) - **ALL PAPERS FROZEN FOR PAPER 5 DEVELOPMENT**
 
-**❄️ FROZEN PAPERS**:
+**❄️ FROZEN PAPERS** (September 2025):
 • Paper 4 (Quantum Spectra): ✅ **COMPLETE** - Zero sorries ([DOI: 10.5281/zenodo.17059483](https://doi.org/10.5281/zenodo.17059483)) `paper4-freeze-v1.0`
 • Paper 3A (AxCal Framework): ✅ **COMPLETE** - Zero sorries, 3 orthogonal axes `paper3a-freeze-v1.0`
 • Paper 3B (Proof-theoretic scaffold): ✅ **COMPLETE** - 21 axioms (proof-theoretic limit) `paper3b-freeze-v1.0`
 • Paper 2 (WLPO ↔ Bidual Gap): ✅ **CORE COMPLETE** - Main theorem proven, 3 WLPO-conditional sorries `paper2-freeze-v1.0`
 • Paper 1 (Rank-One Toggle Kernel): ✅ **CORE COMPLETE** - Down to 4 sorries (from 14) `paper1-freeze-v1.0`
 
-🚀 **NEXT**: Paper 5 development begins
+🚀 **CURRENT DEVELOPMENT**: 
+• **Paper 5 (General Relativity AxCal)**: 🔧 **ACTIVE** - Axiom calibration for Einstein Field Equations, GR pin (Σ₀^GR), three orthogonal axes
 
 ## 🎯 Overview
 
@@ -41,37 +42,45 @@ A Lean 4 formalization project that calibrates the exact logical strength requir
 **Paper 5 LaTeX document** is located in [`Papers/P5_GeneralRelativity/latex/`](Papers/P5_GeneralRelativity/latex/):
 - **Paper5_GR_AxCal.tex** - Axiom Calibration for General Relativity with Lean 4 verification plan
 
-### Papers and Results
+### Papers Summary (All Frozen Except Paper 5)
 
-1. **Paper 1: Rank-One Toggle on Hilbert Spaces** ✅
-   - Minimal operator-theoretic core around orthogonal projections
-   - Sherman-Morrison inverse formula: **COMPLETE** (0 sorries)
+**❄️ FROZEN PAPERS** (Complete AxCal ecosystem):
+
+1. **Paper 1: Rank-One Toggle Kernel** `paper1-freeze-v1.0` ✅ **CORE COMPLETE**
+   - Sherman-Morrison formula: **COMPLETE** (0 sorries)
    - Fredholm theory: Nearly complete (1 sorry for quotient dimension)
-   - Spectrum characterization: 3 sorries (awaiting mathlib spectrum API)
-   - **Major milestone**: Reduced from 14 to just 4 sorries!
+   - Spectrum: 3 sorries (awaiting mathlib spectrum API)
+   - **Achievement**: Reduced from 14 to just 4 sorries!
 
-2. **Paper 2: WLPO ↔ Bidual Gap Equivalence** ✅
-   - Main theorem: Detecting bidual gap has exactly WLPO strength
-   - Complete Lean 4 formalization with only 3 WLPO-conditional sorries
-   - Constructive finite-dimensional surrogates via Cesàro means
+2. **Paper 2: WLPO ↔ Bidual Gap** `paper2-freeze-v1.0` ✅ **CORE COMPLETE**
+   - **Main theorem complete**: Gap_∃ ↔ WLPO equivalence proven
+   - Witness space: c₀ (sequences vanishing at infinity)
+   - 3 WLPO-conditional sorries in optional completeness module
 
-**Papers 3A & 3B: Axiom Calibration Framework** ✅ **CORE STABLE**
+3. **Paper 3A: AxCal Framework** `paper3a-freeze-v1.0` ✅ **COMPLETE** (0 sorries)
+   - Three orthogonal axes: WLPO, FT, DCω
+   - Uniformization height theory complete
+   - Stone Window API: 100+ Boolean algebra lemmas
+   - Complete 2-categorical foundation structure
 
-• Paper 3A (Framework): Active
-  – Uniformizability + height theory complete
-  – WLPO axis (bidual gap) and FT axis (uniform continuity) calibrated
-  – Stone Window API: 100+ Boolean algebra lemmas
-  – DC_ω/Baire: Work package (axiomatized), earmarked for future 3C; not in CI
+4. **Paper 3B: Proof-Theoretic Scaffold** `paper3b-freeze-v1.0` ✅ **COMPLETE** (21 axioms)
+   - Stage-based ladders resolve circularities
+   - RFN_Σ₁ → Con: proved schematically
+   - Honest proof-theoretic limit reached
 
-• Paper 3B (Scaffold): ❄️ Frozen at 21 axioms
-  – Stage-based ladders resolve circularities
-  – RFN_Σ₁ → Con: proved schematically
-  – Con → Gödel: axiomatized (documented in AXIOM_INDEX.md)
+5. **Paper 4: Quantum Spectra AxCal** `paper4-freeze-v1.0` ✅ **COMPLETE** (0 sorries)
+   - [Zenodo archived](https://doi.org/10.5281/zenodo.17059483)
+   - S0-S4 spectral calibrations: Height 0 to MP/DCω/WLPO frontiers
+   - Profile algebra and composition laws
 
-4. **Paper 4: Axiom Calibration for Quantum Spectra** 📐 **NEW DIRECTION**
-   - Applies AxCal framework to quantum spectral theory
-   - Calibrates height of spectral results (S0-S4)
-   - Identifies WLPO portal, MP frontier, DCω upper bounds
+🚀 **ACTIVE DEVELOPMENT**:
+
+**Paper 5: General Relativity AxCal** 🔧 **NEW DIRECTION**
+   - Applies AxCal to Einstein Field Equations
+   - GR pin (Σ₀^GR): Manifolds, tensors, Einstein tensor
+   - Three orthogonal axes: Choice (AC/DCω/ACω), Compactness/Kinematics (FT/WKL₀), Logic/Computability (WLPO/LEM/MP)
+   - Targets G1-G5: Explicit solutions → Computable GR evolution
+   - 45-page LaTeX document with Lean 4 verification plan
 
 ### Axiom Calibration Methodology
 
@@ -91,50 +100,63 @@ Examples: Bidual gap has profile (WLPO, FT, DC_ω) = (1, 0, 0); UCT has (0, 1, 0
 
 ## 📚 Papers & Formalization Status
 
-### Complete Papers
-- **[Papers 3A & 3B: Axiom Calibration Framework](Papers/P3_2CatFramework/)** ✅ **CORE STABLE**
-  - **Paper 3A**: AxCal framework with calibrated WLPO/FT axes (active development)
-  - **Paper 3B**: Proof-theoretic scaffold with 21 axioms (❄️ FROZEN)
+### ❄️ Frozen Papers (Complete AxCal Ecosystem)
+
+- **[Paper 4: Quantum Spectra AxCal](Papers/P4_SpectralGeometry/)** ✅ **COMPLETE** `paper4-freeze-v1.0`
+  - Zero sorries, [Zenodo archived](https://doi.org/10.5281/zenodo.17059483)
+  - S0-S4 spectral calibrations with profile algebra
+  - Markov's Principle integration and composition laws
+
+- **[Papers 3A & 3B: AxCal Framework](Papers/P3_2CatFramework/)** ✅ **COMPLETE** 
+  - **Paper 3A** `paper3a-freeze-v1.0`: AxCal framework (0 sorries)
+  - **Paper 3B** `paper3b-freeze-v1.0`: Proof-theoretic scaffold (21 axioms)
   - **🚨 IMPORTANT**: See [`MASTER_DEPENDENCY_CHART.md`](Papers/P3_2CatFramework/documentation/MASTER_DEPENDENCY_CHART.md) for separation guide
-  - Use `Papers.P3_2CatFramework.Paper3A_Main` or `Papers.P3_2CatFramework.Paper3B_Main` aggregators (NOT both)
+  - Use `Papers.P3_2CatFramework.Paper3A_Main` or `Papers.P3_2CatFramework.Paper3B_Main` aggregators
 
-### Nearly Complete
-- **[Paper 2: WLPO ↔ Bidual Gap](Papers/P2_BidualGap/)** ✅ **Main theorem complete (3 conditional sorries)**
-  - Full equivalence: Gap_∃ ↔ WLPO formalized
-  - Witness space: c₀ (sequences vanishing at infinity)
-  - Remaining sorries: Only in optional completeness module
+- **[Paper 2: WLPO ↔ Bidual Gap](Papers/P2_BidualGap/)** ✅ **CORE COMPLETE** `paper2-freeze-v1.0`
+  - Main theorem: Gap_∃ ↔ WLPO equivalence proven (0 sorries)
+  - Witness space: c₀ construction complete
+  - 3 WLPO-conditional sorries in optional completeness only
 
-### In Progress
-- **[Paper 1: Rank-One Toggle Kernel](Papers/P1_GBC/)** 🔧 **Core complete (~14 sorries)**
-  - Sherman-Morrison formula verified
-  - Spectrum/Fredholm sections pending mathlib updates
+- **[Paper 1: Rank-One Toggle Kernel](Papers/P1_GBC/)** ✅ **CORE COMPLETE** `paper1-freeze-v1.0`
+  - Sherman-Morrison formula complete (0 sorries)
+  - 4 sorries total (down from 14!) - pending mathlib updates
 
-### New Development
-- **[Paper 4: Quantum Spectra](Papers/P4_SpectralGeometry/)** 📐 **NEW**
-  - Complete direction change (September 2025)
-  - Old spectral geometry work archived
-  - New focus: Axiom calibration for quantum spectral theory
+### 🚀 Active Development
+
+- **[Paper 5: General Relativity AxCal](Papers/P5_GeneralRelativity/)** 🔧 **NEW DIRECTION**
+  - Applies AxCal framework to Einstein Field Equations
+  - 45-page theoretical foundation with Lean 4 verification plan
+  - Three orthogonal axes tailored for GR: Choice, Compactness/Kinematics, Logic/Computability
 
 ## 🏗️ Project Structure
 
 ```
 FoundationRelativity/
 ├── Papers/
-│   ├── P1_GBC/                    # 🔧 Paper 1 (rank-one; WIP)
-│   ├── P2_BidualGap/              # ✅ Paper 2 (WLPO ↔ BidualGap)
-│   └── P3_2CatFramework/          # 3A/3B/3C codebase
-│       ├── latex/                     # 📄 ALL LaTeX documents (consolidated)
-│       ├── Paper3A_Main.lean          # 📘 Paper 3A aggregator (ACTIVE)
-│       ├── Paper3B_Main.lean          # 📙 Paper 3B aggregator (FROZEN)
-│       ├── MASTER_DEPENDENCY_CHART.md
-│       ├── Phase1-3_*.lean            # 3A framework
-│       ├── P3C_DCwAxis/               # 📗 Paper 3C materials (DCω/Baire)
-│       ├── P4_Meta/
-│       │   ├── ProofTheory/           # ❄️ 3B (21 axioms; frozen)
-│       │   ├── StoneWindow_SupportIdeals.lean  # 3A (100+ lemmas)
-│       │   ├── FT_UCT_*.lean          # 3A FT axis
-│       │   └── DCw_*.lean             # 3C DCω/Baire infrastructure
-│       └── documentation/
+│   ├── P1_GBC/                    # ❄️ Paper 1 (rank-one; FROZEN)
+│   ├── P2_BidualGap/              # ❄️ Paper 2 (WLPO ↔ BidualGap; FROZEN)
+│   ├── P3_2CatFramework/          # ❄️ Papers 3A/3B (AxCal core; FROZEN)
+│   │   ├── latex/                     # 📄 Papers 3A/3B LaTeX documents
+│   │   ├── Paper3A_Main.lean          # 📘 Paper 3A aggregator (FROZEN)
+│   │   ├── Paper3B_Main.lean          # 📙 Paper 3B aggregator (FROZEN)
+│   │   ├── MASTER_DEPENDENCY_CHART.md
+│   │   ├── Phase1-3_*.lean            # 3A framework components
+│   │   ├── P4_Meta/
+│   │   │   ├── ProofTheory/           # ❄️ 3B (21 axioms; frozen)
+│   │   │   ├── StoneWindow_SupportIdeals.lean  # 3A (100+ lemmas)
+│   │   │   ├── FT_UCT_*.lean          # 3A FT axis
+│   │   │   └── DCw_*.lean             # 3A DCω/Baire infrastructure
+│   │   └── documentation/
+│   ├── P4_SpectralGeometry/       # ❄️ Paper 4 (Quantum Spectra; FROZEN)
+│   │   ├── Paper4_QuantumSpectra.tex  # 📄 Paper 4 LaTeX (Zenodo archived)
+│   │   ├── Smoke.lean                 # CI smoke test (0 sorries)
+│   │   └── Spectral/                  # S0-S4 implementations
+│   └── P5_GeneralRelativity/      # 🚀 Paper 5 (GR AxCal; ACTIVE)
+│       ├── latex/                     # 📄 Paper 5 LaTeX documents
+│       │   └── Paper5_GR_AxCal.tex    # 45-page theoretical foundation
+│       ├── Main.lean                  # Entry point for GR AxCal
+│       └── README.md                  # Paper 5 development guide
 └── docs/
     ├── planning/
     └── reference/
@@ -188,11 +210,15 @@ elan toolchain install $(cat lean-toolchain) || true
 # (Optional) get mathlib cache
 lake exe cache get || true
 
-# Build per-paper targets (recommended)
-lake build Papers.P3_2CatFramework.Paper3A_Main   # Paper 3A: Axiom Calibration Framework (active)
+# Build frozen papers (stable ecosystem)
+lake build Papers.P3_2CatFramework.Paper3A_Main   # Paper 3A: AxCal Framework (frozen)
 lake build Papers.P3_2CatFramework.Paper3B_Main   # Paper 3B: Proof-Theoretic Scaffold (frozen)
+lake build Papers.P4_SpectralGeometry.Smoke       # Paper 4: Quantum Spectra (frozen)
 
-# Optional: build everything (may include archived components)
+# Build active development
+lake build Papers.P5_GeneralRelativity            # Paper 5: GR AxCal (active)
+
+# Optional: build everything (includes all frozen papers)
 # lake build
 ```
 
@@ -211,8 +237,11 @@ lake build Papers.P3_2CatFramework.Paper3A_Main
 # Paper 3B: Proof-Theoretic Scaffold (use aggregator)
 lake build Papers.P3_2CatFramework.Paper3B_Main
 
-# Paper 4: Quantum Spectra (CI smoke test)
+# Paper 4: Quantum Spectra (frozen - smoke test)
 lake build Papers.P4_SpectralGeometry.Smoke && ./scripts/no_sorry_p4.sh
+
+# Paper 5: General Relativity AxCal (active development)
+lake build Papers.P5_GeneralRelativity
 ```
 
 **Note**: We recommend building per-paper targets during development. `lake build` builds everything, including archived code, and is not necessary for day-to-day work.
