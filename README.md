@@ -29,11 +29,17 @@ A Lean 4 formalization project that calibrates the exact logical strength requir
 
 ### 📄 LaTeX Documents
 
-All Paper 3 LaTeX documents are consolidated in [`Papers/P3_2CatFramework/latex/`](Papers/P3_2CatFramework/latex/):
+**Paper 3 LaTeX documents** are consolidated in [`Papers/P3_2CatFramework/latex/`](Papers/P3_2CatFramework/latex/):
 - **Paper3_Main.tex** - Comprehensive framework document
 - **Paper3A_Publication.tex** - Paper 3A with integrated DCω axis
 - **Paper3B_Publication.tex** - Paper 3B proof-theoretic scaffold
 - **Paper3_Lean_Formalization.tex** - Technical formalization details
+
+**Paper 4 LaTeX document** is located in [`Papers/P4_SpectralGeometry/`](Papers/P4_SpectralGeometry/):
+- **Paper4_QuantumSpectra.tex** - Quantum spectra AxCal with Zenodo reproducibility
+
+**Paper 5 LaTeX document** is located in [`Papers/P5_GeneralRelativity/latex/`](Papers/P5_GeneralRelativity/latex/):
+- **Paper5_GR_AxCal.tex** - Axiom Calibration for General Relativity with Lean 4 verification plan
 
 ### Papers and Results
 

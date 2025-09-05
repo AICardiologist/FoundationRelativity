@@ -1,6 +1,12 @@
-# Paper 5: [Title TBD]
+# Paper 5: Axiom Calibration for General Relativity
 
 ## Status: Development Starting
+
+### 📄 LaTeX Document
+
+**Main Paper**: [`latex/Paper5_GR_AxCal.tex`](latex/Paper5_GR_AxCal.tex) - "Axiom Calibration for General Relativity (Paper 5): Empirical Axioms, Computability, and Constructive Profiles with Lean 4 Verification Plan"
+
+See [`latex/README.md`](latex/README.md) for compilation instructions.
 
 **Development Start**: September 2025  
 **Current Phase**: Planning and initial development
@@ -39,7 +45,25 @@ Paper 5 has access to the complete AxCal framework:
 
 ## Development Goals
 
-[To be defined based on research direction]
+Paper 5 applies the AxCal framework to General Relativity:
+
+### Research Direction
+- **GR Pin**: Manifolds, tensors, Einstein Field Equations (Σ₀^GR)
+- **Three Orthogonal Axes**: 
+  - Choice (AC/DCω/ACω)
+  - Compactness/Kinematics (FT/WKL₀)
+  - Logic/Computability (WLPO/LEM/MP)
+- **Calibration Targets (G1-G5)**:
+  - G1: Explicit solutions (Height 0)
+  - G2: Cauchy problem (MGHD)  
+  - G3: Singularity theorems
+  - G4: Maximal extensions
+  - G5: Computable GR evolution
+
+### Verification Strategy
+- **Schematic Lean layer**: Structural height certification
+- **Imported axioms**: Heavy GR mathematics via verification ledger
+- **Targeted formalization**: G1 (Schwarzschild vacuum check)
 
 ## Build Commands
 

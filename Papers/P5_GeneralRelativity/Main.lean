@@ -39,9 +39,9 @@ Paper 5 development begins fresh from this stable foundation.
 -- import Papers.P3_2CatFramework.Paper3A_Main
 -- import Papers.P4_SpectralGeometry.Smoke
 
-namespace Papers.P5_NewDirection
+namespace Papers.P5_GeneralRelativity
 
 -- Placeholder for Paper 5 development
--- Development will begin here with new research direction
+-- Development will begin here with General Relativity AxCal research
 
-end Papers.P5_NewDirection
+end Papers.P5_GeneralRelativity
