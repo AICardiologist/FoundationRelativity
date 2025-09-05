@@ -64,8 +64,8 @@
 \theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remark}
 
-% Human-readable proof sketch environment
-\newenvironment{hrproof}{\noindent\textit{Human-readable proof sketch:} }{}
+% Proof sketch environment
+\newenvironment{prfsketch}{\noindent\textit{Proof sketch.} }{}
 
 % Reproducibility macros
 \newcommand{\ReproBox}[1]{\begin{mdframed}[linewidth=1pt,linecolor=blue,backgroundcolor=blue!5] #1 \end{mdframed}}
@@ -353,7 +353,7 @@ Over $\BISH$, for bounded self-adjoint $T$,
 \]
 \end{theorem}
 
-\begin{hrproof}
+\begin{prfsketch}
 The key insight is that approximate spectral values ``almost fail to invert,'' which non-constructively means ``actually fail to invert'' using $\MP$. 
 
 \textbf{($\Rightarrow$ direction):} Given $\lambda\in\mathrm{Spec}_{\mathrm{approx}}(T)$, we have sequences of unit vectors $(v_n)$ with $\|(T-\lambda I)v_n\| \to 0$. 
@@ -371,7 +371,7 @@ Since $\neg\neg\exists n P(n)$, we have $0 \in \mathrm{Spec}_{\mathrm{approx}}(T
 By assumption, $0 \in \mathrm{Spec}(T)$, so $T$ is not invertible. 
 But $T$ is not invertible if and only if $\exists n P(n)$ (otherwise $T$ has bounded inverse). 
 Thus $\MP$ holds.
-\end{hrproof}
+\end{prfsketch}
 
 \begin{proof}[Formal upper direction (Lean-feasible under $\MP$)]
 The forward direction is formalized in Lean as \lean{S1\_iff\_MP} in \texttt{MarkovSpectrum.lean}.
@@ -388,7 +388,7 @@ In constructive Gelfand duality (e.g., \cite{CoquandSpitters}), the spectrum of 
 If $\DCw$ holds, then for a \emph{separable} commutative $C^*$-algebra the spectrum locale is spatial (has enough points/characters); hence a classical pointwise spectral resolution is available.
 \end{proposition}
 
-\begin{hrproof}
+\begin{prfsketch}
 Think of the locale as a ``cloud'' of open set data without committed points. To extract actual points (characters), we need to make infinitely many consistent choices. 
 
 \textbf{Setup:} Let $A$ be a separable commutative $C^*$-algebra with countable dense subset $\{a_1, a_2, \ldots\}$.
@@ -404,7 +404,7 @@ We build a character $\chi: A \to \C$ step by step:
 \end{enumerate}
 
 \textbf{Why $\DCw$ is needed:} Each extension choice depends on the previous partial character. We cannot make all choices simultaneously (which would be $\ACw$), but must choose sequentially based on prior choices.
-\end{hrproof}
+\end{prfsketch}
 
 \begin{proof}[Formal proof]
 Formalized in Lean as \lean{S2\_ProfileUpper} in \texttt{LocaleSpatiality.lean}.
@@ -429,7 +429,7 @@ A proof of a spectral claim has flag \textsf{uses\_separation} if it relies on c
 Any spectral proof at the pin with flag \textsf{uses\_separation} implies the bidual gap for $\linf$; over $\BISH$ this is equivalent to $\WLPO$ (Paper~2 \cite{Paper2}). Thus the spectral claim inherits a frontier containing $\{\WLPO\}$ along that route.
 \end{theorem}
 
-\begin{hrproof}
+\begin{prfsketch}
 Suppose a spectral proof uses separation to extend a functional from $c_0$ to $\ell^\infty$ (e.g., to construct a special state or resolve a spectral component). 
 
 \textbf{Step 1: Extension creates bidual element.}
@@ -443,7 +443,7 @@ Specifically, given a binary sequence $(a_n)$ with at most one 1, WLPO asserts w
 Since the spectral proof constructs such a functional $\phi$ via separation in the non-separable context, 
 and this construction succeeds, we can detect the bidual gap, hence WLPO holds.
 Therefore, any spectral claim using this separation route inherits WLPO as a requirement.
-\end{hrproof}
+\end{prfsketch}
 
 \begin{remark}[Hahn-Banach Variants]
 It is crucial to distinguish the context:
@@ -489,7 +489,7 @@ Let $H=L^2(\R)$ with $H_{\mathrm{QHO}}\psi=-\psi''+x^2\psi$ on the Schwartz core
 The Hermite basis diagonalizes $H_{\mathrm{QHO}}$ with eigenvalues $(2n+1)_{n\ge 0}$. For every $N,\varepsilon>0$, the partial spectral sum provides an $(N,\varepsilon)$-approximation (in the appropriate sense for unbounded operators). Height $0$.
 \end{proposition}
 
-\begin{hrproof}
+\begin{prfsketch}
 The quantum harmonic oscillator is one of the most thoroughly understood operators in quantum mechanics, with explicit constructive spectral decomposition.
 
 \textbf{Hermite basis construction:}
@@ -513,7 +513,7 @@ Given $\psi$ in the Schwartz space and $\varepsilon > 0$:
 \end{enumerate}
 
 Everything is explicit and constructive: Hermite functions have closed formulas, inner products are computable integrals (using Gaussian integration), and $N$ is found by rational arithmetic on the decay bounds.
-\end{hrproof}
+\end{prfsketch}
 
 \noindent\textbf{Profile:} Height 0 ($\allzero$). The QHO demonstrates that even unbounded operators can have fully constructive spectral approximations when sufficient structure is present.
 
