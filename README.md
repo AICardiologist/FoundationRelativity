@@ -10,15 +10,16 @@
 [![DOI Paper 3B](https://zenodo.org/badge/DOI/10.5281/zenodo.17054155.svg)](https://doi.org/10.5281/zenodo.17054155)
 [![DOI Paper 4](https://zenodo.org/badge/DOI/10.5281/zenodo.17059483.svg)](https://doi.org/10.5281/zenodo.17059483)
 
-🎯 Current Status (September 2025)
+🎯 Current Status (September 2025) - **ALL PAPERS FROZEN FOR PAPER 5 DEVELOPMENT**
 
-• Paper 3A/3B core framework: ✅ Stable, 0 sorries on 3A/3B code paths
-  – Paper 3A (Framework & Calibrators): active development (WLPO/FT axes complete)
-  – Paper 3B (Proof-theoretic scaffold): ❄️ FROZEN at 21 axioms (RFN_Σ₁ ⇒ Con proved)
+**❄️ FROZEN PAPERS**:
+• Paper 4 (Quantum Spectra): ✅ **COMPLETE** - Zero sorries ([DOI: 10.5281/zenodo.17059483](https://doi.org/10.5281/zenodo.17059483)) `paper4-freeze-v1.0`
+• Paper 3A (AxCal Framework): ✅ **COMPLETE** - Zero sorries, 3 orthogonal axes `paper3a-freeze-v1.0`
+• Paper 3B (Proof-theoretic scaffold): ✅ **COMPLETE** - 21 axioms (proof-theoretic limit) `paper3b-freeze-v1.0`
+• Paper 2 (WLPO ↔ Bidual Gap): ✅ **CORE COMPLETE** - Main theorem proven, 3 WLPO-conditional sorries `paper2-freeze-v1.0`
+• Paper 1 (Rank-One Toggle Kernel): ✅ **CORE COMPLETE** - Down to 4 sorries (from 14) `paper1-freeze-v1.0`
 
-• Paper 4 (Quantum Spectra): ✅ **COMPLETE** - Zero sorries, full AxCal framework for spectral theory ([DOI: 10.5281/zenodo.17059483](https://doi.org/10.5281/zenodo.17059483))
-• Paper 2 (WLPO ↔ Bidual Gap): ✅ Main equivalence done; 3 WLPO-conditional sorries remain
-• Paper 1 (Rank-One Toggle Kernel): ✅ Major progress! Down to 4 sorries (from 14)
+🚀 **NEXT**: Paper 5 development begins
 
 ## 🎯 Overview
 
@@ -237,15 +238,15 @@ axiom ft_independent_of_wlpo : FT ⊬ WLPO
 axiom wlpo_independent_of_ft : WLPO ⊬ FT
 ```
 
-## 📊 Sorry Count Summary
+## 📊 Final Sorry Count Summary (All Papers Frozen)
 
-| Component | Sorries | Status | Notes |
-|-----------|---------|--------|-------|
-| **Paper 3A** | **0** | ✅ **Complete** | **Active development** |
-| **Paper 3B** | **0** (21 axioms) | ✅ **Frozen** | **Proof-theoretic limit** |
-| **Paper 2** | **3** | ✅ **Main theorem done** | **WLPO-conditional only** |
-| **Paper 1** | **~14** | 🔧 **Core complete** | **Pending mathlib updates** |
-| **Paper 4** | **~61** | ⚠️ **Suspended** | **Not built in CI** |
+| Component | Sorries | Status | Freeze Tag | Notes |
+|-----------|---------|--------|------------|-------|
+| **Paper 4** | **0** | ✅ **Complete** | `paper4-freeze-v1.0` | **Zenodo archived** |
+| **Paper 3A** | **0** | ✅ **Complete** | `paper3a-freeze-v1.0` | **Three orthogonal axes** |
+| **Paper 3B** | **0** (21 axioms) | ✅ **Complete** | `paper3b-freeze-v1.0` | **Proof-theoretic limit** |
+| **Paper 2** | **3** | ✅ **Core complete** | `paper2-freeze-v1.0` | **WLPO-conditional only** |
+| **Paper 1** | **4** | ✅ **Core complete** | `paper1-freeze-v1.0` | **Down from 14 sorries** |
 
 ## 🤝 Contributing
 

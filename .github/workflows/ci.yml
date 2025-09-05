@@ -1,7 +1,15 @@
 name: CI (Full)
 
-# Run full CI only on main branch pushes
+# Run full CI only on main branch pushes  
 # PRs use ci-optimized.yml with path filtering
+#
+# NOTE: Papers 1-4 are FROZEN as of September 2025
+# - paper1-freeze-v1.0: Rank-One Toggle (4 sorries)
+# - paper2-freeze-v1.0: WLPO ↔ Gap (3 conditional sorries)
+# - paper3a-freeze-v1.0: AxCal Framework (0 sorries)  
+# - paper3b-freeze-v1.0: Proof Theory (21 axioms)
+# - paper4-freeze-v1.0: Quantum Spectra (0 sorries, Zenodo)
+# Active development: Paper 5
 on:
   push:
     branches: [main]
