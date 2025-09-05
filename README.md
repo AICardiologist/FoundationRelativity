@@ -42,6 +42,9 @@ A Lean 4 formalization project that calibrates the exact logical strength requir
 **Paper 5 LaTeX document** is located in [`Papers/P5_GeneralRelativity/latex/`](Papers/P5_GeneralRelativity/latex/):
 - **Paper5_GR_AxCal.tex** - Axiom Calibration for General Relativity with Lean 4 verification plan
 
+**Paper 6 LaTeX document** is located in [`Papers/P6_Heisenberg/`](Papers/P6_Heisenberg/):
+- **Paper6_HeisenbergAxCal.tex** - Heisenberg Uncertainty Principle AxCal analysis
+
 ### Papers Summary (All Frozen Except Paper 5)
 
 **❄️ FROZEN PAPERS** (Complete AxCal ecosystem):
@@ -81,6 +84,13 @@ A Lean 4 formalization project that calibrates the exact logical strength requir
    - Three orthogonal axes: Choice (AC/DCω/ACω), Compactness/Kinematics (FT/WKL₀), Logic/Computability (WLPO/LEM/MP)
    - Targets G1-G5: Explicit solutions → Computable GR evolution
    - 45-page LaTeX document with Lean 4 verification plan
+
+**Paper 6: Heisenberg Uncertainty Principle AxCal** ⚛️ **NEW QUANTUM PHYSICS**
+   - Distinguishes preparation uncertainty (HUP-RS) from measurement uncertainty (HUP-M)
+   - HUP-RS: Height 0 (fully constructive) - Robertson-Schrödinger inequality
+   - HUP-M: ≤ DCω (requires Dependent Choice) - sequential measurement analysis  
+   - Mathlib-free Hilbert space axioms with complete Lean 4 verification
+   - Foundational separation: quantum structure vs. classical information extraction
 
 ### Axiom Calibration Methodology
 
