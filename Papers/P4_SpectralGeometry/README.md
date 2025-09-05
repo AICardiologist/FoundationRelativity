@@ -1,21 +1,58 @@
 # Paper 4: Axiom Calibration for Quantum Spectra
 
-[![Paper 4 Smoke](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/p4-smoke.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/p4-smoke.yml)
+[![Paper 4 Smoke](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/p4-smoke.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/p4-smoke.yml) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17059483.svg)](https://doi.org/10.5281/zenodo.17059483)
 
-## Status: Implemented - Zero Sorries
+## Status: Complete - Zero Sorries ✅
+
+**📦 Archived Release**: [Zenodo DOI: 10.5281/zenodo.17059483](https://zenodo.org/records/17059483)  
+**🔗 GitHub Release**: [paper4-v1.0.0](https://github.com/AICardiologist/FoundationRelativity/releases/tag/paper4-v1.0.0)
 
 **Transition Date**: September 4, 2025  
-**New Direction Defined**: September 4, 2025
+**New Direction Defined**: September 4, 2025  
+**Publication Date**: September 2025
 
-### Overview
+## 📚 Citation
+
+If you use this work, please cite:
+
+```bibtex
+@software{lee_2025_17059483,
+  author       = {Paul Chun-Kit Lee},
+  title        = {{Axiom Calibration for Quantum Spectra: A Lean 4 
+                   Implementation with Profile Algebra and Orthogonal 
+                   MP Composition}},
+  month        = sep,
+  year         = 2025,
+  publisher    = {Zenodo},
+  version      = {v1.0.0},
+  doi          = {10.5281/zenodo.17059483},
+  url          = {https://doi.org/10.5281/zenodo.17059483}
+}
+```
+
+## Overview
 Paper 4 applies the Axiom Calibration (AxCal) framework to quantum spectral theory, identifying which spectral results are constructively provable (height 0) and which require additional logical principles like WLPO, DCω, or Markov's Principle.
 
-### Key Results (S0-S4)
+## 🚀 Quick Start
+
+### Download and Build
+```bash
+# Download from Zenodo (permanent archive)
+curl -L https://zenodo.org/records/17059483/files/AICardiologist-FoundationRelativity-v1.0.0.zip -o paper4.zip
+unzip paper4.zip && cd AICardiologist-FoundationRelativity-*
+
+# Build and verify
+lake build Papers.P4_SpectralGeometry.Smoke
+./scripts/no_sorry_p4.sh
+```
+
+### Key Results (S0-S5)
 1. **S0**: ε-spectral approximations for compact operators (height 0)
 2. **S1**: Spec_approx = Spec equivalence requires Markov's Principle
 3. **S2**: Locale spatiality needs DCω (upper bound)
 4. **S3**: WLPO portal for separation-based proofs
 5. **S4**: Quantum harmonic oscillator at height 0
+6. **S5**: Fan Theorem demonstration (height (0,1,0))
 
 ### Previous Work
 The original Paper 4 (Spectral Geometry - Undecidable eigenvalue problems) has been archived to `archive/old_spectral_geometry_2025/`. It contained ~75 sorries and was suspended from active development.

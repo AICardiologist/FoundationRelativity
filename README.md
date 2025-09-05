@@ -8,6 +8,7 @@
 [![Paper 1 Rank-One](https://img.shields.io/badge/Paper%201%20Rank--One-4%20sorries-green)](Papers/P1_GBC/)
 [![DOI Paper 3A](https://zenodo.org/badge/DOI/10.5281/zenodo.17054050.svg)](https://doi.org/10.5281/zenodo.17054050)
 [![DOI Paper 3B](https://zenodo.org/badge/DOI/10.5281/zenodo.17054155.svg)](https://doi.org/10.5281/zenodo.17054155)
+[![DOI Paper 4](https://zenodo.org/badge/DOI/10.5281/zenodo.17059483.svg)](https://doi.org/10.5281/zenodo.17059483)
 
 🎯 Current Status (September 2025)
 
@@ -15,9 +16,9 @@
   – Paper 3A (Framework & Calibrators): active development (WLPO/FT axes complete)
   – Paper 3B (Proof-theoretic scaffold): ❄️ FROZEN at 21 axioms (RFN_Σ₁ ⇒ Con proved)
 
+• Paper 4 (Quantum Spectra): ✅ **COMPLETE** - Zero sorries, full AxCal framework for spectral theory ([DOI: 10.5281/zenodo.17059483](https://doi.org/10.5281/zenodo.17059483))
 • Paper 2 (WLPO ↔ Bidual Gap): ✅ Main equivalence done; 3 WLPO-conditional sorries remain
 • Paper 1 (Rank-One Toggle Kernel): ✅ Major progress! Down to 4 sorries (from 14)
-• Paper 4 (Quantum Spectra): 📐 NEW - Axiom calibration for spectral theory (planning phase)
 
 ## 🎯 Overview
 

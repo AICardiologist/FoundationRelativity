@@ -761,7 +761,15 @@ This is a route-conditional obligation: avoiding that route may avoid \(\WLPO\).
 
 \subsection{Repository and access}
 \begin{itemize}
+\item \textbf{Zenodo Archive:} \url{https://zenodo.org/records/17059483} \textbf{(Primary Citation)}
 \item \textbf{Repository:} \url{https://github.com/AICardiologist/FoundationRelativity}
+\item \textbf{Release:} \url{https://github.com/AICardiologist/FoundationRelativity/releases/tag/paper4-v1.0.0}
+\item \textbf{Archive Downloads:} 
+  \begin{itemize}
+  \item Zenodo (permanent): \url{https://zenodo.org/records/17059483/files/AICardiologist-FoundationRelativity-v1.0.0.zip}
+  \item tar.gz: \url{https://api.github.com/repos/AICardiologist/FoundationRelativity/tarball/paper4-v1.0.0}
+  \item zip: \url{https://api.github.com/repos/AICardiologist/FoundationRelativity/zipball/paper4-v1.0.0}
+  \end{itemize}
 \item \textbf{Paper 4 Directory:} \texttt{Papers/P4\_SpectralGeometry/}
 \item \textbf{License:} MIT (see \texttt{LICENSE} file)
 \item \textbf{Lean Version:} As specified in \texttt{lean-toolchain} (Lean 4.x)
@@ -772,9 +780,22 @@ This is a route-conditional obligation: avoiding that route may avoid \(\WLPO\).
 The complete artifact is mathlib-free and maintains a zero-sorry constraint:
 
 \begin{verbatim}
-# Clone repository
+# Option 1: Download from Zenodo (recommended for permanent access)
+curl -L https://zenodo.org/records/17059483/files/AICardiologist-FoundationRelativity-v1.0.0.zip \
+  -o paper4-zenodo.zip
+unzip paper4-zenodo.zip
+cd AICardiologist-FoundationRelativity-*
+
+# Option 2: Clone repository and checkout release
 git clone https://github.com/AICardiologist/FoundationRelativity.git
 cd FoundationRelativity
+git checkout paper4-v1.0.0
+
+# Option 3: Download GitHub release archive
+curl -L https://api.github.com/repos/AICardiologist/FoundationRelativity/tarball/paper4-v1.0.0 \
+  -o paper4-v1.0.0.tar.gz
+tar -xzf paper4-v1.0.0.tar.gz
+cd AICardiologist-FoundationRelativity-*
 
 # Build Paper 4 main target
 lake build Papers.P4_SpectralGeometry.Smoke
