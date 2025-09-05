@@ -20,11 +20,21 @@ def measSerial (S : HilbertSig) (O : OperatorSig S) : SerialRel (History S O) wh
 
 -- Old HUP-RS structure removed - now using RobertsonSchrodinger.lean approach
 
+theorem hupM_stream_from_dcω
+  (S : HilbertSig) (O : OperatorSig S)
+  (F : Foundation) [HasDCω F] :
+  ∃ f : Nat → History S O, True := by
+  let Srl := measSerial S O
+  -- seed with length 0
+  have ⟨f, _h0, _step⟩ := dcω_stream (F:=F) Srl { len := 0 }
+  exact ⟨f, True.intro⟩
+
 /-- Measurement witness family: DCω lets us produce an infinite sequence of histories. -/
 def HUP_M_W (S : HilbertSig) (O : OperatorSig S) : WitnessFamily Unit := {
+  -- property explicitly says: "for every foundation F that has DCω, we can build a stream"
   property := fun _ => ∀ (F : Foundation), [HasDCω F] → ∃ f : Nat → History S O, True,
   witness_exists := ⟨(), by
-    intro F _inst; exact HUPM_stream_axiom S O F⟩
+    intro F _; exact hupM_stream_from_dcω S O F⟩
 }
 
 /-- DCω upper bound certificate (now uses the dcω_stream axiom). -/

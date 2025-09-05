@@ -65,3 +65,16 @@ axiom position_momentum_commutator (H : HilbertSig)
   (O : OperatorSig H) (X P : O.Operator) : ∀ (ψ : H.ψ),
   H.inner ψ (O.apply X (O.apply P ψ)) = 
   complex_add (H.inner ψ (O.apply P (O.apply X ψ))) (H.inner ψ (H.scalar_mul complex_i ψ))
+
+/-! # Paper-6 shells that other modules/ledger can refer to -/
+
+/-- Minimal "measurement history" skeleton used by DCω streams. -/
+structure History (S : HilbertSig) (O : OperatorSig S) : Type where
+  len : Nat
+
+/-- RS inequality predicate shell (Phase-2 will replace `True` by the squared inequality). -/
+def RS_Ineq (S : HilbertSig) (O : OperatorSig S) : Prop :=
+  ∀ (A B : O.Operator) (ψ : S.ψ),
+    O.selfAdj A → O.selfAdj B →
+    S.norm ψ = real_one →
+    True

@@ -3,7 +3,7 @@ Paper 6 — Axiom ledger.
 Collects all axioms used in P6 in one place with short docstrings.
 -/
 import Papers.P6_Heisenberg.Axioms.Complex
-import Papers.P6_Heisenberg.HUP.DComega
+import Papers.P6_Heisenberg.HUP.DComega   -- keep your DCω eliminator available
 import Papers.P6_Heisenberg.HUP.HilbertSig
 
 /-! # Axioms used in Paper 6: Heisenberg Uncertainty Principle AxCal Analysis
@@ -80,27 +80,12 @@ Each one mirrors a concrete target described in the Paper 6 roadmap. -/
 namespace Papers.P6_Heisenberg.HUP
 open Papers.P6_Heisenberg.HUP
 
--- Forward declarations for types that will be defined in other files
--- These need to match exactly what's in RobertsonSchrodinger.lean and Witnesses.lean
-
--- History type from Witnesses.lean
-structure History (S : HilbertSig) (O : OperatorSig S) where
-  len : Nat
-
--- RS_Ineq predicate from RobertsonSchrodinger.lean  
-def RS_Ineq (S : HilbertSig) (O : OperatorSig S) : Prop :=
-  ∀ (A B : O.Operator) (ψ : S.ψ),
-    O.selfAdj A → O.selfAdj B →
-    S.norm ψ = real_one →
-    True  -- placeholder: will be the actual RS inequality (squared)
+-- NOTE: `History` and `RS_Ineq` are now defined in `HilbertSig.lean`
 
 /-- RS inequality holds over the abstract Hilbert/Operator signatures.
     (Phase-1 shell; will be replaced by a constructive proof in Phase-2.) -/
 axiom RS_Ineq_axiom (S : HilbertSig) (O : OperatorSig S) : RS_Ineq S O
 
-/-- Given DCω at foundation `F`, there exists an infinite measurement history.
-    (Phase-1 shell; will be replaced by a derivation using `dcω_stream`.) -/
-axiom HUPM_stream_axiom (S : HilbertSig) (O : OperatorSig S) :
-  ∀ (F : Foundation), [HasDCω F] → ∃ f : Nat → History S O, True
+-- NOTE: HUPM_stream_axiom was eliminated - now derived from dcω_stream in Witnesses.lean
 
 end Papers.P6_Heisenberg.HUP
