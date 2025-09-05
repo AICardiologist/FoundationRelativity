@@ -42,10 +42,7 @@ jobs:
           lean --version
           lake --version
 
-      - name: Resolve deps
-        run: lake update
-
-      - name: Build Paper 4 smoke target
+      - name: Build Paper 4 smoke target (mathlib-free)
         run: lake build Papers.P4_SpectralGeometry.Smoke
 
       - name: No-sorry guard (Paper 4)
