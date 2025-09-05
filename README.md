@@ -296,3 +296,8 @@ This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENS
 - Lean 4 development team for the proof assistant
 - mathlib4 contributors for the mathematical library
 - The constructive mathematics community for foundational insights
+
+**Development Assistance:**
+- **Gemini 2.5 Deep Think** - Architecture exploration and theoretical framework design
+- **GPT-5 Pro** - Lean 4 scaffolding and implementation support
+- **Claude Code** - Repository management and development workflow
