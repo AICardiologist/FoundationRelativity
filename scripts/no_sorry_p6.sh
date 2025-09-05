@@ -9,21 +9,21 @@ echo "[Paper 6 No-Sorry Guard] Checking Heisenberg uncertainty modules..."
 
 # Check main Axioms modules
 echo "Checking Papers/P6_Heisenberg/Axioms/*.lean ..."
-if rg --type lean "sorry" "Papers/P6_Heisenberg/Axioms/" --no-heading --line-number; then
+if rg "sorry" "Papers/P6_Heisenberg/Axioms/" --glob "*.lean" --no-heading --line-number; then
     echo "❌ Found sorry in Paper 6 axioms modules!"
     exit 1
 fi
 
 # Check HUP analysis modules  
 echo "Checking Papers/P6_Heisenberg/HUP/*.lean ..."
-if rg --type lean "sorry" "Papers/P6_Heisenberg/HUP/" --no-heading --line-number; then
+if rg "sorry" "Papers/P6_Heisenberg/HUP/" --glob "*.lean" --no-heading --line-number; then
     echo "❌ Found sorry in Paper 6 HUP modules!"
     exit 1
 fi
 
 # Check smoke test
 echo "Checking Papers/P6_Heisenberg/Smoke.lean ..."
-if rg --type lean "sorry" "Papers/P6_Heisenberg/Smoke.lean" --no-heading --line-number; then
+if rg "sorry" "Papers/P6_Heisenberg/Smoke.lean" --no-heading --line-number; then
     echo "❌ Found sorry in Paper 6 smoke test!"
     exit 1
 fi

@@ -56,7 +56,17 @@ From `Papers.P6_Heisenberg.HUP.HilbertSig`:
 * ✅ All axioms are Prop-only (no instances to avoid code generation)
 * ✅ Library target only (no executables)  
 * ✅ Mathlib-free implementation
-* ✅ Sorry-free verification passes
+* ⚠️ **Development phase**: Contains intentional `sorry` placeholders in witness proofs
+  - `HUP/RobertsonSchrodinger.lean`: RS_Ineq constructive proof (Height 0 target)
+  - `HUP/Witnesses.lean`: HUP_M_W witness using dcω_stream (DCω target)
+  - These are marked for replacement with actual constructive proofs per roadmap
 * 📋 Full AxCal height analysis: HUP-RS at Height 0, HUP-M ≤ DCω
+
+## Development Notes
+
+The current implementation follows the incremental roadmap:
+1. ✅ **Phase 1**: DCω stream axiom + non-trivial witness structure (current)
+2. 🎯 **Phase 2**: RS squared inequality + Cauchy-Schwarz bridge axioms (next)
+3. 🎯 **Phase 3**: Complete constructive proofs replacing sorry placeholders
 
 -/
