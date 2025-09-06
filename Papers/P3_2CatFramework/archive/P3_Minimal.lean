@@ -25,7 +25,7 @@
 -/
 
 -- DEPRECATED: This import is kept for backwards compatibility only
-import Papers.P3_2CatFramework.Paper3_Integration
+-- import Papers.P3_2CatFramework.Paper3_Integration  -- Moved to archive
 
 #print "WARNING: P3_Minimal.lean is deprecated. Use Paper3A_Main.lean or Paper3B_Main.lean instead."
 
@@ -45,11 +45,11 @@ def runPaper3 : IO Unit := do
   IO.println ""
   
   IO.println "Main Results:"
-  IO.println s!"1. Gap obstruction at level 0: Stage {gapObstructionCert.n}"
-  IO.println s!"   {gapObstructionCert.note}"
+  -- IO.println s!"1. Gap obstruction at level 0: Stage {gapObstructionCert.n}"  -- From Paper3_Integration
+  -- IO.println s!"   {gapObstructionCert.note}"  -- From Paper3_Integration
   IO.println ""
-  IO.println s!"2. Gap uniformization at level 1: Stage {gapUniformCert.n}"
-  IO.println s!"   {gapUniformCert.note}"
+  -- IO.println s!"2. Gap uniformization at level 1: Stage {gapUniformCert.n}"  -- From Paper3_Integration
+  -- IO.println s!"   {gapUniformCert.note}"  -- From Paper3_Integration
   IO.println ""
   IO.println s!"3. Truth uniformization at level 0: Stage {truthUniformCert.n}"
   IO.println s!"   {truthUniformCert.note}"

@@ -1,0 +1,188 @@
+name: Paper 3A/3B Separation Guard
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  check-separation:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check Paper 3A doesn't import ProofTheory
+        run: |
+          echo "Checking that Paper 3A doesn't import ProofTheory files..."
+          
+          # Get all imports from Paper3A_Main and files it imports (recursively)
+          if grep -r "import.*ProofTheory" Papers/P3_2CatFramework/Paper3A_Main.lean; then
+            echo "❌ ERROR: Paper3A_Main directly imports ProofTheory files!"
+            exit 1
+          fi
+          
+          # Check all files imported by Paper3A_Main (simplified check)
+          paper3a_files=$(grep "^import Papers.P3_2CatFramework" Papers/P3_2CatFramework/Paper3A_Main.lean | \
+                          sed 's/import //' | sed 's/\./\//g' | sed 's/$/.lean/')
+          
+          for file in $paper3a_files; do
+            if [ -f "$file" ]; then
+              if grep -q "import.*ProofTheory" "$file"; then
+                echo "❌ ERROR: $file (imported by Paper3A) imports ProofTheory!"
+                exit 1
+              fi
+            fi
+          done
+          
+          echo "✅ Paper 3A properly isolated from ProofTheory"
+      
+      - name: Check Paper 3B doesn't import Stone/FT files
+        run: |
+          echo "Checking that Paper 3B doesn't import Stone Window or FT/UCT files..."
+          
+          if grep -E "import.*(StoneWindow|FT_UCT|FT_Frontier|FTPortal)" Papers/P3_2CatFramework/Paper3B_Main.lean; then
+            echo "❌ ERROR: Paper3B_Main imports Stone Window or FT/UCT files!"
+            exit 1
+          fi
+          
+          echo "✅ Paper 3B properly isolated from Stone/FT components"
+      
+      - name: Verify frozen status markers
+        run: |
+          echo "Checking frozen status markers..."
+          
+          # Paper3B_Main should have FROZEN marker
+          if ! grep -q "❄️ FROZEN" Papers/P3_2CatFramework/Paper3B_Main.lean; then
+            echo "⚠️ WARNING: Paper3B_Main missing FROZEN marker"
+          fi
+          
+          # ProofTheory README should have FROZEN marker
+          if [ -f Papers/P3_2CatFramework/P4_Meta/ProofTheory/README.md ]; then
+            if ! grep -q "FROZEN" Papers/P3_2CatFramework/P4_Meta/ProofTheory/README.md; then
+              echo "⚠️ WARNING: ProofTheory/README.md missing FROZEN marker"
+            fi
+          fi
+          
+          echo "✅ Frozen status markers checked"
+      
+      - name: Enforce 3A does not import ProofTheory (deep check)
+        run: |
+          set -euo pipefail
+          echo "Deep check: ensuring no 3A files import ProofTheory..."
+          
+          # Check across all tracked Lean files, excluding Paper3B and ProofTheory itself
+          BAD=$(git grep -nE '^\s*import\s+Papers\.P3_2CatFramework\.P4_Meta\.ProofTheory' -- \
+            "Papers/P3_2CatFramework/**/*.lean" \
+            ":!Papers/P3_2CatFramework/Paper3B_Main.lean" \
+            ":!Papers/P3_2CatFramework/P4_Meta/ProofTheory/**" \
+            ":!Papers/P3_2CatFramework/P4_Meta/PartV_*.lean" \
+            ":!Papers/P3_2CatFramework/test/ProofTheory_Sanity.lean" \
+            ":!Papers/P3_2CatFramework/test/Bot_is_FalseInN_test.lean" \
+            ":!Papers/P3_2CatFramework/test/Sigma1Bot_test.lean" || true)
+          
+          if [ -n "$BAD" ]; then
+            echo "❌ Cross-import detected in 3A files:"
+            echo "$BAD"
+            exit 1
+          fi
+          
+          echo "✅ No ProofTheory imports found in 3A files"
+      
+      - name: No sorries/admit in Paper 3A
+        run: |
+          set -euo pipefail
+          echo "Checking for sorry/admit in Paper 3A files..."
+          
+          # Exclude 3B (ProofTheory), test files, and archive
+          # Look for actual sorry/admit statements, not just the word in comments
+          if git grep -nE '^\s*(sorry|admit)\s*($|--|\/)' -- \
+            "Papers/P3_2CatFramework/**/*.lean" \
+            ":!Papers/P3_2CatFramework/P4_Meta/ProofTheory/**" \
+            ":!Papers/P3_2CatFramework/test/**" \
+            ":!Papers/P3_2CatFramework/old_3b_*/**" \
+            ":!Papers/P3_2CatFramework/archive/**"; then
+            echo "❌ Found 'sorry'/'admit' in Paper 3A files."
+            exit 1
+          fi
+          
+          echo "✅ No sorry/admit found in Paper 3A"
+      
+      - name: Limited axiom declarations in Paper 3A
+        run: |
+          set -euo pipefail
+          echo "Checking for unauthorized axiom declarations in Paper 3A files..."
+          echo "Note: Orthogonality axioms and meta placeholders are allowed"
+          
+          # Exclude files that are allowed to have axioms:
+          # - ProofTheory (Paper 3B)
+          # - PartV/PartVI (proof-theoretic calibrators)
+          # - Test files
+          # - Archive
+          # - Meta_LowerBounds_Axioms (placeholders)
+          # - IndependenceRegistry (orthogonality declarations)
+          # - FT/DCw axis files (orthogonality axioms)
+          if git grep -nE '^\s*axiom\b' -- \
+            "Papers/P3_2CatFramework/**/*.lean" \
+            ":!Papers/P3_2CatFramework/P4_Meta/ProofTheory/**" \
+            ":!Papers/P3_2CatFramework/P4_Meta/PartV_*.lean" \
+            ":!Papers/P3_2CatFramework/P4_Meta/PartVI_*.lean" \
+            ":!Papers/P3_2CatFramework/P4_Meta/Meta_LowerBounds_Axioms.lean" \
+            ":!Papers/P3_2CatFramework/P4_Meta/IndependenceRegistry.lean" \
+            ":!Papers/P3_2CatFramework/P4_Meta/FT_UCT_MinimalSurface.lean" \
+            ":!Papers/P3_2CatFramework/P4_Meta/DCwPortalWire.lean" \
+            ":!Papers/P3_2CatFramework/P4_Meta/FusedLadders.lean" \
+            ":!Papers/P3_2CatFramework/P4_Meta/PartIII_ProductHeight.lean" \
+            ":!Papers/P3_2CatFramework/test/**" \
+            ":!Papers/P3_2CatFramework/archive/**" \
+            ":!Papers/P3_2CatFramework/old_3b_*/**"; then
+            echo "❌ Found unauthorized axiom declarations in Paper 3A"
+            exit 1
+          fi
+          
+          echo "✅ Only authorized axiom declarations in Paper 3A"
+      
+      # Build tests moved to separate CI workflows that have Lean setup
+      # The separation guard focuses on import/axiom/sorry checks only
+      
+      - name: Ensure ProofTheory does not import 3A modules
+        run: |
+          set -euo pipefail
+          echo "Checking ProofTheory doesn't import 3A modules..."
+          BAD=$(git grep -nE '^\s*import\s+Papers\.P3_2CatFramework\.(Phase|FT_Frontier|Examples)' -- \
+            "Papers/P3_2CatFramework/P4_Meta/ProofTheory/**" || true)
+          test -z "$BAD" || { echo "❌ 3B importing 3A modules:"; echo "$BAD"; exit 1; }
+          echo "✅ No 3A imports inside ProofTheory"
+      
+      - name: Ensure archive/ is never imported
+        run: |
+          set -euo pipefail
+          echo "Checking that no Lean file imports from archive/..."
+          BAD=$(git grep -nE '^\s*import\s+Papers\.P3_2CatFramework\.archive' -- \
+            "Papers/**/*.lean" || true)
+          if [ -n "$BAD" ]; then
+            echo "❌ Found imports from archive/:"
+            echo "$BAD"
+            exit 1
+          fi
+          echo "✅ No imports from archive/ detected"
+      
+      - name: Ensure 3A does not import Paper 3C
+        run: |
+          set -euo pipefail
+          echo "Checking 3A files don't import Papers/P3C_DCwAxis..."
+          BAD=$(git grep -nE '^\s*import\s+Papers\.P3C_DCwAxis(\.|/)' -- \
+            "Papers/P3_2CatFramework/**/*.lean" || true)
+          test -z "$BAD" || { echo "❌ 3A importing 3C modules:"; echo "$BAD"; exit 1; }
+          echo "✅ No 3A→3C imports"
+      
+      - name: Ensure 3B does not import Paper 3C
+        run: |
+          set -euo pipefail
+          echo "Checking ProofTheory doesn't import Papers/P3C_DCwAxis..."
+          BAD=$(git grep -nE '^\s*import\s+Papers\.P3C_DCwAxis(\.|/)' -- \
+            "Papers/P3_2CatFramework/P4_Meta/ProofTheory/**" || true)
+          test -z "$BAD" || { echo "❌ 3B importing 3C modules:"; echo "$BAD"; exit 1; }
+          echo "✅ No 3B→3C imports"
+      
+      # Build test for Paper3A_API moved to separate CI with Lean setup

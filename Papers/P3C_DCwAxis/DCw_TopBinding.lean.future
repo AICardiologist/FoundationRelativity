@@ -1,0 +1,56 @@
+import Mathlib.Topology.Basic
+import Mathlib.Topology.Baire
+import Papers.P3C_DCwAxis.DCw_Skeleton
+
+namespace Papers.P3C.DCw
+open Classical Topology
+
+/-- Cylinder as a set of sequences. -/
+def Cyl.asSet (C : Cyl) : Set Seq := {x | C.mem x}
+
+/-- Cylinders are open (finite intersection of evaluation preimages of singletons). -/
+lemma isOpen_cyl (C : Cyl) : IsOpen (C.asSet) := by
+  classical
+  -- `x ↦ x i` is continuous and `Set.singleton` is open in discrete ℕ.
+  -- `C.asSet` = ⋂_{i < length} {x | x i = stem[i]}
+  -- Use finite intersection of opens.
+  -- Implement with a small `Finset` over indices `0..C.stem.length-1`.
+  sorry
+
+/-- Every cylinder is nonempty: extend the stem arbitrarily. -/
+lemma cyl_nonempty (C : Cyl) : (C.asSet).Nonempty := by
+  classical
+  refine ⟨fun n => if h : n < C.stem.length then C.stem.get ⟨n, h⟩ else 0, ?_⟩
+  intro i; by_cases h : i.val < C.stem.length <;> simp [Cyl.asSet, h]
+
+/-- If `x` agrees with `C` and `x (len C) = a`, then `x ∈ (C.extend a)`. -/
+lemma mem_extend_of_mem {C : Cyl} {x : Seq} {a : Nat}
+  (hx : C.mem x) (hnext : x C.stem.length = a) :
+  (C.extend a).mem x := by
+  intro i
+  simp [Cyl.extend_stem]
+  by_cases h : i.val < C.stem.length
+  · -- left block uses `hx`
+    simpa [List.getElem_append_left h] using hx ⟨i.val, h⟩
+  · -- boundary index = `C.stem.length`
+    have : i.val = C.stem.length := by
+      -- `i : Fin (C.stem.length+1)` and not `< C.stem.length` ⇒ must be the boundary
+      exact Nat.eq_of_le_of_lt_succ (Nat.le_of_not_lt h) i.isLt
+    simpa [this, hnext]
+
+/-- Adapter: dense open set in Baire space → our `DenseOpen` (cylinder interface). -/
+def DenseOpen.ofOpenDense (U : Set Seq) (hU : IsOpen U) (hDense : Dense U) : DenseOpen where
+  hit C := ∃ x : Seq, C.mem x ∧ x ∈ U
+  dense C := by
+    -- `(C.asSet)` is nonempty open; density gives a point in the intersection.
+    have h := hDense.inter_open_nonempty (isOpen_cyl C) (cyl_nonempty C)
+    rcases h with ⟨x, hxC, hxU⟩
+    refine ⟨C, le_rfl, ⟨x, hxC, hxU⟩⟩
+  refine1 C := by
+    -- choose a point in `U ∩ C`, then extend with its next digit
+    have h := hDense.inter_open_nonempty (isOpen_cyl C) (cyl_nonempty C)
+    rcases h with ⟨x, hxC, hxU⟩
+    refine ⟨x C.stem.length, ?_⟩
+    exact ⟨x, mem_extend_of_mem hxC rfl, hxU⟩
+
+end Papers.P3C.DCw

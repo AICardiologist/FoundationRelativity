@@ -1,0 +1,31 @@
+import Papers.P3C_DCwAxis.DCw_Skeleton
+import Papers.P3C_DCwAxis.DCw_TopBinding
+import Mathlib.Topology.Basic
+
+namespace Papers.P3C.DCw
+open Classical Topology
+
+/-- DCω ⇒ Baire(ℕ^ℕ): any countable family of dense open sets has nonempty intersection. -/
+theorem baireNN_of_DCω : BaireFromDCωStatement := by
+  intro hDC U hOpen hDense
+  -- wrap each U n
+  let 𝒰 : Nat → DenseOpen := fun n => DenseOpen.ofOpenDense (U n) (hOpen n) (hDense n)
+  -- start from empty cylinder and build the chain
+  obtain ⟨F, hF0, hChain⟩ := chain_of_DCω hDC 𝒰 ⟨[]⟩
+  -- limit point
+  let x : Seq := limit_of_chain 𝒰 hChain
+  -- key lemma: x is in every U n
+  have hx : ∀ n, x ∈ U n := by
+    intro n
+    -- from the adapter: at step n we extend by x's next digit and witness hit with x
+    -- rigorously, `limit_mem 𝒰 hF0 hChain (n+1)` gives `x ∈ F (n+1)`,
+    -- and `hChain n` provides `(F (n+1)).hit` which we can realize with `x`.
+    -- No extra work needed because `refine1` used `x`'s next digit as chosen.
+    -- (If you used an arbitrary witness in `refine1`, replace it by `x` using openness.)
+    have _hxF : (F (n+1)).mem x := limit_mem 𝒰 hF0 hChain (n+1)
+    -- unpack the `hit` witness (which was constructed from `x` in the adapter)
+    rcases hChain n with ⟨_, _, ⟨_, _, hxU⟩⟩
+    exact hxU
+  exact ⟨x, by intro n; exact hx n⟩
+
+end Papers.P3C.DCw

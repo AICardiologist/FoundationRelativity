@@ -1,14 +1,21 @@
-/-
-  Papers/P3_2CatFramework/Phase2_API.lean
-  
-  Clean API for Phase 2: Uniformization height theory
-  
-  Based on Paul's guidance, this provides a clean interface to the
-  uniformization height concepts without exposing the internal details.
--/
-
 import Papers.P3_2CatFramework.Phase2_UniformHeight
 import Papers.P3_2CatFramework.Phase3_Levels
+
+/-!
+  # Phase 2 API: Uniformization Height Theory
+  
+  Clean API for the uniformization height framework.
+  
+  ## Overview
+  This module provides the main interface for measuring logical strength
+  via uniformizability of witness families. Based on Paul's guidance,
+  it cleanly encapsulates the height computation without exposing internals.
+  
+  ## Key Concepts
+  - **Level**: Discrete height values (0 = BISH, 1 = BISH+WLPO)
+  - **HeightAt**: Computes minimum uniformization level for a witness family
+  - **Gap Theorem**: The bidual gap has height exactly 1 (calibration point)
+-/
 
 namespace Papers.P3.Phase2API
 
@@ -17,13 +24,24 @@ open Classical  -- Needed for choice
 
 /-! ## Level definitions for uniformization height -/
 
-/-- Level represents the height in the uniformization hierarchy -/
+/-- 
+Level in the uniformization hierarchy.
+
+- `zero`: Height 0, uniformizable in BISH (all foundations)
+- `one`: Height 1, requires WLPO for uniformization
+
+Future work will extend this to higher levels (DC_ω, etc.).
+-/
 inductive Level
   | zero  -- All foundations (height ≥ 0)
   | one   -- Foundations with WLPO (height ≥ 1)
 deriving DecidableEq, Repr
 
-/-- Convert a Level to the corresponding foundation predicate -/
+/-- 
+Convert a Level to its corresponding foundation predicate.
+
+Maps discrete levels to the set of foundations at that height or above.
+-/
 @[simp] def Level.toPred : Level → (Foundation → Prop)
   | Level.zero => W_ge0  -- Always true
   | Level.one  => W_ge1  -- hasWLPO F = true
@@ -31,12 +49,16 @@ deriving DecidableEq, Repr
 /-! ## Height determination for witness families -/
 
 /-- 
-  HeightAt determines the uniformization height of a witness family.
-  Returns the minimum level at which uniformization exists.
-  
-  Uses classical logic for decidability. This is intentionally non-decidable
-  beyond level 1 for now; the if-chain is a placeholder for a real lattice 
-  of levels that will be developed in Phase 3+.
+Determines the uniformization height of a witness family.
+
+## Returns
+- `some Level.zero`: Uniformizable in BISH
+- `some Level.one`: Requires WLPO for uniformization
+- `none`: Not uniformizable at levels 0 or 1
+
+## Implementation Note
+Uses classical logic for decidability. The if-chain is a placeholder
+for a proper lattice of levels to be developed in future phases.
 -/
 noncomputable def HeightAt (WF : WitnessFamily) : Option Level :=
   if h₀ : Nonempty (UniformizableOn W_ge0 WF) then
@@ -48,7 +70,15 @@ noncomputable def HeightAt (WF : WitnessFamily) : Option Level :=
 
 /-! ## Main theorem: The bidual gap has height = 1 -/
 
-/-- The bidual gap witness family has uniformization height exactly 1 -/
+/-- 
+**Main Calibration Theorem**: The bidual gap has height exactly 1.
+
+This is the key calibration point showing that the bidual gap:
+- Cannot be uniformized in BISH (height > 0)
+- Can be uniformized with WLPO (height = 1)
+
+This theorem anchors the entire uniformization hierarchy.
+-/
 theorem gap_has_height_one : HeightAt GapFamily = some Level.one := by
   unfold HeightAt
   -- First branch: height 0 fails
@@ -61,11 +91,20 @@ theorem gap_has_height_one : HeightAt GapFamily = some Level.one := by
 
 /-! ## Helper functions for working with uniformization -/
 
-/-- Check if a foundation satisfies a given level requirement -/
+/-- 
+Check if a foundation satisfies a given level requirement.
+
+Returns true if foundation F is at height ≥ l in the hierarchy.
+-/
+@[simp]
 def satisfiesLevel (F : Foundation) (l : Level) : Prop :=
   l.toPred F
 
-/-- Get uniformization at a specific level (if it exists) -/
+/-- 
+Extract the uniformization witness at a specific level (if it exists).
+
+Returns the actual uniformization data when available.
+-/
 noncomputable def getUniformizationAt (l : Level) (WF : WitnessFamily) : 
     Option (UniformizableOn l.toPred WF) :=
   match l with
@@ -113,7 +152,11 @@ lemma gap_has_uniformization_at_one :
 
 #eval "Phase 2 API: Clean interface for uniformization height theory complete!"
 
-/-- Phase 3 numeric height, re-exposed through the Phase 2 API. -/
+/-- 
+Numeric height computation from Phase 3, exposed via Phase 2 API.
+
+Provides natural number heights for future extensions beyond level 1.
+-/
 noncomputable def HeightAtNat_viaPhase2 (WF : Papers.P3.Phase2.WitnessFamily) : Option Nat :=
   Papers.P3.Phase3.HeightAtNat WF
 
@@ -121,13 +164,22 @@ noncomputable def HeightAtNat_viaPhase2 (WF : Papers.P3.Phase2.WitnessFamily) : 
   HeightAtNat_viaPhase2 Papers.P3.Phase2.GapFamily = some 1 := by
   simp [HeightAtNat_viaPhase2, Papers.P3.Phase3.gap_height_nat_is_one]
 
-/-- Map numeric levels to Phase 2's `Level` (only defined on {0,1}). -/
+/-- 
+Convert natural number heights to Level type.
+
+Currently only handles levels 0 and 1; returns none for higher levels
+until the framework is extended.
+-/
 def ofNatLevel? : Nat → Option Level
   | 0 => some Level.zero
   | 1 => some Level.one
   | _ => none
 
-/-- Re-express `HeightAt` via the numeric height (dropping ≥2 as `none`). -/
+/-- 
+Alternative height computation via numeric levels.
+
+Bridges between the discrete Level type and natural number heights.
+-/
 noncomputable def HeightAt_viaNat (WF : Papers.P3.Phase2.WitnessFamily) : Option Level :=
   (Papers.P3.Phase3.HeightAtNat WF).bind ofNatLevel?
 
@@ -152,7 +204,12 @@ noncomputable def HeightAt_viaNat (WF : Papers.P3.Phase2.WitnessFamily) : Option
 ⟨ (fun ⟨u⟩ => ⟨Papers.P3.Phase3.UniformizableOn.toN1 u⟩),
   (fun ⟨v⟩ => ⟨Papers.P3.Phase3.toW1 v⟩) ⟩
 
-/-- On {0,1}, the Phase 2 `HeightAt` equals the Phase 3 numeric height view. -/
+/-- 
+**Consistency Theorem**: Phase 2 and Phase 3 height computations agree.
+
+Shows that the Level-based and Nat-based height computations
+are equivalent on levels 0 and 1.
+-/
 theorem HeightAt_agrees_on_0_1 (WF : Papers.P3.Phase2.WitnessFamily) :
   HeightAt WF = HeightAt_viaNat WF := by
   classical

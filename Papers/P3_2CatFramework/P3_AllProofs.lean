@@ -8,9 +8,9 @@
   UPDATED: September 2025 - Now uses separated aggregators
 -/
 
--- Use the transition aggregator during migration
--- TODO: After full migration, split this into P3A_AllProofs and P3B_AllProofs
-import Papers.P3_2CatFramework.Paper3_Transition
+-- Use the separated aggregators
+-- Note: Can't import both Paper3A_Main and Paper3B_Main due to conflicts
+import Papers.P3_2CatFramework.Paper3A_Main  -- Using 3A as primary
 import Papers.P3_2CatFramework.Phase3_Positive
 import Papers.P3_2CatFramework.Phase2_PositivePins
 import Papers.P3_2CatFramework.P4_Meta.PartIII_Schedule
@@ -182,15 +182,16 @@ end PartVI
 
 section Paper3Main
   -- Main theorems via P4_Meta
-  #check Paper3_MainTheorem               -- Gap height = 1 certificate pair
-  #check Paper3_MainTheorem_Omega         -- Result holds at ω-limit
-  #check gapObstructionCert              -- Obstruction at level 0
-  #check gapUniformCert                  -- Uniform at level 1
-  #check truthUniformCert                -- Truth uniform at level 0
+  -- Note: Paper3_Integration moved to archive, these theorems are from there
+  -- #check Paper3_MainTheorem               -- Gap height = 1 certificate pair
+  -- #check Paper3_MainTheorem_Omega         -- Result holds at ω-limit
+  -- #check gapObstructionCert              -- Obstruction at level 0
+  -- #check gapUniformCert                  -- Uniform at level 1
+  -- #check truthUniformCert                -- Truth uniform at level 0
   
   -- Aggregated results  
-  #check Paper3_AllResults               -- All results aggregated
-  #check Paper3_ProgressionCert          -- Level progression
+  -- #check Paper3_AllResults               -- All results aggregated
+  -- #check Paper3_ProgressionCert          -- Level progression
 end Paper3Main
 
 /-! ## Verification Summary -/

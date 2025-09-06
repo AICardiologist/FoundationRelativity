@@ -1,18 +1,19 @@
-/-
-  Papers/P3_2CatFramework/Phase2_UniformHeight_Fixed.lean
-
-  Phase 2 scaffolding at the Σ₀ (pinned) layer:
-  - Σ₀ index
-  - witness families on Σ₀
-  - uniformization-on-a-subcategory (restricted to Σ₀)
-  - case study: bidual gap has height = 1
-
-  This file depends only on Phase1_Simple.lean (toy bicategory).
--/
 import Mathlib.Logic.Equiv.Basic
-
--- Bring in the Phase 1 toy bicategory as the lightweight substrate.
 import Papers.P3_2CatFramework.Phase1_Simple
+
+/-!
+  # Phase 2: Uniformization Height Theory Core
+
+  Core scaffolding for uniformization at the Σ₀ (pinned) layer.
+  
+  ## Contents
+  - Σ₀ signature elements as indices
+  - Witness families indexed by foundations and Σ₀
+  - Uniformization functors on subcategories
+  - Main theorem: bidual gap has height = 1
+  
+  This module depends only on Phase1_Simple.lean (toy bicategory).
+-/
 
 open Papers.P3.Phase1Simple
 
@@ -22,6 +23,14 @@ namespace Papers.P3.Phase2
     Σ₀ : pinned signature as *indices* (names only)
     ------------------------------------------------------------ -/
 
+/-- 
+Σ₀ signature elements (pinned across all foundations).
+
+These are the fixed mathematical objects that exist in all foundations:
+- Basic types: nat, bool, real
+- Sequence spaces: ℓ∞ (bounded sequences), c₀ (null sequences)
+- Quotient map: ℓ∞ → ℓ∞/c₀
+-/
 inductive Sigma0
   | nat
   | bool
@@ -31,7 +40,14 @@ inductive Sigma0
   | quo_linf_c0 -- ℓ∞ ⟶ ℓ∞/c₀ (we only need the *name* at Phase 2)
 deriving DecidableEq, Repr
 
-/-! A tiny "truth groupoid": empty vs singleton. -/
+/-- 
+Truth value as a type (Bishop's approach).
+
+- `Truth true` = PUnit (inhabited)
+- `Truth false` = Empty (uninhabited)
+
+Used for encoding logical conditions as type inhabitation.
+-/
 def Truth (b : Bool) : Type := if b then PUnit else Empty
 
 lemma Truth_true  : Truth true  = PUnit := rfl
@@ -59,23 +75,39 @@ abbrev BISH        : Foundation := Papers.P3.Phase1Simple.BISH
 abbrev BISH_WLPO   : Foundation := Papers.P3.Phase1Simple.BISH_WLPO
 abbrev inclusionBW : Interp BISH BISH_WLPO := Papers.P3.Phase1Simple.bish_to_wlpo
 
-/-- WLPO bit from Foundation structure -/
+/-- 
+Extract the WLPO status from a foundation.
+
+Returns true if the foundation includes the Weak Limited Principle of Omniscience.
+-/
+@[simp]
 def hasWLPO (F : Foundation) : Bool := F.wlpo
 
 @[simp] lemma hasWLPO_BISH     : hasWLPO BISH = false := rfl
 @[simp] lemma hasWLPO_BISH_WLPO : hasWLPO BISH_WLPO = true := rfl
 
-/-!
-  "Levels" for height: we only need ≥0 (all foundations) and ≥1 (those with WLPO).
+/-- 
+Foundations at height ≥ 0 (all foundations).
 -/
+@[simp]
 def W_ge0 : Foundation → Prop := fun _ => True
+
+/-- 
+Foundations at height ≥ 1 (those with WLPO).
+-/
+@[simp]
 def W_ge1 : Foundation → Prop := fun F => hasWLPO F = true
 
 /-! ------------------------------------------------------------
     Witness families and uniformization at Σ₀
     ------------------------------------------------------------ -/
 
-/-- A witness family *restricted to pinned Σ₀ objects*. -/
+/-- 
+A witness family indexed by foundations and Σ₀ elements.
+
+Assigns to each foundation F and Σ₀ element X a type C(F,X) of witnesses.
+The size field tracks complexity (e.g., number of parameters).
+-/
 structure WitnessFamily where
   C : Foundation → Sigma0 → Type
 

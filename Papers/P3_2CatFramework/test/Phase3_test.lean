@@ -2,7 +2,7 @@
   Papers/P3_2CatFramework/test/Phase3_test.lean
 -/
 import Papers.P3_2CatFramework.Phase3_Levels
-import Papers.P3_2CatFramework.Phase3_Obstruction
+-- import Papers.P3_2CatFramework.Phase3_Obstruction  -- Moved to archive
 import Papers.P3_2CatFramework.Phase3_StoneWindowMock
 import Papers.P3_2CatFramework.Phase2_API
 
@@ -14,7 +14,7 @@ open Papers.P3.Phase3
 #check gap_height_nat_is_one
 
 -- Obstruction lemma recovers the Phase 2 negative result at level 0
-#check gap_obstructs_at_zero
+-- #check gap_obstructs_at_zero  -- From Phase3_Obstruction (now in archive)
 
 -- StoneWindowMock is uniformizable at 0
 #check stone_uniformization_h0
