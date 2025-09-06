@@ -1,7 +1,7 @@
 \documentclass[11pt]{article}
 
 % -------------------------------------------------
-% Preamble (Standard AxCal setup, based on Paper 4)
+% Preamble (AxCal setup, aligned with Paper 6 tree)
 % -------------------------------------------------
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -9,16 +9,29 @@
 \usepackage{geometry}
 \geometry{margin=1in}
 \usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage{microtype}
 \usepackage{hyperref}
 \hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  breaklines=true,
+  keepspaces=true
+}
 
-% AxCal macros (reused from Paper 4)
+% -------------------------------------------------
+% AxCal macros (reused and extended)
+% -------------------------------------------------
 \newcommand{\WLPO}{\mathsf{WLPO}}
 \newcommand{\FT}{\mathsf{FT}}
 \newcommand{\DCw}{\mathsf{DC}_{\omega}}
 \newcommand{\MP}{\mathsf{MP}}
 \newcommand{\BISH}{\mathsf{BISH}}
-\newcommand{\SigmaZero}{\Sigma_{0}}
+\newcommand{\SigmaZero}{\Sigma_0}
 
 % Height triple pretty-print
 \newcommand{\hzero}{\mathbf{0}}
@@ -26,14 +39,12 @@
 \newcommand{\homega}{\boldsymbol{\omega}}
 \newcommand{\allzero}{\langle \hzero,\hzero,\hzero\rangle}
 \newcommand{\DCwonly}{\langle \hzero,\hzero,\hone\rangle}
-\newcommand{\WLPOonly}{\langle \hone,\hzero,\hzero\rangle}
-\newcommand{\FTonly}{\langle \hzero,\hone,\hzero\rangle}
 
 % Lean shortcuts
 \newcommand{\lean}[1]{\texttt{#1}}
-\newcommand{\leanok}{\text{\tiny [✓ Lean]}}
+\newcommand{\leanok}{\text{\tiny [✓ Lean Verified]}}
 
-% Physics macros
+% Physics/macros
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\C}{\mathbb{C}}
 \newcommand{\Hil}{\mathcal{H}}
@@ -41,10 +52,15 @@
 \newcommand{\bra}[1]{\langle#1|}
 \newcommand{\braket}[2]{\langle#1|#2\rangle}
 \newcommand{\ip}[2]{\langle #1, #2 \rangle}
-\newcommand{\expect}[1]{\langle #1 \rangle}
+\newcommand{\E}[1]{\langle #1 \rangle}
 \newcommand{\comm}[2]{[#1, #2]}
 \newcommand{\anticomm}[2]{\{#1, #2\}}
+\newcommand{\acomm}[2]{\{#1, #2\}} % synonym used in Lean-facing text
 \newcommand{\stddev}{\sigma}
+\newcommand{\absC}[1]{\left| #1 \right|}
+\newcommand{\abssq}[1]{\absC{#1}^{2}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\Var}{\mathrm{Var}}
 
 % Theorem environments
 \theoremstyle{plain}
@@ -60,14 +76,11 @@
 \theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remark}
 
-% Proof sketch environment
-\newenvironment{prfsketch}{\noindent\textit{Proof sketch.} }{}
-
 % -------------------------------------------------
 % Title
 % -------------------------------------------------
 \title{Axiom Calibration for the Heisenberg Uncertainty Principle (Paper 6):\\
-Distinguishing Preparation and Measurement Uncertainty}
+Preparation vs.\ Measurement, Constructive RS \& Schrödinger Inequalities}
 \author{Paul Chun--Kit Lee\\
 \texttt{dr.paul.c.lee@gmail.com}\\
 New York University, NY}
@@ -77,364 +90,397 @@ New York University, NY}
 \maketitle
 
 \begin{abstract}
-We apply the Axiom Calibration (AxCal) framework to the Heisenberg Uncertainty Principle (HUP), distinguishing between preparation uncertainty and measurement uncertainty. We calibrate the standard Robertson-Schrödinger inequality (HUP-RS) at Height 0 ($\allzero$), demonstrating it is fully constructive. The proof relies only on the constructive validity of the Cauchy-Schwarz inequality and basic Hilbert space algebra. We then analyze measurement uncertainty (HUP-M) in the context of sequential measurements, establishing an upper bound involving Dependent Choice ($\DCwonly$). This calibration clarifies the foundational distinction between the inherent structure of quantum states and the process of extracting classical information through measurement sequences.
+We apply the Axiom Calibration (AxCal) framework to the Heisenberg Uncertainty Principle (HUP) and separate two notions: (i) \emph{preparation} uncertainty (intrinsic state geometry) and (ii) \emph{measurement} uncertainty (sequential disturbance).
+Over the constructive base $\BISH$, we mechanize---in Lean 4, mathlib-free---the \emph{division-free squared} Robertson--Schrödinger inequality and its \emph{Schrödinger strengthening} (with anti-commutator term), both at AxCal height $\allzero$.
+For the sequential measurement track (HUP--M), we provide a foundation-scoped upper bound by Dependent Choice, $\DCwonly$, via a serial-relation stream construction. The result clarifies which parts of HUP belong to constructive Hilbert geometry and which reflect the logical cost of extracting classical data from infinite sequential experiments.
 \end{abstract}
 
 \tableofcontents
 
 \noindent\fbox{\parbox{\textwidth}{
-\textbf{Reproducibility Infrastructure:}
+\textbf{Reproducibility (Lean 4 / Lake).}
 \begin{itemize}
+\item \textbf{Zenodo Software:} \url{https://zenodo.org/records/17068179}
 \item \textbf{Repository:} \url{https://github.com/AICardiologist/FoundationRelativity}
-\item \textbf{Paper 6 CI status:} \url{https://github.com/AICardiologist/FoundationRelativity/actions/workflows/p6-heisenberg.yml}
 \item \textbf{Paper 6 Directory:} \texttt{Papers/P6\_Heisenberg/}
-\item \textbf{CI target:} \texttt{lake build Papers.P6\_Heisenberg.Smoke}
-\item \textbf{Constraint:} Mathlib-free, utilizing axiomatic Hilbert space definitions
+\item \textbf{Build target:} \texttt{lake build Papers.P6\_Heisenberg.Main}
 \item \textbf{No-sorry guard:} \texttt{./scripts/no\_sorry\_p6.sh}
+\item \textbf{Constraint:} mathlib-free; signatures and bridges are Prop-only, with no typeclass codegen.
 \end{itemize}
 }}
 
 % ===========================================================
-\section{Introduction: The Two Faces of Uncertainty}
+\section{Introduction and Guide to Reading}
 % ===========================================================
 
-The Heisenberg Uncertainty Principle (HUP) is fundamental to quantum mechanics, but the term often conflates two distinct concepts:
-
+The Heisenberg Uncertainty Principle (HUP) packages two ideas with different logical flavors:
 \begin{enumerate}
-\item \textbf{Preparation Uncertainty (HUP-RS):} A mathematical constraint on the variance of non-commuting observables within any given quantum state. It limits how precisely a state can be \emph{prepared}. This is formalized by the Robertson-Schrödinger inequality.
-\item \textbf{Measurement Uncertainty (HUP-M):} A statement about how the act of \emph{measuring} one observable disturbs the system, affecting subsequent measurements of a non-commuting observable.
+\item \textbf{Preparation uncertainty (HUP--RS).} State geometry constrains simultaneous sharpness of non-commuting observables. This is expressed by the Robertson--Schrödinger inequality~\cite{Robertson1929,Schrodinger1930}.
+\item \textbf{Measurement uncertainty (HUP--M).} Sequential measurement and state update introduce disturbance; formal analyses track distributions across infinitely many trials~\cite{BuschLahtiWerner2014,Ozawa2003}.
 \end{enumerate}
-
-We apply the AxCal framework (Papers 3A, 4 \cite{Paper3A, Paper4}) to calibrate the axiomatic costs of these two formulations over the constructive base $\BISH$. We find a sharp distinction in their logical requirements.
-
-\paragraph{Pinned Signature ($\SigmaZero$).}
-We extend $\SigmaZero$ with the structure of a complex Hilbert space $\Hil$. This includes the inner product $\ip{\cdot}{\cdot}$, normalized states $\psi$ ($\|\psi\|=1$), and self-adjoint operators $A$ (observables). All interpretations between foundations must fix these structures up to canonical isomorphism.
-
-\paragraph{Main Contributions.}
+We calibrate these under AxCal (see Papers 3A, 4~\cite{Paper3A,Paper4}) over $\BISH$. The main outcomes are:
 \begin{itemize}
-\item \textbf{HUP-RS calibration:} Height 0 profile showing preparation uncertainty is fully constructive
-\item \textbf{HUP-M analysis:} Upper bound $\DCw$ for measurement uncertainty via infinite sequential measurements  
-\item \textbf{Foundational distinction:} Clear separation between Hilbert space geometry and measurement extraction costs
-\item \textbf{Mathlib-free implementation:} Complete Lean 4 formalization using minimal axiomatic Hilbert space theory
+\item \textbf{Height~0 (constructive) theorems.} We formalize and prove in Lean the \emph{division-free squared} Robertson--Schrödinger bound and the \emph{Schrödinger} two-term strengthening (commutator plus anti-commutator).
+\item \textbf{DC$\boldsymbol{\omega}$ upper bound for HUP--M.} The infinite-history stream needed for sequential experiments uses $\DCw$ as a foundation-scoped token, giving an AxCal upper bound $\le \DCwonly$.
 \end{itemize}
 
-% ===========================================================
-\section{Minimal AxCal Interface and Hilbert Space Axioms}
-% ===========================================================
-
-We recall the AxCal framework from Papers 3A/4 and introduce the minimal Hilbert space structure needed for our analysis.
-
-\subsection{AxCal Framework (Recap)}
-
-\begin{definition}[Witness Family and Profile]
-A witness family $\mathcal{W}$ assigns to each foundation $F \supseteq \BISH$ a proposition $\mathcal{W}(F)$. 
-The profile $h^{\to}(\mathcal{W}) = (h_{\WLPO}, h_{\FT}, h_{\DCw}) \in \{0,1,\omega\}^3$ records the minimal height on each axis where positive uniformization holds.
-\end{definition}
-
-\subsection{Minimal Hilbert Space Axioms}
-
-Rather than importing full functional analysis, we axiomatize the essential structure:
-
-\begin{definition}[Complex Inner Product Space] 
-A type $\Hil$ equipped with:
-\begin{itemize}
-\item Inner product $\ip{\cdot}{\cdot}: \Hil \to \Hil \to \C$ 
-\item Linearity: $\ip{ax + by}{z} = a\ip{x}{z} + b\ip{y}{z}$
-\item Conjugate symmetry: $\ip{x}{y} = \overline{\ip{y}{x}}$
-\item Positive definiteness: $\ip{x}{x} \geq 0$ with equality iff $x = 0$
-\end{itemize}
-\end{definition}
-
-\begin{definition}[Self-adjoint Operators]
-An operator $A: \Hil \to \Hil$ is self-adjoint if $\ip{Ax}{y} = \ip{x}{Ay}$ for all $x,y \in \Hil$.
-The commutator is $\comm{A}{B} = AB - BA$.
-\end{definition}
-
-\begin{lemma}[Constructive Prerequisites] \leanok
-The following are provable in $\BISH$ from the axioms:
-\begin{enumerate}
-\item \textbf{Cauchy-Schwarz:} $|\ip{x}{y}| \leq \|x\| \|y\|$ where $\|x\| = \sqrt{\ip{x}{x}}$
-\item \textbf{Real expectations:} If $A$ is self-adjoint, then $\ip{\psi}{A\psi} \in \R$
-\item \textbf{Variance formula:} $\stddev_A^2(\psi) = \|\Delta A \psi\|^2$ where $\Delta A = A - \ip{\psi}{A\psi} I$
-\end{enumerate}
-\end{lemma}
+\paragraph{Organization.}
+Section~\ref{sec:related} reviews prior work in uncertainty relations, formalization efforts, and axiom‑dependency studies.
+Section~\ref{sec:signatures-bridges} summarizes the signatures and bridges used by the constructive proofs.
+Sections~\ref{sec:RS}--\ref{sec:Schrodinger} prove the RS and Schrödinger inequalities in squared, division-free form.
+Section~\ref{sec:measurement-DC} treats the DC$\omega$ bound for sequential measurement.
+Section~\ref{sec:engineering} discusses Lean formalization strategies, AxCal architecture reuse from the spectral/quantum track, and a retrospective on early prototypes.
+A reproducibility ledger and a Lean--to--LaTeX crosswalk appear at the end.
 
 % ===========================================================
-\section{HUP-RS: Preparation Uncertainty at Height 0}
+\section{Background and Related Work}
+\label{sec:related}
 % ===========================================================
 
-We calibrate the standard Robertson-Schrödinger inequality.
+\paragraph{Uncertainty inequalities.}
+The modern preparation‑uncertainty landscape begins with Robertson~\cite{Robertson1929} and Schrödinger~\cite{Schrodinger1930}; standard functional‑analytic treatments include Reed--Simon~\cite{ReedSimonI}.
+Measurement‑disturbance relations were refined in the last two decades, notably by Ozawa~\cite{Ozawa2003} and by Busch--Lahti--Werner~\cite{BuschLahtiWerner2014}.
+Our treatment isolates the \emph{preparation} inequalities as constructive Hilbert geometry (Height~0) and places the sequential‑measurement stream in the $\DCw$ stratum.
 
-\begin{definition}[Expectation and Variance]
-For observable $A$ and state $\psi$:
-\begin{itemize}
-\item \textbf{Expectation:} $\expect{A}_\psi = \ip{\psi}{A\psi}$
-\item \textbf{Variance:} $\stddev_A^2(\psi) = \expect{(A - \expect{A}_\psi I)^2}_\psi$
-\end{itemize}
-\end{definition}
+\paragraph{Formalization of quantum theory.}
+Several efforts formalize aspects of quantum theory:
+circuit‑level languages and reasoning in Coq (e.g., QWIRE~\cite{QWIRE2017}),
+quantum program logics and refinement calculi (see Ying's monograph~\cite{Ying2016}).
+These typically work in finite‑dimensional settings or with intermediate denotational layers tailored to programs and circuits.
+Our focus is different: we work \emph{analytically} directly at Hilbert‑space signature level, mathlib‑free, and separate constructive bridges (centered vectors, expectation identities) from axiom‑height accounting in AxCal.
 
-\begin{theorem}[Robertson-Schrödinger Inequality (HUP-RS)] \leanok
-For any observables $A, B$ and normalized state $\psi$:
+\paragraph{Axiom‑dependency and constructive analysis.}
+The practice of tracking logical strength via \emph{which} principles are needed is classical in constructive analysis~\cite{BishopBridges,BridgesRichman,TroelstraVanDalen}.
+Weak forms of excluded middle (e.g.\ $\WLPO$), compactness principles (e.g.\ the Fan Theorem, $\FT$), and choice schemata (e.g.\ $\DCw$) play distinct roles.
+Our calibration uses only a minimal real order (for chaining inequalities), Cauchy--Schwarz, and precise complex‑norm identities for Height~0 results, and \emph{foundation‑scoped} $\DCw$ for the measurement stream.
+For background on choice principles and their consequences, see Howard--Rubin~\cite{HowardRubin}.
+
+\paragraph{Positioning.}
+To our knowledge, a mathlib‑free constructive formalization of the \emph{squared division‑free} RS and Schrödinger inequalities at Height~0, with a separate DC$\omega$ upper bound for measurement streams, has not previously appeared in a single mechanized account.
+This paper aims to serve as a compact reference that cleanly separates (constructive) geometry from (choice‑driven) sampling.
+
+% ===========================================================
+\section{Signatures and Bridge Lemmas}
+\label{sec:signatures-bridges}
+% ===========================================================
+
+We work with an abstract complex Hilbert signature $S$ (inner product $\ip{\cdot}{\cdot}$, norm $\|\cdot\|$) and an observable signature $O$ (self-adjointness, complex/real expectations, commutator/anti-commutator). The Lean files are
+\begin{center}
+\texttt{HUP/HilbertSig.lean},\quad
+\texttt{Axioms/Complex.lean}.
+\end{center}
+The constructive proofs below use only the following bridges (each provided as Prop-level lemmas in Lean).%
+\footnote{See the ``Ledger'' table in \S\ref{sec:ledger}. All bridges appear as named lemmas with Lean anchors indicated in small caps below.}
+
+\begin{description}
+  \item[Centered vectors.] For observable $A$ and state $\psi$, define
+  $\Delta A\psi := A\psi - \E{A}_\psi\,\psi$ (and similarly for $B$). \hfill{\small(\lean{center})}
+  \item[Variance identity.] $\Var_\psi(A) = \|\Delta A\psi\|^2$. \hfill{\small(\lean{variance\_centered})}
+  \item[Skew identity.] $\E{\comm{A}{B}}_\psi = \ip{\Delta A\psi}{\Delta B\psi} - \overline{\ip{\Delta A\psi}{\Delta B\psi}}$. \hfill{\small(\lean{comm\_expect\_as\_skew\_centered})}
+  \item[Symmetric identity.] $\E{\acomm{\Delta A}{\Delta B}}_\psi = \ip{\Delta A\psi}{\Delta B\psi} + \overline{\ip{\Delta A\psi}{\Delta B\psi}}$. \hfill{\small(\lean{acomm\_expect\_as\_sym\_centered})}
+  \item[Exact complex identity.] For $z\in\C$,
+  \[
+    \abssq{z-\bar z} + \abssq{z+\bar z} = 4\,\abssq{z}.
+  \]
+  \hfill{\small(\lean{norm\_sq\_skew\_sym\_sum\_eq\_4\_norm\_sq})}
+  \item[Cauchy--Schwarz (squared).] $\abssq{\ip{x}{y}} \le \|x\|^2\,\|y\|^2$.\hfill{\small(\lean{cauchy\_schwarz\_sq})}
+\end{description}
+
+\begin{remark}[Division-free style]
+We present all inequalities in squared form with an explicit factor $4$.
+The more familiar $\tfrac12$ versions follow by taking square roots and dividing by $2$, outside the division-free core we calibrate constructively.
+\end{remark}
+
+
+% ===========================================================
+\section{Robertson--Schrödinger (squared, constructive)}
+\label{sec:RS}
+% ===========================================================
+
+\begin{theorem}[Robertson--Schrödinger, division-free squared form]\leanok
+\label{thm:RS-squared}
+Let $A,B$ be self-adjoint and $\psi$ normalized. Then
 \[
-\stddev_A(\psi) \stddev_B(\psi) \geq \frac{1}{2} \left| \expect{\comm{A}{B}}_\psi \right|
+  \abssq{\E{\comm{A}{B}}_\psi} \;\le\; 4\,\Var_\psi(A)\,\Var_\psi(B).
 \]
-This has AxCal profile $\allzero$ (Height 0).
+\emph{Lean anchor:} \lean{Papers.P6\_Heisenberg.HUP.RobertsonSchrodinger.RS\_from\_bridges}.
 \end{theorem}
 
-\begin{prfsketch}
-The proof uses only constructively valid steps from Hilbert space axioms.
-
-\textbf{Setup:} Let $\Delta A = A - \expect{A}_\psi I$ and $\Delta B = B - \expect{B}_\psi I$ be centered operators. 
-Set $x = \Delta A \psi$ and $y = \Delta B \psi$. Then $\stddev_A^2 = \|x\|^2$ and $\stddev_B^2 = \|y\|^2$.
-
-\textbf{Cauchy-Schwarz Application:}
+\begin{proof}
+Let $\Delta A\psi$ and $\Delta B\psi$ be the centered vectors, and set $z:=\ip{\Delta A\psi}{\Delta B\psi}$.
+By the skew identity (\lean{comm\_expect\_as\_skew\_centered}),
 \[
-\stddev_A^2 \stddev_B^2 = \|x\|^2 \|y\|^2 \geq |\ip{x}{y}|^2
+\E{\comm{A}{B}}_\psi \;=\; z-\bar z \quad\Longrightarrow\quad \abssq{\E{\comm{A}{B}}_\psi} = \abssq{z-\bar z}.
 \]
-
-\textbf{Complex Analysis:} Let $Z = \ip{x}{y}$. We have $|Z|^2 = (\text{Re } Z)^2 + (\text{Im } Z)^2 \geq (\text{Im } Z)^2$.
-
-\textbf{Commutator Connection:} The imaginary part satisfies:
-\begin{align}
-\text{Im } Z &= \frac{1}{2i}(Z - \overline{Z}) = \frac{1}{2i}(\ip{x}{y} - \ip{y}{x}) \\
-&= \frac{1}{2i}\ip{\psi}{[\Delta A, \Delta B]\psi} = \frac{1}{2i}\expect{\comm{A}{B}}_\psi
-\end{align}
-
-\textbf{Final Step:} Therefore:
+Using the inequality component of the exact complex identity,
 \[
-\stddev_A^2 \stddev_B^2 \geq \frac{1}{4}|\expect{\comm{A}{B}}_\psi|^2
+\abssq{z-\bar z} \;\le\; 4\,\abssq{z}.
 \]
-Taking square roots (constructive for non-negative reals) yields the result.
-\end{prfsketch}
-
-\begin{proof}[Lean Formalization]
-This is formalized as \lean{HUP\_RS\_ProfileUpper} in \texttt{HUP/RobertsonSchrodinger.lean} with height-0 certificate.
+By Cauchy--Schwarz (\lean{cauchy\_schwarz\_sq}) and the variance identity (\lean{variance\_centered}),
+\[
+\abssq{z} \;=\; \abssq{\ip{\Delta A\psi}{\Delta B\psi}}
+\;\le\; \norm{\Delta A\psi}^2 \norm{\Delta B\psi}^2
+\;=\; \Var_\psi(A)\,\Var_\psi(B).
+\]
+Multiplying by $4$ and chaining the inequalities yields the claim.
 \end{proof}
 
-\noindent\textbf{Profile:} $\allzero$ (Height 0). The Robertson-Schrödinger inequality is fully constructive, requiring no axioms beyond $\BISH$ plus Hilbert space structure.
+\begin{remark}[Classical form]
+From Theorem~\ref{thm:RS-squared},
+$\stddev_A(\psi)\,\stddev_B(\psi)\ge \tfrac12\,\absC{\E{\comm{A}{B}}_\psi}$ follows by square roots and division by $2$.
+\end{remark}
 
 % ===========================================================
-\section{HUP-M: Measurement Uncertainty and Dependent Choice}
+\section{Schrödinger strengthening (commutator + anti-commutator)}
+\label{sec:Schrodinger}
 % ===========================================================
 
-We analyze measurement uncertainty through sequential measurement protocols.
+\begin{theorem}[Schrödinger inequality, constructive squared form]\leanok
+\label{thm:Schrodinger-squared}
+Let $A,B$ be self-adjoint and $\psi$ normalized. Then
+\[
+  \abssq{\E{\comm{A}{B}}_\psi}
+  \;+\;
+  \abssq{\E{\acomm{\Delta A}{\Delta B}}_\psi}
+  \;\le\; 4\,\Var_\psi(A)\,\Var_\psi(B).
+\]
+\emph{Lean anchor:} \lean{Papers.P6\_Heisenberg.HUP.RobertsonSchrodinger.Schrodinger\_from\_bridges}.
+\end{theorem}
 
-\subsection{Measurement Model}
-
-\begin{definition}[Sequential Measurement Protocol]
-Consider the following idealized experiment:
-\begin{enumerate}
-\item Prepare initial state $\psi_0$ (normalized)
-\item At step $n$: 
-   \begin{enumerate}
-   \item Measure observable $A$ on state $\psi_{n-1}$, obtaining outcome $a_n$
-   \item State collapses to $\psi'_n$ (projection postulate)
-   \item Measure observable $B$ on state $\psi'_n$, obtaining outcome $b_n$ 
-   \item State collapses to $\psi_n$
-   \end{enumerate}
-\end{enumerate}
-\end{definition}
-
-\begin{definition}[Measurement History]
-A finite measurement history is $h = ((a_1,b_1), (a_2,b_2), \ldots, (a_k,b_k))$.
-An infinite measurement history is a sequence $(a_n, b_n)_{n \in \mathbb{N}}$.
-\end{definition}
-
-\subsection{The Role of Dependent Choice}
-
-\begin{proposition}[Measurement Uncertainty Upper Bound] \leanok
-Formalizing the statistical analysis of infinite sequential measurement protocols suggests an upper bound of $\DCw$.
-\end{proposition}
-
-\begin{prfsketch}
-The measurement uncertainty principle (HUP-M) concerns how precisely measuring $A$ affects the precision of subsequent $B$ measurements. To verify this statistically requires analyzing infinite sequences of measurement outcomes.
-
-\textbf{Dependent Choice Structure:}
-At each step $n$, the measurement outcomes $(a_n, b_n)$ are selected stochastically from a probability distribution determined by the current quantum state $\psi_{n-1}$. Crucially:
-\begin{enumerate}
-\item The state $\psi_n$ (and thus the probability distribution for step $n+1$) depends on the actual outcomes at step $n$
-\item Quantum mechanics guarantees some outcome occurs at each step (serial relation)
-\item The sequence construction requires infinitely many choices, each depending on previous outcomes
-\end{enumerate}
-
-\textbf{Formalization via Serial Relations:}
-Define relation $R$ on measurement histories: $R(h_1, h_2)$ holds if $h_2$ extends $h_1$ by one measurement step with outcomes compatible with quantum mechanics. Since measurements always yield some result, $R$ is serial.
-
-Applying $\DCw$ to this serial relation constructs an infinite measurement sequence $(a_n, b_n)_{n \in \mathbb{N}}$, enabling statistical analysis of the measurement uncertainty.
-
-\textbf{Comparison to Paper 4:} This parallels the $\DCw$ requirement for extracting classical points from locale spectra (Paper 4, S2). Both involve making infinitely many dependent choices to extract definite classical information from quantum/geometric structures.
-\end{prfsketch}
-
-\begin{proof}[Lean Upper Bound]
-Formalized as \lean{HUP\_M\_ProfileUpper} in \texttt{HUP/MeasurementUncertainty.lean} using the \lean{HasDCω} token.
+\begin{proof}
+Set $z:=\ip{\Delta A\psi}{\Delta B\psi}$.
+By the skew/symmetric identities,
+\[
+  \E{\comm{A}{B}}_\psi = z-\bar z, 
+  \qquad
+  \E{\acomm{\Delta A}{\Delta B}}_\psi = z+\bar z.
+\]
+Hence the left-hand side is
+\[
+  \abssq{z-\bar z} + \abssq{z+\bar z}
+  \;=\; 4\,\abssq{z}
+  \qquad\text{by the exact complex identity.}
+\]
+Apply Cauchy--Schwarz and the variance identity as in Theorem~\ref{thm:RS-squared}:
+$\abssq{z}\le \Var_\psi(A)\,\Var_\psi(B)$, and multiply by $4$.
 \end{proof}
 
-\noindent\textbf{Profile:} $h^{\to}(\text{HUP-M}) \leq \DCwonly$ (Upper bound $\{\DCw\}$).
+\begin{remark}[Centered anti-commutator]
+We write $\acomm{\Delta A}{\Delta B}$ to emphasize centering at $\psi$.
+The Lean bridge \lean{acomm\_expect\_as\_sym\_centered} returns the expression $z+\bar z$ directly.
+\end{remark}
 
 % ===========================================================
-\section{Implementation Strategy and Lean Architecture}
+\section{Measurement track (HUP--M) and $\DCw$}
+\label{sec:measurement-DC}
 % ===========================================================
 
-\subsection{File Structure}
+The sequential (disturbance) viewpoint models an experiment producing an infinite history of dependent outcomes.
+Let $H_{\mathrm{fin}}$ be the type of finite histories. Define a \emph{serial} relation $R$ by extending a history by one admissible measurement step. Seriality reflects that every measurement yields some outcome.
 
-The Paper 6 implementation follows the mathlib-free pattern established in Paper 4:
+\begin{theorem}[Serial DC$\omega$ stream]\leanok
+\label{thm:dcomega}
+Assume a foundation $F$ with token $[\mathrm{Has}\DCw\,F]$.
+From any seed in a serial relation there exists an infinite $R$-chain. In particular, the history relation above admits an infinite measurement stream.
+\emph{Lean anchors:} \lean{dcω\_stream} (axiom) and \lean{hupM\_stream\_from\_dcω} (derivation, \texttt{HUP/Witnesses.lean}).
+\end{theorem}
 
+\begin{corollary}[Calibration for HUP--M]\leanok
+\label{cor:HUPM}
+There is a witness family for measurement uncertainty whose AxCal height is bounded by $\DCwonly$.
+\emph{Lean anchor:} \lean{HUP\_M\_W} and its profile certificate in \texttt{HUP/Witnesses.lean}.
+\end{corollary}
+
+\begin{remark}
+The $\DCw$ cost reflects extraction of a definite infinite classical sample path from a process with history-dependent choices.
+This separates the geometric (Height~0) content of preparation from the choice‑centric content of sequential measurement.
+\end{remark}
+
+% ===========================================================
+\section{Engineering Notes: Lean Strategies, Architecture, and Retrospective}
+\label{sec:engineering}
+% ===========================================================
+
+\paragraph{AxCal architecture reused from spectral/quantum track.}
+We reuse the \emph{AxCal Core} built for spectral geometry (Paper~4) to keep the HUP analysis modular:
 \begin{itemize}
-\item \texttt{Papers/P6\_Heisenberg/}
-  \begin{itemize}
-  \item \texttt{Axioms/Complex.lean} -- Minimal complex numbers
-  \item \texttt{Axioms/InnerProduct.lean} -- Inner product space axioms  
-  \item \texttt{Axioms/Operators.lean} -- Self-adjoint operators, commutators
-  \item \texttt{HUP/Basic.lean} -- Foundation tokens and witness families
-  \item \texttt{HUP/RobertsonSchrodinger.lean} -- HUP-RS height-0 proof
-  \item \texttt{HUP/MeasurementUncertainty.lean} -- HUP-M upper bound
-  \item \texttt{Smoke.lean} -- Aggregator for CI testing
-  \end{itemize}
+  \item \emph{Foundations and profiles.} \lean{AxCalCore} provides the axiom‑height lattice (Height~0, finite, $\omega$), profile records (\lean{ProfileUpper}), and witness families (\lean{WitnessFamily}).
+  \item \emph{Scoping of $\DCw$.} The token \lean{[HasDCω F]} is indexed by a foundation $F$, so uses of dependent choice remain foundation‑scoped. This avoids "free" availability of $\DCw$.
+  \item \emph{Prop‑only signatures.} All operators/inner‑product facts are Prop‑level fields/axioms to avoid code generation and keep the library mathlib‑free.
 \end{itemize}
 
-\subsection{Key Lean Interfaces}
+\paragraph{Formalization strategies.}
+\begin{enumerate}
+  \item \textbf{Division‑free squared proofs.} RS and Schrödinger are proved in squared form with a hard‑coded factor $4$ (\texttt{Axioms/Complex.lean}), removing division and square roots from the core proof.
+  \item \textbf{Centering bridge.} Algebraic identities are expressed via \lean{center}, \lean{comm\_expect\_as\_skew\_centered}, \lean{acomm\_expect\_as\_sym\_centered}; we work at inner‑product level rather than general operator algebra.
+  \item \textbf{Minimal real order.} Only order facts needed for chaining and monotonicity under scaling by $4$ are assumed.
+  \item \textbf{Serial DC$\omega$ eliminator.} \lean{dcω\_stream} plus the history serial relation yields the measurement stream with $\DCw$ as an explicit token.
+\end{enumerate}
 
-\begin{verbatim}
--- Axioms/InnerProduct.lean
-class InnerProductSpace (H : Type*) [AddCommGroup H] [Module ℂ H] where
-  inner : H → H → ℂ  
-  inner_add_left : ∀ x y z, inner (x + y) z = inner x z + inner y z
-  inner_conj_symm : ∀ x y, inner x y = conj (inner y x)  
-  inner_pos_def : ∀ x, 0 ≤ (inner x x).re ∧ (inner x x = 0 ↔ x = 0)
+\paragraph{Retrospective on the prior prototype (and fixes).}
+Early drafts exposed several issues now corrected:
+\begin{itemize}
+  \item \textbf{Unscoped $\DCw$.} Dependent Choice was accidentally usable "for free." We fixed this by introducing a \emph{foundation‑scoped} class \lean{[HasDCω F]} and requiring it everywhere $\DCw$ is used.
+  \item \textbf{Expectation typing.} Conflating complex and real expectations complicated equalities and coercions. Splitting into \lean{cexpect} (always complex) and \lean{expect} (real, for self‑adjoints) stabilized the bridges and proofs.
+  \item \textbf{Axiom ledger vs.\ sorrys.} All provisional \texttt{sorry} were replaced by named, documented bridges; these were then discharged in the Phase‑3 proofs. The \texttt{no\_sorry} guard enforces this across the tree.
+  \item \textbf{Witness family shape.} \lean{HUP\_M\_W} now quantifies over a foundation and explicitly requires \lean{[HasDCω F]} to produce an infinite history, matching the AxCal profile statement.
+\end{itemize}
 
--- HUP/Basic.lean  
-class HasWLPO (F : Foundation) : Prop
-class HasFT (F : Foundation) : Prop  
-class HasDCω (F : Foundation) : Prop
-
-def HUP_RS_W : WitnessFamily := fun F => 
-  ∀ (H : Type*) [InnerProductSpace H] (A B : H →ₗ H) (ψ : H),
-    ‖ψ‖ = 1 → IsSelfAdjoint A → IsSelfAdjoint B →
-    stddev A ψ * stddev B ψ ≥ (1/2) * |⟨commutator A B ψ, ψ⟩|
-
-def HUP_M_W : WitnessFamily := fun F =>
-  HasDCω F → ∀ (measurement_protocol : InfiniteSequence), 
-    statistical_uncertainty_relation_holds measurement_protocol
-\end{verbatim}
-
-\subsection{Calibration Certificates}
-
-\begin{verbatim}
--- HUP/RobertsonSchrodinger.lean
-def HUP_RS_ProfileUpper : ProfileUpper all_zero HUP_RS_W :=
-  ProfileUpper.height_zero (fun F _ => 
-    -- Constructive proof using only Cauchy-Schwarz
-    sorry_free_proof_of_robertson_schrodinger)
-
--- HUP/MeasurementUncertainty.lean  
-def HUP_M_ProfileUpper : ProfileUpper DCω_only HUP_M_W :=
-  ProfileUpper.upper_bound (fun F hDC => 
-    -- Use DCω to construct infinite measurement sequence
-    dependent_choice_infinite_sequence hDC)
-\end{verbatim}
-
-% ===========================================================
-\section{Physics Readout and Calibration Summary}
-% ===========================================================
-
+\paragraph{Axiom‑dependency ledger (informal DAG).}
 \begin{center}
-\begin{tabular}{|l|l|l|l|}
-\hline
-\textbf{Component} & \textbf{Profile} & \textbf{Logical Cost} & \textbf{Physical Interpretation} \\
-\hline
-HUP-RS & $\allzero$ & None (Height 0) & State preparation limits are geometric \\
-(Preparation) & & & properties of Hilbert space \\
-\hline  
-HUP-M & $\leq \DCwonly$ & $\DCw$ (Upper bound) & Measurement analysis requires \\
-(Measurement) & & & choice principles for classical extraction \\
-\hline
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Result} & \textbf{Depends on} & \textbf{Height} \\
+\midrule
+RS (squared) & Cauchy--Schwarz, variance identity, skew identity, complex sum rule &
+$\hzero$ \\
+Schrödinger (squared) & RS deps + symmetric identity (centered) & $\hzero$ \\
+Measurement stream & seriality of histories + $\DCw$ eliminator & $\le \homega$ \\
+\bottomrule
 \end{tabular}
 \end{center}
 
-\subsection{Foundational Implications}
-
-The calibration reveals a fundamental distinction in quantum mechanics:
-
-\begin{enumerate}
-\item \textbf{Preparation Uncertainty (HUP-RS):} The mathematical constraints on quantum state preparation are fully constructive. They follow from the geometric structure of Hilbert space and require no non-constructive principles. This places uncertainty relations in the computable core of quantum mechanics.
-
-\item \textbf{Measurement Uncertainty (HUP-M):} The statistical analysis of measurement disturbance, when formalized through infinite sequential protocols, requires dependent choice principles. This reflects the general pattern that extracting classical information from quantum processes incurs logical costs.
-\end{enumerate}
-
-\subsection{Comparison to Papers 3A and 4}
-
-This result fits the broader AxCal landscape:
-\begin{itemize}
-\item Like Paper 4's S0/S4 (compact approximations, QHO), HUP-RS is fully constructive (Height 0)
-\item Like Paper 4's S2 (locale spatiality), HUP-M requires $\DCw$ to extract classical sequences
-\item The pattern reinforces that quantum \emph{structure} is often constructive while classical \emph{extraction} incurs choice costs
-\end{itemize}
-
 % ===========================================================
-\section{Related Work and Future Directions}
+\section{Reproducibility Ledger and File Map}
+\label{sec:ledger}
 % ===========================================================
 
-\paragraph{Constructive Quantum Mechanics.}
-Bishop-Bridges \cite{BishopBridges} developed constructive functional analysis including basic Hilbert space theory. Our work extends this to foundational analysis of quantum uncertainty principles.
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Lean artifact} & \textbf{Purpose in paper} \\
+\midrule
+\verb|Axioms/Complex.lean| & Complex axioms; real order; norm identities (\lean{norm\_sq\_skew\_sym\_sum\_eq\_4\_norm\_sq}) \\
+\verb|HUP/HilbertSig.lean| & Signatures and bridges (\lean{center}, \lean{variance\_centered}, \lean{cauchy\_schwarz\_sq}, \\
+ & \hspace{1.4em}\lean{comm\_expect\_as\_skew\_centered}, \lean{acomm\_expect\_as\_sym\_centered}) \\
+\verb|HUP/RobertsonSchrodinger.lean| & \lean{RS\_from\_bridges}, \lean{Schrodinger\_from\_bridges} (Height~0 theorems) \\
+\verb|HUP/DComega.lean| & \lean{dcω\_stream} interface for serial relations \\
+\verb|HUP/Witnesses.lean| & \lean{hupM\_stream\_from\_dcω}; \lean{HUP\_M\_W} and $\DCw$ profile \\
+\verb|Axioms/Ledger.lean| & Documentary index of assumptions already discharged/derived \\
+\bottomrule
+\end{tabular}
+\end{center}
 
-\paragraph{Quantum Uncertainty Relations.}
-Busch-Lahti-Werner \cite{BuschLahtiWerner} provide modern treatments of various uncertainty relations. Our contribution is the precise axiomatic calibration distinguishing preparation from measurement uncertainty.
-
-\paragraph{Future Calibrations.}
-Several quantum mechanical principles await AxCal analysis:
-\begin{itemize}
-\item \textbf{Bell's inequalities:} Likely requiring choice principles for statistical analysis
-\item \textbf{Quantum entanglement:} May involve independence assumptions across orthogonal axes  
-\item \textbf{Measurement problem:} Could reveal deep connections to constructive analysis of stochastic processes
-\end{itemize}
+\paragraph{Build.}
+\texttt{lake build Papers.P6\_Heisenberg.Main} compiles the library target; \texttt{./scripts/no\_sorry\_p6.sh} confirms sorry‑free status.
 
 % ===========================================================
-\section{Conclusion}
+\section{Calibration Summary and Physics Readout}
 % ===========================================================
 
-The AxCal framework successfully calibrates the Heisenberg Uncertainty Principle by distinguishing preparation uncertainty (HUP-RS) from measurement uncertainty (HUP-M). HUP-RS emerges as fully constructive (Height 0), demonstrating that the fundamental limits on state preparation are geometric properties accessible within constructive mathematics. HUP-M, when analyzed through infinite measurement sequences, requires dependent choice ($\DCw$) to extract the classical information needed for statistical verification.
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Label} & \textbf{Claim} & \textbf{AxCal Profile} & \textbf{Readout} \\
+\midrule
+HUP--RS & Preparation uncertainty (squared) & $\allzero$ &
+Hilbert-space geometry, fully constructive \\
+Schrödinger & Two-term strengthening (squared) & $\allzero$ &
+Adds symmetric term via centered anti-commutator \\
+HUP--M & Sequential measurement stream & $\le \DCwonly$ &
+Infinite dependent choices via $\DCw$ token \\
+\bottomrule
+\end{tabular}
+\end{center}
 
-This calibration clarifies a foundational distinction in quantum mechanics: the inherent quantum structure (Hilbert space geometry, operator algebra) versus the classical extraction processes (measurement sequences, statistical analysis). The former is constructively accessible while the latter incurs logical costs characteristic of choice principles.
+% ===========================================================
+\section*{Appendix: Lean--to--LaTeX Crosswalk}
+% ===========================================================
 
-The mathlib-free Lean implementation demonstrates the feasibility of foundational quantum mechanical analysis within minimal axiomatic frameworks, opening paths for further AxCal investigations of quantum theory.
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Lean symbol} & \textbf{Paper notation} \\
+\midrule
+\verb|S.inner x y| & $\ip{x}{y}$ \\
+\verb|O.cexpect op ψ| & $\E{op}_\psi$ \\
+\verb|O.expect op ψ| & $\E{op}_\psi$ (real when $op$ is self-adjoint) \\
+\verb|O.variance op ψ| & $\Var_\psi(op)$ \\
+\verb|center S O A ψ| & $\Delta A\psi$ \\
+\verb|O.comm A B| & $\comm{A}{B}$ \\
+\verb|O.acomm A B| & $\acomm{\Delta A}{\Delta B}$ (centered via bridge) \\
+\verb|complex_norm_sq z| & $\absC{z}^2$ \\
+\verb|RS_from_bridges| & Thm.~\ref{thm:RS-squared} \\
+\verb|Schrodinger_from_bridges| & Thm.~\ref{thm:Schrodinger-squared} \\
+\bottomrule
+\end{tabular}
+\end{center}
 
-\bigskip
-
-\section*{Acknowledgments}
-Development assistance provided by: Gemini 2.5 Deep Think (architecture exploration and theoretical framework design), GPT-5 Pro (Lean 4 scaffolding and implementation support), and Claude Code (repository management and development workflow).
-
+% -------------------------------------------------
+% Bibliography
+% -------------------------------------------------
 \bibliographystyle{abbrv}
 \begin{thebibliography}{99}
 
 \bibitem{Paper3A}
 P.~C.-K.~Lee.
-\newblock Axiom Calibration via Non-Uniformizability: A Framework for Orthogonal Logical Dependencies in Analysis.
-\newblock (Paper 3A, revised with Paper 3C integration), 2025.
+\newblock Axiom Calibration for Constructive Mathematics (Paper 3A).
+\newblock 2025.
 
 \bibitem{Paper4}
 P.~C.-K.~Lee.
-\newblock Axiom Calibration for Quantum Spectra: Orthogonal Heights, Choice Principles, and Separation Portals.
-\newblock (Paper 4, Lean 4 verified), 2025.
+\newblock AxCal Framework and Spectral Geometry (Paper 4).
+\newblock 2025.
 
 \bibitem{BishopBridges}
 E.~Bishop and D.~S.~Bridges.
-\newblock {\em Constructive Analysis}.
+\newblock \emph{Constructive Analysis}.
 \newblock Springer, 1985.
 
-\bibitem{BuschLahtiWerner}
-P.~Busch, P.~Lahti, and R.~F.~Werner.
-\newblock Quantum root-mean-square error and measurement uncertainty relations.
-\newblock {\em Rev. Mod. Phys.} 86:1261, 2014.
+\bibitem{BridgesRichman}
+D.~S.~Bridges and F.~Richman.
+\newblock \emph{Varieties of Constructive Mathematics}.
+\newblock Cambridge University Press, 1987.
 
-\bibitem{Robertson29}
+\bibitem{TroelstraVanDalen}
+A.~S.~Troelstra and D.~van~Dalen.
+\newblock \emph{Constructivism in Mathematics: An Introduction}.
+\newblock North-Holland, 1988.
+
+\bibitem{HowardRubin}
+P.~Howard and J.~E.~Rubin.
+\newblock \emph{Consequences of the Axiom of Choice}.
+\newblock American Mathematical Society, 1998.
+
+\bibitem{Heisenberg1927}
+W.~Heisenberg.
+\newblock \"Uber den anschaulichen Inhalt der quantentheoretischen Kinematik und Mechanik.
+\newblock \emph{Z. Phys.}, 43:172--198, 1927.
+
+\bibitem{Robertson1929}
 H.~P.~Robertson.
-\newblock The uncertainty principle.
-\newblock {\em Phys. Rev.} 34:163--164, 1929.
+\newblock The Uncertainty Principle.
+\newblock \emph{Phys. Rev.}, 34:163--164, 1929.
 
-\bibitem{Schrodinger30}  
-E.~Schrödinger.
-\newblock Zum Heisenbergschen Unschärfeprinzip.
-\newblock {\em Ber. Kgl. Akad. Wiss. Berlin} 24:296--303, 1930.
+\bibitem{Schrodinger1930}
+E.~Schr\"odinger.
+\newblock Zum Heisenbergschen Unsch\"arfeprinzip.
+\newblock \emph{Sitzungsber. Preuss. Akad. Wiss.}, Phys.-Math. Kl., 19:296--303, 1930.
+
+\bibitem{ReedSimonI}
+M.~Reed and B.~Simon.
+\newblock \emph{Methods of Modern Mathematical Physics I: Functional Analysis}.
+\newblock Academic Press, 1980.
+
+\bibitem{Ozawa2003}
+M.~Ozawa.
+\newblock Universally valid reformulation of the Heisenberg uncertainty principle on noise and disturbance in measurement.
+\newblock \emph{Phys. Rev. A}, 2003.
+
+\bibitem{BuschLahtiWerner2014}
+P.~Busch, P.~Lahti, and R.~F.~Werner.
+\newblock Colloquium: Quantum root-mean-square error and measurement uncertainty relations.
+\newblock \emph{Rev. Mod. Phys.} 86:1261--1281, 2014.
+
+\bibitem{Ying2016}
+M.~Ying.
+\newblock \emph{Foundations of Quantum Programming}.
+\newblock Morgan Kaufmann, 2016.
+
+\bibitem{QWIRE2017}
+J.~Paykin, R.~Rand, and S.~Zdancewic.
+\newblock QWIRE: A Formalized Quantum Circuit Language.
+\newblock In \emph{POPL}, 2017.
 
 \end{thebibliography}
 
