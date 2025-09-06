@@ -1,0 +1,49 @@
+name: Paper4 Smoke
+
+on:
+  push:
+    paths:
+      - "Papers/P4_SpectralGeometry/**"
+      - "scripts/no_sorry_p4.sh"
+      - "lakefile.lean"
+      - "lean-toolchain"
+  pull_request:
+    paths:
+      - "Papers/P4_SpectralGeometry/**"
+      - "scripts/no_sorry_p4.sh"
+      - "lakefile.lean"
+      - "lean-toolchain"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache elan & Lake build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.elan
+            ~/.cache/elan
+            .lake
+            lake-packages
+          key: p4-smoke-${{ runner.os }}-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.lean') }}
+          restore-keys: |
+            p4-smoke-${{ runner.os }}-
+
+      - name: Install elan (Lean toolchain manager)
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Print toolchain versions
+        run: |
+          lean --version
+          lake --version
+
+      - name: Build Paper 4 smoke target (mathlib-free)
+        run: lake build Papers.P4_SpectralGeometry.Smoke
+
+      - name: No-sorry guard (Paper 4)
+        run: ./scripts/no_sorry_p4.sh

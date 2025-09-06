@@ -1,14 +1,15 @@
 # Paper 3A Roadmap — Resuming for Publication
 
-> **Current Phase:** Paper 3 Framework Complete with Three Orthogonal Axes  
-> **Objective:** Complete final polish for Paper 3A publication as framework + three calibrated case studies.
+> **Current Phase:** Resuming Paper 3A after Paper 3B completion.  
+> **Objective:** Complete final polish for Paper 3A publication as framework + two calibrated case studies.
 > 
 > **Paper 3B Status**: ✅ COMPLETE (September 2, 2025) - 21 axioms (honest limit of schematic encoding)
-> **Paper 3C Status**: ✅ COMPLETE (September 3, 2025) - DCω→Baire skeleton (276 lines, 0 sorries)
 > **Axiom Discharge Progress**: 30 → 24 → 23 → 22 → **21** (PR-6/7: collision machinery discharged)
-> **Paper 3A LaTeX**: Updated with three orthogonal axes (WLPO, FT, DCω)
+> **Paper 3A LaTeX**: Updated with complete three-axis framework (WLPO, FT, DCω integrated)
 
 ## 📍 Current Position (September 2025 - RESUMING)
+
+**Note on Paper 3C Integration**: Paper 3C (DCω/Baire axis) is now fully integrated into Paper 3A as the third orthogonal axis. The aggregator `Paper3C_Main.lean` is imported by `Paper3A_Main.lean`.
 
 #### Infrastructure
 - **Part I**: Full uniformization height theory for {0,1} levels
@@ -31,14 +32,13 @@
 
 ## 0) Executive Summary
 
-**Paper 3 Complete Scope (with 3C integration):**
+**Paper 3A Updated Scope (as per new LaTeX):**
 - **Framework**: AxCal (Axiom Calibration) with uniformizability, height calculus, orthogonal profiles
-- **Three Calibrated Case Studies**: 
+- **Two Calibrated Case Studies**: 
   - WLPO axis: ℓ∞ bidual gap at height 1
   - FT axis: UCT at height 1
-  - DCω axis: Baire category at height 1 (Paper 3C COMPLETE)
 - **Open Calibration Program**: Stone Window (APIs + conjectures, no new theorems claimed)
-- **Achievement**: Three fully orthogonal axes established with profiles (1,0,0), (0,1,0), (0,0,1)
+- **Complete Three-Axis Framework**: DCω/Baire axis fully integrated (formerly Paper 3C)
 
 **Remaining Work:**  
 1) Final **documentation polish** in Lean (docstrings, section headers)
@@ -59,9 +59,9 @@
 - ◻ **Documentation pass** (docstrings, section headers, lemma groups, naming pass, `@[simp]` orientation notes) (Workstream D)
 - ◻ **Lint & CI hygiene** (no sorries, green `lake build`, targeted lint warnings only) (Workstream D)
 
-### Out of Scope (completed separately)
-- Expanded proof-theory layers (Parts III–V) - ✅ Done in Paper 3B
-- DCω/Baire axis - ✅ Done in Paper 3C (276 lines, 0 sorries)
+### Out of Scope (shift to 3B)
+- Expanded proof-theory layers (Parts III–V)
+- Additional axes beyond **WLPO** and **FT** (e.g., full DC_ω, Baire Category)
 - Deeper constructive lower bounds (model-theoretic work) beyond what 3A states as a conjecture
 
 ---

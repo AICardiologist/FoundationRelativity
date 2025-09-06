@@ -1,9 +1,21 @@
 # Paper 3A: Axiom Calibration via Non-Uniformizability
 ## A Framework for Orthogonal Logical Dependencies in Analysis
 
+## 📄 LaTeX Documents Location
+
+**All LaTeX documents have been consolidated in:** [`latex/`](latex/)
+
+- **Paper3_Main.tex** - Comprehensive Paper 3 (mother document)
+- **Paper3A_Publication.tex** - Paper 3A publication version (includes integrated Paper 3C)
+- **Paper3B_Publication.tex** - Paper 3B publication version
+- **Paper3_Lean_Formalization.tex** - Lean formalization documentation
+
+See [`latex/README.md`](latex/README.md) for complete details.
+
 ## 🚨 IMPORTANT: Paper 3A/3B Separation Guide Available
 
 **MUST READ FIRST**: [`documentation/MASTER_DEPENDENCY_CHART.md`](documentation/MASTER_DEPENDENCY_CHART.md)
+
 
 This guide shows:
 - ✅ Which files belong to Paper 3A (active development)
@@ -21,14 +33,16 @@ import Papers.P3_2CatFramework.Paper3A_Main
 
 ---
 
-### 🎯 Paper 3 Focus (Complete Axiom Calibration Framework)
+### 🎯 Paper 3A Focus (Complete Three-Axis Framework)
 
-This repository contains the Lean 4 formalization supporting Papers 3A, 3B, and 3C:
+This repository contains the Lean 4 formalization supporting Paper 3A, which presents:
 1. **The AxCal Framework**: Categories of Foundations, uniformizability, height calculus
-2. **Three Orthogonal Axes**: WLPO (via bidual gap), FT (via UCT), and DCω (via Baire)
-3. **Paper 3C DCω→Baire**: Complete skeleton (276 lines, 0 sorries) establishing third axis
-4. **Stone Window Program**: Classical theorem, constructive caveat, and calibration conjecture
-5. **Complete Formalization**: 6,100+ lines of Lean 4 with 0 sorries in core components
+2. **Three Orthogonal Axes**: 
+   - **WLPO axis**: Bidual gap at height 1 (profile: 1,0,0)
+   - **FT axis**: Uniform Continuity Theorem at height 1 (profile: 0,1,0)
+   - **DCω axis**: Baire Category Theorem at height 1 (profile: 0,0,1)
+3. **Stone Window Program**: Classical theorem, constructive caveat, and calibration conjecture
+4. **Complete Formalization**: 6,500+ lines of Lean 4 with 0 sorries in core components
 
 ### 📦 Aggregator Files (September 2025)
 
@@ -38,18 +52,30 @@ This repository contains the Lean 4 formalization supporting Papers 3A, 3B, and 
 | [`Paper3B_Main.lean`](Paper3B_Main.lean) | Paper 3B ONLY imports (FROZEN) | `import Papers.P3_2CatFramework.Paper3B_Main` |
 | [`MASTER_DEPENDENCY_CHART.md`](documentation/MASTER_DEPENDENCY_CHART.md) | **MUST READ** - Complete separation guide | Documentation |
 
-## 📊 Current Status Summary (Updated: September 3, 2025)
-**Mathematical Sorries**: 0 ✅ | **Integration Sorries**: 7 ⚠️ | **Lines of Code**: 6,100+ | **Files**: 65+
+## 📊 Current Status Summary (Updated: September 2025)
+**Mathematical Sorries**: 0 ✅ | **Integration Sorries**: 7 ⚠️ | **Lines of Code**: 6,500+ | **Files**: 60+
 
 ### Framework Status
 **Part I (Uniformization)**: ✅ COMPLETE - Height theory fully formalized  
 **Part II (Positive Uniformization)**: ✅ COMPLETE - Witness existence layer implemented  
 **Parts III-VI (P4_Meta)**: ✅ COMPLETE - Meta-theoretic framework with ladder algebra  
 **Paper 3B (ProofTheory)**: ✅ COMPLETE (August 29, 2025) - Proof-theoretic scaffold with 0 sorries
-**Paper 3C (DCω→Baire)**: ✅ COMPLETE (September 3, 2025) - Complete skeleton (276 lines, 0 sorries)
 **WP-D Stone Window**: ✅ COMPLETE (August 29, 2025) - Full Stone equivalence + Production API (27 simp lemmas) + Path A BooleanAlgebra (100+ API lemmas)
 **FT/UCT Minimal Surface**: ✅ COMPLETE (August 29, 2025) - Paper 3A FT axis with orthogonality axioms
+**DCω/Baire Axis**: ✅ COMPLETE (September 2025) - Third orthogonal axis fully integrated
 **CI Status**: ✅ All core modules build (1189+ jobs, 0 errors) | **Import Structure**: ✅ No cycles
+
+### 📊 Three Orthogonal Axes - Complete Calibration Profiles
+
+| Calibrator | WLPO | FT | DCω | Profile | Height | Location |
+|------------|------|----|-----|---------|--------|----------|
+| **Gap** (Bidual) | 1 | 0 | 0 | (1,0,0) | 1 | WLPO axis |
+| **UCT** ([0,1]) | 0 | 1 | 0 | (0,1,0) | 1 | FT axis |
+| **Baire** (BCT) | 0 | 0 | 1 | (0,0,1) | 1 | DCω axis |
+| Gap × UCT | 1 | 1 | 0 | (1,1,0) | 2 | WLPO×FT plane |
+| Gap × Baire | 1 | 0 | 1 | (1,0,1) | 2 | WLPO×DCω plane |
+| UCT × Baire | 0 | 1 | 1 | (0,1,1) | 2 | FT×DCω plane |
+| Gap × UCT × Baire | 1 | 1 | 1 | (1,1,1) | 3 | Full space |
 
 ### Part 6 Schedule Mathematics ✅ COMPLETE
 | Component | Status | What's Done | What's TODO |
@@ -87,15 +113,6 @@ import Papers.P3_2CatFramework.Paper3B_Main  -- Frozen aggregator
 - ❄️ P4_Meta/ProofTheory/Heights.lean
 - ❄️ P4_Meta/ProofTheory/Progressions.lean
 - ❄️ P4_Meta/ProofTheory/Collisions.lean
-
-### Paper 3C Components (✅ COMPLETE)
-```lean
-import Papers.P3C_DCwAxis  -- DCω → Baire calibrator
-```
-- ✅ Papers/P3C_DCwAxis/DCw_Skeleton.lean (276 lines, 0 sorries)
-- ✅ Papers/P3C_DCwAxis/DCw_Baire.lean (1 intentional sorry)
-- 📄 Papers/P3C_DCwAxis/Paper3C_TechReport.tex (technical details)
-- 🔮 DCw_TopBinding.lean.future (ready for mathlib topology)
 
 ### Shared Infrastructure (Use Carefully)
 - Core/*.lean (Foundation types)
@@ -261,11 +278,15 @@ import Papers.P3C_DCwAxis  -- DCω → Baire calibrator
        - `AxCalProfile` structure: UCT has (ftHeight := 1, wlpoHeightIsOmega := true)
        - 0 sorries (axiomatized for Paper 3A's AxCal framework)
        - Complete sanity tests validating all axioms compile
-   - ✅ **DCω Frontier (Track A)**: Complete dependent choice axis (0 sorries)
-     - `DCω_Frontier.lean`: DCω → Baire reduction for metric spaces
-     - `DCωPortalWire.lean`: Baire height certificate transport
-     - Orthogonal to both WLPO and FT axes
-     - Gap × Baire product demonstrates (1,0,1) height profile
+   - ✅ **DCω/Baire Axis (Paper 3C integrated)**: Third orthogonal axis complete (0 sorries)
+     - `DCw_Frontier.lean`: Core DCω → Baire reduction infrastructure
+     - `DCwPortalWire.lean`: Baire height certificate transport (note: namespace conflicts)
+     - `Paper3C_Main.lean`: Aggregator for all DCω components
+     - Calibrator: Baire Category Theorem at height 1 on DCω axis
+     - Orthogonal profiles verified:
+       * Baire: (0,0,1) on (WLPO, FT, DCω) axes
+       * Gap × Baire: (1,0,1) showing WLPO ⊥ DCω
+       * UCT × Baire: (0,1,1) showing FT ⊥ DCω
      - Full test coverage in `DCw_Frontier_Sanity.lean`
    - ✅ **Frontier API**: Compositional reduction framework
      - `ReducesTo` structure with `Trans` instance for calc chains
@@ -287,6 +308,11 @@ import Papers.P3C_DCwAxis  -- DCω → Baire calibrator
 
 ```
 Papers/P3_2CatFramework/
+├── latex/                          # 📄 All LaTeX documents (consolidated)
+│   ├── Paper3_Main.tex            # Mother document (comprehensive)
+│   ├── Paper3A_Publication.tex    # Paper 3A (includes Paper 3C)
+│   ├── Paper3B_Publication.tex    # Paper 3B (proof-theoretic)
+│   └── Paper3_Lean_Formalization.tex # Formalization docs
 ├── Phase1_Simple.lean              # Bicategorical foundation (105 lines)
 ├── Phase2_UniformHeight.lean       # Uniformization theory (218 lines)
 ├── Phase2_API.lean                 # Clean Level/HeightAt API (115 lines)
@@ -306,12 +332,13 @@ Papers/P3_2CatFramework/
 │   ├── PartV_Collision.lean       # RFN→Con→Gödel
 │   ├── StoneWindow.lean           # Boolean rings
 │   ├── StoneWindow_SupportIdeals.lean # ✨ Stone equivalence (820+ lines, 0 sorries!)
-│   ├── DCω_Frontier.lean          # Track A: DCω → Baire calibrator
+│   ├── DCw_Frontier.lean          # DCω → Baire calibrator (Paper 3C)
 │   ├── FT_Frontier.lean           # Track B: FT → UCT, Sperner, BFPT
 │   └── NormalForm_test.lean       # Comprehensive tests
 ├── Paper3_Integration.lean         # Paper 3 using P4_Meta
-├── Paper3A_Main.lean              # Entry point for Paper 3A (active)
+├── Paper3A_Main.lean              # Entry point for Paper 3A (active, includes 3C)
 ├── Paper3B_Main.lean              # Entry point for Paper 3B (frozen)
+├── Paper3C_Main.lean              # DCω/Baire axis aggregator (integrated into 3A)
 ├── Paper3_Transition.lean         # Migration helper (temporary)
 ├── P3_Minimal.lean                # DEPRECATED - use Paper3A/3B_Main
 ├── P4_Meta.lean                   # Single import surface

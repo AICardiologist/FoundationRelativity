@@ -1,0 +1,74 @@
+name: Paper 5 Development
+
+# Dedicated CI workflow for Paper 5 development
+# Papers 1-4 are frozen, only Paper 5 needs active testing
+on:
+  push:
+    paths:
+      - 'Papers/P5_GeneralRelativity/**'
+    branches: ['*']
+  pull_request:
+    paths:
+      - 'Papers/P5_GeneralRelativity/**'
+  workflow_dispatch:
+
+env:
+  LEAN_ABORT_ON_SORRY: 1
+
+jobs:
+  paper5-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Lean
+        uses: leanprover/lean-action@v1
+        with:
+          use-mathlib-cache: true
+          build-args: "-K 400000"
+
+      - name: Cache .lake
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.lake
+            .lake/build
+          key: ${{ runner.os }}-lake-p5-${{ hashFiles('lakefile.lean') }}
+
+      - name: Build Paper 5
+        run: |
+          echo "Building Paper 5 components..."
+          lake build Papers.P5_GeneralRelativity
+          echo "✅ Paper 5 build completed successfully"
+
+      - name: Verify Paper 5 has no sorries
+        run: |
+          echo "Checking for sorry statements in Paper 5..."
+          SORRY_COUNT=$(find Papers/P5_GeneralRelativity/ -name "*.lean" -exec grep -l "sorry" {} \; 2>/dev/null | wc -l)
+          if [ "$SORRY_COUNT" -gt 0 ]; then
+            echo "❌ Found sorry statements in Paper 5:"
+            find Papers/P5_GeneralRelativity/ -name "*.lean" -exec grep -Hn "sorry" {} \; 2>/dev/null
+            exit 1
+          fi
+          echo "✅ No sorry statements found in Paper 5"
+
+      - name: Test Paper 5 imports
+        run: |
+          echo "Testing Paper 5 import..."
+          # Test that P5 aggregator compiles
+          echo 'import Papers.P5_GeneralRelativity' | lake env lean --stdin
+          echo "✅ Paper 5 import verified"
+          echo ""
+          echo "Note: Infrastructure imports (P3A/P4) tested in other workflows"
+
+      - name: Verify frozen papers remain unchanged
+        run: |
+          echo "Verifying frozen papers are not modified..."
+          # Check that frozen paper directories haven't been modified in this PR
+          if git diff --name-only HEAD~1 | grep -E "Papers/(P1_GBC|P2_BidualGap|P3_2CatFramework|P4_SpectralGeometry)"; then
+            echo "❌ Frozen papers have been modified:"
+            git diff --name-only HEAD~1 | grep -E "Papers/(P1_GBC|P2_BidualGap|P3_2CatFramework|P4_SpectralGeometry)"
+            echo "Papers 1-4 are frozen! Only Paper 5 development allowed."
+            exit 1
+          fi
+          echo "✅ Frozen papers remain unchanged"

@@ -19,6 +19,9 @@ lean_exe Paper2SmokeTest where
 lean_exe Paper3SmokeTest where
   root := `Papers.P3_2CatFramework.SmokeTest
 
+lean_lib Paper6Heisenberg where
+  roots := #[`Papers.P6_Heisenberg.Main]
+
 -- QA enforcement tools
 lean_exe cheap_proofs where
   root := `scripts.lean.CheapProofs

@@ -6,10 +6,10 @@ authors:
   given-names: "Paul C"
   orcid: "https://orcid.org/0000-0000-0000-0000"
   affiliation: "AICardiologist"
-title: "Axiom-Calibration"
-version: v0.3.4
-doi: 10.5281/zenodo.1234567
-date-released: 2024-01-01
+title: "Foundation Relativity: Axiom Calibration Framework"
+version: v0.4.0
+doi: 10.5281/zenodo.17054050
+date-released: 2025-09-03
 url: "https://github.com/AICardiologist/FoundationRelativity"
 repository-code: "https://github.com/AICardiologist/FoundationRelativity"
 abstract: >-
@@ -35,3 +35,21 @@ references:
     doi: "10.5281/zenodo.13356587"
     url: "https://github.com/AICardiologist/FoundationRelativity/releases/tag/p2-minimal-v0.1"
     notes: "Lean 4 minimal target; dependency-free, sorry-free core."
+  - type: software
+    title: "Paper 3A: Three Orthogonal Axes (Lean 4 Artifacts)"
+    authors:
+      - family-names: Lee
+        given-names: Paul Chun-Kit
+    version: "0.2.0"
+    doi: "10.5281/zenodo.17054050"
+    url: "https://github.com/AICardiologist/FoundationRelativity/releases/tag/p3a-three-axes-v0.2"
+    notes: "Lean 4 formalization of AxCal framework with WLPO, FT, DCω axes"
+  - type: software
+    title: "Paper 3B: Proof-Theoretic Collisions (Lean 4 Artifacts)"
+    authors:
+      - family-names: Lee
+        given-names: Paul Chun-Kit
+    version: "0.2.0"
+    doi: "10.5281/zenodo.17054155"
+    url: "https://github.com/AICardiologist/FoundationRelativity/releases/tag/p3b-collisions-v0.2"
+    notes: "Lean 4 formalization of proof-theoretic ladders and collision diagrams"

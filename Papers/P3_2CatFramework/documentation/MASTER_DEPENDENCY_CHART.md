@@ -14,6 +14,14 @@ This master chart clearly separates Paper 3A (Axiom Calibration Framework) from 
 - ❄️ Frozen components (Paper 3B - DO NOT MODIFY)
 - 🟢 Active development areas (Paper 3A)
 
+## 📄 LaTeX Documents
+
+All LaTeX documents are now consolidated in `Papers/P3_2CatFramework/latex/`:
+- Paper3_Main.tex (Mother document)
+- Paper3A_Publication.tex (Includes Paper 3C)
+- Paper3B_Publication.tex (Proof-theoretic)
+- Paper3_Lean_Formalization.tex (Technical details)
+
 ## 📦 Aggregator Files
 
 ### Main Entry Points
@@ -52,8 +60,9 @@ Use `import Papers.P3_2CatFramework.Paper3A_API` for a clean, re-exported surfac
 ✅ P4_Meta/FT_UCT_MinimalSurface.lean      # FT axis infrastructure
 ✅ P4_Meta/FT_Frontier.lean                # FT→UCT, Sperner, BFPT
 ✅ P4_Meta/FTPortalWire.lean               # FT height transport
-✅ P4_Meta/DCw_Frontier.lean               # DC_ω axis (future 3C)
+✅ P4_Meta/DCw_Frontier.lean               # DC_ω axis (Paper 3C integrated)
 ✅ P4_Meta/DCwPortalWire.lean              # DC_ω transport
+✅ Paper3C_Main.lean                       # Paper 3C aggregator (imported by 3A)
 ✅ P4_Meta/Frontier_API.lean               # Frontier infrastructure
 ```
 
