@@ -90,9 +90,11 @@ New York University, NY}
 \maketitle
 
 \begin{abstract}
-We apply the Axiom Calibration (AxCal) framework to the Heisenberg Uncertainty Principle (HUP) and separate two notions: (i) \emph{preparation} uncertainty (intrinsic state geometry) and (ii) \emph{measurement} uncertainty (sequential disturbance).
-Over the constructive base $\BISH$, we mechanize---in Lean 4, mathlib-free---the \emph{division-free squared} Robertson--Schrödinger inequality and its \emph{Schrödinger strengthening} (with anti-commutator term), both at AxCal height $\allzero$.
-For the sequential measurement track (HUP--M), we provide a foundation-scoped upper bound by Dependent Choice, $\DCwonly$, via a serial-relation stream construction. The result clarifies which parts of HUP belong to constructive Hilbert geometry and which reflect the logical cost of extracting classical data from infinite sequential experiments.
+Heisenberg's uncertainty principle intertwines two conceptually distinct phenomena: the geometric constraints imposed by quantum state preparation, and the disturbance effects arising from sequential measurements. Using the Axiom Calibration (AxCal) framework, we separate these concerns and measure their logical complexity.
+
+We prove that preparation uncertainty---embodied in the Robertson--Schrödinger inequality and its Schrödinger strengthening---requires no choice principles beyond basic constructive analysis. Both results are established at AxCal height $(\mathbf{0},\mathbf{0},\mathbf{0})$ through division-free squared inequalities, mechanized in Lean~4 without external libraries.
+
+Measurement uncertainty, by contrast, demands the logical strength of Dependent Choice on $\omega$ to construct infinite measurement histories. This yields an AxCal upper bound of $(\mathbf{0},\mathbf{0},\mathbf{1})$ and reveals why sequential quantum experiments carry a fundamentally different logical cost than geometric state properties.
 \end{abstract}
 
 \tableofcontents
@@ -110,67 +112,56 @@ For the sequential measurement track (HUP--M), we provide a foundation-scoped up
 }}
 
 % ===========================================================
-\section{Introduction and Guide to Reading}
+\section{Introduction}
 % ===========================================================
 
-The Heisenberg Uncertainty Principle (HUP) packages two ideas with different logical flavors:
-\begin{enumerate}
-\item \textbf{Preparation uncertainty (HUP--RS).} State geometry constrains simultaneous sharpness of non-commuting observables. This is expressed by the Robertson--Schrödinger inequality~\cite{Robertson1929,Schrodinger1930}.
-\item \textbf{Measurement uncertainty (HUP--M).} Sequential measurement and state update introduce disturbance; formal analyses track distributions across infinitely many trials~\cite{BuschLahtiWerner2014,Ozawa2003}.
-\end{enumerate}
-We calibrate these under AxCal (see Papers 3A, 4~\cite{Paper3A,Paper4}) over $\BISH$. The main outcomes are:
-\begin{itemize}
-\item \textbf{Height~0 (constructive) theorems.} We formalize and prove in Lean the \emph{division-free squared} Robertson--Schrödinger bound and the \emph{Schrödinger} two-term strengthening (commutator plus anti-commutator).
-\item \textbf{DC$\boldsymbol{\omega}$ upper bound for HUP--M.} The infinite-history stream needed for sequential experiments uses $\DCw$ as a foundation-scoped token, giving an AxCal upper bound $\le \DCwonly$.
-\end{itemize}
+Quantum mechanics students first encounter Heisenberg's uncertainty principle as a constraint on measurement precision: the more accurately we determine a particle's position, the less we can know about its momentum, and vice versa. This intuition, while pedagogically useful, conflates two mathematically distinct phenomena that deserve separate analysis.
+
+Consider first the \emph{geometric} perspective. Every quantum state $\psi$ has intrinsic "width" or variance when measured against any observable $A$. For non-commuting observables $A$ and $B$, these widths are constrained by the Robertson--Schrödinger inequality---a consequence of Hilbert space geometry that holds regardless of whether any measurements actually occur. This geometric constraint reflects the mathematical structure of quantum states themselves.
+
+Now consider the \emph{dynamical} perspective. When we perform sequential measurements on identically prepared systems, each measurement disturbs the quantum state. Analyzing the resulting statistical patterns requires tracking infinitely many potential measurement outcomes---a conceptually different enterprise from the geometric analysis above.
+
+These two perspectives involve different mathematical foundations. The geometric constraints emerge from Hilbert space inner products and follow by elementary inequalities. The dynamical analysis, however, requires infinite constructions that depend on choice principles from mathematical logic.
+
+\paragraph{Our contribution.}
+We formalize this distinction using Axiom Calibration (AxCal), a framework that measures the logical strength required to prove mathematical theorems. The geometric Robertson--Schrödinger inequality and its Schrödinger strengthening require no choice principles beyond constructive analysis---they achieve AxCal height $(\mathbf{0},\mathbf{0},\mathbf{0})$. Sequential measurement analysis, by contrast, requires Dependent Choice on $\omega$ and achieves height $(\mathbf{0},\mathbf{0},\mathbf{1})$. This separation clarifies which aspects of quantum uncertainty are "built into" the mathematical framework versus which emerge from the logical complexity of infinite sampling.
+
+\paragraph{For readers unfamiliar with constructive mathematics.}
+Constructive mathematics builds proofs using only explicit constructions, avoiding indirect reasoning like proof by contradiction. The AxCal framework measures how much "classical" reasoning (excluded middle, choice principles) a proof actually requires. Height $(\mathbf{0},\mathbf{0},\mathbf{0})$ means fully constructive; height $(\mathbf{0},\mathbf{0},\mathbf{1})$ requires one infinitary choice principle but is otherwise constructive.
 
 \paragraph{Organization.}
-Section~\ref{sec:related} reviews prior work in uncertainty relations, formalization efforts, and axiom‑dependency studies.
-Section~\ref{sec:signatures-bridges} summarizes the signatures and bridges used by the constructive proofs.
-Sections~\ref{sec:RS}--\ref{sec:Schrodinger} prove the RS and Schrödinger inequalities in squared, division-free form.
-Section~\ref{sec:measurement-DC} treats the DC$\omega$ bound for sequential measurement.
-Section~\ref{sec:engineering} discusses Lean formalization strategies, AxCal architecture reuse from the spectral/quantum track, and a retrospective on early prototypes.
-A reproducibility ledger and a Lean--to--LaTeX crosswalk appear at the end.
+Section~\ref{sec:related} surveys prior work on uncertainty relations and their formalizations.
+Sections~\ref{sec:signatures-bridges} through~\ref{sec:Schrodinger} develop the mathematical core: geometric uncertainty bounds proven constructively in squared, division-free form.
+Section~\ref{sec:measurement-DC} analyzes measurement uncertainty and its reliance on Dependent Choice.
+Section~\ref{sec:implications} discusses the foundational implications of this geometric/dynamical separation.
+Technical details on the Lean formalization appear in Appendix~\ref{sec:engineering}.
 
 % ===========================================================
 \section{Background and Related Work}
 \label{sec:related}
 % ===========================================================
 
-\paragraph{Uncertainty inequalities.}
-The modern preparation‑uncertainty landscape begins with Robertson~\cite{Robertson1929} and Schrödinger~\cite{Schrodinger1930}; standard functional‑analytic treatments include Reed--Simon~\cite{ReedSimonI}.
-Measurement‑disturbance relations were refined in the last two decades, notably by Ozawa~\cite{Ozawa2003} and by Busch--Lahti--Werner~\cite{BuschLahtiWerner2014}.
-Our treatment isolates the \emph{preparation} inequalities as constructive Hilbert geometry (Height~0) and places the sequential‑measurement stream in the $\DCw$ stratum.
+\paragraph{Historical development.}
+Robertson~\cite{Robertson1929} first proved the uncertainty relation for state variances, showing that $\sigma_A \sigma_B \geq \frac{1}{2}|\langle[A,B]\rangle|$ for any quantum state. Schrödinger~\cite{Schrodinger1930} strengthened this by adding an anti-commutator term, tightening the bound in many physically relevant cases. These ``preparation uncertainty'' relations capture geometric constraints inherent in quantum states, independent of any measurement process.
 
-\paragraph{Formalization of quantum theory.}
-Several efforts formalize aspects of quantum theory:
-circuit‑level languages and reasoning in Coq (e.g., QWIRE~\cite{QWIRE2017}),
-quantum program logics and refinement calculi (see Ying's monograph~\cite{Ying2016}).
-These typically work in finite‑dimensional settings or with intermediate denotational layers tailored to programs and circuits.
-Our focus is different: we work \emph{analytically} directly at Hilbert‑space signature level, mathlib‑free, and separate constructive bridges (centered vectors, expectation identities) from axiom‑height accounting in AxCal.
+Measurement-disturbance uncertainty emerged later as experimenters recognized that sequential measurements introduce additional statistical correlations beyond the geometric bounds. Ozawa~\cite{Ozawa2003} and others~\cite{BuschLahtiWerner2014} developed frameworks that distinguish preparation uncertainty from measurement-induced disturbance, though typically without explicit attention to their different logical foundations.
 
-\paragraph{Axiom‑dependency and constructive analysis.}
-The practice of tracking logical strength via \emph{which} principles are needed is classical in constructive analysis~\cite{BishopBridges,BridgesRichman,TroelstraVanDalen}.
-Weak forms of excluded middle (e.g.\ $\WLPO$), compactness principles (e.g.\ the Fan Theorem, $\FT$), and choice schemata (e.g.\ $\DCw$) play distinct roles.
-Our calibration uses only a minimal real order (for chaining inequalities), Cauchy--Schwarz, and precise complex‑norm identities for Height~0 results, and \emph{foundation‑scoped} $\DCw$ for the measurement stream.
-For background on choice principles and their consequences, see Howard--Rubin~\cite{HowardRubin}.
+\paragraph{Formalization landscape.}
+Formal verification of quantum mechanics has proceeded along several tracks. Circuit-based approaches like QWIRE~\cite{QWIRE2017} focus on quantum computing applications, while program verification frameworks~\cite{Ying2016} address quantum algorithms and protocols. These efforts typically work in finite-dimensional spaces with computational concerns foremost.
 
-\paragraph{Positioning.}
-To our knowledge, a mathlib‑free constructive formalization of the \emph{squared division‑free} RS and Schrödinger inequalities at Height~0, with a separate DC$\omega$ upper bound for measurement streams, has not previously appeared in a single mechanized account.
-This paper aims to serve as a compact reference that cleanly separates (constructive) geometry from (choice‑driven) sampling.
+Our approach differs by working directly with infinite-dimensional Hilbert space signatures, avoiding external libraries, and explicitly tracking logical dependencies. Rather than optimizing for computation, we prioritize mathematical foundation.
+
+\paragraph{Constructive analysis context.}
+The systematic study of which classical principles are actually needed for mathematical theorems has deep roots~\cite{BishopBridges,BridgesRichman,TroelstraVanDalen}. Weak forms of excluded middle, compactness principles, and choice axioms each contribute differently to mathematical strength~\cite{HowardRubin}.
+
+Our analysis reveals that Heisenberg uncertainty splits cleanly along these lines: geometric aspects require only basic constructive reasoning, while measurement aspects demand infinitary choice. This separation was not apparent in classical treatments, which freely used whichever logical principles seemed convenient.
 
 % ===========================================================
 \section{Signatures and Bridge Lemmas}
 \label{sec:signatures-bridges}
 % ===========================================================
 
-We work with an abstract complex Hilbert signature $S$ (inner product $\ip{\cdot}{\cdot}$, norm $\|\cdot\|$) and an observable signature $O$ (self-adjointness, complex/real expectations, commutator/anti-commutator). The Lean files are
-\begin{center}
-\texttt{HUP/HilbertSig.lean},\quad
-\texttt{Axioms/Complex.lean}.
-\end{center}
-The constructive proofs below use only the following bridges (each provided as Prop-level lemmas in Lean).%
-\footnote{See the ``Ledger'' table in \S\ref{sec:ledger}. All bridges appear as named lemmas with Lean anchors indicated in small caps below.}
+We work with an abstract complex Hilbert signature $S$ (inner product $\ip{\cdot}{\cdot}$, norm $\|\cdot\|$) and an observable signature $O$ (self-adjointness, complex/real expectations, commutator/anti-commutator). The constructive proofs use only elementary bridge lemmas:
 
 \begin{description}
   \item[Centered vectors.] For observable $A$ and state $\psi$, define
@@ -186,9 +177,8 @@ The constructive proofs below use only the following bridges (each provided as P
   \item[Cauchy--Schwarz (squared).] $\abssq{\ip{x}{y}} \le \|x\|^2\,\|y\|^2$.\hfill{\small(\lean{cauchy\_schwarz\_sq})}
 \end{description}
 
-\begin{remark}[Division-free style]
-We present all inequalities in squared form with an explicit factor $4$.
-The more familiar $\tfrac12$ versions follow by taking square roots and dividing by $2$, outside the division-free core we calibrate constructively.
+\begin{remark}[Why squared form?]
+Working in squared form with explicit factor $4$ eliminates division and square roots from the constructive proof core. The familiar forms like $\sigma_A \sigma_B \geq \frac{1}{2}|\langle[A,B]\rangle|$ can be recovered by taking square roots and dividing by $2$, but these operations lie outside our constructive framework.
 \end{remark}
 
 
@@ -207,22 +197,21 @@ Let $A,B$ be self-adjoint and $\psi$ normalized. Then
 \end{theorem}
 
 \begin{proof}
-Let $\Delta A\psi$ and $\Delta B\psi$ be the centered vectors, and set $z:=\ip{\Delta A\psi}{\Delta B\psi}$.
-By the skew identity (\lean{comm\_expect\_as\_skew\_centered}),
+The key insight is to work with ``centered'' vectors $\Delta A\psi := A\psi - \langle A \rangle_\psi \psi$ and $\Delta B\psi := B\psi - \langle B \rangle_\psi \psi$. These represent the ``fluctuation'' parts of the observables around their mean values.
+
+Set $z := \ip{\Delta A\psi}{\Delta B\psi}$. The bridge lemma \lean{comm\_expect\_as\_skew\_centered} shows that commutator expectations reduce to a skew-symmetric combination:
 \[
-\E{\comm{A}{B}}_\psi \;=\; z-\bar z \quad\Longrightarrow\quad \abssq{\E{\comm{A}{B}}_\psi} = \abssq{z-\bar z}.
+\E{\comm{A}{B}}_\psi = z - \bar{z}.
 \]
-Using the inequality component of the exact complex identity,
+Therefore $\abssq{\E{\comm{A}{B}}_\psi} = \abssq{z - \bar{z}}$.
+
+The exact complex identity gives us $\abssq{z - \bar{z}} \leq 4\abssq{z}$, while Cauchy--Schwarz provides
 \[
-\abssq{z-\bar z} \;\le\; 4\,\abssq{z}.
+\abssq{z} = \abssq{\ip{\Delta A\psi}{\Delta B\psi}} \leq \norm{\Delta A\psi}^2 \norm{\Delta B\psi}^2.
 \]
-By Cauchy--Schwarz (\lean{cauchy\_schwarz\_sq}) and the variance identity (\lean{variance\_centered}),
-\[
-\abssq{z} \;=\; \abssq{\ip{\Delta A\psi}{\Delta B\psi}}
-\;\le\; \norm{\Delta A\psi}^2 \norm{\Delta B\psi}^2
-\;=\; \Var_\psi(A)\,\Var_\psi(B).
-\]
-Multiplying by $4$ and chaining the inequalities yields the claim.
+The variance identity \lean{variance\_centered} connects these norms back to the statistical variances: $\norm{\Delta A\psi}^2 = \Var_\psi(A)$ and similarly for $B$.
+
+Chaining these inequalities and multiplying by $4$ completes the proof.
 \end{proof}
 
 \begin{remark}[Classical form]
@@ -248,21 +237,19 @@ Let $A,B$ be self-adjoint and $\psi$ normalized. Then
 \end{theorem}
 
 \begin{proof}
-Set $z:=\ip{\Delta A\psi}{\Delta B\psi}$.
-By the skew/symmetric identities,
+Again work with $z := \ip{\Delta A\psi}{\Delta B\psi}$. The bridge lemmas give us both skew and symmetric combinations:
 \[
-  \E{\comm{A}{B}}_\psi = z-\bar z, 
-  \qquad
-  \E{\acomm{\Delta A}{\Delta B}}_\psi = z+\bar z.
+\E{\comm{A}{B}}_\psi = z - \bar{z}, \qquad \E{\acomm{\Delta A}{\Delta B}}_\psi = z + \bar{z}.
 \]
-Hence the left-hand side is
+The Schrödinger inequality bounds the \emph{sum} of squared magnitudes of both the skew (commutator) and symmetric (anti-commutator) parts. This sum simplifies dramatically:
 \[
-  \abssq{z-\bar z} + \abssq{z+\bar z}
-  \;=\; 4\,\abssq{z}
-  \qquad\text{by the exact complex identity.}
+\abssq{z - \bar{z}} + \abssq{z + \bar{z}} = 4\abssq{z}
 \]
-Apply Cauchy--Schwarz and the variance identity as in Theorem~\ref{thm:RS-squared}:
-$\abssq{z}\le \Var_\psi(A)\,\Var_\psi(B)$, and multiply by $4$.
+by the exact complex identity.
+
+Applying Cauchy--Schwarz and the variance identity as in the Robertson proof gives $\abssq{z} \leq \Var_\psi(A)\Var_\psi(B)$. Multiplying by $4$ yields the bound.
+
+The geometric insight is that we capture \emph{both} the skew and symmetric correlations between the observables' fluctuations, not just the skew part as in the Robertson bound.
 \end{proof}
 
 \begin{remark}[Centered anti-commutator]
@@ -297,72 +284,31 @@ This separates the geometric (Height~0) content of preparation from the choice�
 \end{remark}
 
 % ===========================================================
-\section{Engineering Notes: Lean Strategies, Architecture, and Retrospective}
-\label{sec:engineering}
+\section{Implications and Interpretation}
+\label{sec:implications}
 % ===========================================================
 
-\paragraph{AxCal architecture reused from spectral/quantum track.}
-We reuse the \emph{AxCal Core} built for spectral geometry (Paper~4) to keep the HUP analysis modular:
-\begin{itemize}
-  \item \emph{Foundations and profiles.} \lean{AxCalCore} provides the axiom‑height lattice (Height~0, finite, $\omega$), profile records (\lean{ProfileUpper}), and witness families (\lean{WitnessFamily}).
-  \item \emph{Scoping of $\DCw$.} The token \lean{[HasDCω F]} is indexed by a foundation $F$, so uses of dependent choice remain foundation‑scoped. This avoids "free" availability of $\DCw$.
-  \item \emph{Prop‑only signatures.} All operators/inner‑product facts are Prop‑level fields/axioms to avoid code generation and keep the library mathlib‑free.
-\end{itemize}
+The AxCal analysis reveals a precise sense in which preparation and measurement uncertainty have fundamentally different logical characters. This section explores what this separation means for quantum foundations and constructive analysis more broadly.
 
-\paragraph{Formalization strategies.}
-\begin{enumerate}
-  \item \textbf{Division‑free squared proofs.} RS and Schrödinger are proved in squared form with a hard‑coded factor $4$ (\texttt{Axioms/Complex.lean}), removing division and square roots from the core proof.
-  \item \textbf{Centering bridge.} Algebraic identities are expressed via \lean{center}, \lean{comm\_expect\_as\_skew\_centered}, \lean{acomm\_expect\_as\_sym\_centered}; we work at inner‑product level rather than general operator algebra.
-  \item \textbf{Minimal real order.} Only order facts needed for chaining and monotonicity under scaling by $4$ are assumed.
-  \item \textbf{Serial DC$\omega$ eliminator.} \lean{dcω\_stream} plus the history serial relation yields the measurement stream with $\DCw$ as an explicit token.
-\end{enumerate}
+\paragraph{The geometry/choice distinction.}
+Our results show that Robertson--Schrödinger bounds emerge purely from Hilbert space geometry and require no choice principles beyond basic constructive reasoning. The mathematical "content" of these inequalities lies entirely in the interplay between inner products, complex arithmetic, and the Cauchy--Schwarz inequality. No infinitary constructions or classical logic enters the argument.
 
-\paragraph{Retrospective on the prior prototype (and fixes).}
-Early drafts exposed several issues now corrected:
-\begin{itemize}
-  \item \textbf{Unscoped $\DCw$.} Dependent Choice was accidentally usable "for free." We fixed this by introducing a \emph{foundation‑scoped} class \lean{[HasDCω F]} and requiring it everywhere $\DCw$ is used.
-  \item \textbf{Expectation typing.} Conflating complex and real expectations complicated equalities and coercions. Splitting into \lean{cexpect} (always complex) and \lean{expect} (real, for self‑adjoints) stabilized the bridges and proofs.
-  \item \textbf{Axiom ledger vs.\ sorrys.} All provisional \texttt{sorry} were replaced by named, documented bridges; these were then discharged in the Phase‑3 proofs. The \texttt{no\_sorry} guard enforces this across the tree.
-  \item \textbf{Witness family shape.} \lean{HUP\_M\_W} now quantifies over a foundation and explicitly requires \lean{[HasDCω F]} to produce an infinite history, matching the AxCal profile statement.
-\end{itemize}
+Measurement uncertainty analysis, by contrast, inherently involves infinite constructions. To model sequential measurements mathematically, we must consider the space of all possible measurement histories and extract definite sequences from this space. The latter step requires Dependent Choice---we cannot avoid this logical cost while maintaining mathematical rigor.
 
-\paragraph{Axiom‑dependency ledger (informal DAG).}
-\begin{center}
-\begin{tabular}{@{}lll@{}}
-\toprule
-\textbf{Result} & \textbf{Depends on} & \textbf{Height} \\
-\midrule
-RS (squared) & Cauchy--Schwarz, variance identity, skew identity, complex sum rule &
-$\hzero$ \\
-Schrödinger (squared) & RS deps + symmetric identity (centered) & $\hzero$ \\
-Measurement stream & seriality of histories + $\DCw$ eliminator & $\le \homega$ \\
-\bottomrule
-\end{tabular}
-\end{center}
+\paragraph{Constructive quantum mechanics.}
+These observations suggest that quantum mechanics splits naturally into "constructive-friendly" and "choice-dependent" components. The fundamental geometric structure---inner products, observables, expectation values, variance bounds---operates constructively. Classical reasoning becomes necessary only when we attempt to model infinite sampling procedures or extract definite infinite data from probabilistic processes.
 
-% ===========================================================
-\section{Reproducibility Ledger and File Map}
-\label{sec:ledger}
-% ===========================================================
+This perspective offers a middle ground between fully classical treatments (which use choice principles freely) and algorithmic approaches (which avoid infinite constructions entirely). We can work constructively with quantum states and geometric properties while reserving classical reasoning for sampling and measurement theory.
 
-\begin{center}
-\begin{tabular}{ll}
-\toprule
-\textbf{Lean artifact} & \textbf{Purpose in paper} \\
-\midrule
-\verb|Axioms/Complex.lean| & Complex axioms; real order; norm identities (\lean{norm\_sq\_skew\_sym\_sum\_eq\_4\_norm\_sq}) \\
-\verb|HUP/HilbertSig.lean| & Signatures and bridges (\lean{center}, \lean{variance\_centered}, \lean{cauchy\_schwarz\_sq}, \\
- & \hspace{1.4em}\lean{comm\_expect\_as\_skew\_centered}, \lean{acomm\_expect\_as\_sym\_centered}) \\
-\verb|HUP/RobertsonSchrodinger.lean| & \lean{RS\_from\_bridges}, \lean{Schrodinger\_from\_bridges} (Height~0 theorems) \\
-\verb|HUP/DComega.lean| & \lean{dcω\_stream} interface for serial relations \\
-\verb|HUP/Witnesses.lean| & \lean{hupM\_stream\_from\_dcω}; \lean{HUP\_M\_W} and $\DCw$ profile \\
-\verb|Axioms/Ledger.lean| & Documentary index of assumptions already discharged/derived \\
-\bottomrule
-\end{tabular}
-\end{center}
+\paragraph{Pedagogical implications.}
+The standard presentation of Heisenberg uncertainty conflates geometric and measurement phenomena, potentially obscuring their mathematical differences. A foundationally-aware approach might introduce the Robertson--Schrödinger inequality first as a theorem about state geometry, independent of any measurement considerations. Measurement-disturbance effects would appear later as a separate topic involving different mathematical machinery.
 
-\paragraph{Build.}
-\texttt{lake build Papers.P6\_Heisenberg.Main} compiles the library target; \texttt{./scripts/no\_sorry\_p6.sh} confirms sorry‑free status.
+This organization aligns with the logical complexity revealed by AxCal analysis: geometric uncertainty requires only basic mathematical reasoning, while measurement uncertainty demands sophisticated infinite constructions.
+
+\paragraph{Broader constructive analysis.}
+Our separation of geometric from choice-dependent reasoning may apply beyond quantum mechanics. Many areas of mathematical physics involve both "local" geometric constraints and "global" sampling or optimization procedures. AxCal analysis could help identify which aspects require classical reasoning and which remain constructively accessible.
+
+The foundation-scoped approach to choice principles, where we explicitly track which foundations support which infinitary constructions, may prove useful for other areas where classical and constructive reasoning interweave.
 
 % ===========================================================
 \section{Calibration Summary and Physics Readout}
@@ -384,7 +330,72 @@ Infinite dependent choices via $\DCw$ token \\
 \end{center}
 
 % ===========================================================
-\section*{Appendix: Lean--to--LaTeX Crosswalk}
+\section*{Appendix A: Lean Formalization Details}
+\label{sec:engineering}
+% ===========================================================
+
+\paragraph{AxCal architecture reuse.}
+We built upon the AxCal Core infrastructure developed for spectral geometry (Paper~4):
+\begin{itemize}
+  \item \emph{Foundations and profiles.} \lean{AxCalCore} provides the axiom-height lattice (Height~0, finite, $\omega$), profile records (\lean{ProfileUpper}), and witness families (\lean{WitnessFamily}).
+  \item \emph{Foundation-scoped choice.} The token \lean{[HasDCω F]} is indexed by a foundation $F$, so uses of dependent choice remain foundation-scoped. This prevents "free" availability of $\DCw$.
+  \item \emph{Prop-only signatures.} All operators and inner-product facts use Prop-level fields to avoid code generation and maintain mathlib-free status.
+\end{itemize}
+
+\paragraph{Key formalization strategies.}
+\begin{enumerate}
+  \item \textbf{Division-free squared proofs.} Both RS and Schrödinger inequalities use squared form with explicit factor $4$ (\texttt{Axioms/Complex.lean}), eliminating division and square roots from the constructive core.
+  \item \textbf{Centered vector bridges.} Algebraic identities work through \lean{center}, \lean{comm\_expect\_as\_skew\_centered}, \lean{acomm\_expect\_as\_sym\_centered} at inner-product level rather than general operator algebra.
+  \item \textbf{Minimal real order.} Only order facts needed for inequality chaining and monotonicity under scaling by $4$.
+  \item \textbf{Serial DCω eliminator.} \lean{dcω\_stream} plus history serial relation yields measurement streams with $\DCw$ as explicit token.
+\end{enumerate}
+
+\paragraph{Development retrospective.}
+Early prototypes revealed several issues that required architectural changes:
+\begin{itemize}
+  \item \textbf{Unscoped $\DCw$.} Initial implementation made Dependent Choice available "for free" everywhere. Fixed by introducing foundation-scoped class \lean{[HasDCω F]}.
+  \item \textbf{Expectation value typing.} Conflating complex and real expectations created coercion problems. Solution: separate \lean{cexpect} (always complex) and \lean{expect} (real for self-adjoints).
+  \item \textbf{Sorry elimination.} All provisional \texttt{sorry} placeholders were replaced by named, documented bridge lemmas, then discharged in constructive proofs. The \texttt{no\_sorry} guard enforces this.
+  \item \textbf{Witness family structure.} \lean{HUP\_M\_W} now properly quantifies over foundations and explicitly requires \lean{[HasDCω F]} for infinite history construction.
+\end{itemize}
+
+\paragraph{Dependency structure.}
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Result} & \textbf{Mathematical dependencies} & \textbf{AxCal height} \\
+\midrule
+RS (squared) & Cauchy--Schwarz, variance identity, skew identity, complex norm & $(\mathbf{0},\mathbf{0},\mathbf{0})$ \\
+Schrödinger (squared) & RS dependencies + symmetric identity (centered) & $(\mathbf{0},\mathbf{0},\mathbf{0})$ \\
+Measurement stream & History seriality + $\DCw$ eliminator & $(\mathbf{0},\mathbf{0},\mathbf{1})$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ===========================================================
+\section*{Appendix B: Reproducibility and File Index}
+% ===========================================================
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Lean artifact} & \textbf{Mathematical content} \\
+\midrule
+\verb|Axioms/Complex.lean| & Complex number axiomatization, real order, norm identities \\
+\verb|HUP/HilbertSig.lean| & Hilbert space signatures, centered vectors, bridge lemmas \\
+\verb|HUP/RobertsonSchrodinger.lean| & Constructive proofs of both inequalities \\
+\verb|HUP/DComega.lean| & Serial relation interface for dependent choice \\
+\verb|HUP/Witnesses.lean| & Witness families and AxCal profile certificates \\
+\verb|Axioms/Ledger.lean| & Documentation of assumption discharge \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Build verification.}
+\texttt{lake build Papers.P6\_Heisenberg.Main} compiles all targets; \texttt{./scripts/no\_sorry\_p6.sh} verifies sorry-free status.
+
+% ===========================================================
+\section*{Appendix C: Lean--to--LaTeX Symbol Reference}
 % ===========================================================
 
 \begin{center}
@@ -400,8 +411,8 @@ Infinite dependent choices via $\DCw$ token \\
 \verb|O.comm A B| & $\comm{A}{B}$ \\
 \verb|O.acomm A B| & $\acomm{\Delta A}{\Delta B}$ (centered via bridge) \\
 \verb|complex_norm_sq z| & $\absC{z}^2$ \\
-\verb|RS_from_bridges| & Thm.~\ref{thm:RS-squared} \\
-\verb|Schrodinger_from_bridges| & Thm.~\ref{thm:Schrodinger-squared} \\
+\verb|RS_from_bridges| & Theorem~\ref{thm:RS-squared} \\
+\verb|Schrodinger_from_bridges| & Theorem~\ref{thm:Schrodinger-squared} \\
 \bottomrule
 \end{tabular}
 \end{center}
