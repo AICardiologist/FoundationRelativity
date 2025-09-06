@@ -58,7 +58,7 @@ theorem Profile_Computation_Works :
   -- Framework compiles and certificates load correctly
   True := by
   simp [Certificates.G1_Vacuum_Cert, Certificates.G2_MGHD_Cert, 
-        route_to_profile, memFlag, eqb, AxisProfile.height_zero, AxisProfile.choice1]
+        route_to_profile, memFlag, eqb, AxisProfile.height_zero]
 
 -- Export key components for external use
 export AxisProfile (height_zero max)

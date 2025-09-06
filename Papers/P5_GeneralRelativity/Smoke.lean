@@ -28,15 +28,13 @@ open AxisProfile
 #check GR.G5_CompNeg_W
 #check GR.G5_MeasStream_W
 
--- Sanity: route_to_profile reflects flags (no constant height_zero anymore).
+-- Sanity: flags map to the intended coordinates
 theorem route_to_profile_sanity :
   (route_to_profile [PortalFlag.uses_zorn]).hChoice = Height.one
   ∧ (route_to_profile [PortalFlag.uses_limit_curve]).hComp = Height.one
   ∧ (route_to_profile [PortalFlag.uses_serial_chain]).hLogic = Height.one
   ∧ (route_to_profile [PortalFlag.uses_reductio]).hLogic = Height.one := by
-  -- Direct computation through reflection/normalization
   simp [route_to_profile, memFlag, eqb]
-  decide
 
 -- Test: All certificates are well-formed
 #check Certificates.G1_Vacuum_Cert
