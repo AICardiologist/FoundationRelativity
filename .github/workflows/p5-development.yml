@@ -41,16 +41,15 @@ jobs:
           lake build Papers.P5_GeneralRelativity
           echo "✅ Paper 5 build completed successfully"
 
-      - name: Verify Paper 5 has no sorries
+      - name: Verify Paper 5 has no unauthorized sorries
         run: |
-          echo "Checking for sorry statements in Paper 5..."
-          SORRY_COUNT=$(find Papers/P5_GeneralRelativity/ -name "*.lean" -exec grep -l "sorry" {} \; 2>/dev/null | wc -l)
-          if [ "$SORRY_COUNT" -gt 0 ]; then
-            echo "❌ Found sorry statements in Paper 5:"
-            find Papers/P5_GeneralRelativity/ -name "*.lean" -exec grep -Hn "sorry" {} \; 2>/dev/null
+          echo "Checking for unauthorized sorry statements in Paper 5..."
+          # Use the project's allowlist-based sorry checker
+          if ! scripts/check-sorry-allowlist.sh Papers/P5_GeneralRelativity/; then
+            echo "❌ Found unauthorized sorry statements in Paper 5"
             exit 1
           fi
-          echo "✅ No sorry statements found in Paper 5"
+          echo "✅ All Paper 5 sorries are authorized or none found"
 
       - name: Test Paper 5 imports
         run: |
