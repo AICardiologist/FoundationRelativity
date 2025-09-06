@@ -1,0 +1,30 @@
+%===========================================================
+\section{WP–B: New analytic calibrators (frontiers + certificates) — \textbf{\color{green}COMPLETE}}
+%===========================================================
+
+\textbf{Status:} Fully implemented in Lean with FT frontier infrastructure (0 sorries).
+
+\subsection{B1. UCT on \([0,1]\) (frontier $\{\FT\}$) — \textbf{\color{green}COMPLETE}}
+\emph{Witness.} $\mathcal C^{\mathrm{UCT}}$: "every pointwise continuous $f:[0,1]\to\mathbb R$ is uniformly continuous."
+
+\emph{Upper bound (Lean):} \textbf{\color{green}Formalized} in \texttt{FT\_Frontier.lean}: \(\FT\Rightarrow\) UCT at the pinned interval via \texttt{FT\_to\_UCT} reduction.
+
+\emph{Height certificate (Lean):} \textbf{\color{green}Implemented} \texttt{UCT\_height1}: If FT has height 1, then UCT has height 1.
+\(h_{\FT}(\mathcal C^{\mathrm{UCT}})=1\) on the FT-axis, \(h_{\WLPO}(\mathcal C^{\mathrm{UCT}})=0\) (orthogonal axes).
+
+\subsection{B2. Additional calibrators (FT axis) — \textbf{\color{green}COMPLETE}}
+\emph{Sperner's lemma:} \textbf{\color{green}Formalized} \(\FT\Rightarrow\) Sperner via \texttt{FT\_to\_Sperner} reduction.
+
+\emph{Brouwer fixed-point theorem:} \textbf{\color{green}Formalized} \(\FT\Rightarrow\) BFPT$_n$ via composition \texttt{FT\_to\_BFPT}.
+
+\emph{Height transport:} Generic \texttt{height\_lift\_of\_imp} for certificate transport along implications.
+
+\subsection{B3. Deliverables — \textbf{\color{green}COMPLETE}}
+\textbf{Lean implementation:}
+\begin{itemize}
+\item \texttt{FT\_Frontier.lean}: Complete FT axis with calibrator tokens and reductions
+\item \texttt{FTPortalWire.lean}: Height certificate wiring through frontier infrastructure  
+\item \texttt{Frontier\_API.lean}: Enhanced with \texttt{ReducesTo} structure and \texttt{Trans} instance
+\item \texttt{FT\_Frontier\_Sanity.lean}: Comprehensive test coverage
+\end{itemize}
+New \emph{frontiers} recorded with orthogonal axes: FT axis independent of WLPO axis for analytic calibrators.

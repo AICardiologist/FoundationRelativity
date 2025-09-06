@@ -1,0 +1,613 @@
+\documentclass[11pt]{article}
+
+% -------------------------------------------------
+% Preamble (harmonized with Paper 3A/4)
+% -------------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[american]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{microtype}
+\usepackage{enumitem}
+\setlist[enumerate,1]{label=\textnormal{(\alph*)}, leftmargin=2em}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{amsthm}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+
+% lightweight callouts
+\usepackage{xcolor}
+\usepackage{mdframed}
+\mdfdefinestyle{status}{backgroundcolor=gray!10,linecolor=gray!60!black,linewidth=0.8pt,
+  innerleftmargin=6pt,innerrightmargin=6pt,innertopmargin=4pt,innerbottommargin=4pt}
+
+% -------------------------------------------------
+% Theorem styles
+% -------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% -------------------------------------------------
+% AxCal + GR macros
+% -------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+
+\newcommand{\BISH}{\mathsf{BISH}}
+\newcommand{\ZF}{\mathsf{ZF}}
+\newcommand{\ZFC}{\mathsf{ZFC}}
+\newcommand{\CZF}{\mathsf{CZF}}
+
+\newcommand{\WLPO}{\mathrm{WLPO}}
+\newcommand{\LEM}{\mathrm{LEM}}
+\newcommand{\FT}{\mathrm{FT}}
+\newcommand{\WKLz}{\mathrm{WKL}_0}
+\newcommand{\MP}{\mathrm{MP}}
+\newcommand{\AC}{\mathrm{AC}}
+\newcommand{\ACw}{\mathrm{AC}_\omega}
+\newcommand{\DCw}{\mathrm{DC}_\omega}
+
+\newcommand{\Found}{\mathsf{Found}}
+\newcommand{\SigmaZero}{\Sigma_{0}}
+\newcommand{\AxCal}{\textsc{AxCal}}
+\newcommand{\Frontierpos}{\partial^{+}}
+
+\newcommand{\hChoice}{h_{\mathrm{Choice}}}    % AC/DC
+\newcommand{\hComp}{h_{\mathrm{Comp}}}        % FT/WKL
+\newcommand{\hLogic}{h_{\mathrm{Logic}}}      % LEM/WLPO/MP
+
+\newcommand{\EFE}{\mathrm{EFE}} % Einstein Field Equations
+
+% -------------------------------------------------
+% Title
+% -------------------------------------------------
+\title{Axiom Calibration for General Relativity (Paper 5):\\
+Portals, Profiles, and a Hybrid Plan for EPS and Schwarzschild}
+\author{Paul Chun--Kit Lee}
+\date{October 2025}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We make \emph{Axiom Calibration} (\AxCal) the organizing principle for a foundations-first study of General Relativity (GR). The paper contributes three AxCal instruments for GR: (I) \emph{witness families} pinned to a fixed $\SigmaZero^{\mathrm{GR}}$ signature; (II) \emph{proof-route flags} and \emph{portal theorems} that turn standard GR arguments into explicit frontier costs (Zorn$\Rightarrow\{\AC\}$, Limit-Curve/Ascoli$\Rightarrow\{\FT/\WKLz\}$, Serial-Chain$\Rightarrow\{\DCw\}$, Reductio$\Rightarrow\{\LEM\}$); and (III) \emph{HeightCertificates} that compose costs across results. On this basis we calibrate five loci: G1 (explicit vacuum checks: Height~0), G2 (Cauchy/MGHD: PDE core vs.\ Zorn portal), G3 (singularity theorems: compactness and contradiction portals), G4 (maximal extensions: Zorn portal), and G5 (computable evolution: negative template after Pour--El--Richards). To balance breadth with verification, we adopt a \emph{hybrid plan}: a schematic, machine-checked map of portals and heights, and a narrow deep dive delivering two Height~0 anchors---an EPS kinematics core and a minimal tensor engine proving a Schwarzschild vacuum check. Literature from Robb, Reichenbach, and Ehlers--Pirani--Schild, as well as Pour--El--Richards and constructive analysis (Bishop--Bridges; Hellman), is integrated at the portal level via named ledger entries.
+\end{abstract}
+
+\begin{mdframed}[style=status]
+\textbf{What is calibrated here (AxCal content).}
+For each GR target we (a) define a \emph{witness family} at the pin, (b) mark \emph{proof-route flags} indicating which portals are used, and (c) emit a \emph{HeightCertificate} with axiswise heights $(\hChoice,\hComp,\hLogic)$. Deep-dive deliverables (EPS; Schwarzschild) produce Height~0 certificates; imported heavy theorems are recorded as \emph{named axioms} triggering portals and heights.
+\end{mdframed}
+
+\tableofcontents
+
+% ===========================================================
+\section{AxCal instrumentation for GR}
+% ===========================================================
+\subsection{Pinned signature \texorpdfstring{$\SigmaZero^{\mathrm{GR}}$}{Σ0$^{\mathrm{GR}}$}}
+We fix the smooth category (second-countable, Hausdorff manifolds), tensor fields, Lorentzian metrics, Levi--Civita connection, curvature and Einstein tensors, $\EFE$, and pinned exemplars (Minkowski; a Schwarzschild-type vacuum metric). Interpretations must fix $\SigmaZero^{\mathrm{GR}}$.
+
+\subsection{Tokens and witness families}
+For foundations $F\in\Found$, we use tokens
+\[
+[{\rm HasAC}\,F],\ [{\rm HasDC}\omega\,F],\ [{\rm HasFT}\,F],\ [{\rm HasWKL}_0\,F],\ [{\rm HasLEM}\,F],\ [{\rm HasWLPO}\,F].
+\]
+A \emph{witness family} $\mathcal{W}$ assigns to $F$ a groupoid of witnesses for the target statement over the pin.
+
+\subsection{Proof-route flags and portals}
+We make explicit route flags that, when present in a proof, trigger an \emph{AxCal portal}:
+\begin{itemize}
+\item \textsf{uses\_zorn}: applies Zorn on a $\SigmaZero$-definable poset of extensions $\Rightarrow$ \emph{Zorn portal} $(\Frontierpos\supseteq\{\AC\})$.
+\item \textsf{uses\_limit\_curve}: invokes Ascoli--Arzelà / compactness of causal curves $\Rightarrow$ \emph{Compactness portal} $(\Frontierpos\supseteq\{\FT/\WKLz\})$.
+\item \textsf{uses\_serial\_chain}: builds an infinite dependent chain (e.g. curve prolongation) $\Rightarrow$ \emph{Dependent-Choice portal} $(\Frontierpos\supseteq\{\DCw\})$.
+\item \textsf{uses\_reductio}: essential proof by contradiction on $\SigmaZero$ data $\Rightarrow$ \emph{LEM portal} $(\Frontierpos\supseteq\{\LEM\})$.
+\end{itemize}
+
+\begin{proposition}[Portal soundness]\label{prop:portals}
+If a proof of a $\SigmaZero^{\mathrm{GR}}$-pinned statement uses a flagged route, the corresponding token is necessary along that route: Zorn$\Rightarrow{\rm HasAC}$; Limit-Curve$\Rightarrow{\rm HasFT}/{\rm HasWKL}_0$ (depending on constructive/classical base); Serial-Chain$\Rightarrow{\rm HasDC}\omega$; Reductio$\Rightarrow{\rm HasLEM}$.
+\end{proposition}
+
+\begin{proof}[Sketch]
+These are standard meta-implications: Zorn is equivalent to AC over \ZF; Ascoli-type compactness aligns with \FT\ constructively (and with \WKLz\ classically); building infinite dependent sequences is a canonical use of $\DCw$; essential reductio uses \LEM. The novelty is the \emph{proof-route} tagging that transports these meta-results to the $\SigmaZero^{\mathrm{GR}}$ pin.
+\end{proof}
+
+\subsection{Height certificates and composition}
+Given portals triggered for a witness family $\mathcal{W}$, we record a HeightCertificate with $(\hChoice,\hComp,\hLogic)\in\{0,1,\omega\}^3$. Products of claims compose componentwise by the AxCal product law (Paper~3A).
+
+% ===========================================================
+\section{Literature anchors mapped to portals}
+% ===========================================================
+Robb and Reichenbach provide axiomatic scaffolding for kinematics; EPS derives Lorentz classes from light and free-fall~\cite{Robb1914,Reichenbach1969,EPS1972} (no Zorn; compactness may enter via curve families $\Rightarrow$ Compactness portal when maximizers are extracted). Pour--El--Richards show computable well-posed PDEs can yield non-computable evolutions~\cite{PourElRichards1989} (Logic/Computability axis). Bishop--Bridges and Hellman/Bridges guide which analytic steps are Height~0 and which align with choice or \LEM~\cite{BishopBridges1985,Hellman1998,BridgesReply1995}. Wald, Hawking--Ellis, and Choquet--Bruhat are used to \emph{locate} where standard GR proofs instantiate portals~\cite{Wald1984,HawkingEllis1973,ChoquetBruhat2009}.
+
+% ===========================================================
+\section{Calibration targets (G1--G5) with AxCal profiles}
+% ===========================================================
+\subsection*{G1. Explicit vacuum checks (Height 0)}
+\begin{definition}[G1 witness]
+$\mathcal{C}^{\mathrm{G1}}$: the pinned Schwarzschild-type metric satisfies vacuum $\EFE$ at the pin.
+\end{definition}
+\begin{proposition}[G1 profile]\label{prop:G1}
+$(\hChoice,\hComp,\hLogic)=(0,0,0)$.
+\end{proposition}
+\begin{proof}[Sketch]
+Finite symbolic computation of $\Gamma^\alpha_{\mu\nu}$, $R_{\mu\nu}$, and $G_{\mu\nu}$ (cf.\ \cite[§B.4]{Wald1984}); no portals are triggered.
+\end{proof}
+
+\subsection*{G2. Cauchy problem (local well-posedness and MGHD)}
+\begin{definition}[G2 witness]
+$\mathcal{C}^{\mathrm{G2}}$: local well-posedness for $\EFE$ and existence/uniqueness of MGHD from data $(\Sigma,h,K)$.
+\end{definition}
+\begin{proposition}[G2 profile (route-separated)]\label{prop:G2}
+Local PDE (harmonic gauge, energy estimates) can be arranged with $(0,0,0)$ or low choice ($\ACw$) in separable settings; the MGHD step has \textsf{uses\_zorn}, so $(\hChoice,\hComp,\hLogic)\ge(1,0,0)$ for the global statement.
+\end{proposition}
+\begin{proof}[Sketch]
+Local existence follows Choquet--Bruhat's PDE machinery \cite{ChoquetBruhat2009}. MGHD standard proofs invoke Zorn on the poset of developments (Wald \cite[Thm.~10.1.2]{Wald1984}); by Prop.~\ref{prop:portals}, the Zorn portal yields the \AC\ frontier.
+\end{proof}
+
+\subsection*{G3. Singularity theorems (Penrose/Hawking)}
+\begin{definition}[G3 witness]
+$\mathcal{C}^{\mathrm{G3}}$: under trapped surface + energy conditions in a globally hyperbolic spacetime, geodesic incompleteness holds.
+\end{definition}
+\begin{proposition}[G3 profile]\label{prop:G3}
+Standard proofs trigger \textsf{uses\_limit\_curve} and \textsf{uses\_reductio}; hence $(\hChoice,\hComp,\hLogic)\ge(0,1,1)$ (the 1 on the second axis reads as FT/WKL\(_0\) compactness; the 1 on the third as LEM).
+\end{proposition}
+\begin{proof}[Sketch]
+Raychaudhuri focusing plus limit-curve compactness (\cite[§8]{HawkingEllis1973}, \cite[§14]{Wald1984}) gives a maximizing geodesic; contradiction shows incompleteness. Portals: compactness and reductio.
+\end{proof}
+
+\subsection*{G4. Maximal extensions}
+\begin{definition}[G4 witness]
+$\mathcal{C}^{\mathrm{G4}}$: any local solution admits a maximal extension by isometric inclusion.
+\end{definition}
+\begin{proposition}[G4 profile]\label{prop:G4}
+\textsf{uses\_zorn} holds; $(\hChoice,\hComp,\hLogic)\ge(1,0,0)$.
+\end{proposition}
+\begin{proof}
+Chains of extensions admit upper bounds; Zorn yields a maximal element (portal to \AC).
+\end{proof}
+
+\subsection*{G5. Computable evolution}
+\begin{definition}[G5 witness]
+$\mathcal{C}^{\mathrm{G5}}$: computable initial data yield computable evolved fields (in a fixed representation) on a pinned globally hyperbolic class.
+\end{definition}
+\begin{proposition}[G5 negative template]\label{prop:G5}
+Without added uniformity, $\mathcal{C}^{\mathrm{G5}}$ can fail by a Pour--El--Richards template \cite{PourElRichards1989}. The failure calibrates on the Logic/Computability axis; any attempt to extract definite infinite data sequences invokes \textsf{uses\_serial\_chain} (portal to $\{\DCw\}$).
+\end{proposition}
+\begin{proof}[Sketch]
+Linear prototypes show computable$\to$non-computable evolution; for quasi-linear systems, similar non-uniformity can occur. If one insists on classical infinite sample paths from measurement-like procedures, the $\DCw$ portal is triggered.
+\end{proof}
+
+% ===========================================================
+\section{Auxiliary lemmas (EPS; limit-curve) with sketches}
+% ===========================================================
+\begin{lemma}[EPS kinematics]\label{lem:EPS}
+Under the Ehlers--Pirani--Schild axioms, light rays define a conformal structure and free fall a projective structure; compatibility yields a Weyl structure whose scale integrability produces a Lorentz metric class.
+\end{lemma}
+\begin{proof}[Sketch]
+EPS axioms isolate the null cones and (unparameterized) timelike geodesics; the compatibility condition yields a torsion-free Weyl connection preserving the conformal class; vanishing length curvature selects a Levi--Civita metric representative \cite{EPS1972}. No Zorn; compactness may enter only if one extracts maximizing curves.
+\end{proof}
+
+\begin{lemma}[Limit-curve compactness]\label{lem:limitcurve}
+In globally hyperbolic spacetimes, causal curves between compact sets form a compact set in the $C^0$ topology; maximizing causal geodesics exist.
+\end{lemma}
+\begin{proof}[Sketch]
+Global hyperbolicity yields compact diamond sets; equicontinuity gives Ascoli--Arzelà; upper semicontinuity of length gives maximizers (cf.\ \cite[§14]{Wald1984}). This triggers the Compactness portal.
+\end{proof}
+
+% ===========================================================
+\section{Hybrid plan: schematic map + Height 0 anchors}
+% ===========================================================
+\paragraph{Schematic map (now).} Register G1--G5 witness families; attach route flags per the standard proofs; emit HeightCertificates using portal soundness (Prop.~\ref{prop:portals}). Maintain a verification ledger of \emph{named axioms} (MGHD, Penrose/Hawking, limit-curve compactness) with citations.
+
+\paragraph{Deep dive (deliverables).}
+\begin{itemize}
+\item \textbf{D1 (EPS Core).} Implement an EPS interface and prove Lemma~\ref{lem:EPS} instances that avoid portals (Height~0).
+\item \textbf{D2 (Tensor Engine).} Minimal symbolic tensors to verify Prop.~\ref{prop:G1} for a pinned vacuum solution (Height~0).
+\end{itemize}
+
+\begin{mdframed}[style=status]
+\textbf{Success metrics.} (i) D1 and D2 compiled without \texttt{sorry}; (ii) HeightCertificates present for all G1--G5; (iii) explicit portal flags in ledger; (iv) CI and "no-sorry" guards for deep-dive directories.
+\end{mdframed}
+
+% ===========================================================
+\section{Calibration table (profiles at a glance)}
+% ===========================================================
+\begin{center}
+\begin{tabular}{|l|c|l|l|}
+\hline
+\textbf{Target} & \textbf{Profile $(\hChoice,\hComp,\hLogic)$} & \textbf{Flags/Portals used} & \textbf{Notes} \\
+\hline
+G1: explicit vacuum & $(0,0,0)$ & none & symbolic tensor algebra \\
+\hline
+G2: Cauchy/MGHD & $\ge(1,0,0)$ (global) & \textsf{uses\_zorn} & local PDE core can be $(0,0,0)$/$\ACw$ \\
+\hline
+G3: singularities & $\ge(0,1,1)$ & \textsf{uses\_limit\_curve}, \textsf{uses\_reductio} & compactness + contradiction \\
+\hline
+G4: maximal extension & $\ge(1,0,0)$ & \textsf{uses\_zorn} & Zorn portal \\
+\hline
+G5: computable evolution & logic-sensitive; DC stream & \textsf{uses\_serial\_chain} & PER-style negative template \\
+\hline
+\end{tabular}
+\end{center}
+
+% ===========================================================
+\section{Conclusion}
+% ===========================================================
+This paper is not a GR formalization for its own sake: it is an \emph{AxCal map} of GR. Portals, route flags, and HeightCertificates turn the folklore "this uses choice/compactness/LEM" into machine-checkable artifacts that compose across the theory. The deep-dive tasks (EPS; Schwarzschild) supply Height~0 anchors, ensuring the project yields verifiable infrastructure while the schematic layer documents axiomatic cost with precision.
+
+% ===========================================================
+\begin{thebibliography}{99}
+
+\bibitem{Robb1914}
+A.~A.~Robb.
+\newblock {\em A Theory of Time and Space}.
+\newblock Cambridge University Press, 1914.
+
+\bibitem{Reichenbach1969}
+H.~Reichenbach.
+\newblock {\em Axiomatization of the Theory of Relativity}.
+\newblock University of California Press, 1969 (transl.\ of 1924).
+
+\bibitem{EPS1972}
+J.~Ehlers, F.~A.~E.~Pirani, and A.~Schild.
+\newblock The geometry of free fall and light propagation.
+\newblock In {\em General Relativity: Papers in Honour of J.~L.~Synge}, 1972.
+
+\bibitem{PourElRichards1989}
+M.~B.~Pour-El and J.~I.~Richards.
+\newblock {\em Computability in Analysis and Physics}.
+\newblock Springer, 1989.
+
+\bibitem{BishopBridges1985}
+E.~Bishop and D.~S.~Bridges.
+\newblock {\em Constructive Analysis}.
+\newblock Springer, 1985.
+
+\bibitem{Hellman1998}
+G.~Hellman.
+\newblock Mathematical constructivism in spacetime physics.
+\newblock {\em Brit.~J.~Phil.~Sci.}, 49(3):425--450, 1998.
+
+\bibitem{BridgesReply1995}
+D.~S.~Bridges.
+\newblock Constructive mathematics and unbounded operators: a reply to Hellman.
+\newblock {\em J.~Philosophical Logic}, 24(5):549--561, 1995.
+
+\bibitem{Wald1984}
+R.~M.~Wald.
+\newblock {\em General Relativity}.
+\newblock University of Chicago Press, 1984.
+
+\bibitem{HawkingEllis1973}
+S.~W.~Hawking and G.~F.~R.~Ellis.
+\newblock {\em The Large Scale Structure of Space-Time}.
+\newblock Cambridge University Press, 1973.
+
+\bibitem{ChoquetBruhat2009}
+Y.~Choquet--Bruhat.
+\newblock {\em General Relativity and the Einstein Equations}.
+\newblock Oxford University Press, 2009.
+
+\end{thebibliography}
+\appendix
+
+
+% ===========================
+\section{Portals and Proof–Route Flags: Soundness}
+\label{sec:portal-soundness}
+% ===========================
+
+We make explicit the mechanism that transports standard proof routes in GR into AxCal height costs.
+
+\subsection{Route flags and their semantics}
+
+\begin{definition}[Route flag]
+A \emph{route flag} is a marker indicating that a derivation of a witness explicitly invokes a standard device:
+\[
+\mathrm{Flag} \in \{\mathrm{uses\_zorn},\ \mathrm{uses\_limit\_curve},\ \mathrm{uses\_serial\_chain},\ \mathrm{uses\_reductio}\}.
+\]
+\end{definition}
+
+\begin{definition}[Usage predicate]
+For a given derivation $\mathcal{D}$, $\mathrm{Uses}(\mathrm{Flag},\mathcal{D})$ is the proposition that the corresponding device is \emph{actually used as a step} in $\mathcal{D}$ (not merely available or admissible). Formally, in Lean we record this as a Prop argument to the witness:
+\[
+\mathsf{Uses}\ \mathrm{Flag} \quad\text{is a hypothesis to the witness family for that result.}
+\]
+\end{definition}
+
+\begin{remark}[Route sensitivity]
+Height costs attach to \emph{routes}, not just to statements. If the same theorem admits a proof avoiding a flagged device, then the certificate for that alternate route carries a lower profile.
+\end{remark}
+
+\subsection{Zorn's lemma portal (Choice axis)}
+
+\begin{proposition}[Zorn portal: $\mathrm{uses\_zorn}\Rightarrow\{\mathrm{AC}\}$]
+\label{prop:zorn-portal}
+Over $\ZF$, any derivation $\mathcal{D}$ that uses Zorn's Lemma triggers a positive frontier on the Choice axis: if $\mathrm{Uses}(\mathrm{uses\_zorn},\mathcal{D})$, then $\mathrm{AC}$ is required.
+\end{proposition}
+
+\begin{proof}
+In $\ZF$, the following are equivalent: the Axiom of Choice (AC), Zorn's Lemma, and the Hausdorff Maximal Principle; see any standard reference (e.g.\ Jech, \emph{Set Theory}, Thm.~8.1; Howard–Rubin, \emph{Consequences of the Axiom of Choice}). Hence invoking Zorn in $\mathcal{D}$ imports a principle equivalent to AC. In AxCal, we reflect this by a portal axiom
+\[
+\mathrm{Uses}(\mathrm{uses\_zorn},\mathcal{D})\ \Rightarrow\ \mathrm{HasAC}(F),
+\]
+which feeds the Choice coordinate of the height profile. \qedhere
+\end{proof}
+
+\subsection{Limit–curve portal (Compactness axis)}
+
+\begin{proposition}[Limit–curve portal: $\mathrm{uses\_limit\_curve}\Rightarrow\{\FT\ \text{or}\ \WKL_0\}$]
+\label{prop:limit-curve-portal}
+Suppose a GR derivation $\mathcal{D}$ invokes a \emph{limit–curve} argument: from a sequence of causal curves with uniform local bounds (e.g.\ equicontinuity and uniform speed control), $\mathcal{D}$ extracts a convergent subsequence (or a limit curve) without quantitative moduli of compactness. Then
+\[
+\mathrm{Uses}(\mathrm{uses\_limit\_curve},\mathcal{D}) \ \Rightarrow\ \big(\mathrm{HasFT}(F)\ \text{or}\ \mathrm{HasWKL}_0(F)\big).
+\]
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+Limit–curve arguments in Lorentzian geometry are typically instances of Arzelà–Ascoli–type compactness on spaces of curves (or a diagonal Bolzano–Weierstraß selection). Over the classical base $\RCA_0$, the necessary sequential compactness for $[0,1]$ and the Bolzano–Weierstraß theorem are equivalent to $\WKL_0$ (Simpson, \emph{Subsystems of Second Order Arithmetic}, Chs.~III–IV). Over constructive bases, Heine–Borel/compactness of Cantor space (hence $[0,1]$ via coding) is calibrated by the Fan Theorem $\FT$ (Bishop–Bridges, \emph{Constructive Analysis}; Troelstra–van Dalen, \emph{Constructivism in Mathematics}). Thus a non-quantitative subsequence/limit extraction imports compactness strength: classically $\WKL_0$; constructively $\FT$. We record this disjunctively, to be resolved by the chosen base. \qedhere
+\end{proof}
+
+\begin{remark}
+If one supplies explicit moduli (e.g.\ an effective Arzelà–Ascoli hypothesis), the portal can be avoided; the certificate for that route will then carry a lower compactness height.
+\end{remark}
+
+\subsection{Serial–chain portal (Dependent Choice axis)}
+
+\begin{proposition}[Serial–chain portal: $\mathrm{uses\_serial\_chain}\Rightarrow\{\DC_\omega\}$]
+\label{prop:dc-portal}
+Let $R\subseteq X\times X$ be serial: $\forall x\in X\,\exists y\in X\,(xRy)$. If a derivation $\mathcal{D}$ requires the existence of an infinite $R$–chain $(x_n)_{n\in\mathbb{N}}$ with $x_n R x_{n+1}$, then
+\[
+\mathrm{Uses}(\mathrm{uses\_serial\_chain},\mathcal{D})\ \Rightarrow\ \mathrm{HasDC}_\omega(F).
+\]
+\end{proposition}
+
+\begin{proof}
+This is exactly the axiom of Dependent Choice (for $\omega$) specialized to a serial relation. In $\ZF$, $\DC_\omega$ is strictly weaker than AC and sufficient to construct such chains; in $\BISH$, the same scheme expresses the iteration of countably many dependent selections. The portal records this as a foundation‑scoped token. \qedhere
+\end{proof}
+
+\subsection{Reductio portal (Logic axis)}
+
+\begin{proposition}[Reductio portal: $\mathrm{uses\_reductio}\Rightarrow\{\LEM\}$ (upper bound)]
+\label{prop:reductio-portal}
+If a derivation $\mathcal{D}$ obtains an \emph{existential} or a \emph{disjunctive} conclusion solely by contradiction (i.e.\ using $\neg\neg\varphi\Rightarrow\varphi$ at top level, not under stable predicates), then
+\[
+\mathrm{Uses}(\mathrm{uses\_reductio},\mathcal{D})\ \Rightarrow\ \mathrm{HasLEM}(F),
+\]
+giving an upper bound on the Logic axis.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+In intuitionistic/constructive settings, double–negation elimination is not generally valid; it becomes available under $\LEM$ (or specific semi–classical schemes for restricted formula classes). The standard proofs of the singularity theorems—e.g.\ Penrose—often conclude by contradiction from a global completeness hypothesis without providing a constructed witness; see Hawking–Ellis, \emph{Large Scale Structure}, and Wald, \emph{General Relativity}. We therefore mark the route with $\mathrm{uses\_reductio}$ and import $\LEM$ as a conservative upper bound. If a route is reworked into a stable/existentially constructive form, the flag can be removed and the profile lowered. References: Troelstra–van Dalen; Bridges–Richman. \qedhere
+\end{proof}
+
+\subsection{Portal soundness summary}
+
+Combining Propositions~\ref{prop:zorn-portal}–\ref{prop:reductio-portal} yields the meta–level transport principle used throughout:
+\begin{quote}
+\emph{Portal Soundness.} If a certificate includes a set of route flags, then the corresponding tokens on the AxCal axes are admissible in the foundation, yielding the advertised height profile as an \emph{upper bound}. When the route is replaced by one without a given flag, the corresponding coordinate can be lowered.
+\end{quote}
+
+\section{AxCal--Lean Ledger}\label{app:ledger}
+
+This appendix records the Lean-facing names for tokens, portal axioms, witness families, and height certificates used in the calibration of G1--G5. It functions as a machine-checkable index aligning the paper's calibration table with repository artifacts.
+
+\subsection{Axis tokens and portal axioms}\label{app:tokens-portals}
+
+\begin{verbatim}
+-- AxCal core tokens (foundation-scoped)
+class HasAC   (F : Foundation) : Prop
+class HasDCω  (F : Foundation) : Prop
+class HasFT   (F : Foundation) : Prop
+class HasWKL0 (F : Foundation) : Prop
+class HasLEM  (F : Foundation) : Prop
+class HasWLPO (F : Foundation) : Prop
+
+/-- Proof-route flags (carried in certificates; see §\ref{app:certs}) -/
+inductive PortalFlag
+| uses_zorn
+| uses_limit_curve
+| uses_serial_chain
+| uses_reductio
+
+/-- Portal soundness axioms (paper Prop. 1.1). 
+    They are registered once per foundation F. -/
+axiom Zorn_portal     : ∀ {F}, Uses PortalFlag.uses_zorn         → HasAC   F
+axiom LimitCurve_portal : ∀ {F}, Uses PortalFlag.uses_limit_curve → (HasFT F ∨ HasWKL0 F)
+axiom SerialChain_portal : ∀ {F}, Uses PortalFlag.uses_serial_chain → HasDCω F
+axiom Reductio_portal  : ∀ {F}, Uses PortalFlag.uses_reductio     → HasLEM F
+\end{verbatim}
+
+\paragraph{Notes.}
+\begin{itemize}
+\item The wrapper \verb|Uses flag| is a Prop recording that the corresponding proof-route is actually used in the provided derivation (not merely available in the library). This is what ties the \emph{route} to the \emph{frontier cost}.
+\item The compactness portal is recorded disjunctively (\verb|HasFT ∨ HasWKL0|) to reflect constructive/classical bases; the certificate chooses the branch used in the imported argument.
+\end{itemize}
+
+\subsection{Witness families for G1--G5}\label{app:witnesses}
+
+\begin{verbatim}
+-- Pinned signature Σ0^GR (interfaces only; no mathlib dependency)
+structure Manifold := ...
+structure LorentzMetric (M : Manifold) := ...
+structure Spacetime := (M : Manifold) (g : LorentzMetric M)
+
+-- Einstein tensor interface and EFE predicate
+def EinsteinTensor (S : Spacetime) : Tensor := ...
+def EFE (S : Spacetime) (T : Tensor) : Prop := ...
+
+-- WitnessFamily type (from AxCal core)
+--   WitnessFamily F  := Prop (witness existence over foundation F)
+
+namespace GR
+
+/-- G1: explicit vacuum check (Schwarzschild@pin) -/
+def G1_Vacuum_W : WitnessFamily := fun F =>
+  ∀ (Ssch : Spacetime), IsPinnedSchwarzschild Ssch → EFE Ssch ZeroTensor
+
+/-- G2: Cauchy problem split into local PDE and MGHD (global) -/
+def G2_LocalPDE_W : WitnessFamily := fun F =>
+  ∀ (ID : InitialData), LocalWellPosed ID         -- no portal flags
+def G2_MGHD_W     : WitnessFamily := fun F =>
+  ∀ (ID : InitialData), Uses PortalFlag.uses_zorn → MGHD_Exists ID
+
+/-- G3: Singularity theorem (schematic Penrose) -/
+def G3_Penrose_W : WitnessFamily := fun F =>
+  ∀ (S : Spacetime),
+    (NullEnergyCondition S) →
+    (HasTrappedSurface S)    →
+    Uses PortalFlag.uses_limit_curve →
+    Uses PortalFlag.uses_reductio     →
+    ¬ GeodesicallyComplete S
+
+/-- G4: Maximal extension existence -/
+def G4_MaxExt_W : WitnessFamily := fun F =>
+  ∀ (S : Spacetime),
+    Uses PortalFlag.uses_zorn →
+    ∃ Smax, IsMaximalExtension S Smax
+
+/-- G5: Computable evolution (negative template and DC stream) -/
+def G5_CompNeg_W : WitnessFamily := fun F =>
+  ∃ (class : GHClass),
+    ComputableInitialData class ∧
+    NonComputableEvolution class  -- PER-style failure
+
+def G5_MeasStream_W : WitnessFamily := fun F =>
+  HasDCω F → (∀ proto : SerialProtocol, InfiniteHistory proto)
+
+end GR
+\end{verbatim}
+
+\subsection{Height certificates (profiles and routes)}\label{app:certs}
+
+\begin{verbatim}
+-- Axis triple: (Choice, Compactness, Logic)
+structure AxisProfile := (hChoice hComp hLogic : Height)   -- Height ∈ {zero, one, omega}
+structure HeightCertificate :=
+{ W        : WitnessFamily
+, profile  : AxisProfile
+, flags    : List PortalFlag
+, upper    : ProfileUpper profile W        -- constructive upper proof or portal imports
+, cites    : List Citation                 -- paper-level references used
+}
+
+-- Concrete certificates (G1--G5)
+def G1_Vacuum_Cert : HeightCertificate :=
+{ W       := GR.G1_Vacuum_W
+, profile := ⟨zero, zero, zero⟩
+, flags   := []
+, upper   := by
+    -- symbolic curvature computation at the pin (no portals)
+    exact upper_height0_vacuum_check
+, cites   := [cite "Wald §B.4"]
+}
+
+def G2_LocalPDE_Cert : HeightCertificate :=
+{ W       := GR.G2_LocalPDE_W
+, profile := ⟨zero, zero, zero⟩  -- or ⟨one, zero, zero⟩ if ACω is used in analysis
+, flags   := []
+, upper   := import_local_pde_result
+, cites   := [cite "Choquet–Bruhat (2009)"]
+}
+
+def G2_MGHD_Cert : HeightCertificate :=
+{ W       := GR.G2_MGHD_W
+, profile := ⟨one, zero, zero⟩
+, flags   := [PortalFlag.uses_zorn]
+, upper   := by
+    intro F ID hzorn
+    have hAC : HasAC F := Zorn_portal hzorn
+    exact imported_mghd_existence hAC
+, cites   := [cite "Wald Thm. 10.1.2"]
+}
+
+def G3_Penrose_Cert : HeightCertificate :=
+{ W       := GR.G3_Penrose_W
+, profile := ⟨zero, one, one⟩
+, flags   := [PortalFlag.uses_limit_curve, PortalFlag.uses_reductio]
+, upper   := by
+    intro F S nec trapped hlim hred
+    have hComp : (HasFT F ∨ HasWKL0 F) := LimitCurve_portal hlim
+    have hLEM  : HasLEM F              := Reductio_portal hred
+    exact imported_penrose hComp hLEM nec trapped
+, cites   := [cite "Hawking–Ellis §8", cite "Wald §14"]
+}
+
+def G4_MaxExt_Cert : HeightCertificate :=
+{ W       := GR.G4_MaxExt_W
+, profile := ⟨one, zero, zero⟩
+, flags   := [PortalFlag.uses_zorn]
+, upper   := by
+    intro F S hz
+    exact imported_maximal_extension (Zorn_portal hz)
+, cites   := [cite "Wald §10.1"]
+}
+
+def G5_CompNeg_Cert : HeightCertificate :=
+{ W       := GR.G5_CompNeg_W
+, profile := ⟨zero, zero, one⟩  -- logic/Computability axis sensitivity
+, flags   := []
+, upper   := imported_PER_negative_template
+, cites   := [cite "Pour–El–Richards (1989)"]
+}
+
+def G5_MeasStream_Cert : HeightCertificate :=
+{ W       := GR.G5_MeasStream_W
+, profile := ⟨zero, zero, one⟩  -- shown via DCω portal on serial protocols
+, flags   := [PortalFlag.uses_serial_chain]
+, upper   := by
+    intro F hDC proto
+    exact SerialChain_portal_elim hDC proto
+, cites   := [cite "AxCal DCω eliminator"]
+}
+\end{verbatim}
+
+\subsection{Verification table (names ↔ profiles ↔ portals)}\label{app:table}
+
+\begin{center}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+\textbf{Target} & \textbf{Witness (Lean)} & \textbf{Certificate (Lean)} & \textbf{Flags} & \textbf{Profile}\\
+\midrule
+G1 & \verb|GR.G1_Vacuum_W| & \verb|G1_Vacuum_Cert| & -- & $(0,0,0)$ \\
+G2 (local) & \verb|GR.G2_LocalPDE_W| & \verb|G2_LocalPDE_Cert| & -- & $(0,0,0)$ or $(1,0,0)$ \\
+G2 (MGHD) & \verb|GR.G2_MGHD_W| & \verb|G2_MGHD_Cert| & Zorn & $(1,0,0)$ \\
+G3 & \verb|GR.G3_Penrose_W| & \verb|G3_Penrose_Cert| & LimitCurve, Reductio & $(0,1,1)$ \\
+G4 & \verb|GR.G4_MaxExt_W| & \verb|G4_MaxExt_Cert| & Zorn & $(1,0,0)$ \\
+G5 (neg.) & \verb|GR.G5_CompNeg_W| & \verb|G5_CompNeg_Cert| & -- & $(0,0,1)$ \\
+G5 (stream) & \verb|GR.G5_MeasStream_W| & \verb|G5_MeasStream_Cert| & SerialChain & $(0,0,1)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{File map (proposed layout)}\label{app:files}
+
+\begin{verbatim}
+Papers/P5_GR/
+  AxCalCore/Axis.lean              -- Height, AxisProfile, ProfileUpper
+  AxCalCore/Tokens.lean            -- HasAC, HasDCω, HasFT, HasWKL0, HasLEM, HasWLPO
+  GR/Interfaces.lean               -- Σ0^GR: manifolds, Lorentz metrics, EFE predicate
+  GR/Portals.lean                  -- PortalFlag, Zorn_portal, LimitCurve_portal, ...
+  GR/Witnesses.lean                -- G1_Vacuum_W, G2_*, G3_*, G4_*, G5_*
+  GR/Certificates.lean             -- G*_Cert definitions (HeightCertificate)
+  GR/EPSCore.lean                  -- (deep-dive) EPS kinematics proofs (Height 0)
+  GR/Schwarzschild.lean            -- (deep-dive) vacuum check engine (Height 0)
+  Ledger/Citations.lean            -- structured bibliography handles for certificates
+  Smoke.lean                       -- CI aggregator; no-sorry guard for deep-dive dirs
+\end{verbatim}
+
+\subsection{Ledger policy}
+\begin{itemize}
+\item Every certificate includes \emph{flags} (route evidence) and \emph{cites} (bibliographic anchors).
+\item Replacing an imported theorem by an internal proof that avoids a flagged portal \emph{automatically} lowers the certificate's profile (the AxCal algebra recomputes heights componentwise).
+\item Disjunctive compactness (\verb|HasFT ∨ HasWKL0|) must be resolved per foundation instance to produce a concrete $(\hComp)$ entry.
+\end{itemize}
+\end{document}

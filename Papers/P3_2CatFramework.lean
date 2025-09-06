@@ -14,7 +14,7 @@ import Papers.P3_2CatFramework.Phase2_API
 
 -- Phase 3: Numeric levels and obstruction framework
 import Papers.P3_2CatFramework.Phase3_Levels
-import Papers.P3_2CatFramework.Phase3_Obstruction
+-- import Papers.P3_2CatFramework.Phase3_Obstruction  -- Moved to archive
 import Papers.P3_2CatFramework.Phase3_StoneWindowMock
 
 -- Positive uniformization (Part II of paper)

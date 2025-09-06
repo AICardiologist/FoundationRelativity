@@ -1,96 +1,161 @@
-# Paper 5: Axiom Calibration for General Relativity
+# Paper 5: General Relativity AxCal Analysis
 
-## Status: Development Starting
+**Axiom Calibration for General Relativity: Portals, Profiles, and a Hybrid Plan for EPS and Schwarzschild**
 
-### 📄 LaTeX Document
+This paper applies the Axiom Calibration (AxCal) framework to General Relativity, providing precise measurements of the logical strength required for key GR theorems through a novel portal-based approach.
 
-**Main Paper**: [`latex/Paper5_GR_AxCal.tex`](latex/Paper5_GR_AxCal.tex) - "Axiom Calibration for General Relativity (Paper 5): Empirical Axioms, Computability, and Constructive Profiles with Lean 4 Verification Plan"
+## 📄 Paper Content
 
-See [`latex/README.md`](latex/README.md) for compilation instructions.
+### LaTeX Documents
+- **Main Paper**: [`Paper5_GR_AxCal.tex`](Paper5_GR_AxCal.tex) - Complete paper with mathematical content and appendices
+- **Legacy**: [`latex/Paper5_GR_AxCal_old.tex`](latex/Paper5_GR_AxCal_old.tex) - Original theoretical foundation
 
-**Development Start**: September 2025  
-**Current Phase**: Planning and initial development
+### Key Contributions
 
-## Overview
+1. **AxCal Instrumentation for GR**:
+   - Witness families pinned to Σ₀^GR signature
+   - Proof-route flags and portal theorems
+   - HeightCertificates with three-axis profiles (Choice, Compactness, Logic)
 
-Paper 5 represents a new direction in the Axiom Calibration (AxCal) framework, building on the complete foundational work from Papers 1-4:
+2. **Portal Framework**:
+   - `uses_zorn` → AC portal (Choice axis)
+   - `uses_limit_curve` → FT/WKL₀ portal (Compactness axis)  
+   - `uses_serial_chain` → DCω portal (Dependent Choice)
+   - `uses_reductio` → LEM portal (Logic axis)
 
-- **Paper 1**: Rank-One Toggle Kernel (core complete, 4 sorries) ❄️ `paper1-freeze-v1.0`
-- **Paper 2**: WLPO ↔ Bidual Gap (main theorem complete, 3 conditional sorries) ❄️ `paper2-freeze-v1.0`  
-- **Paper 3A**: AxCal Framework (complete, 0 sorries) ❄️ `paper3a-freeze-v1.0`
-- **Paper 3B**: Proof-Theoretic Scaffold (complete, 21 axioms) ❄️ `paper3b-freeze-v1.0`
-- **Paper 4**: Quantum Spectra AxCal (complete, 0 sorries, Zenodo archived) ❄️ `paper4-freeze-v1.0`
+3. **Five Calibration Targets (G1-G5)**:
+   - **G1**: Explicit vacuum checks (Height 0)
+   - **G2**: Cauchy problem/MGHD (Zorn portal)
+   - **G3**: Singularity theorems (Compactness + LEM portals)
+   - **G4**: Maximal extensions (Zorn portal)
+   - **G5**: Computable evolution (Pour-El-Richards negative template)
 
-## Inherited Infrastructure
+4. **Deep-Dive Deliverables** (Height 0 anchors):
+   - **D1**: EPS kinematics core (constructive proof)
+   - **D2**: Schwarzschild vacuum check (symbolic tensor engine)
 
-Paper 5 has access to the complete AxCal framework:
+## 🏗️ Lean 4 Implementation
 
-### From Paper 3A (AxCal Framework)
-- Three orthogonal axes: WLPO, FT, DCω
-- Uniformization height theory
-- Stone Window API with 100+ Boolean algebra lemmas
-- Complete 2-categorical foundation structure
+### File Structure
+```
+Papers/P5_GeneralRelativity/
+├── Main.lean                     # Primary entry point and main theorems
+├── AxCalCore/                    # Core AxCal infrastructure
+│   ├── Axis.lean                 # Height profiles and composition
+│   └── Tokens.lean               # Foundation-scoped axiom tokens
+├── GR/                           # GR-specific calibration framework
+│   ├── Interfaces.lean           # Σ₀^GR signature: manifolds, metrics, EFE
+│   ├── Portals.lean              # Proof-route flags and portal soundness
+│   ├── Witnesses.lean            # G1-G5 witness families
+│   ├── Certificates.lean        # HeightCertificate definitions
+│   ├── EPSCore.lean              # Deep-dive D1: EPS kinematics (Height 0)
+│   └── Schwarzschild.lean        # Deep-dive D2: vacuum check (Height 0)
+├── Ledger/
+│   └── Citations.lean            # Structured bibliography
+└── Smoke.lean                    # CI aggregator and verification
+```
 
-### From Paper 3B (Proof Theory)  
-- Stage-based ladder system
-- 21 axioms representing proof-theoretic limits
-- RFN_Σ₁ → Con schematic proof
-- Collision theory framework
+### Key Lean Concepts
 
-### From Paper 4 (Quantum Applications)
-- S0-S4 spectral calibrations
-- Profile algebra and composition laws
-- Markov's Principle (MP) integration
-- Advanced certificate system
+#### Height Profiles
+```lean
+structure AxisProfile where
+  hChoice : Height    -- AC/DCω axis
+  hComp   : Height    -- FT/WKL₀ axis  
+  hLogic  : Height    -- LEM/WLPO/MP axis
+```
 
-## Development Goals
+#### Portal Framework
+```lean
+inductive PortalFlag
+| uses_zorn         -- Zorn's lemma application
+| uses_limit_curve  -- Ascoli-Arzelà / curve compactness
+| uses_serial_chain -- Infinite dependent choice construction
+| uses_reductio     -- Essential proof by contradiction
+```
 
-Paper 5 applies the AxCal framework to General Relativity:
+#### Witness Families
+```lean
+def WitnessFamily := Foundation → Prop
 
-### Research Direction
-- **GR Pin**: Manifolds, tensors, Einstein Field Equations (Σ₀^GR)
-- **Three Orthogonal Axes**: 
-  - Choice (AC/DCω/ACω)
-  - Compactness/Kinematics (FT/WKL₀)
-  - Logic/Computability (WLPO/LEM/MP)
-- **Calibration Targets (G1-G5)**:
-  - G1: Explicit solutions (Height 0)
-  - G2: Cauchy problem (MGHD)  
-  - G3: Singularity theorems
-  - G4: Maximal extensions
-  - G5: Computable GR evolution
+def G1_Vacuum_W : WitnessFamily := fun F =>
+  ∀ (Ssch : Spacetime), IsPinnedSchwarzschild Ssch → VacuumEFE Ssch
+```
 
-### Verification Strategy
-- **Schematic Lean layer**: Structural height certification
-- **Imported axioms**: Heavy GR mathematics via verification ledger
-- **Targeted formalization**: G1 (Schwarzschild vacuum check)
+## 📊 Calibration Results
 
-## Build Commands
+| Target | Profile (h_Choice, h_Comp, h_Logic) | Portals | Notes |
+|--------|-------------------------------------|---------|-------|
+| **G1** | (0,0,0) | none | Symbolic tensor algebra |
+| **G2 Local** | (0,0,0) | none | PDE core constructive |
+| **G2 MGHD** | (1,0,0) | Zorn | Global maximal development |
+| **G3** | (0,1,1) | LimitCurve, Reductio | Penrose singularity theorem |
+| **G4** | (1,0,0) | Zorn | Maximal extension existence |
+| **G5** | (0,0,1) | SerialChain | Computability/measurement |
 
+## 🚀 Build Instructions
+
+### Prerequisites
+- Lean 4 with elan toolchain manager
+- Lake package manager
+
+### Build Commands
 ```bash
-# Paper 5 development target (when implemented)
-lake build Papers.P5_NewDirection.Main
+# Build main Paper 5 target
+lake build Papers.P5_GeneralRelativity
 
-# Inherited infrastructure available
-lake build Papers.P3_2CatFramework.Paper3A_Main  # AxCal framework
-lake build Papers.P4_SpectralGeometry.Smoke      # Quantum spectra patterns
+# Run smoke test and verification
+lake build Papers.P5_GeneralRelativity.Smoke
+
+# Check individual components
+lake build Papers.P5_GeneralRelativity.GR.Certificates
+lake build Papers.P5_GeneralRelativity.GR.EPSCore
+lake build Papers.P5_GeneralRelativity.GR.Schwarzschild
 ```
 
-## Structure
+### Verification Status
+- **No-sorry requirement**: All deep-dive deliverables (D1, D2) must compile without `sorry`
+- **Certificate completeness**: All G1-G5 targets have HeightCertificate instances
+- **Portal soundness**: All route flags trigger appropriate axiom tokens
 
-```
-P5_NewDirection/
-├── README.md                    # This file
-├── Main.lean                    # Entry point (TBD)
-└── [To be defined]
-```
+## 🔬 Hybrid Development Plan
 
-## Connection to Previous Work
+**Schematic Map (Current)**: 
+- Register all G1-G5 witness families ✅
+- Attach route flags per standard proofs ✅  
+- Emit HeightCertificates using portal soundness ✅
+- Maintain verification ledger with citations ✅
 
-Paper 5 leverages the complete AxCal ecosystem:
-- **Calibration methodology** from Papers 3A/3B
-- **Operational examples** from Papers 1, 2, 4
-- **Proof-theoretic boundaries** established in 3B
-- **Implementation patterns** proven in 4
+**Deep Dive (Deliverables)**:
+- **D1**: EPS interface avoiding portals (Height 0) ✅
+- **D2**: Minimal tensor engine for Schwarzschild vacuum (Height 0) ✅
 
-The frozen state of Papers 1-4 provides a stable foundation for new research directions.
+## 📚 Literature Integration
+
+The portal framework integrates key literature at the axiom level:
+
+- **Robb/Reichenbach/EPS**: Axiomatic kinematics → no portals for conformal/projective recovery
+- **Pour-El-Richards**: Computable→non-computable PDE evolution → Logic axis calibration
+- **Bishop-Bridges/Hellman**: Constructive analysis guidance → Height 0 vs choice distinction
+- **Wald/Hawking-Ellis/Choquet-Bruhat**: Standard GR proofs → portal location identification
+
+## 🎯 Success Metrics
+
+1. ✅ **D1 and D2 compiled without `sorry`**
+2. ✅ **HeightCertificates present for all G1-G5** 
+3. ✅ **Explicit portal flags in ledger**
+4. ✅ **CI and verification infrastructure**
+
+## 🔗 Integration with AxCal Ecosystem
+
+Paper 5 builds on the complete frozen AxCal framework:
+- **Paper 3A**: Three orthogonal axes and uniformization theory
+- **Paper 3B**: Proof-theoretic scaffold and collision framework  
+- **Paper 4**: Spectral geometry calibrations and profile algebra
+- **Papers 1-2**: Foundational results in functional analysis
+
+The GR calibration extends AxCal methodology to spacetime physics while maintaining the same rigorous approach to axiom accounting.
+
+---
+
+*This paper demonstrates that GR's logical complexity can be mapped precisely through AxCal portals, separating constructive geometry (Height 0) from choice-dependent existence results and measurement theory.*

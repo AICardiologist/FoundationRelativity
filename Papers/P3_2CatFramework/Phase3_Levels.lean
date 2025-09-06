@@ -1,16 +1,31 @@
-/-
-  Papers/P3_2CatFramework/Phase3_Levels.lean
-  Numeric levels + bridges to Phase 2 (0/1).
--/
 import Papers.P3_2CatFramework.Phase2_UniformHeight
 import Mathlib.Logic.Equiv.Basic
+
+/-!
+  # Phase 3: Numeric Levels and Bridges
+  
+  Extensions of the height framework to natural number levels,
+  with bridges back to Phase 2's discrete Level type.
+  
+  ## Key Features
+  - Natural number heights (extensible beyond 1)
+  - Bidirectional bridges between Phase 2 and Phase 3
+  - Foundation for future axiom calibrations at higher levels
+-/
 
 namespace Papers.P3.Phase3
 
 -- Bring Phase 1 names in (Foundation comes from here)
 open Papers.P3.Phase1Simple
 
-/-- Level k requirement on foundations. Extend beyond k = 1 in later phases. -/
+/-- 
+Level k requirement on foundations.
+
+Defines which foundations satisfy height ≥ k:
+- Level 0: All foundations (BISH and above)
+- Level 1: Foundations with WLPO
+- Level 2+: Placeholder for future axioms (DC_ω, AC, etc.)
+-/
 def W_ge : Nat → (Foundation → Prop)
 | 0 => fun _ => True
 | 1 => fun F => F.wlpo = true
@@ -44,7 +59,12 @@ lemma W_ge_mono_from_two : ∀ k F, 2 ≤ k → W_ge k F → W_ge (k+1) F := by
     | zero => contradiction  -- 2 ≤ 1 is false
     | succ k'' => simp [W_ge]  -- k = k''+2, so both levels are True
 
-/-- Uniformization at numeric level k (Σ₀-only, same packaging as Phase 2). -/
+/-- 
+Uniformization at numeric level k.
+
+Extends Phase 2's uniformization to natural number levels.
+Maintains the same Σ₀-restriction and functorial properties.
+-/
 structure UniformizableOnN (k : Nat) (WF : Papers.P3.Phase2.WitnessFamily) : Type where
   η :
     ∀ {F F'} (_ : Interp F F'), W_ge k F → W_ge k F' →
@@ -58,7 +78,11 @@ structure UniformizableOnN (k : Nat) (WF : Papers.P3.Phase2.WitnessFamily) : Typ
       η (comp_interp φ ψ) hF hH X
         = (η φ hF hG X).trans (η ψ hG hH X)
 
-/-- Bridge from Phase 2's `UniformizableOn W_ge0` and `UniformizableOn W_ge1`. -/
+/-- 
+Bridge: Phase 2 level 0 → Phase 3 numeric level 0.
+
+Converts uniformization at W_ge0 to numeric level 0.
+-/
 def UniformizableOn.toN0 {WF} :
   Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge0 WF → UniformizableOnN 0 WF :=
 fun U => {
@@ -68,6 +92,11 @@ fun U => {
     simpa using U.η_comp φ ψ (by trivial) (by trivial) (by trivial) X
 }
 
+/-- 
+Bridge: Phase 2 level 1 → Phase 3 numeric level 1.
+
+Converts uniformization at W_ge1 to numeric level 1.
+-/
 def UniformizableOn.toN1 {WF} :
   Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge1 WF → UniformizableOnN 1 WF :=
 fun U => {
@@ -86,7 +115,11 @@ fun U => {
     exact U.η_comp φ ψ hF_phase2 hG_phase2 hH_phase2 X
 }
 
-/-- Bridge back to Phase 2: numeric level 0 → W_ge0. -/
+/-- 
+Bridge: Phase 3 numeric level 0 → Phase 2 level 0.
+
+Converts numeric uniformization back to W_ge0 format.
+-/
 def toW0 {WF} :
     UniformizableOnN 0 WF → Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge0 WF :=
 fun U => {
@@ -96,7 +129,11 @@ fun U => {
     by simpa using U.η_comp φ ψ (by trivial) (by trivial) (by trivial) X
 }
 
-/-- Bridge back to Phase 2: numeric level 1 → W_ge1. -/
+/-- 
+Bridge: Phase 3 numeric level 1 → Phase 2 level 1.
+
+Converts numeric uniformization back to W_ge1 format.
+-/
 def toW1 {WF} :
     UniformizableOnN 1 WF → Papers.P3.Phase2.UniformizableOn Papers.P3.Phase2.W_ge1 WF :=
 fun U => {

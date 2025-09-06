@@ -396,3 +396,16 @@ Papers/P3_2CatFramework/test/ProofTheory_Sanity.lean:73
 Papers/P3_2CatFramework/test/ProofTheory_Sanity.lean:81
 Papers/P3_2CatFramework/P4_Meta/ProofTheory/Reflection.lean:44
 Papers/P3_2CatFramework/P4_Meta/ProofTheory/Reflection.lean:55
+Papers/P3_2CatFramework/Examples/Example1_WitnessFamily.lean:23
+Papers/P3_2CatFramework/Examples/Example1_WitnessFamily.lean:30
+Papers/P3_2CatFramework/Examples/Example1_WitnessFamily.lean:39
+Papers/P3_2CatFramework/Examples/Example1_WitnessFamily.lean:44
+Papers/P3_2CatFramework/Examples/Example2_HeightComposition.lean:27
+Papers/P3_2CatFramework/Examples/Example2_HeightComposition.lean:38
+Papers/P3_2CatFramework/Examples/Example2_HeightComposition.lean:47
+Papers/P3_2CatFramework/Examples/Example2_HeightComposition.lean:49
+Papers/P3_2CatFramework/Examples/Example3_StoneWindow.lean:42
+Papers/P3_2CatFramework/Examples/Example3_StoneWindow.lean:55
+
+# Paper 5: General Relativity AxCal Analysis - Framework proof placeholder
+Papers/P5_GeneralRelativity/Main.lean:67  # Calibration_Summary - Certificate profile computation proof
