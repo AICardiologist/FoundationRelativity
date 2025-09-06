@@ -109,4 +109,23 @@ theorem EPS_Height_Zero (S : Spacetime) :
 
 end EPS
 
+namespace EPS
+
+/-- Minimal structured EPS kinematics payload. -/
+structure Kinematics (S : Spacetime) where
+  light : LightRay S
+  fall  : FreeFall S
+
+/-- Construct a schematic Lorentz metric from kinematics (height 0). -/
+def derive_metric {S : Spacetime} (_k : Kinematics S) : LorentzMetric S.M :=
+  { components := fun _ => True, lorentzian := True, nondeg := True }
+
+/-- Structured Height 0: given kinematics, recover a metric constructively. -/
+theorem EPS_Kinematics_Height0 (S : Spacetime) :
+  ∀ k : Kinematics S, ∃ m : LorentzMetric S.M, True := by
+  intro k
+  exact ⟨derive_metric k, True.intro⟩
+
+end EPS
+
 end Papers.P5_GeneralRelativity

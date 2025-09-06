@@ -12,6 +12,7 @@ import Papers.P5_GeneralRelativity.GR.Witnesses
 import Papers.P5_GeneralRelativity.GR.Certificates
 import Papers.P5_GeneralRelativity.GR.EPSCore
 import Papers.P5_GeneralRelativity.GR.Schwarzschild
+import Papers.P5_GeneralRelativity.GR.Compose
 import Papers.P5_GeneralRelativity.Ledger.Citations
 
 -- Paper 5 smoke test aggregator
@@ -86,6 +87,10 @@ theorem Deep_Dive_Height_Zero_Ready : True := True.intro
 theorem Schwarzschild_Height_Zero_Ready : True := True.intro
 
 end Paper5Smoke
+
+-- Profile algebra and composition checks
+#check Papers.P5_GeneralRelativity.G2_Composed_Cert
+#check Papers.P5_GeneralRelativity.G2_Composed_well_formed
 
 -- Export main aggregator for CI
 #check Paper5Smoke.Paper5_Smoke_Success
