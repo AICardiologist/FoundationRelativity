@@ -107,9 +107,12 @@ pdflatex Paper6_HeisenbergAxCal.tex
 - No mathlib dependency
 - CI builds library target and enforces no-sorry constraint
 
-## CI Status
+## Software Release & CI Status
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17068179.svg)](https://doi.org/10.5281/zenodo.17068179)
 [![Paper 6 Heisenberg](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/p6-heisenberg.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/p6-heisenberg.yml)
+
+**Zenodo Software Package**: [https://zenodo.org/records/17068179](https://zenodo.org/records/17068179)
 
 ## Relation to Other Papers
 

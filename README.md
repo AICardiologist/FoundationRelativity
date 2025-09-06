@@ -10,11 +10,12 @@
 [![DOI Paper 3A](https://zenodo.org/badge/DOI/10.5281/zenodo.17054050.svg)](https://doi.org/10.5281/zenodo.17054050)
 [![DOI Paper 3B](https://zenodo.org/badge/DOI/10.5281/zenodo.17054155.svg)](https://doi.org/10.5281/zenodo.17054155)
 [![DOI Paper 4](https://zenodo.org/badge/DOI/10.5281/zenodo.17059483.svg)](https://doi.org/10.5281/zenodo.17059483)
+[![DOI Paper 6](https://zenodo.org/badge/DOI/10.5281/zenodo.17068179.svg)](https://doi.org/10.5281/zenodo.17068179)
 
 🎯 Current Status (September 2025) - **ALL PAPERS FROZEN FOR PAPER 5 DEVELOPMENT**
 
 **❄️ FROZEN PAPERS** (September 2025):
-• Paper 6 (Heisenberg AxCal): ✅ **COMPLETE** - Zero sorries, constructive RS + Schrödinger proofs `paper6-phase3-v1.0`
+• Paper 6 (Heisenberg AxCal): ✅ **COMPLETE** - Zero sorries, constructive RS + Schrödinger proofs ([DOI: 10.5281/zenodo.17068179](https://doi.org/10.5281/zenodo.17068179)) `paper6-phase3-v1.0`
 • Paper 4 (Quantum Spectra): ✅ **COMPLETE** - Zero sorries ([DOI: 10.5281/zenodo.17059483](https://doi.org/10.5281/zenodo.17059483)) `paper4-freeze-v1.0`
 • Paper 3A (AxCal Framework): ✅ **COMPLETE** - Zero sorries, 3 orthogonal axes `paper3a-freeze-v1.0`
 • Paper 3B (Proof-theoretic scaffold): ✅ **COMPLETE** - 21 axioms (proof-theoretic limit) `paper3b-freeze-v1.0`
@@ -45,7 +46,7 @@ A Lean 4 formalization project that calibrates the exact logical strength requir
 - **Paper5_GR_AxCal.tex** - Axiom Calibration for General Relativity with Lean 4 verification plan
 
 **Paper 6 LaTeX document** is located in [`Papers/P6_Heisenberg/`](Papers/P6_Heisenberg/):
-- **Paper6_HeisenbergAxCal.tex** - Heisenberg Uncertainty Principle AxCal analysis
+- **Paper6_HeisenbergAxCal.tex** - Heisenberg Uncertainty Principle AxCal analysis ([Software DOI: 10.5281/zenodo.17068179](https://doi.org/10.5281/zenodo.17068179))
 
 ### Papers Summary (All Frozen Except Paper 5)
 
