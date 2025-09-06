@@ -11,6 +11,22 @@ axiom real_mul : ℝ → ℝ → ℝ
 axiom real_zero : ℝ
 axiom real_one : ℝ
 axiom real_neg : ℝ → ℝ
+-- Prop-only order on ℝ
+axiom real_le : ℝ → ℝ → Prop
+infix:50 " ≤ᵣ " => real_le
+
+-- Basic properties of ≤ᵣ used in inequality chaining
+axiom real_le_refl  : ∀ a : ℝ, a ≤ᵣ a
+axiom real_le_trans : ∀ {a b c : ℝ}, a ≤ᵣ b → b ≤ᵣ c → a ≤ᵣ c
+axiom real_le_of_eq : ∀ {a b : ℝ}, a = b → a ≤ᵣ b
+
+-- Monotonicity under left-multiplication by 4 (specialized; no general order theory needed)
+axiom real_mul_mono_left_four :
+  ∀ {x y : ℝ}, x ≤ᵣ y → real_mul real_four x ≤ᵣ real_mul real_four y
+
+-- Small named constants (no division needed)
+noncomputable def real_two  : ℝ := real_add real_one real_one
+noncomputable def real_four : ℝ := real_add real_two real_two
 
 -- Complex number type and operations (signature only)
 axiom ℂ : Type
@@ -85,3 +101,27 @@ axiom real_embed_mul : ∀ a b : ℝ,
 
 axiom real_embed_zero : real_to_complex real_zero = complex_zero
 axiom real_embed_one : real_to_complex real_one = complex_one
+
+-- Universal complex bound: |z - conj z|^2 ≤ 4 |z|^2 (in squared-norm form)
+axiom norm_sq_sub_conj_le_4_norm_sq :
+  ∀ z : ℂ,
+    complex_norm_sq (complex_add z (complex_neg (complex_conj z)))
+      ≤ᵣ real_mul real_four (complex_norm_sq z)
+
+-- Congruence for real_mul to avoid transport issues
+axiom real_mul_congr_right :
+  ∀ {a a' b b' : ℝ}, a = a' → b = b' → real_mul a b = real_mul a' b'
+
+/-! Additional small helpers for Phase-3+ -/
+
+/-- Congruence for real addition. -/
+axiom real_add_congr :
+  ∀ {a a' b b' : ℝ}, a = a' → b = b' → real_add a b = real_add a' b'
+
+/-- Exact identity: ‖z - conj z‖² + ‖z + conj z‖² = 4‖z‖². -/
+axiom norm_sq_skew_sym_sum_eq_4_norm_sq :
+  ∀ z : ℂ,
+    real_add
+      (complex_norm_sq (complex_add z (complex_neg (complex_conj z))))
+      (complex_norm_sq (complex_add z (complex_conj z)))
+    = real_mul real_four (complex_norm_sq z)

@@ -13,6 +13,8 @@ import Papers.P6_Heisenberg.HUP.DComega
 import Papers.P6_Heisenberg.HUP.RobertsonSchrodinger
 import Papers.P6_Heisenberg.HUP.Witnesses
 
+set_option linter.unusedVariables false
+
 open Papers.P6_Heisenberg.HUP
 
 -- Main theorem: Paper 6 claims summary (axiomatized for now)
@@ -24,7 +26,7 @@ axiom paper6_main_claims :
 
 -- Export key definitions for external use
 export HilbertSig (ψ add scalar_mul zero inner norm)
-export OperatorSig (Operator apply selfAdj expect variance)
+export OperatorSig (Operator apply selfAdj cexpect expect variance comm acomm)
 export AxCalHeight (zero finite omega)
 export AxCalProfile (wlpo_height ft_height dc_height)
 
