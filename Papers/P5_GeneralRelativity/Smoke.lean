@@ -1,6 +1,6 @@
 /-
 Paper 5: General Relativity AxCal Analysis - Smoke Test
-CI aggregator and no-sorry guard for all GR AxCal components
+CI aggregator and verification guard for all GR AxCal components
 -/
 
 -- Import all Paper 5 components
@@ -74,7 +74,7 @@ variable (F : Foundation)
 #check HasLEM F
 #check HasWLPO F
 
--- Success indicator: all components compile without sorry
+-- Success indicator: all components compile successfully
 theorem Paper5_Smoke_Success : True := True.intro
 
 -- Certificate count verification
