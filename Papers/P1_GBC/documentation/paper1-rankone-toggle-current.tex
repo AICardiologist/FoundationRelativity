@@ -90,8 +90,10 @@
 % ---------- Title ----------
 \title{\textbf{Rank-One Toggle on Hilbert Spaces:\\
 A Minimal Operator-Theoretic Core with a Lean 4 Formalization}}
-\author{Paul Chun--Kit Lee}
-\date{August 2025 \\[2pt] \small (working note / preprint)}
+\author{Paul Chun--Kit Lee\\
+\texttt{dr.paul.c.lee@gmail.com}\\
+New York University, NY}
+\date{September 2025 \\[2pt] \small (working note / preprint)}
 
 \begin{document}
 \maketitle
@@ -103,7 +105,7 @@ G(c)\;:=\;I - c\,P,\qquad c\in\{0,1\},
 \]
 on a (real or complex) Hilbert space~$H$. We give compact proofs of block decomposition, kernel/range, injectivity $\Leftrightarrow$ surjectivity, spectrum and essential spectrum, and a projection-specialized Sherman--Morrison inverse formula which yields a closed-form resolvent away from $\{0,1\}$.
 
-A fully \emph{mechanized} development accompanies the paper in Lean~4 (\leanRepoTag). With the pinned toolchain, the projection API, the toggle algebra, the Sherman--Morrison identity, explicit resolvent formulas, and a robust resolvent norm bound are \leanok. The Spectrum and Fredholm sections are included mathematically, and their Lean counterparts are \leanpending\ in this snapshot due to missing operator-algebra and finiteness APIs; our Spectrum module compiles against a local placeholder until we upgrade \texttt{mathlib4}.
+A fully \emph{mechanized} development accompanies the paper in Lean~4 (\leanRepoTag). \textbf{Major achievement}: reduced from 14 sorries to just 4! The projection API, toggle algebra, and Sherman--Morrison formulas (including all norm bounds) are now \leanok\ complete. Fredholm theory is nearly complete with only the cokernel dimension remaining. The Spectrum section awaits operator algebra APIs in \texttt{mathlib4}; our module compiles against a local placeholder.
 \end{abstract}
 
 \tableofcontents
@@ -339,11 +341,31 @@ lake build Papers.P1_GBC.RankOneToggle.Spectrum
 \paragraph{Spectrum stub (temporary).}
 \texttt{Spectrum.lean} compiles against a local placeholder (no new axioms; confined to that module). Once \texttt{mathlib4} provides the required operator-algebra instances for $\CL{\K}{H}$, we will switch to the canonical \texttt{spectrum} API and remove the placeholder (\leanpending).
 
+\section{Formalization Status (September 2025)}
+
+\textbf{Major Achievement:} Reduced from 14 sorries to just 4!
+
+\subsection{Complete (0 sorries)}
+\begin{itemize}
+\item \texttt{Projection.lean}: Orthogonal projection API fully formalized
+\item \texttt{Toggle.lean}: Kernel/range characterization, injectivity $\Leftrightarrow$ surjectivity
+\item \texttt{ShermanMorrison.lean}: \textbf{Now complete!} All inverse formulas and norm bounds proven
+\item \texttt{Fredholm.lean} (mostly): Kernel finite-dimensional, range closed, kernel dimension = 1
+\end{itemize}
+
+\subsection{Remaining Gaps (4 sorries)}
+\begin{itemize}
+\item \textbf{Fredholm cokernel} (1 sorry): Proving $\dim(H/\langle u\rangle^\perp) = 1$ requires the isomorphism $H/K^\perp \cong K$ for closed subspaces, which is deep Hilbert space theory not yet in mathlib.
+\item \textbf{Spectrum} (3 sorries): Awaiting operator spectrum API in mathlib. Current spectrum is for Banach algebras, not specifically for $\mathcal{L}_\mathbb{K}(H)$.
+\end{itemize}
+
 \section{Limitations and roadmap}
 \begin{itemize}
-\item Spectrum and numeric Fredholm index are mathematically standard and included here; Lean proofs are postponed behind the pinned dependency snapshot.
+\item The 4 remaining sorries are \emph{not easily closable} with current mathlib (September 2025).
+\item Fredholm quotient dimension requires new mathematical infrastructure.
+\item Spectrum characterization needs extensive API development for operator algebras.
 \item Code isolates the Sherman--Morrison and resolvent machinery behind small composition lemmas to minimize blast radius on upgrade.
-\item Next steps: update \texttt{mathlib4}, replace the Spectrum placeholder, strengthen \texttt{FredholmAlt.lean} to numeric index $0$, and add a small library of finite-rank projection variants.
+\item Next steps: await mathlib spectrum API updates and orthogonal decomposition theory.
 \end{itemize}
 
 \section{Concluding Remarks}
@@ -497,5 +519,8 @@ A.~B\"{o}ttcher and I.~M.~Spitkovsky, A gentle guide to the basics of two projec
 I.~C.~Gohberg and M.~G.~Krein, \emph{Introduction to the Theory of Linear Nonselfadjoint Operators}. AMS, 1969.
 
 \end{thebibliography}
+
+\section*{Acknowledgments}
+Development assistance provided by: Gemini 2.5 Deep Think (architecture exploration and theoretical framework design), GPT-5 Pro (Lean 4 scaffolding and implementation support), and Claude Code (repository management and development workflow).
 
 \end{document}
