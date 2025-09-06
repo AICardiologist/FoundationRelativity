@@ -3,6 +3,7 @@
 [![CI](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/ci.yml)
 [![Nightly](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/nightly.yml)
 [![Paper 4 Smoke](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/p4-smoke.yml/badge.svg)](https://github.com/AICardiologist/FoundationRelativity/actions/workflows/p4-smoke.yml)
+[![Paper 6 Heisenberg](https://img.shields.io/badge/Paper%206%20Heisenberg-Complete-brightgreen)](Papers/P6_Heisenberg/)
 [![Paper 3A/3B Complete](https://img.shields.io/badge/Paper%203A%2F3B-Complete-brightgreen)](Papers/P3_2CatFramework/)
 [![Paper 2 WLPO↔Gap](https://img.shields.io/badge/Paper%202%20WLPO%E2%86%94Gap-3%20sorries-green)](Papers/P2_BidualGap/)
 [![Paper 1 Rank-One](https://img.shields.io/badge/Paper%201%20Rank--One-4%20sorries-green)](Papers/P1_GBC/)
@@ -13,6 +14,7 @@
 🎯 Current Status (September 2025) - **ALL PAPERS FROZEN FOR PAPER 5 DEVELOPMENT**
 
 **❄️ FROZEN PAPERS** (September 2025):
+• Paper 6 (Heisenberg AxCal): ✅ **COMPLETE** - Zero sorries, constructive RS + Schrödinger proofs `paper6-phase3-v1.0`
 • Paper 4 (Quantum Spectra): ✅ **COMPLETE** - Zero sorries ([DOI: 10.5281/zenodo.17059483](https://doi.org/10.5281/zenodo.17059483)) `paper4-freeze-v1.0`
 • Paper 3A (AxCal Framework): ✅ **COMPLETE** - Zero sorries, 3 orthogonal axes `paper3a-freeze-v1.0`
 • Paper 3B (Proof-theoretic scaffold): ✅ **COMPLETE** - 21 axioms (proof-theoretic limit) `paper3b-freeze-v1.0`
@@ -85,12 +87,12 @@ A Lean 4 formalization project that calibrates the exact logical strength requir
    - Targets G1-G5: Explicit solutions → Computable GR evolution
    - 45-page LaTeX document with Lean 4 verification plan
 
-**Paper 6: Heisenberg Uncertainty Principle AxCal** ⚛️ **NEW QUANTUM PHYSICS**
-   - Distinguishes preparation uncertainty (HUP-RS) from measurement uncertainty (HUP-M)
-   - HUP-RS: Height 0 (fully constructive) - Robertson-Schrödinger inequality
-   - HUP-M: ≤ DCω (requires Dependent Choice) - sequential measurement analysis  
-   - Mathlib-free Hilbert space axioms with complete Lean 4 verification
-   - Foundational separation: quantum structure vs. classical information extraction
+6. **Paper 6: Heisenberg Uncertainty Principle AxCal** `paper6-phase3-v1.0` ✅ **COMPLETE** (0 sorries)
+   - **Phase-3 Achievement**: Constructive proofs of both Robertson-Schrödinger and full Schrödinger inequalities
+   - HUP-RS: Height 0 (fully constructive) - `RS_from_bridges` theorem
+   - HUP-M: ≤ DCω (dependent choice) - `hupM_stream_from_dcω` derived from dcω_stream
+   - **Schrödinger strengthening**: |⟨[A,B]⟩|² + |⟨{A,B}⟩|² ≤ 4·Var(A)·Var(B) (division-free)
+   - Mathlib-free Hilbert space signatures with complete bridge axiom foundations
 
 ### Axiom Calibration Methodology
 
