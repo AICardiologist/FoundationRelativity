@@ -1,31 +1,32 @@
 /-
-Paper 5: General Relativity AxCal Analysis - Composition (simplified, no-sorry)
-- G2 composition example: local ⊔ MGHD (composed certificate)
+  Paper 5: GR - Composition examples
 -/
 import Papers.P5_GeneralRelativity.GR.Portals
-import Papers.P5_GeneralRelativity.GR.Certificates
+import Papers.P5_GeneralRelativity.AxCalCore.ProfileLUB
+import Papers.P5_GeneralRelativity.GR.ComposeLaws
 
 namespace Papers.P5_GeneralRelativity
-open AxisProfile
 
--- Simple composition using existing max
+def LocalPDE_flags : List PortalFlag := [PortalFlag.uses_limit_curve]
+def MGHD_flags : List PortalFlag := [PortalFlag.uses_zorn]
+
+def LocalPDE_Profile : AxisProfile := route_to_profile LocalPDE_flags
+def MGHD_Profile : AxisProfile := route_to_profile MGHD_flags
+
 def G2_Composed_Profile : AxisProfile :=
-  AxisProfile.max
-    Certificates.G2_LocalPDE_Cert.profile
-    Certificates.G2_MGHD_Cert.profile
+  maxAP LocalPDE_Profile MGHD_Profile
 
--- Lightweight composed certificate (flags appended; profile recomputed)
-def G2_Composed_Cert : HeightCertificate :=
-{ name   := "G2 (local ⊔ MGHD): composed via flags append",
-  W      := GR.G2_MGHD_W,
-  flags  := Certificates.G2_LocalPDE_Cert.flags ++ Certificates.G2_MGHD_Cert.flags,
-  profile := route_to_profile
-              (Certificates.G2_LocalPDE_Cert.flags ++ Certificates.G2_MGHD_Cert.flags),
-  upper  := { upper_proof := by intro _ _; exact True.intro },
-  cites  := Certificates.G2_LocalPDE_Cert.cites ++ Certificates.G2_MGHD_Cert.cites }
+def G2_Composed_Cert_flags : List PortalFlag :=
+  LocalPDE_flags ++ MGHD_flags
 
--- Basic composition check
-theorem G2_Composed_well_formed : G2_Composed_Cert.profile.hChoice = Height.one := by
-  simp [G2_Composed_Cert, route_to_profile, Certificates.G2_LocalPDE_Cert, Certificates.G2_MGHD_Cert, memFlag, eqb]
+def G2_Composed_profile_law :
+  route_to_profile G2_Composed_Cert_flags = G2_Composed_Profile := by
+  unfold G2_Composed_Cert_flags G2_Composed_Profile LocalPDE_Profile MGHD_Profile
+  exact route_to_profile_append_eq_maxAP LocalPDE_flags MGHD_flags
+
+def G2_Composed_well_formed :
+  (route_to_profile G2_Composed_Cert_flags).hChoice = Height.one := by
+  simp [G2_Composed_Cert_flags, LocalPDE_flags, MGHD_flags, 
+        route_to_profile, memFlag, eqb]
 
 end Papers.P5_GeneralRelativity
