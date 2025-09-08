@@ -6,8 +6,13 @@ import Papers.P5_GeneralRelativity.GR.Portals
 
 namespace Papers.P5_GeneralRelativity
 
+/-- Profiles compose under append via componentwise `maxAP`. -/
 def route_to_profile_append_eq_maxAP (xs ys : List PortalFlag) :
   route_to_profile (xs ++ ys) = maxAP (route_to_profile xs) (route_to_profile ys) := by
+  -- TODO: Once all simp rules are stable everywhere, the following line should close the goal:
+  -- ext <;> simp [route_to_profile, memFlag_append_simp, maxH_if_one_zero_simp,
+  --               Bool.or_assoc, Bool.or_left_comm, Bool.or_comm]
+  -- For now we keep the case-split proof:
   ext
   · simp [route_to_profile, maxAP, maxH, memFlag_append_simp]
     cases h1 : memFlag PortalFlag.uses_zorn xs <;> cases h2 : memFlag PortalFlag.uses_zorn ys <;> simp

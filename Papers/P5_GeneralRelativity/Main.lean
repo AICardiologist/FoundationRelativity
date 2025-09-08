@@ -49,15 +49,15 @@ theorem Paper5_Main :
   · exact True.intro  
   · intro flags; exact ⟨AxisProfile.height_zero, True.intro⟩
 
--- Certificate summary validation: shows dynamic profile computation works
+/-- Sanity summary using the local flag-based profiles (no external certificates). -/
 theorem Profile_Computation_Works :
-  -- G1 uses no portals = height_zero  
-  True ∧
-  -- G2-MGHD uses Zorn portal = choice height increases
-  True ∧
-  -- Framework compiles and certificates load correctly
-  True := by
-  exact ⟨True.intro, True.intro, True.intro⟩
+  -- Zorn portal correctly increases choice height
+  (route_to_profile [PortalFlag.uses_zorn]).hChoice = Height.one ∧
+  -- Limit curve portal correctly increases compactness height
+  (route_to_profile [PortalFlag.uses_limit_curve]).hComp = Height.one ∧
+  -- Logic portals correctly increase logic height
+  (route_to_profile [PortalFlag.uses_serial_chain, PortalFlag.uses_reductio]).hLogic = Height.one := by
+  simp [route_to_profile, memFlag, eqb]
 
 -- Export key components for external use
 export AxisProfile (height_zero max)
