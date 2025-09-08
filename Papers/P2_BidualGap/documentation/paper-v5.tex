@@ -143,14 +143,14 @@
 % \thanks{Lean 4 formalization available at \leanRepo. A citable snapshot is archived at Zenodo: DOI \texttt{10.5281/zenodo.13356587}.} % TODO: Replace DOI with actual value
 
 % For standard article class (temporary):
-\title{The Bidual Gap and WLPO: Complete Characterization and Formalization}
+\title{The Bidual Gap and WLPO: A Constructive Calibration of Banach Space Non-Reflexivity}
 \author{Paul Chun-Kit Lee\thanks{Lean 4 formalization available at \leanRepo. A citable snapshot is archived at Zenodo: DOI \texttt{10.5281/zenodo.13356587}.} \\ New York University \\ \texttt{paul.lee@nyu.edu}}
 \date{}
 
 \begin{document}
 
 \begin{abstract}
-We show, over Bishop-style constructive mathematics (BISH), that detecting a bidual gap (non-surjectivity of the canonical embedding from a Banach space into its bidual) has exactly the strength of the Weak Limited Principle of Omniscience (WLPO). We provide a complete Lean 4 formalization of the equivalence. Beyond the equivalence, we develop constructive finite-dimensional surrogates via Cesàro means and formalize a ``Stone window'' that identifies idempotents in the quotient of bounded sequences by the sequences converging to zero with almost-equality classes of subsets of the natural numbers. Methodologically, we isolate a Prop-level kernel for the ``gap implies WLPO'' direction and a robust treatment of conditional suprema for partial sums. The main equivalence builds without errors; three WLPO-conditional lemmas remain in an optional module about completeness of certain dual spaces and do not affect the main result.
+We calibrate the logical strength of Banach space non-reflexivity over Bishop-style constructive mathematics (BISH). This phenomenon, where the canonical embedding from a Banach space into its bidual is not surjective, is referred to as a `bidual gap.' We prove its existence is equivalent to the Weak Limited Principle of Omniscience (WLPO). We provide a complete Lean 4 formalization of the equivalence. Beyond the equivalence, we develop constructive finite-dimensional surrogates via Cesàro means and formalize a ``Stone window'' that identifies idempotents in the quotient of bounded sequences by the sequences converging to zero with almost-equality classes of subsets of the natural numbers. Methodologically, we isolate a Prop-level kernel for the ``gap implies WLPO'' direction and a robust treatment of conditional suprema for partial sums. The main equivalence builds without errors; three WLPO-conditional lemmas remain in an optional module about completeness of certain dual spaces and do not affect the main result.
 \end{abstract}
 
 \maketitle
@@ -164,6 +164,10 @@ We show, over Bishop-style constructive mathematics (BISH), that detecting a bid
 \subsection{The foundation-sensitive bidual gap}
 
 For any Banach space $X$, the canonical embedding $J:X\to X^{**}$ maps $x\in X$ to the evaluation functional $J(x)(f)=f(x)$ for $f\in X^*$. A central question in functional analysis is whether $J$ is surjective; if not, $X$ is non-reflexive, and there exists a ``bidual gap.''
+
+\begin{definition}[Non-Reflexivity and Bidual Gap]
+A Banach space $X$ is called \textbf{non-reflexive} if the canonical embedding $J_X$ is not surjective. For descriptive clarity in our constructive context, we will say such a space \textbf{has a bidual gap}.
+\end{definition}
 
 For the space $\linf$ of bounded sequences, the answer depends on the foundational setting. In classical mathematics ($\ZFC$), the Hahn--Banach theorem implies that $J$ is not surjective.
 
