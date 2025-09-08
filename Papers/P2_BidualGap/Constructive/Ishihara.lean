@@ -1,8 +1,8 @@
 /-
   Papers/P2_BidualGap/Constructive/Ishihara.lean
-  Constructive skeleton for Ishihara's argument (BidualGapStrong → WLPO).
-
-  We do NOT open classical or use by_cases here.
+  Ishihara-style argument for BidualGapStrong → WLPO.
+  Note: Despite the "Constructive" directory name, this module uses classical logic
+  as needed for the functional analysis (by_contra, open Classical, etc.).
 -/
 import Mathlib.Analysis.Normed.Module.Dual
 import Mathlib.Analysis.Normed.Group.Completeness
