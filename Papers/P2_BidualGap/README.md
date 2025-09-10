@@ -13,6 +13,13 @@ constructive mathematics (BISH).
 - Witness construction with c₀: ✅ Complete (0 sorries)  
 - Optional completeness lemmas: 3 WLPO-conditional sorries
 
+### Recent Update (September 2025)
+Following discussions in the Lean Zulip group, we have updated the proof construction
+to be more consistent with Constructive Reverse Mathematics (CRM) requirements.
+The changes focus on proper fencing of classical reasoning and a more robust
+approach to the gap parameter δ. We believe the current approach is correct,
+but it would benefit from verification by experts in constructive reverse mathematics.
+
 ## Scope
 
 ### ✅ Completed (0 sorries)
@@ -58,6 +65,8 @@ with the bidual functional G : (c₀)** defined by G(f) = Σₙ f(eₙ) where (e
 - **Ishihara Kernel**: Prop-level construction avoiding computational overhead
 - **Option-B Bridge**: Abstract pattern for gap construction
 - **Robust csSup**: Direct suprema approach avoiding fragile instance resolution
+- **CRM-Compliant Construction**: Proper fencing of classical reasoning with constructive consumer
+- **Concrete δ-Gap**: Uses `δ := |y(h⋆)|/2` avoiding bidual norm type inference issues
 
 ## Build Commands
 

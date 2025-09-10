@@ -19,7 +19,7 @@
 • Paper 4 (Quantum Spectra): ✅ **COMPLETE** - Zero sorries ([DOI: 10.5281/zenodo.17059483](https://doi.org/10.5281/zenodo.17059483)) `paper4-freeze-v1.0`
 • Paper 3A (AxCal Framework): ✅ **COMPLETE** - Zero sorries, 3 orthogonal axes `paper3a-freeze-v1.0`
 • Paper 3B (Proof-theoretic scaffold): ✅ **COMPLETE** - 21 axioms (proof-theoretic limit) `paper3b-freeze-v1.0`
-• Paper 2 (WLPO ↔ Bidual Gap): ✅ **CORE COMPLETE** - Main theorem proven, 3 WLPO-conditional sorries `paper2-freeze-v1.0`
+• Paper 2 (WLPO ↔ Bidual Gap): ✅ **CORE COMPLETE** - Main theorem proven, 3 WLPO-conditional sorries `paper2-freeze-v1.0` *(recently updated for CRM compliance following Lean Zulip discussions)*
 • Paper 1 (Rank-One Toggle Kernel): ✅ **CORE COMPLETE** - Down to 4 sorries (from 14) `paper1-freeze-v1.0`
 
 🚀 **CURRENT DEVELOPMENT**: 
@@ -130,6 +130,7 @@ Examples: Bidual gap has profile (WLPO, FT, DC_ω) = (1, 0, 0); UCT has (0, 1, 0
   - Main theorem: Gap_∃ ↔ WLPO equivalence proven (0 sorries)
   - Witness space: c₀ construction complete
   - 3 WLPO-conditional sorries in optional completeness only
+  - Recently updated for CRM compliance following Lean Zulip discussions
 
 - **[Paper 1: Rank-One Toggle Kernel](Papers/P1_GBC/)** ✅ **CORE COMPLETE** `paper1-freeze-v1.0`
   - Sherman-Morrison formula complete (0 sorries)
