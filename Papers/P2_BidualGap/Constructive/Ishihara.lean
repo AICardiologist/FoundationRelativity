@@ -1,16 +1,20 @@
 /-
   Papers/P2_BidualGap/Constructive/Ishihara.lean
-  Argument for BidualGapStrong -> WLPO, via the Ishihara kernel.
+  BidualGapStrong → WLPO via the Ishihara kernel.
 
-  CRM methodology split:
-  • Classical meta-reasoning (fenced in `section ClassicalMeta`):
-      extract y ∈ X** \ j(X), obtain a half-norm witness h⋆, define g(α) by
-      case-splitting on an undecidable predicate.
+  CRM methodology:
+  • Classical meta-extraction (fenced in `section ClassicalMeta`):
+      pick y ∈ X** \ j(X), find h⋆ ∈ X* with (‖y‖/2) < ‖y h⋆‖, and define
+      g(α) := if (∀ n, α n = false) then 0 else h⋆.
+      We define the gap δ := ‖y h⋆‖ / 2 > 0 using only order facts on ℝ.
   • Constructive consumption:
-      the IshiharaKernel API and WLPO_of_kernel are intuitionistically valid.
+      the kernel (y, f, g, δ) is fed to `WLPO_of_kernel`, which is intuitionistic.
+      No classical reasoning or undecidable case-splits occur outside ClassicalMeta.
 
   Implementation notes:
-  - Avoid fragile patterns; expand normalization and op-norm steps explicitly.
+  - We avoid fragile normalization/`gcongr` tricks; explicit inequalities are used.
+  - Normability (op-norm existence) is delegated to `OpNormCore` and only used in
+    the classical construction of the kernel; the consumer uses it as a hypothesis.
 -/
 import Mathlib.Analysis.Normed.Module.Dual
 import Mathlib.Analysis.Normed.Group.Completeness
@@ -19,7 +23,6 @@ import Papers.P2_BidualGap.Constructive.OpNormCore
 
 namespace Papers.P2.Constructive
 open Papers.P2
-open scoped BigOperators
 
 noncomputable section
 
@@ -38,23 +41,22 @@ lemma exists_on_unitBall_gt_half_opNorm
   have bound_all : ∀ x : E, ‖T x‖ ≤ (‖T‖ / 2) * ‖x‖ := by
     intro x
     by_cases hx : x = 0
-    · simpa [hx, norm_zero, mul_zero, div_nonneg, norm_nonneg] using
-        (show (0 : ℝ) ≤ (‖T‖ / 2) * ‖x‖ from
-          mul_nonneg (div_nonneg (norm_nonneg _) (by norm_num)) (norm_nonneg _))
+    · simpa [hx, norm_zero, mul_zero] using
+        mul_nonneg (div_nonneg (norm_nonneg _) (by norm_num)) (norm_nonneg _)
     · have hxpos : 0 < ‖x‖ := norm_pos_iff.mpr hx
       let u : E := (‖x‖)⁻¹ • x
       have hu_norm : ‖u‖ = 1 := by
-        have h1 : ‖u‖ = ‖(‖x‖)⁻¹‖ * ‖x‖ := by simpa [u] using norm_smul ((‖x‖)⁻¹) x
+        have h1 : ‖u‖ = ‖(‖x‖)⁻¹‖ * ‖x‖ := by simp [u, norm_smul]
         have h2 : ‖(‖x‖)⁻¹‖ = (‖x‖)⁻¹ := by
           have : 0 < ‖x‖ := norm_pos_iff.mpr hx
-          simpa [Real.norm_of_nonneg (le_of_lt (inv_pos.mpr this))]
+          simp [Real.norm_of_nonneg (le_of_lt (inv_pos.mpr this))]
         have hxne : (‖x‖ : ℝ) ≠ 0 := ne_of_gt hxpos
-        simpa [h2, hxne] using h1
-      have hu_le : ‖u‖ ≤ 1 := by simpa [hu_norm]
+        simp [h2, hxne, h1]
+      have hu_le : ‖u‖ ≤ 1 := by simp [hu_norm]
       have hu_ball : ‖T u‖ ≤ ‖T‖ / 2 := h u hu_le
       have hxu : (‖x‖ : ℝ) • u = x := by
         have hxne : (‖x‖ : ℝ) ≠ 0 := ne_of_gt hxpos
-        simpa [u] using smul_inv_smul₀ hxne x
+        simp [u, smul_inv_smul₀ hxne x]
       have h_Tx_eq : T x = (‖x‖) • T u := by
         simpa [hxu] using T.map_smul (‖x‖ : ℝ) u
       calc
@@ -113,15 +115,6 @@ structure KernelWitness where
   K : IshiharaKernel X
 
 attribute [instance] KernelWitness.Xng KernelWitness.Xns KernelWitness.Xc
-
-/-- A tiny helper: just re-expose the separation disjunction. -/
-lemma kernel_threshold
-  {X : Type} [NormedAddCommGroup X] [NormedSpace ℝ X]
-  (K : IshiharaKernel X) (α : ℕ → Bool) :
-  |K.y (K.f + K.g α)| = 0 ∨ |K.y (K.f + K.g α)| ≥ K.δ := by
-  rcases K.sep α with h0 | hge
-  · exact Or.inl h0
-  · exact Or.inr hge
 
 /-- Constructive consumer: a kernel with a positive gap yields `WLPO`. -/
 theorem WLPO_of_kernel
