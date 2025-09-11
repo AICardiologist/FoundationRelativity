@@ -241,7 +241,7 @@ If some Banach space $X$ has $J:X\to X^{**}$ not surjective, then $\WLPO$ holds.
 \end{thm}
 
 \begin{proof}
-Choose $y\in X^{**}\setminus J(X)$ with $y\ne 0$. A half-norm attainment lemma yields $h\in X^*$ with $\|h\|\le 1$ and $|y(h)|>\|y\|/2$. Let $f=0$, $\delta=\|y\|/2$, and
+Choose $y\in X^{**}\setminus J(X)$ with $y\ne 0$. A half-norm attainment lemma yields $h\in X^*$ with $\|h\|\le 1$ and $|y(h)|>\|y\|/2$. Let $f=0$, $\delta=|y(h)|/2$ (so $\delta>0$ by $0 \leq \|y\|/2 < |y(h)|$), and
 \[
 g(\alpha)=\begin{cases}
 0 & \text{if } \forall n,\alpha(n)=0,\\
@@ -251,9 +251,54 @@ h & \text{otherwise}.
 Then the dichotomy and decision properties hold, so the kernel exists.
 \end{proof}
 
-\begin{rem}[Foundational status of the proof term]\label{rem:meta-classical}
-The definition of $g(\alpha)$ case-splits on $(\forall n,\alpha(n)=0)$, an undecidable proposition in $\BISH$. In our Lean development we enable classical reasoning (\texttt{open Classical}), which internally rests on \texttt{propext} and \texttt{Classical.choice}. This follows the standard reverse-mathematical stance: we prove in a classical meta-logic that, over $\BISH$, ``Gap $\Rightarrow$ $\WLPO$'' holds, thereby calibrating the statement over $\BISH$ without adding classical logic to $\BISH$ itself.
+\subsection{Foundation-theoretic interlude: Classical logic in reverse mathematics}
+
+Before proceeding to the reverse direction, we must address a subtle but crucial point about the use of classical logic in constructive reverse mathematics.
+
+\begin{rem}[Classical meta-logic vs. object logic]\label{rem:meta-classical}
+The definition of $g(\alpha)$ in the proof case-splits on the undecidable proposition
+$(\forall n,\alpha(n)=0)$. In $\BISH$, we cannot constructively perform this case split.
+However, in reverse mathematics, we work in a \emph{classical meta-logic} to prove
+statements \emph{about} $\BISH$.
+
+Concretely, we prove the implication:
+\[
+  \text{(classically)}\quad
+  \big[\text{there exists a Banach space with a bidual gap (a $\BISH$-provable statement)}\big]
+  \;\Longrightarrow\;
+  \big[\BISH \vdash \WLPO\big].
+\]
+This is standard in reverse mathematics: classical reasoning is used only to
+\emph{extract} the data that a constructive argument can \emph{consume}.
+
+In the formalization, we fence the meta-classical reasoning (witness extraction and
+the case split in $g$) inside a dedicated block, and keep the kernel consumer
+(\emph{Ishihara kernel} $\Rightarrow \WLPO$) intuitionistic. No classical axiom
+is added to the object theory.
 \end{rem}
+
+\paragraph{Special note (differences from an earlier draft).}
+Two technical changes make the argument robust and CRM-compliant:
+\begin{enumerate}
+  \item \textbf{Gap parameter.} We set
+  \[
+    \delta \;:=\; \frac{|y(h^\star)|}{2}\,,
+  \]
+  where $h^\star\in X^\ast$ satisfies $\|h^\star\|\le 1$ and
+  $\tfrac{\|y\|}{2}<|y(h^\star)|$. This yields $\delta>0$ by elementary
+  order facts ($0\le \tfrac{\|y\|}{2} < |y(h^\star)|$ implies $0<|y(h^\star)|$,
+  hence $0<\delta$). In particular, we do \emph{not} need to derive $\|y\|>0$
+  from $y\neq 0$, which would otherwise force norm-positivity lemmas at the bidual
+  type and introduce foundational friction in a constructive setting.
+  \item \textbf{Fencing classical reasoning.} The only classical steps are:
+  picking $y\in X^{**}\!\setminus j(X)$, obtaining $h^\star$, and
+  defining $g(\alpha)$ by a global case split. The kernel consumer
+  (from the separation statement and the zero-characterization to $\WLPO$)
+  is intuitionistic and does not depend on classical principles.
+\end{enumerate}
+Both changes are invisible at the level of classical mathematics, but they are
+important for constructive reverse mathematics: the consumer no longer relies on
+bidual-specific norm facts or undecidable case splits.
 
 \subsection{Reverse direction: WLPO implies gap}
 
