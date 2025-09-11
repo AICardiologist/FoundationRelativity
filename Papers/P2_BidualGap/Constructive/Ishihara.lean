@@ -33,7 +33,7 @@ open Classical
 
 -- Helper lemma for approximate supremum selection (no compactness needed).  
 lemma exists_on_unitBall_gt_half_opNorm
-  {E} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
+  {E} [NormedAddCommGroup E] [NormedSpace ℝ E]
   (T : E →L[ℝ] ℝ) (hT : T ≠ 0) :
   ∃ x : E, ‖x‖ ≤ 1 ∧ (‖T‖ / 2) < ‖T x‖ := by
   classical
@@ -99,32 +99,8 @@ lemma hasOpNorm_zero {X} [NormedAddCommGroup X] [NormedSpace ℝ X] :
 -- Any continuous linear functional has an OpNorm LUB (classical completeness of ℝ).
 lemma hasOpNorm_CLF
   {X} [NormedAddCommGroup X] [NormedSpace ℝ X]
-  (h : X →L[ℝ] ℝ) : OpNorm.HasOpNorm (X:=X) h := by
-  classical
-  -- S := {|h x| | ‖x‖ ≤ 1}; we phrase with norm to avoid abs/Real.* drift
-  let S : Set ℝ := OpNorm.valueSet (X:=X) h
-  -- Nonempty: take x = 0
-  have hne : S.Nonempty := by
-    refine ⟨0, ?_⟩
-    refine ⟨(0 : X), ?_, ?_⟩
-    · simp [OpNorm.UnitBall]
-    · simp
-  -- Bounded above by ‖h‖.
-  have hbdd : BddAbove S := by
-    refine ⟨‖h‖, ?_⟩
-    intro r hr
-    rcases hr with ⟨x, hx, rfl⟩
-    have : ‖h x‖ ≤ ‖h‖ * ‖x‖ := by simpa using h.le_opNorm x
-    have hx1 : ‖x‖ ≤ 1 := hx
-    have hnn : 0 ≤ ‖h‖ := norm_nonneg _
-    have : ‖h x‖ ≤ ‖h‖ :=
-      this.trans <| by
-        have : ‖h‖ * ‖x‖ ≤ ‖h‖ * 1 := mul_le_mul_of_nonneg_left hx1 hnn
-        simpa using this
-    exact this
-  -- Classical completeness of ℝ.
-  exact ⟨sSup S, isLUB_csSup hne hbdd⟩
-  -- If your tree spells it `isLub_csSup`, just change the lemma name here.
+  (h : X →L[ℝ] ℝ) : OpNorm.HasOpNorm (X:=X) h :=
+  OpNorm.hasOpNorm_CLF h
 
 /-
   Lightweight kernel API for the forward direction.
@@ -163,7 +139,8 @@ lemma kernel_threshold
   (K : IshiharaKernel X) (α : ℕ → Bool) :
   |K.y (K.f + K.g α)| = 0 ∨ |K.y (K.f + K.g α)| ≥ K.δ :=
 by
-  simpa [le_abs] using K.sep α
+  -- no rewriting is needed: δ ≤ |⋯| is definitionally |⋯| ≥ δ
+  simpa using K.sep α
 
 /-- From a kernel with a uniform positive gap δ, we can define a WLPO decision
     procedure at the meta level and package it as a proof of WLPO.
@@ -173,7 +150,7 @@ by
     never needs to reason about the details again.
 -/
 theorem WLPO_of_kernel
-  {X : Type _} [NormedAddCommGroup X] [NormedSpace ℝ X] [CompleteSpace X]
+  {X : Type _} [NormedAddCommGroup X] [NormedSpace ℝ X]
   (K : IshiharaKernel X) : WLPO := by
   -- WLPO for Bool-sequences: for every α, either all-false or not-all-false.
   intro α
@@ -217,7 +194,7 @@ Notes:
 /-- This wrapper matches the delegation used in the main equivalence file:
     `gap_implies_wlpo` calls `WLPO_of_witness (kernel_from_gap hGap)`. -/
 def WLPO_of_witness (W : KernelWitness) : WLPO :=
-  @WLPO_of_kernel W.X _ _ _ W.K
+  @WLPO_of_kernel W.X _ _ W.K
 
 -- Previous approach: Extract an Ishihara kernel from a strong bidual gap.  
 -- This used the point y ∈ X** \ j(X), closedness of j(X), positive distance,  
@@ -252,30 +229,21 @@ theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
     intro h0; subst h0
     exact hy ⟨0, by simp⟩
 
-  -- Uniform gap
-  let δ : ℝ := ‖y‖ / 2
-  have δpos : 0 < δ := by
-    -- (1) Get 0 ≤ ‖y‖ without letting `simp` collapse it to `True`
-    have h₀ : (0 : ℝ) ≤ ‖y‖ := by
-      exact (@norm_nonneg ((X →L[ℝ] ℝ) →L[ℝ] ℝ) _ y)
-
-    -- (2) From ‖y‖ = 0 ⇒ y = 0, contradicting hy0
-    have hne : ‖y‖ ≠ 0 := by
-      intro hnorm
-      have hy_zero : (y : (X →L[ℝ] ℝ) →L[ℝ] ℝ) = 0 :=
-        ((@norm_eq_zero ((X →L[ℝ] ℝ) →L[ℝ] ℝ) _ y)).1 hnorm
-      exact hy0 hy_zero
-
-    -- (3) Strict positivity and then halve
-    have : 0 < ‖y‖ := lt_of_le_of_ne h₀ (by simpa [ne_comm] using hne)
-    simpa [δ] using half_pos this
-
-  -- Near maximizer h⋆ in X* (use ASCII `hstar`, and pin E explicitly)
+  -- Extract a half-norm witness h⋆ in X* with (‖y‖/2) < ‖y h⋆‖ (classical).
   obtain ⟨hstar, hstar_le1, hstar_big⟩ :
-      ∃ h : (X →L[ℝ] ℝ), ‖h‖ ≤ 1 ∧ δ < ‖y h‖ := by
-    -- the helper lemma returns (‖y‖/2) < ‖y h‖; rewrite to δ with [δ]
-    simpa [δ] using
+      ∃ h : (X →L[ℝ] ℝ), ‖h‖ ≤ 1 ∧ (‖y‖ / 2) < ‖y h‖ := by
+    simpa using
       (exists_on_unitBall_gt_half_opNorm (E := (X →L[ℝ] ℝ)) y hy0)
+
+  -- Define the gap from the actual evaluation; avoids instance issues on X**.
+  let δ : ℝ := ‖y hstar‖ / 2
+  have δpos : 0 < δ := by
+    -- 0 ≤ ‖y‖/2, so from (‖y‖/2) < ‖y h⋆‖ we get 0 < ‖y h⋆‖
+    have zero_le_half_norm_y : 0 ≤ ‖y‖ / 2 :=
+      div_nonneg (norm_nonneg y) (by norm_num)
+    have pos_yh : 0 < ‖y hstar‖ :=
+      lt_of_le_of_lt zero_le_half_norm_y hstar_big
+    simpa [δ] using half_pos pos_yh
 
   -- Define kernel data
   let f : X →L[ℝ] ℝ := 0
@@ -290,9 +258,12 @@ theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
       left
       -- y(0) = 0; use Real.norm_eq_abs to produce |·|
       simp [f, g, hall]
-    · -- not all-false → g α = hstar, so ‖y (f + g α)‖ = ‖y hstar‖
+    · -- not all-false → g α = hstar
       right
-      have : δ ≤ ‖y hstar‖ := le_of_lt hstar_big
+      -- δ ≤ ‖y hstar‖ because a/2 ≤ a for a ≥ 0
+      have : δ ≤ ‖y hstar‖ := by
+        have hnn : 0 ≤ ‖y hstar‖ := norm_nonneg _
+        simpa [δ] using half_le_self hnn
       -- rewrite to abs with Real.norm_eq_abs and unfold f,g
       simpa [f, g, hall, zero_add, Real.norm_eq_abs] using this
 
@@ -305,10 +276,11 @@ theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
       -- if not all-false, g α = hstar
       have yh_eq : y (f + g α) = y hstar := by simpa [f, g, hnot, zero_add]
       have yhstar0 : y hstar = 0 := by simpa [yh_eq] using h0
-      -- But hstar_big gives δ < ‖y hstar‖; with δpos we get 0 < ‖y hstar‖
+      -- We already know 0 ≤ ‖y‖/2 < ‖y hstar‖, so 0 < ‖y hstar‖
       have pos : 0 < ‖y hstar‖ := by
-        have : δ < ‖y hstar‖ := by simpa [δ] using hstar_big
-        exact lt_trans δpos this
+        have zero_le_half_norm_y : 0 ≤ ‖y‖ / 2 :=
+          div_nonneg (norm_nonneg y) (by norm_num)
+        exact lt_of_le_of_lt zero_le_half_norm_y hstar_big
       have zero : ‖y hstar‖ = 0 := by simpa [yhstar0]
       -- Contradiction: 0 < ‖y hstar‖ = 0
       have : (0 : ℝ) < 0 := by simpa [zero] using pos
@@ -330,6 +302,7 @@ theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
     { y := y, f := f, g := g, δ := δ, δpos := δpos
       sep := sep, zero_iff_allFalse := zero_iff_allFalse, closed_add := closed_add }
 
-end -- noncomputable section
+end ClassicalMeta
 
+end -- noncomputable section
 end Papers.P2.Constructive
