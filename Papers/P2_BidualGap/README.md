@@ -118,5 +118,6 @@ Using WLPO's decision power, we:
 
 Planned mathlib4 contributions:
 1. **Ishihara kernel**: Prop-level decision infrastructure for constructive reverse mathematics
-2. **Bidual theory**: General bidual space constructions  
+2. **Bidual theory**: General bidual space constructions with modern def-based API
 3. **HasWLPO typeclass**: Lightweight axiom management pattern for conditional results
+4. **CRM methodology**: Classical meta-extraction patterns with proper fencing
