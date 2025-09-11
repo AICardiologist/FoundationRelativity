@@ -1,8 +1,20 @@
 /-
   Papers/P2_BidualGap/Constructive/Ishihara.lean
-  Ishihara-style argument for BidualGapStrong → WLPO.
-  Note: Despite the "Constructive" directory name, this module uses classical logic
-  as needed for the functional analysis (by_contra, open Classical, etc.).
+  BidualGapStrong → WLPO via the Ishihara kernel.
+
+  CRM methodology:
+  • Classical meta-extraction (fenced in `section ClassicalMeta`):
+      pick y ∈ X** \ j(X), find h⋆ ∈ X* with (‖y‖/2) < ‖y h⋆‖, and define
+      g(α) := if (∀ n, α n = false) then 0 else h⋆.
+      We define the gap δ := ‖y h⋆‖ / 2 > 0 using only order facts on ℝ.
+  • Constructive consumption:
+      the kernel (y, f, g, δ) is fed to `WLPO_of_kernel`, which is intuitionistic.
+      No classical reasoning or undecidable case-splits occur outside ClassicalMeta.
+
+  Implementation notes:
+  - We avoid fragile normalization/`gcongr` tricks; explicit inequalities are used.
+  - Normability (op-norm existence) is delegated to `OpNormCore` and only used in
+    the classical construction of the kernel; the consumer uses it as a hypothesis.
 -/
 import Mathlib.Analysis.Normed.Module.Dual
 import Mathlib.Analysis.Normed.Group.Completeness
@@ -14,6 +26,9 @@ open Papers.P2
 open scoped BigOperators
 
 noncomputable section
+
+-- ------------------------- Classical meta-reasoning -------------------------
+section ClassicalMeta
 open Classical
 
 -- Helper lemma for approximate supremum selection (no compactness needed).  
@@ -49,8 +64,7 @@ lemma exists_on_unitBall_gt_half_opNorm
       -- T x = ‖x‖ * T u by linearity
       have hxu : (‖x‖ : ℝ) • u = x := by
         have hxne : (‖x‖ : ℝ) ≠ 0 := ne_of_gt hxpos
-        -- (‖x‖) • ((‖x‖)⁻¹ • x) = (‖x‖ * (‖x‖)⁻¹) • x = 1 • x = x
-        simpa [u, smul_smul, hxne, one_smul]
+        simpa [u] using smul_inv_smul₀ hxne x
       have : T x = ‖x‖ * T u := by simpa [hxu] using T.map_smul (‖x‖ : ℝ) u
       -- Bound ‖T x‖.
       calc
