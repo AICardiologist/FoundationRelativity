@@ -1,5 +1,5 @@
 /-
-  Papers/P2_BidualGap/Constructive/OpNormCore.lean
+  Papers/P2_BidualGap/CRM_MetaClassical/OpNormCore.lean
   Minimal operator-norm core: honest, classical existence of an LUB for the
   value set on the unit ball (no stubs).
 -/

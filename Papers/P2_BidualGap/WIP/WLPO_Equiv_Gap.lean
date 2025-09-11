@@ -10,8 +10,8 @@
 -/
 import Mathlib.Tactic
 import Papers.P2_BidualGap.Basic
-import Papers.P2_BidualGap.Constructive.Ishihara
-import Papers.P2_BidualGap.Constructive.DualStructure
+import Papers.P2_BidualGap.CRM_MetaClassical.Ishihara
+import Papers.P2_BidualGap.CRM_MetaClassical.DualStructure
 
 namespace Papers.P2
 open Papers.P2.Constructive
