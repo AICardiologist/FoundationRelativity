@@ -93,15 +93,15 @@ This release includes:
 
 ## Citation
 
-If you use this formalization in your research, please cite:
+If you use this Lean 4 formalization in your research, please cite the code archive:
 ```
-@software{lee2025bidual,
+@software{lee2025bidual_code,
   author = {Lee, Paul Chun-Kit},
-  title = {The Bidual Gap and WLPO: Complete Characterization and Formalization},
+  title = {The Bidual Gap and WLPO: Lean 4 Formalization Code},
   year = {2025},
   publisher = {Zenodo},
   version = {v0.2},
-  doi = {10.5281/zenodo.XXXXXXX},
+  doi = {10.5281/zenodo.17107493},
   url = {https://github.com/AICardiologist/FoundationRelativity}
 }
 ```
