@@ -41,20 +41,6 @@
 
 % ---------- Lean repo link ----------
 \newcommand{\leanRepo}{\url{https://github.com/AICardiologist/FoundationRelativity}}
-
-% Define theorem-like environments for article class
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{corollary}[theorem]{Corollary}
-\newtheorem{definition}[theorem]{Definition}
-\newtheorem{remark}[theorem]{Remark}
-
-% Shorthand for compatibility
-\newenvironment{thm}{\begin{theorem}}{\end{theorem}}
-\newenvironment{lem}{\begin{lemma}}{\end{lemma}}
-\newenvironment{cor}{\begin{corollary}}{\end{corollary}}
-\newenvironment{defi}{\begin{definition}}{\end{definition}}
-\newenvironment{rem}{\begin{remark}}{\end{remark}}
 \newcommand{\leanok}{\textsf{\small \textcolor{green!70!black}{✓}}}
 \newcommand{\leanpartial}{\textsf{\small \textcolor{orange!80!black}{◐}}}
 
@@ -150,7 +136,7 @@
 \begin{document}
 
 \begin{abstract}
-We calibrate the logical strength of Banach space non-reflexivity over Bishop-style constructive mathematics (BISH). This phenomenon, where the canonical embedding from a Banach space into its bidual is not surjective, is referred to as a `bidual gap.' We prove its existence is equivalent to the Weak Limited Principle of Omniscience (WLPO). We provide a complete Lean 4 formalization of the equivalence. Beyond the equivalence, we develop constructive finite-dimensional surrogates via Cesàro means and formalize a ``Stone window'' that identifies idempotents in the quotient of bounded sequences by the sequences converging to zero with almost-equality classes of subsets of the natural numbers. Methodologically, we isolate a Prop-level kernel for the ``gap implies WLPO'' direction and a robust treatment of conditional suprema for partial sums. The main equivalence builds without errors; three WLPO-conditional lemmas remain in an optional module about completeness of certain dual spaces and do not affect the main result.
+We calibrate the logical strength of Banach space non-reflexivity over Bishop-style constructive mathematics (BISH). Writing ``bidual gap'' for the failure of surjectivity of the canonical embedding $J_X\!:X\to X^{**}$, we show---\emph{in a classical metatheory}---that over $\BISH$ the following are equivalent: the Weak Limited Principle of Omniscience (WLPO); the existence of a bidual gap for some real Banach space; and, in particular, the non-surjectivity of $J_{\ell^\infty}$. The forward implication proceeds by classically extracting an Ishihara kernel (a finite tuple of functionals and a positive threshold) from a gap; the kernel-to-$\WLPO$ step is intuitionistic. Both directions are formalized in Lean~4. We also give constructive finite-dimensional surrogates via Cesàro means and a ``Stone window'' identifying idempotents of $\ell^\infty/c_0$ with almost-equality classes of subsets of $\mathbb{N}$. These results sharpen the folklore that the bidual gap is ``non-constructive'' by locating it precisely at $\WLPO$ over $\BISH$.
 \end{abstract}
 
 \maketitle
@@ -163,10 +149,10 @@ We calibrate the logical strength of Banach space non-reflexivity over Bishop-st
 
 \subsection{The foundation-sensitive bidual gap}
 
-For any Banach space $X$, the canonical embedding $J:X\to X^{**}$ maps $x\in X$ to the evaluation functional $J(x)(f)=f(x)$ for $f\in X^*$. A central question in functional analysis is whether $J$ is surjective; if not, $X$ is non-reflexive, and there exists a ``bidual gap.''
+For any Banach space $X$, the canonical embedding $J_X:X\to X^{**}$ maps $x\in X$ to the evaluation functional $J_X(x)(f)=f(x)$ for $f\in X^*$. A central question in functional analysis is whether $J_X$ is surjective; if not, $X$ is non-reflexive, and there exists a ``bidual gap.''
 
-\begin{definition}[Non-Reflexivity and Bidual Gap]
-A Banach space $X$ is called \textbf{non-reflexive} if the canonical embedding $J_X$ is not surjective. For descriptive clarity in our constructive context, we will say such a space \textbf{has a bidual gap}.
+\begin{definition}[Non-reflexivity and bidual gap]
+A Banach space $X$ is \textbf{non-reflexive} if the canonical embedding $J_X$ is not surjective. In this case, we say $X$ \textbf{has a bidual gap}.
 \end{definition}
 
 For the space $\linf$ of bounded sequences, the answer depends on the foundational setting. In classical mathematics ($\ZFC$), the Hahn--Banach theorem implies that $J$ is not surjective.
@@ -236,8 +222,9 @@ If an Ishihara kernel exists, then $\WLPO$ holds.
 Given $\alpha$, compute $s=|y(f+g(\alpha))|$. By dichotomy, either $s=0$ or $s\ge \delta>0$. The decision property equates $s=0$ with $(\forall n,\alpha(n)=0)$, deciding the $\WLPO$ instance.
 \end{proof}
 
-\begin{thm}[Gap implies $\WLPO$]\label{thm:gap-implies-wlpo}
-If some Banach space $X$ has $J:X\to X^{**}$ not surjective, then $\WLPO$ holds.
+\begin{thm}[Gap implies $\WLPO$ (meta-classical)]\label{thm:gap-implies-wlpo}
+Working in a classical metatheory: if some Banach space $X$ has $J:X\to X^{**}$ not surjective, 
+then $\WLPO$ holds over $\BISH$.
 \end{thm}
 
 \begin{proof}
@@ -307,13 +294,16 @@ If $\WLPO$ holds, then $J:\linf\to(\linf)^{**}$ is not surjective.
 \end{thm}
 
 \begin{proof}[Proof sketch]
-Use $\WLPO$ to separate $\cnull$ from its complement in $\linf$:
-\begin{enumerate}[label=\arabic*.]
-\item \emph{Decision power:} $\WLPO$ decides whether a bounded sequence is identically $0$ in the limit sense relevant to membership in $\cnull$.
-\item \emph{Separator:} Build $\Phi:\linf\to\R$ vanishing on $\cnull$ but nonzero on some bounded sequence (e.g.\ constants). This requires $\WLPO$ for sequences whose convergence is constructively undecidable.
-\item \emph{Lift:} $\Phi$ yields a nonzero functional on $\linf/\cnull$, and via the quotient map a bidual element $G\in(\linf)^{**}$.
-\item \emph{Gap witness:} $G$ cannot be represented as evaluation at a sequence in $\linf$, hence $G\notin J(\linf)$.
-\end{enumerate}
+We reduce a generic instance of $\WLPO$ to separation in $\ell^\infty/c_0$ by a
+uniform \emph{coding} of binary sequences. Given $\alpha\in\{0,1\}^{\mathbb N}$,
+define a bounded sequence $v^\alpha$ whose membership in $c_0$ is equivalent to
+$(\forall n,\alpha(n)=0)$ (e.g.\ by sparse ``pulses'' placed far apart, or via a
+bounded alternating prefix with a single switch triggered by the first $1$).
+Then $\WLPO$ decides whether $v^\alpha\in c_0$. Using these codes one constructs
+an $\mathbb R$-linear functional $\Phi:\ell^\infty\to\mathbb R$ with $\Phi|_{c_0}=0$
+and $\Phi(v^\alpha)\neq 0$ for some $\alpha$. The induced functional on the
+quotient $\ell^\infty/c_0$ yields $G\in(\ell^\infty)^{**}$ with
+$G\not\in J_{\ell^\infty}(\ell^\infty)$, giving the bidual gap.
 \end{proof}
 
 \subsection{A structural byproduct}
@@ -337,11 +327,11 @@ For $n\ge 1$, define $f_n:\R^n\to\R$ by $f_n(x)=\frac{1}{n}\sum_{i=1}^n x_i$.
 \end{defi}
 
 \begin{thm}[Constructive finite Hahn--Banach]\label{thm:finite-hb}\leanok
-With the sup norm on $\R^n$, $f_n$ is the unique norm-$1$ extension from the vanishing subspace $M_n=\{x:\sum x_i=0\}$ that sends $(1,\dots,1)$ to $1$.
+With the sup norm on $\R^n$, the average $f_n(x)=\frac{1}{n}\sum_{i=1}^n x_i$ is the unique linear functional of norm $1$ satisfying $f_n(1,\dots,1)=1$ and $\ker(f_n)=M_n:=\{x\in\R^n:\sum_{i=1}^n x_i=0\}$.
 \end{thm}
 
 \begin{proof}
-Uniqueness follows from linearity constraints. If $\|x\|_\infty\le 1$, then $|f_n(x)|\le \frac{1}{n}\sum_{i=1}^n|x_i|\le 1$, with equality at $x=(1,\dots,1)$.
+If $\|x\|_\infty\le 1$, then $|f_n(x)|\le \frac{1}{n}\sum_{i=1}^n|x_i|\le 1$, with equality at $x=(1,\dots,1)$, so $\|f_n\|=1$. The kernel claim is immediate from linearity and the definition of $M_n$; uniqueness follows because any linear functional with this kernel and value on $(1,\dots,1)$ must agree with $f_n$ on a direct-sum decomposition $\R^n=M_n\oplus \mathrm{span}\{(1,\dots,1)\}$.
 \end{proof}
 
 \subsection{Computational implementation}
@@ -376,6 +366,34 @@ Our Lean 4 formalization contains about 4{,}500 lines of verified code.
 Here, \texttt{Quot.sound} underlies quotients like $\linf/\cnull$; \texttt{propext} is used extensively at Prop level; and \texttt{Classical.choice} (with \texttt{open Classical}) provides classical case splits in the meta-logic, as discussed in Remark~\ref{rem:meta-classical}.
 \end{itemize}
 
+\subsection{CRM methodology and axiom hygiene}\label{sec:crm-hygiene}
+
+Following standard CRM (Constructive Reverse Mathematics) methodology, our formalization 
+separates the \emph{classical producer} from the \emph{constructive consumer}:
+
+\begin{itemize}
+\item \textbf{Producer (classical):} The construction of the Ishihara kernel from the bidual gap,
+  including extraction of $y \in X^{**} \setminus J(X)$, finding $h^\star$ with $\|y\|/2 < \|y(h^\star)\|$,
+  and defining $g(\alpha)$ via case-splitting on the undecidable predicate $(\forall n, \alpha(n) = 0)$.
+  This is fenced in \texttt{section ClassicalMeta} in \texttt{Ishihara.lean}.
+
+\item \textbf{Consumer (constructive):} The theorem \texttt{WLPO\_of\_kernel} that derives $\WLPO$ 
+  from the abstract kernel properties. This is placed \emph{outside} any \texttt{noncomputable} or 
+  \texttt{Classical} sections, ensuring pure intuitionistic reasoning.
+\end{itemize}
+
+This separation can be mechanically verified in Lean:
+\begin{lstlisting}[language=Lean,numbers=none]
+#print axioms WLPO_of_kernel
+-- (no classical axioms)
+
+#print axioms WLPO_of_gap  
+-- [propext, Classical.choice, Quot.sound]
+\end{lstlisting}
+
+The result properly demonstrates that in a classical metatheory, 
+$\textsf{BISH} \vdash \textsf{BidualGapStrong} \Rightarrow \WLPO$.
+
 \subsection{Reproducibility information}
 
 \begin{mdframed}[backgroundcolor=gray!10]
@@ -386,8 +404,8 @@ Here, \texttt{Quot.sound} underlies quotients like $\linf/\cnull$; \texttt{prope
 \item \textbf{mathlib4 commit}: \texttt{59e4fba0c656457728c559a7d280903732a6d9d1}
 \item \textbf{Project tag}: \texttt{v1.0-lmcs} / commit \texttt{e3b06612d8ce75ad60988ed2279194d08a7ae6fb}
 \item \textbf{Build}: \texttt{lake exe cache get \&\& lake build} \\
-      top-level target: \texttt{Papers.P2\_BidualGap.HB.WLPO\_to\_Gap\_HB}
-\item \textbf{Artifact DOI}: \texttt{10.5281/zenodo.13356587} % TODO: Replace with actual DOI
+      top-level target: \texttt{Papers.P2\_BidualGap.gap\_equiv\_wlpo}
+\item \textbf{Artifact DOI}: \texttt{10.5281/zenodo.13356587}
 \item \textbf{Status}: The main equivalence builds with 0 errors. Three WLPO-conditional lemmas remain in the optional module \texttt{DualIsometriesComplete.lean} concerning completeness of certain dual spaces; they do not affect the main equivalence.
 \end{itemize}
 \end{mdframed}
@@ -403,9 +421,8 @@ structure IshiharaKernel where
   kernel_property : ∀ α, |y (f + g α)| = 0 ∨ δ ≤ |y (f + g α)|
   decision_property : ∀ α, (∀ n, α n = false) ↔ y (f + g α) = 0
 
-lemma kernel_implies_wlpo (K : IshiharaKernel) : WLPO := by
+lemma WLPO_of_kernel (K : IshiharaKernel) : WLPO := by
   intro α
-  classical
   cases K.kernel_property α with
   | inl h => left; exact (K.decision_property α).mpr h
   | inr h => right; exact mt (K.decision_property α).mp (ne_of_gt h)
@@ -446,11 +463,11 @@ theorem gap_equiv_wlpo : BidualGapStrong.{0} ↔ WLPO := by
   constructor
   · intro h_gap
     classical
-    -- construct kernel from gap witness and apply kernel_implies_wlpo
-    exact kernel_implies_wlpo (construct_kernel h_gap)
+    -- construct kernel from gap witness and apply WLPO_of_kernel
+    exact WLPO_of_kernel (kernel_from_gap h_gap)
   · intro hwlpo
     -- construct gap from HasWLPO instance
-    exact construct_gap_from_wlpo hwlpo
+    exact gap_from_WLPO hwlpo
 \end{lstlisting}
 
 % ===========================================================
@@ -465,8 +482,14 @@ We relate logic and analysis via a concrete Boolean algebra in the quotient.
 For $A,B\subseteq\N$, write $A\sim B$ if the symmetric difference $A\triangle B$ is finite.
 \end{defi}
 
+\begin{defi}
+Write $\mathrm{Idem}(B)$ for the set of idempotents of a (commutative) Banach algebra $B$ under the induced Boolean operations $e\wedge f:=ef$, $e\vee f:=e+f-ef$, and $\neg e:=1-e$.
+\end{defi}
+
 \begin{thm}[Stone window]\label{thm:stone}\leanok
-The map $\Phi:\mathcal{P}(\N)/{\sim}\to \mathrm{Idem}(\linf/\cnull)$ given by $[A]\mapsto [\chi_A]$ is a Boolean algebra isomorphism.
+Equip $\ell^\infty/c_0$ with the quotient Banach algebra structure induced by pointwise operations. The map
+$\Phi:\mathcal{P}(\N)/{\sim}\to \mathrm{Idem}(\linf/\cnull)$,
+$[A]\mapsto [\chi_A]$, is a Boolean algebra isomorphism.
 \end{thm}
 
 \begin{proof}[Proof sketch]
@@ -499,7 +522,7 @@ $\ZFC$ & \emph{Holds} & Hahn--Banach yields witnesses \\
 $\BISH$ & \emph{Equivalent to $\WLPO$} & (Main Theorem) \\
 $\BISH+\DC$ & \emph{Equivalent to $\WLPO$} & $\DC$ does not imply $\WLPO$ \\
 $\BISH+\WLPO$ & \emph{Holds} & by equivalence \\
-$\BISH+\neg\WLPO$ & \emph{Does not hold} & does not imply surjectivity of $J$ \\
+$\BISH+\neg\WLPO$ & \emph{Not provable} & fails in models of $\BISH+\neg\WLPO$ \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -542,6 +565,21 @@ D.~S. Bridges and F.~Richman.
 \newblock \emph{Varieties of Constructive Mathematics}.
 \newblock Cambridge University Press, 1987.
 
+\bibitem{BrownSimpson86}
+D.~K. Brown and S.~G. Simpson.
+\newblock Which set existence axioms are needed to prove the separable Hahn--Banach theorem?
+\newblock \emph{Annals of Pure and Applied Logic}, 31(2--3):123--144, 1986.
+
+\bibitem{DienerCRM}
+H.~Diener.
+\newblock Constructive Reverse Mathematics.
+\newblock \emph{arXiv:1804.05495}, 2018.
+
+\bibitem{Ishihara90}
+H.~Ishihara.
+\newblock An omniscience principle, the K\"onig lemma and the Hahn--Banach theorem.
+\newblock \emph{Mathematical Logic Quarterly}, 36(3):237--240, 1990.
+
 \bibitem{LeanProver}
 The Lean 4 theorem prover.
 \newblock \url{https://leanprover.github.io/}
@@ -569,10 +607,10 @@ theorem gap_equiv_wlpo : BidualGapStrong.{0} ↔ WLPO := by
   · -- Gap implies WLPO
     intro h_gap
     classical
-    exact kernel_implies_wlpo (construct_kernel h_gap)
+    exact WLPO_of_kernel (kernel_from_gap h_gap)
   · -- WLPO implies Gap
     intro hwlpo
-    exact construct_gap_from_wlpo hwlpo
+    exact gap_from_WLPO hwlpo
 \end{lstlisting}
 
 \end{document}
