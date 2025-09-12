@@ -1,41 +1,26 @@
+/-
+  Papers/P2_BidualGap/CRM_MetaClassical/Ishihara.lean
+  BidualGapStrong → WLPO via the Ishihara kernel.
+
+  CRM methodology:
+  • Classical meta-extraction (fenced in `section ClassicalMeta`):
+      pick y ∈ X** \ j(X), find h⋆ ∈ X* with (‖y‖/2) < ‖y h⋆‖, and define
+      g(α) := if (∀ n, α n = false) then 0 else h⋆.
+      We define the gap δ := ‖y h⋆‖ / 2 > 0 using only order facts on ℝ.
+  • Constructive consumption:
+      the kernel (y, f, g, δ) is fed to `WLPO_of_kernel`, which is intuitionistic.
+      No classical reasoning or undecidable case-splits occur outside ClassicalMeta.
+
+  Implementation notes:
+  - We avoid fragile normalization/`gcongr` tricks; explicit inequalities are used.
+  - Normability (op-norm existence) is delegated to `OpNormCore` and only used in
+    the classical construction of the kernel; the consumer uses it as a hypothesis.
+-/
 import Mathlib.Analysis.Normed.Module.Dual
 import Mathlib.Analysis.Normed.Group.Completeness
 import Mathlib.Tactic -- for nlinarith, norm_num, etc.
 import Papers.P2_BidualGap.Basic
 import Papers.P2_BidualGap.CRM_MetaClassical.OpNormCore
-
-/-!
-# The Ishihara Kernel and its implication to WLPO
-
-This file defines the `IshiharaKernel` structure, which captures the necessary
-properties of a "witness" object extracted from a classical theorem about bidual gaps.
-
-The main result is `WLPO_of_kernel`, a purely constructive proof that the
-existence of such a kernel implies the Weak Limited Principle of Omniscience (WLPO).
-This serves as the "constructive consumer" in our producer/consumer architecture.
-
-## CRM methodology implementation:
-• **Classical producer** (fenced in `section ClassicalMeta`):
-  - Extracts y ∈ X** \ j(X) using classical choice
-  - Finds h⋆ ∈ X* with (‖y‖/2) < ‖y h⋆‖ via approximate supremum selection
-  - Defines g(α) using a global case-split on the undecidable predicate (∀ n, α n = false)
-  - Computes the gap parameter δ := ‖y h⋆‖ / 2 > 0 using only order facts on ℝ
-  
-• **Constructive consumer**:
-  - The kernel (y, f, g, δ) is processed by `WLPO_of_kernel`
-  - This proof is fully intuitionistic (no classical axioms)
-  - No undecidable case-splits occur outside ClassicalMeta
-
-## Implementation details:
-- **Tactic choices**: We avoid fragile normalization/`gcongr` tactics in favor of explicit inequalities
-- **Norm handling**: Operator norm existence is proven in `OpNormCore` and used only in classical sections
-- **Universe management**: The `KernelWitness` structure avoids universe polymorphism issues
-- **Proof structure**: The consumer proof uses simple case analysis on the dichotomy property
-
-## Axiom usage:
-- `WLPO_of_kernel`: No axioms (fully constructive)
-- `kernel_from_gap`: Uses `Classical.choice` and `propext` (meta-classical)
--/
 
 namespace Papers.P2.Constructive
 open Papers.P2
@@ -46,21 +31,7 @@ The kernel and the WLPO consumer are **constructive**.  Keep them outside any
 `noncomputable` or `Classical` sections to ensure axiom hygiene.
 -/
 
-/--
-A structure representing an Ishihara kernel. This is a mathematical object
-that acts as a "logical oracle," encoding the answer to a WLPO-style
-undecidable question into the structure of a Banach space functional.
-
-It consists of:
-- `y`: A bidual functional (the witness extracted from the gap)
-- `f`, `g`: Functionals used to "probe" y and extract logical information
-- `δ`: A positive constant ensuring definite separation from zero
-- `sep`: A proof of the key dichotomy property (either exactly 0 or at least δ)
-- `zero_iff_allFalse`: A proof that the probe result corresponds to the logical property
-
-This structure is designed to be constructive: all fields can be reasoned about
-without classical axioms once the structure is instantiated.
--/
+-- Lightweight kernel API (constructive)
 structure IshiharaKernel (X : Type _) [NormedAddCommGroup X] [NormedSpace ℝ X] where
   y     : (X →L[ℝ] ℝ) →L[ℝ] ℝ
   f     : X →L[ℝ] ℝ
@@ -82,39 +53,17 @@ structure KernelWitness where
   K : IshiharaKernel X
 attribute [instance] KernelWitness.Xng KernelWitness.Xns KernelWitness.Xc
 
-/--
-The existence of an Ishihara kernel implies WLPO.
-
-This is the "constructive consumer" part of the main theorem. The proof
-proceeds by case analysis on the `sep` property of the kernel, which gives
-us a decidable dichotomy that we can leverage constructively.
-
-**Proof strategy:**
-1. Apply the separation property to get |y(f + g α)| = 0 ∨ δ ≤ |y(f + g α)|
-2. In the first case: Use zero_iff_allFalse to conclude (∀ n, α n = false)
-3. In the second case: Show y(f + g α) ≠ 0, hence ¬(∀ n, α n = false)
-
-**Implementation notes:**
-- The proof is fully constructive (no classical axioms)
-- We use basic order reasoning on reals to connect the cases
-- The key insight is that the dichotomy property provides enough information
-  to decide the WLPO question without actually computing α
--/
+/-- WLPO consumer: purely intuitionistic. -/
 theorem WLPO_of_kernel
   {X : Type _} [NormedAddCommGroup X] [NormedSpace ℝ X]
   (K : IshiharaKernel X) : WLPO := by
   intro α
-  -- We case-split on the core dichotomy property of the kernel.
-  -- This is constructively valid since sep gives us a disjunction.
   have h := K.sep α
   rcases h with h0 | hpos
-  · -- Case 1: The probe result is exactly zero.
-    -- We use `zero_iff_allFalse` to prove the left side of the WLPO disjunction.
+  · -- |y(F α)| = 0 ⇒ y(F α) = 0 ⇒ all-false
     have yz0 : K.y (K.f + K.g α) = 0 := (abs_eq_zero.mp h0)
     exact Or.inl ((K.zero_iff_allFalse α).mpr yz0)
-  · -- Case 2: The probe result is separated from zero by δ.
-    -- We use this to prove the right side of the WLPO disjunction (the negation).
-    -- Key: δ > 0 and δ ≤ |y(f + g α)| together imply y(f + g α) ≠ 0
+  · -- δ ≤ |y(F α)| with δ>0 ⇒ y(F α) ≠ 0 ⇒ not all-false
     have pos : 0 < |K.y (K.f + K.g α)| := lt_of_lt_of_le K.δpos hpos
     have hne : K.y (K.f + K.g α) ≠ 0 := by
       intro yz0; have : |K.y (K.f + K.g α)| = 0 := by simp [yz0]
@@ -138,18 +87,7 @@ noncomputable section
 section ClassicalMeta
 open Classical
 
-/--
-Helper lemma for approximate supremum selection.
-
-Given a nonzero bounded linear functional T, we can find a unit vector x
-such that |T(x)| > ‖T‖/2. This is a classical result that doesn't require
-compactness of the unit ball (which would fail in infinite dimensions).
-
-**Implementation notes:**
-- We use classical logic to perform the proof by contradiction
-- The scaling argument is explicit to avoid normalization issues
-- This lemma is only used in the classical producer section
--/
+-- Helper lemma for approximate supremum selection (no compactness needed).  
 lemma exists_on_unitBall_gt_half_opNorm
   {E} [NormedAddCommGroup E] [NormedSpace ℝ E]
   (T : E →L[ℝ] ℝ) (hT : T ≠ 0) :

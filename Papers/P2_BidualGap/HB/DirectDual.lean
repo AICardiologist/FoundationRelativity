@@ -18,20 +18,7 @@ namespace Papers.P2.HB
 /-- Our model for `c₀` on the discrete space `ℕ`. -/
 abbrev c₀ := ZeroAtInftyContinuousMap ℕ ℝ
 
-/--
-The standard basis element e_n for c₀.
-
-**Definition**: e_n(m) = 1 if m = n, else 0
-
-**Implementation notes**:
-- We use the discrete topology on ℕ, so all functions are continuous
-- The zero_at_infty property follows from e_n being supported on the singleton {n}
-- The proof uses the fact that singletons are compact in discrete spaces
-
-**Mathematical significance**:
-These basis elements are used to probe functionals in c₀* and extract
-their values at each coordinate.
--/
+/-- The standard basis: `e n` is `1` at `n` and `0` elsewhere. -/
 def e (n : ℕ) : c₀ :=
 { toContinuousMap :=
   { toFun := fun m => if m = n then (1 : ℝ) else 0
@@ -56,20 +43,7 @@ def e (n : ℕ) : c₀ :=
       simpa [hSet] using hm
     simp [this, hε] }
 
-/--
-Coordinate evaluation functional δ_n : c₀ → ℝ.
-
-**Definition**: δ_n(x) = x(n) (evaluates x at coordinate n)
-
-**Properties**:
-- Linear: δ_n(x + y) = δ_n(x) + δ_n(y)
-- Bounded: |δ_n(x)| ≤ ‖x‖_∞
-- Dual basis: δ_n(e_m) = 1 if n = m, else 0
-
-**Role in the proof**:
-The functionals δ_n are used to show that if G = J(x) for some x ∈ c₀,
-then x(n) = G(δ_n) = 1 for all n, contradicting x ∈ c₀.
--/
+/-- Coordinate evaluation `δ n`. -/
 def δ (n : ℕ) : c₀ →L[ℝ] ℝ :=
   LinearMap.mkContinuous
     { toFun := fun x => (x : ℕ → ℝ) n
@@ -96,11 +70,19 @@ lemma abs_coeff_le_one (f : c₀ →L[ℝ] ℝ) (n : ℕ) : |coeff f n| ≤ 1 :=
 
 lemma coeff_mul_eval_abs (f : c₀ →L[ℝ] ℝ) (n : ℕ) :
     coeff f n * f (e n) = ‖f (e n)‖ := by
-  by_cases h : f (e n) = 0
-  · simp [coeff, h]
-  · have hnz : ‖f (e n)‖ ≠ 0 := by
-      simpa [Real.norm_eq_abs, h] using (norm_ne_zero_iff.mpr (by exact h))
-    field_simp [coeff, h, hnz, Real.norm_eq_abs, abs_mul, abs_of_pos (norm_pos_iff.mpr (by exact h))]
+  unfold coeff
+  split_ifs with h
+  · simp [h]
+  · -- We have coeff f n = f (e n) / ‖f (e n)‖
+    -- So coeff f n * f (e n) = (f (e n) / ‖f (e n)‖) * f (e n) = f (e n) * f (e n) / ‖f (e n)‖
+    -- We need to show this equals ‖f (e n)‖
+    -- Since f (e n) ≠ 0, we have f (e n) ∈ ℝ \ {0}
+    -- For real numbers: x * x = |x| * |x| = ‖x‖ * ‖x‖
+    have : f (e n) * f (e n) = ‖f (e n)‖ * ‖f (e n)‖ := by
+      simp only [Real.norm_eq_abs]
+      exact (abs_mul_abs_self _).symm
+    rw [div_mul_eq_mul_div, this, mul_div_cancel_left₀]
+    exact norm_ne_zero_iff.mpr h
 
 /-- Finite "sign vector": sum of basis with sign coefficients. -/
 def signVector (f : c₀ →L[ℝ] ℝ) (F : Finset ℕ) : c₀ :=

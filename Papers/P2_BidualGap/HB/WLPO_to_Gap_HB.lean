@@ -1,31 +1,8 @@
-/-!
-# WLPO implies Bidual Gap: Direct Construction
+/-
+Papers/P2_BidualGap/HB/WLPO_to_Gap_HB.lean
+WLPO → BidualGapStrong via direct construction
 
-This file completes the reverse direction of the main equivalence theorem:
-WLPO → BidualGapStrong.
-
-## Proof Architecture
-
-Unlike the Gap → WLPO direction (which uses the producer/consumer pattern),
-this direction uses a direct construction:
-
-1. **Witness Construction**: We build a specific functional G ∈ c₀** that cannot
-   be represented by any element of c₀.
-   
-2. **Contradiction Argument**: If c₀ were reflexive, then G = J(x) for some x ∈ c₀.
-   But G's specific properties (G(δ_m) = 1 for all m) would force x to be the
-   constant sequence 1, which is not in c₀.
-
-## Implementation Notes
-
-- The witness G is imported from DirectDual.lean (= S ∘ Φ₁)
-- We axiomatize WLPO-dependent normability for now (to be completed)
-- The proof is constructive given WLPO (no additional classical axioms)
-
-## Comparison with Classical Proof
-
-The classical proof would simply assert that ℓ^∞/c₀ is non-reflexive.
-Our constructive approach requires WLPO to build the specific witness.
+Direct construction: Uses the witness G = S ∘ Φ₁ in c₀** to prove non-reflexivity.
 -/
 import Mathlib.Tactic
 import Mathlib.Analysis.Normed.Module.Dual
@@ -33,7 +10,7 @@ import Mathlib.Topology.ContinuousMap.ZeroAtInfty
 import Mathlib.Topology.ContinuousMap.Bounded.Basic
 import Mathlib.Topology.Basic
 import Papers.P2_BidualGap.Basic
-import Papers.P2_BidualGap.CRM_MetaClassical.Ishihara
+import Papers.P2_BidualGap.Constructive.Ishihara
 import Papers.P2_BidualGap.HB.SimpleFacts
 import Papers.P2_BidualGap.HB.DirectDual
 
@@ -41,15 +18,7 @@ noncomputable section
 namespace Papers.P2.HB
 open Classical ZeroAtInfty Filter Topology NormedSpace
 
-/--
-Forward direction: Gap implies WLPO.
-
-This delegates to the producer/consumer machinery in Ishihara.lean,
-where a classical producer extracts an Ishihara kernel from the gap,
-and a constructive consumer derives WLPO from the kernel.
-
-**Axiom usage**: Uses Classical.choice in the producer phase.
--/
+-- Forward direction already complete
 lemma gap_implies_wlpo : BidualGapStrong → WLPO := 
   Papers.P2.Constructive.WLPO_of_gap
 
@@ -74,28 +43,15 @@ axiom dual_is_banach_c0_dual_from_WLPO : WLPO → DualIsBanach (c₀ →L[ℝ] �
 -- Direct construction of the gap
 -- ========================================================================
 
-/--
-c₀ is not reflexive: Direct construction of a non-representable functional.
-
-**Proof strategy**:
-1. Assume for contradiction that J: c₀ → c₀** is surjective
-2. Then our witness G must equal J(x) for some x ∈ c₀
-3. Evaluate at basis functionals: x_m = J(x)(δ_m) = G(δ_m) = 1 for all m
-4. This forces x to be the constant sequence 1, contradicting x ∈ c₀
-
-**Implementation notes**:
-- The witness G is defined in DirectDual.lean
-- We use the pointwise evaluation J(x)(δ_m) = x_m
-- The contradiction comes from c₀'s vanishing-at-infinity property
--/
+/-- c₀ is not reflexive via direct construction. -/
 lemma c0_not_reflexive_via_direct :
   ¬ Function.Surjective (inclusionInDoubleDual ℝ c₀) := by
   intro hsurj
-  -- Step 1: Import the witness G from DirectDual (= S ∘ Φ₁)
+  -- The witness G from DirectDual
   let G := Papers.P2.HB.G
-  -- Step 2: If J is surjective, then G = J(x) for some x ∈ c₀
+  -- If J is surjective, then G = J(x) for some x ∈ c₀
   obtain ⟨x, hx⟩ := hsurj G
-  -- Step 3: Evaluate at basis functionals to derive x_m = 1 for all m
+  -- But then x_m = G(δ_m) = 1 for all m
   have hx_m : ∀ m, x m = 1 := by
     intro m
     -- J(x)(δ_m) = δ_m(x) = x_m
