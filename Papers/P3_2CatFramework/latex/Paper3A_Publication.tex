@@ -9,6 +9,7 @@
 \usepackage{mathtools}
 \usepackage{enumitem}
 \usepackage{hyperref}
+\usepackage[final]{microtype}
 \usepackage{cleveref}
 \usepackage{thmtools}
 \usepackage{mdframed}
@@ -28,6 +29,15 @@
 \newtheorem{example}[theorem]{Example}
 \newtheorem{remark}[theorem]{Remark}
 \newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{assumption}[theorem]{Assumption}
+% Cleveref names
+\Crefname{assumption}{Assumption}{Assumptions}
+\Crefname{theorem}{Theorem}{Theorems}
+\Crefname{lemma}{Lemma}{Lemmas}
+\Crefname{proposition}{Proposition}{Propositions}
+\Crefname{corollary}{Corollary}{Corollaries}
+\Crefname{definition}{Definition}{Definitions}
+\Crefname{remark}{Remark}{Remarks}
 
 % Custom commands
 \newcommand{\N}{\mathbb{N}}
@@ -35,6 +45,7 @@
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\Q}{\mathbb{Q}}
 \newcommand{\WLPO}{\mathrm{WLPO}}
+\newcommand{\LLPO}{\mathrm{LLPO}}
 \newcommand{\FT}{\mathrm{FT}}
 \newcommand{\DCw}{\mathrm{DC}_\omega}
 \newcommand{\ACw}{\mathrm{AC}_\omega}
@@ -46,6 +57,7 @@
 \newcommand{\BISH}{\mathsf{BISH}}
 \newcommand{\ZFC}{\mathsf{ZFC}}
 \newcommand{\ZF}{\mathsf{ZF}}
+% Category of foundations
 \newcommand{\Found}{\mathsf{Found}}
 \newcommand{\Gpd}{\mathsf{Gpd}}
 \newcommand{\SigmaZero}{\Sigma_{0}}
@@ -82,17 +94,17 @@ New York University, NY}
 \maketitle
 
 \begin{abstract}
-We present Axiom Calibration (AxCal), a categorical framework for measuring the axiomatic strength of mathematical theorems via uniformizability and height invariants. Using uniformizability—the invariance of witness constructions across foundations fixing a core signature—we establish a precise calculus for logical dependencies. 
+We present Axiom Calibration (AxCal), a categorical framework for measuring the axiomatic strength of mathematical theorems via uniformizability and height invariants. Using uniformizability—the invariance of witness constructions across foundations that agree on a core signature—we develop a practical calculus for logical dependencies. Throughout we work under a mild standing hypothesis on witness families (an extension/restriction condition; see \Cref{assump:WEP}), and we distinguish fully formalized results from axiomatized and literature-backed ones. 
 
 We provide complete mathematical proofs and clearly distinguish between fully formalized results (marked \leanok), axiomatized components (marked \leanaxiom), and results cited from literature (marked \leancited). Our main contributions include:
 \begin{enumerate}
 \item A rigorous framework with uniformizability and height invariants for measuring axiomatic strength
-\item Complete calibration of three orthogonal axes: the bidual gap at height 1 on the WLPO axis \leanok, the Uniform Continuity Theorem at height 1 on the Fan Theorem axis \leanaxiom, and Baire Category at height 1 on the $\DCw$ axis \leanok{} (Paper 3C, fully integrated)
+\item Calibration of three orthogonal axes: the bidual gap at height 1 on the WLPO axis \leanok, the Uniform Continuity Theorem at height 1 on the Fan Theorem axis \leanaxiom, and Baire Category at height 1 on the $\DCw$ axis \leanok{} (Paper 3C, fully integrated)
 \item A comprehensive Boolean algebra API for quotient spaces with 100+ formalized lemmas \leanok
 \item Analysis of the Stone Window showing where classical proofs fail constructively
 \end{enumerate}
 
-Our Lean 4 formalization comprises ~15,000 lines across 50+ files with 0 mathematical sorries in core components. All code is available at \url{https://github.com/AICardiologist/FoundationRelativity}.
+As of tag \texttt{p2-crm-v0.2}, the Lean 4 formalization comprises on the order of $1.5\times 10^4$ lines across 50+ files with 0 sorries in core components. All code is available at \url{https://github.com/AICardiologist/FoundationRelativity}.
 
 \vspace{0.5em}
 \noindent\textbf{Keywords:} Constructive mathematics, reverse mathematics, axiom calibration, Lean formalization\\
@@ -198,7 +210,7 @@ The \emph{pinned signature} $\SigmaZero$ consists of:
 All foundations must interpret these components identically.
 \end{definition}
 
-\begin{definition}[The Category $\Found$] \leanok
+\begin{definition}[The category $\Found$] \leanok
 The category $\Found$ has:
 \begin{itemize}
 \item \textbf{Objects}: Foundations as in Definition \ref{def:foundation}
@@ -210,6 +222,10 @@ The category $\Found$ has:
   \end{enumerate}
 \end{itemize}
 \end{definition}
+
+\begin{remark}[Scope of conservativity]\label{rem:conservativity-scope}
+The conservativity clause is restricted to $\SigmaZero$ in order to pin a common problem language (statements to be calibrated). The witness categories $\mathcal C(F)$ may quantify over objects available only in $F$'s full language (e.g.\ reals, functionals). All uniformizability and height arguments are phrased relative to this separation of concerns.
+\end{remark}
 
 \begin{example}[Standard Foundations]
 Key examples include:
@@ -258,7 +274,16 @@ The groupoid $\mathcal{C}(F)$ has:
 A witness family $\mathcal{C}$ is \emph{uniformizable} if for all morphisms $\iota: F \to G$ in $\Found$, the restriction functor $\mathcal{C}(G) \to \mathcal{C}(F)$ is an equivalence of groupoids.
 \end{definition}
 
+\begin{assumption}[Witness Extension Property]\label{assump:WEP}
+For each inclusion of foundations $\iota:F\hookrightarrow G$ the restriction functor
+\[
+  \rho_{\iota}:\mathcal C(G)\longrightarrow \mathcal C(F)
+\]
+admits a conservative right adjoint (``extension'') or, equivalently for our purposes, $\mathcal C$ can be treated as a (pseudo)fibration over $\Found$ with chosen cartesian liftings along inclusions. Intuitively: any $F$-witness extends (up to isomorphism) to a $G$-witness, and identifications between $F$-witnesses lift along~$\iota$.
+\end{assumption}
+
 \begin{theorem}[No-Uniformization Principle]\label{thm:no-unif} \leanok
+Assume the Witness Extension Property (\Cref{assump:WEP}). 
 If $\mathcal{C}$ is not uniformizable, then there exist foundations $F \subseteq G$ and a theorem provable in $G$ where:
 \begin{enumerate}
 \item Witnesses exist in $G$ (i.e., $\mathcal{C}(G)$ is non-empty)
@@ -268,13 +293,13 @@ If $\mathcal{C}$ is not uniformizable, then there exist foundations $F \subseteq
 \end{theorem}
 
 \begin{proof}
-Suppose $\mathcal{C}$ is not uniformizable. Then there exist $F \subseteq G$ where the restriction $\mathcal{C}(G) \to \mathcal{C}(F)$ is not an equivalence. We consider two cases:
+Suppose $\mathcal{C}$ is not uniformizable. Then there exist $F \subseteq G$ with inclusion $\iota$ such that the restriction $\rho_\iota:\mathcal{C}(G) \to \mathcal{C}(F)$ is not an equivalence. By \Cref{assump:WEP}, $\rho_\iota$ admits a conservative right adjoint (extension), hence failure of equivalence forces emptiness below: either $\mathcal{C}(F)=\varnothing$ while $\mathcal{C}(G)\neq\varnothing$, or else essential surjectivity/fully-faithfulness would hold by standard 2-categorical arguments. Thus witnesses exist in $G$ but not in $F$, and the theorem is not provable in $F$.
 
-\textbf{Case 1}: The restriction is not essentially surjective. Then there exists a witness in $\mathcal{C}(F)$ with no preimage in $\mathcal{C}(G)$. This contradicts conservativity since any $F$-construction should extend to $G$.
-
-\textbf{Case 2}: The restriction is not fully faithful. If not faithful, distinct $G$-witnesses become equal in $F$, violating the preservation of distinctions. If not full, there are $F$-morphisms not induced from $G$, contradicting that $F$-constructions lift to $G$.
-
-The only remaining possibility is that $\mathcal{C}(G)$ is non-empty while $\mathcal{C}(F)$ is empty, giving the desired conclusion.
+Consequently $\mathcal{C}(G) \neq \emptyset$ while $\mathcal{C}(F) = \emptyset$. This means:
+\begin{itemize}
+\item $G$ proves the theorem (witnesses exist)
+\item $F$ cannot prove it (no witnesses possible)
+\end{itemize}
 \end{proof}
 
 %===========================================================
@@ -309,8 +334,8 @@ or $\infty$ if no such $k$ exists.
 
 To handle independent logical principles, we work with multi-dimensional profiles.
 
-\begin{definition}[Orthogonal Axes]\label{def:orthogonal}
-Logical principles $A_1, \ldots, A_n$ are \emph{orthogonal} if:
+\begin{definition}[Pairwise orthogonal axes]\label{def:orthogonal}
+Logical principles $A_1, \ldots, A_n$ are \emph{pairwise orthogonal} if:
 \begin{enumerate}
 \item No $A_i$ implies any $A_j$ for $i \neq j$ over $\BISH$
 \item No combination of $A_i$'s (excluding $A_j$) implies $A_j$ over $\BISH$
@@ -325,7 +350,7 @@ h^{\vec{}}(\mathcal{C}) = (h_{\mathcal{L}_1}(\mathcal{C}), \ldots, h_{\mathcal{L
 \end{definition}
 
 \begin{proposition}[Product Law]\label{prop:product} \leanok
-For independent witness families $\mathcal{C}$ and $\mathcal{D}$:
+Assume products in the witness semantics are computed pointwise, i.e.\ $(\mathcal C\times\mathcal D)(F)\simeq \mathcal C(F)\times \mathcal D(F)$ and restriction functors preserve products. For independent witness families $\mathcal{C}$ and $\mathcal{D}$ along orthogonal axes,
 \[
 h^{\vec{}}(\mathcal{C} \times \mathcal{D}) = \max(h^{\vec{}}(\mathcal{C}), h^{\vec{}}(\mathcal{D}))
 \]
@@ -405,6 +430,7 @@ The witness family $\mathcal{C}^{\UCT}$ for uniform continuity has:
 \end{theorem}
 
 \begin{proof}
+We fix the standard FT formulation for decidable bars on the full binary tree and the usual UCT on $[0,1]$ with the Euclidean metric.
 We prove both directions of the equivalence between FT and UCT on $[0,1]$.
 
 \textbf{Direction 1: FT $\Rightarrow$ UCT}
@@ -450,7 +476,7 @@ g(\alpha) = 2^{-\min\{|s| : s \sqsubset \alpha, s \in B\}}
 The key insight is that uniform continuity of $g$ (when transferred via homeomorphism to $[0,1]$) yields a uniform modulus that bounds the bar depth. Specifically, if $g$ has modulus of continuity $\delta(\varepsilon) = 2^{-N}$ for $\varepsilon = 2^{-N-1}$, then every infinite path meets $B$ at depth $\leq N$.
 \end{proof}
 
-\begin{proposition}[WLPO-FT Independence]\label{prop:orthogonal} \leancited
+\begin{proposition}[WLPO–FT independence]\label{prop:orthogonal} \leancited
 WLPO and FT are orthogonal:
 \begin{enumerate}
 \item $\BISH + \WLPO \not\vdash \FT$
@@ -458,13 +484,14 @@ WLPO and FT are orthogonal:
 \end{enumerate}
 \end{proposition}
 
-\begin{proof}[Proof sketch]
+\begin{proof}[Proof sketch and status]
+We treat these separations as literature-backed and axiomatized in Lean (no model theory is formalized here).
 Independence is shown via models (see \cite{vanDalen1997, Beeson1985}):
 \begin{itemize}
 \item \textbf{WLPO $\not\rightarrow$ FT}: Kleene's recursive realizability model $\mathcal{K}_2$ satisfies WLPO (recursive predicates on $\N$ are decidable) but not FT (would make all recursive functions bounded).
 \item \textbf{FT $\not\rightarrow$ WLPO}: Certain sheaf models over topological spaces satisfy FT (via compactness) but not WLPO (which would require decidability of all opens).
 \end{itemize}
-The independence proofs are formalized as axioms in our Lean development (\texttt{FT\_not\_implies\_WLPO}, \texttt{WLPO\_not\_implies\_FT}).
+In the repository these are recorded as axioms (\texttt{FT\_not\_implies\_WLPO}, \texttt{WLPO\_not\_implies\_FT}) to keep the formal development focused on calibration.
 \end{proof}
 
 \subsection{The Dependent Choice Axis: Baire Category}
@@ -482,7 +509,7 @@ The witness family $\mathcal{C}^{\BCT}$ for Baire Category on $\N^\N$ has:
 \begin{itemize}
 \item Profile on $(\WLPO, \FT, \DCw)$ axes: $(\infty, \infty, 1)$
 \end{itemize}
-Moreover, in $\ZF$ (without choice), $\DCw \Leftrightarrow \BCT$ for complete metric spaces.
+Moreover, over $\ZF$ (without full choice), $\DCw$ and standard BCT schemas for complete metric spaces are equivalent (see \cite{Blair77}).
 \end{theorem}
 
 \begin{proof}
@@ -546,8 +573,8 @@ I_{\mathcal{I}} = \{f \in \linf : \text{supp}(f) \in \mathcal{I}\}
 where $\text{supp}(f) = \{n \in \N : f(n) \neq 0\}$.
 \end{definition}
 
-\begin{theorem}[Stone Window - Classical]\label{thm:stone-classical} \leanpartial
-In ZFC, for any Boolean ideal $\mathcal{I}$, the map
+\begin{theorem}[Stone Window — Classical]\label{thm:stone-classical} \leanpartial
+In the classical setting (e.g.\ $\ZFC$), for any Boolean ideal $\mathcal{I}$, the map
 \[
 \Phi_{\mathcal{I}}: \mathcal{P}(\N)/\mathcal{I} \to \text{Idem}(\linf/I_{\mathcal{I}})
 \]
@@ -604,11 +631,7 @@ The classical surjectivity proof requires forming $A = \{n : e(n) = 1\}$. Constr
 \end{proof}
 
 \begin{conjecture}[Stone Window Calibration]\label{conj:stone}
-For broad classes of support ideals $\mathcal{I}$ (excluding metrically controlled cases like the ideal of finite sets):
-\[
-\text{``}\Phi_{\mathcal{I}} \text{ is surjective''} \implies \WLPO
-\]
-over $\BISH$.
+For broad classes of support ideals $\mathcal{I}$ (beyond metrically controlled cases such as the finite-set ideal), surjectivity of $\Phi_{\mathcal I}$ entails at least \LLPO, and plausibly \WLPO, over $\BISH$.
 \end{conjecture}
 
 \begin{intuitionbox}
@@ -720,7 +743,7 @@ Axiom Calibration provides a quantitative foundation for understanding construct
 
 \paragraph{Constructive Analysis.} The bidual gap calibration extends Ishihara's work \cite{Ishihara2006} on WLPO and functional analysis. Our systematic framework goes beyond individual equivalences to establish a coordinate system for logical dependencies. The Stone Window analysis connects to constructive algebra studied in \cite{MinesRichmanRuitenburg1988}.
 
-\paragraph{Categorical Logic.} Our use of groupoids for witness families relates to homotopy type theory \cite{HoTTBook}, though we work in a more traditional setting. The uniformizability concept has similarities to parametricity in type theory but focuses on foundation-invariance rather than type-invariance.
+\paragraph{Categorical Logic.} Our use of groupoids for witness families relates to homotopy type theory \cite{HoTTBook}, though we work in a more traditional setting. The uniformizability concept echoes parametricity ideas but targets foundation-invariance rather than type-invariance.
 
 \paragraph{Formalization.} Previous formalizations of reverse mathematics include \cite{LeanRM2023} in Lean and \cite{CoqRM2022} in Coq. Our work is distinguished by:
 \begin{itemize}
