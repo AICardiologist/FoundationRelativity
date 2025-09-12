@@ -1,16 +1,11 @@
 
-% \documentclass{lmcs}  % Uncomment when lmcs.cls is available
-\documentclass[11pt]{article}  % Temporary replacement for testing
-
-% Note: To compile with LMCS journal style:
-% 1. Download lmcs.cls from https://www.lmcs-online.org/ (under Author Guidelines)
-% 2. Place lmcs.cls in the same directory as this .tex file
-% 3. Uncomment the \documentclass{lmcs} line above and comment out \documentclass{article}
-% 4. Uncomment the LMCS-specific author commands below and comment out the article version
+\documentclass[11pt]{article}
 
 % ------------------------------------------------------------
-% Minimal, LMCS-friendly preamble (no hyperref/lmodern/geometry)
+% Standard LaTeX packages
 % ------------------------------------------------------------
+\usepackage[margin=1in]{geometry}
+\usepackage{lmodern}
 \usepackage{amsmath,amssymb,mathtools}
 \usepackage[american]{babel}
 \usepackage{stmaryrd}
@@ -23,21 +18,16 @@
 \usepackage{graphicx}
 \usepackage{array}
 \usepackage{mdframed}
-\usepackage{url}  % Added for \url command
+\usepackage{url}
+% hyperref should typically come last
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 
-% Define theorem-like environments for article class (remove when using lmcs.cls)
+% Define theorem-like environments
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{remark}[theorem]{Remark}
-
-% Shorthand for compatibility
-\newenvironment{thm}{\begin{theorem}}{\end{theorem}}
-\newenvironment{lem}{\begin{lemma}}{\end{lemma}}
-\newenvironment{cor}{\begin{corollary}}{\end{corollary}}
-\newenvironment{defi}{\begin{definition}}{\end{definition}}
-\newenvironment{rem}{\begin{remark}}{\end{remark}}
 
 % ---------- Lean repo link ----------
 \newcommand{\leanRepo}{\url{https://github.com/AICardiologist/FoundationRelativity}}
@@ -121,17 +111,11 @@
 \lstset{style=leanstyle}
 
 % ---------- Title and author ----------
-% For LMCS class:
-% \title[The Bidual Gap and WLPO]{The Bidual Gap and WLPO: Complete Characterization and Formalization}
-% \author[P.~C.-K.~Lee]{Paul Chun-Kit Lee}
-% \address{New York University}
-% \email{paul.lee@nyu.edu} % TODO: Replace with actual email
-% \thanks{Lean 4 formalization available at \leanRepo. Code archive available at Zenodo: DOI \texttt{10.5281/zenodo.17107493}.}
-
-% For standard article class (temporary):
 \title{The Bidual Gap and WLPO: A Constructive Calibration of Banach Space Non-Reflexivity}
-\author{Paul Chun-Kit Lee\thanks{Lean 4 formalization available at \leanRepo. Code archive available at Zenodo: DOI \texttt{10.5281/zenodo.17107493}.} \\ New York University \\ \texttt{paul.lee@nyu.edu}}
-\date{}
+\author{Paul Chun-Kit Lee\thanks{Lean 4 formalization available at \leanRepo. Code archive available at Zenodo: DOI \texttt{10.5281/zenodo.17107493}.} \\ 
+New York University \\ 
+\texttt{paul.lee@nyu.edu}}
+\date{\today}
 
 \begin{document}
 
@@ -402,10 +386,10 @@ $\textsf{BISH} \vdash \textsf{BidualGapStrong} \Rightarrow \WLPO$.
 \item \textbf{Repository}: \leanRepo
 \item \textbf{Lean toolchain}: \texttt{leanprover/lean4:v4.22.0-rc4}
 \item \textbf{mathlib4 commit}: \texttt{59e4fba0c656457728c559a7d280903732a6d9d1}
-\item \textbf{Project tag}: \texttt{v1.0-lmcs} / commit \texttt{e3b06612d8ce75ad60988ed2279194d08a7ae6fb}
+\item \textbf{Project tag}: \texttt{p2-crm-v0.2} / commit \texttt{85f69aa}
 \item \textbf{Build}: \texttt{lake exe cache get \&\& lake build} \\
       top-level target: \texttt{Papers.P2\_BidualGap.gap\_equiv\_wlpo}
-\item \textbf{Code Archive DOI}: \texttt{10.5281/zenodo.17107493}
+\item \textbf{Artifact DOI}: \texttt{10.5281/zenodo.17107493}
 \item \textbf{Status}: The main equivalence builds with 0 errors. Three WLPO-conditional lemmas remain in the optional module \texttt{DualIsometriesComplete.lean} concerning completeness of certain dual spaces; they do not affect the main equivalence.
 \end{itemize}
 \end{mdframed}
@@ -596,241 +580,21 @@ The mathlib4 mathematical library.
 
 \appendix
 
-\section{Selected Lean Snippets}
+\section{Lean Implementation Snippets}
 
-This appendix presents key excerpts from our Lean 4 formalization, demonstrating the producer/consumer architecture and axiom hygiene discussed in the main text. These snippets are illustrative but align with the actual implementation available at \leanRepo.
+\subsection{The main equivalence (top level)}
 
-\subsection{Constructive consumer (Ishihara kernel $\to$ WLPO)}
-
-The following shows the purely constructive consumer that derives WLPO from an Ishihara kernel without using classical axioms:
-
-\begin{lstlisting}[caption={Constructive consumer: no classical axioms},label={lst:consumer}]
-/-! Constructive consumer: no `open Classical`, no `noncomputable`. -/
-structure IshiharaKernel (X : Type _) [NormedAddCommGroup X] [NormedSpace ℝ X] where
-  y  : (X →L[ℝ] ℝ) →L[ℝ] ℝ
-  f  : X →L[ℝ] ℝ
-  g  : (ℕ → Bool) → (X →L[ℝ] ℝ)
-  δ  : ℝ
-  δpos : 0 < δ
-  sep  : ∀ α, |y (f + g α)| = 0 ∨ δ ≤ |y (f + g α)|
-  zero_iff_allFalse : ∀ α, (∀ n, α n = false) ↔ y (f + g α) = 0
-
-theorem WLPO_of_kernel
-  {X : Type _} [NormedAddCommGroup X] [NormedSpace ℝ X]
-  (K : IshiharaKernel X) : WLPO := by
-  intro α
-  rcases K.sep α with h0 | hpos
-  · have : K.y (K.f + K.g α) = 0 := (abs_eq_zero.mp h0)
-    exact Or.inl ((K.zero_iff_allFalse α).mpr this)
-  · have pos : 0 < |K.y (K.f + K.g α)| := lt_of_lt_of_le K.δpos hpos
-    have hne : K.y (K.f + K.g α) ≠ 0 := by
-      intro hz; have : |K.y (K.f + K.g α)| = 0 := by simp [hz]
-      exact (ne_of_gt pos) this
-    have : ¬ (∀ n, α n = false) := by
-      intro hall
-      have hz : K.y (K.f + K.g α) = 0 := (K.zero_iff_allFalse α).mp hall
-      exact hne hz
-    exact Or.inr this
-\end{lstlisting}
-
-\subsection{Classical producer (Gap $\to$ kernel)}
-
-The classical producer extracts an Ishihara kernel from a bidual gap. Note the explicit \texttt{noncomputable} and \texttt{open Classical} declarations:
-
-\begin{lstlisting}[caption={Classical producer: extracting kernel from gap},label={lst:producer}]
-/-! Classical producer: fenced. Extract a kernel from a bidual gap. -/
-noncomputable section
-section ClassicalMeta
-open Classical
-
-lemma exists_on_unitBall_gt_half_opNorm
-  {E} [NormedAddCommGroup E] [NormedSpace ℝ E]
-  (T : E →L[ℝ] ℝ) (hT : T ≠ 0) :
-  ∃ x : E, ‖x‖ ≤ 1 ∧ (‖T‖ / 2) < ‖T x‖ := by
-  by_contra h; push_neg at h
-  have bound_all : ∀ x, ‖T x‖ ≤ (‖T‖ / 2) * ‖x‖ := by
-    intro x
-    by_cases hx : x = 0
-    · simp [hx]
-    · have hxpos : 0 < ‖x‖ := norm_pos_iff.mpr hx
-      let u : E := (‖x‖)⁻¹ • x
-      have hu_le : ‖u‖ ≤ 1 := by
-        field_simp; rw [norm_smul, Real.norm_of_nonneg (inv_nonneg.mpr (le_of_lt hxpos))]
-        simp [ne_of_gt hxpos]
-      have hu_ball : ‖T u‖ ≤ ‖T‖ / 2 := h u hu_le
-      calc ‖T x‖ = ‖x‖ * ‖T u‖     := by rw [← T.map_smul]; simp [u]
-               _ ≤ (‖T‖ / 2) * ‖x‖ := mul_le_mul_of_nonneg_left hu_ball (norm_nonneg x)
-  have hle : ‖T‖ ≤ ‖T‖ / 2 := by
-    apply ContinuousLinearMap.opNorm_le_bound
-    · exact div_nonneg (norm_nonneg T) (by norm_num)
-    · intro x; exact bound_all x
-  have : ‖T‖ = 0 := by linarith
-  exact hT (ContinuousLinearMap.norm_eq_zero.mp this)
-\end{lstlisting}
-
-\subsection{Gap $\to$ WLPO (full bridge)}
-
-This shows the complete meta-classical construction:
-
-\begin{lstlisting}[caption={Meta-classical: from bidual gap to WLPO},label={lst:bridge}]
-/-- Meta-classical: from a bidual gap, build a kernel and consume it. -/
-theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
-  classical
-  rcases hGap with ⟨X, Xng, Xns, Xc, _dualBan, _bidualBan, hNotSurj⟩
-  letI : NormedAddCommGroup X := Xng
-  letI : NormedSpace ℝ X := Xns
-  letI : CompleteSpace X := Xc
-  let j := NormedSpace.inclusionInDoubleDual ℝ X
-  -- Extract witness y ∉ range(j)
-  have : ∃ y : (X →L[ℝ] ℝ) →L[ℝ] ℝ, y ∉ Set.range j := by
-    push_neg at hNotSurj; exact hNotSurj
-  rcases this with ⟨y, hy⟩
-  have hy0 : y ≠ 0 := by intro hz; subst hz; exact hy ⟨0, by simp⟩
-  -- Find h* with ‖y h*‖ > ‖y‖/2
-  obtain ⟨h⋆, -, hbig⟩ := exists_on_unitBall_gt_half_opNorm y hy0
-  let δ : ℝ := ‖y h⋆‖ / 2
-  have δpos : 0 < δ := by
-    have : 0 < ‖y h⋆‖ := lt_of_le_of_lt (div_nonneg (norm_nonneg y) (by norm_num)) hbig
-    exact half_pos this
-  -- Build kernel components
-  let f : X →L[ℝ] ℝ := 0
-  let g : (ℕ → Bool) → (X →L[ℝ] ℝ) := fun α => if (∀ n, α n = false) then 0 else h⋆
-  have sep : ∀ α, |y (f + g α)| = 0 ∨ δ ≤ |y (f + g α)| := by
-    intro α; by_cases hall : ∀ n, α n = false
-    · left;  simp [f, g, hall]
-    · right; simp [f, g, hall, δ]; exact le_of_eq rfl
-  have ziff : ∀ α, (∀ n, α n = false) ↔ y (f + g α) = 0 := by
-    intro α; constructor
-    · intro hall; simp [f, g, hall]
-    · intro hz; by_contra hall
-      have : y (f + g α) = y h⋆ := by simp [f, g, hall]
-      rw [this] at hz; norm_num at hz
-      exact absurd hz (ne_of_gt (by exact δpos))
-  exact WLPO_of_kernel
-    { y := y, f := f, g := g, δ := δ, δpos := δpos, 
-      sep := sep, zero_iff_allFalse := ziff }
-end ClassicalMeta
-\end{lstlisting}
-
-\subsection{WLPO $\to$ Gap (coding-based sketch)}
-
-The reverse direction uses WLPO to construct a gap via sequence coding:
-
-\begin{lstlisting}[caption={WLPO implies gap via coding},label={lst:wlpo-gap}]
-/-- Abbreviation: a "code" turning α into a bounded sequence v^α. -/
-def codedSeq (α : ℕ → Bool) : ℕ → ℝ :=
-  fun n => if (∃ k ≤ n, α k = true) then (1 : ℝ) else 0
-
-lemma codedSeq_in_c0_iff_allFalse (α : ℕ → Bool) :
-  (Filter.Tendsto (codedSeq α) Filter.atTop (nhds 0)) ↔ (∀ n, α n = false) := by
+\begin{lstlisting}[caption={Complete bidirectional proof (top level)}]
+/-- The main equivalence theorem -/
+theorem gap_equiv_wlpo : BidualGapStrong.{0} ↔ WLPO := by
   constructor
-  · intro htend hall
-    -- If α has a true value, sequence stays at 1 eventually
-    rcases hall with ⟨m, hm⟩
-    have : ∀ n ≥ m, codedSeq α n = 1 := by
-      intro n hn; simp [codedSeq]; use m, le_trans (le_of_eq rfl) hn, hm
-    -- This contradicts convergence to 0
-    have : Filter.Tendsto (codedSeq α) Filter.atTop (nhds 1) := by
-      apply tendsto_atTop_of_eventually_const
-      use m; intros; apply this; assumption
-    exact absurd (tendsto_nhds_unique htend this) (by norm_num)
-  · intro hall
-    -- If all false, sequence is constantly 0
-    have : ∀ n, codedSeq α n = 0 := by
-      intro n; simp [codedSeq]
-      intro k hk hkt; exact hall k hkt
-    simp [this]; exact tendsto_const_nhds
-
-/-- Uses WLPO to separate coded sequences in ℓ∞/c₀ -/
-theorem gap_from_WLPO : WLPO → BidualGapStrong := by
-  intro hwlpo
-  -- Construction uses the coding to build a functional on ℓ∞/c₀
-  -- that separates some codedSeq α from c₀
-  -- Full proof in Papers.P2_BidualGap.HB.WLPO_to_Gap_pure
-  sorry  -- See repository for complete construction
+  · -- Gap implies WLPO
+    intro h_gap
+    classical
+    exact WLPO_of_kernel (kernel_from_gap h_gap)
+  · -- WLPO implies Gap
+    intro hwlpo
+    exact gap_from_WLPO hwlpo
 \end{lstlisting}
-
-\subsection{OpNorm core (classical LUB)}
-
-The operator norm construction shows the classical use of suprema:
-
-\begin{lstlisting}[caption={Classical operator norm via supremum},label={lst:opnorm}]
-/-- Classical: existence of operator norm via sSup of values on unit ball -/
-namespace OpNorm
-variable {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
-
-def valueSet (h : X →L[ℝ] ℝ) : Set ℝ := 
-  { r | ∃ x, ‖x‖ ≤ 1 ∧ r = ‖h x‖ }
-
-lemma valueSet_nonempty (h : X →L[ℝ] ℝ) : (valueSet h).Nonempty := 
-  ⟨0, 0, by simp⟩
-  
-lemma valueSet_bddAbove (h : X →L[ℝ] ℝ) : BddAbove (valueSet h) :=
-  ⟨‖h‖, by rintro r ⟨x, hx, rfl⟩; exact h.le_opNorm_of_le hx⟩
-
-def HasOpNorm (h : X →L[ℝ] ℝ) : Prop := 
-  ∃ N, IsLUB (valueSet h) N
-
-lemma hasOpNorm_classical (h : X →L[ℝ] ℝ) : HasOpNorm h := by
-  classical
-  use sSup (valueSet h)
-  exact isLUB_csSup (valueSet_nonempty h) (valueSet_bddAbove h)
-end OpNorm
-\end{lstlisting}
-
-\subsection{Stone window (idempotents in the quotient)}
-
-The Stone window construction shows the Boolean algebra structure:
-
-\begin{lstlisting}[caption={Stone window: Boolean algebra of idempotents},label={lst:stone}]
-/-- Almost-equality of subsets of ℕ -/
-def AlmostEq (A B : Set ℕ) : Prop := (A \ B ∪ B \ A).Finite
-
-/-- Indicator function in ℓ∞ -/
-def chi (A : Set ℕ) : ℕ → ℝ := fun n => if n ∈ A then 1 else 0
-
-/-- The quotient ℓ∞/c₀ has a Banach algebra structure -/
-instance : Algebra ℝ (ℓ∞ ⧸ c₀) where
-  -- Multiplication is pointwise, well-defined modulo c₀
-  mul := Quotient.map₂ (fun f g n => f n * g n) (by sorry)
-  one := Quotient.mk (fun _ => 1)
-  -- Other fields omitted
-
-/-- Boolean algebra of idempotents -/
-def Idem (B : Type*) [Mul B] := { e : B // e * e = e }
-
-instance [Mul B] [One B] [Add B] [Sub B] : BooleanAlgebra (Idem B) where
-  inf e f := ⟨e.val * f.val, by simp [e.property, f.property]⟩
-  sup e f := ⟨e.val + f.val - e.val * f.val, by ring_nf; simp [e.property, f.property]⟩
-  compl e := ⟨1 - e.val, by ring_nf; simp [e.property]⟩
-  -- Other fields follow from these operations
-
-/-- Stone window isomorphism -/
-def StoneWindow : (Set ℕ) ⧸ AlmostEq ≃ Idem (ℓ∞ ⧸ c₀) where
-  toFun := Quotient.map (fun A => ⟨Quotient.mk (chi A), by sorry⟩) (by sorry)
-  invFun := sorry  -- Inverse via support extraction
-  left_inv := by sorry
-  right_inv := by sorry
-\end{lstlisting}
-
-\subsection{Axiom hygiene verification}
-
-Finally, we can verify the axiom usage as discussed in Section~\ref{sec:axioms}:
-
-\begin{lstlisting}[caption={Axiom audit commands},label={lst:axioms}]
-#print axioms WLPO_of_kernel
--- (no axioms)
-
-#print axioms WLPO_of_gap  
--- [propext, Classical.choice, Quot.sound]
-
-#print axioms gap_from_WLPO
--- [propext, Quot.sound]  -- uses WLPO hypothesis, not Classical.choice
-
-#print axioms gap_equiv_wlpo
--- [propext, Classical.choice, Quot.sound]
-\end{lstlisting}
-
-The output confirms that the constructive consumer (\texttt{WLPO\_of\_kernel}) uses no classical axioms, while the meta-classical producer (\texttt{WLPO\_of\_gap}) requires classical choice. This validates our CRM methodology claim that the consumer remains purely constructive.
 
 \end{document}
