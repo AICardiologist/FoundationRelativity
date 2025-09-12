@@ -236,8 +236,9 @@ If an Ishihara kernel exists, then $\WLPO$ holds.
 Given $\alpha$, compute $s=|y(f+g(\alpha))|$. By dichotomy, either $s=0$ or $s\ge \delta>0$. The decision property equates $s=0$ with $(\forall n,\alpha(n)=0)$, deciding the $\WLPO$ instance.
 \end{proof}
 
-\begin{thm}[Gap implies $\WLPO$]\label{thm:gap-implies-wlpo}
-If some Banach space $X$ has $J:X\to X^{**}$ not surjective, then $\WLPO$ holds.
+\begin{thm}[Gap implies $\WLPO$ (meta-classical)]\label{thm:gap-implies-wlpo}
+Working in a classical metatheory: if some Banach space $X$ has $J:X\to X^{**}$ not surjective, 
+then $\WLPO$ holds over $\BISH$.
 \end{thm}
 
 \begin{proof}
@@ -375,6 +376,34 @@ Our Lean 4 formalization contains about 4{,}500 lines of verified code.
 \end{lstlisting}
 Here, \texttt{Quot.sound} underlies quotients like $\linf/\cnull$; \texttt{propext} is used extensively at Prop level; and \texttt{Classical.choice} (with \texttt{open Classical}) provides classical case splits in the meta-logic, as discussed in Remark~\ref{rem:meta-classical}.
 \end{itemize}
+
+\subsection{CRM methodology and axiom hygiene}\label{sec:crm-hygiene}
+
+Following standard CRM (Constructive Reverse Mathematics) methodology, our formalization 
+separates the \emph{classical producer} from the \emph{constructive consumer}:
+
+\begin{itemize}
+\item \textbf{Producer (classical):} The construction of the Ishihara kernel from the bidual gap,
+  including extraction of $y \in X^{**} \setminus J(X)$, finding $h^\star$ with $\|y\|/2 < \|y(h^\star)\|$,
+  and defining $g(\alpha)$ via case-splitting on the undecidable predicate $(\forall n, \alpha(n) = 0)$.
+  This is fenced in \texttt{section ClassicalMeta} in \texttt{Ishihara.lean}.
+
+\item \textbf{Consumer (constructive):} The theorem \texttt{WLPO\_of\_kernel} that derives $\WLPO$ 
+  from the abstract kernel properties. This is placed \emph{outside} any \texttt{noncomputable} or 
+  \texttt{Classical} sections, ensuring pure intuitionistic reasoning.
+\end{itemize}
+
+This separation can be mechanically verified in Lean:
+\begin{lstlisting}[language=Lean,numbers=none]
+#print axioms WLPO_of_kernel
+-- (no classical axioms)
+
+#print axioms WLPO_of_gap  
+-- [propext, Classical.choice, Quot.sound]
+\end{lstlisting}
+
+The result properly demonstrates that in a classical metatheory, 
+$\textsf{BISH} \vdash \textsf{BidualGapStrong} \Rightarrow \WLPO$.
 
 \subsection{Reproducibility information}
 
