@@ -1,5 +1,5 @@
 /-
-  Papers/P2_BidualGap/Constructive/Ishihara.lean
+  Papers/P2_BidualGap/CRM_MetaClassical/Ishihara.lean
   BidualGapStrong → WLPO via the Ishihara kernel.
 
   CRM methodology:
@@ -19,7 +19,7 @@
 import Mathlib.Analysis.Normed.Module.Dual
 import Mathlib.Analysis.Normed.Group.Completeness
 import Papers.P2_BidualGap.Basic
-import Papers.P2_BidualGap.Constructive.OpNormCore
+import Papers.P2_BidualGap.CRM_MetaClassical.OpNormCore
 
 namespace Papers.P2.Constructive
 open Papers.P2
