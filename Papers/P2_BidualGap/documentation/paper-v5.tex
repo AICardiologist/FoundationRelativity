@@ -14,7 +14,7 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,cd}
 \usepackage{listings}
-\usepackage{color}
+\usepackage[x11names,table]{xcolor}
 \usepackage{graphicx}
 \usepackage{array}
 \usepackage{mdframed}
@@ -28,6 +28,8 @@
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{remark}[theorem]{Remark}
+% Alias used in body:
+\newenvironment{defi}{\begin{definition}}{\end{definition}}
 
 % ---------- Lean repo link ----------
 \newcommand{\leanRepo}{\url{https://github.com/AICardiologist/FoundationRelativity}}
@@ -139,7 +141,7 @@ For any Banach space $X$, the canonical embedding $J_X:X\to X^{**}$ maps $x\in X
 A Banach space $X$ is \textbf{non-reflexive} if the canonical embedding $J_X$ is not surjective. In this case, we say $X$ \textbf{has a bidual gap}.
 \end{definition}
 
-For the space $\linf$ of bounded sequences, the answer depends on the foundational setting. In classical mathematics ($\ZFC$), the Hahn--Banach theorem implies that $J$ is not surjective.
+For the space $\linf$ of bounded sequences, the answer depends on the foundational setting. In classical mathematics ($\ZFC$), the Hahn--Banach theorem implies that $J_{\linf}$ is not surjective.
 
 However, in Bishop-style constructive mathematics ($\BISH$)---a system based on intuitionistic logic without the Law of Excluded Middle ($\LEM$) or full Choice---one cannot prove that this gap exists. This dependence of provability on foundations exemplifies \emph{foundation relativity}.
 
@@ -166,7 +168,7 @@ $\WLPO$ is strictly weaker than $\LEM$ but not provable in $\BISH$. It captures 
 Over $\BISH$, the following are equivalent:
 \begin{enumerate}
 \item $\WLPO$.
-\item \textbf{Gap$_{\linf}$:} The embedding $J:\linf\to(\linf)^{**}$ is not surjective.
+\item \textbf{Gap$_{\linf}$:} The embedding $J_{\linf}:\linf\to(\linf)^{**}$ is not surjective.
 \item \textbf{Gap$_{\exists}$:} There exists a real Banach space $X$ such that $J_X:X\to X^{**}$ is not surjective.
 \end{enumerate}
 Moreover, this equivalence is fully formalized in Lean~4 (see Section~\ref{sec:lean}).
@@ -320,7 +322,7 @@ If $\|x\|_\infty\le 1$, then $|f_n(x)|\le \frac{1}{n}\sum_{i=1}^n|x_i|\le 1$, wi
 
 \subsection{Computational implementation}
 
-We provide $O(n)$ implementations (see Appendix~\ref{app:computational}) to verify Theorem~\ref{thm:finite-hb} numerically.
+We provide $O(n)$ implementations (see the repository) to verify Theorem~\ref{thm:finite-hb} numerically.
 
 \subsection{Convergence and the constructive boundary}
 
@@ -667,7 +669,10 @@ theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
   let j := NormedSpace.inclusionInDoubleDual ℝ X
   -- Extract witness y ∉ range(j)
   have : ∃ y : (X →L[ℝ] ℝ) →L[ℝ] ℝ, y ∉ Set.range j := by
-    push_neg at hNotSurj; exact hNotSurj
+    have : ¬ (∀ y, y ∈ Set.range j) := by
+      simpa [Function.Surjective, Set.mem_range] using hNotSurj
+    push_neg at this
+    exact this
   rcases this with ⟨y, hy⟩
   have hy0 : y ≠ 0 := by intro hz; subst hz; exact hy ⟨0, by simp⟩
   -- Find h* with ‖y h*‖ > ‖y‖/2
@@ -680,9 +685,15 @@ theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
   let f : X →L[ℝ] ℝ := 0
   let g : (ℕ → Bool) → (X →L[ℝ] ℝ) := fun α => if (∀ n, α n = false) then 0 else h⋆
   have sep : ∀ α, |y (f + g α)| = 0 ∨ δ ≤ |y (f + g α)| := by
-    intro α; by_cases hall : ∀ n, α n = false
+    intro α
+    by_cases hall : ∀ n, α n = false
     · left;  simp [f, g, hall]
-    · right; simp [f, g, hall, δ]; exact le_of_eq rfl
+    · right
+      have : δ ≤ ‖y h⋆‖ := by
+        have hnn : 0 ≤ ‖y h⋆‖ := norm_nonneg _
+        simpa [δ] using half_le_self hnn
+      -- unfold to |y(f+g α)| and rewrite ‖·‖ = |·|
+      simpa [f, g, hall, zero_add, Real.norm_eq_abs]
   have ziff : ∀ α, (∀ n, α n = false) ↔ y (f + g α) = 0 := by
     intro α; constructor
     · intro hall; simp [f, g, hall]
