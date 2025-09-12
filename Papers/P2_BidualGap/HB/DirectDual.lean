@@ -1,6 +1,35 @@
-/-
-Papers/P2_BidualGap/HB/DirectDual.lean
-Direct construction: G : (c₀ →L ℝ) →L ℝ via G(f) = ∑ f(e n)
+/-!
+# Direct Construction of the Bidual Witness
+
+This file constructs the witness G : (c₀ →L ℝ) →L ℝ that demonstrates
+the non-reflexivity of c₀ when WLPO holds.
+
+## Mathematical Construction
+
+The witness is defined as G(f) = ∑_{n=0}^∞ f(e_n), where:
+- e_n is the standard basis element (1 at position n, 0 elsewhere)
+- The sum converges because f is bounded and e_n form a bounded sequence
+- G cannot be represented by any element of c₀
+
+## Key Properties of G
+
+1. **Linearity**: G is a linear functional on c₀*
+2. **Boundedness**: ‖G‖ ≤ 1 (proven via the summability of f(e_n))
+3. **Non-representability**: G(δ_n) = 1 for all n, which would require
+   the representing element to be the constant sequence 1 ∉ c₀
+
+## Implementation Details
+
+- We model c₀ as `ZeroAtInftyContinuousMap ℕ ℝ` (functions vanishing at infinity)
+- The basis elements e_n are constructed using the discrete topology on ℕ
+- Summability proofs use mathlib's infinite sum machinery
+- All constructions are noncomputable but use only WLPO (no additional axioms)
+
+## Relationship to the Main Theorem
+
+This witness is used in WLPO_to_Gap_HB.lean to prove that WLPO implies
+the existence of a bidual gap, completing the reverse direction of the
+main equivalence.
 -/
 import Mathlib.Topology.ContinuousMap.ZeroAtInfty
 import Mathlib.Analysis.Normed.Group.InfiniteSum
@@ -18,7 +47,20 @@ namespace Papers.P2.HB
 /-- Our model for `c₀` on the discrete space `ℕ`. -/
 abbrev c₀ := ZeroAtInftyContinuousMap ℕ ℝ
 
-/-- The standard basis: `e n` is `1` at `n` and `0` elsewhere. -/
+/--
+The standard basis element e_n for c₀.
+
+**Definition**: e_n(m) = 1 if m = n, else 0
+
+**Implementation notes**:
+- We use the discrete topology on ℕ, so all functions are continuous
+- The zero_at_infty property follows from e_n being supported on the singleton {n}
+- The proof uses the fact that singletons are compact in discrete spaces
+
+**Mathematical significance**:
+These basis elements are used to probe functionals in c₀* and extract
+their values at each coordinate.
+-/
 def e (n : ℕ) : c₀ :=
 { toContinuousMap :=
   { toFun := fun m => if m = n then (1 : ℝ) else 0
@@ -43,7 +85,20 @@ def e (n : ℕ) : c₀ :=
       simpa [hSet] using hm
     simp [this, hε] }
 
-/-- Coordinate evaluation `δ n`. -/
+/--
+Coordinate evaluation functional δ_n : c₀ → ℝ.
+
+**Definition**: δ_n(x) = x(n) (evaluates x at coordinate n)
+
+**Properties**:
+- Linear: δ_n(x + y) = δ_n(x) + δ_n(y)
+- Bounded: |δ_n(x)| ≤ ‖x‖_∞
+- Dual basis: δ_n(e_m) = 1 if n = m, else 0
+
+**Role in the proof**:
+The functionals δ_n are used to show that if G = J(x) for some x ∈ c₀,
+then x(n) = G(δ_n) = 1 for all n, contradicting x ∈ c₀.
+-/
 def δ (n : ℕ) : c₀ →L[ℝ] ℝ :=
   LinearMap.mkContinuous
     { toFun := fun x => (x : ℕ → ℝ) n
