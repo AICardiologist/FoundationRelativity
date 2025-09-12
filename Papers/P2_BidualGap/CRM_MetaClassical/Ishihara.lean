@@ -1,3 +1,9 @@
+import Mathlib.Analysis.Normed.Module.Dual
+import Mathlib.Analysis.Normed.Group.Completeness
+import Mathlib.Tactic -- for nlinarith, norm_num, etc.
+import Papers.P2_BidualGap.Basic
+import Papers.P2_BidualGap.CRM_MetaClassical.OpNormCore
+
 /-!
 # The Ishihara Kernel and its implication to WLPO
 
@@ -30,11 +36,6 @@ This serves as the "constructive consumer" in our producer/consumer architecture
 - `WLPO_of_kernel`: No axioms (fully constructive)
 - `kernel_from_gap`: Uses `Classical.choice` and `propext` (meta-classical)
 -/
-import Mathlib.Analysis.Normed.Module.Dual
-import Mathlib.Analysis.Normed.Group.Completeness
-import Mathlib.Tactic -- for nlinarith, norm_num, etc.
-import Papers.P2_BidualGap.Basic
-import Papers.P2_BidualGap.CRM_MetaClassical.OpNormCore
 
 namespace Papers.P2.Constructive
 open Papers.P2

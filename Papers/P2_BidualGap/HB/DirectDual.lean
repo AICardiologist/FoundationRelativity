@@ -1,35 +1,6 @@
-/-!
-# Direct Construction of the Bidual Witness
-
-This file constructs the witness G : (c₀ →L ℝ) →L ℝ that demonstrates
-the non-reflexivity of c₀ when WLPO holds.
-
-## Mathematical Construction
-
-The witness is defined as G(f) = ∑_{n=0}^∞ f(e_n), where:
-- e_n is the standard basis element (1 at position n, 0 elsewhere)
-- The sum converges because f is bounded and e_n form a bounded sequence
-- G cannot be represented by any element of c₀
-
-## Key Properties of G
-
-1. **Linearity**: G is a linear functional on c₀*
-2. **Boundedness**: ‖G‖ ≤ 1 (proven via the summability of f(e_n))
-3. **Non-representability**: G(δ_n) = 1 for all n, which would require
-   the representing element to be the constant sequence 1 ∉ c₀
-
-## Implementation Details
-
-- We model c₀ as `ZeroAtInftyContinuousMap ℕ ℝ` (functions vanishing at infinity)
-- The basis elements e_n are constructed using the discrete topology on ℕ
-- Summability proofs use mathlib's infinite sum machinery
-- All constructions are noncomputable but use only WLPO (no additional axioms)
-
-## Relationship to the Main Theorem
-
-This witness is used in WLPO_to_Gap_HB.lean to prove that WLPO implies
-the existence of a bidual gap, completing the reverse direction of the
-main equivalence.
+/-
+Papers/P2_BidualGap/HB/DirectDual.lean
+Direct construction: G : (c₀ →L ℝ) →L ℝ via G(f) = ∑ f(e n)
 -/
 import Mathlib.Topology.ContinuousMap.ZeroAtInfty
 import Mathlib.Analysis.Normed.Group.InfiniteSum
