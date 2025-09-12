@@ -1,8 +1,8 @@
 # Paper 2: Reproducibility Information
 
-## Artifact DOI
-- **Previous**: 10.5281/zenodo.13356587 (v0.1)
-- **Current**: [To be assigned] (v0.2)
+## Code Archive DOI (Zenodo)
+- **v0.1**: 10.5281/zenodo.13356587
+- **v0.2**: 10.5281/zenodo.17107493
 
 ## Releases
 - **v0.1**: [p2-minimal-v0.1](https://github.com/AICardiologist/FoundationRelativity/releases/tag/p2-minimal-v0.1) - Initial release
