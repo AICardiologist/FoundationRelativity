@@ -78,7 +78,6 @@ lemma coeff_mul_eval_abs (f : c₀ →L[ℝ] ℝ) (n : ℕ) :
     -- Since f (e n) ≠ 0, we have f (e n) ∈ ℝ \ {0}
     -- For real numbers: x * x = |x| * |x| = ‖x‖ * ‖x‖
     have : f (e n) * f (e n) = ‖f (e n)‖ * ‖f (e n)‖ := by
-      -- For reals, x * x = |x| * |x|; and ‖x‖ = |x|
       simp only [Real.norm_eq_abs]
       exact (abs_mul_abs_self _).symm
     rw [div_mul_eq_mul_div, this, mul_div_cancel_left₀]
