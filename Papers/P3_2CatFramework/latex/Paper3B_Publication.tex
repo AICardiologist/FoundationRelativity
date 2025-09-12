@@ -8,10 +8,12 @@
 \usepackage{amsmath,amssymb,mathtools}
 \usepackage{amsthm}
 \usepackage{hyperref}
+\usepackage[final]{microtype}
 \usepackage{xcolor}
 \usepackage{mdframed}
 \usepackage{listings} % For Lean code snippets
-\usepackage{babel}
+\usepackage[american]{babel}
+\usepackage[nameinlink,noabbrev]{cleveref}
 
 % Definitions
 \newtheorem{theorem}{Theorem}[section]
@@ -20,6 +22,14 @@
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{remark}[theorem]{Remark}
+
+% Cleveref names
+\Crefname{theorem}{Theorem}{Theorems}
+\Crefname{lemma}{Lemma}{Lemmas}
+\Crefname{definition}{Definition}{Definitions}
+\Crefname{proposition}{Proposition}{Propositions}
+\Crefname{corollary}{Corollary}{Corollaries}
+\Crefname{remark}{Remark}{Remarks}
 
 \newcommand{\PA}{\mathrm{PA}}
 \newcommand{\HA}{\mathrm{HA}}
@@ -38,6 +48,7 @@
 \newcommand{\leanok}{\textsf{\textcolor{green!70!black}{[Lean-formalized]}}}
 \newcommand{\leanaxiom}{\textsf{\textcolor{orange!80!black}{[Lean-axiomatized]}}}
 \newcommand{\leancited}{\textsf{\textcolor{blue!70!black}{[Classical]}}}
+\newcommand{\leanpartial}{\textsf{\textcolor{violet!70!black}{[Lean-partial]}}}
 
 % Style for Provenance notes
 \mdfdefinestyle{provenance}{%
@@ -56,7 +67,7 @@
 % -------------------------------------------------
 % Title (Focused on Proof Theory and Structure)
 % -------------------------------------------------
-\title{Axiom Calibration of Meta-Mathematical Hierarchies:\\
+\title{Axiom Calibration of Meta‑Mathematical Hierarchies:\\
 Formal Collisions and the Structure of\\
 Consistency and Reflection}
 \author{Paul Chun--Kit Lee\\
@@ -78,7 +89,7 @@ Our Lean 4 implementation (P4\_Meta framework) certifies these structural relati
 \noindent\textbf{Artifact Availability:} Lean~4 formalization at \url{https://github.com/AICardiologist/FoundationRelativity}\\
 \textbf{Zenodo DOI:} \href{https://doi.org/10.5281/zenodo.17054155}{10.5281/zenodo.17054155}\\
 \textbf{CI Status:} All core modules compile with 0 sorries (verified by GitHub Actions)\\
-\textbf{Build Command:} \texttt{lake build Papers.P3\_2CatFramework}\\
+\textbf{Build:} \texttt{lake build Papers.P3\_2CatFramework}\\
 \textbf{Verification:} \texttt{./scripts/no\_sorry\_p3b.sh} checks proof-theoretic modules
 \end{abstract}
 
@@ -96,7 +107,7 @@ This entire Lean 4 formalization project was produced by multi-AI agents working
 \section{Introduction}
 %===========================================================
 
-The organization of mathematical theories by consistency strength and reflective power is central to proof theory, tracing back to Gödel's incompleteness theorems \cite{Godel1931}, Turing's consistency progressions \cite{Turing1939}, and Feferman's reflection hierarchies \cite{Feferman1962}. We apply the Axiom Calibration (AxCal) framework (introduced in the companion Paper 3A) to provide a uniform structural account of these hierarchies.
+The organization of mathematical theories by consistency strength and reflective power is central to proof theory, tracing back to Gödel's incompleteness theorems \cite{Godel1931}, Turing's consistency progressions \cite{Turing1939}, and Feferman's reflection hierarchies \cite{Feferman1962}. We apply the Axiom Calibration (AxCal) framework (introduced in the companion Paper 3A~\cite{LeeAxCal2025}) to provide a uniform structural account of these hierarchies.
 
 Our account complements and abstracts the ordinal-analytic viewpoint developed via iterated reflection and the polymodal provability logic GLP/provability algebras; see especially Beklemishev's analyses \cite{Beklemishev2003,Beklemishev2004} and the survey \cite{ArtemovBeklemishev2004}.
 
@@ -200,7 +211,7 @@ We now establish precise calibrations for the fundamental theorems of proof theo
 
 \subsection{The Classicality Axis}
 
-\begin{theorem}[Classical Principles Calibration] \leanok
+\begin{theorem}[Classical Principles Calibration] \leanpartial
 Along $\LClass$ (with $T_{n+1}=T_n+\EM_{\Sigma^0_n}$ and $T_0=\HA$):
 \begin{itemize}
 \item $\WLPO$ has height $2$ (requires $\EM_{\Sigma^0_1}$)
@@ -362,7 +373,7 @@ $$B \vdash \Prov_T(\ulcorner\bot\urcorner)$$
 By $\RFNSigOne(T)$ with $\varphi = \bot \in \Sigma^0_1$:
 $$B \vdash \Prov_T(\ulcorner\bot\urcorner) \to \bot$$
 
-Therefore $B \vdash \bot$. But $\bot$ is false in the standard model (this is formalized as \texttt{Bot\_is\_FalseInN} in our Lean code), giving a contradiction.
+Therefore $B \vdash \bot$. But $\bot$ is false (this is formalized as \texttt{Bot\_is\_FalseInN} in our Lean code), giving a contradiction.
 
 The Lean proof:
 \begin{lstlisting}[language=Lean]
@@ -500,11 +511,6 @@ Future directions include:
 \item Applications to program extraction and proof mining
 \end{itemize}
 
-%===========================================================
-\section*{Acknowledgments}
-%===========================================================
-
-Development assistance provided by: Gemini 2.5 Deep Think (architecture exploration), GPT-5 Pro (Lean scaffolding), and Claude Code (repository management).
 
 \begin{thebibliography}{10}
 
@@ -538,6 +544,11 @@ Monatshefte für Mathematik, 38:173--198, 1931.
 P.~Hájek and P.~Pudlák.
 \emph{Metamathematics of First-Order Arithmetic}.
 Perspectives in Mathematical Logic. Springer-Verlag, 1993.
+
+\bibitem{LeeAxCal2025}
+P.~C.~Lee.
+\emph{Axiom Calibration of 2-Categorical Foundations: Base Classes and Witness Extension}.
+Paper 3A, FoundationRelativity Repository, 2025.
 
 \bibitem{Lob1955}
 M.~H.~Löb.
