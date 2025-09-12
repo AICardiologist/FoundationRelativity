@@ -9,6 +9,7 @@
 \usepackage{mathtools}
 \usepackage{enumitem}
 \usepackage{hyperref}
+\usepackage[final]{microtype}
 \usepackage{cleveref}
 \usepackage{thmtools}
 \usepackage{mdframed}
@@ -29,6 +30,14 @@
 \newtheorem{remark}[theorem]{Remark}
 \newtheorem{conjecture}[theorem]{Conjecture}
 \newtheorem{assumption}[theorem]{Assumption}
+% Cleveref names
+\Crefname{assumption}{Assumption}{Assumptions}
+\Crefname{theorem}{Theorem}{Theorems}
+\Crefname{lemma}{Lemma}{Lemmas}
+\Crefname{proposition}{Proposition}{Propositions}
+\Crefname{corollary}{Corollary}{Corollaries}
+\Crefname{definition}{Definition}{Definitions}
+\Crefname{remark}{Remark}{Remarks}
 
 % Custom commands
 \newcommand{\N}{\mathbb{N}}
@@ -48,6 +57,7 @@
 \newcommand{\BISH}{\mathsf{BISH}}
 \newcommand{\ZFC}{\mathsf{ZFC}}
 \newcommand{\ZF}{\mathsf{ZF}}
+% Category of foundations
 \newcommand{\Found}{\mathsf{Found}}
 \newcommand{\Gpd}{\mathsf{Gpd}}
 \newcommand{\SigmaZero}{\Sigma_{0}}
@@ -84,7 +94,7 @@ New York University, NY}
 \maketitle
 
 \begin{abstract}
-We present Axiom Calibration (AxCal), a categorical framework for measuring the axiomatic strength of mathematical theorems via uniformizability and height invariants. Using uniformizability—the invariance of witness constructions across foundations that agree on a core signature—we obtain a practical calculus for logical dependencies. Throughout we work under a mild standing hypothesis on witness families (an extension/restriction condition; see Assumption~\ref{assump:WEP}), and we distinguish fully formalized results from axiomatized and literature-backed ones. 
+We present Axiom Calibration (AxCal), a categorical framework for measuring the axiomatic strength of mathematical theorems via uniformizability and height invariants. Using uniformizability—the invariance of witness constructions across foundations that agree on a core signature—we develop a practical calculus for logical dependencies. Throughout we work under a mild standing hypothesis on witness families (an extension/restriction condition; see \Cref{assump:WEP}), and we distinguish fully formalized results from axiomatized and literature-backed ones. 
 
 We provide complete mathematical proofs and clearly distinguish between fully formalized results (marked \leanok), axiomatized components (marked \leanaxiom), and results cited from literature (marked \leancited). Our main contributions include:
 \begin{enumerate}
@@ -94,7 +104,7 @@ We provide complete mathematical proofs and clearly distinguish between fully fo
 \item Analysis of the Stone Window showing where classical proofs fail constructively
 \end{enumerate}
 
-Our Lean 4 formalization comprises ~15{,}000 lines across 50+ files with 0 sorries in core components. All code is available at \url{https://github.com/AICardiologist/FoundationRelativity}.
+As of tag \texttt{p2-crm-v0.2}, the Lean 4 formalization comprises on the order of $1.5\times 10^4$ lines across 50+ files with 0 sorries in core components. All code is available at \url{https://github.com/AICardiologist/FoundationRelativity}.
 
 \vspace{0.5em}
 \noindent\textbf{Keywords:} Constructive mathematics, reverse mathematics, axiom calibration, Lean formalization\\
@@ -200,7 +210,7 @@ The \emph{pinned signature} $\SigmaZero$ consists of:
 All foundations must interpret these components identically.
 \end{definition}
 
-\begin{definition}[The Category $\Found$] \leanok
+\begin{definition}[The category $\Found$] \leanok
 The category $\Found$ has:
 \begin{itemize}
 \item \textbf{Objects}: Foundations as in Definition \ref{def:foundation}
@@ -273,7 +283,7 @@ admits a conservative right adjoint (``extension'') or, equivalently for our pur
 \end{assumption}
 
 \begin{theorem}[No-Uniformization Principle]\label{thm:no-unif} \leanok
-Assume the Witness Extension Property (Assumption~\ref{assump:WEP}). 
+Assume the Witness Extension Property (\Cref{assump:WEP}). 
 If $\mathcal{C}$ is not uniformizable, then there exist foundations $F \subseteq G$ and a theorem provable in $G$ where:
 \begin{enumerate}
 \item Witnesses exist in $G$ (i.e., $\mathcal{C}(G)$ is non-empty)
@@ -283,7 +293,7 @@ If $\mathcal{C}$ is not uniformizable, then there exist foundations $F \subseteq
 \end{theorem}
 
 \begin{proof}
-Suppose $\mathcal{C}$ is not uniformizable. Then there exist $F \subseteq G$ with inclusion $\iota$ such that the restriction $\rho_\iota:\mathcal{C}(G) \to \mathcal{C}(F)$ is not an equivalence. By Assumption~\ref{assump:WEP}, $\rho_\iota$ admits a conservative right adjoint (extension), hence failure of equivalence forces emptiness below: either $\mathcal{C}(F)=\varnothing$ while $\mathcal{C}(G)\neq\varnothing$, or else essential surjectivity/fully-faithfulness would hold by standard 2-categorical arguments. Thus witnesses exist in $G$ but not in $F$, and the theorem is not provable in $F$.
+Suppose $\mathcal{C}$ is not uniformizable. Then there exist $F \subseteq G$ with inclusion $\iota$ such that the restriction $\rho_\iota:\mathcal{C}(G) \to \mathcal{C}(F)$ is not an equivalence. By \Cref{assump:WEP}, $\rho_\iota$ admits a conservative right adjoint (extension), hence failure of equivalence forces emptiness below: either $\mathcal{C}(F)=\varnothing$ while $\mathcal{C}(G)\neq\varnothing$, or else essential surjectivity/fully-faithfulness would hold by standard 2-categorical arguments. Thus witnesses exist in $G$ but not in $F$, and the theorem is not provable in $F$.
 
 Consequently $\mathcal{C}(G) \neq \emptyset$ while $\mathcal{C}(F) = \emptyset$. This means:
 \begin{itemize}
@@ -324,8 +334,8 @@ or $\infty$ if no such $k$ exists.
 
 To handle independent logical principles, we work with multi-dimensional profiles.
 
-\begin{definition}[Orthogonal Axes]\label{def:orthogonal}
-Logical principles $A_1, \ldots, A_n$ are \emph{orthogonal} if:
+\begin{definition}[Pairwise orthogonal axes]\label{def:orthogonal}
+Logical principles $A_1, \ldots, A_n$ are \emph{pairwise orthogonal} if:
 \begin{enumerate}
 \item No $A_i$ implies any $A_j$ for $i \neq j$ over $\BISH$
 \item No combination of $A_i$'s (excluding $A_j$) implies $A_j$ over $\BISH$
@@ -466,7 +476,7 @@ g(\alpha) = 2^{-\min\{|s| : s \sqsubset \alpha, s \in B\}}
 The key insight is that uniform continuity of $g$ (when transferred via homeomorphism to $[0,1]$) yields a uniform modulus that bounds the bar depth. Specifically, if $g$ has modulus of continuity $\delta(\varepsilon) = 2^{-N}$ for $\varepsilon = 2^{-N-1}$, then every infinite path meets $B$ at depth $\leq N$.
 \end{proof}
 
-\begin{proposition}[WLPO–FT Independence]\label{prop:orthogonal} \leancited
+\begin{proposition}[WLPO–FT independence]\label{prop:orthogonal} \leancited
 WLPO and FT are orthogonal:
 \begin{enumerate}
 \item $\BISH + \WLPO \not\vdash \FT$
@@ -564,7 +574,7 @@ where $\text{supp}(f) = \{n \in \N : f(n) \neq 0\}$.
 \end{definition}
 
 \begin{theorem}[Stone Window — Classical]\label{thm:stone-classical} \leanpartial
-In ZFC, for any Boolean ideal $\mathcal{I}$, the map
+In the classical setting (e.g.\ $\ZFC$), for any Boolean ideal $\mathcal{I}$, the map
 \[
 \Phi_{\mathcal{I}}: \mathcal{P}(\N)/\mathcal{I} \to \text{Idem}(\linf/I_{\mathcal{I}})
 \]
