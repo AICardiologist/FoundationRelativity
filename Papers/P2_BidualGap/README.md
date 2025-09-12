@@ -1,5 +1,12 @@
 # Paper 2: WLPO ↔ Bidual Gap
 
+> ## 🤖 **IMPORTANT DISCLAIMER**
+> ### A Case Study: Using Multi-AI Agents to Tackle Formal Mathematics
+> 
+> **This entire Lean 4 formalization was produced by multi-AI agents working under human direction.** All proofs, definitions, and mathematical structures in this paper were AI-generated. This represents a case study in using multi-AI agent systems to tackle complex formal mathematics problems with human guidance on project direction.
+>
+> The mathematical content has been verified through Lean's proof checker. Users should be aware that the code was AI-generated as part of an experiment in AI-assisted formal mathematics.
+
 ## Overview
 
 Paper 2 calibrates the **existence of a bidual gap** (J_X: X → X** non-surjective for some real Banach space X)
