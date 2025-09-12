@@ -5,7 +5,6 @@ Direct construction: G : (c₀ →L ℝ) →L ℝ via G(f) = ∑ f(e n)
 import Mathlib.Topology.ContinuousMap.ZeroAtInfty
 import Mathlib.Analysis.Normed.Group.InfiniteSum
 import Mathlib.Analysis.Normed.Module.Dual
-import Mathlib.Algebra.BigOperators.Finprod
 import Mathlib.Topology.Algebra.InfiniteSum.Real
 
 noncomputable section
@@ -205,7 +204,6 @@ noncomputable def G : (c₀ →L[ℝ] ℝ) →L[ℝ] ℝ :=
     1
     (fun (f : c₀ →L[ℝ] ℝ) => by
       have hf_abs := summable_abs_eval f
-      have hf_plain := summable_eval f
       have h1 : ‖∑' n, f (e n)‖ ≤ ∑' n, ‖f (e n)‖ := by
         -- norm_tsum_le_tsum_norm requires Summable of norms
         exact norm_tsum_le_tsum_norm hf_abs
