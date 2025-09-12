@@ -10,7 +10,7 @@ import Mathlib.Topology.ContinuousMap.ZeroAtInfty
 import Mathlib.Topology.ContinuousMap.Bounded.Basic
 import Mathlib.Topology.Basic
 import Papers.P2_BidualGap.Basic
-import Papers.P2_BidualGap.CRM_MetaClassical.Ishihara
+import Papers.P2_BidualGap.Constructive.Ishihara
 import Papers.P2_BidualGap.HB.SimpleFacts
 import Papers.P2_BidualGap.HB.DirectDual
 

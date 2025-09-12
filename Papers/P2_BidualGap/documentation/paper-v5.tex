@@ -249,13 +249,12 @@ Concretely, we prove the implication:
   \;\Longrightarrow\;
   \big[\BISH \vdash \WLPO\big].
 \]
-This is standard in reverse mathematics: classical reasoning is used only to
-\emph{extract} the data that a constructive argument can \emph{consume}.
+This is the standard proof strategy in Constructive Reverse Mathematics (CRM), which follows a two-part structure that we frame using a \emph{producer/consumer} analogy \cite{Diener2018}. First, a \emph{classical producer}, operating in a meta-theory, uses non-constructive reasoning to extract a concrete ``witness''---in our case, an Ishihara kernel---from a classical theorem. Second, a \emph{constructive consumer} analyzes this witness using only the logic of the constructive base theory ($\BISH$) to derive a non-constructive principle like $\WLPO$. This pattern is conceptually analogous to models of linear logic that separate the unlimited production of resources from their disciplined consumption \cite{PousZdancewic14}, thereby clarifying how the non-constructive content of a theorem is isolated before its logical strength is measured.
 
 In the formalization, we fence the meta-classical reasoning (witness extraction and
 the case split in $g$) inside a dedicated block, and keep the kernel consumer
 (\emph{Ishihara kernel} $\Rightarrow \WLPO$) intuitionistic. No classical axiom
-is added to the object theory.
+is added to the object theory. This approach follows Ishihara's original pattern for extracting logical principles from functional analysis results \cite{Ishihara90}.
 \end{rem}
 
 \paragraph{Special note (differences from an earlier draft).}
@@ -581,6 +580,11 @@ The Lean 4 theorem prover.
 \bibitem{mathlib}
 The mathlib4 mathematical library.
 \newblock \url{https://github.com/leanprover-community/mathlib4}
+
+\bibitem{PousZdancewic14}
+A.~Pous and S.~Zdancewic.
+\newblock A linear/producer/consumer model of classical linear logic.
+\newblock In \emph{Proceedings of the 29th Annual ACM/IEEE Symposium on Logic in Computer Science (LICS)}, pages 1--10. IEEE, 2014.
 
 \end{thebibliography}
 

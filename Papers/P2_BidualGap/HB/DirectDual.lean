@@ -70,11 +70,19 @@ lemma abs_coeff_le_one (f : c₀ →L[ℝ] ℝ) (n : ℕ) : |coeff f n| ≤ 1 :=
 
 lemma coeff_mul_eval_abs (f : c₀ →L[ℝ] ℝ) (n : ℕ) :
     coeff f n * f (e n) = ‖f (e n)‖ := by
-  by_cases h : f (e n) = 0
-  · simp [coeff, h]
-  · have hnz : ‖f (e n)‖ ≠ 0 := by
-      simpa [Real.norm_eq_abs, h] using (norm_ne_zero_iff.mpr (by exact h))
-    field_simp [coeff, h, hnz, Real.norm_eq_abs, abs_mul, abs_of_pos (norm_pos_iff.mpr (by exact h))]
+  unfold coeff
+  split_ifs with h
+  · simp [h]
+  · -- We have coeff f n = f (e n) / ‖f (e n)‖
+    -- So coeff f n * f (e n) = (f (e n) / ‖f (e n)‖) * f (e n) = f (e n) * f (e n) / ‖f (e n)‖
+    -- We need to show this equals ‖f (e n)‖
+    -- Since f (e n) ≠ 0, we have f (e n) ∈ ℝ \ {0}
+    -- For real numbers: x * x = |x| * |x| = ‖x‖ * ‖x‖
+    have : f (e n) * f (e n) = ‖f (e n)‖ * ‖f (e n)‖ := by
+      simp only [Real.norm_eq_abs]
+      exact (abs_mul_abs_self _).symm
+    rw [div_mul_eq_mul_div, this, mul_div_cancel_left₀]
+    exact norm_ne_zero_iff.mpr h
 
 /-- Finite "sign vector": sum of basis with sign coefficients. -/
 def signVector (f : c₀ →L[ℝ] ℝ) (F : Finset ℕ) : c₀ :=
