@@ -5,7 +5,6 @@ Direct construction: G : (c₀ →L ℝ) →L ℝ via G(f) = ∑ f(e n)
 import Mathlib.Topology.ContinuousMap.ZeroAtInfty
 import Mathlib.Analysis.Normed.Group.InfiniteSum
 import Mathlib.Analysis.Normed.Module.Dual
-import Mathlib.Algebra.BigOperators.Finprod
 import Mathlib.Topology.Algebra.InfiniteSum.Real
 
 noncomputable section
