@@ -42,19 +42,7 @@
 % ---------- Lean repo link ----------
 \newcommand{\leanRepo}{\url{https://github.com/AICardiologist/FoundationRelativity}}
 
-% Define theorem-like environments for article class
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{corollary}[theorem]{Corollary}
-\newtheorem{definition}[theorem]{Definition}
-\newtheorem{remark}[theorem]{Remark}
-
-% Shorthand for compatibility
-\newenvironment{thm}{\begin{theorem}}{\end{theorem}}
-\newenvironment{lem}{\begin{lemma}}{\end{lemma}}
-\newenvironment{cor}{\begin{corollary}}{\end{corollary}}
-\newenvironment{defi}{\begin{definition}}{\end{definition}}
-\newenvironment{rem}{\begin{remark}}{\end{remark}}
+% (Theorem environments already defined above)
 \newcommand{\leanok}{\textsf{\small \textcolor{green!70!black}{✓}}}
 \newcommand{\leanpartial}{\textsf{\small \textcolor{orange!80!black}{◐}}}
 
@@ -150,7 +138,7 @@
 \begin{document}
 
 \begin{abstract}
-We calibrate the logical strength of Banach space non-reflexivity over Bishop-style constructive mathematics (BISH). This phenomenon, where the canonical embedding from a Banach space into its bidual is not surjective, is referred to as a `bidual gap.' We prove its existence is equivalent to the Weak Limited Principle of Omniscience (WLPO). We provide a complete Lean 4 formalization of the equivalence. Beyond the equivalence, we develop constructive finite-dimensional surrogates via Cesàro means and formalize a ``Stone window'' that identifies idempotents in the quotient of bounded sequences by the sequences converging to zero with almost-equality classes of subsets of the natural numbers. Methodologically, we isolate a Prop-level kernel for the ``gap implies WLPO'' direction and a robust treatment of conditional suprema for partial sums. The main equivalence builds without errors; three WLPO-conditional lemmas remain in an optional module about completeness of certain dual spaces and do not affect the main result.
+We calibrate the logical strength of Banach space non-reflexivity over Bishop-style constructive mathematics (BISH). Writing ``bidual gap'' for the failure of surjectivity of the canonical embedding $J_X\!:X\to X^{**}$, we show---\emph{in a classical metatheory}---that over $\BISH$ the following are equivalent: the Weak Limited Principle of Omniscience (WLPO); the existence of a bidual gap for some real Banach space; and, in particular, the non-surjectivity of $J_{\ell^\infty}$. The forward implication is proved by a classical meta-extraction of a small ``Ishihara kernel'' from a gap; the kernel-to-$\WLPO$ step is intuitionistic. Both directions are formalized in Lean~4. We also give constructive, finite-dimensional surrogates via Cesàro means and a ``Stone window'' identifying idempotents of $\ell^\infty/c_0$ with almost-equality classes of subsets of $\mathbb{N}$. These results sharpen the folklore that the bidual gap is ``non-constructive'' by locating it precisely at $\WLPO$ over $\BISH$.
 \end{abstract}
 
 \maketitle
@@ -528,7 +516,7 @@ $\ZFC$ & \emph{Holds} & Hahn--Banach yields witnesses \\
 $\BISH$ & \emph{Equivalent to $\WLPO$} & (Main Theorem) \\
 $\BISH+\DC$ & \emph{Equivalent to $\WLPO$} & $\DC$ does not imply $\WLPO$ \\
 $\BISH+\WLPO$ & \emph{Holds} & by equivalence \\
-$\BISH+\neg\WLPO$ & \emph{Does not hold} & does not imply surjectivity of $J$ \\
+$\BISH+\neg\WLPO$ & \emph{Not derivable in general} & does not imply surjectivity of $J$ \\
 \bottomrule
 \end{tabular}
 \end{center}
