@@ -18,12 +18,68 @@
 -/
 import Mathlib.Analysis.Normed.Module.Dual
 import Mathlib.Analysis.Normed.Group.Completeness
+import Mathlib.Tactic -- for nlinarith, norm_num, etc.
 import Papers.P2_BidualGap.Basic
 import Papers.P2_BidualGap.CRM_MetaClassical.OpNormCore
 
 namespace Papers.P2.Constructive
 open Papers.P2
 open scoped BigOperators
+
+/-!  =========================== Constructive core ============================
+The kernel and the WLPO consumer are **constructive**.  Keep them outside any
+`noncomputable` or `Classical` sections to ensure axiom hygiene.
+-/
+
+-- Lightweight kernel API (constructive)
+structure IshiharaKernel (X : Type _) [NormedAddCommGroup X] [NormedSpace ℝ X] where
+  y     : (X →L[ℝ] ℝ) →L[ℝ] ℝ
+  f     : X →L[ℝ] ℝ
+  g     : (ℕ → Bool) → (X →L[ℝ] ℝ)
+  δ     : ℝ
+  δpos  : 0 < δ
+  /-- Numeric separation: value is either 0 or at least δ in absolute value. -/
+  sep   : ∀ α : ℕ → Bool, |y (f + g α)| = 0 ∨ δ ≤ |y (f + g α)|
+  /-- Logical tie-in (constructive key): "all false" iff the evaluation vanishes. -/
+  zero_iff_allFalse :
+    ∀ α : ℕ → Bool, (∀ n, α n = false) ↔ y (f + g α) = 0
+
+/-- Monomorphic witness package to avoid universe headaches when transporting across files. -/
+structure KernelWitness where
+  X : Type
+  [Xng : NormedAddCommGroup X]
+  [Xns : NormedSpace ℝ X]
+  [Xc  : CompleteSpace X]
+  K : IshiharaKernel X
+attribute [instance] KernelWitness.Xng KernelWitness.Xns KernelWitness.Xc
+
+/-- WLPO consumer: purely intuitionistic. -/
+theorem WLPO_of_kernel
+  {X : Type _} [NormedAddCommGroup X] [NormedSpace ℝ X]
+  (K : IshiharaKernel X) : WLPO := by
+  intro α
+  have h := K.sep α
+  rcases h with h0 | hpos
+  · -- |y(F α)| = 0 ⇒ y(F α) = 0 ⇒ all-false
+    have yz0 : K.y (K.f + K.g α) = 0 := (abs_eq_zero.mp h0)
+    exact Or.inl ((K.zero_iff_allFalse α).mpr yz0)
+  · -- δ ≤ |y(F α)| with δ>0 ⇒ y(F α) ≠ 0 ⇒ not all-false
+    have pos : 0 < |K.y (K.f + K.g α)| := lt_of_lt_of_le K.δpos hpos
+    have hne : K.y (K.f + K.g α) ≠ 0 := by
+      intro yz0; have : |K.y (K.f + K.g α)| = 0 := by simp [yz0]
+      exact (ne_of_gt pos) this
+    have : ¬ (∀ n, α n = false) := by
+      intro hall
+      have yz0 : K.y (K.f + K.g α) = 0 := (K.zero_iff_allFalse α).mp hall
+      exact hne yz0
+    exact Or.inr this
+
+/-- This wrapper matches the delegation used in the main equivalence file:
+    `gap_implies_wlpo` calls `WLPO_of_witness (kernel_from_gap hGap)`. -/
+def WLPO_of_witness (W : KernelWitness) : WLPO :=
+  @WLPO_of_kernel W.X _ _ W.K
+
+/-!  ===================== Classical producer (fenced) ===================== -/
 
 noncomputable section
 
@@ -102,78 +158,7 @@ lemma hasOpNorm_CLF
   (h : X →L[ℝ] ℝ) : OpNorm.HasOpNorm (X:=X) h :=
   OpNorm.hasOpNorm_CLF h
 
-/-
-  Lightweight kernel API for the forward direction.
-  We purposely avoid committing to a particular space such as ℓ¹.
-  The "consumer" only needs: a bidual point `y`, a base functional `f`,
-  a family `g : (ℕ → Bool) → X →L[ℝ] ℝ`, and a gap δ > 0 giving the
-  separation `|y (f + g α)| = 0 ∨ δ ≤ |y (f + g α)|`.
--/
-structure IshiharaKernel (X : Type _) [NormedAddCommGroup X] [NormedSpace ℝ X] where
-  y     : (X →L[ℝ] ℝ) →L[ℝ] ℝ
-  f     : X →L[ℝ] ℝ
-  g     : (ℕ → Bool) → (X →L[ℝ] ℝ)
-  δ     : ℝ
-  δpos  : 0 < δ
-  /-- Numeric separation: value is either 0 or at least δ in absolute value. -/
-  sep   : ∀ α : ℕ → Bool, |y (f + g α)| = 0 ∨ δ ≤ |y (f + g α)|
-  /-- Logical tie-in (constructive key): "all false" iff the evaluation vanishes. -/
-  zero_iff_allFalse :
-    ∀ α : ℕ → Bool, (∀ n, α n = false) ↔ y (f + g α) = 0
-  /-- Normability closure (kept as before). -/
-  closed_add : ∀ α, OpNorm.HasOpNorm (X:=X) (f + g α)
-
-/-- Monomorphic witness package to avoid universe headaches when transporting across files. -/
-structure KernelWitness where
-  X : Type
-  [Xng : NormedAddCommGroup X]
-  [Xns : NormedSpace ℝ X]
-  [Xc  : CompleteSpace X]
-  K : IshiharaKernel X
-
-attribute [instance] KernelWitness.Xng KernelWitness.Xns KernelWitness.Xc
-
-/-- Tiny helper: a threshold test from the separation statement. -/
-lemma kernel_threshold
-  {X : Type} [NormedAddCommGroup X] [NormedSpace ℝ X]
-  (K : IshiharaKernel X) (α : ℕ → Bool) :
-  |K.y (K.f + K.g α)| = 0 ∨ |K.y (K.f + K.g α)| ≥ K.δ :=
-by
-  -- no rewriting is needed: δ ≤ |⋯| is definitionally |⋯| ≥ δ
-  simpa using K.sep α
-
-/-- From a kernel with a uniform positive gap δ, we can define a WLPO decision
-    procedure at the meta level and package it as a proof of WLPO.
-
-    NOTE: The crucial constructive step (turning the real-comparison into a
-    *proof* of WLPO) is concentrated in the axiom below, so downstream code
-    never needs to reason about the details again.
--/
-theorem WLPO_of_kernel
-  {X : Type _} [NormedAddCommGroup X] [NormedSpace ℝ X]
-  (K : IshiharaKernel X) : WLPO := by
-  -- WLPO for Bool-sequences: for every α, either all-false or not-all-false.
-  intro α
-  have h := K.sep α
-  rcases h with h0 | hpos
-  · -- |y(F α)| = 0 ⇒ y(F α) = 0 ⇒ all-false
-    have yz0 : K.y (K.f + K.g α) = 0 := by
-      -- `Real.abs_eq_zero` is `abs_eq_zero.mp`/`.mpr` in mathlib
-      exact abs_eq_zero.mp h0
-    exact Or.inl ((K.zero_iff_allFalse α).mpr yz0)
-  · -- δ ≤ |y(F α)| with δ>0 ⇒ y(F α) ≠ 0 ⇒ not all-false
-    have pos : 0 < |K.y (K.f + K.g α)| := lt_of_lt_of_le K.δpos hpos
-    have hne : K.y (K.f + K.g α) ≠ 0 := by
-      -- if y(F α) = 0 then |…| = 0, contradicting `pos`
-      intro yz0
-      have : |K.y (K.f + K.g α)| = 0 := by simp [yz0]
-      exact (ne_of_gt pos) this
-    -- by the equivalence, y(F α) ≠ 0 implies not all-false
-    have : ¬ (∀ n, α n = false) := by
-      intro hall
-      have yz0 : K.y (K.f + K.g α) = 0 := (K.zero_iff_allFalse α).mp hall
-      exact hne yz0
-    exact Or.inr this
+-- (tiny helper `kernel_threshold` is unnecessary; use `K.sep α` directly)
 
 /-!
 Implementation checklist (forward direction):
@@ -190,11 +175,6 @@ Notes:
 - For the δ-gap, follow the professor's guidance: the key use of "dual is Banach"
   is to ensure sums of normable functionals remain normable (bounded with LUB).
  -/
-
-/-- This wrapper matches the delegation used in the main equivalence file:
-    `gap_implies_wlpo` calls `WLPO_of_witness (kernel_from_gap hGap)`. -/
-def WLPO_of_witness (W : KernelWitness) : WLPO :=
-  @WLPO_of_kernel W.X _ _ W.K
 
 -- Previous approach: Extract an Ishihara kernel from a strong bidual gap.  
 -- This used the point y ∈ X** \ j(X), closedness of j(X), positive distance,  
@@ -218,9 +198,8 @@ theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
   have : ∃ y : (X →L[ℝ] ℝ) →L[ℝ] ℝ, y ∉ Set.range j := by
     -- Sprint C: More direct approach to avoid not_forall.mp
     -- From ¬ surjective j, we get a specific y not in range
-    -- Use Function.Surjective.exists_of_right_inverse or similar
     have : ¬ (∀ y, y ∈ Set.range j) := by
-      simpa [Function.Surjective, Set.range] using hNotSurj
+      simpa [Function.Surjective, Set.mem_range] using hNotSurj
     -- Use push_neg instead of not_forall.mp to be more constructive
     push_neg at this
     exact this
@@ -264,8 +243,8 @@ theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
       have : δ ≤ ‖y hstar‖ := by
         have hnn : 0 ≤ ‖y hstar‖ := norm_nonneg _
         simpa [δ] using half_le_self hnn
-      -- rewrite to abs with Real.norm_eq_abs and unfold f,g
-      simpa [f, g, hall, zero_add, Real.norm_eq_abs] using this
+      -- rewrite to abs and unfold f,g
+      simpa [f, g, hall, zero_add] using this
 
   -- Zero-characterization
   have zero_iff_allFalse : ∀ α, (∀ n, α n = false) ↔ y (f + g α) = 0 := by
@@ -286,21 +265,10 @@ theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
       have : (0 : ℝ) < 0 := by simpa [zero] using pos
       exact lt_irrefl _ this
 
-  -- Normability closure
-  have closed_add : ∀ α, OpNorm.HasOpNorm (X:=X) (f + g α) := by
-    intro α
-    by_cases hall : ∀ n, α n = false
-    · -- f + g α = 0
-      have : OpNorm.HasOpNorm (X:=X) (0 : X →L[ℝ] ℝ) := hasOpNorm_zero
-      simpa [f, g, hall] using this
-    · -- f + g α = hstar
-      have : OpNorm.HasOpNorm (X:=X) hstar := hasOpNorm_CLF (X:=X) hstar
-      simpa [f, g, hall] using this
-
-  -- Conclude WLPO from the kernel package
+  -- Conclude WLPO from the (classically produced) kernel
   exact WLPO_of_kernel (X := X)
     { y := y, f := f, g := g, δ := δ, δpos := δpos
-      sep := sep, zero_iff_allFalse := zero_iff_allFalse, closed_add := closed_add }
+      sep := sep, zero_iff_allFalse := zero_iff_allFalse }
 
 end ClassicalMeta
 

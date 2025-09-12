@@ -36,7 +36,8 @@ lemma valueSet_bddAbove (h : X →L[ℝ] ℝ) : BddAbove (valueSet h) := by
 def HasOpNorm (h : X →L[ℝ] ℝ) : Prop :=
   ∃ N : ℝ, IsLUB (valueSet h) N
 
-/-- Classical: any continuous linear functional has an operator norm as an LUB. -/
+/-- Classical: any continuous linear functional has an operator norm as an LUB.
+    Kept separate so that constructive consumers do not depend on LUB existence. -/
 lemma hasOpNorm_CLF (h : X →L[ℝ] ℝ) : HasOpNorm h := by
   classical
   use sSup (valueSet h)
