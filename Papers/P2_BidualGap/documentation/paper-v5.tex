@@ -1,16 +1,11 @@
 
-% \documentclass{lmcs}  % Uncomment when lmcs.cls is available
-\documentclass[11pt]{article}  % Temporary replacement for testing
-
-% Note: To compile with LMCS journal style:
-% 1. Download lmcs.cls from https://www.lmcs-online.org/ (under Author Guidelines)
-% 2. Place lmcs.cls in the same directory as this .tex file
-% 3. Uncomment the \documentclass{lmcs} line above and comment out \documentclass{article}
-% 4. Uncomment the LMCS-specific author commands below and comment out the article version
+\documentclass[11pt]{article}
 
 % ------------------------------------------------------------
-% Minimal, LMCS-friendly preamble (no hyperref/lmodern/geometry)
+% Standard LaTeX packages
 % ------------------------------------------------------------
+\usepackage[margin=1in]{geometry}
+\usepackage{lmodern}
 \usepackage{amsmath,amssymb,mathtools}
 \usepackage[american]{babel}
 \usepackage{stmaryrd}
@@ -23,21 +18,16 @@
 \usepackage{graphicx}
 \usepackage{array}
 \usepackage{mdframed}
-\usepackage{url}  % Added for \url command
+\usepackage{url}
+% hyperref should typically come last
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 
-% Define theorem-like environments for article class (remove when using lmcs.cls)
+% Define theorem-like environments
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{remark}[theorem]{Remark}
-
-% Shorthand for compatibility
-\newenvironment{thm}{\begin{theorem}}{\end{theorem}}
-\newenvironment{lem}{\begin{lemma}}{\end{lemma}}
-\newenvironment{cor}{\begin{corollary}}{\end{corollary}}
-\newenvironment{defi}{\begin{definition}}{\end{definition}}
-\newenvironment{rem}{\begin{remark}}{\end{remark}}
 
 % ---------- Lean repo link ----------
 \newcommand{\leanRepo}{\url{https://github.com/AICardiologist/FoundationRelativity}}
@@ -121,17 +111,11 @@
 \lstset{style=leanstyle}
 
 % ---------- Title and author ----------
-% For LMCS class:
-% \title[The Bidual Gap and WLPO]{The Bidual Gap and WLPO: Complete Characterization and Formalization}
-% \author[P.~C.-K.~Lee]{Paul Chun-Kit Lee}
-% \address{New York University}
-% \email{paul.lee@nyu.edu} % TODO: Replace with actual email
-% \thanks{Lean 4 formalization available at \leanRepo. Code archive available at Zenodo: DOI \texttt{10.5281/zenodo.17107493}.}
-
-% For standard article class (temporary):
 \title{The Bidual Gap and WLPO: A Constructive Calibration of Banach Space Non-Reflexivity}
-\author{Paul Chun-Kit Lee\thanks{Lean 4 formalization available at \leanRepo. Code archive available at Zenodo: DOI \texttt{10.5281/zenodo.17107493}.} \\ New York University \\ \texttt{paul.lee@nyu.edu}}
-\date{}
+\author{Paul Chun-Kit Lee\thanks{Lean 4 formalization available at \leanRepo. Code archive available at Zenodo: DOI \texttt{10.5281/zenodo.17107493}.} \\ 
+New York University \\ 
+\texttt{paul.lee@nyu.edu}}
+\date{\today}
 
 \begin{document}
 
@@ -402,10 +386,10 @@ $\textsf{BISH} \vdash \textsf{BidualGapStrong} \Rightarrow \WLPO$.
 \item \textbf{Repository}: \leanRepo
 \item \textbf{Lean toolchain}: \texttt{leanprover/lean4:v4.22.0-rc4}
 \item \textbf{mathlib4 commit}: \texttt{59e4fba0c656457728c559a7d280903732a6d9d1}
-\item \textbf{Project tag}: \texttt{v1.0-lmcs} / commit \texttt{e3b06612d8ce75ad60988ed2279194d08a7ae6fb}
+\item \textbf{Project tag}: \texttt{p2-crm-v0.2} / commit \texttt{85f69aa}
 \item \textbf{Build}: \texttt{lake exe cache get \&\& lake build} \\
       top-level target: \texttt{Papers.P2\_BidualGap.gap\_equiv\_wlpo}
-\item \textbf{Code Archive DOI}: \texttt{10.5281/zenodo.17107493}
+\item \textbf{Artifact DOI}: \texttt{10.5281/zenodo.17107493}
 \item \textbf{Status}: The main equivalence builds with 0 errors. Three WLPO-conditional lemmas remain in the optional module \texttt{DualIsometriesComplete.lean} concerning completeness of certain dual spaces; they do not affect the main equivalence.
 \end{itemize}
 \end{mdframed}
