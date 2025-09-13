@@ -1014,4 +1014,119 @@ The contradiction ``$G=J_{c_0}(x)\Rightarrow x=(1,1,\dots)\notin c_0$'' is prove
 \medskip
 This establishes that the Lean development in \texttt{DirectDual.lean} exactly represents the handwritten theorem and proof structure, with each mathematical step mirrored by a named Lean definition or lemma and no elided reasoning.
 
+\appendix
+\section{Meta-Classical Witness Extraction and the Producer/Consumer Analogy}
+\label{app:MetaWitnessPC}
+
+This appendix explains the proof architecture in standard Constructive Reverse Mathematics (CRM) terms and clarifies the intended role of the producer/consumer metaphor.
+
+\subsection*{A. CRM terminology and proof shape}
+
+In CRM one typically proves implications of the form
+\[
+\text{(classically)}\qquad \big[\mathsf{BISH} \vdash \mathsf{Thm}\big] \;\Longrightarrow\; \big[\mathsf{BISH} \vdash \mathsf{Prin}\big],
+\]
+where the \emph{meta-proof} is classical, but the \emph{object-level} target theory is $\mathsf{BISH}$ (intuitionistic). The standard two-stage pattern is:
+\begin{enumerate}
+\item \textbf{Meta-classical witness extraction.}
+Working in classical logic \emph{about} $\mathsf{BISH}$, use the assumed theorem to \emph{produce} a concrete mathematical \emph{witness} (sometimes called a \emph{test object}) whose existence is provable in $\mathsf{BISH}$ and whose properties will be sufficient to derive the target principle.
+\item \textbf{Constructive consumption.}
+Still inside $\mathsf{BISH}$ (no classical axioms), \emph{consume} only the abstract properties of that witness to derive the logical principle.
+\end{enumerate}
+
+Formally, the meta-argument composes two $\mathsf{BISH}$-internal arrows:
+\[
+\mathsf{BISH} \vdash \big(\mathsf{Thm} \Rightarrow \exists W\,.\,\mathsf{Adequate}(W)\big)
+\quad\text{and}\quad
+\mathsf{BISH} \vdash \big(\mathsf{Adequate}(W)\Rightarrow \mathsf{Prin}\big).
+\]
+The first arrow is \emph{proved} meta-classically; the second arrow is proved intuitionistically. (See \cite{Ishihara06,DienerCRM,Ishihara90} for surveys and examples of this pattern.)
+
+\subsection*{B. The witness schema used in this paper}
+
+In our setting the witness is an \emph{Ishihara-style test object} with a sharp \emph{dichotomy} and a \emph{decision} property:
+\begin{itemize}
+\item A Banach-analytic package $W=(y,f,g,\delta)$ such that for each binary sequence $\alpha$,
+\[
+\big|y(f + g(\alpha))\big| = 0 \;\;\text{or}\;\; \delta \le \big|y(f + g(\alpha))\big|
+\]
+\[\text{and}\qquad
+\big(\forall n,\,\alpha(n)=0\big)\ \Leftrightarrow\ y(f + g(\alpha))=0.
+\]
+\item The consumer (\S\ref{sec:lean}, App.~\ref{app:DirectDualCorrespondence}) shows \emph{constructively} that this suffices to decide each WLPO instance $\alpha$.
+\end{itemize}
+
+The only logically delicate step is the \emph{extraction} of $W$ from a gap witness in the bidual, where one (i) chooses $y\in X^{**}\setminus J(X)$, (ii) obtains $h^\star\in X^\ast$ with $|y(h^\star)|>\tfrac12|y|$, and (iii) defines $g(\alpha)$ by a global case split on the undecidable predicate $(\forall n, \alpha(n)=0)$. As is standard in CRM, that case split happens in the \emph{meta-classical} part, while the consumer uses only the abstract properties of $W$ and remains intuitionistic. Compare \cite{Ishihara90} for earlier uses of such dichotomy-style witnesses and \cite{DienerCRM} for a general CRM perspective; see also \cite{BrownSimpson86} for related calibrations around Hahn--Banach.
+
+\subsection*{C. How this is organized in Lean (axiom hygiene)}
+
+We make this separation \emph{mechanical}:
+\begin{itemize}
+\item \textbf{Producer (meta-classical block).}
+In the file \texttt{CRM\_MetaClassical/Ishihara.lean}, the witness $W$ is extracted inside a fenced section
+\begin{center}
+\texttt{noncomputable section}\quad\texttt{section ClassicalMeta}\quad\texttt{open Classical}
+\end{center}
+which licenses classical reasoning needed for choice and global case splits.
+\item \textbf{Consumer (constructive block).}
+The theorem \texttt{WLPO\_of\_kernel} (App.\ref{app:DirectDualCorrespondence}, Listing\ref{lst:consumer}) lives \emph{outside} any classical section and uses no classical axioms:
+\begin{verbatim}
+#print axioms WLPO_of_kernel
+-- (no axioms)
+\end{verbatim}
+\item \textbf{Audit (meta composition).}
+The bridge \texttt{WLPO\_of\_gap} composes the two $\mathsf{BISH}$-internal arrows and reports exactly the expected meta-classical footprint:
+\begin{verbatim}
+#print axioms WLPO_of_gap
+-- [propext, Classical.choice, Quot.sound]
+\end{verbatim}
+\end{itemize}
+
+This confirms the intended CRM architecture: only the extraction uses classical logic; the consumption is purely constructive.
+
+\subsection*{D. The producer/consumer analogy---useful, but just an analogy}
+
+The terms ``producer'' and ``consumer'' are \emph{not} standard CRM jargon; they are metaphors we use to communicate the separation of concerns:
+\begin{itemize}
+\item The producer is the meta-classical routine that \emph{produces} a witness $W$ from the assumed theorem (here, the bidual gap).
+\item The consumer is the constructive routine that \emph{consumes} only the abstract API of $W$ to derive the target principle (here, WLPO).
+\end{itemize}
+
+This is an explanatory overlay on the standard witness-extraction pattern in CRM; our paper and code use the precise terms \emph{meta-classical witness extraction} and \emph{constructive consumption} as the primary terminology and ``producer/consumer'' only as a helpful guide.
+
+\paragraph{Relation to linear-logic intuitions (optional).}
+There is a useful conceptual parallel to resource sensitivity in linear logic: meta-classical inferences (strong resources) are confined to the extraction phase, while the consumer manipulates only the \emph{type} of $W$ (its API) using constructive rules. We do not rely on any linear-logic machinery; the connection is heuristic and pedagogical.
+
+\subsection*{E. How others use the same mechanism}
+\begin{itemize}
+\item \textbf{Ishihara (1990):} Uses an Ishihara-style dichotomy witness to calibrate variants of Hahn--Banach and omniscience principles, deriving WLPO-level consequences from analytic hypotheses \cite{Ishihara90}.
+\item \textbf{Brown--Simpson (1986):} Calibrate set-existence axioms needed for separable Hahn--Banach, a closely related program in classical reverse mathematics \cite{BrownSimpson86}.
+\item \textbf{Diener (CRM overview):} Describes the general two-stage CRM pattern (extract a witness/test object classically; analyze it constructively) across many examples \cite{DienerCRM}.
+\end{itemize}
+
+Our development follows this well-trodden schema: the specific \emph{shape} of $W$ is tailored to the bidual-gap setting (the ``Ishihara-style kernel'' used here), but the methodology is the standard CRM pattern of witness extraction and constructive consumption.
+
+\subsection*{F. Minimal formal schema (for readers comparing paper and code)}
+
+\begin{center}
+\fbox{\begin{minipage}{0.9\textwidth}
+\textbf{Meta-classical step (witness extraction).}
+\[
+\text{(classically)}\quad
+\mathsf{BISH} \vdash \Big(\mathsf{Gap}\ \Rightarrow\ \exists W\,.\,\mathsf{Adequate}(W)\Big)
+\]
+\textbf{Constructive step (witness consumption).}
+\[
+\mathsf{BISH} \vdash \Big(\mathsf{Adequate}(W)\ \Rightarrow\ \mathsf{WLPO}\Big)
+\]
+\textbf{Composition (CRM conclusion).}
+\[
+\text{(classically)}\quad
+\mathsf{BISH} \vdash \big(\mathsf{Gap}\ \Rightarrow\ \mathsf{WLPO}\big).
+\]
+\end{minipage}}
+\end{center}
+
+In our formalization, the first arrow is implemented in \texttt{Ishihara.lean} (producer block) and the second arrow is \texttt{WLPO\_of\_kernel} (consumer block). App.~\ref{app:DirectDualCorrespondence} explains how the direct dual construction (\texttt{DirectDual.lean}) supplies the complementary witness $G$ used for the reverse direction.
+
 \end{document}
