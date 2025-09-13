@@ -855,4 +855,163 @@ Finally, we can verify the axiom usage as discussed in Section~\ref{sec:axioms}:
 
 The output confirms that the constructive consumer (\texttt{WLPO\_of\_kernel}) uses no classical axioms, while the meta-classical producer (\texttt{WLPO\_of\_gap}) requires classical choice. This validates our CRM methodology claim that the consumer remains purely constructive.
 
+% ===========================================================
+\section{Code--Theorem Correspondence for the Direct Dual Construction}
+% ===========================================================
+\label{app:DirectDualCorrespondence}
+
+This appendix explains how the Lean file
+\[
+\texttt{Papers/P2\_BidualGap/HB/DirectDual.lean}
+\]
+formalizes the standard ``direct construction'' used in the reverse direction (WLPO $\Rightarrow$ Gap) and in the classical non--reflexivity argument for $c_0$. Concretely, the file builds a bounded linear functional
+\[
+G : (c_0^\ast) \to \mathbb R
+\qquad\text{via}\qquad
+G(f)\;=\;\sum_{n=0}^\infty f(e_n),
+\]
+and proves that $G(\delta_m)=1$ for all $m$. From this, one derives that $G$ cannot be represented by evaluation at any $x\in c_0$, whence the canonical embedding $J_{c_0}:c_0\to c_0^{\ast\ast}$ is not surjective. The last step is carried out in the file that imports this construction (see remark at the end of this appendix).
+
+\subsection*{A. The target theorem (mathematical form)}
+
+\begin{mdframed}[backgroundcolor=gray!5,linewidth=0pt]
+\textbf{Theorem (Direct dual witness for non-surjectivity of $J_{c_0}$).}
+Define $G:(c_0^\ast)\to\mathbb{R}$ by $G(f)=\sum_{n} f(e_n)$, where $e_n\in c_0$ is the $n$-th standard basis vector and the series is absolutely convergent. Then for every $m$,
+\[
+G(\delta_m)=1.
+\]
+Consequently, if $G=J_{c_0}(x)$ for some $x\in c_0$, then $x_m=G(\delta_m)=1$ for all $m$, contradicting $x\in c_0$. Hence $G\notin \mathrm{im}(J_{c_0})$ and $J_{c_0}$ is not surjective.
+\end{mdframed}
+
+This is the classical ``basis/coordinate'' argument: the values of $G$ on the coordinate functionals force the representing vector to be the constant sequence $(1,1,\dots)$, which is not in $c_0$.
+
+\subsection*{B. Modeling choices and core definitions (Lean $\leftrightarrow$ mathematics)}
+
+We model $c_0$ over the discrete space $\mathbb N$ using the standard mathlib type:
+
+\begin{center}
+\begin{tabular}{p{0.44\textwidth} p{0.52\textwidth}}
+\toprule
+\textbf{Lean artifact} & \textbf{Mathematical meaning}\\
+\midrule
+\verb|abbrev c₀ := ZeroAtInftyContinuousMap ℕ ℝ|
+& $c_0=\{x:\mathbb N\to\mathbb R : x_n\to 0\}$ with $\|\cdot\|_\infty$ \\[2pt]
+\verb|def e (n : ℕ) : c₀ := …|
+& Basis vector $e_n$ ($1$ at $n$, $0$ elsewhere); tends to $0$ outside the singleton $\{n\}$ \\[2pt]
+\verb|def δ (n : ℕ) : c₀ →L[ℝ] ℝ := …|
+& Coordinate evaluation $\delta_n(x)=x_n$, a bounded linear functional \\[2pt]
+\verb|def coeff …|
+& Scalar $\mathrm{coeff}(f,n) = f(e_n)/\|f(e_n)\|$ (or $0$ if $f(e_n)=0$) \\[2pt]
+\verb|def signVector …|
+& Finite ``sign vector'' $\sum_{n\in F}\mathrm{coeff}(f,n)\,e_n \in c_0$ \\[2pt]
+\verb|noncomputable def G …|
+& $G(f)=\sum_n f(e_n)$ as a continuous linear functional on $c_0^\ast$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The choice \verb|ZeroAtInftyContinuousMap ℕ ℝ| is mathlib's canonical $c_0$; it is isometrically the usual Banach space of real sequences tending to $0$. The proof uses the built--in sup--norm via the map \verb|toBCF| into \verb|BoundedContinuousFunction|.
+
+\subsection*{C. The ``finite signs'' inequality $\sum_{n\in F}\|f(e_n)\|\le \|f\|$}
+
+The core analytic estimate is proved exactly as on paper, using ``sign vectors'':
+\[
+x_F:=\sum_{n\in F}\mathrm{coeff}(f,n)\,e_n,\qquad \|x_F\|_\infty\le 1,\qquad
+f(x_F)=\sum_{n\in F}\|f(e_n)\|.
+\]
+In Lean this is the lemma:
+\begin{itemize}
+\item \verb|lemma finite_sum_bound … : ∑ n∈F ‖f (e n)‖ ≤ ‖f‖|,
+\end{itemize}
+which follows from:
+\begin{itemize}
+\item \verb|lemma abs_coeff_le_one …| (the sign coefficients have absolute value $\le 1$),
+\item \verb|lemma signVector_norm_le_one …| ($\|x_F\|\le 1$),
+\item \verb|lemma coeff_mul_eval_abs …| ($\mathrm{coeff}(f,n)\cdot f(e_n)=\|f(e_n)\|$).
+\end{itemize}
+The proof path is the textbook argument and matches the handwritten derivation line--by--line.
+
+\subsection*{D. Absolute summability and definition of $G$}
+
+From the finite--sum bound, Lean derives the absolute summability of $n\mapsto f(e_n)$:
+\begin{itemize}
+\item \verb|lemma summable_abs_eval … : Summable (λ n, ‖f (e n)‖)|,
+\end{itemize}
+and hence summability of $n\mapsto f(e_n)$:
+\begin{itemize}
+\item \verb|lemma summable_eval … : Summable (λ n, f (e n))|.
+\end{itemize}
+With this, the series defining $G$ exists and is used to build a continuous linear map:
+\begin{itemize}
+\item \verb|noncomputable def G : (c₀ →L[ℝ] ℝ) →L[ℝ] ℝ := …|,
+\end{itemize}
+together with the operator--norm bound
+\[
+\|G(f)\|\ \le\ \sum_n \|f(e_n)\|\ \le\ \|f\|,
+\]
+encoded in the Lipschitz proof obligation for \verb|LinearMap.mkContinuous|.
+
+\subsection*{E. Computing $G(\delta_m)=1$}
+
+The key computation is:
+\begin{itemize}
+\item \verb|lemma G_delta (m : ℕ) : G (δ m) = 1|.
+\end{itemize}
+Mathematically, $(\delta_m)(e_n)=\mathbf 1_{n=m}$, so the series is the sum of a single $1$. The Lean proof implements exactly this: it identifies the (finite) support of $n\mapsto \delta_m(e_n)$, reduces the $\mathsf{tsum}$ to a finite sum over $\{m\}$, and computes it to be $1$.
+
+\subsection*{F. From $G(\delta_m)=1$ to the non-surjectivity of $J_{c_0}$}
+
+The last step is a purely formal consequence. If $G=J_{c_0}(x)$ for some $x\in c_0$, then
+\[
+x_m \;=\; J_{c_0}(x)(\delta_m) \;=\; G(\delta_m)\;=\;1 \quad\text{for all }m,
+\]
+so $x=(1,1,\dots)\notin c_0$. Therefore $G\not\in \mathrm{im}(J_{c_0})$. In the repository this implication is proven in the file that imports \texttt{DirectDual.lean} (see the lemma named along the lines of \texttt{c0\_not\_reflexive\_via\_direct} in \texttt{HB/WLPO\_to\_Gap\_HB.lean}), where the contradiction is discharged using the evaluation identity $J_{c_0}(x)(\delta_m)=x_m$.
+
+\medskip
+\noindent\emph{Conclusion.} The sequence of Lean lemmas \texttt{finite\_sum\_bound} $\Rightarrow$ \texttt{summable\_eval} $\Rightarrow$ definition of \texttt{G} $\Rightarrow$ \texttt{G\_delta} formalizes the standard analytical argument and yields the intended witness $G\in c_0^{\ast\ast}\setminus\mathrm{im}(J_{c_0})$ once paired with the short evaluation argument above.
+
+\subsection*{G. Axiom profile and scope}
+
+The file begins with \verb|noncomputable section| and \verb|open Classical| because mathlib's infinite--sum API (\verb|tsum|) and some norm inequalities live in the classical namespace. No additional axioms are introduced by the definitions and lemmas in \texttt{DirectDual.lean}; the construction uses only:
+\begin{itemize}
+\item the discrete--space model for $c_0$ (\verb|ZeroAtInftyContinuousMap|),
+\item basic sup--norm bounds via \verb|BoundedContinuousFunction|,
+\item standard series facts (\verb|Summable|, \verb|tsum|),
+\item linearity and operator--norm estimates for continuous linear maps.
+\end{itemize}
+
+For reproducibility, an axiom audit can be inspected with:
+\begin{lstlisting}[language={},numbers=none]
+#print axioms Papers.P2.HB.G
+#print axioms Papers.P2.HB.G_delta
+#print axioms Papers.P2.HB.finite_sum_bound
+\end{lstlisting}
+which (on our build) report no extra axioms beyond classical logic used by mathlib's series machinery.
+
+\subsection*{H. Minimal crosswalk (code $\leftrightarrow$ paper)}
+
+\begin{center}
+\begin{tabular}{@{}p{0.44\textwidth} p{0.52\textwidth}@{}}
+\toprule
+\textbf{Lean name (this file)} & \textbf{Paper step} \\
+\midrule
+\verb|abbrev c₀| & $c_0$ as sequences $\to 0$ with $\|\cdot\|_\infty$ \\
+\verb|def e (n)| & Basis vector $e_n$ \\
+\verb|def δ (n)| & Coordinate functional $\delta_n$ \\
+\verb|def coeff|, \verb|def signVector| & Sign--vector device for Hölder--type bound \\
+\verb|lemma finite_sum_bound| & $\sum_{n\in F}\|f(e_n)\|\le \|f\|$ \\
+\verb|lemma summable_abs_eval|, \verb|summable_eval| & Absolute summability of $n\mapsto f(e_n)$ \\
+\verb|noncomputable def G| & $G(f)=\sum_n f(e_n)$, linear and bounded \\
+\verb|lemma G_delta| & $G(\delta_m)=1$ \\
+\textit{(importing file)} & Conclude $G\notin \mathrm{im}(J_{c_0})$ and so $J_{c_0}$ not surjective \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Where the final contradiction is discharged.}
+The contradiction ``$G=J_{c_0}(x)\Rightarrow x=(1,1,\dots)\notin c_0$'' is proved in the file that imports this module (Section~\ref{sec:lean}; see the lemma titled \emph{c_0 is not reflexive via direct construction}). That lemma uses only the two facts exported here: the definition of $G$ and $G(\delta_m)=1$ for all $m$.
+
+\medskip
+This establishes that the Lean development in \texttt{DirectDual.lean} exactly represents the handwritten theorem and proof structure, with each mathematical step mirrored by a named Lean definition or lemma and no elided reasoning.
+
 \end{document}
