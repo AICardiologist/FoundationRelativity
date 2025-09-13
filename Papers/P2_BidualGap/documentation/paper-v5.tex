@@ -124,7 +124,7 @@ New York University \\
 \begin{abstract}
 Over Bishop-style constructive mathematics (\BISH), we identify the exact logical strength of a familiar non-reflexivity phenomenon in Banach space theory. Working in a classical meta-theory, we prove that the following are equivalent over \BISH: the Weak Limited Principle of Omniscience (\WLPO); the non-surjectivity of the canonical embedding $J_{\ell^\infty}:\ell^\infty\to(\ell^\infty)^{**}$; and the existence of a real Banach space with a bidual gap. 
 
-This equivalence builds on and refines earlier connections between variants of Hahn--Banach and omniscience principles in constructive reverse mathematics (e.g.\ Ishihara; Bridges--Richman; Diener) by isolating the \emph{bare bidual-gap statement} and showing it sits precisely at \WLPO. Our Lean~4 development separates the (meta-classical) witness-extraction step from the (constructive) analysis that derives \WLPO from an abstract kernel, making the logical hygiene explicit. We also include a constructively careful account of the Boolean algebra of idempotents in $\ell^\infty/c_0$ (``Stone window'') and finite-dimensional surrogates via Cesàro means. 
+This equivalence builds on and refines earlier connections between variants of Hahn--Banach and omniscience principles in constructive reverse mathematics (e.g.\ work of Ishihara; Bridges--Richman; and surveys such as Diener) by isolating the \emph{bare bidual-gap statement} and locating it precisely at \WLPO. Our Lean~4 development separates the (meta-classical) witness-extraction step from the (constructive) analysis that derives \WLPO from an abstract kernel, making the logical hygiene explicit. We also include a constructively careful account of the Boolean algebra of idempotents in $\ell^\infty/c_0$ (a ``Stone window'') and finite-dimensional surrogates via Ces\`{a}ro means. 
 
 We view the contribution as modest but useful: to place a classically standard fact at an exact level in \CRM, and to provide a machine-checked record that may serve future calibrations.
 \end{abstract}
@@ -138,7 +138,7 @@ We view the contribution as modest but useful: to place a classically standard f
 \section{Introduction: Non-reflexivity, Constructivity, and Logical Strength}
 % ===========================================================
 
-For a Banach space $X$, the canonical embedding $J_X:X\to X^{**}$ maps $x$ to evaluation at $x$. Classically, many spaces fail to be reflexive (i.e.\ $J_X$ is not surjective); for example, $\ell^\infty$ is non-reflexive via Hahn--Banach. In Bishop-style constructive mathematics (\BISH), however, the status of such facts can depend on additional logical principles. It is therefore natural, in the spirit of constructive reverse mathematics (\CRM), to ask for the \emph{precise} logical strength of non-reflexivity statements over \BISH.
+For a Banach space $X$, the canonical embedding $J_X:X\to X^{**}$ maps $x$ to evaluation at $x$. Classically, many spaces fail to be reflexive (i.e.\ $J_X$ is not surjective); for example, $\ell^\infty$ is non-reflexive via Hahn--Banach. In Bishop-style constructive mathematics (\BISH), however, the status of such facts can depend on additional logical principles. It is therefore natural, in the spirit of constructive reverse mathematics (\CRM), to ask for the \emph{precise} logical strength of non-reflexivity statements over \BISH. We emphasize that nothing here alters the classical status of these results; the point is to describe their exact logical strength \emph{over \BISH} and to record clean proofs with explicit axiom boundaries.
 
 Building on prior work that relates forms of Hahn--Banach to omniscience principles (notably Ishihara's calibration results and subsequent surveys), we prove that, over \BISH, the following are equivalent: \WLPO; non-surjectivity of $J_{\ell^\infty}$; and the existence of a real Banach space with a bidual gap. Our aim is modest: to make explicit, and to formalize in Lean~4, a calibration that we have not found written down in this exact form, and to present it with careful separation between meta-classical witness extraction and constructive analysis.
 
@@ -155,7 +155,7 @@ This paper fits into a line of results locating analytic theorems over \BISH\ at
 
 \item \textbf{Classical reverse mathematics.} Brown--Simpson~\cite{BrownSimpson86} analyzed set-existence strength behind analytic theorems in the classical base theory. Our use of a two-stage argument (meta extraction, internal analysis) mirrors that methodology in a constructive setting.
 
-\item \textbf{Non-reflexivity folklore.} That $\ell^\infty$ is non-reflexive is a textbook fact (e.g.\ \cite{AlbiacKalton16}). The \emph{logical} content of the \emph{bare non-reflexivity statement} over \BISH\ appears not to have been recorded explicitly; our contribution is to formulate and verify the bi-implication with \WLPO.
+\item \textbf{Non-reflexivity folklore.} That $\ell^\infty$ is non-reflexive is a textbook fact (e.g.\ \cite{ConwayFA,Megginson98,AlbiacKalton16}). The \emph{logical} content of the \emph{bare non-reflexivity statement} over \BISH\ appears not to have been recorded explicitly; our contribution is to formulate and verify the bi-implication with \WLPO. To our knowledge, the equivalence between the bare non-reflexivity statements (for $\ell^\infty$ and ``$\exists X$'') and \WLPO over \BISH\ has not been recorded explicitly; we regard the present contribution as making that calibration precise and verifiable.
 \end{itemize}
 
 Compared with the literature above, our novelty lies in identifying the exact logical strength of \emph{non-surjectivity of $J_{\ell^\infty}$ and the existence of a bidual gap} (rather than particular extension/separation schemes) exactly at \WLPO, and in making the meta-classical/constructive separation explicit and machine-checked.
@@ -182,6 +182,8 @@ Over $\BISH$, the following are equivalent:
 \end{enumerate}
 Moreover, this equivalence is fully formalized in Lean~4 (see Section~\ref{sec:lean}).
 \end{thm}
+
+\noindent\emph{Scope.} Throughout, ``over \BISH'' means that the implication is derivable in \BISH; the meta-proof certifying the derivation may use classical reasoning (see Remark~\ref{rem:meta-classical}).
 
 Our contributions are:
 \begin{enumerate}[label=\arabic*.]
@@ -219,7 +221,7 @@ Given $\alpha$, compute $s=|y(f+g(\alpha))|$. By dichotomy, either $s=0$ or $s\g
 \end{proof}
 
 \begin{thm}[Gap implies $\WLPO$ (meta-classical)]\label{thm:gap-implies-wlpo}
-Working in a classical metatheory: if some Banach space $X$ has $J:X\to X^{**}$ not surjective, 
+Working in a classical meta-theory: if some Banach space $X$ has $J:X\to X^{**}$ not surjective, 
 then $\WLPO$ holds over $\BISH$.
 \end{thm}
 
@@ -399,8 +401,10 @@ This separation can be mechanically verified in Lean:
 -- [propext, Classical.choice, Quot.sound]
 \end{lstlisting}
 
-The result properly demonstrates that in a classical metatheory, 
+The result properly demonstrates that in a classical meta-theory, 
 $\textsf{BISH} \vdash \textsf{BidualGapStrong} \Rightarrow \WLPO$.
+
+This mechanical separation is not mathematically deep, but it reduces the risk of inadvertently importing classical reasoning into the constructive core.
 
 \subsection{Reproducibility information}
 
@@ -541,14 +545,14 @@ The Lean development clarified axiom usage, suggested robust approaches to condi
 
 \subsection{Conclusion}
 
-We establish and formalize that detecting the bidual gap has exactly the logical strength of $\WLPO$ over $\BISH$. Finite constructive surrogates illuminate the obstruction at the infinite limit. The approach integrates constructive analysis, reverse mathematics, and mechanized verification.
+We establish and formalize that detecting the bidual gap has exactly the logical strength of $\WLPO$ over $\BISH$. Finite constructive surrogates illuminate the obstruction at the infinite limit. The approach integrates constructive analysis, reverse mathematics, and mechanized verification. We do not address stronger choice principles, nor do we attempt to calibrate other classical non-reflexivity phenomena; our focus here is solely the bidual-gap statements above.
 
 \section*{Acknowledgments}
 
 We are indebted to the constructive analysis and reverse mathematics communities for the conceptual groundwork: in particular E.~Bishop, D.~S.~Bridges, F.~Richman, and H.~Ishihara, and to surveys such as Diener's overview of constructive reverse mathematics. Discussions in the Lean and mathlib communities shaped the formalization style. Any remaining mistakes are the author's alone.
 
 \smallskip
-\noindent\textbf{AI/Tooling disclosure.} The Lean code and parts of the prose benefited from standard programming assistants (e.g.\ GPT-5 Pro, Gemini, Claude) under human supervision. All mathematical claims were reviewed by the author and are machine-checked by Lean~4. Any errors are the author's responsibility.
+\noindent\textbf{AI/Tooling disclosure.} The Lean code and parts of the prose benefited from standard programming assistants (e.g.\ GPT-5 Pro, Gemini, Claude) under human supervision. All mathematical claims were reviewed by the author and have been machine-checked by Lean~4. Any errors are the author's responsibility.
 
 \bibliographystyle{alphaurl}
 \begin{thebibliography}{10}
@@ -1039,7 +1043,6 @@ The contradiction ``$G=J_{c_0}(x)\Rightarrow x=(1,1,\dots)\notin c_0$'' is prove
 \medskip
 This establishes that the Lean development in \texttt{DirectDual.lean} exactly represents the handwritten theorem and proof structure, with each mathematical step mirrored by a named Lean definition or lemma and no elided reasoning.
 
-\appendix
 \section{Meta-Classical Witness Extraction and the Producer/Consumer Analogy}
 \label{app:MetaWitnessPC}
 
@@ -1154,7 +1157,6 @@ Our development follows this well-trodden schema: the specific \emph{shape} of $
 
 In our formalization, the first arrow is implemented in \texttt{Ishihara.lean} (producer block) and the second arrow is \texttt{WLPO\_of\_kernel} (consumer block). App.~\ref{app:DirectDualCorrespondence} explains how the direct dual construction (\texttt{DirectDual.lean}) supplies the complementary witness $G$ used for the reverse direction.
 
-\appendix
 \section{WLPO $\Rightarrow$ Bidual Gap via Direct Dual Witness $G$}
 \label{app:WLPOtoGap-Direct}
 
