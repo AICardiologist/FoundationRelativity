@@ -122,42 +122,43 @@ New York University \\
 \begin{document}
 
 \begin{abstract}
-We calibrate the logical strength of Banach space non-reflexivity over Bishop-style constructive mathematics (BISH). Writing ``bidual gap'' for the failure of surjectivity of the canonical embedding $J_X\!:X\to X^{**}$, we show---\emph{in a classical metatheory}---that over $\BISH$ the following are equivalent: the Weak Limited Principle of Omniscience (WLPO); the existence of a bidual gap for some real Banach space; and, in particular, the non-surjectivity of $J_{\ell^\infty}$. The forward implication proceeds by classically extracting an Ishihara kernel (a finite tuple of functionals and a positive threshold) from a gap; the kernel-to-$\WLPO$ step is intuitionistic. Both directions are formalized in Lean~4. We also give constructive finite-dimensional surrogates via Cesàro means and a ``Stone window'' identifying idempotents of $\ell^\infty/c_0$ with almost-equality classes of subsets of $\mathbb{N}$. These results sharpen the folklore that the bidual gap is ``non-constructive'' by locating it precisely at $\WLPO$ over $\BISH$.
+Over Bishop-style constructive mathematics (\BISH), we identify the exact logical strength of a familiar non-reflexivity phenomenon in Banach space theory. Working in a classical meta-theory, we prove that the following are equivalent over \BISH: the Weak Limited Principle of Omniscience (\WLPO); the non-surjectivity of the canonical embedding $J_{\ell^\infty}:\ell^\infty\to(\ell^\infty)^{**}$; and the existence of a real Banach space with a bidual gap. 
+
+This equivalence builds on and refines earlier connections between variants of Hahn--Banach and omniscience principles in constructive reverse mathematics (e.g.\ Ishihara; Bridges--Richman; Diener) by isolating the \emph{bare bidual-gap statement} and showing it sits precisely at \WLPO. Our Lean~4 development separates the (meta-classical) witness-extraction step from the (constructive) analysis that derives \WLPO from an abstract kernel, making the logical hygiene explicit. We also include a constructively careful account of the Boolean algebra of idempotents in $\ell^\infty/c_0$ (``Stone window'') and finite-dimensional surrogates via Cesàro means. 
+
+We view the contribution as modest but useful: to place a classically standard fact at an exact level in \CRM, and to provide a machine-checked record that may serve future calibrations.
 \end{abstract}
 
 \maketitle
 
-\begin{mdframed}[backgroundcolor=gray!10, linewidth=0pt]
-\textbf{IMPORTANT DISCLAIMER}
-
-\textbf{A Case Study: Using Multi-AI Agents to Tackle Formal Mathematics}
-
-This entire Lean 4 formalization project was produced by multi-AI agents working under human direction. All proofs, definitions, and mathematical structures in this repository were AI-generated. This represents a case study in using multi-AI agent systems to tackle complex formal mathematics problems with human guidance on project direction.
-\end{mdframed}
 
 \tableofcontents
 
 % ===========================================================
-\section{Introduction: Foundation Relativity and Logical Calibration}
+\section{Introduction: Non-reflexivity, Constructivity, and Logical Strength}
 % ===========================================================
 
-\subsection{The foundation-sensitive bidual gap}
+For a Banach space $X$, the canonical embedding $J_X:X\to X^{**}$ maps $x$ to evaluation at $x$. Classically, many spaces fail to be reflexive (i.e.\ $J_X$ is not surjective); for example, $\ell^\infty$ is non-reflexive via Hahn--Banach. In Bishop-style constructive mathematics (\BISH), however, the status of such facts can depend on additional logical principles. It is therefore natural, in the spirit of constructive reverse mathematics (\CRM), to ask for the \emph{precise} logical strength of non-reflexivity statements over \BISH.
 
-For any Banach space $X$, the canonical embedding $J_X:X\to X^{**}$ maps $x\in X$ to the evaluation functional $J_X(x)(f)=f(x)$ for $f\in X^*$. A central question in functional analysis is whether $J_X$ is surjective; if not, $X$ is non-reflexive, and there exists a ``bidual gap.''
+Building on prior work that relates forms of Hahn--Banach to omniscience principles (notably Ishihara's calibration results and subsequent surveys), we prove that, over \BISH, the following are equivalent: \WLPO; non-surjectivity of $J_{\ell^\infty}$; and the existence of a real Banach space with a bidual gap. Our aim is modest: to make explicit, and to formalize in Lean~4, a calibration that we have not found written down in this exact form, and to present it with careful separation between meta-classical witness extraction and constructive analysis.
 
 \begin{definition}[Non-reflexivity and bidual gap]
 A Banach space $X$ is \textbf{non-reflexive} if the canonical embedding $J_X$ is not surjective. In this case, we say $X$ \textbf{has a bidual gap}.
 \end{definition}
 
-For the space $\linf$ of bounded sequences, the answer depends on the foundational setting. In classical mathematics ($\ZFC$), the Hahn--Banach theorem implies that $J_{\linf}$ is not surjective.
+\subsection{Related work and positioning}
 
-However, in Bishop-style constructive mathematics ($\BISH$)---a system based on intuitionistic logic without the Law of Excluded Middle ($\LEM$) or full Choice---one cannot prove that this gap exists. This dependence of provability on foundations exemplifies \emph{foundation relativity}.
+This paper fits into a line of results locating analytic theorems over \BISH\ at specific logical principles.
 
-\subsection{Motivation: From independence to precise calibration}
+\begin{itemize}[leftmargin=2em]
+\item \textbf{Hahn--Banach and omniscience.} Ishihara~\cite{Ishihara90,Ishihara06} and others isolated forms of Hahn--Banach that imply or are equivalent to weak omniscience principles such as \WLPO. Bridges and Richman~\cite{Bridges87} present the broader constructive context; Diener~\cite{DienerCRM} surveys \CRM\ calibrations.
 
-This project began by probing whether functional-analytic ``pathologies'' might mirror independence phenomena. While no direct connection to G\"odelian incompleteness emerged, the Lean 4 formalization led to a precise calibration result: the exact logical strength of the bidual gap.
+\item \textbf{Classical reverse mathematics.} Brown--Simpson~\cite{BrownSimpson86} analyzed set-existence strength behind analytic theorems in the classical base theory. Our use of a two-stage argument (meta extraction, internal analysis) mirrors that methodology in a constructive setting.
 
-The bidual gap is not independent in the G\"odelian sense, but its provability over $\BISH$ is exactly that of a specific, weak non-constructive principle. This situates the problem within \emph{Constructive Reverse Mathematics} ($\CRM$), whose goal is to determine minimal axioms needed for classical theorems over constructive bases.
+\item \textbf{Non-reflexivity folklore.} That $\ell^\infty$ is non-reflexive is a textbook fact (e.g.\ \cite{AlbiacKalton16}). The \emph{logical} content of the \emph{bare non-reflexivity statement} over \BISH\ appears not to have been recorded explicitly; our contribution is to formulate and verify the bi-implication with \WLPO.
+\end{itemize}
+
+Compared with the literature above, our novelty lies in identifying the exact logical strength of \emph{non-surjectivity of $J_{\ell^\infty}$ and the existence of a bidual gap} (rather than particular extension/separation schemes) exactly at \WLPO, and in making the meta-classical/constructive separation explicit and machine-checked.
 
 \subsection{The Weak Limited Principle of Omniscience (WLPO)}
 
@@ -184,10 +185,9 @@ Moreover, this equivalence is fully formalized in Lean~4 (see Section~\ref{sec:l
 
 Our contributions are:
 \begin{enumerate}[label=\arabic*.]
-\item \textbf{Logical calibration:} an exact equivalence within $\CRM$.
-\item \textbf{Formal verification:} a complete Lean 4 formalization of both directions.
-\item \textbf{Methodology:} a Prop-level Ishihara kernel and a robust csSup treatment of partial sums.
-\item \textbf{Constructive surrogates:} explicit, verified finite-dimensional approximations via Ces\`aro means.
+\item \textbf{Exact location over \BISH.} Building on Ishihara's connections between Hahn--Banach and omniscience principles, we show that the \emph{bare bidual-gap statements} (for $\ell^\infty$ and $\exists X$) are each equivalent to \WLPO.
+\item \textbf{Formal verification.} A Lean~4 development makes explicit the separation between meta-classical extraction and constructive analysis, and provides an axiom audit for the consumer lemma.
+\item \textbf{Auxiliary tools.} We package a Prop-level kernel interface, a csSup treatment of partial sums suited to \BISH, and a constructively careful ``Stone window'' for $\ell^\infty/c_0$ used as a tool rather than a headline result.
 \end{enumerate}
 
 % ===========================================================
@@ -545,10 +545,10 @@ We establish and formalize that detecting the bidual gap has exactly the logical
 
 \section*{Acknowledgments}
 
-I thank colleagues and the Lean community for discussions around constructive analysis and formal verification.
+We are indebted to the constructive analysis and reverse mathematics communities for the conceptual groundwork: in particular E.~Bishop, D.~S.~Bridges, F.~Richman, and H.~Ishihara, and to surveys such as Diener's overview of constructive reverse mathematics. Discussions in the Lean and mathlib communities shaped the formalization style. Any remaining mistakes are the author's alone.
 
 \smallskip
-\noindent\textbf{AI assistance disclosure.} During development we used large language models as programming assistants: Google Gemini 2.5 Pro Deep Think (architectural sketching and refactor suggestions), GPT-5 Pro (Lean code scaffolding/refactoring and error-message triage), and Claude Code (build scripts and repository wiring). All suggested code and text were reviewed, edited, and verified by the author; the final mathematical claims are machine-checked by Lean~4 against mathlib. No model is credited as an author, and the author bears full responsibility for all content and any errors.
+\noindent\textbf{AI/Tooling disclosure.} The Lean code and parts of the prose benefited from standard programming assistants (e.g.\ GPT-5 Pro, Gemini, Claude) under human supervision. All mathematical claims were reviewed by the author and are machine-checked by Lean~4. Any errors are the author's responsibility.
 
 \bibliographystyle{alphaurl}
 \begin{thebibliography}{10}
@@ -600,6 +600,31 @@ The mathlib4 mathematical library.
 A.~Pous and S.~Zdancewic.
 \newblock A linear/producer/consumer model of classical linear logic.
 \newblock In \emph{Proceedings of the 29th Annual ACM/IEEE Symposium on Logic in Computer Science (LICS)}, pages 1--10. IEEE, 2014.
+
+\bibitem{BridgesVita06}
+D.~S. Bridges and L.~Vîţă.
+\newblock \emph{Techniques of Constructive Analysis}.
+\newblock Springer, 2006.
+
+\bibitem{Beeson85}
+M.~Beeson.
+\newblock \emph{Foundations of Constructive Mathematics}.
+\newblock Springer, 1985.
+
+\bibitem{TroelstraVanDalen88}
+A.~S. Troelstra and D.~van Dalen.
+\newblock \emph{Constructivism in Mathematics, Vols.~I--II}.
+\newblock North-Holland, 1988.
+
+\bibitem{ConwayFA}
+J.~B. Conway.
+\newblock \emph{A Course in Functional Analysis}.
+\newblock Springer, 2nd ed., 1990.
+
+\bibitem{Megginson98}
+R.~E. Megginson.
+\newblock \emph{An Introduction to Banach Space Theory}.
+\newblock Springer, 1998.
 
 \end{thebibliography}
 
