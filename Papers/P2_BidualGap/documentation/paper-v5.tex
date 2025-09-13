@@ -114,7 +114,8 @@
 
 % ---------- Title and author ----------
 \title{The Bidual Gap and WLPO: A Constructive Calibration of Banach Space Non-Reflexivity}
-\author{Paul Chun-Kit Lee\thanks{Lean 4 formalization available at \leanRepo. Code archive available at Zenodo: DOI \texttt{10.5281/zenodo.17107493}.} \\ 
+\author{Paul Chun-Kit Lee\thanks{Tooling \& AI disclosure:
+Large-language-model programming assistants (e.g., GPT-5 Pro, Gemini, Claude) were used for refactoring, boilerplate generation, and error-message triage in the Lean code, under human supervision. All mathematical statements were authored, reviewed, and interpreted by the author and have been machine-checked in Lean~4; no model is credited as an author. The author takes full responsibility for the content.}\thanks{Lean 4 formalization available at \leanRepo. Code archive: DOI \texttt{10.5281/zenodo.17107493}.} \\ 
 New York University \\ 
 \texttt{dr.paul.c.lee@gmail.com}}
 \date{\today}
@@ -131,6 +132,10 @@ We view the contribution as modest but useful: to place a classically standard f
 
 \maketitle
 
+\begin{mdframed}[backgroundcolor=gray!08, linewidth=0.4pt]
+\noindent\textbf{Tooling and AI Use Disclosure.}
+This paper used LLM-based programming assistants in the Lean development for routine tasks (refactoring, boilerplate, docstrings, and error-message triage). Conception of the results, choice of definitions, proof strategy, and all mathematical writing are the author's; all claims have been checked in Lean~4 against \emph{mathlib}. No model is listed as an author, and the author remains fully responsible for the content. This disclosure is made up front to comply with emerging community and publisher policies regarding generative AI.
+\end{mdframed}
 
 \tableofcontents
 
@@ -419,6 +424,7 @@ This mechanical separation is not mathematically deep, but it reduces the risk o
       top-level target: \texttt{Papers.P2\_BidualGap.gap\_equiv\_wlpo}
 \item \textbf{Code Archive DOI}: \texttt{10.5281/zenodo.17107493}
 \item \textbf{Status}: The main equivalence builds with 0 errors. Three WLPO-conditional lemmas remain in the optional module \texttt{DualIsometriesComplete.lean} concerning completeness of certain dual spaces; they do not affect the main equivalence.
+\item \textbf{Tooling}: See the front-page Tooling and AI Use Disclosure for a summary of the limited role of LLM tools.
 \end{itemize}
 \end{mdframed}
 
@@ -552,7 +558,7 @@ We establish and formalize that detecting the bidual gap has exactly the logical
 We are indebted to the constructive analysis and reverse mathematics communities for the conceptual groundwork: in particular E.~Bishop, D.~S.~Bridges, F.~Richman, and H.~Ishihara, and to surveys such as Diener's overview of constructive reverse mathematics. Discussions in the Lean and mathlib communities shaped the formalization style. Any remaining mistakes are the author's alone.
 
 \smallskip
-\noindent\textbf{AI/Tooling disclosure.} The Lean code and parts of the prose benefited from standard programming assistants (e.g.\ GPT-5 Pro, Gemini, Claude) under human supervision. All mathematical claims were reviewed by the author and have been machine-checked by Lean~4. Any errors are the author's responsibility.
+\noindent\textbf{Tooling note.} The Lean code benefited from standard programming assistants under human supervision; see the front-page disclosure. All results were machine-checked in Lean~4.
 
 \bibliographystyle{alphaurl}
 \begin{thebibliography}{10}
