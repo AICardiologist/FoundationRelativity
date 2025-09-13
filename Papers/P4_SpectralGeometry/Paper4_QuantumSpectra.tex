@@ -138,6 +138,9 @@ and S3 (non-separable separation) via a route-conditional \(\WLPO\) portal.
 All artifacts are mathlib-free, zero-sorry, and reproducible with composition mechanized through automatic certificate folding. The result
 is a machine-checked ledger of foundational costs for standard spectral routes in quantum mechanics,
 revealing precisely which non-constructive principles are required for various spectral properties.
+
+\medskip
+\noindent\emph{Dirac/RHS linkage.} We make explicit the route-conditional connection to Dirac's bra--ket formalism via rigged Hilbert spaces (Gelfand triples): standard separation-based constructions of generalized eigenvectors in non-separable duals incur a \WLPO\ cost (S3), while locale- or kernel-based routes can avoid it. We also note the alignment of PVM/direct-integral machinery with the \DCw\ layer (S2) and the approximative-to-exact spectrum step with the orthogonal \MP\ guard (S1).
 \end{abstract}
 % === PATCH B: END ==============================================================
 
@@ -198,6 +201,7 @@ Compared with earlier drafts, we (i) adopt the \emph{broader axiomatic landscape
 \item \textbf{S0--S5 calibration:} Compact approximation, Markov spectrum, locale spatiality, WLPO portal, QHO---each with verified profile certificates.
 \item \textbf{Zero-sorry implementation:} Complete Lean 4 verification (700+ lines) with comprehensive CI testing and mathlib-free constraint.
 \item \textbf{Physics implications:} Clear separation between computational core and non-constructive layers in quantum spectral theory.
+\item \textbf{Dirac/RHS connection (route-conditional):} We identify when the Gelfand-triple route to generalized eigenvectors uses non-separable separation and thus incurs the S3 \WLPO\ portal; PVM/direct-integral steps align with the S2 \DCw\ layer; and the Spec\(_{\mathrm{approx}}=\)Spec hinge aligns with the S1 \MP\ guard.
 \end{itemize}
 }}
 % === PATCH D: END =============================================================
@@ -462,6 +466,11 @@ It is crucial to distinguish the context:
 \end{itemize}
 \end{remark}
 
+\paragraph{RHS/Dirac link (route-conditional).}
+In the rigged Hilbert space (Gelfand triple) $\Phi \subset H \subset \Phi'$ used to formalize Dirac's bra--ket calculus, standard derivations of generalized eigenvectors proceed in the dual space $\Phi'$. When this step invokes separation/extension on the non-separable dual (e.g.\ via Hahn--Banach on a quotient or in a bidual), it matches our \textsf{uses\_separation} flag and thereby triggers the S3 \WLPO\ portal. 
+By contrast, RHS arguments confined to the pinned test space $\Phi$ (e.g.\ explicit kernel constructions for special operators) or locale-based spectral routes can avoid this portal. 
+This identifies the WLPO bill as a \emph{route cost} for the Dirac/RHS pathway rather than a cost of the spectral statement itself; see, e.g., the Gelfand--Maurin (nuclear spectral) theorem and modern RHS expositions \cite{Maurin,BohmGadella,delaMadrid}.
+
 \noindent\textbf{Profile:} Conditionally $(1,0,0)$ on the WLPO axis, determined by the \emph{proof route}. Alternative locale-based proofs typically avoid this portal.
 
 % === PATCH O: BEGIN (route-conditional portal) =================================
@@ -560,6 +569,16 @@ Without FT, we cannot guarantee the uniform continuity needed for the approximat
 \item \textbf{S5:} FT layer $(0,1,0)$ — completeness/continuity demonstrations
 \end{itemize}
 % === PATCH G: END =============================================================
+
+\subsection{(S6) RHS/Dirac route map (informal, route-conditional)}
+
+\noindent\textbf{Informal upper bound.} 
+For a self-adjoint $T$ on separable $H$ presented via a Gelfand triple $\Phi \subset H \subset \Phi'$, the \emph{standard} RHS route to generalized eigenvectors typically carries at most the profile
+\[
+  \langle \hone,\hzero,\hone\rangle \quad\text{with an orthogonal \MP\ guard},
+\]
+i.e.\ \WLPO\ from non-separable separation (S3), \DCw\ for spectral measures/direct integrals (S2), and \MP\ for the Spec\(_{\mathrm{approx}}=\)Spec hinge (S1). 
+\emph{Route-conditionality:} explicit kernel arguments on $\Phi$ or locale-based spectra can avoid the \WLPO\ cost. Establishing sharp lower bounds for specific RHS steps is left open.
 
 % ===========================================================
 \section{Broader axiomatic landscape for spectra}\label{sec:broad-axes}
@@ -845,6 +864,26 @@ S.~G.~Simpson.
 \newblock {\em Subsystems of Second Order Arithmetic} (2nd ed.).
 \newblock Cambridge University Press, 2009.
 
+\bibitem{Maurin}
+K.~Maurin.
+\newblock {\em Generalized Eigenfunction Expansions and Unitary Representations}.
+\newblock Polish Scientific Publishers, 1968.
+
+\bibitem{GelfandVilenkin}
+I.~M.~Gel'fand and N.~Ya.~Vilenkin.
+\newblock {\em Generalized Functions, Vol.~4: Applications of Harmonic Analysis}.
+\newblock Academic Press, 1964.
+
+\bibitem{BohmGadella}
+A.~Bohm and M.~Gadella.
+\newblock {\em Dirac Kets, Gamow Vectors and Gel'fand Triplets}.
+\newblock Springer, 1989.
+
+\bibitem{delaMadrid}
+R.~de~la~Madrid.
+\newblock The role of the rigged Hilbert space in quantum mechanics.
+\newblock {\em European Journal of Physics}, 26:287--312, 2005.
+
 \end{thebibliography}
 
 % === PATCH C: BEGIN (append before \end{document}) ============================
@@ -1090,6 +1129,7 @@ The calibration results provide a precise map of the logical terrain underlying 
 \item \textbf{Approximation vs. exactness:} The MP layer (S1) quantifies the gap between what can be computed (approximate spectrum) and what can be decided (exact spectrum). This has practical implications for spectral algorithms in quantum chemistry and condensed matter physics.
 
 \item \textbf{Infinite-dimensional contexts:} The WLPO portal (S3) warns that certain standard techniques (separation in non-separable spaces) carry hidden decidability costs, potentially relevant to quantum field theory where non-separable spaces naturally arise.
+\item \textbf{Dirac/RHS route (route-conditional):} The Gelfand-triple pathway to generalized eigenvectors typically requires separation on the non-separable dual $\Phi'$, hence the S3 \WLPO\ portal. The measure-theoretic spectral resolution (PVMs/direct integrals) aligns with the S2 \DCw\ layer, and deciding exact spectral membership from approximants aligns with the S1 \MP\ guard. Axiom-cheap alternatives (explicit constructions on $\Phi$ or locale-based spectra) can bypass \WLPO.
 \end{itemize}
 % === PATCH I: END =============================================================
 
