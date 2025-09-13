@@ -201,7 +201,9 @@ We explain the equivalence between the bidual gap and $\WLPO$.
 To bridge a bidual-gap witness and a logical decision, we use an ``Ishihara kernel'', adapted from constructive reverse mathematics.
 
 \begin{defi}[Ishihara kernel]
-An Ishihara kernel consists of a normed space $X$, an element $y\in X^{**}\setminus J(X)$, a functional $f\in X^*$, a family $g:(\N\to\{0,1\})\to X^*$, and a constant $\delta>0$ such that for all binary sequences $\alpha$:
+An \emph{Ishihara kernel} is a specific \emph{CRM witness/test object} with a sharp
+dichotomy, designed so that purely constructive analysis of its properties decides $\WLPO$.
+It consists of a normed space $X$, an element $y\in X^{**}\setminus J(X)$, a functional $f\in X^*$, a family $g:(\N\to\{0,1\})\to X^*$, and a constant $\delta>0$ such that for all binary sequences $\alpha$:
 \begin{enumerate}
 \item $|y(f+g(\alpha))|=0$ or $|y(f+g(\alpha))|\ge \delta$ (dichotomy);
 \item $(\forall n,\ \alpha(n)=0)\ \Leftrightarrow\ y(f+g(\alpha))=0$ (decision property).
@@ -249,12 +251,25 @@ Concretely, we prove the implication:
   \;\Longrightarrow\;
   \big[\BISH \vdash \WLPO\big].
 \]
-This is the standard proof strategy in Constructive Reverse Mathematics (CRM), which follows a two-part structure that we frame using a \emph{producer/consumer} analogy \cite{Diener2018}. First, a \emph{classical producer}, operating in a meta-theory, uses non-constructive reasoning to extract a concrete ``witness''---in our case, an Ishihara kernel---from a classical theorem. Second, a \emph{constructive consumer} analyzes this witness using only the logic of the constructive base theory ($\BISH$) to derive a non-constructive principle like $\WLPO$. This pattern is conceptually analogous to models of linear logic that separate the unlimited production of resources from their disciplined consumption \cite{PousZdancewic14}, thereby clarifying how the non-constructive content of a theorem is isolated before its logical strength is measured.
+This is the standard proof strategy in Constructive Reverse Mathematics (CRM), which follows a two-part structure: \emph{meta-classical witness extraction} followed by \emph{constructive analysis of the witness}. First, operating in a meta-theory, we use non-constructive reasoning to extract a concrete witness---in our case, an Ishihara kernel---from a classical theorem. Second, we analyze this witness using only the logic of the constructive base theory ($\BISH$) to derive a non-constructive principle like $\WLPO$.
 
 In the formalization, we fence the meta-classical reasoning (witness extraction and
-the case split in $g$) inside a dedicated block, and keep the kernel consumer
+the case split in $g$) inside a dedicated block, and keep the kernel analysis
 (\emph{Ishihara kernel} $\Rightarrow \WLPO$) intuitionistic. No classical axiom
 is added to the object theory. This approach follows Ishihara's original pattern for extracting logical principles from functional analysis results \cite{Ishihara90}.
+\end{rem}
+
+\begin{rem}[Terminology: \emph{witness/test object} in CRM]
+In constructive reverse mathematics (CRM), the standard phrasing for the two-stage pattern used here is:
+\emph{(meta-classical) witness extraction} followed by \emph{(constructive) analysis of the witness}.
+The specific witness we use is an \emph{Ishihara-style} test object with a sharp dichotomy
+$|y(f+g(\alpha))|=0 \;\vee\; |y(f+g(\alpha))|\ge \delta$; this is a well-known pattern for calibrating results at
+$\WLPO$ (see Ishihara~\cite{Ishihara90} and the survey~\cite{DienerCRM}).%
+\footnote{In an earlier draft we informally called this a ``producer/consumer'' split. We keep that
+metaphor out of the formal presentation and use the standard CRM terms \emph{witness extraction} and
+\emph{constructive analysis}.}
+A closely related separation of concerns is common in classical reverse mathematics, e.g.\ the work of
+Brown--Simpson~\cite{BrownSimpson86} on the set-existence strength behind analytic theorems.
 \end{rem}
 
 \paragraph{Special note (differences from an earlier draft).}
@@ -365,12 +380,12 @@ Following standard CRM (Constructive Reverse Mathematics) methodology, our forma
 separates the \emph{classical producer} from the \emph{constructive consumer}:
 
 \begin{itemize}
-\item \textbf{Producer (classical):} The construction of the Ishihara kernel from the bidual gap,
+\item \textbf{Meta-classical witness extraction:} The construction of the Ishihara kernel from the bidual gap,
   including extraction of $y \in X^{**} \setminus J(X)$, finding $h^\star$ with $\|y\|/2 < \|y(h^\star)\|$,
   and defining $g(\alpha)$ via case-splitting on the undecidable predicate $(\forall n, \alpha(n) = 0)$.
   This is fenced in \texttt{section ClassicalMeta} in \texttt{Ishihara.lean}.
 
-\item \textbf{Consumer (constructive):} The theorem \texttt{WLPO\_of\_kernel} that derives $\WLPO$ 
+\item \textbf{Constructive analysis of the witness:} The theorem \texttt{WLPO\_of\_kernel} that derives $\WLPO$ 
   from the abstract kernel properties. This is placed \emph{outside} any \texttt{noncomputable} or 
   \texttt{Classical} sections, ensuring pure intuitionistic reasoning.
 \end{itemize}
@@ -596,14 +611,14 @@ A.~Pous and S.~Zdancewic.
 
 \section{Selected Lean Snippets}
 
-This appendix presents key excerpts from our Lean 4 formalization, demonstrating the producer/consumer architecture and axiom hygiene discussed in the main text. These snippets are illustrative but align with the actual implementation available at \leanRepo.
+This appendix presents key excerpts from our Lean 4 formalization, demonstrating the witness extraction/analysis architecture and axiom hygiene discussed in the main text. These snippets are illustrative but align with the actual implementation available at \leanRepo.
 
-\subsection{Constructive consumer (Ishihara kernel $\to$ WLPO)}
+\subsection{Constructive analysis (witness $\Rightarrow$ \texorpdfstring{$\WLPO$}{WLPO})}
 
-The following shows the purely constructive consumer that derives WLPO from an Ishihara kernel without using classical axioms:
+The following shows the purely constructive analysis that derives WLPO from an Ishihara kernel witness without using classical axioms:
 
-\begin{lstlisting}[caption={Constructive consumer: no classical axioms},label={lst:consumer}]
-/-! Constructive consumer: no `open Classical`, no `noncomputable`. -/
+\begin{lstlisting}[caption={Constructive analysis of a witness: no classical axioms},label={lst:consumer}]
+/-! Constructive analysis: no `open Classical`, no `noncomputable`. -/
 structure IshiharaKernel (X : Type _) [NormedAddCommGroup X] [NormedSpace ℝ X] where
   y  : (X →L[ℝ] ℝ) →L[ℝ] ℝ
   f  : X →L[ℝ] ℝ
@@ -631,12 +646,12 @@ theorem WLPO_of_kernel
     exact Or.inr this
 \end{lstlisting}
 
-\subsection{Classical producer (Gap $\to$ kernel)}
+\subsection{Meta-classical witness extraction (Gap $\Rightarrow$ witness)}
 
-The classical producer extracts an Ishihara kernel from a bidual gap. Note the explicit \texttt{noncomputable} and \texttt{open Classical} declarations:
+The meta-classical witness extraction obtains an Ishihara kernel from a bidual gap. Note the explicit \texttt{noncomputable} and \texttt{open Classical} declarations:
 
-\begin{lstlisting}[caption={Classical producer: extracting kernel from gap},label={lst:producer}]
-/-! Classical producer: fenced. Extract a kernel from a bidual gap. -/
+\begin{lstlisting}[caption={Meta-classical witness extraction from a bidual gap},label={lst:producer}]
+/-! Meta-classical witness extraction: fenced. Extract a kernel from a bidual gap. -/
 noncomputable section
 section ClassicalMeta
 open Classical
@@ -666,12 +681,12 @@ lemma exists_on_unitBall_gt_half_opNorm
   exact hT (ContinuousLinearMap.norm_eq_zero.mp this)
 \end{lstlisting}
 
-\subsection{Gap $\to$ WLPO (full bridge)}
+\subsection{Gap $\Rightarrow$ \texorpdfstring{$\WLPO$}{WLPO} (meta-classical bridge)}
 
 This shows the complete meta-classical construction:
 
 \begin{lstlisting}[caption={Meta-classical: from bidual gap to WLPO},label={lst:bridge}]
-/-- Meta-classical: from a bidual gap, build a kernel and consume it. -/
+/-- Meta-classical bridge: from a bidual gap, extract a witness and apply the constructive analysis. -/
 theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
   classical
   rcases hGap with ⟨X, Xng, Xns, Xc, _dualBan, _bidualBan, hNotSurj⟩
