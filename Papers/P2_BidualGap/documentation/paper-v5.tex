@@ -1129,4 +1129,106 @@ Our development follows this well-trodden schema: the specific \emph{shape} of $
 
 In our formalization, the first arrow is implemented in \texttt{Ishihara.lean} (producer block) and the second arrow is \texttt{WLPO\_of\_kernel} (consumer block). App.~\ref{app:DirectDualCorrespondence} explains how the direct dual construction (\texttt{DirectDual.lean}) supplies the complementary witness $G$ used for the reverse direction.
 
+\appendix
+\section{WLPO $\Rightarrow$ Bidual Gap via Direct Dual Witness $G$}
+\label{app:WLPOtoGap-Direct}
+
+This appendix documents the reverse direction of the equivalence---the direct construction of a non-representable element of $c_0^{**}$---and shows that the Lean code in
+\texttt{Papers/P2\_BidualGap/HB/WLPO\_to\_Gap\_HB.lean}
+faithfully implements the informal proof.
+
+\subsection*{A. Mathematical statement and proof sketch}
+
+Over $\mathsf{BISH}$ with $\mathsf{WLPO}$ as a hypothesis, we claim that
+$J_{c_0}:c_0\to c_0^{**}$ is not surjective.
+
+\textbf{Witness $G$.} For $f\in c_0^\ast$, write $f(e_n)$ for the evaluation of $f$ on the standard basis $e_n\in c_0$ (the function that is 1 at $n$ and 0 elsewhere). Define
+\[G(f) \;:=\; \sum_{n=0}^{\infty} f(e_n).\]
+Two key facts:
+\begin{enumerate}
+\item The series $\sum_n f(e_n)$ is absolutely summable (uniform bound on partial sums), hence $G$ is a well-defined bounded linear functional on $c_0^\ast$, i.e. $G\in (c_0^\ast)^\ast=c_0^{**}$.
+\item For the coordinate functionals $\delta_m\in c_0^\ast$ (evaluation at $m$), we have $G(\delta_m)=1$ for all $m$.
+\end{enumerate}
+
+\textbf{Contradiction.} If $G=J_{c_0}(x)$ for some $x\in c_0$, then
+$x_m=J_{c_0}(x)(\delta_m)=G(\delta_m)=1$ for all $m$, so $x$ is the constant sequence 1, which is not in $c_0$ (does not vanish at infinity). Hence $G\notin \mathrm{im}(J_{c_0})$, i.e. $J_{c_0}$ is not surjective.
+
+\subsection*{B. Lean $\leftrightarrow$ Math crosswalk}
+
+The following table matches the informal proof objects to their Lean definitions.
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Mathematics} & \textbf{Lean symbol / fact} & \textbf{Where} \\
+\midrule
+The space $c_0$ on $\mathbb{N}$ & \verb|abbrev c₀ := ZeroAtInftyContinuousMap ℕ ℝ| & DirectDual.lean \\
+Basis $e_n\in c_0$ & \verb|def e (n : ℕ) : c₀| & DirectDual.lean \\
+Coordinate $\delta_m\in c_0^\ast$ & \verb|def δ (m : ℕ) : c₀ →L[ℝ] ℝ| & DirectDual.lean \\
+Witness $G(f)=\sum_n f(e_n)$ & \verb|def G : (c₀ →L[ℝ] ℝ) →L[ℝ] ℝ| & DirectDual.lean \\
+Key property $G(\delta_m)=1$ & \verb|lemma G_delta (m) : G (δ m) = 1| & DirectDual.lean \\
+Non-surjectivity of $J_{c_0}$ & \verb|lemma c0_not_reflexive_via_direct :| & WLPO\_to\_Gap\_HB.lean \\
+& \verb|  ¬ Surjective (inclusionInDoubleDual ℝ c₀)| & \\
+Packaging as BidualGapStrong & \verb|lemma wlpo_implies_gap :| & WLPO\_to\_Gap\_HB.lean \\
+& \verb|  WLPO → BidualGapStrong.{0}| & \\
+Equivalence & \verb|theorem gap_equiv_wlpo :| & WLPO\_to\_Gap\_HB.lean \\
+& \verb|  BidualGapStrong.{0} ↔ WLPO| & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Notes on the core steps}
+\begin{itemize}
+\item \textbf{Absolute summability:}
+DirectDual.lean proves \verb|summable_abs_eval| and \verb|summable_eval| for the sequence $n\mapsto f(e_n)$, then uses \verb|norm_tsum_le_tsum_norm| to bound $\|G\|$. This is the formal counterpart of the textbook estimate $\sum_{n\in F} |f(e_n)| \le \|f\|$ for any finite $F$.
+\item \textbf{Computing $G(\delta_m)$:}
+\verb|G_delta| reduces the tsum to a finite sum over the support, which is just $\{m\}$, and evaluates $(\delta_m)(e_m)=1$.
+\item \textbf{The contradiction:}
+In \verb|c0_not_reflexive_via_direct|, assuming surjectivity gives $x$ with $J(x)=G$. Evaluating both sides at $\delta_m$ yields $x_m=1$ for all $m$, contradicting \verb|x.zero_at_infty'| (the vanishing-at-infinity property). This is exactly the informal argument.
+\end{itemize}
+
+\subsection*{C. Where $\mathsf{WLPO}$ appears (and where it does not)}
+
+The \emph{contradiction} that $G\notin \mathrm{im}(J_{c_0})$ uses only:
+\begin{itemize}
+\item the concrete model of $c_0$,
+\item the basis $e_n$, coordinates $\delta_m$,
+\item the definition and summability of $G$, and
+\item the topological fact that elements of $c_0$ tend to 0 at infinity.
+\end{itemize}
+
+It does not use any instance of $\mathsf{WLPO}$.
+In \verb|wlpo_implies_gap| the hypothesis WLPO is threaded in only to satisfy the packaging requirements of the predicate \verb|BidualGapStrong| (see the two declarations below). The core non-representability of $G$ is independent of WLPO.
+
+\subsection*{D. On the two auxiliary axioms}
+
+The file currently contains
+\begin{verbatim}
+axiom dual_is_banach_c0_from_WLPO :
+  WLPO → DualIsBanach c₀
+
+axiom dual_is_banach_c0_dual_from_WLPO :
+  WLPO → DualIsBanach (c₀ →L[ℝ] ℝ)
+\end{verbatim}
+
+These are \emph{packaging stubs} for the fields that \verb|BidualGapStrong| asks for (completeness/Banachness of the space and its duals). They are deliberately placed here to avoid entangling the direct $G$-construction with library-level completeness proofs. Two remarks:
+\begin{enumerate}
+\item \textbf{They do not touch the core argument.}
+The contradiction $J_{c_0}(x)=G\Rightarrow x=1$ is proved in \verb|c0_not_reflexive_via_direct| \emph{without} these axioms.
+\item \textbf{They are dischargeable.}
+In mathlib, one has completeness of $E\to_L F$ once $F$ is complete, and $c_0$ is complete as a closed subspace of bounded continuous functions on a discrete space. Thus these stubs can be replaced by ordinary lemmas/instances (or the \verb|BidualGapStrong| record can be relaxed to require only the standard \verb|CompleteSpace| instances). We keep them localized here solely to decouple the direct dual argument from auxiliary typeclass plumbing.
+\end{enumerate}
+
+We highlight this so that readers can see that the formalization mirrors the informal proof structure: the hard analytic content is in DirectDual.lean; the ``gap witness packaging'' around it is orthogonal.
+
+\subsection*{E. Relation to $G=S\circ\Phi_1$ in the text}
+
+Analytically, one often identifies $c_0^\ast \cong \ell^1$ via the coordinate map $\Phi_1(f)=(f(e_n))_n$ and takes $S$ to be the summation functional on $\ell^1$. Our Lean definition of
+\[G(f)=\sum_n f(e_n)\]
+is exactly the composition $S\circ \Phi_1$ at the level of behavior, but avoids committing to the explicit $c_0^\ast\cong \ell^1$ isomorphism. This keeps the construction lightweight: we use only the unconditional summability proved in DirectDual.lean.
+
+\subsection*{F. CRM positioning (standard terms)}
+
+Unlike the Gap $\Rightarrow$ WLPO direction---where we used a meta-classical \emph{witness extraction} followed by a constructive \emph{consumer}---this WLPO $\Rightarrow$ Gap direction is a direct explicit construction: we build $G\in c_0^{**}$, prove $G\notin J(c_0)$, and then package $c_0$ as the witness space in \verb|BidualGapStrong|. The producer/consumer terminology is still a helpful mental model for the other direction, but here the proof is purely ``producer-style'': we produce the object $G$ outright.
+
 \end{document}
