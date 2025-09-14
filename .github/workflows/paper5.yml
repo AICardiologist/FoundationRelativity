@@ -9,7 +9,7 @@ on:
     branches: [ main ]
     paths:
       - 'Papers/P5_GeneralRelativity/**'
-      - 'Scripts/**'
+      - 'scripts/**'
       - '.github/workflows/paper5.yml'
 
 jobs:
@@ -40,11 +40,11 @@ jobs:
         run: lake build Papers.P5_GeneralRelativity.Smoke
 
       - name: No sorries (Paper 5)
-        run: bash Scripts/no_sorry.sh
+        run: bash scripts/no_sorry.sh
 
       - name: Axiom audit
         run: |
-          lake env lean Scripts/AxiomAudit.lean | tee axiom-audit.txt
+          lake env lean scripts/AxiomAudit.lean | tee axiom-audit.txt
 
       - uses: actions/upload-artifact@v4
         with:
