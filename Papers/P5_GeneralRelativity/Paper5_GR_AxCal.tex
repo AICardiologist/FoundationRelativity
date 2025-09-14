@@ -54,10 +54,12 @@
 \newcommand{\LEM}{\mathrm{LEM}}
 \newcommand{\FT}{\mathrm{FT}}
 \newcommand{\WKLz}{\mathrm{WKL}_0}
+\newcommand{\RCA}{\mathrm{RCA}}
 \newcommand{\MP}{\mathrm{MP}}
 \newcommand{\AC}{\mathrm{AC}}
 \newcommand{\ACw}{\mathrm{AC}_\omega}
 \newcommand{\DCw}{\mathrm{DC}_\omega}
+\newcommand{\DC}{\mathrm{DC}}
 
 \newcommand{\Found}{\mathsf{Found}}
 \newcommand{\SigmaZero}{\Sigma_{0}}
@@ -123,7 +125,7 @@ We make explicit route flags that, when present in a proof, trigger an \emph{AxC
 \end{itemize}
 
 \begin{proposition}[Portal soundness]\label{prop:portals}
-If a proof of a $\SigmaZero^{\mathrm{GR}}$-pinned statement uses a flagged route, the corresponding token is necessary along that route: Zorn$\Rightarrow{\rm HasAC}$; Limit-Curve$\Rightarrow{\rm HasFT}/{\rm HasWKL}_0$ (depending on constructive/classical base); Serial-Chain$\Rightarrow{\rm HasDC}\omega$; Reductio$\Rightarrow{\rm HasLEM}$.
+If a proof of a $\SigmaZero^{\mathrm{GR}}$-pinned statement uses a flagged route, the corresponding token is necessary along that route: Zorn $\Rightarrow$ HasAC; Limit-Curve $\Rightarrow$ HasFT/HasWKL$_0$ (depending on constructive/classical base); Serial-Chain $\Rightarrow$ HasDC$\omega$; Reductio $\Rightarrow$ HasLEM.
 \end{proposition}
 
 \begin{proof}[Sketch]
@@ -136,7 +138,7 @@ Given portals triggered for a witness family $\mathcal{W}$, we record a HeightCe
 % ===========================================================
 \section{Literature anchors mapped to portals}
 % ===========================================================
-Robb and Reichenbach provide axiomatic scaffolding for kinematics; EPS derives Lorentz classes from light and free-fall~\cite{Robb1914,Reichenbach1969,EPS1972} (no Zorn; compactness may enter via curve families $\Rightarrow$ Compactness portal when maximizers are extracted). Pour--El--Richards show computable well-posed PDEs can yield non-computable evolutions~\cite{PourElRichards1989} (Logic/Computability axis). Bishop--Bridges and Hellman/Bridges guide which analytic steps are Height~0 and which align with choice or \LEM~\cite{BishopBridges1985,Hellman1998,BridgesReply1995}. Wald, Hawking--Ellis, and Choquet--Bruhat are used to \emph{locate} where standard GR proofs instantiate portals~\cite{Wald1984,HawkingEllis1973,ChoquetBruhat2009}.
+Robb and Reichenbach provide axiomatic scaffolding for kinematics; EPS derives Lorentz classes from light and free-fall~\cite{Robb1914,Reichenbach1969,EPS1972} (no Zorn; compactness may enter via curve families $\Rightarrow$ Compactness portal when maximizers are extracted). Pour--El--Richards show computable well-posed PDEs can yield non-computable evolutions~\cite{PourElRichards1989} (Logic/Computability axis). Bishop--Bridges and Hellman/Bridges guide which analytic steps are Height~0 and which align with choice or $\LEM$~\cite{BishopBridges1985,Hellman1998,BridgesReply1995}. Wald, Hawking--Ellis, and Choquet--Bruhat are used to \emph{locate} where standard GR proofs instantiate portals~\cite{Wald1984,HawkingEllis1973,ChoquetBruhat2009}.
 
 % ===========================================================
 \section{Calibration targets (G1--G5) with AxCal profiles}
@@ -160,7 +162,7 @@ $\mathcal{C}^{\mathrm{G2}}$: local well-posedness for $\EFE$ and existence/uniqu
 Local PDE (harmonic gauge, energy estimates) can be arranged with $(0,0,0)$ or low choice ($\ACw$) in separable settings; the MGHD step has \textsf{uses\_zorn}, so $(\hChoice,\hComp,\hLogic)\ge(1,0,0)$ for the global statement.
 \end{proposition}
 \begin{proof}[Sketch]
-Local existence follows Choquet--Bruhat's PDE machinery \cite{ChoquetBruhat2009}. MGHD standard proofs invoke Zorn on the poset of developments (Wald \cite[Thm.~10.1.2]{Wald1984}); by Prop.~\ref{prop:portals}, the Zorn portal yields the \AC\ frontier.
+Local existence follows Choquet--Bruhat's PDE machinery \cite{ChoquetBruhat2009}. MGHD standard proofs invoke Zorn on the poset of developments (Wald \cite[Thm.~10.1.2]{Wald1984}); by Prop.~\ref{prop:portals}, the Zorn portal yields the $\AC$ frontier.
 \end{proof}
 
 \subsection*{G3. Singularity theorems (Penrose/Hawking)}
@@ -182,7 +184,7 @@ $\mathcal{C}^{\mathrm{G4}}$: any local solution admits a maximal extension by is
 \textsf{uses\_zorn} holds; $(\hChoice,\hComp,\hLogic)\ge(1,0,0)$.
 \end{proposition}
 \begin{proof}
-Chains of extensions admit upper bounds; Zorn yields a maximal element (portal to \AC).
+Chains of extensions admit upper bounds; Zorn yields a maximal element (portal to $\AC$).
 \end{proof}
 
 \subsection*{G5. Computable evolution}
@@ -528,7 +530,7 @@ which feeds the Choice coordinate of the height profile. \qedhere
 
 \subsection{Limit–curve portal (Compactness axis)}
 
-\begin{proposition}[Limit–curve portal: $\mathrm{uses\_limit\_curve}\Rightarrow\{\FT\ \text{or}\ \WKL_0\}$]
+\begin{proposition}[Limit–curve portal: $\mathrm{uses\_limit\_curve}\Rightarrow\{\FT\ \text{or}\ \WKLz\}$]
 \label{prop:limit-curve-portal}
 Suppose a GR derivation $\mathcal{D}$ invokes a \emph{limit–curve} argument: from a sequence of causal curves with uniform local bounds (e.g.\ equicontinuity and uniform speed control), $\mathcal{D}$ extracts a convergent subsequence (or a limit curve) without quantitative moduli of compactness. Then
 \[
@@ -537,7 +539,7 @@ Suppose a GR derivation $\mathcal{D}$ invokes a \emph{limit–curve} argument: f
 \end{proposition}
 
 \begin{proof}[Proof sketch]
-Limit–curve arguments in Lorentzian geometry are typically instances of Arzelà–Ascoli–type compactness on spaces of curves (or a diagonal Bolzano–Weierstraß selection). Over the classical base $\RCA_0$, the necessary sequential compactness for $[0,1]$ and the Bolzano–Weierstraß theorem are equivalent to $\WKL_0$ (Simpson, \emph{Subsystems of Second Order Arithmetic}, Chs.~III–IV). Over constructive bases, Heine–Borel/compactness of Cantor space (hence $[0,1]$ via coding) is calibrated by the Fan Theorem $\FT$ (Bishop–Bridges, \emph{Constructive Analysis}; Troelstra–van Dalen, \emph{Constructivism in Mathematics}). Thus a non-quantitative subsequence/limit extraction imports compactness strength: classically $\WKL_0$; constructively $\FT$. We record this disjunctively, to be resolved by the chosen base. \qedhere
+Limit–curve arguments in Lorentzian geometry are typically instances of Arzelà–Ascoli–type compactness on spaces of curves (or a diagonal Bolzano–Weierstraß selection). Over the classical base $\RCA_0$, the necessary sequential compactness for $[0,1]$ and the Bolzano–Weierstraß theorem are equivalent to $\WKLz$ (Simpson, \emph{Subsystems of Second Order Arithmetic}, Chs.~III–IV). Over constructive bases, Heine–Borel/compactness of Cantor space (hence $[0,1]$ via coding) is calibrated by the Fan Theorem $\FT$ (Bishop–Bridges, \emph{Constructive Analysis}; Troelstra–van Dalen, \emph{Constructivism in Mathematics}). Thus a non-quantitative subsequence/limit extraction imports compactness strength: classically $\WKLz$; constructively $\FT$. We record this disjunctively, to be resolved by the chosen base. \qedhere
 \end{proof}
 
 \begin{remark}
@@ -546,7 +548,7 @@ If one supplies explicit moduli (e.g.\ an effective Arzelà–Ascoli hypothesis)
 
 \subsection{Serial–chain portal (Dependent Choice axis)}
 
-\begin{proposition}[Serial–chain portal: $\mathrm{uses\_serial\_chain}\Rightarrow\{\DC_\omega\}$]
+\begin{proposition}[Serial–chain portal: $\mathrm{uses\_serial\_chain}\Rightarrow\{\DCw\}$]
 \label{prop:dc-portal}
 Let $R\subseteq X\times X$ be serial: $\forall x\in X\,\exists y\in X\,(xRy)$. If a derivation $\mathcal{D}$ requires the existence of an infinite $R$–chain $(x_n)_{n\in\mathbb{N}}$ with $x_n R x_{n+1}$, then
 \[
@@ -555,7 +557,7 @@ Let $R\subseteq X\times X$ be serial: $\forall x\in X\,\exists y\in X\,(xRy)$. I
 \end{proposition}
 
 \begin{proof}
-This is exactly the axiom of Dependent Choice (for $\omega$) specialized to a serial relation. In $\ZF$, $\DC_\omega$ is strictly weaker than AC and sufficient to construct such chains; in $\BISH$, the same scheme expresses the iteration of countably many dependent selections. The portal records this as a foundation‑scoped token. \qedhere
+This is exactly the axiom of Dependent Choice (for $\omega$) specialized to a serial relation. In $\ZF$, $\DCw$ is strictly weaker than AC and sufficient to construct such chains; in $\BISH$, the same scheme expresses the iteration of countably many dependent selections. The portal records this as a foundation‑scoped token. \qedhere
 \end{proof}
 
 \subsection{Reductio portal (Logic axis)}
@@ -674,7 +676,7 @@ end GR
 
 \begin{verbatim}
 -- Axis triple: (Choice, Compactness, Logic)
-structure AxisProfile := (hChoice hComp hLogic : Height)   -- Height ∈ {zero, one, omega}
+structure AxisProfile := (hChoice hComp hLogic : Height)   -- Height in {zero, one, omega}
 structure HeightCertificate :=
 { W        : WitnessFamily
 , profile  : AxisProfile
