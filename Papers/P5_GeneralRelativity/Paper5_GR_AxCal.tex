@@ -9,7 +9,8 @@
 \IfFileExists{lmodern.sty}{\usepackage{lmodern}}{} % Latin Modern fonts (optional)
 \usepackage{geometry}
 \geometry{margin=1in}
-\IfFileExists{microtype.sty}{\usepackage{microtype}}{} % optional enhancement
+% microtype disabled for CI compatibility (requires scalable fonts)
+% \IfFileExists{microtype.sty}{\usepackage{microtype}}{}
 
 \usepackage{amsmath,amssymb}
 \usepackage{amsthm}
