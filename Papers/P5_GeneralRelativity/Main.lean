@@ -40,7 +40,7 @@ theorem Paper5_Main :
   True ∧
   True ∧
   -- Portal framework is sound
-  (∀ flags : List PortalFlag, ∃ profile : AxisProfile, True) := by
+  (∀ _ : List PortalFlag, ∃ _ : AxisProfile, True) := by
   constructor
   · exact ⟨Certificates.all_certificates, by rfl⟩
   constructor  
