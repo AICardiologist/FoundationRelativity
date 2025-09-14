@@ -61,9 +61,9 @@ Uses classical logic for decidability. The if-chain is a placeholder
 for a proper lattice of levels to be developed in future phases.
 -/
 noncomputable def HeightAt (WF : WitnessFamily) : Option Level :=
-  if h₀ : Nonempty (UniformizableOn W_ge0 WF) then
+  if Nonempty (UniformizableOn W_ge0 WF) then
     some Level.zero
-  else if h₁ : Nonempty (UniformizableOn W_ge1 WF) then
+  else if Nonempty (UniformizableOn W_ge1 WF) then
     some Level.one
   else
     none
@@ -83,11 +83,11 @@ theorem gap_has_height_one : HeightAt GapFamily = some Level.one := by
   unfold HeightAt
   -- First branch: height 0 fails
   have neg_h0 := no_uniformization_height0
-  simp only [dif_neg neg_h0]
+  simp only [if_neg neg_h0]
   -- Second branch: height 1 succeeds
   have pos_h1 : Nonempty (UniformizableOn W_ge1 GapFamily) := 
     ⟨uniformization_height1⟩
-  simp only [dif_pos pos_h1]
+  simp only [if_pos pos_h1]
 
 /-! ## Helper functions for working with uniformization -/
 

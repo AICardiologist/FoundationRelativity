@@ -18,8 +18,8 @@ open Papers.P3.Phase2API
 
 /-- Positive uniformization at numeric level k. -/
 def PosUniformizableOnN (k : Nat) (WF : WitnessFamily) : Prop :=
-  ∃ (U : UniformizableOnN k WF),
-    ∀ {F} (hF : W_ge k F) (X : Sigma0), Nonempty (WF.C F X)
+  ∃ (_ : UniformizableOnN k WF),
+    ∀ {F} (_ : W_ge k F) (X : Sigma0), Nonempty (WF.C F X)
 
 /-- Positive numeric height (0/1 implemented for now). -/
 noncomputable def PosHeightAtNat (WF : WitnessFamily) : Option Nat := by

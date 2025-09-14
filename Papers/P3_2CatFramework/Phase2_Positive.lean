@@ -29,8 +29,8 @@ open Papers.P3.Phase2API
 
 /-- Positive uniformization = uniformization + fiber non-emptiness. -/
 def PosUniformizableOn (W : Phase2.Foundation → Prop) (WF : WitnessFamily) : Prop :=
-  ∃ (U : UniformizableOn W WF),
-    ∀ {F} (hF : W F) (X : Sigma0), Nonempty (WF.C F X)
+  ∃ (_ : UniformizableOn W WF),
+    ∀ {F} (_ : W F) (X : Sigma0), Nonempty (WF.C F X)
 
 @[simp] theorem PosUniformizableOn.uniformizable {W WF} :
   PosUniformizableOn W WF → Nonempty (UniformizableOn W WF) :=
