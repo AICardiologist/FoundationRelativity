@@ -2,7 +2,7 @@ import Papers.P1_GBC.RankOneToggle.Toggle
 
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.Normed.Operator.ContinuousLinearMap
-import Mathlib.Analysis.NormedSpace.RCLike
+import Mathlib.Analysis.Normed.Module.RCLike.Basic
 -- We comment out the spectrum import as the required infrastructure is missing.
 -- import Mathlib.Analysis.Normed.Algebra.Spectrum
 
