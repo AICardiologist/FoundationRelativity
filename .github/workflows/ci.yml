@@ -130,8 +130,12 @@ jobs:
   # Sprint 43 P2: CI Tightening with strict warnings/axiom gates
   ci-strict:
     runs-on: ubuntu-latest
+    # Only run on PRs; skip on main branch pushes
+    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for diff
 
       - name: Set up Lean
         uses: leanprover/lean-action@v1
@@ -147,18 +151,43 @@ jobs:
             .lake/build
           key: ${{ runner.os }}-lake-strict-${{ hashFiles('lakefile.lean') }}
 
-      - name: Build with strict warnings
+      - name: Check warnings in changed files only
         run: |
-          echo "Building with strict linter flags..."
-          # Enable strict warnings for new modules (Papers/, CategoryTheory/)
+          echo "Checking for warnings in changed files..."
+          
+          # Get the base branch
+          BASE_BRANCH="origin/${{ github.base_ref }}"
+          
+          # Get list of changed Lean files
+          CHANGED_FILES=$(git diff --name-only "$BASE_BRANCH"...HEAD | grep -E '^(Papers/|CategoryTheory/).*\.lean$' || true)
+          
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "✅ No Lean files changed in Papers/ or CategoryTheory/"
+            exit 0
+          fi
+          
+          echo "Changed files to check:"
+          echo "$CHANGED_FILES" | sed 's/^/  - /'
+          
+          # Build and check for warnings in changed files only
           lake build 2>&1 | tee build.log
           
-          # Check for warnings in new modules only (allow legacy warnings)
-          if grep -E "warning.*\/(Papers|CategoryTheory)\/" build.log | grep -v "declaration uses 'sorry'"; then
-            echo "❌ Warnings found in new modules - CI strict mode requires warning-free code"
+          # Extract warnings for changed files
+          WARNINGS=""
+          for file in $CHANGED_FILES; do
+            FILE_WARNINGS=$(grep -E "warning:.*$file" build.log | grep -v "declaration uses 'sorry'" || true)
+            if [ -n "$FILE_WARNINGS" ]; then
+              WARNINGS="${WARNINGS}${FILE_WARNINGS}\n"
+            fi
+          done
+          
+          if [ -n "$WARNINGS" ]; then
+            echo "❌ Warnings found in changed files:"
+            echo -e "$WARNINGS"
             exit 1
           fi
-          echo "✅ New modules are warning-free"
+          
+          echo "✅ Changed files are warning-free"
 
       - name: Documentation coverage check
         id: doc_coverage

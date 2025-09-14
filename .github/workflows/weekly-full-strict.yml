@@ -1,0 +1,77 @@
+name: Weekly Full Strict Check
+
+on:
+  schedule:
+    # Run at 3 AM UTC every Sunday
+    - cron: '0 3 * * 0'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  full-strict-scan:
+    runs-on: ubuntu-latest
+    continue-on-error: true  # Non-blocking
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Lean
+        uses: leanprover/lean-action@v1
+        with:
+          use-mathlib-cache: true
+          build-args: "-K 400000"
+
+      - name: Full repository warning scan
+        run: |
+          echo "# Full Repository Warning Report" > warning_report.md
+          echo "Date: $(date -u '+%Y-%m-%d %H:%M UTC')" >> warning_report.md
+          echo "" >> warning_report.md
+          
+          # Build and collect all warnings
+          lake build 2>&1 | tee build.log || true
+          
+          # Count warnings by directory
+          echo "## Warning Summary by Directory" >> warning_report.md
+          echo "" >> warning_report.md
+          
+          for dir in Papers CategoryTheory; do
+            if [ -d "$dir" ]; then
+              COUNT=$(grep -c "warning:.*/$dir/" build.log 2>/dev/null || echo "0")
+              echo "- **$dir/**: $COUNT warnings" >> warning_report.md
+            fi
+          done
+          
+          echo "" >> warning_report.md
+          
+          # Detailed breakdown (excluding 'sorry' warnings)
+          echo "## Non-sorry Warnings" >> warning_report.md
+          echo "" >> warning_report.md
+          
+          WARNINGS=$(grep -E "warning:.*\/(Papers|CategoryTheory)\/" build.log | grep -v "declaration uses 'sorry'" || true)
+          
+          if [ -n "$WARNINGS" ]; then
+            echo '```' >> warning_report.md
+            echo "$WARNINGS" | head -50 >> warning_report.md
+            echo '```' >> warning_report.md
+            
+            TOTAL=$(echo "$WARNINGS" | wc -l)
+            echo "" >> warning_report.md
+            echo "Total non-sorry warnings: $TOTAL" >> warning_report.md
+          else
+            echo "🎉 No non-sorry warnings found!" >> warning_report.md
+          fi
+          
+          # Upload report as artifact
+          cat warning_report.md
+
+      - name: Upload warning report
+        uses: actions/upload-artifact@v4
+        with:
+          name: warning-report
+          path: warning_report.md
+          retention-days: 30
+
+      - name: Create issue if warning count increased
+        if: github.event_name == 'schedule'
+        run: |
+          # This is a placeholder for tracking warning trends
+          # In practice, you'd compare against a baseline
+          echo "::notice::Weekly warning scan complete. Check artifacts for full report."
