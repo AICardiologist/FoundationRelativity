@@ -15,14 +15,14 @@ def maxH (a b : Height) : Height :=
   | Height.omega, Height.one   => Height.omega
   | Height.omega, Height.omega => Height.omega
 
-def maxH_comm (a b : Height) : maxH a b = maxH b a := by
+theorem maxH_comm (a b : Height) : maxH a b = maxH b a := by
   cases a <;> cases b <;> rfl
 
-def maxH_assoc (a b c : Height) :
+theorem maxH_assoc (a b c : Height) :
   maxH (maxH a b) c = maxH a (maxH b c) := by
   cases a <;> cases b <;> cases c <;> rfl
 
-def maxH_idem (a : Height) : maxH a a = a := by
+theorem maxH_idem (a : Height) : maxH a a = a := by
   cases a <;> rfl
 
 def maxAP (p q : AxisProfile) : AxisProfile :=
@@ -31,24 +31,24 @@ def maxAP (p q : AxisProfile) : AxisProfile :=
     (maxH p.hComp   q.hComp)
     (maxH p.hLogic  q.hLogic)
 
-def maxAP_hChoice (p q : AxisProfile) :
+theorem maxAP_hChoice (p q : AxisProfile) :
   (maxAP p q).hChoice = maxH p.hChoice q.hChoice := rfl
-def maxAP_hComp (p q : AxisProfile) :
+theorem maxAP_hComp (p q : AxisProfile) :
   (maxAP p q).hComp = maxH p.hComp q.hComp := rfl
-def maxAP_hLogic (p q : AxisProfile) :
+theorem maxAP_hLogic (p q : AxisProfile) :
   (maxAP p q).hLogic = maxH p.hLogic q.hLogic := rfl
 
-def maxAP_comm (p q : AxisProfile) : maxAP p q = maxAP q p := by
+theorem maxAP_comm (p q : AxisProfile) : maxAP p q = maxAP q p := by
   cases p <;> cases q <;> simp [maxAP, maxH_comm]
 
-def maxAP_assoc (p q r : AxisProfile) :
+theorem maxAP_assoc (p q r : AxisProfile) :
   maxAP (maxAP p q) r = maxAP p (maxAP q r) := by
   cases p <;> cases q <;> cases r <;> simp [maxAP, maxH_assoc]
 
-def maxAP_idem (p : AxisProfile) : maxAP p p = p := by
+theorem maxAP_idem (p : AxisProfile) : maxAP p p = p := by
   cases p <;> simp [maxAP, maxH_idem]
 
-def maxH_if_one_zero (a b : Bool) :
+theorem maxH_if_one_zero (a b : Bool) :
   maxH (if a then Height.one else Height.zero)
        (if b then Height.one else Height.zero)
     = (if a || b then Height.one else Height.zero) := by

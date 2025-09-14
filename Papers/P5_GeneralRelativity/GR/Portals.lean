@@ -26,7 +26,13 @@ def route_to_profile (flags : List PortalFlag) : AxisProfile :=
     (if (memFlag .uses_serial_chain flags || memFlag .uses_reductio flags)
       then Height.one else Height.zero)
 
-def memFlag_append (f : PortalFlag) (xs ys : List PortalFlag) :
+-- Basic simp lemmas for list membership
+@[simp] theorem memFlag_nil (f : PortalFlag) : memFlag f [] = false := rfl
+
+@[simp] theorem memFlag_cons (f g : PortalFlag) (gs : List PortalFlag) :
+  memFlag f (g :: gs) = if eqb f g then true else memFlag f gs := rfl
+
+theorem memFlag_append (f : PortalFlag) (xs ys : List PortalFlag) :
   memFlag f (xs ++ ys) = (memFlag f xs || memFlag f ys) := by
   induction xs with
   | nil => simp [memFlag]
