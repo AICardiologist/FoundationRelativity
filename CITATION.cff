@@ -53,3 +53,11 @@ references:
     doi: "10.5281/zenodo.17054155"
     url: "https://github.com/AICardiologist/FoundationRelativity/releases/tag/p3b-collisions-v0.2"
     notes: "Lean 4 formalization of proof-theoretic ladders and collision diagrams"
+  - type: software
+    title: "Paper 5: General Relativity AxCal Analysis"
+    authors:
+      - family-names: Lee
+        given-names: Paul Chun-Kit
+    version: "1.0.0"
+    url: "https://github.com/AICardiologist/FoundationRelativity/releases/tag/paper5-v1.0"
+    notes: "AxCal framework for GR with portal theorems and Height 0 anchors (EPS, Schwarzschild)"
