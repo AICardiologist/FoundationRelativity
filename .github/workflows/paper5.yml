@@ -19,22 +19,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install elan (Lean toolchain)
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y
-          echo "$HOME/.elan/bin" >> $GITHUB_PATH
-          elan --version
+      - name: Set up Lean
+        uses: leanprover/lean-action@v1
+        with:
+          use-mathlib-cache: true
+          build-args: "-K 400000"
 
-      - name: Use repo toolchain
-        run: elan override set "$(cat lean-toolchain)"
-
-      - name: Cache Lake & toolchain
+      - name: Cache .lake
         uses: actions/cache@v4
         with:
           path: |
+            ~/.lake
             .lake/build
-            ~/.elan
-          key: lake-${{ runner.os }}-${{ hashFiles('lean-toolchain','lake-manifest.json') }}
+          key: ${{ runner.os }}-lake-p5-${{ hashFiles('lakefile.lean','lake-manifest.json') }}
 
       - name: Build Smoke
         run: lake build Papers.P5_GeneralRelativity.Smoke
