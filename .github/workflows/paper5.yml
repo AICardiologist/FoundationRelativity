@@ -12,6 +12,9 @@ on:
       - 'scripts/**'
       - '.github/workflows/paper5.yml'
 
+env:
+  LEAN_ABORT_ON_SORRY: 1
+
 jobs:
   lean:
     name: Build Lean + No-sorry + Axiom audit
@@ -26,21 +29,27 @@ jobs:
           build-args: "-K 400000"
 
       - name: Cache .lake
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           path: |
             ~/.lake
             .lake/build
-          key: ${{ runner.os }}-lake-p5-${{ hashFiles('lakefile.lean','lake-manifest.json') }}
+          key: ${{ runner.os }}-lake-p5-${{ hashFiles('lakefile.lean') }}
 
       - name: Build Smoke
-        run: lake build Papers.P5_GeneralRelativity.Smoke
+        run: |
+          echo "Building Paper 5 Smoke test..."
+          lake build Papers.P5_GeneralRelativity.Smoke
+          echo "✅ Smoke test build completed"
 
       - name: No sorries (Paper 5)
-        run: bash scripts/no_sorry.sh
+        run: |
+          echo "Checking for sorries in Paper 5..."
+          bash scripts/no_sorry.sh
 
       - name: Axiom audit
         run: |
+          echo "Running axiom audit..."
           lake env lean scripts/AxiomAudit.lean | tee axiom-audit.txt
 
       - uses: actions/upload-artifact@v4
