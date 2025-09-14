@@ -54,11 +54,15 @@ lemma posUL_truth_iff
         η_id := by
           intro F hF X
           -- Everything reduces to `Equiv.refl PUnit`
-          simp only [toUnit, TruthFamily_C, Truth_true]
+          have hb : B F X = true := hAll hF X
+          simp only [toUnit, TruthFamily_C, Truth_true, hb]
         η_comp := by
           intro F G H φ ψ hF hG hH X
           -- Again, everything is `Equiv.refl PUnit` after rewriting
-          simp only [toUnit, TruthFamily_C, Truth_true]
+          have hbF : B F X = true := hAll hF X
+          have hbG : B G X = true := hAll hG X
+          have hbH : B H X = true := hAll hH X
+          simp only [toUnit, TruthFamily_C, Truth_true, hbF, hbG, hbH]
           rfl },
       ?_⟩
     -- Non-emptiness of fibers: `Truth true` is inhabited
@@ -110,7 +114,7 @@ theorem pos_UL_or_pointwise
     (W : Phase2.Foundation → Prop)
     (B C : Phase2.Foundation → Sigma0 → Bool) :
   PosUniformizableOn W (TruthFamily (fun F X => B F X || C F X))
-    ↔ (∀ {F} (hF : W F) (X : Sigma0), B F X = true ∨ C F X = true) := by
+    ↔ (∀ {F} (_ : W F) (X : Sigma0), B F X = true ∨ C F X = true) := by
   simp only [posUL_truth_iff]
   constructor
   · intro h F hF X
@@ -142,9 +146,9 @@ theorem posUL_equiv_truth_iff
   {W : Phase2.Foundation → Prop}
   {WF : WitnessFamily} {B : Phase2.Foundation → Sigma0 → Bool}
   (U : UniformizableOn W WF)
-  (e : ∀ {F} (hF : W F) (X : Sigma0), (WF.C F X) ≃ Truth (B F X)) :
+  (e : ∀ {F} (_ : W F) (X : Sigma0), (WF.C F X) ≃ Truth (B F X)) :
   PosUniformizableOn W WF
-    ↔ (∀ {F} (hF : W F) (X : Sigma0), B F X = true) := by
+    ↔ (∀ {F} (_ : W F) (X : Sigma0), B F X = true) := by
   constructor
   · intro h
     rcases h with ⟨_, ne⟩
