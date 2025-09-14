@@ -54,16 +54,13 @@ lemma posUL_truth_iff
         η_id := by
           intro F hF X
           -- Everything reduces to `Equiv.refl PUnit`
-          have hb : B F X = true := hAll hF X
-          simp only [toUnit, TruthFamily_C, Truth_true, hb]
+          ext x
+          simp [toUnit]
         η_comp := by
           intro F G H φ ψ hF hG hH X
           -- Again, everything is `Equiv.refl PUnit` after rewriting
-          have hbF : B F X = true := hAll hF X
-          have hbG : B G X = true := hAll hG X
-          have hbH : B H X = true := hAll hH X
-          simp only [toUnit, TruthFamily_C, Truth_true, hbF, hbG, hbH]
-          rfl },
+          ext x
+          simp [toUnit] },
       ?_⟩
     -- Non-emptiness of fibers: `Truth true` is inhabited
     intro F hF X
