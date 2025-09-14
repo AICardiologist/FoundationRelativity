@@ -1,27 +1,30 @@
 \documentclass[11pt]{article}
 
 % -------------------------------------------------
-% Preamble (harmonized with Paper 3A/4)
+% Preamble (portable with fallbacks)
 % -------------------------------------------------
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage[english]{babel}
+\IfFileExists{babel.sty}{\usepackage[english]{babel}}{} % ok if missing
 \usepackage{lmodern}
 \usepackage{geometry}
 \geometry{margin=1in}
-% \usepackage{microtype} % Commented out - not essential
-% \usepackage{enumitem}
-% \setlist[enumerate,1]{label=\textnormal{(\alph*)}, leftmargin=2em}
+\IfFileExists{microtype.sty}{\usepackage{microtype}}{} % optional enhancement
+
 \usepackage{amsmath,amssymb}
 \usepackage{amsthm}
 \usepackage{hyperref}
 \hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
-
-% lightweight callouts
 \usepackage{xcolor}
-\usepackage{mdframed}
-\mdfdefinestyle{status}{backgroundcolor=gray!10,linecolor=gray!60!black,linewidth=0.8pt,
-  innerleftmargin=6pt,innerrightmargin=6pt,innertopmargin=4pt,innerbottommargin=4pt}
+
+% mdframed with fallback
+\IfFileExists{mdframed.sty}{
+  \usepackage{mdframed}
+  \mdfdefinestyle{status}{backgroundcolor=gray!10,linecolor=gray!60!black,linewidth=0.8pt,
+    innerleftmargin=6pt,innerrightmargin=6pt,innertopmargin=4pt,innerbottommargin=4pt}
+}{
+  \newenvironment{mdframed}[1][]{\begin{quote}\itshape}{\end{quote}}
+}
 
 % -------------------------------------------------
 % Theorem styles
@@ -241,7 +244,7 @@ cd FoundationRelativity
 \noindent\textbf{Build Commands:}
 \begin{verbatim}
 # Set exact Lean version
-elan override set leanprover/lean4:v4.13.0-rc3
+elan override set leanprover/lean4:v4.23.0-rc2
 
 # Clean and update dependencies
 lake clean && lake update
@@ -297,19 +300,19 @@ G5: computable evolution & logic-sensitive; DC stream & \textsf{uses\_serial\_ch
 \small
 \begin{tabular}{|p{5cm}|p{5.5cm}|p{4cm}|}
 \hline
-\textbf{Paper Concept} & \textbf{Lean Symbol} & \textbf{File Location} \\
+\textbf{Paper Concept} & \textbf{Lean Symbol} & \textbf{Module} \\
 \hline
-Height levels $(0, 1, \omega)$ & \texttt{Height.zero/.one/.omega} & \texttt{AxCalCore/Axis.lean:17-20} \\
+Height levels $(0, 1, \omega)$ & \texttt{Height.zero/.one/.omega} & \texttt{AxCalCore.Axis} \\
 \hline
-Axis profile $(\hChoice, \hComp, \hLogic)$ & \texttt{AxisProfile} & \texttt{AxCalCore/Axis.lean:22-25} \\
+Axis profile $(\hChoice, \hComp, \hLogic)$ & \texttt{AxisProfile} & \texttt{AxCalCore.Axis} \\
 \hline
-Witness family type & \texttt{WitnessFamily} & \texttt{AxCalCore/Axis.lean:51} \\
+Witness family type & \texttt{WitnessFamily} & \texttt{AxCalCore.Axis} \\
 \hline
-Height certificate structure & \texttt{HeightCertificate} & \texttt{GR/Certificates.lean:15-22} \\
+Height certificate structure & \texttt{HeightCertificate} & \texttt{GR.Certificates} \\
 \hline
-Portal flags (Zorn, Limit-Curve, etc.) & \texttt{PortalFlag} & \texttt{GR/Portals.lean:11-15} \\
+Portal flags (Zorn, Limit-Curve, etc.) & \texttt{PortalFlag} & \texttt{GR.Portals} \\
 \hline
-Route-to-profile mapping & \texttt{route\_to\_profile} & \texttt{GR/Portals.lean:25-42} \\
+Route-to-profile mapping & \texttt{route\_to\_profile} & \texttt{GR.Portals} \\
 \hline
 \end{tabular}
 \end{center}
@@ -320,13 +323,13 @@ Route-to-profile mapping & \texttt{route\_to\_profile} & \texttt{GR/Portals.lean
 \small
 \begin{tabular}{|p{5cm}|p{5.5cm}|p{4cm}|}
 \hline
-\textbf{Paper Concept} & \textbf{Lean Symbol} & \textbf{File Location} \\
+\textbf{Paper Concept} & \textbf{Lean Symbol} & \textbf{Module} \\
 \hline
-Pinned signature $\Sigma_0^{\mathrm{GR}}$ & \texttt{Spacetime}, \texttt{LorentzMetric} & \texttt{GR/Interfaces.lean:14-51} \\
+Pinned signature $\Sigma_0^{\mathrm{GR}}$ & \texttt{Spacetime}, \texttt{LorentzMetric} & \texttt{GR.Interfaces} \\
 \hline
-Einstein Field Equations & \texttt{EFE}, \texttt{VacuumEFE} & \texttt{GR/Interfaces.lean:55-61} \\
+Einstein Field Equations & \texttt{EFE}, \texttt{VacuumEFE} & \texttt{GR.Interfaces} \\
 \hline
-Schwarzschild pinning & \texttt{IsPinnedSchwarzschild} & \texttt{GR/Interfaces.lean:63-65} \\
+Schwarzschild pinning & \texttt{IsPinnedSchwarzschild} & \texttt{GR.Interfaces} \\
 \hline
 \end{tabular}
 \end{center}
@@ -365,10 +368,10 @@ G5: Stream & \texttt{GR.G5\_MeasStream\_W} & \texttt{G5\_MeasStream\_Cert} & $(0
 \textbf{Deliverable} & \textbf{Main Theorem} & \textbf{Implementation Status} \\
 \hline
 D1: EPS Kinematics Core & \texttt{EPS\_Height\_Zero} & Schematic framework implemented \\
-& \texttt{EPS\_Kinematics\_Height0} & \texttt{GR/EPSCore.lean:108-127} \\
+& \texttt{EPS\_Kinematics\_Height0} & \texttt{GR.EPSCore} \\
 \hline
 D2: Schwarzschild Vacuum & \texttt{Schwarzschild\_Vacuum\_Check} & Symbolic engine framework \\
-& \texttt{TensorEngine\_Height\_Zero} & \texttt{GR/Schwarzschild.lean:84-121} \\
+& \texttt{TensorEngine\_Height\_Zero} & \texttt{GR.Schwarzschild} \\
 \hline
 \end{tabular}
 \end{center}
@@ -401,16 +404,16 @@ Reductio Portal & \texttt{Reductio\_portal} axiom & $\hLogic \gets 1$ \\
 \textbf{Component} & \textbf{Lean Symbol} & \textbf{Purpose} \\
 \hline
 Main aggregator & \texttt{Paper5\_Main} & Verifies framework completeness \\
-& & \texttt{Main.lean:36-50} \\
+& & \texttt{Main} \\
 \hline
 Profile computation test & \texttt{Profile\_Computation\_Works} & Tests portal$\to$height mapping \\
-& & \texttt{Main.lean:53-60} \\
+& & \texttt{Main} \\
 \hline
 Smoke test & \texttt{Paper5\_Smoke\_Success} & CI aggregator, no-sorry guard \\
-& & \texttt{Smoke.lean:56} \\
+& & \texttt{Smoke} \\
 \hline
 Certificate registry & \texttt{Certificates.all\_certificates} & Lists all 7 height certificates \\
-& & \texttt{Certificates.lean:89-97} \\
+& & \texttt{GR.Certificates} \\
 \hline
 \end{tabular}
 \end{center}
