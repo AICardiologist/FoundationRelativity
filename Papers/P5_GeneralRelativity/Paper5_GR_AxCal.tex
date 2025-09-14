@@ -6,7 +6,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 % babel package removed for CI compatibility
-\usepackage{lmodern}
+\IfFileExists{lmodern.sty}{\usepackage{lmodern}}{} % Latin Modern fonts (optional)
 \usepackage{geometry}
 \geometry{margin=1in}
 \IfFileExists{microtype.sty}{\usepackage{microtype}}{} % optional enhancement
