@@ -5,7 +5,7 @@
 % -------------------------------------------------
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\IfFileExists{babel.sty}{\usepackage[english]{babel}}{} % ok if missing
+% babel package removed for CI compatibility
 \usepackage{lmodern}
 \usepackage{geometry}
 \geometry{margin=1in}
@@ -103,7 +103,7 @@ For each GR target we (a) define a \emph{witness family} at the pin, (b) mark \e
 % ===========================================================
 \section{AxCal instrumentation for GR}
 % ===========================================================
-\subsection{Pinned signature \texorpdfstring{$\SigmaZero^{\mathrm{GR}}$}{Σ0$^{\mathrm{GR}}$}}
+\subsection{Pinned signature \texorpdfstring{$\Sigma_0^{\mathrm{GR}}$}{Sigma0-GR}}
 We fix the smooth category (second-countable, Hausdorff manifolds), tensor fields, Lorentzian metrics, Levi--Civita connection, curvature and Einstein tensors, $\EFE$, and pinned exemplars (Minkowski; a Schwarzschild-type vacuum metric). Interpretations must fix $\SigmaZero^{\mathrm{GR}}$.
 
 \subsection{Tokens and witness families}
@@ -127,7 +127,7 @@ If a proof of a $\SigmaZero^{\mathrm{GR}}$-pinned statement uses a flagged route
 \end{proposition}
 
 \begin{proof}[Sketch]
-These are standard meta-implications: Zorn is equivalent to AC over \ZF; Ascoli-type compactness aligns with \FT\ constructively (and with \WKLz\ classically); building infinite dependent sequences is a canonical use of $\DCw$; essential reductio uses \LEM. The novelty is the \emph{proof-route} tagging that transports these meta-results to the $\SigmaZero^{\mathrm{GR}}$ pin.
+These are standard meta-implications: Zorn is equivalent to AC over $\ZF$; Ascoli-type compactness aligns with $\FT$ constructively (and with $\WKLz$ classically); building infinite dependent sequences is a canonical use of $\DCw$; essential reductio uses $\LEM$. The novelty is the \emph{proof-route} tagging that transports these meta-results to the $\SigmaZero^{\mathrm{GR}}$ pin.
 \end{proof}
 
 \subsection{Height certificates and composition}
@@ -589,7 +589,7 @@ This appendix records the Lean-facing names for tokens, portal axioms, witness f
 \begin{verbatim}
 -- AxCal core tokens (foundation-scoped)
 class HasAC   (F : Foundation) : Prop
-class HasDCω  (F : Foundation) : Prop
+class HasDCw  (F : Foundation) : Prop
 class HasFT   (F : Foundation) : Prop
 class HasWKL0 (F : Foundation) : Prop
 class HasLEM  (F : Foundation) : Prop
@@ -604,22 +604,22 @@ inductive PortalFlag
 
 /-- Portal soundness axioms (paper Prop. 1.1). 
     They are registered once per foundation F. -/
-axiom Zorn_portal     : ∀ {F}, Uses PortalFlag.uses_zorn         → HasAC   F
-axiom LimitCurve_portal : ∀ {F}, Uses PortalFlag.uses_limit_curve → (HasFT F ∨ HasWKL0 F)
-axiom SerialChain_portal : ∀ {F}, Uses PortalFlag.uses_serial_chain → HasDCω F
-axiom Reductio_portal  : ∀ {F}, Uses PortalFlag.uses_reductio     → HasLEM F
+axiom Zorn_portal     : forall {F}, Uses PortalFlag.uses_zorn         -> HasAC   F
+axiom LimitCurve_portal : forall {F}, Uses PortalFlag.uses_limit_curve -> (HasFT F or HasWKL0 F)
+axiom SerialChain_portal : forall {F}, Uses PortalFlag.uses_serial_chain -> HasDCw F
+axiom Reductio_portal  : forall {F}, Uses PortalFlag.uses_reductio     -> HasLEM F
 \end{verbatim}
 
 \paragraph{Notes.}
 \begin{itemize}
 \item The wrapper \verb|Uses flag| is a Prop recording that the corresponding proof-route is actually used in the provided derivation (not merely available in the library). This is what ties the \emph{route} to the \emph{frontier cost}.
-\item The compactness portal is recorded disjunctively (\verb|HasFT ∨ HasWKL0|) to reflect constructive/classical bases; the certificate chooses the branch used in the imported argument.
+\item The compactness portal is recorded disjunctively (\verb|HasFT or HasWKL0|) to reflect constructive/classical bases; the certificate chooses the branch used in the imported argument.
 \end{itemize}
 
 \subsection{Witness families for G1--G5}\label{app:witnesses}
 
 \begin{verbatim}
--- Pinned signature Σ0^GR (interfaces only; no mathlib dependency)
+-- Pinned signature Sigma0^GR (interfaces only; no mathlib dependency)
 structure Manifold := ...
 structure LorentzMetric (M : Manifold) := ...
 structure Spacetime := (M : Manifold) (g : LorentzMetric M)
@@ -635,17 +635,17 @@ namespace GR
 
 /-- G1: explicit vacuum check (Schwarzschild@pin) -/
 def G1_Vacuum_W : WitnessFamily := fun F =>
-  ∀ (Ssch : Spacetime), IsPinnedSchwarzschild Ssch → EFE Ssch ZeroTensor
+  forall (Ssch : Spacetime), IsPinnedSchwarzschild Ssch -> EFE Ssch ZeroTensor
 
 /-- G2: Cauchy problem split into local PDE and MGHD (global) -/
 def G2_LocalPDE_W : WitnessFamily := fun F =>
-  ∀ (ID : InitialData), LocalWellPosed ID         -- no portal flags
+  forall (ID : InitialData), LocalWellPosed ID         -- no portal flags
 def G2_MGHD_W     : WitnessFamily := fun F =>
-  ∀ (ID : InitialData), Uses PortalFlag.uses_zorn → MGHD_Exists ID
+  forall (ID : InitialData), Uses PortalFlag.uses_zorn -> MGHD_Exists ID
 
 /-- G3: Singularity theorem (schematic Penrose) -/
 def G3_Penrose_W : WitnessFamily := fun F =>
-  ∀ (S : Spacetime),
+  forall (S : Spacetime),
     (NullEnergyCondition S) →
     (HasTrappedSurface S)    →
     Uses PortalFlag.uses_limit_curve →
@@ -654,18 +654,18 @@ def G3_Penrose_W : WitnessFamily := fun F =>
 
 /-- G4: Maximal extension existence -/
 def G4_MaxExt_W : WitnessFamily := fun F =>
-  ∀ (S : Spacetime),
+  forall (S : Spacetime),
     Uses PortalFlag.uses_zorn →
-    ∃ Smax, IsMaximalExtension S Smax
+    exists Smax, IsMaximalExtension S Smax
 
 /-- G5: Computable evolution (negative template and DC stream) -/
 def G5_CompNeg_W : WitnessFamily := fun F =>
-  ∃ (class : GHClass),
-    ComputableInitialData class ∧
+  exists (class : GHClass),
+    ComputableInitialData class and
     NonComputableEvolution class  -- PER-style failure
 
 def G5_MeasStream_W : WitnessFamily := fun F =>
-  HasDCω F → (∀ proto : SerialProtocol, InfiniteHistory proto)
+  HasDCw F -> (forall proto : SerialProtocol, InfiniteHistory proto)
 
 end GR
 \end{verbatim}
@@ -686,7 +686,7 @@ structure HeightCertificate :=
 -- Concrete certificates (G1--G5)
 def G1_Vacuum_Cert : HeightCertificate :=
 { W       := GR.G1_Vacuum_W
-, profile := ⟨zero, zero, zero⟩
+, profile := <zero, zero, zero>
 , flags   := []
 , upper   := by
     -- symbolic curvature computation at the pin (no portals)
@@ -696,7 +696,7 @@ def G1_Vacuum_Cert : HeightCertificate :=
 
 def G2_LocalPDE_Cert : HeightCertificate :=
 { W       := GR.G2_LocalPDE_W
-, profile := ⟨zero, zero, zero⟩  -- or ⟨one, zero, zero⟩ if ACω is used in analysis
+, profile := <zero, zero, zero>  -- or ⟨one, zero, zero> if ACw is used in analysis
 , flags   := []
 , upper   := import_local_pde_result
 , cites   := [cite "Choquet–Bruhat (2009)"]
@@ -704,7 +704,7 @@ def G2_LocalPDE_Cert : HeightCertificate :=
 
 def G2_MGHD_Cert : HeightCertificate :=
 { W       := GR.G2_MGHD_W
-, profile := ⟨one, zero, zero⟩
+, profile := <one, zero, zero>
 , flags   := [PortalFlag.uses_zorn]
 , upper   := by
     intro F ID hzorn
@@ -715,7 +715,7 @@ def G2_MGHD_Cert : HeightCertificate :=
 
 def G3_Penrose_Cert : HeightCertificate :=
 { W       := GR.G3_Penrose_W
-, profile := ⟨zero, one, one⟩
+, profile := <zero, one, one>
 , flags   := [PortalFlag.uses_limit_curve, PortalFlag.uses_reductio]
 , upper   := by
     intro F S nec trapped hlim hred
@@ -727,7 +727,7 @@ def G3_Penrose_Cert : HeightCertificate :=
 
 def G4_MaxExt_Cert : HeightCertificate :=
 { W       := GR.G4_MaxExt_W
-, profile := ⟨one, zero, zero⟩
+, profile := <one, zero, zero>
 , flags   := [PortalFlag.uses_zorn]
 , upper   := by
     intro F S hz
@@ -737,7 +737,7 @@ def G4_MaxExt_Cert : HeightCertificate :=
 
 def G5_CompNeg_Cert : HeightCertificate :=
 { W       := GR.G5_CompNeg_W
-, profile := ⟨zero, zero, one⟩  -- logic/Computability axis sensitivity
+, profile := <zero, zero, one>  -- logic/Computability axis sensitivity
 , flags   := []
 , upper   := imported_PER_negative_template
 , cites   := [cite "Pour–El–Richards (1989)"]
@@ -745,22 +745,22 @@ def G5_CompNeg_Cert : HeightCertificate :=
 
 def G5_MeasStream_Cert : HeightCertificate :=
 { W       := GR.G5_MeasStream_W
-, profile := ⟨zero, zero, one⟩  -- shown via DCω portal on serial protocols
+, profile := <zero, zero, one>  -- shown via DCw portal on serial protocols
 , flags   := [PortalFlag.uses_serial_chain]
 , upper   := by
     intro F hDC proto
     exact SerialChain_portal_elim hDC proto
-, cites   := [cite "AxCal DCω eliminator"]
+, cites   := [cite "AxCal DCw eliminator"]
 }
 \end{verbatim}
 
-\subsection{Verification table (names ↔ profiles ↔ portals)}\label{app:table}
+\subsection{Verification table (names / profiles / portals)}\label{app:table}
 
 \begin{center}
 \begin{tabular}{@{}lllll@{}}
-\toprule
+\hline
 \textbf{Target} & \textbf{Witness (Lean)} & \textbf{Certificate (Lean)} & \textbf{Flags} & \textbf{Profile}\\
-\midrule
+\hline
 G1 & \verb|GR.G1_Vacuum_W| & \verb|G1_Vacuum_Cert| & -- & $(0,0,0)$ \\
 G2 (local) & \verb|GR.G2_LocalPDE_W| & \verb|G2_LocalPDE_Cert| & -- & $(0,0,0)$ or $(1,0,0)$ \\
 G2 (MGHD) & \verb|GR.G2_MGHD_W| & \verb|G2_MGHD_Cert| & Zorn & $(1,0,0)$ \\
@@ -768,7 +768,7 @@ G3 & \verb|GR.G3_Penrose_W| & \verb|G3_Penrose_Cert| & LimitCurve, Reductio & $(
 G4 & \verb|GR.G4_MaxExt_W| & \verb|G4_MaxExt_Cert| & Zorn & $(1,0,0)$ \\
 G5 (neg.) & \verb|GR.G5_CompNeg_W| & \verb|G5_CompNeg_Cert| & -- & $(0,0,1)$ \\
 G5 (stream) & \verb|GR.G5_MeasStream_W| & \verb|G5_MeasStream_Cert| & SerialChain & $(0,0,1)$ \\
-\bottomrule
+\hline
 \end{tabular}
 \end{center}
 
@@ -777,7 +777,7 @@ G5 (stream) & \verb|GR.G5_MeasStream_W| & \verb|G5_MeasStream_Cert| & SerialChai
 \begin{verbatim}
 Papers/P5_GR/
   AxCalCore/Axis.lean              -- Height, AxisProfile, ProfileUpper
-  AxCalCore/Tokens.lean            -- HasAC, HasDCω, HasFT, HasWKL0, HasLEM, HasWLPO
+  AxCalCore/Tokens.lean            -- HasAC, HasDCw, HasFT, HasWKL0, HasLEM, HasWLPO
   GR/Interfaces.lean               -- Σ0^GR: manifolds, Lorentz metrics, EFE predicate
   GR/Portals.lean                  -- PortalFlag, Zorn_portal, LimitCurve_portal, ...
   GR/Witnesses.lean                -- G1_Vacuum_W, G2_*, G3_*, G4_*, G5_*
@@ -792,6 +792,6 @@ Papers/P5_GR/
 \begin{itemize}
 \item Every certificate includes \emph{flags} (route evidence) and \emph{cites} (bibliographic anchors).
 \item Replacing an imported theorem by an internal proof that avoids a flagged portal \emph{automatically} lowers the certificate's profile (the AxCal algebra recomputes heights componentwise).
-\item Disjunctive compactness (\verb|HasFT ∨ HasWKL0|) must be resolved per foundation instance to produce a concrete $(\hComp)$ entry.
+\item Disjunctive compactness (\verb|HasFT or HasWKL0|) must be resolved per foundation instance to produce a concrete $(\hComp)$ entry.
 \end{itemize}
 \end{document}
