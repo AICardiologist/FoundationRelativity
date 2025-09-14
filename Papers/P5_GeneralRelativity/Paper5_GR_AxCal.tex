@@ -721,7 +721,7 @@ def G3_Penrose_Cert : HeightCertificate :=
 , flags   := [PortalFlag.uses_limit_curve, PortalFlag.uses_reductio]
 , upper   := by
     intro F S nec trapped hlim hred
-    have hComp : (HasFT F ∨ HasWKL0 F) := LimitCurve_portal hlim
+    have hComp : (HasFT F or HasWKL0 F) := LimitCurve_portal hlim
     have hLEM  : HasLEM F              := Reductio_portal hred
     exact imported_penrose hComp hLEM nec trapped
 , cites   := [cite "Hawking–Ellis §8", cite "Wald §14"]
@@ -780,7 +780,7 @@ G5 (stream) & \verb|GR.G5_MeasStream_W| & \verb|G5_MeasStream_Cert| & SerialChai
 Papers/P5_GR/
   AxCalCore/Axis.lean              -- Height, AxisProfile, ProfileUpper
   AxCalCore/Tokens.lean            -- HasAC, HasDCw, HasFT, HasWKL0, HasLEM, HasWLPO
-  GR/Interfaces.lean               -- Σ0^GR: manifolds, Lorentz metrics, EFE predicate
+  GR/Interfaces.lean               -- Sigma0^GR: manifolds, Lorentz metrics, EFE predicate
   GR/Portals.lean                  -- PortalFlag, Zorn_portal, LimitCurve_portal, ...
   GR/Witnesses.lean                -- G1_Vacuum_W, G2_*, G3_*, G4_*, G5_*
   GR/Certificates.lean             -- G*_Cert definitions (HeightCertificate)
