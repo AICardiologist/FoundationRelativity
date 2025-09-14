@@ -19,7 +19,7 @@ open AxisProfile
 #check PortalFlag
 #check route_to_profile
 
-def route_to_profile_sanity :
+theorem route_to_profile_sanity :
   (route_to_profile [PortalFlag.uses_zorn]).hChoice = Height.one
   ∧ (route_to_profile [PortalFlag.uses_limit_curve]).hComp = Height.one
   ∧ (route_to_profile [PortalFlag.uses_serial_chain]).hLogic = Height.one
@@ -48,7 +48,7 @@ def route_to_profile_sanity :
 
 #reduce route_to_profile (LocalPDE_flags ++ MGHD_flags)
 
-def Belt_and_Suspenders_Normalization_Check :
+theorem Belt_and_Suspenders_Normalization_Check :
   route_to_profile (LocalPDE_flags ++ MGHD_flags) = 
   AxisProfile.mk Height.one Height.one Height.zero := by
   simp [LocalPDE_flags, MGHD_flags, route_to_profile, memFlag, eqb]

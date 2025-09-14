@@ -19,12 +19,12 @@ def G2_Composed_Profile : AxisProfile :=
 def G2_Composed_Cert_flags : List PortalFlag :=
   LocalPDE_flags ++ MGHD_flags
 
-def G2_Composed_profile_law :
+theorem G2_Composed_profile_law :
   route_to_profile G2_Composed_Cert_flags = G2_Composed_Profile := by
   unfold G2_Composed_Cert_flags G2_Composed_Profile LocalPDE_Profile MGHD_Profile
   exact route_to_profile_append_eq_maxAP LocalPDE_flags MGHD_flags
 
-def G2_Composed_well_formed :
+theorem G2_Composed_well_formed :
   (route_to_profile G2_Composed_Cert_flags).hChoice = Height.one := by
   simp [G2_Composed_Cert_flags, LocalPDE_flags, MGHD_flags, 
         route_to_profile, memFlag, eqb]
