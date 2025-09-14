@@ -61,9 +61,9 @@ Uses classical logic for decidability. The if-chain is a placeholder
 for a proper lattice of levels to be developed in future phases.
 -/
 noncomputable def HeightAt (WF : WitnessFamily) : Option Level :=
-  if h₀ : Nonempty (UniformizableOn W_ge0 WF) then
+  if Nonempty (UniformizableOn W_ge0 WF) then
     some Level.zero
-  else if h₁ : Nonempty (UniformizableOn W_ge1 WF) then
+  else if Nonempty (UniformizableOn W_ge1 WF) then
     some Level.one
   else
     none

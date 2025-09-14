@@ -32,7 +32,7 @@ lemma posUL_truth_iff
   {W : Phase2.Foundation → Prop}
   {B : Phase2.Foundation → Sigma0 → Bool} :
   PosUniformizableOn W (TruthFamily B)
-    ↔ (∀ {F} (hF : W F) (X : Sigma0), B F X = true) := by
+    ↔ (∀ {F} (_ : W F) (X : Sigma0), B F X = true) := by
   constructor
   · -- → : extract `true` everywhere from the non-emptiness component
     intro h; rcases h with ⟨_, ne⟩
@@ -54,12 +54,11 @@ lemma posUL_truth_iff
         η_id := by
           intro F hF X
           -- Everything reduces to `Equiv.refl PUnit`
-          simp [toUnit, TruthFamily_C, Truth_true, hAll hF X]
+          simp only [toUnit, TruthFamily_C, Truth_true]
         η_comp := by
           intro F G H φ ψ hF hG hH X
           -- Again, everything is `Equiv.refl PUnit` after rewriting
-          simp [toUnit, TruthFamily_C, Truth_true,
-                hAll hF X, hAll hG X, hAll hH X]
+          simp only [toUnit, TruthFamily_C, Truth_true]
           rfl },
       ?_⟩
     -- Non-emptiness of fibers: `Truth true` is inhabited
