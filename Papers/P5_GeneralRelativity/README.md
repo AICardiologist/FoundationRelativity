@@ -103,10 +103,23 @@ def G1_Vacuum_W : WitnessFamily := fun F =>
 ## 🚀 Build Instructions
 
 ### Prerequisites
-- Lean 4 with elan toolchain manager
+- Lean 4 with elan toolchain manager (v4.23.0-rc2)
 - Lake package manager
 
-### Build Commands
+### Quick Start
+```bash
+# Build and verify (0 sorries)
+lake build Papers.P5_GeneralRelativity.Smoke
+
+# Run axiom audit
+lake env lean Scripts/AxiomAudit.lean
+
+# Build PDF
+cd Papers/P5_GeneralRelativity
+latexmk -pdf Paper5_GR_AxCal.tex
+```
+
+### Full Build Commands
 ```bash
 # Build main Paper 5 target
 lake build Papers.P5_GeneralRelativity
@@ -115,10 +128,17 @@ lake build Papers.P5_GeneralRelativity
 lake build Papers.P5_GeneralRelativity.Smoke
 
 # Check individual components
-lake build Papers.P5_GeneralRelativity.GR.Certificates
-lake build Papers.P5_GeneralRelativity.GR.EPSCore
+lake build Papers.P5_GeneralRelativity.GR.Portals
+lake build Papers.P5_GeneralRelativity.GR.EPS
 lake build Papers.P5_GeneralRelativity.GR.Schwarzschild
+
+# Run truth table test
+lake build Papers.P5_GeneralRelativity.Tests.TruthTable
 ```
+
+### Tagged Release
+- **Release**: [`paper5-v1.0`](https://github.com/AICardiologist/FoundationRelativity/releases/tag/paper5-v1.0)
+- **PDF**: Available as release artifact
 
 ### Verification Status
 - **No-sorry requirement**: All deep-dive deliverables (D1, D2) must compile without `sorry`
