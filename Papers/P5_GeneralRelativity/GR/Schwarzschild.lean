@@ -82,6 +82,26 @@ theorem f_pos_iff_r_gt_2M (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
     have hdiv : 2*M / r < 1 := (div_lt_one hr).2 hR
     simpa [f] using (sub_pos.mpr hdiv)
 
+/-- On the horizon: `f M r = 0` iff `r = 2M` (assuming `M>0` and `r>0`). -/
+theorem f_eq_zero_iff_r_eq_2M (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
+    f M r = 0 ↔ r = 2*M := by
+  constructor
+  · intro hf
+    -- `f = 0` means `1 - 2M/r = 0` hence `1 = 2M/r`
+    have h1 : 1 - 2*M / r = 0 := by simpa [f] using hf
+    have h2 : 1 = 2*M / r := sub_eq_zero.mp h1
+    -- From `1 = 2M/r` and `r > 0`, we get `r = 2M`
+    have h3 : r * 1 = r * (2*M / r) := by rw [h2]
+    simp [mul_div_assoc', ne_of_gt hr] at h3
+    exact h3
+  · intro hrEq
+    -- `f M (2M) = 1 - 2M/(2M) = 0` (need denominator ≠ 0 which follows from `M>0`)
+    subst hrEq
+    have twoM_ne : (2*M) ≠ 0 := by
+      have two_pos : 0 < (2 : ℝ) := by norm_num
+      exact mul_ne_zero (ne_of_gt two_pos) (ne_of_gt hM)
+    simpa [f, twoM_ne]
+
 /-- Exterior region implies `0 < r`. -/
 lemma r_pos_of_exterior (M r : ℝ) (hM : 0 < M) (hr_ex : 2*M < r) : 0 < r := by
   have two_pos : 0 < (2 : ℝ) := by norm_num
@@ -144,6 +164,11 @@ noncomputable def g_inv_rr (M r : ℝ) : ℝ := f M r  -- inverse radial-radial:
 noncomputable def g_inv_θθ (r : ℝ) : ℝ := r⁻¹^2  -- inverse angular
 noncomputable def g_inv_φφ (r θ : ℝ) : ℝ := (r^2 * (sin θ)^2)⁻¹  -- inverse azimuthal
 
+/-- Exterior sign for the inverse metric: `g_inv_rr = f > 0` when `r > 2M`. -/
+theorem g_inv_rr_pos_of_hr (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) :
+    0 < g_inv_rr M r := by
+  simpa [g_inv_rr] using (f_pos_of_hr M r hM hr)
+
 /-- Derivative of `g_inv_rr = f`. -/
 theorem g_inv_rr_hasDerivAt (M r : ℝ) (hr : r ≠ 0) :
     HasDerivAt (fun r' => g_inv_rr M r') (2*M / r^2) r := by
@@ -194,6 +219,14 @@ theorem g_rr_derivative_exterior (M r : ℝ) (hM : 0 < M) (hr_ex : 2*M < r) :
   have hr0  : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
   have hfnz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
   exact g_rr_derivative M r hr0 hfnz
+
+/-- Exterior sign for the inverse time-time metric: `g_inv_tt = -(1/f) < 0` when `r > 2M`. -/
+theorem g_inv_tt_neg_of_hr (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) :
+    g_inv_tt M r < 0 := by
+  have hfpos : 0 < f M r := f_pos_of_hr M r hM hr
+  have hpos_inv : 0 < (f M r)⁻¹ := inv_pos.mpr hfpos
+  have : -(f M r)⁻¹ < 0 := neg_lt_zero.mpr hpos_inv
+  simpa [g_inv_tt] using this
 
 -- Christoffel symbols Γ^μ_νρ (non-zero components only)
 -- Computed symbolically from metric (finite computation)

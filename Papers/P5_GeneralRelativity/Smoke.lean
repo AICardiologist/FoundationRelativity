@@ -224,6 +224,17 @@ example : Schwarzschild.g_tt (1 : ℝ) (3 : ℝ) < 0 := by
   have hr : 2 * (1 : ℝ) < (3 : ℝ) := by norm_num
   exact Schwarzschild.g_tt_neg_of_hr (1 : ℝ) (3 : ℝ) hM hr
 
+-- Inverse metric signs in the same exterior point
+example : 0 < Schwarzschild.g_inv_rr (1 : ℝ) (3 : ℝ) := by
+  have hM : 0 < (1 : ℝ) := by norm_num
+  have hr : 2 * (1 : ℝ) < (3 : ℝ) := by norm_num
+  exact Schwarzschild.g_inv_rr_pos_of_hr (1 : ℝ) (3 : ℝ) hM hr
+
+example : Schwarzschild.g_inv_tt (1 : ℝ) (3 : ℝ) < 0 := by
+  have hM : 0 < (1 : ℝ) := by norm_num
+  have hr : 2 * (1 : ℝ) < (3 : ℝ) := by norm_num
+  exact Schwarzschild.g_inv_tt_neg_of_hr (1 : ℝ) (3 : ℝ) hM hr
+
 end SchwarzschildSmokeChecks
 
 def Paper5_Smoke_Success : True := True.intro
