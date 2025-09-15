@@ -30,7 +30,7 @@
 • Paper 1 (Rank-One Toggle Kernel): ✅ **CORE COMPLETE** - Down to 4 sorries (from 14) `paper1-freeze-v1.0`
 
 🚀 **CURRENT DEVELOPMENT**: 
-• **Paper 5 (General Relativity AxCal)**: 🔧 **ACTIVE** - Axiom calibration for Einstein Field Equations, GR pin (Σ₀^GR), three orthogonal axes
+• **Paper 5 (General Relativity AxCal)**: ✅ **COMPLETE** - Axiom calibration for Einstein Field Equations, GR pin (Σ₀^GR), three orthogonal axes (0 sorries)
 
 ## 🎯 Overview
 
@@ -49,8 +49,8 @@ A Lean 4 formalization project that calibrates the exact logical strength requir
 **Paper 4 LaTeX document** is located in [`Papers/P4_SpectralGeometry/`](Papers/P4_SpectralGeometry/):
 - **Paper4_QuantumSpectra.tex** - Quantum spectra AxCal with Zenodo reproducibility
 
-**Paper 5 LaTeX document** is located in [`Papers/P5_GeneralRelativity/latex/`](Papers/P5_GeneralRelativity/latex/):
-- **Paper5_GR_AxCal.tex** - Axiom Calibration for General Relativity with Lean 4 verification plan
+**Paper 5 LaTeX document** is located in [`Papers/P5_GeneralRelativity/`](Papers/P5_GeneralRelativity/):
+- **[Paper5_GR_AxCal.tex](Papers/P5_GeneralRelativity/Paper5_GR_AxCal.tex)** - Axiom Calibration for General Relativity with complete Lean 4 formalization
 
 **Paper 6 LaTeX document** is located in [`Papers/P6_Heisenberg/`](Papers/P6_Heisenberg/):
 - **Paper6_HeisenbergAxCal.tex** - Heisenberg Uncertainty Principle AxCal analysis ([Software DOI: 10.5281/zenodo.17068179](https://doi.org/10.5281/zenodo.17068179))
@@ -88,12 +88,13 @@ A Lean 4 formalization project that calibrates the exact logical strength requir
 
 🚀 **ACTIVE DEVELOPMENT**:
 
-**Paper 5: General Relativity AxCal** 🔧 **NEW DIRECTION**
+**Paper 5: General Relativity AxCal** ✅ **COMPLETE** (0 sorries)
    - Applies AxCal to Einstein Field Equations
    - GR pin (Σ₀^GR): Manifolds, tensors, Einstein tensor
    - Three orthogonal axes: Choice (AC/DCω/ACω), Compactness/Kinematics (FT/WKL₀), Logic/Computability (WLPO/LEM/MP)
    - Targets G1-G5: Explicit solutions → Computable GR evolution
-   - 45-page LaTeX document with Lean 4 verification plan
+   - Complete Lean 4 formalization with portal theorems and height certificates
+   - CI/CD pipeline with automated PDF generation and axiom auditing
 
 6. **Paper 6: Heisenberg Uncertainty Principle AxCal** `paper6-phase3-v1.0` ✅ **COMPLETE** (0 sorries)
    - **Phase-3 Achievement**: Constructive proofs of both Robertson-Schrödinger and full Schrödinger inequalities
