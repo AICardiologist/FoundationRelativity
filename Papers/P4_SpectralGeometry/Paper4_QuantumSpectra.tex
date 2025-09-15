@@ -44,6 +44,15 @@
 % Lean monospace shortcut
 \newcommand{\lean}[1]{\texttt{#1}}
 \newcommand{\leanok}{\text{\tiny [✓ Lean]}}
+
+% --- Status badges (to match 3A/3B) ---
+\newcommand{\leanaxiom}{\text{\tiny [Axiom]}}
+\newcommand{\leanpartial}{\text{\tiny [Lean-partial]}}
+
+% --- FT variant and MC token used in S5 hygiene ---
+\newcommand{\FTc}{\mathsf{FAN}_{\mathrm{c}}}
+\newcommand{\MC}{\mathsf{MC}}
+\newcommand{\BDN}{\mathsf{BD}\text{-}\mathsf{N}}
 % === PATCH A: END =============================================================
 
 % Theorem environments (Standard amsthm setup)
@@ -200,6 +209,13 @@ This approach allows us to track precisely which axioms are needed for which spe
 \paragraph{What is new here.}
 Compared with earlier drafts, we (i) adopt the \emph{broader axiomatic landscape} of Paper~3A (adding $\ACw$, $\WKLz$, $\BI$, $\MP$, $\ACR/\DCR$ as survey axes), (ii) attach \emph{frontiers/profiles} to physics-salient subclaims (S0--S4), distinguishing carefully between upper bounds and precise frontiers, and (iii) publish a \emph{verification ledger} tracking Lean-feasible parts vs. literature-level inputs.
 
+\paragraph{Scope \& Dependencies (CRM hygiene).}
+Unless stated otherwise, our base is \(\BISH\) (no \(\BDN\), no \(\WKLz\)). Heights and orthogonality are relative to this base.
+When we rely on uniform continuity on \([0,1]\) (UCT), we make this explicit as either
+\(\UCT\) itself or via \(\FTc+\MC\) (and note that \(\WKLz\Rightarrow \UCT\)).
+Our FT‑gated examples therefore use \(\FTc\) (c‑bars) and, where UCT is invoked, record the
+\(\MC\) dependence; any route that already assumes \(\WKLz\) drops UCT costs automatically.
+
 % === PATCH D: BEGIN (contributions box) ======================================
 \noindent\fbox{\parbox{\textwidth}{
 \textbf{Main contributions:}
@@ -344,7 +360,7 @@ Let $P_V$ be the orthogonal projection onto $V$. Then $\|Tx - P_V Tx\| \leq \|Tx
 
 \textbf{Step 2: Diagonalization in finite dimension.}
 The restriction $T|_V: V \to V$ is a self-adjoint operator on the finite-dimensional space $V$. 
-By the spectral theorem for finite-dimensional self-adjoint operators (constructive via Gram-Schmidt and characteristic polynomial roots), 
+By the finite-dimensional spectral decomposition for self-adjoint operators (constructive via orthogonalization and, e.g., QR/Householder schemes or SVD), 
 we obtain orthonormal eigenvectors $\{e_1, \ldots, e_n\}$ of $T|_V$ with eigenvalues $\{\lambda_1, \ldots, \lambda_n\}$.
 
 \textbf{Step 3: Error bound.}
@@ -366,7 +382,7 @@ Let $\mathrm{Spec}_{\mathrm{approx}}(T)=\{\lambda:\forall k\ \exists v,\ \|v\|=1
 The actual spectrum $\mathrm{Spec}(T)$ consists of $\lambda$ such that $T-\lambda I$ is not invertible.
 Constructively, $\mathrm{Spec}(T) \subseteq \mathrm{Spec}_{\mathrm{approx}}(T)$. The reverse inclusion often relies on Markov's Principle ($\MP$), which asserts that if an algorithm is proven not to run forever, it must terminate (formally: $\neg\neg\exists n P(n) \to \exists n P(n)$ for decidable $P$).
 
-\begin{theorem}[Bridges--Ishihara; provenance \cite{BridgesRichman}] \leanok
+\begin{theorem}[Bridges--Ishihara; provenance \cite{BridgesRichman}] \leanpartial
 Over $\BISH$, for bounded self-adjoint $T$,
 \[
 \mathrm{Spec}_{\mathrm{approx}}(T)=\mathrm{Spec}(T)\quad \Longleftrightarrow\quad \MP.
@@ -393,9 +409,9 @@ But $T$ is not invertible if and only if $\exists n P(n)$ (otherwise $T$ has bou
 Thus $\MP$ holds.
 \end{prfsketch}
 
-\begin{proof}[Formal upper direction (Lean-feasible under $\MP$)]
+\begin{proof}[Formal upper direction (Lean)]
 The forward direction is formalized in Lean as \lean{S1\_iff\_MP} in \texttt{MarkovSpectrum.lean}.
-The converse implication establishing the equivalence with $\MP$ is taken from the literature and axiomatized.
+The converse implication is taken from the literature and recorded as an axiom in the artifact.
 \end{proof}
 
 \noindent\textbf{Profile:} Frontier $\{\MP\}$. We treat $\MP$ as orthogonal to the primary axes (WLPO, FT, DC$\omega$), as it represents a different type of non-constructivity (related to unbounded search).
@@ -547,23 +563,19 @@ Everything is explicit and constructive: Hermite functions have closed formulas,
 
 To demonstrate the full 3-axis framework, we include an FT-gated witness:
 
-\begin{proposition}[FT portal] \leanok
+\begin{proposition}[UCT / \(\FTc+\MC\) portal] \leanok
 In certain completeness arguments (e.g., proving that $\BISH + \FT$ suffices to show every bounded linear functional on $C[0,1]$ extends to a measure via Riesz representation in the separable case), the Fan Theorem provides the necessary continuity/compactness. Profile: $(0,1,0)$.
 \end{proposition}
 
 \begin{proof}[Proof sketch]
-The Fan Theorem provides uniform continuity for functions on compact metric spaces. In the context of $C[0,1]$:
+\textbf{UCT use.} The step that replaces arbitrary \(f\in C[0,1]\) by uniform dyadic approximants
+uses \(\UCT\) (every continuous \(f:[0,1]\to\mathbb{R}\) is uniformly continuous). Over \(\BISH\),
+\(\UCT\) can be supplied either directly or via \(\FTc+\MC\); any route that already assumes
+\(\WKLz\) also supplies \(\UCT\). With UCT in hand, the dyadic approximation and consistency
+checks yield the measure and the usual representation.
 
-\textbf{Setup:} Given a bounded linear functional $\Lambda: C[0,1] \to \R$.
-
-\textbf{FT application:} For each $f \in C[0,1]$, the Fan Theorem ensures $f$ is uniformly continuous on $[0,1]$. 
-This allows us to approximate $f$ uniformly by step functions on dyadic partitions.
-
-\textbf{Measure construction:} Define the measure $\mu$ on dyadic intervals via $\mu([k2^{-n}, (k+1)2^{-n}]) = \Lambda(\chi_{[k2^{-n}, (k+1)2^{-n}]})$ where $\chi$ denotes characteristic functions. The FT ensures this extends consistently to a measure.
-
-\textbf{Riesz representation:} We obtain $\Lambda(f) = \int_0^1 f \, d\mu$ for all $f \in C[0,1]$.
-
-Without FT, we cannot guarantee the uniform continuity needed for the approximation argument, hence the $(0,1,0)$ profile.
+\textbf{Profile.} We record the FT‑axis upper bound as \((0,1,0)\) relative to \(\FTc+\MC\). On
+any ladder that already includes \(\WKLz\), this cost disappears (UCT becomes height \(0\) there).
 \end{proof}
 
 \noindent\textbf{Physics readout:} The FT axis captures scenarios where uniform continuity or compactness properties are needed beyond the constructive base. In spectral contexts, this might arise when proving density properties or establishing moduli for convergence in functional calculus constructions.
