@@ -5,6 +5,8 @@ Deep-dive deliverable D2: minimal tensor engine for vacuum check (Height 0)
 
 import Papers.P5_GeneralRelativity.GR.Interfaces
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Analysis.Calculus.Deriv.Inv  -- for derivative of 1/r
+import Mathlib.Analysis.Calculus.Deriv.Mul  -- for derivative rules
 import Mathlib.Tactic  -- for `norm_num`, basic inequalities
 
 namespace Papers.P5_GeneralRelativity
@@ -35,6 +37,13 @@ theorem f_pos_of_hr (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) : 0 < f M r := by
   have hdiv : 2*M / r < 1 := (div_lt_one hr_pos).mpr hr
   -- Then `0 < 1 - 2*M/r`, i.e. `0 < f M r`.
   simpa [f] using (sub_pos.mpr hdiv)
+
+/-- Derivative of the Schwarzschild factor: d/dr[f(r)] = d/dr[1 - 2M/r] = 2M/r² 
+    Placeholder: Full calculus proof deferred to v1.1 (requires careful derivative chain) -/
+theorem f_derivative_placeholder (M r : ℝ) (hr : r ≠ 0) : 
+    -- Statement: deriv (fun r' => f M r') r = 2*M/r^2
+    -- Full proof implementation coming in v1.1
+    True := True.intro
 
 -- Schwarzschild metric components in coordinate basis
 noncomputable def g_tt (M r : ℝ) : ℝ := -f M r  -- time-time component: -f(r)
