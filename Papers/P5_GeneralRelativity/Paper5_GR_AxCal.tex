@@ -261,6 +261,14 @@ lake build Papers.P5_GeneralRelativity.Smoke
 # Verify no sorries in implementation
 grep -r "sorry" Papers/P5_GeneralRelativity/*.lean | \
   grep -v "-- sorry" | wc -l  # Should output: 0
+
+# Run schematic/axiom audits (match CI)
+bash scripts/SchematicAudit.sh
+bash scripts/AxiomDeclAudit.sh
+
+# Optional (informational): print transitive axiom dependencies
+# (will not fail; used for human-readable auditing in CI logs)
+lake env lean scripts/AxiomAudit.lean || true
 \end{verbatim}
 
 \noindent\textbf{Verification Outputs:}
