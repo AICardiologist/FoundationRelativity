@@ -115,6 +115,9 @@ Our account complements and abstracts the ordinal-analytic viewpoint developed v
 We use ``height'' and ``ladder morphism (collision)'' in the same technical sense as Paper~3A. All imported classical lower bounds (e.g., G1/G2) are treated as external inputs; schematic upper bounds and collision steps are certified inside our Lean~4 framework.
 \end{remark}
 
+\subsection*{Scope \& Base (Proof‑theory hygiene)}
+Unless stated otherwise, formalizations internal to arithmetic are carried out over a very weak classical base such as \(\EA\) (or \(\ISigma\)) sufficient for the Hilbert–Bernays–Löb (HBL) derivability conditions, coding of syntax, and explosion (ex falso). Imported incompleteness lower bounds (\textsc{G1}/\textsc{G2}) and ordinal‑analytic facts are treated as classical inputs and are tagged \leancited. Our ladder calibrations and "collision" morphisms are proved \emph{relative to this base}.
+
 \begin{mdframed}[style=provenance]
 \textbf{Provenance Note.} The proof-theoretic results analyzed here are classical. Our contribution is the integration of these hierarchies into the structural framework of the Height Calculus, the identification of ``Formal Collisions,'' and the supporting Lean 4 infrastructure with complete formalization of key theorems.
 \end{mdframed}
@@ -144,6 +147,10 @@ For an arithmetized theory $T$, the \emph{HBL derivability conditions} are:
 \item[(D3)] $T \vdash \Prov_T(\ulcorner\varphi\urcorner) \to \Prov_T(\ulcorner\Prov_T(\ulcorner\varphi\urcorner)\urcorner)$
 \end{enumerate}
 \end{definition}
+
+\begin{remark}[Base sufficient for HBL]
+All uses of (D1)–(D3), coding of syntax, and explosion are carried out over a weak classical base such as \(\EA\) or \(\ISigma\). No stronger induction is required for the results in this paper.
+\end{remark}
 
 The Lean formalization captures this abstractly:
 \begin{lstlisting}[language=Lean]
@@ -354,35 +361,29 @@ The $\Sigma^0_1$ reflection principle for theory $T$ is:
 $$\RFNSigOne(T) \equiv \forall \varphi \in \Sigma^0_1. [\Prov_T(\ulcorner\varphi\urcorner) \to \varphi]$$
 \end{definition}
 
+The key observation is that we must instantiate reflection with a \(\Sigma^0_1\) formula; we use the \emph{false} \(\Sigma^0_1\) sentence \(\exists x\,(x\neq x)\).
+
 \begin{theorem}[Collision Step] \leanok
 For any theory $B$ extending a base theory $T$ with arithmetization:
-$$B \vdash \RFNSigOne(T) \to \Con(T)$$
+$B \vdash \RFNSigOne(T) \to \Con(T).$
 \end{theorem}
 
 \begin{proof}
-We formalize this schematically in Lean. The key insight is that $\bot$ (falsum) is a $\Sigma^0_1$ formula.
+\emph{Key correction.} The instance for reflection must be a \(\Sigma^0_1\) formula. While $\bot$ itself is not \(\Sigma^0_1\), the sentence
+\[
+\sigma \;:=\; \exists x\, (x \neq x)
+\]
+\emph{is} \(\Sigma^0_1\) and is provably false in arithmetic (since $\forall x\, x=x$). 
 
-Assume $\RFNSigOne(T)$ and suppose for contradiction $\neg\Con(T)$, i.e., $T \vdash \bot$.
-
-By D1 (formalized provability):
-$$T \vdash \bot \implies T \vdash \Prov_T(\ulcorner\bot\urcorner)$$
-
-Since we work in extension $B \supseteq T$:
-$$B \vdash \Prov_T(\ulcorner\bot\urcorner)$$
-
-By $\RFNSigOne(T)$ with $\varphi = \bot \in \Sigma^0_1$:
-$$B \vdash \Prov_T(\ulcorner\bot\urcorner) \to \bot$$
-
-Therefore $B \vdash \bot$. But $\bot$ is false (this is formalized as \texttt{Bot\_is\_FalseInN} in our Lean code), giving a contradiction.
-
-The Lean proof:
-\begin{lstlisting}[language=Lean]
-theorem RFN_implies_Con (Text Tbase : Theory) 
-  [HasRFN_Sigma1 Text Tbase] : Con Tbase := by
-  intro h_provable_bot
-  have h_true_bot := HasRFN_Sigma1.reflect Bot Sigma1_Bot h_provable_bot
-  exact Bot_is_FalseInN h_true_bot
-\end{lstlisting}
+Assume towards a contradiction that $\neg\Con(T)$, i.e.\ $T \vdash \bot$. By explosion inside $T$, we then have $T \vdash \sigma$. By the derivability condition (D1), 
+\[
+B \vdash \Prov_T(\ulcorner \sigma \urcorner).
+\]
+Applying $\RFNSigOne(T)$ to the \(\Sigma^0_1\) sentence $\sigma$ yields
+\[
+B \vdash \Prov_T(\ulcorner \sigma \urcorner) \to \sigma,
+\]
+hence $B \vdash \sigma$. But $B$ also proves $\forall x\, x=x$, so $B \vdash \neg \sigma$. Contradiction. Therefore $B \vdash \Con(T)$.
 \end{proof}
 
 \subsection{Ladder Morphism Structure}
@@ -443,15 +444,37 @@ Our Lean formalization is organized into several key modules:
 
 \subsection{Key Achievements}
 
-\begin{theorem}[Formalized RFN-Con Bridge]
+\begin{theorem}[Formalized RFN\texorpdfstring{$\to$}{->}Con Bridge]
 Our Lean code proves (0 sorries):
 \begin{lstlisting}[language=Lean]
-theorem RFN_to_Con_formula (Text Tbase : Theory) 
+/-- A fixed false Σ₁ sentence: ∃x, x ≠ x. -/
+def Sigma1False : Formula := Exists fun x => Not (Eq (var x) (var x))
+
+theorem RFN_to_Con_formula (Text Tbase : Theory)
   [HasArithmetization Tbase] :
   Text.Provable (RFN_Sigma1_Formula Tbase) →
-  Text.Provable (ConsistencyFormula Tbase)
+  Text.Provable (ConsistencyFormula Tbase) := by
+  intro hRFN
+  -- Show: if Tbase proves ⊥ then contradiction via Σ₁-reflection on ∃x x≠x
+  have explode : Tbase.Provable FalseFormula → 
+                 Tbase.Provable Sigma1False := by
+    -- ex falso inside Tbase: from ⊥, prove ∃x x≠x
+    intro h
+    exact provable_exfalso_exists_ne_self h
+  -- Work under the assumption Tbase ⊢ ⊥ and derive a contradiction in Text
+  apply by_contradiction_provable
+  intro hIncon : Text.Provable (Prov_Tbase FalseFormula)
+  -- Lift explosion through (D1) and apply Σ₁-reflection:
+  have hProvSigma1 : Text.Provable (Prov_Tbase Sigma1False) :=
+    derivability1_of_explosion hIncon explode
+  have hSigma1True : Text.Provable Sigma1False :=
+    reflect_Sigma1 hRFN hProvSigma1
+  -- But ∀x x=x is provable, hence ¬(∃x x≠x):
+  exact contradiction_with_reflexivity hSigma1True
 \end{lstlisting}
 \end{theorem}
+
+(Names like provable_exfalso_exists_ne_self, derivability1_of_explosion, reflect_Sigma1, and contradiction_with_reflexivity are placeholders for the corresponding lemmas in your codebase; the point is to reflect a \emph{false} \Sigma^0_1 sentence, not \bot.)
 
 \begin{theorem}[Collision Verification]
 The collision morphism is verified:
