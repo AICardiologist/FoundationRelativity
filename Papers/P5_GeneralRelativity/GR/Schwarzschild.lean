@@ -102,11 +102,48 @@ theorem g_tt_neg_of_hr (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) :
   -- `-f < 0` when `f > 0`
   simpa [g_tt] using (neg_lt_zero.mpr hf)
 
+/-- Derivative of `g_tt = -f`. -/
+theorem g_tt_hasDerivAt (M r : ℝ) (hr : r ≠ 0) :
+    HasDerivAt (fun r' => g_tt M r') (-(2*M / r^2)) r := by
+  -- g_tt = -f
+  have hf := f_hasDerivAt M r hr
+  -- derivative of negation
+  simpa [g_tt] using hf.neg
+
+theorem g_tt_derivative (M r : ℝ) (hr : r ≠ 0) :
+    deriv (fun r' => g_tt M r') r = -(2*M / r^2) := by
+  simpa using (g_tt_hasDerivAt M r hr).deriv
+
 -- Inverse metric components
 noncomputable def g_inv_tt (M r : ℝ) : ℝ := -(f M r)⁻¹  -- inverse time-time: -1/f(r)
 noncomputable def g_inv_rr (M r : ℝ) : ℝ := f M r  -- inverse radial-radial: f(r)
 noncomputable def g_inv_θθ (r : ℝ) : ℝ := r⁻¹^2  -- inverse angular
 noncomputable def g_inv_φφ (r θ : ℝ) : ℝ := (r^2 * (sin θ)^2)⁻¹  -- inverse azimuthal
+
+/-- General derivative of `g_rr = (f)⁻¹`. Requires `f(M,r) ≠ 0`. -/
+theorem g_rr_hasDerivAt (M r : ℝ) (hr : r ≠ 0) (hfnz : f M r ≠ 0) :
+    HasDerivAt (fun r' => g_rr M r')
+      (-(2*M / r^2) / (f M r)^2) r := by
+  have hf := f_hasDerivAt M r hr
+  -- derivative of inverse: (f)⁻¹ ↦ -(f') / (f r)²
+  have hInv := hf.inv hfnz
+  simpa [g_rr] using hInv
+
+theorem g_rr_derivative (M r : ℝ) (hr : r ≠ 0) (hfnz : f M r ≠ 0) :
+    deriv (fun r' => g_rr M r') r = (-(2*M / r^2) / (f M r)^2) := by
+  simpa using (g_rr_hasDerivAt M r hr hfnz).deriv
+
+/-- Exterior specialization: discharge `f ≠ 0` via `r > 2M`. -/
+theorem g_rr_derivative_exterior (M r : ℝ) (hM : 0 < M) (hr_ex : 2*M < r) :
+    deriv (fun r' => g_rr M r') r = (-(2*M / r^2) / (f M r)^2) := by
+  -- r ≠ 0 from 2M < r and M > 0
+  have two_pos : 0 < (2 : ℝ) := by norm_num
+  have hr0 : r ≠ 0 := by
+    have : 0 < r := lt_trans (mul_pos two_pos hM) hr_ex
+    exact ne_of_gt this
+  have hfpos : 0 < f M r := f_pos_of_hr M r hM hr_ex
+  have hfnz  : f M r ≠ 0 := ne_of_gt hfpos
+  exact g_rr_derivative M r hr0 hfnz
 
 -- Christoffel symbols Γ^μ_νρ (non-zero components only)
 -- Computed symbolically from metric (finite computation)

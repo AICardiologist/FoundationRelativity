@@ -159,6 +159,25 @@ example : deriv (fun r' => Schwarzschild.f (1 : ℝ) r') (3 : ℝ) = (2 : ℝ) /
     norm_num
   · norm_num
 
+-- Derivative of g_tt at (M,r)=(1,3): -(2/9)
+example : deriv (fun r' => Schwarzschild.g_tt (1 : ℝ) r') (3 : ℝ) = -((2 : ℝ) / 9) := by
+  have hr0 : (3 : ℝ) ≠ 0 := by norm_num
+  rw [Schwarzschild.g_tt_derivative]
+  · simp only [sq]
+    norm_num
+  · exact hr0
+
+-- Derivative of g_rr at (M,r)=(1,3): -2 (since f(1,3)=1/3)
+example : deriv (fun r' => Schwarzschild.g_rr (1 : ℝ) r') (3 : ℝ) = (-2 : ℝ) := by
+  -- Use exterior specialization to discharge f ≠ 0
+  have hM : 0 < (1 : ℝ) := by norm_num
+  have hr : 2 * (1 : ℝ) < (3 : ℝ) := by norm_num
+  have h := Schwarzschild.g_rr_derivative_exterior (1 : ℝ) (3 : ℝ) hM hr
+  -- simplify right-hand side numerically
+  simp only [Schwarzschild.f, sq] at h
+  convert h using 1
+  norm_num
+
 -- Outside the horizon at M=1, r=3: g_rr > 0 and g_tt < 0
 example : 0 < Schwarzschild.g_rr (1 : ℝ) (3 : ℝ) := by
   have hM : 0 < (1 : ℝ) := by norm_num
