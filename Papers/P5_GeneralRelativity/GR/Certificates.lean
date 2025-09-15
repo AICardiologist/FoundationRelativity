@@ -67,20 +67,22 @@ def G4_MaxExt_Cert : HeightCertificate := {
   cites := [cite_wald_ch10_1]
 }
 
+-- PER-style negative template: profile neutral (no tracked portal)
 def G5_CompNeg_Cert : HeightCertificate := {
   name := "G5a: Computable→non-computable evolution (PER template)",
   W := GR.G5_CompNeg_W,
   flags := [], -- template itself is portal-free; the theorem instantiation will decide flags
-  profile := route_to_profile [],
+  profile := route_to_profile [],  -- Will be (0,0,0) since no flags
   upper := { upper_proof := by intro _ _; exact True.intro },
   cites := [cite_pour_el_richards_1989]
 }
 
+-- Measurement stream: DCω sits on the Choice axis
 def G5_MeasStream_Cert : HeightCertificate := {
   name := "G5b: Sequential measurement stream (DCω upper bound)",
   W := GR.G5_MeasStream_W,
   flags := [PortalFlag.uses_serial_chain],
-  profile := route_to_profile [PortalFlag.uses_serial_chain],
+  profile := route_to_profile [PortalFlag.uses_serial_chain],  -- Will be (1,0,0) with DCω on Choice
   upper := { upper_proof := by intro _ _; exact True.intro },
   cites := [cite_axcal_dc_eliminator]
 }

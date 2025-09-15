@@ -22,11 +22,17 @@ open AxisProfile
 #check route_to_profile
 
 theorem route_to_profile_sanity :
-  (route_to_profile [PortalFlag.uses_zorn]).hChoice = Height.one
-  ∧ (route_to_profile [PortalFlag.uses_limit_curve]).hComp = Height.one
-  ∧ (route_to_profile [PortalFlag.uses_serial_chain]).hLogic = Height.one
-  ∧ (route_to_profile [PortalFlag.uses_reductio]).hLogic = Height.one := by
-  simp [route_to_profile, memFlag, eqb]
+  (route_to_profile [PortalFlag.uses_zorn]).hChoice = Height.one ∧
+  (route_to_profile [PortalFlag.uses_limit_curve]).hComp = Height.one ∧
+  (route_to_profile [PortalFlag.uses_serial_chain]).hChoice = Height.one ∧
+  (route_to_profile [PortalFlag.uses_reductio]).hLogic = Height.one := by
+  constructor
+  · simp [route_to_profile, memFlag, eqb]   -- Zorn → Choice
+  constructor
+  · simp [route_to_profile, memFlag, eqb]   -- Limit-curve → Comp
+  constructor
+  · simp [route_to_profile, memFlag, eqb]   -- Serial-chain (DCω) → Choice
+  · simp [route_to_profile, memFlag, eqb]   -- Reductio → Logic
 
 #check maxH
 #check maxAP
