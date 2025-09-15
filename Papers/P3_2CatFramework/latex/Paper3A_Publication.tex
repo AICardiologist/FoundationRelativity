@@ -68,6 +68,14 @@
 \newcommand{\MP}{\mathrm{MP}}
 \newcommand{\BI}{\mathrm{BI}}
 
+% --- CRM "zoo" macros (added)
+\newcommand{\BDN}{\mathrm{BD\mbox{-}N}}
+\newcommand{\MC}{\mathrm{MC}}            % majorized choice
+\newcommand{\WKL}{\mathrm{WKL}}
+\newcommand{\FTc}{\mathrm{FAN}_{\mathrm{c}}}  % fan theorem for c-bars
+\newcommand{\FANPiO}{\mathrm{FAN}_{\Pi^0_1}}
+\newcommand{\FANDelta}{\mathrm{FAN}_{\Delta}}
+
 % Formalization status markers
 \newcommand{\leanok}{\textsf{\textcolor{green!70!black}{[Lean-formalized]}}}
 \newcommand{\leanaxiom}{\textsf{\textcolor{orange!80!black}{[Lean-axiomatized]}}}
@@ -99,7 +107,7 @@ We present Axiom Calibration (AxCal), a categorical framework for measuring the 
 We provide complete mathematical proofs and clearly distinguish between fully formalized results (marked \leanok), axiomatized components (marked \leanaxiom), and results cited from literature (marked \leancited). Our main contributions include:
 \begin{enumerate}
 \item A rigorous framework with uniformizability and height invariants for measuring axiomatic strength
-\item Calibration of three orthogonal axes: the bidual gap at height 1 on the WLPO axis \leanok, the Uniform Continuity Theorem at height 1 on the Fan Theorem axis \leanaxiom, and Baire Category at height 1 on the $\DCw$ axis \leanok{} (Paper 3C, fully integrated)
+\item Calibration of three axes: the bidual gap at height 1 on the WLPO axis \leanok; the Uniform Continuity Theorem at height 1 on the \(\FTc+\MC\) axis (and at height 0 on any ladder admitting \(\WKL\)) \leanaxiom; and Baire Category at height 1 on the \(\DCw\) axis \leanok{} (Paper 3C, fully integrated)
 \item A comprehensive Boolean algebra API for quotient spaces with 100+ formalized lemmas \leanok
 \item Analysis of the Stone Window showing where classical proofs fail constructively
 \end{enumerate}
@@ -165,6 +173,13 @@ This enhanced edition provides:
 \item \textbf{Warning boxes} highlighting subtleties
 \item \textbf{Concrete examples} illustrating abstract definitions
 \end{itemize}
+
+\subsection{Scope \& Dependencies (CRM hygiene)}\label{subsec:scope}
+Unless explicitly stated otherwise, our base theory is \(\BISH\) (intuitionistic analysis, no \(\BDN\), no \(\WKL\), no global choice). We treat \(\ACw\), \(\DCw\), \(\BDN\), \(\WKL\), and fan-theorem variants as \emph{independent toggles}. All independence/orthogonality and height claims are over this base.
+
+\begin{warningbox}
+\textbf{Collapse cautions.} Over \(\BISH\): (i) \(\WKL \Rightarrow \UCT\); hence on any ladder admitting \(\WKL\), \(\UCT\) sits at height \(0\). (ii) Under \(\BDN\), one has \(\FTc \Rightarrow \FANPiO\) and \(\UCT \iff \FTc+\MC\), partially collapsing the FT/UCT axis. Our FT/UCT calibrations are therefore stated relative to \(\FTc+\MC\) (and \emph{without} \(\BDN\) or \(\WKL\)).
+\end{warningbox}
 
 \subsection{Contributions}
 
@@ -369,6 +384,10 @@ For the product $\mathcal{C} \times \mathcal{D}$ to be positively uniformizable 
 Therefore $h_i(\mathcal{C} \times \mathcal{D}) = \max(c_i, d_i)$ for each $i$.
 \end{proof}
 
+\begin{remark}[What we prove vs.\ assume]\label{rem:orthog-disclaimer}
+We do not re-prove model-theoretic separations among \(\WLPO\), FT-variants, and \(\DCw\). Where needed, we record axioms or cite literature; our height calculus and product laws are \emph{relative to the declared base} in \Cref{subsec:scope}. Admitting extra background principles (e.g.\ \(\WKL\), \(\BDN\)) can collapse some heights, as documented there.
+\end{remark}
+
 %===========================================================
 \section{Three Orthogonal Calibrations}
 %===========================================================
@@ -404,30 +423,33 @@ By Theorem \ref{thm:paper2}:
 \end{itemize}
 \end{proof}
 
-\subsection{The Fan Theorem Axis: Uniform Continuity}
+\subsection{The Fan Theorem Axis: Uniform Continuity (revised)}\label{subsec:uct-revised}
 
-\begin{definition}[Fan Theorem]\label{def:ft}
-The \emph{Fan Theorem} (FT) states: Every decidable bar in the binary tree $2^{<\N}$ has a uniform bound.
-
-Formally: If $B \subseteq 2^{<\N}$ is decidable and every infinite path meets $B$ (bar property), then there exists $N$ such that every path meets $B$ at depth $\leq N$.
+\begin{definition}[Fan Theorem variants]\label{def:fan-variants}
+We distinguish \(\FTc\) (decidable c-bars), \(\FANPiO\) (bars that are \(\Pi^0_1\) with extension-closure), and \(\FANDelta\) (Dini-type). These variants are not equivalent over \(\BISH\) absent extra hypotheses.\footnote{Under \(\BDN\) one has \(\FTc \Rightarrow \FANPiO\); and further, \(\UCT \iff \FTc+\MC\), see \Cref{subsec:scope}.}
 \end{definition}
 
-\begin{definition}[Uniform Continuity Theorem]\label{def:uct}
-The \emph{Uniform Continuity Theorem} (UCT) states: Every continuous function $f: [0,1] \to \R$ is uniformly continuous.
+\begin{definition}[Uniform Continuity Theorem]\label{def:uct-restate}
+\(\UCT\): Every pointwise continuous \(f:[0,1]\to\R\) is uniformly continuous.
 \end{definition}
 
 \begin{warningbox}
-\textbf{Formalization Status}: The UCT calibration is currently \leanaxiom{} (axiomatized) in our Lean development. The equivalence FT $\leftrightarrow$ UCT is a classical result in constructive mathematics, first established by Brouwer and refined by Bishop \cite{Bishop1967} and Bridges-Richman \cite{BridgesRichman1987}. The proof involves substantial technical machinery (dyadic approximations, decidable bars, etc.) that would require significant Lean infrastructure. As noted in the code comment, ``the constructive proof lives in WP-B'' (likely Paper 3B). We present the standard mathematical proof following \cite{BridgesVita2006}.
+\textbf{Facts used.} Over \(\BISH\): (i) \(\WKL \Rightarrow \UCT\); (ii) \(\UCT \iff \FTc+\MC\) (majorized choice); (iii) \(\BDN\) collapses some fan variants. We therefore calibrate \(\UCT\) along the \(\FTc+\MC\) ladder, and we record the \(\WKL\) shortcut separately.
 \end{warningbox}
 
-\begin{theorem}[UCT Calibration]\label{thm:uct-calib} \leanaxiom
-The witness family $\mathcal{C}^{\UCT}$ for uniform continuity has:
-\begin{itemize}
-\item Height $\infty$ on WLPO ladder: Not provable from WLPO alone
-\item Height 1 on FT ladder: Provable from FT
-\item Profile on $(\WLPO, \FT, \DCw)$ axes: $(\infty, 1, \infty)$
-\end{itemize}
+\begin{theorem}[UCT Calibration --- revised]\label{thm:uct-calib-revised} \leanaxiom
+Over \(\BISH\):
+\begin{enumerate}
+  \item \(\WKL \Rightarrow \UCT\). Consequently, any ladder admitting \(\WKL\) places \(\UCT\) at height \(0\) relative to that ladder.
+  \item \(\UCT \iff \FTc+\MC\). Hence along the \(\FTc+\MC\) ladder, \(h_{\FTc+\MC}(\mathcal{C}^{\UCT})=1\).
+  \item Without \(\MC\), \(\FTc\) alone does not (currently) entail \(\UCT\); our framework treats this case as \emph{undetermined height} on the pure \(\FTc\) ladder.
+\end{enumerate}
+Accordingly, the profile of \(\UCT\) on \((\WLPO,\FTc+\MC,\DCw)\) is \((\infty,1,\infty)\), and on any ladder containing \(\WKL\) it is \((\infty,0,\infty)\).
 \end{theorem}
+
+\begin{remark}[Orthogonality scope]\label{rem:ft-orth-scope}
+All orthogonality claims involving the FT/UCT axis are meant over the base in \Cref{subsec:scope}. Admitting \(\BDN\) or \(\WKL\) can collapse parts of the axis.
+\end{remark}
 
 \begin{proof}
 We fix the standard FT formulation for decidable bars on the full binary tree and the usual UCT on $[0,1]$ with the Euclidean metric.
@@ -671,8 +693,8 @@ Product law & 0 sorries & \texttt{PartIII\_ProductSup.lean} \\
 \hline
 \multicolumn{3}{|c|}{\textit{Axiomatized} \leanaxiom} \\
 \hline
-FT $\rightarrow$ UCT & Axiom & \texttt{FT\_UCT\_MinimalSurface.lean} \\
-UCT $\rightarrow$ FT & Not formalized & Classical result \\
+\(\WKL \rightarrow \UCT\) & Axiom & \texttt{WKL\_UCT.lean} \\
+\((\FTc+\MC) \leftrightarrow \UCT\) & Axiom & \texttt{FTc\_MC\_UCT.lean} \\
 \hline
 \multicolumn{3}{|c|}{\textit{Paper 3C Components (Fully Integrated)} \leanok} \\
 \hline
@@ -689,6 +711,8 @@ Stone surjectivity & Classical only & Requires LEM \\
 \caption{Formalization status of key results}
 \label{tab:formalization-status}
 \end{table}
+
+\noindent\emph{Scope note:} Orthogonality and heights are over \(\BISH\) without \(\BDN\) or \(\WKL\); see \Cref{subsec:scope}.
 
 %===========================================================
 \section{Conclusion and Future Work}
@@ -754,6 +778,18 @@ Axiom Calibration provides a quantitative foundation for understanding construct
 \end{itemize}
 
 %===========================================================
+\section{Where AxCal Sits Relative to CRM Principles}\label{app:zoo-map}
+%===========================================================
+
+Over \(\BISH\) (no \(\BDN\), no \(\WKL\), no \(\MC\)):
+
+\begin{itemize}
+\item \textbf{UCT:} Height \(1\) on \(\FTc+\MC\); sits at height \(0\) on any ladder containing \(\WKL\).
+\item \textbf{Fan variants:} \(\FANDelta \Rightarrow \FTc \Rightarrow \FANPiO\). Under \(\BDN\): \(\FTc \Rightarrow \FANPiO\) and \(\UCT \iff \FTc+\MC\), partially collapsing this axis.
+\item \textbf{WLPO/LLPO:} Remain orthogonal to the fan principles in this base; we deliberately keep classical collapses out of scope.
+\end{itemize}
+
+%===========================================================
 % Bibliography
 %===========================================================
 
@@ -784,6 +820,21 @@ D.~Bridges and F.~Richman.
 D.~Bridges and L.~Vîţă.
 \newblock \emph{Techniques of Constructive Analysis}.
 \newblock Universitext. Springer-Verlag, 2006.
+
+\bibitem[BD07]{BridgesDiener2007}
+D.~S.~Bridges and H.~Diener.
+\newblock The pseudocompactness of $[0,1]$ is equivalent to the uniform continuity theorem.
+\newblock \emph{Journal of Symbolic Logic}, 72(4):1379--1384, 2007.
+
+\bibitem[Die13]{Diener2013}
+H.~Diener.
+\newblock Weak K\"onig's lemma implies the uniform continuity theorem.
+\newblock \emph{Computability}, 2(1):9--13, 2013.
+
+\bibitem[Die18]{Diener2018}
+H.~Diener.
+\newblock Constructive Reverse Mathematics.
+\newblock \emph{arXiv:1804.05495}, 2018.
 
 \bibitem[TvD88]{TroelstraVanDalen1988}
 A.S.~Troelstra and D.~van~Dalen.
