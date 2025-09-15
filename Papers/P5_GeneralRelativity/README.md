@@ -14,8 +14,9 @@ This paper applies the Axiom Calibration (AxCal) framework to General Relativity
 ## 📄 Paper Content
 
 ### LaTeX Documents
-- **Main Paper**: [`Paper5_GR_AxCal.tex`](Paper5_GR_AxCal.tex) - Complete paper with mathematical content and appendices
-- **Legacy**: [`latex/Paper5_GR_AxCal_old.tex`](latex/Paper5_GR_AxCal_old.tex) - Original theoretical foundation
+- **Main Paper**: [`Paper5_GR_AxCal.tex`](Paper5_GR_AxCal.tex) - Complete 45-page paper with full mathematical exposition
+- **PDF Build**: Automated CI/CD pipeline generates PDF on every push
+- **Location**: The LaTeX file is located directly in this directory: `Papers/P5_GeneralRelativity/Paper5_GR_AxCal.tex`
 
 ### Key Contributions
 
@@ -105,6 +106,7 @@ def G1_Vacuum_W : WitnessFamily := fun F =>
 ### Prerequisites
 - Lean 4 with elan toolchain manager (v4.23.0-rc2)
 - Lake package manager
+- LaTeX distribution (for PDF generation)
 
 ### Quick Start
 ```bash
@@ -141,9 +143,10 @@ lake build Papers.P5_GeneralRelativity.Tests.TruthTable
 - **PDF**: Available as release artifact
 
 ### Verification Status
-- **No-sorry requirement**: All deep-dive deliverables (D1, D2) must compile without `sorry`
-- **Certificate completeness**: All G1-G5 targets have HeightCertificate instances
-- **Portal soundness**: All route flags trigger appropriate axiom tokens
+- **No-sorry requirement**: ✅ **COMPLETE** - Zero sorries in entire Paper 5 codebase
+- **Certificate completeness**: ✅ All G1-G5 targets have HeightCertificate instances
+- **Portal soundness**: ✅ All route flags trigger appropriate axiom tokens
+- **CI/CD Pipeline**: ✅ Automated builds, PDF generation, and axiom auditing
 
 ## 🔬 Hybrid Development Plan
 
