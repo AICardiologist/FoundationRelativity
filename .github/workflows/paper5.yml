@@ -1,0 +1,107 @@
+name: Paper 5 – build, audit, and PDF
+
+on:
+  push:
+    branches: [ main, 'paper5/**', 'feature/**' ]
+    tags:
+      - 'paper5-v*'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'Papers/P5_GeneralRelativity/**'
+      - 'scripts/**'
+      - '.github/workflows/paper5.yml'
+
+env:
+  LEAN_ABORT_ON_SORRY: 1
+
+jobs:
+  lean:
+    name: Build Lean + No-sorry + Axiom audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Lean
+        uses: leanprover/lean-action@v1
+        with:
+          use-mathlib-cache: true
+          build-args: "-K 400000"
+
+      - name: Cache .lake
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.lake
+            .lake/build
+          key: ${{ runner.os }}-lake-p5-${{ hashFiles('lakefile.lean') }}
+
+      - name: Build Smoke
+        run: |
+          echo "Building Paper 5 Smoke test..."
+          lake build Papers.P5_GeneralRelativity.Smoke
+          echo "✅ Smoke test build completed"
+
+      - name: No sorries (Paper 5)
+        run: |
+          echo "Checking for sorries in Paper 5..."
+          bash scripts/no_sorry.sh
+
+      - name: Axiom audit
+        run: |
+          echo "Running axiom audit..."
+          lake env lean scripts/AxiomAudit.lean | tee axiom-audit.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: axiom-audit
+          path: axiom-audit.txt
+
+  pdf:
+    name: Build Paper 5 PDF
+    needs: lean
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Lightweight LaTeX build; your preamble has fallbacks so this is enough
+      - name: Install TeXLive (minimal)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
+            texlive-fonts-extra texlive-latex-recommended latexmk
+
+      - name: Build Paper PDF
+        working-directory: Papers/P5_GeneralRelativity
+        run: |
+          # Build PDF (allowing warnings but not errors)
+          pdflatex -interaction=nonstopmode Paper5_GR_AxCal.tex || true
+          pdflatex -interaction=nonstopmode Paper5_GR_AxCal.tex || true
+          # Check that PDF was created
+          if [ -f Paper5_GR_AxCal.pdf ]; then
+            echo "✅ PDF created successfully"
+            ls -l Paper5_GR_AxCal.pdf
+          else
+            echo "❌ PDF creation failed"
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper5-pdf
+          path: Papers/P5_GeneralRelativity/Paper5_GR_AxCal.pdf
+
+  release:
+    name: Attach PDF on tag
+    needs: pdf
+    if: startsWith(github.ref, 'refs/tags/paper5-v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: paper5-pdf
+          path: dist
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/Paper5_GR_AxCal.pdf
