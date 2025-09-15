@@ -144,9 +144,15 @@ lake build Papers.P5_GeneralRelativity.Tests.TruthTable
 
 ### Verification Status
 - **No-sorry requirement**: ✅ **COMPLETE** - Zero sorries in entire Paper 5 codebase
+  - *Note*: "No-sorry" means all proofs present are closed in Lean; it does not imply that every deep computation has been carried out. For Schwarzschild we currently ship a typed scaffold with `True` placeholders; the full component computations land in v1.1.
 - **Certificate completeness**: ✅ All G1-G5 targets have HeightCertificate instances
 - **Portal soundness**: ✅ All route flags trigger appropriate axiom tokens
 - **CI/CD Pipeline**: ✅ Automated builds, PDF generation, and axiom auditing
+
+## 📋 Known Limitations (v1.0 Framework Release)
+
+- **`Papers/P5_GeneralRelativity/GR/Schwarzschild.lean`** is schematic: it defines the typed pipeline (metric → Γ → Ricci → Einstein) but uses `True` placeholders rather than explicit component formulas/derivatives. No `sorry` are used; symbolic proofs are scheduled for v1.1.
+- All portal/profile results are fully checked and compositional; the axiom audit shows only `propext` for core algebra and the intended portal axioms.
 
 ## 🔬 Hybrid Development Plan
 

@@ -224,7 +224,7 @@ Global hyperbolicity yields compact diamond sets; equicontinuity gives Ascoli--A
 \paragraph{Deep dive anchors (Height 0 demonstrations).}
 \begin{itemize}
 \item \textbf{D1 (EPS Core).} We implement the EPS kinematics framework showing how light rays and free fall determine metric structure. The implementation provides a Height~0 certificate by avoiding all portals, demonstrating that the EPS reconstruction can be done constructively. The current version provides the structural scaffold; future work could expand the symbolic computation.
-\item \textbf{D2 (Schwarzschild Engine).} We provide a minimal tensor computation framework for verifying vacuum solutions. The implementation shows how Christoffel symbols, Ricci tensor, and Einstein tensor can be computed symbolically at Height~0, avoiding choice, compactness, and logic portals. The framework is ready for concrete symbolic expansion.
+\item \textbf{D2 (Schwarzschild Engine).} We provide a typed, schematic scaffold for Schwarzschild (coordinates, nonzero slots, proof pipeline). Current proof obligations are represented by \texttt{True} placeholders (no \texttt{sorry}); the symbolic derivations $G_{\mu\nu}=0$ are deferred to v1.1. The framework demonstrates Height~0 structure while concrete component formulas await implementation.
 \end{itemize}
 
 \begin{mdframed}[style=status]
