@@ -8,6 +8,7 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Analysis.Calculus.Deriv.Inv  -- for derivative of 1/r
 import Mathlib.Analysis.Calculus.Deriv.Mul  -- for derivative rules
 import Mathlib.Tactic  -- for `norm_num`, basic inequalities
+import Mathlib.Analysis.Calculus.Deriv.Basic
 
 namespace Papers.P5_GeneralRelativity
 open Papers.P5_GeneralRelativity
@@ -38,12 +39,33 @@ theorem f_pos_of_hr (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) : 0 < f M r := by
   -- Then `0 < 1 - 2*M/r`, i.e. `0 < f M r`.
   simpa [f] using (sub_pos.mpr hdiv)
 
-/-- Derivative of the Schwarzschild factor: d/dr[f(r)] = d/dr[1 - 2M/r] = 2M/r² 
-    Placeholder: Full calculus proof deferred to v1.1 (requires careful derivative chain) -/
-theorem f_derivative_placeholder (M r : ℝ) (hr : r ≠ 0) : 
-    -- Statement: deriv (fun r' => f M r') r = 2*M/r^2
-    -- Full proof implementation coming in v1.1
-    True := True.intro
+/-- Pure calculus fact used by the Schwarzschild engine:
+    `d/dr [ 1 - 2*M/r ] = 2*M / r^2` (for `r ≠ 0`). -/
+theorem f_derivative (M r : ℝ) (hr : r ≠ 0) :
+    deriv (fun r' => f M r') r = 2*M / r^2 := by
+  -- Work via `HasDerivAt` combinators, then convert to `deriv`.
+  -- 1) Constants and identity
+  have h_const : HasDerivAt (fun _ : ℝ => (1 : ℝ)) 0 r := by
+    simpa using hasDerivAt_const (c := (1 : ℝ)) r
+  have h_id : HasDerivAt (fun x : ℝ => x) 1 r := hasDerivAt_id r
+  -- 2) Reciprocal derivative of identity: d/dr (r⁻¹) = -(r^2)⁻¹
+  have h_inv : HasDerivAt (fun x : ℝ => x⁻¹) (-(r^2)⁻¹) r := by
+    convert h_id.inv hr using 1
+    simp only [one_div, sq]
+    ring
+  -- 3) Multiply by constant `2*M`
+  have h_mul : HasDerivAt (fun x : ℝ => (2*M) * x⁻¹)
+      ((2*M) * (-(r^2)⁻¹)) r := h_inv.const_mul (2*M)
+  -- 4) Subtract from the constant function `1`
+  have h_sub : HasDerivAt (fun x : ℝ => 1 - (2*M) * x⁻¹)
+      (0 - ((2*M) * (-(r^2)⁻¹))) r := h_const.sub h_mul
+  -- 5) Rewrite it to our `f` and normalize the target
+  have h_final : HasDerivAt (fun x : ℝ => f M x) (2*M / r^2) r := by
+    -- note: `2*M / r^2` = `(2*M) * (r^2)⁻¹`
+    simpa [f, div_eq_mul_inv, zero_sub, one_div, sq,
+           mul_comm, mul_left_comm, mul_assoc]
+      using h_sub
+  simpa using h_final.deriv
 
 -- Schwarzschild metric components in coordinate basis
 noncomputable def g_tt (M r : ℝ) : ℝ := -f M r  -- time-time component: -f(r)
