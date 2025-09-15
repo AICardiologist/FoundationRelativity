@@ -39,11 +39,9 @@ theorem f_pos_of_hr (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) : 0 < f M r := by
   -- Then `0 < 1 - 2*M/r`, i.e. `0 < f M r`.
   simpa [f] using (sub_pos.mpr hdiv)
 
-/-- Pure calculus fact used by the Schwarzschild engine:
-    `d/dr [ 1 - 2*M/r ] = 2*M / r^2` (for `r ≠ 0`). -/
-theorem f_derivative (M r : ℝ) (hr : r ≠ 0) :
-    deriv (fun r' => f M r') r = 2*M / r^2 := by
-  -- Work via `HasDerivAt` combinators, then convert to `deriv`.
+/-- `HasDerivAt` form of `f_derivative` (useful for chain rules). -/
+theorem f_hasDerivAt (M r : ℝ) (hr : r ≠ 0) :
+    HasDerivAt (fun r' => f M r') (2*M / r^2) r := by
   -- 1) Constants and identity
   have h_const : HasDerivAt (fun _ : ℝ => (1 : ℝ)) 0 r := by
     simpa using hasDerivAt_const (c := (1 : ℝ)) r
@@ -60,12 +58,16 @@ theorem f_derivative (M r : ℝ) (hr : r ≠ 0) :
   have h_sub : HasDerivAt (fun x : ℝ => 1 - (2*M) * x⁻¹)
       (0 - ((2*M) * (-(r^2)⁻¹))) r := h_const.sub h_mul
   -- 5) Rewrite it to our `f` and normalize the target
-  have h_final : HasDerivAt (fun x : ℝ => f M x) (2*M / r^2) r := by
-    -- note: `2*M / r^2` = `(2*M) * (r^2)⁻¹`
-    simpa [f, div_eq_mul_inv, zero_sub, one_div, sq,
-           mul_comm, mul_left_comm, mul_assoc]
-      using h_sub
-  simpa using h_final.deriv
+  -- note: `2*M / r^2` = `(2*M) * (r^2)⁻¹`
+  simpa [f, div_eq_mul_inv, zero_sub, one_div, sq,
+         mul_comm, mul_left_comm, mul_assoc]
+    using h_sub
+
+/-- Pure calculus fact used by the Schwarzschild engine:
+    `d/dr [ 1 - 2*M/r ] = 2*M / r^2` (for `r ≠ 0`). -/
+theorem f_derivative (M r : ℝ) (hr : r ≠ 0) :
+    deriv (fun r' => f M r') r = 2*M / r^2 := by
+  simpa using (f_hasDerivAt M r hr).deriv
 
 -- Schwarzschild metric components in coordinate basis
 noncomputable def g_tt (M r : ℝ) : ℝ := -f M r  -- time-time component: -f(r)

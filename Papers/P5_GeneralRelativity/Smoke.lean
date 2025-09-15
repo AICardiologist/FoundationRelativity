@@ -152,6 +152,13 @@ example : Γ_r_tt (1 : ℝ) (3 : ℝ) ≠ 0 := by
   have hr : 2 * (1 : ℝ) < (3 : ℝ) := by norm_num
   exact Schwarzschild.Christoffel_r_tt_nonzero (1 : ℝ) (3 : ℝ) hM hr
 
+-- Numeric derivative sanity: d/dr f(1,r) at r=3 is 2/9
+example : deriv (fun r' => Schwarzschild.f (1 : ℝ) r') (3 : ℝ) = (2 : ℝ) / 9 := by
+  rw [Schwarzschild.f_derivative]
+  · simp only [sq]
+    norm_num
+  · norm_num
+
 end SchwarzschildSmokeChecks
 
 def Paper5_Smoke_Success : True := True.intro
