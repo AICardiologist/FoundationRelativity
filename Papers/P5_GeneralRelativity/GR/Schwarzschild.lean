@@ -66,7 +66,7 @@ noncomputable def Γ_φ_θφ (θ : ℝ) : ℝ := cos θ / sin θ  -- Γ^φ_{θφ
 -- Computed from R_μν = ∂_ρ Γ^ρ_μν - ∂_ν Γ^ρ_μρ + Γ^ρ_μν Γ^σ_ρσ - Γ^σ_μρ Γ^ρ_νσ
 
 -- Concrete Christoffel symbol computation theorem
-theorem Christoffel_t_tr_formula (M r : ℝ) (hr : r > 2*M) :
+theorem Christoffel_t_tr_formula (M r : ℝ) :
   -- Γ^t_{tr} = (1/2) g^{tt} ∂_r g_{tt}
   -- = (1/2) * (-1/f(r)) * (2M/r²)
   -- = M/(r²f(r))
