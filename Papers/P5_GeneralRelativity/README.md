@@ -114,12 +114,11 @@ def G1_Vacuum_W : WitnessFamily := fun F =>
 lake build Papers.P5_GeneralRelativity.Smoke
 
 # Run axiom audit
-lake env lean scripts/AxiomAudit.lean
+lake env lean Scripts/AxiomAudit.lean
 
-# Build PDF (from repository root)
+# Build PDF
 cd Papers/P5_GeneralRelativity
-pdflatex Paper5_GR_AxCal.tex
-pdflatex Paper5_GR_AxCal.tex  # Run twice for references
+latexmk -pdf Paper5_GR_AxCal.tex
 ```
 
 ### Full Build Commands
