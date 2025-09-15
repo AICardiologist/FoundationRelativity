@@ -30,6 +30,9 @@ open Papers.P5_GeneralRelativity
 -- Deep-dive anchors (should be axiom-free)
 #print axioms Papers.P5_GeneralRelativity.Schwarzschild.f_pos_of_hr
 #print axioms Papers.P5_GeneralRelativity.Schwarzschild.f_pos_iff_r_gt_2M
+#print axioms Papers.P5_GeneralRelativity.Schwarzschild.f_nonpos_iff_r_le_2M
+#print axioms Papers.P5_GeneralRelativity.Schwarzschild.r_pos_of_exterior
+#print axioms Papers.P5_GeneralRelativity.Schwarzschild.r_ne_zero_of_exterior
 #print axioms Papers.P5_GeneralRelativity.Schwarzschild.f_hasDerivAt
 #print axioms Papers.P5_GeneralRelativity.Schwarzschild.f_derivative
 #print axioms Papers.P5_GeneralRelativity.Schwarzschild.g_tt_derivative

@@ -159,6 +159,20 @@ example : deriv (fun r' => Schwarzschild.f (1 : ℝ) r') (3 : ℝ) = (2 : ℝ) /
     norm_num
   · norm_num
 
+-- Horizon boundary: f(1, 2) = 0
+example : Schwarzschild.f (1 : ℝ) (2 : ℝ) = 0 := by
+  -- 1 - 2*1/2 = 1 - 1 = 0
+  simp [Schwarzschild.f]
+
+-- Interior to the horizon: with M = 1 and r = 3/2, we have f ≤ 0
+example : Schwarzschild.f (1 : ℝ) ((3 : ℝ) / 2) ≤ 0 := by
+  have hM : 0 < (1 : ℝ) := by norm_num
+  have hr : 0 < (3 : ℝ) / 2 := by norm_num
+  have hle : (3 : ℝ) / 2 ≤ 2 * (1 : ℝ) := by norm_num
+  -- Use the new horizon-side equivalence
+  have := (Schwarzschild.f_nonpos_iff_r_le_2M (1 : ℝ) ((3 : ℝ) / 2) hM hr).2 hle
+  exact this
+
 -- Derivative of g_tt at (M,r)=(1,3): -(2/9)
 example : deriv (fun r' => Schwarzschild.g_tt (1 : ℝ) r') (3 : ℝ) = -((2 : ℝ) / 9) := by
   have hr0 : (3 : ℝ) ≠ 0 := by norm_num
