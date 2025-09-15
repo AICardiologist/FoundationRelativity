@@ -112,7 +112,7 @@ We fix the smooth category (second-countable, Hausdorff manifolds), tensor field
 \subsection{Tokens and witness families}
 For foundations $F\in\Found$, we use tokens
 \[
-[{\rm HasAC}\,F],\ [{\rm HasDC}\omega\,F],\ [{\rm HasFT}\,F],\ [{\rm HasWKL}_0\,F],\ [{\rm HasLEM}\,F],\ [{\rm HasWLPO}\,F].
+[{\rm HasAC}\,F],\ [{\rm HasDC}_{\omega}\,F],\ [{\rm HasFT}\,F],\ [{\rm HasWKL}_0\,F],\ [{\rm HasLEM}\,F],\ [{\rm HasWLPO}\,F].
 \]
 A \emph{witness family} $\mathcal{W}$ assigns to $F$ a groupoid of witnesses for the target statement over the pin.
 
@@ -240,14 +240,14 @@ Global hyperbolicity yields compact diamond sets; equicontinuity gives Ascoli--A
 curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh
 
 # Clone repository
-git clone https://github.com/quantmann/FoundationRelativity.git
+git clone https://github.com/AICardiologist/FoundationRelativity.git
 cd FoundationRelativity
 \end{verbatim}
 
 \noindent\textbf{Build Commands:}
 \begin{verbatim}
-# Set exact Lean version
-elan override set leanprover/lean4:v4.23.0-rc2
+# Toolchain is pinned by the repository; no manual override needed
+# (elan will read ./lean-toolchain automatically)
 
 # Clean and update dependencies
 lake clean && lake update
@@ -268,7 +268,7 @@ grep -r "sorry" Papers/P5_GeneralRelativity/*.lean | \
 \item All 7 height certificates compile: G1 (vacuum), G2 (local PDE + MGHD), G3 (Penrose), G4 (maximal extension), G5 (computable evolution + stream)
 \item Portal theorems correctly map flags to heights
 \item EPS and Schwarzschild Height 0 anchors verified
-\item Profile computation: Zorn $\to$ $(1,0,0)$, Limit-Curve $\to$ $(0,1,0)$, Reductio $\to$ $(0,0,1)$
+\item Profile computation: Zorn $\to$ $(1,0,0)$, Limit-Curve $\to$ $(0,1,0)$, Serial-Chain $\to$ $(1,0,0)$, Reductio $\to$ $(0,0,1)$
 \end{itemize}
 \end{mdframed}
 
@@ -288,7 +288,9 @@ G3: singularities & $\ge(0,1,1)$ & \textsf{uses\_limit\_curve}, \textsf{uses\_re
 \hline
 G4: maximal extension & $\ge(1,0,0)$ & \textsf{uses\_zorn} & Zorn portal \\
 \hline
-G5: computable evolution & logic-sensitive; DC stream & \textsf{uses\_serial\_chain} & PER-style negative template \\
+G5a: computability negative (PER) & $(0,0,0)$ & none & negative template; no portal cost tracked \\
+\hline
+G5b: measurement stream & $(1,0,0)$ & \textsf{uses\_serial\_chain} & DC$_\omega$ portal on dependent streams \\
 \hline
 \end{tabular}
 \end{center}
@@ -357,7 +359,7 @@ G4: MaxExt & \texttt{GR.G4\_MaxExt\_W} & \texttt{G4\_MaxExt\_Cert} & $(1,0,0)$ \
 \hline
 G5: CompNeg & \texttt{GR.G5\_CompNeg\_W} & \texttt{G5\_CompNeg\_Cert} & $(0,0,0)$ \checkmark \\
 \hline
-G5: Stream & \texttt{GR.G5\_MeasStream\_W} & \texttt{G5\_MeasStream\_Cert} & $(0,0,1)$ \checkmark \\
+G5: Stream & \texttt{GR.G5\_MeasStream\_W} & \texttt{G5\_MeasStream\_Cert} & $(1,0,0)$ \checkmark \\
 \hline
 \end{tabular}
 \end{center}
@@ -391,7 +393,7 @@ Zorn Portal & \texttt{Zorn\_portal} axiom & $\hChoice \gets 1$ \\
 \hline
 Limit-Curve Portal & \texttt{LimitCurve\_portal} axiom & $\hComp \gets 1$ \\
 \hline
-Serial-Chain Portal & \texttt{SerialChain\_portal} axiom & $\hLogic \gets 1$ (via DC$_\omega$) \\
+Serial-Chain Portal & \texttt{SerialChain\_portal} axiom & $\hChoice \gets 1$ (via DC$_\omega$) \\
 \hline
 Reductio Portal & \texttt{Reductio\_portal} axiom & $\hLogic \gets 1$ \\
 \hline
@@ -555,6 +557,7 @@ Let $R\subseteq X\times X$ be serial: $\forall x\in X\,\exists y\in X\,(xRy)$. I
 \[
 \mathrm{Uses}(\mathrm{uses\_serial\_chain},\mathcal{D})\ \Rightarrow\ \mathrm{HasDC}_\omega(F).
 \]
+In the AxCal profile we record this on the Choice axis: $\hChoice \gets 1$.
 \end{proposition}
 
 \begin{proof}
@@ -605,7 +608,7 @@ inductive PortalFlag
 | uses_serial_chain
 | uses_reductio
 
-/-- Portal soundness axioms (paper Prop. 1.1). 
+/-- Portal soundness axioms (paper Proposition~\ref{prop:portals}). 
     They are registered once per foundation F. -/
 axiom Zorn_portal     : forall {F}, Uses PortalFlag.uses_zorn         -> HasAC   F
 axiom LimitCurve_portal : forall {F}, Uses PortalFlag.uses_limit_curve -> (HasFT F or HasWKL0 F)
@@ -740,7 +743,7 @@ def G4_MaxExt_Cert : HeightCertificate :=
 
 def G5_CompNeg_Cert : HeightCertificate :=
 { W       := GR.G5_CompNeg_W
-, profile := <zero, zero, one>  -- logic/Computability axis sensitivity
+, profile := <zero, zero, zero>  -- negative template; no portal cost tracked
 , flags   := []
 , upper   := imported_PER_negative_template
 , cites   := [cite "Pour–El–Richards (1989)"]
@@ -748,12 +751,12 @@ def G5_CompNeg_Cert : HeightCertificate :=
 
 def G5_MeasStream_Cert : HeightCertificate :=
 { W       := GR.G5_MeasStream_W
-, profile := <zero, zero, one>  -- shown via DCw portal on serial protocols
+, profile := <one, zero, zero>  -- DCω sits on the Choice axis
 , flags   := [PortalFlag.uses_serial_chain]
 , upper   := by
     intro F hDC proto
     exact SerialChain_portal_elim hDC proto
-, cites   := [cite "AxCal DCw eliminator"]
+, cites   := [cite "AxCal DCω eliminator"]
 }
 \end{verbatim}
 
