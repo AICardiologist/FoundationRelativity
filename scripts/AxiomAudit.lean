@@ -35,6 +35,9 @@ open Papers.P5_GeneralRelativity
 #print axioms Papers.P5_GeneralRelativity.Schwarzschild.g_tt_derivative
 #print axioms Papers.P5_GeneralRelativity.Schwarzschild.g_rr_derivative
 #print axioms Papers.P5_GeneralRelativity.Schwarzschild.g_rr_derivative_exterior
+#print axioms Papers.P5_GeneralRelativity.Schwarzschild.g_inv_rr_derivative
+#print axioms Papers.P5_GeneralRelativity.Schwarzschild.g_inv_tt_derivative
+#print axioms Papers.P5_GeneralRelativity.Schwarzschild.g_inv_tt_derivative_exterior
 #print axioms Papers.P5_GeneralRelativity.Schwarzschild.g_rr_pos_of_hr
 #print axioms Papers.P5_GeneralRelativity.Schwarzschild.g_tt_neg_of_hr
 #print axioms Papers.P5_GeneralRelativity.Schwarzschild.Christoffel_t_tr_formula

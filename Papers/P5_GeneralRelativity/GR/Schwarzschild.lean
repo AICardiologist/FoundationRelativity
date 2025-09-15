@@ -120,6 +120,42 @@ noncomputable def g_inv_rr (M r : ℝ) : ℝ := f M r  -- inverse radial-radial:
 noncomputable def g_inv_θθ (r : ℝ) : ℝ := r⁻¹^2  -- inverse angular
 noncomputable def g_inv_φφ (r θ : ℝ) : ℝ := (r^2 * (sin θ)^2)⁻¹  -- inverse azimuthal
 
+/-- Derivative of `g_inv_rr = f`. -/
+theorem g_inv_rr_hasDerivAt (M r : ℝ) (hr : r ≠ 0) :
+    HasDerivAt (fun r' => g_inv_rr M r') (2*M / r^2) r := by
+  simpa [g_inv_rr] using f_hasDerivAt M r hr
+
+theorem g_inv_rr_derivative (M r : ℝ) (hr : r ≠ 0) :
+    deriv (fun r' => g_inv_rr M r') r = 2*M / r^2 := by
+  simpa using (g_inv_rr_hasDerivAt M r hr).deriv
+
+/-- General derivative of `g_inv_tt = -(f)⁻¹`. Requires `f(M,r) ≠ 0`. -/
+theorem g_inv_tt_hasDerivAt (M r : ℝ) (hr : r ≠ 0) (hfnz : f M r ≠ 0) :
+    HasDerivAt (fun r' => g_inv_tt M r')
+      ((2*M / r^2) / (f M r)^2) r := by
+  have hf := f_hasDerivAt M r hr
+  have hinv : HasDerivAt (fun r' => (f M r')⁻¹) (-(2*M / r^2) / (f M r)^2) r := hf.inv hfnz
+  -- g_inv_tt M r' = -(f M r')⁻¹ definitionally
+  show HasDerivAt (fun r' => -(f M r')⁻¹) ((2*M / r^2) / (f M r)^2) r
+  rw [show (2*M / r^2) / (f M r)^2 = -(-(2*M / r^2) / (f M r)^2) by ring]
+  exact hinv.neg
+
+theorem g_inv_tt_derivative (M r : ℝ) (hr : r ≠ 0) (hfnz : f M r ≠ 0) :
+    deriv (fun r' => g_inv_tt M r') r = (2*M / r^2) / (f M r)^2 := by
+  simpa using (g_inv_tt_hasDerivAt M r hr hfnz).deriv
+
+/-- Exterior specialization: discharge `f ≠ 0` via `r > 2M`. -/
+theorem g_inv_tt_derivative_exterior (M r : ℝ) (hM : 0 < M) (hr_ex : 2*M < r) :
+    deriv (fun r' => g_inv_tt M r') r = (2*M / r^2) / (f M r)^2 := by
+  -- r ≠ 0 from 2M < r and M > 0
+  have two_pos : 0 < (2 : ℝ) := by norm_num
+  have hr0 : r ≠ 0 := by
+    have : 0 < r := lt_trans (mul_pos two_pos hM) hr_ex
+    exact ne_of_gt this
+  have hfpos : 0 < f M r := f_pos_of_hr M r hM hr_ex
+  have hfnz  : f M r ≠ 0 := ne_of_gt hfpos
+  exact g_inv_tt_derivative M r hr0 hfnz
+
 /-- General derivative of `g_rr = (f)⁻¹`. Requires `f(M,r) ≠ 0`. -/
 theorem g_rr_hasDerivAt (M r : ℝ) (hr : r ≠ 0) (hfnz : f M r ≠ 0) :
     HasDerivAt (fun r' => g_rr M r')
