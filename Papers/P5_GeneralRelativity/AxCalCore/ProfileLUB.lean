@@ -48,7 +48,7 @@ theorem maxAP_assoc (p q r : AxisProfile) :
 theorem maxAP_idem (p : AxisProfile) : maxAP p p = p := by
   cases p <;> simp [maxAP, maxH_idem]
 
-theorem maxH_if_one_zero (a b : Bool) :
+@[simp] theorem maxH_if_one_zero (a b : Bool) :
   maxH (if a then Height.one else Height.zero)
        (if b then Height.one else Height.zero)
     = (if a || b then Height.one else Height.zero) := by
