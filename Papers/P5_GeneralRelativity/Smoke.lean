@@ -107,6 +107,7 @@ open Schwarzschild
 #check SchwarzschildCoords
 #check f
 #check f_pos_of_hr
+#check f_derivative
 #check g_tt
 #check g_rr
 #check g_θθ
