@@ -58,6 +58,6 @@ references:
     authors:
       - family-names: Lee
         given-names: Paul Chun-Kit
-    version: "1.0.0"
-    url: "https://github.com/AICardiologist/FoundationRelativity/releases/tag/paper5-v1.0"
-    notes: "AxCal framework for GR with portal theorems and Height 0 anchors (EPS, Schwarzschild)"
+    version: "1.0.1"
+    url: "https://github.com/AICardiologist/FoundationRelativity/releases/tag/paper5-v1.0.1"
+    notes: "Maintenance: DCω→Choice axis alignment; axiom-free Schwarzschild anchor (positivity + Γ^r_{tt}≠0); portable build."

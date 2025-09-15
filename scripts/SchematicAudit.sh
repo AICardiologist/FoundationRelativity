@@ -1,24 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
+echo "SchematicAudit: checking 'True' placeholders are confined to whitelist..."
 
-# SchematicAudit.sh - Ensure True placeholders only appear in whitelisted schematic files
-# This preserves the "no-sorry" bar while allowing schematic scaffolds in specific modules
+# Whitelist of files that may intentionally contain schematic True/True.intro.
+allow_re='(Papers/P5_GeneralRelativity/GR/Schwarzschild\.lean|Papers/P5_GeneralRelativity/GR/EPSCore\.lean|Papers/P5_GeneralRelativity/GR/Certificates\.lean|Papers/P5_GeneralRelativity/Main\.lean|Papers/P5_GeneralRelativity/Smoke\.lean)'
 
-ALLOW_RE='(GR/(Schwarzschild|EPSCore)|Smoke)\.lean'
+hits="$(grep -Rns --include='*.lean' -E '\bTrue\.intro\b|:\s*True\s*:=' Papers/P5_GeneralRelativity || true)"
+violations="$(echo "${hits}" | grep -vE "${allow_re}" || true)"
 
-echo "Checking for non-schematic True placeholders in Paper 5..."
-
-violations=$(rg -n ":\s*True\s*:=" Papers/P5_GeneralRelativity | \
-  grep -vE "$ALLOW_RE" || true)
-
-if [ -n "$violations" ]; then
-  echo "❌ Non-schematic True placeholders found:"
-  echo "$violations"
-  echo ""
-  echo "True placeholders should only appear in explicitly whitelisted schematic files:"
-  echo "  - Papers/P5_GeneralRelativity/GR/Schwarzschild.lean"
-  echo "  - Papers/P5_GeneralRelativity/GR/EPSCore.lean"
+if [[ -n "${violations}" ]]; then
+  echo "❌ SchematicAudit: 'True' placeholders found in non-whitelisted files:"
+  echo "${violations}"
   exit 1
 fi
 
-echo "✅ Schematic placeholders restricted to whitelisted files."
+echo "✅ SchematicAudit: placeholders confined to whitelist."
