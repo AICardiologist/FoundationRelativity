@@ -80,7 +80,7 @@ theorem Christoffel_r_tt_nonzero (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) :
   have two_pos : 0 < (2 : ℝ) := by norm_num
   have hr_pos : 0 < r := lt_trans (mul_pos two_pos hM) hr
   have hf : 0 < f M r := f_pos_of_hr M r hM hr
-  have hr2pos : 0 < r^2 := sq_pos hr_pos
+  have hr2pos : 0 < r^2 := pow_pos hr_pos 2
   have numPos : 0 < M * f M r := mul_pos hM hf
   have hpos : 0 < Γ_r_tt M r := by
     -- Γ_r_tt M r = (M * f M r) / r^2
