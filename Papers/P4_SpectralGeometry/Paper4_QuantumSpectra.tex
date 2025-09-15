@@ -14,19 +14,16 @@
 % \usepackage{enumitem}  % Not available
 \usepackage{hyperref}
 \hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
-% \usepackage{mdframed} % For reproducibility box - not available
+
+% Simple frame replacement for mdframed
+\usepackage{framed}
+\newenvironment{graybox}
+  {\begin{shaded}}
+  {\end{shaded}}
 
 % === PATCH A: BEGIN (preamble additions) ======================================
-% \usepackage{booktabs}   % nicer tables - not available
-% \usepackage{array}      % column alignment helpers - not available
-% \usepackage{listings}   % code listings - not available
-% \lstset{
-%   basicstyle=\ttfamily\small,
-%   columns=fullflexible,
-%   frame=single,
-%   breaklines=true,
-%   keepspaces=true
-% }
+% For tables - using standard commands instead of booktabs
+\usepackage{array}
 
 % AxCal macros (logic axes and height shorthand)
 \newcommand{\WLPO}{\mathsf{WLPO}}
@@ -67,8 +64,8 @@
 % Proof sketch environment
 \newenvironment{prfsketch}{\noindent\textit{Proof sketch.} }{}
 
-% Reproducibility macros
-\newcommand{\ReproBox}[1]{\begin{mdframed}[linewidth=1pt,linecolor=blue,backgroundcolor=blue!5] #1 \end{mdframed}}
+% Reproducibility macros (without mdframed)
+\newcommand{\ReproBox}[1]{\fbox{\parbox{\textwidth}{#1}}}
 \newcommand{\LeanTarget}[1]{\texttt{#1}}
 
 % -------------------------------------------------
@@ -84,15 +81,11 @@
 % Foundations and Principles
 \newcommand{\BISH}{\mathsf{BISH}}
 \newcommand{\ZFC}{\mathsf{ZFC}}
-% \newcommand{\WLPO}{\mathrm{WLPO}}  % Already defined above
-% \newcommand{\FT}{\mathrm{FT}}      % Already defined above  
-% \newcommand{\DCw}{\mathrm{DC}_\omega}  % Already defined above (as \DCw)
 \newcommand{\ACw}{\mathrm{AC}_\omega}
 \newcommand{\ACR}{\mathrm{AC}_{\mathbb{R}}}
 \newcommand{\DCR}{\mathrm{DC}_{\mathbb{R}}}
 \newcommand{\WKLz}{\mathrm{WKL}_0}
 \newcommand{\BI}{\mathrm{BI}}
-% \newcommand{\MP}{\mathrm{MP}}      % Already defined above
 \newcommand{\LEM}{\mathrm{LEM}}
 \newcommand{\UCT}{\mathrm{UCT}}
 \newcommand{\BCT}{\mathrm{BCT}}
@@ -107,6 +100,21 @@
 \newcommand{\hWLPO}{h_{\mathrm{WLPO}}}
 \newcommand{\hFT}{h_{\mathrm{FT}}}
 \newcommand{\hDC}{h_{\mathrm{DC}\omega}}
+
+% Additional commands for tables without booktabs
+\newcommand{\toprule}{\hline}
+\newcommand{\midrule}{\hline}
+\newcommand{\bottomrule}{\hline}
+
+% Additional commands
+\newcommand{\HasWLPO}{\mathsf{HasWLPO}}
+\newcommand{\HasFT}{\mathsf{HasFT}}
+\newcommand{\HasDCw}{\mathsf{HasDC}_\omega}
+\newcommand{\HasMP}{\mathsf{HasMP}}
+\newcommand{\UsesSeparationNonSep}{\mathsf{UsesSeparationNonSep}}
+\newcommand{\Requires}{\mathsf{Requires}}
+\newcommand{\ProfileUpper}{\mathsf{ProfileUpper}}
+\newcommand{\RequiresX}{\mathsf{RequiresX}}
 
 % -------------------------------------------------
 % Title
@@ -144,13 +152,13 @@ revealing precisely which non-constructive principles are required for various s
 \end{abstract}
 % === PATCH B: END ==============================================================
 
-\begin{mdframed}[backgroundcolor=gray!10, linewidth=0pt]
+\fbox{\parbox{0.98\textwidth}{
 \textbf{IMPORTANT DISCLAIMER}
 
 \textbf{A Case Study: Using Multi-AI Agents to Tackle Formal Mathematics}
 
 This entire Lean 4 formalization project was produced by multi-AI agents working under human direction. All proofs, definitions, and mathematical structures in this repository were AI-generated. This represents a case study in using multi-AI agent systems to tackle complex formal mathematics problems with human guidance on project direction.
-\end{mdframed}
+}}
 
 \tableofcontents
 
@@ -480,11 +488,11 @@ This identifies the WLPO bill as a \emph{route cost} for the Dirac/RHS pathway r
   \begin{minipage}{0.86\linewidth}
   \vspace{0.4em}
   \[
-    \frac{\;\UsesSeparationNonSep(F)\quad \HasWLPO(F)\;}{\; \SeparationRoute\_W(F)\;}
+    \frac{\;\UsesSeparationNonSep(F)\quad \HasWLPO(F)\;}{\; \mathrm{SeparationRoute\_W}(F)\;}
     \qquad\text{(portal discharge)}
   \]
   \[
-    \ProfileUpper\!\big(\WLPOonly,\;\SeparationRoute\_W\big)
+    \ProfileUpper\!\big(\WLPOonly,\;\mathrm{SeparationRoute\_W}\big)
     \quad\text{and}\quad
     \Requires(\WLPOonly,F)\iff \HasWLPO(F).
   \]
@@ -936,17 +944,17 @@ On profiles we compute
 \]
 requiring both WLPO and DC$\omega$. The certificate composes automatically:
 
-\begin{lstlisting}
+\begin{verbatim}
 -- Papers/P4_SpectralGeometry/Spectral/ProfileUpper.lean
 def S2_S3_ProfileUpper :
   ProfileUpper S2_S3_profile (LocaleSpatiality_W.and SeparationRoute_W) :=
   (S2_ProfileUpper.and S3_ProfileUpper)
-\end{lstlisting}
+\end{verbatim}
 
 The requirements reduce to the expected tokens:
 \[
-  \mathrm{Requires}(S2\_profile) \iff \DCw,\qquad
-  \mathrm{Requires}(S3\_profile) \iff \WLPO.
+  \mathrm{Requires}(\mathrm{S2\_profile}) \iff \DCw,\qquad
+  \mathrm{Requires}(\mathrm{S3\_profile}) \iff \WLPO.
 \]
 
 \subsection{Route-conditional WLPO portal}
@@ -954,12 +962,12 @@ We separate theorem cost from route cost. If a proof route uses non-separable
 separation, then \(\WLPO\) is required to discharge the \lean{SeparationRoute\_W}
 witness:
 
-\begin{lstlisting}
+\begin{verbatim}
 -- Papers/P4_SpectralGeometry/Spectral/RouteFlags.lean
 def PortalRequiresWLPO :
   UpperBound (fun F => HasWLPO F ∧ UsesSeparationNonSep F) SeparationRoute_W :=
 ⟨fun _ h => h.left⟩
-\end{lstlisting}
+\end{verbatim}
 
 This is a route-conditional obligation: avoiding that route may avoid \(\WLPO\).
 
@@ -1148,7 +1156,7 @@ Two immediate directions:
 \section{Artifact Index}
 
 \textbf{Main Lean files:}
-\begin{itemize}[noitemsep]
+\begin{itemize}
 \item \lean{Spectral/Basic.lean} — Foundation, tokens, witness families
 \item \lean{Spectral/Profiles.lean} — 3-axis height algebra and composition  
 \item \lean{Spectral/ProfileUpper.lean} — Profile-based upper bound certificates
@@ -1177,5 +1185,3 @@ lake build Papers.P4_SpectralGeometry.Smoke  # Main target
 Development assistance provided by: Gemini 2.5 Deep Think (architecture exploration and theoretical framework design), GPT-5 Pro (Lean 4 scaffolding and implementation support), and Claude Code (repository management and development workflow).
 
 \end{document}
-
-
