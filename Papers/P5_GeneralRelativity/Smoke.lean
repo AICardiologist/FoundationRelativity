@@ -55,45 +55,6 @@ theorem Belt_and_Suspenders_Normalization_Check :
   AxisProfile.mk Height.one Height.one Height.zero := by
   simp [LocalPDE_flags, MGHD_flags, route_to_profile, memFlag, eqb]
 
-section SchwarzschildSmokeChecks
-open Schwarzschild
-
-#check SchwarzschildCoords
-#check f
-#check f_derivative
-#check g_tt
-#check g_rr
-#check g_θθ
-#check g_φφ
-#check g_inv_tt
-#check g_inv_rr
-#check Γ_t_tr
-#check Γ_r_tt
-#check Γ_r_rr
-#check Christoffel_t_tr_formula
-#check Christoffel_r_tt_nonzero
-
--- Verify that f(r) has the correct form
-theorem f_formula_check (M r : ℝ) :
-  f M r = 1 - 2*M/r := by
-  rfl  -- definitional equality
-
--- Verify metric components use f correctly
-theorem metric_uses_f (M r : ℝ) :
-  g_tt M r = -f M r ∧ g_rr M r = (f M r)⁻¹ := by
-  constructor <;> rfl
-
--- Verify inverse metric relationship
-theorem inverse_metric_check (M r : ℝ) :
-  g_inv_rr M r = f M r ∧ g_inv_tt M r = -(f M r)⁻¹ := by
-  constructor <;> rfl
-
--- Check a specific Christoffel symbol value
-example (M r : ℝ) : Γ_t_tr M r = M / (r^2 * f M r) := by
-  rfl
-
-end SchwarzschildSmokeChecks
-
 section EPSSmokeChecks
 open EPS
 
@@ -132,6 +93,45 @@ theorem ScaleIntegrable_always_holds (S : Spacetime) :
 #check EPS_Kinematics_Height0
 
 end EPSSmokeChecks
+
+section SchwarzschildSmokeChecks
+open Schwarzschild
+
+#check SchwarzschildCoords
+#check f
+#check f_derivative
+#check g_tt
+#check g_rr
+#check g_θθ
+#check g_φφ
+#check g_inv_tt
+#check g_inv_rr
+#check Γ_t_tr
+#check Γ_r_tt
+#check Γ_r_rr
+#check Christoffel_t_tr_formula
+#check Christoffel_r_tt_nonzero
+
+-- Verify that f(r) has the correct form
+theorem f_formula_check (M r : ℝ) :
+  f M r = 1 - 2*M/r := by
+  rfl  -- definitional equality
+
+-- Verify metric components use f correctly
+theorem metric_uses_f (M r : ℝ) :
+  g_tt M r = -f M r ∧ g_rr M r = (f M r)⁻¹ := by
+  constructor <;> rfl
+
+-- Verify inverse metric relationship
+theorem inverse_metric_check (M r : ℝ) :
+  g_inv_rr M r = f M r ∧ g_inv_tt M r = -(f M r)⁻¹ := by
+  constructor <;> rfl
+
+-- Check a specific Christoffel symbol value
+example (M r : ℝ) : Γ_t_tr M r = M / (r^2 * f M r) := by
+  rfl
+
+end SchwarzschildSmokeChecks
 
 def Paper5_Smoke_Success : True := True.intro
 
