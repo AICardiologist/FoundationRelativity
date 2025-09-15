@@ -93,6 +93,11 @@ A Lean 4 formalization project that calibrates the exact logical strength requir
    - GR pin (Σ₀^GR): Manifolds, tensors, Einstein tensor
    - Three orthogonal axes: Choice (AC/DCω/ACω), Compactness/Kinematics (FT/WKL₀), Logic/Computability (WLPO/LEM/MP)
    - Targets G1-G5: Explicit solutions → Computable GR evolution
+   - Portal→Profile mappings (v1.0.1):
+     - Zorn → (1,0,0) on Choice axis
+     - Serial-Chain (DCω) → (1,0,0) on Choice axis
+     - Limit-Curve → (0,1,0) on Compactness axis
+     - Reductio → (0,0,1) on Logic axis
    - Complete Lean 4 formalization with portal theorems and height certificates
    - CI/CD pipeline with automated PDF generation and axiom auditing
 
