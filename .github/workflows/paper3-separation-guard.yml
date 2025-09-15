@@ -122,6 +122,7 @@ jobs:
           # - Meta_LowerBounds_Axioms (placeholders)
           # - IndependenceRegistry (orthogonality declarations)
           # - FT/DCw axis files (orthogonality axioms)
+          # - CRM axioms (WKL, FTc+MC relations)
           if git grep -nE '^\s*axiom\b' -- \
             "Papers/P3_2CatFramework/**/*.lean" \
             ":!Papers/P3_2CatFramework/P4_Meta/ProofTheory/**" \
@@ -133,6 +134,8 @@ jobs:
             ":!Papers/P3_2CatFramework/P4_Meta/DCwPortalWire.lean" \
             ":!Papers/P3_2CatFramework/P4_Meta/FusedLadders.lean" \
             ":!Papers/P3_2CatFramework/P4_Meta/PartIII_ProductHeight.lean" \
+            ":!Papers/P3_2CatFramework/P4_Meta/WKL_UCT.lean" \
+            ":!Papers/P3_2CatFramework/P4_Meta/FTc_MC_UCT.lean" \
             ":!Papers/P3_2CatFramework/test/**" \
             ":!Papers/P3_2CatFramework/archive/**" \
             ":!Papers/P3_2CatFramework/old_3b_*/**"; then
