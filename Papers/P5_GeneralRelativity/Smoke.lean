@@ -11,6 +11,7 @@ import Papers.P5_GeneralRelativity.GR.ComposeLaws
 import Papers.P5_GeneralRelativity.GR.Compose
 import Papers.P5_GeneralRelativity.GR.EPSCore
 import Papers.P5_GeneralRelativity.GR.Schwarzschild
+import Mathlib.Tactic  -- for `norm_num` in tiny numeric examples
 
 namespace Paper5Smoke
 open Papers.P5_GeneralRelativity
@@ -136,6 +137,19 @@ theorem inverse_metric_check (M r : ℝ) :
 -- Check a specific Christoffel symbol value
 example (M r : ℝ) : Γ_t_tr M r = M / (r^2 * f M r) := by
   rfl
+
+-- Concrete numeric sanity checks (no calculus, tiny and fast):
+-- With M = 1, r = 3, θ arbitrary, we have f(1,3) = 1 - 2/3 > 0
+example : 0 < f (1 : ℝ) (3 : ℝ) := by
+  have hM : 0 < (1 : ℝ) := by norm_num
+  have hr : 2 * (1 : ℝ) < (3 : ℝ) := by norm_num
+  exact Schwarzschild.f_pos_of_hr (1 : ℝ) (3 : ℝ) hM hr
+
+-- And Γ^r_{tt}(1,3) ≠ 0 via the proved inequality lemma
+example : Γ_r_tt (1 : ℝ) (3 : ℝ) ≠ 0 := by
+  have hM : 0 < (1 : ℝ) := by norm_num
+  have hr : 2 * (1 : ℝ) < (3 : ℝ) := by norm_num
+  exact Schwarzschild.Christoffel_r_tt_nonzero (1 : ℝ) (3 : ℝ) hM hr
 
 end SchwarzschildSmokeChecks
 
