@@ -69,11 +69,38 @@ theorem f_derivative (M r : ℝ) (hr : r ≠ 0) :
     deriv (fun r' => f M r') r = 2*M / r^2 := by
   simpa using (f_hasDerivAt M r hr).deriv
 
+/-- Outside the horizon, positivity of `f` is equivalent to `r > 2M`. -/
+theorem f_pos_iff_r_gt_2M (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
+    0 < f M r ↔ 2*M < r := by
+  constructor
+  · -- `0 < 1 - 2M/r` ⇒ `2M/r < 1` ⇒ `2M < r`
+    intro hf
+    have hdiv : 2*M / r < 1 := (sub_pos.mp hf)
+    exact (div_lt_one hr).1 hdiv
+  · -- `2M < r` ⇒ `2M/r < 1` ⇒ `0 < 1 - 2M/r`
+    intro hR
+    have hdiv : 2*M / r < 1 := (div_lt_one hr).2 hR
+    simpa [f] using (sub_pos.mpr hdiv)
+
 -- Schwarzschild metric components in coordinate basis
 noncomputable def g_tt (M r : ℝ) : ℝ := -f M r  -- time-time component: -f(r)
 noncomputable def g_rr (M r : ℝ) : ℝ := (f M r)⁻¹  -- radial-radial component: 1/f(r)
 noncomputable def g_θθ (r : ℝ) : ℝ := r^2  -- angular component
 noncomputable def g_φφ (r θ : ℝ) : ℝ := r^2 * (sin θ)^2  -- azimuthal component
+
+/-- For `r > 2M`, the radial metric factor `g_rr = 1/f` is positive. -/
+theorem g_rr_pos_of_hr (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) :
+    0 < g_rr M r := by
+  have hf : 0 < f M r := f_pos_of_hr M r hM hr
+  -- `inv_pos.mpr hf : 0 < (f M r)⁻¹`
+  simpa [g_rr] using (inv_pos.mpr hf)
+
+/-- For `r > 2M`, the time-time component `g_tt = -f` is negative. -/
+theorem g_tt_neg_of_hr (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) :
+    g_tt M r < 0 := by
+  have hf : 0 < f M r := f_pos_of_hr M r hM hr
+  -- `-f < 0` when `f > 0`
+  simpa [g_tt] using (neg_lt_zero.mpr hf)
 
 -- Inverse metric components
 noncomputable def g_inv_tt (M r : ℝ) : ℝ := -(f M r)⁻¹  -- inverse time-time: -1/f(r)

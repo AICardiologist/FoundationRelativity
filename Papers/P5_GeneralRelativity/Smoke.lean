@@ -159,6 +159,17 @@ example : deriv (fun r' => Schwarzschild.f (1 : ℝ) r') (3 : ℝ) = (2 : ℝ) /
     norm_num
   · norm_num
 
+-- Outside the horizon at M=1, r=3: g_rr > 0 and g_tt < 0
+example : 0 < Schwarzschild.g_rr (1 : ℝ) (3 : ℝ) := by
+  have hM : 0 < (1 : ℝ) := by norm_num
+  have hr : 2 * (1 : ℝ) < (3 : ℝ) := by norm_num
+  exact Schwarzschild.g_rr_pos_of_hr (1 : ℝ) (3 : ℝ) hM hr
+
+example : Schwarzschild.g_tt (1 : ℝ) (3 : ℝ) < 0 := by
+  have hM : 0 < (1 : ℝ) := by norm_num
+  have hr : 2 * (1 : ℝ) < (3 : ℝ) := by norm_num
+  exact Schwarzschild.g_tt_neg_of_hr (1 : ℝ) (3 : ℝ) hM hr
+
 end SchwarzschildSmokeChecks
 
 def Paper5_Smoke_Success : True := True.intro
