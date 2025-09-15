@@ -5,7 +5,7 @@ Deep-dive deliverable D2: minimal tensor engine for vacuum check (Height 0)
 
 import Papers.P5_GeneralRelativity.GR.Interfaces
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
-import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Tactic  -- for `norm_num`, basic inequalities
 
 namespace Papers.P5_GeneralRelativity
 open Papers.P5_GeneralRelativity
@@ -26,13 +26,15 @@ variable (M : ℝ) (h_pos : M > 0)
 -- The fundamental Schwarzschild factor f(r) = 1 - 2M/r
 noncomputable def f (M r : ℝ) : ℝ := 1 - 2*M/r
 
--- Derivative of f with respect to r (schematic axiom)
--- Sprint B future work: prove this via actual derivative calculation
-axiom f_derivative (M r : ℝ) (hr : r > 0) : 
-  -- d/dr [f(r)] = d/dr [1 - 2M/r] = 2M/r²
-  deriv (fun r => f M r) r = 2*M/r^2
-  -- This is a finite algebraic computation (no portals needed)
-  -- Currently axiomatized for schematic framework
+/-- Positivity of `f M r = 1 - 2M/r` when `r > 2M`. No calculus needed. -/
+theorem f_pos_of_hr (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) : 0 < f M r := by
+  -- Since `2*M < r` and `r > 0`, we have `2*M / r < 1` (by `div_lt_one`).
+  have two_pos : 0 < (2 : ℝ) := by norm_num
+  have h2Mpos : 0 < 2*M := mul_pos two_pos hM
+  have hr_pos : 0 < r := lt_trans h2Mpos hr
+  have hdiv : 2*M / r < 1 := (div_lt_one hr_pos).mpr hr
+  -- Then `0 < 1 - 2*M/r`, i.e. `0 < f M r`.
+  simpa [f] using (sub_pos.mpr hdiv)
 
 -- Schwarzschild metric components in coordinate basis
 noncomputable def g_tt (M r : ℝ) : ℝ := -f M r  -- time-time component: -f(r)
@@ -72,14 +74,18 @@ theorem Christoffel_t_tr_formula (M r : ℝ) (hr : r > 2*M) :
   -- Direct computation from metric formula
   rfl  -- definitional equality
 
--- Example: Verify a specific Christoffel symbol is non-zero (schematic)
--- Sprint B future work: complete the inequality proof
-axiom Christoffel_r_tt_nonzero (M r : ℝ) (hM : M > 0) (hr : r > 2*M) :
-  Γ_r_tt M r ≠ 0
-  -- Γ^r_{tt} = Mf(r)/r² where f(r) = 1 - 2M/r
-  -- Since r > 2M, we have f(r) > 0
-  -- Therefore Γ^r_{tt} = M(1-2M/r)/r² > 0 when r > 2M
-  -- Currently axiomatized for schematic framework
+-- Γ^r_{tt} = M * f(r) / r² is strictly positive under r > 2M and M > 0, hence nonzero.
+theorem Christoffel_r_tt_nonzero (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) :
+  Γ_r_tt M r ≠ 0 := by
+  have two_pos : 0 < (2 : ℝ) := by norm_num
+  have hr_pos : 0 < r := lt_trans (mul_pos two_pos hM) hr
+  have hf : 0 < f M r := f_pos_of_hr M r hM hr
+  have hr2pos : 0 < r^2 := sq_pos hr_pos
+  have numPos : 0 < M * f M r := mul_pos hM hf
+  have hpos : 0 < Γ_r_tt M r := by
+    -- Γ_r_tt M r = (M * f M r) / r^2
+    simpa [Γ_r_tt, f] using (div_pos numPos hr2pos)
+  exact ne_of_gt hpos
 
 -- Ricci tensor vanishing theorems (concrete formulation)
 theorem Ricci_tt_vanishes (M r : ℝ) (hr : r > 2*M) : 
