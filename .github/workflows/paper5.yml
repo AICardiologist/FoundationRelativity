@@ -50,16 +50,16 @@ jobs:
       - name: Axiom audit
         run: |
           echo "Running axiom audit..."
-          lake env lean Scripts/AxiomAudit.lean | tee axiom-audit.txt
+          lake env lean scripts/AxiomAudit.lean | tee axiom-audit.txt
 
       - name: Run SchematicAudit
-        run: bash Scripts/SchematicAudit.sh
+        run: bash scripts/SchematicAudit.sh
 
       - name: Run AxiomDeclAudit
-        run: bash Scripts/AxiomDeclAudit.sh
+        run: bash scripts/AxiomDeclAudit.sh
 
       - name: Run AxiomAudit (informational)
-        run: lake env lean Scripts/AxiomAudit.lean || true
+        run: lake env lean scripts/AxiomAudit.lean || true
 
       - uses: actions/upload-artifact@v4
         with:
