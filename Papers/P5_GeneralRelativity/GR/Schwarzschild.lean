@@ -82,6 +82,30 @@ theorem f_pos_iff_r_gt_2M (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
     have hdiv : 2*M / r < 1 := (div_lt_one hr).2 hR
     simpa [f] using (sub_pos.mpr hdiv)
 
+/-- Exterior region implies `0 < r`. -/
+lemma r_pos_of_exterior (M r : ℝ) (hM : 0 < M) (hr_ex : 2*M < r) : 0 < r := by
+  have two_pos : 0 < (2 : ℝ) := by norm_num
+  exact lt_trans (mul_pos two_pos hM) hr_ex
+
+/-- Exterior region implies `r ≠ 0`. -/
+lemma r_ne_zero_of_exterior (M r : ℝ) (hM : 0 < M) (hr_ex : 2*M < r) : r ≠ 0 :=
+  ne_of_gt (r_pos_of_exterior M r hM hr_ex)
+
+/-- With `0 < r`, nonpositivity of `f` is equivalent to being at/inside the horizon. -/
+theorem f_nonpos_iff_r_le_2M (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
+    f M r ≤ 0 ↔ r ≤ 2*M := by
+  constructor
+  · intro hle
+    -- from `f ≤ 0` get `1 ≤ 2M/r`, then clear the division
+    have h1 : 1 ≤ 2*M / r := by
+      -- `sub_nonpos.mp : (1 - 2M/r ≤ 0) → 1 ≤ 2M/r`
+      simpa [f] using (sub_nonpos.mp (show 1 - 2*M / r ≤ 0 from by simpa [f] using hle))
+    rwa [one_le_div hr] at h1
+  · intro hle
+    have : 1 ≤ 2*M / r := by rwa [one_le_div hr]
+    have : 1 - 2*M / r ≤ 0 := sub_nonpos.mpr this
+    simpa [f] using this
+
 -- Schwarzschild metric components in coordinate basis
 noncomputable def g_tt (M r : ℝ) : ℝ := -f M r  -- time-time component: -f(r)
 noncomputable def g_rr (M r : ℝ) : ℝ := (f M r)⁻¹  -- radial-radial component: 1/f(r)
@@ -147,13 +171,8 @@ theorem g_inv_tt_derivative (M r : ℝ) (hr : r ≠ 0) (hfnz : f M r ≠ 0) :
 /-- Exterior specialization: discharge `f ≠ 0` via `r > 2M`. -/
 theorem g_inv_tt_derivative_exterior (M r : ℝ) (hM : 0 < M) (hr_ex : 2*M < r) :
     deriv (fun r' => g_inv_tt M r') r = (2*M / r^2) / (f M r)^2 := by
-  -- r ≠ 0 from 2M < r and M > 0
-  have two_pos : 0 < (2 : ℝ) := by norm_num
-  have hr0 : r ≠ 0 := by
-    have : 0 < r := lt_trans (mul_pos two_pos hM) hr_ex
-    exact ne_of_gt this
-  have hfpos : 0 < f M r := f_pos_of_hr M r hM hr_ex
-  have hfnz  : f M r ≠ 0 := ne_of_gt hfpos
+  have hr0  : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
+  have hfnz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
   exact g_inv_tt_derivative M r hr0 hfnz
 
 /-- General derivative of `g_rr = (f)⁻¹`. Requires `f(M,r) ≠ 0`. -/
@@ -172,13 +191,8 @@ theorem g_rr_derivative (M r : ℝ) (hr : r ≠ 0) (hfnz : f M r ≠ 0) :
 /-- Exterior specialization: discharge `f ≠ 0` via `r > 2M`. -/
 theorem g_rr_derivative_exterior (M r : ℝ) (hM : 0 < M) (hr_ex : 2*M < r) :
     deriv (fun r' => g_rr M r') r = (-(2*M / r^2) / (f M r)^2) := by
-  -- r ≠ 0 from 2M < r and M > 0
-  have two_pos : 0 < (2 : ℝ) := by norm_num
-  have hr0 : r ≠ 0 := by
-    have : 0 < r := lt_trans (mul_pos two_pos hM) hr_ex
-    exact ne_of_gt this
-  have hfpos : 0 < f M r := f_pos_of_hr M r hM hr_ex
-  have hfnz  : f M r ≠ 0 := ne_of_gt hfpos
+  have hr0  : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
+  have hfnz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
   exact g_rr_derivative M r hr0 hfnz
 
 -- Christoffel symbols Γ^μ_νρ (non-zero components only)
