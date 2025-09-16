@@ -134,7 +134,6 @@ theorem f_nonpos_iff_r_le_2M (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
     have : 1 - 2*M / r ≤ 0 := sub_nonpos.mpr this
     simpa [f] using this
 
-
 -- Schwarzschild metric components in coordinate basis
 noncomputable def g_tt (M r : ℝ) : ℝ := -f M r  -- time-time component: -f(r)
 noncomputable def g_rr (M r : ℝ) : ℝ := (f M r)⁻¹  -- radial-radial component: 1/f(r)
