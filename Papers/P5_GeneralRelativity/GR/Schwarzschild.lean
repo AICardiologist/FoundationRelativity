@@ -39,11 +39,9 @@ theorem f_pos_of_hr (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) : 0 < f M r := by
   -- Then `0 < 1 - 2*M/r`, i.e. `0 < f M r`.
   simpa [f] using (sub_pos.mpr hdiv)
 
-/-- Pure calculus fact used by the Schwarzschild engine:
-    `d/dr [ 1 - 2*M/r ] = 2*M / r^2` (for `r ≠ 0`). -/
-theorem f_derivative (M r : ℝ) (hr : r ≠ 0) :
-    deriv (fun r' => f M r') r = 2*M / r^2 := by
-  -- Work via `HasDerivAt` combinators, then convert to `deriv`.
+/-- `HasDerivAt` form of `f_derivative` (useful for chain rules). -/
+theorem f_hasDerivAt (M r : ℝ) (hr : r ≠ 0) :
+    HasDerivAt (fun r' => f M r') (2*M / r^2) r := by
   -- 1) Constants and identity
   have h_const : HasDerivAt (fun _ : ℝ => (1 : ℝ)) 0 r := by
     simpa using hasDerivAt_const (c := (1 : ℝ)) r
@@ -60,12 +58,125 @@ theorem f_derivative (M r : ℝ) (hr : r ≠ 0) :
   have h_sub : HasDerivAt (fun x : ℝ => 1 - (2*M) * x⁻¹)
       (0 - ((2*M) * (-(r^2)⁻¹))) r := h_const.sub h_mul
   -- 5) Rewrite it to our `f` and normalize the target
-  have h_final : HasDerivAt (fun x : ℝ => f M x) (2*M / r^2) r := by
-    -- note: `2*M / r^2` = `(2*M) * (r^2)⁻¹`
-    simpa [f, div_eq_mul_inv, zero_sub, one_div, sq,
-           mul_comm, mul_left_comm, mul_assoc]
-      using h_sub
-  simpa using h_final.deriv
+  -- note: `2*M / r^2` = `(2*M) * (r^2)⁻¹`
+  simpa [f, div_eq_mul_inv, zero_sub, one_div, sq,
+         mul_comm, mul_left_comm, mul_assoc]
+    using h_sub
+
+/-- Pure calculus fact used by the Schwarzschild engine:
+    `d/dr [ 1 - 2*M/r ] = 2*M / r^2` (for `r ≠ 0`). -/
+theorem f_derivative (M r : ℝ) (hr : r ≠ 0) :
+    deriv (fun r' => f M r') r = 2*M / r^2 := by
+  simpa using (f_hasDerivAt M r hr).deriv
+
+/-- Outside the horizon, positivity of `f` is equivalent to `r > 2M`. -/
+theorem f_pos_iff_r_gt_2M (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
+    0 < f M r ↔ 2*M < r := by
+  constructor
+  · -- `0 < 1 - 2M/r` ⇒ `2M/r < 1` ⇒ `2M < r`
+    intro hf
+    have hdiv : 2*M / r < 1 := (sub_pos.mp hf)
+    exact (div_lt_one hr).1 hdiv
+  · -- `2M < r` ⇒ `2M/r < 1` ⇒ `0 < 1 - 2M/r`
+    intro hR
+    have hdiv : 2*M / r < 1 := (div_lt_one hr).2 hR
+    simpa [f] using (sub_pos.mpr hdiv)
+
+/-- On the horizon: `f M r = 0` iff `r = 2M` (assuming `M>0` and `r>0`). -/
+theorem f_eq_zero_iff_r_eq_2M (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
+    f M r = 0 ↔ r = 2*M := by
+  constructor
+  · intro hf
+    -- `f = 0` means `1 - 2M/r = 0` hence `1 = 2M/r`
+    have h1 : 1 - 2*M / r = 0 := by simpa [f] using hf
+    have h2 : 1 = 2*M / r := sub_eq_zero.mp h1
+    -- From `1 = 2M/r` and `r > 0`, we get `r = 2M`
+    have h3 : r * 1 = r * (2*M / r) := by rw [h2]
+    simp [mul_div_assoc', ne_of_gt hr] at h3
+    exact h3
+  · intro hrEq
+    -- `f M (2M) = 1 - 2M/(2M) = 0` (need denominator ≠ 0 which follows from `M>0`)
+    subst hrEq
+    have twoM_ne : (2*M) ≠ 0 := by
+      have two_pos : 0 < (2 : ℝ) := by norm_num
+      exact mul_ne_zero (ne_of_gt two_pos) (ne_of_gt hM)
+    simpa [f, twoM_ne]
+
+/-- Direct evaluation at the horizon: `f M (2M) = 0` when `M > 0`. -/
+@[simp] lemma f_at_horizon (M : ℝ) (hM : 0 < M) :
+    f M (2*M) = 0 := by
+  have twoM_ne : (2*M) ≠ 0 := by
+    have two_pos : 0 < (2 : ℝ) := by norm_num
+    exact mul_ne_zero (ne_of_gt two_pos) (ne_of_gt hM)
+  simp [f, twoM_ne]
+
+/-- Exterior region implies `0 < r`. -/
+lemma r_pos_of_exterior (M r : ℝ) (hM : 0 < M) (hr_ex : 2*M < r) : 0 < r := by
+  have two_pos : 0 < (2 : ℝ) := by norm_num
+  exact lt_trans (mul_pos two_pos hM) hr_ex
+
+/-- Exterior region implies `r ≠ 0`. -/
+lemma r_ne_zero_of_exterior (M r : ℝ) (hM : 0 < M) (hr_ex : 2*M < r) : r ≠ 0 :=
+  ne_of_gt (r_pos_of_exterior M r hM hr_ex)
+
+/-- With `0 < r`, nonpositivity of `f` is equivalent to being at/inside the horizon. -/
+theorem f_nonpos_iff_r_le_2M (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
+    f M r ≤ 0 ↔ r ≤ 2*M := by
+  constructor
+  · intro hle
+    -- from `f ≤ 0` get `1 ≤ 2M/r`, then clear the division
+    have h1 : 1 ≤ 2*M / r := by
+      -- `sub_nonpos.mp : (1 - 2M/r ≤ 0) → 1 ≤ 2M/r`
+      simpa [f] using (sub_nonpos.mp (show 1 - 2*M / r ≤ 0 from by simpa [f] using hle))
+    rwa [one_le_div hr] at h1
+  · intro hle
+    have : 1 ≤ 2*M / r := by rwa [one_le_div hr]
+    have : 1 - 2*M / r ≤ 0 := sub_nonpos.mpr this
+    simpa [f] using this
+
+open Set in
+/-- For `M>0`, `f M` is strictly increasing on `(0, ∞)`. -/
+theorem f_strictMonoOn_Ioi (M : ℝ) (hM : 0 < M) :
+    StrictMonoOn (fun r => f M r) (Ioi (0 : ℝ)) := by
+  intro a ha b hb hlt
+  -- We want: `f a < f b`, i.e. `1 - 2*M/a < 1 - 2*M/b`.
+  -- Since `a < b` and `0 < a`, we have `1/b < 1/a`.
+  have inv_lt : (1 : ℝ) / b < 1 / a :=
+    one_div_lt_one_div_of_lt (ha : 0 < a) (hlt : a < b)
+  -- Multiply by `2*M > 0` to preserve the inequality.
+  have twoM_pos : 0 < 2 * M := by
+    have two_pos : 0 < (2 : ℝ) := by norm_num
+    exact mul_pos two_pos hM
+  have h_div' : 2*M * (1 / b) < 2*M * (1 / a) :=
+    mul_lt_mul_of_pos_left inv_lt twoM_pos
+  -- Convert to division and use `f`'s definition.
+  have h_div : 2*M / b < 2*M / a := by
+    simpa [div_eq_mul_inv, one_div, mul_comm, mul_left_comm, mul_assoc] using h_div'
+  -- From `2M / b < 2M / a` we get `-(2M / a) < -(2M / b)` and then add `1`.
+  have h_neg : -(2*M / a) < -(2*M / b) := by
+    simpa using (neg_lt_neg h_div)
+  have h_add : 1 + (-(2*M / a)) < 1 + (-(2*M / b)) :=
+    add_lt_add_left h_neg 1
+  -- Rewrite back to `f`.
+  simpa [f, sub_eq_add_neg] using h_add
+
+/-- For `M>0` and `r>0`, we have `f M r < 1`. -/
+theorem f_lt_one_of_pos (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
+    f M r < 1 := by
+  -- `2*M / r > 0` since both factors are positive.
+  have hpos : 0 < (2*M) / r := by
+    have h2M : 0 < 2 * M := by
+      have : 0 < (2 : ℝ) := by norm_num
+      exact mul_pos this hM
+    exact div_pos h2M hr
+  -- From `0 < 2M/r` we get `1 - 2M/r < 1 - 0`.
+  simpa [f] using (sub_lt_sub_left hpos (1 : ℝ))
+
+/-- On the exterior `r > 2M`, we have `0 < f M r < 1` (requires `M>0`). -/
+theorem f_mem_Ioo_exterior (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) :
+    0 < f M r ∧ f M r < 1 := by
+  have hrpos : 0 < r := r_pos_of_exterior M r hM hr
+  exact ⟨f_pos_of_hr M r hM hr, f_lt_one_of_pos M r hM hrpos⟩
 
 -- Schwarzschild metric components in coordinate basis
 noncomputable def g_tt (M r : ℝ) : ℝ := -f M r  -- time-time component: -f(r)
@@ -73,11 +184,169 @@ noncomputable def g_rr (M r : ℝ) : ℝ := (f M r)⁻¹  -- radial-radial compo
 noncomputable def g_θθ (r : ℝ) : ℝ := r^2  -- angular component
 noncomputable def g_φφ (r θ : ℝ) : ℝ := r^2 * (sin θ)^2  -- azimuthal component
 
+/-- For `r > 2M`, the radial metric factor `g_rr = 1/f` is positive. -/
+theorem g_rr_pos_of_hr (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) :
+    0 < g_rr M r := by
+  have hf : 0 < f M r := f_pos_of_hr M r hM hr
+  -- `inv_pos.mpr hf : 0 < (f M r)⁻¹`
+  simpa [g_rr] using (inv_pos.mpr hf)
+
+/-- For `r > 2M`, the time-time component `g_tt = -f` is negative. -/
+theorem g_tt_neg_of_hr (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) :
+    g_tt M r < 0 := by
+  have hf : 0 < f M r := f_pos_of_hr M r hM hr
+  -- `-f < 0` when `f > 0`
+  simpa [g_tt] using (neg_lt_zero.mpr hf)
+
+/-- Derivative of `g_tt = -f`. -/
+theorem g_tt_hasDerivAt (M r : ℝ) (hr : r ≠ 0) :
+    HasDerivAt (fun r' => g_tt M r') (-(2*M / r^2)) r := by
+  -- g_tt = -f
+  have hf := f_hasDerivAt M r hr
+  -- derivative of negation
+  simpa [g_tt] using hf.neg
+
+theorem g_tt_derivative (M r : ℝ) (hr : r ≠ 0) :
+    deriv (fun r' => g_tt M r') r = -(2*M / r^2) := by
+  simpa using (g_tt_hasDerivAt M r hr).deriv
+
 -- Inverse metric components
 noncomputable def g_inv_tt (M r : ℝ) : ℝ := -(f M r)⁻¹  -- inverse time-time: -1/f(r)
 noncomputable def g_inv_rr (M r : ℝ) : ℝ := f M r  -- inverse radial-radial: f(r)
 noncomputable def g_inv_θθ (r : ℝ) : ℝ := r⁻¹^2  -- inverse angular
 noncomputable def g_inv_φφ (r θ : ℝ) : ℝ := (r^2 * (sin θ)^2)⁻¹  -- inverse azimuthal
+
+/-- Exterior sign for the inverse metric: `g_inv_rr = f > 0` when `r > 2M`. -/
+theorem g_inv_rr_pos_of_hr (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) :
+    0 < g_inv_rr M r := by
+  simpa [g_inv_rr] using (f_pos_of_hr M r hM hr)
+
+/-- Derivative of `g_inv_rr = f`. -/
+theorem g_inv_rr_hasDerivAt (M r : ℝ) (hr : r ≠ 0) :
+    HasDerivAt (fun r' => g_inv_rr M r') (2*M / r^2) r := by
+  simpa [g_inv_rr] using f_hasDerivAt M r hr
+
+theorem g_inv_rr_derivative (M r : ℝ) (hr : r ≠ 0) :
+    deriv (fun r' => g_inv_rr M r') r = 2*M / r^2 := by
+  simpa using (g_inv_rr_hasDerivAt M r hr).deriv
+
+/-- General derivative of `g_inv_tt = -(f)⁻¹`. Requires `f(M,r) ≠ 0`. -/
+theorem g_inv_tt_hasDerivAt (M r : ℝ) (hr : r ≠ 0) (hfnz : f M r ≠ 0) :
+    HasDerivAt (fun r' => g_inv_tt M r')
+      ((2*M / r^2) / (f M r)^2) r := by
+  have hf := f_hasDerivAt M r hr
+  have hinv : HasDerivAt (fun r' => (f M r')⁻¹) (-(2*M / r^2) / (f M r)^2) r := hf.inv hfnz
+  -- g_inv_tt M r' = -(f M r')⁻¹ definitionally
+  show HasDerivAt (fun r' => -(f M r')⁻¹) ((2*M / r^2) / (f M r)^2) r
+  rw [show (2*M / r^2) / (f M r)^2 = -(-(2*M / r^2) / (f M r)^2) by ring]
+  exact hinv.neg
+
+theorem g_inv_tt_derivative (M r : ℝ) (hr : r ≠ 0) (hfnz : f M r ≠ 0) :
+    deriv (fun r' => g_inv_tt M r') r = (2*M / r^2) / (f M r)^2 := by
+  simpa using (g_inv_tt_hasDerivAt M r hr hfnz).deriv
+
+/-- Exterior specialization: discharge `f ≠ 0` via `r > 2M`. -/
+theorem g_inv_tt_derivative_exterior (M r : ℝ) (hM : 0 < M) (hr_ex : 2*M < r) :
+    deriv (fun r' => g_inv_tt M r') r = (2*M / r^2) / (f M r)^2 := by
+  have hr0  : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
+  have hfnz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
+  exact g_inv_tt_derivative M r hr0 hfnz
+
+/-- General derivative of `g_rr = (f)⁻¹`. Requires `f(M,r) ≠ 0`. -/
+theorem g_rr_hasDerivAt (M r : ℝ) (hr : r ≠ 0) (hfnz : f M r ≠ 0) :
+    HasDerivAt (fun r' => g_rr M r')
+      (-(2*M / r^2) / (f M r)^2) r := by
+  have hf := f_hasDerivAt M r hr
+  -- derivative of inverse: (f)⁻¹ ↦ -(f') / (f r)²
+  have hInv := hf.inv hfnz
+  simpa [g_rr] using hInv
+
+theorem g_rr_derivative (M r : ℝ) (hr : r ≠ 0) (hfnz : f M r ≠ 0) :
+    deriv (fun r' => g_rr M r') r = (-(2*M / r^2) / (f M r)^2) := by
+  simpa using (g_rr_hasDerivAt M r hr hfnz).deriv
+
+/-- Exterior specialization: discharge `f ≠ 0` via `r > 2M`. -/
+theorem g_rr_derivative_exterior (M r : ℝ) (hM : 0 < M) (hr_ex : 2*M < r) :
+    deriv (fun r' => g_rr M r') r = (-(2*M / r^2) / (f M r)^2) := by
+  have hr0  : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
+  have hfnz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
+  exact g_rr_derivative M r hr0 hfnz
+
+/-- Exterior sign for the inverse time-time metric: `g_inv_tt = -(1/f) < 0` when `r > 2M`. -/
+theorem g_inv_tt_neg_of_hr (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) :
+    g_inv_tt M r < 0 := by
+  have hfpos : 0 < f M r := f_pos_of_hr M r hM hr
+  have hpos_inv : 0 < (f M r)⁻¹ := inv_pos.mpr hfpos
+  have : -(f M r)⁻¹ < 0 := neg_lt_zero.mpr hpos_inv
+  simpa [g_inv_tt] using this
+
+/-- Exterior region ↔ all (inverse) metric signs match Lorentzian signature. -/
+theorem exterior_iff_signs (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
+    (2*M < r)
+  ↔ (0 < g_rr M r ∧ g_tt M r < 0 ∧ 0 < g_inv_rr M r ∧ g_inv_tt M r < 0) := by
+  constructor
+  · intro hr_ex
+    refine ⟨?_, ?_, ?_, ?_⟩
+    · exact g_rr_pos_of_hr M r hM hr_ex
+    · exact g_tt_neg_of_hr M r hM hr_ex
+    · exact g_inv_rr_pos_of_hr M r hM hr_ex
+    · exact g_inv_tt_neg_of_hr M r hM hr_ex
+  · intro ⟨_, _, h_inv_rr, _⟩
+    -- reuse `f_pos_iff_r_gt_2M` through `g_inv_rr = f`
+    have : 0 < f M r := by simpa [g_inv_rr] using h_inv_rr
+    exact (f_pos_iff_r_gt_2M M r hM hr).mp this
+
+section MonotonicityCorollaries
+open Set
+
+/-- Since `g_tt = -f` and `f` is strictly increasing on `(0,∞)`,
+    `g_tt` is strictly decreasing on `(0,∞)`. -/
+theorem g_tt_strictAntiOn_Ioi (M : ℝ) (hM : 0 < M) :
+    StrictAntiOn (fun r => g_tt M r) (Ioi (0 : ℝ)) := by
+  intro a ha b hb hlt
+  have h := (f_strictMonoOn_Ioi M hM) ha hb hlt
+  -- `a < b` ⟹ `f a < f b`; negation flips: `-f b < -f a`.
+  simpa [g_tt] using (neg_lt_neg h)
+
+/-- On the exterior `(2M,∞)`, since `f` is strictly increasing and positive,
+    `g_rr = 1/f` is strictly decreasing. -/
+theorem g_rr_strictAntiOn_exterior (M : ℝ) (hM : 0 < M) :
+    StrictAntiOn (fun r => g_rr M r) (Ioi (2*M)) := by
+  intro a ha b hb hlt
+  -- `a,b ∈ (2M,∞)` ⇒ `a,b ∈ (0,∞)` and `f a, f b > 0`.
+  have ha0 : 0 < a := r_pos_of_exterior M a hM ha
+  have hb0 : 0 < b := r_pos_of_exterior M b hM hb
+  have hfa : 0 < f M a := f_pos_of_hr M a hM ha
+  -- strict increase of `f` on `(0,∞)`
+  have hmono : f M a < f M b := (f_strictMonoOn_Ioi M hM) ha0 hb0 hlt
+  -- For positives, reciprocal is strictly decreasing: `1/f b < 1/f a`.
+  have hdiv : (1 : ℝ) / f M b < 1 / f M a := one_div_lt_one_div_of_lt hfa hmono
+  simpa [g_rr, one_div] using hdiv
+
+/-- On the exterior `(2M,∞)`, `g_inv_tt = -(1/f)` is strictly increasing:
+    reciprocal is strictly decreasing, then negation flips back to increasing. -/
+theorem g_inv_tt_strictMonoOn_exterior (M : ℝ) (hM : 0 < M) :
+    StrictMonoOn (fun r => g_inv_tt M r) (Ioi (2*M)) := by
+  intro a ha b hb hlt
+  have ha0 : 0 < a := r_pos_of_exterior M a hM ha
+  have hb0 : 0 < b := r_pos_of_exterior M b hM hb
+  have hfa : 0 < f M a := f_pos_of_hr M a hM ha
+  have hmono : f M a < f M b := (f_strictMonoOn_Ioi M hM) ha0 hb0 hlt
+  -- `1/f b < 1/f a`
+  have hdiv : (1 : ℝ) / f M b < 1 / f M a := one_div_lt_one_div_of_lt hfa hmono
+  -- Negate both sides: `-(1/f a) < -(1/f b)` ⇒ `g_inv_tt a < g_inv_tt b`.
+  have hneg : -(1 / f M a) < -(1 / f M b) := neg_lt_neg hdiv
+  simpa [g_inv_tt, one_div] using hneg
+
+/-- `g_inv_rr = f` is strictly increasing on the exterior `(2M,∞)`. -/
+theorem g_inv_rr_strictMonoOn_exterior (M : ℝ) (hM : 0 < M) :
+    StrictMonoOn (fun r => g_inv_rr M r) (Ioi (2*M)) := by
+  intro a ha b hb hlt
+  have ha0 : 0 < a := r_pos_of_exterior M a hM ha
+  have hb0 : 0 < b := r_pos_of_exterior M b hM hb
+  simpa [g_inv_rr] using (f_strictMonoOn_Ioi M hM) ha0 hb0 hlt
+
+end MonotonicityCorollaries
 
 -- Christoffel symbols Γ^μ_νρ (non-zero components only)
 -- Computed symbolically from metric (finite computation)
