@@ -430,6 +430,22 @@ theorem g_inv_tt_hasDerivAt_comp_exterior
 
 end ChainRuleWrappers
 
+section EffectivePotential
+/-! # Effective potentials (radial form)
+
+`Veff_timelike M L r = f M r * (1 + L^2 / r^2)`
+`Veff_null     M L r = f M r * (L^2 / r^2)`
+
+We keep everything Height 0 and rely only on the calculus facts
+you already proved: `f_hasDerivAt` and the combinators.
+-/
+
+-- Timelike and null effective potentials
+noncomputable def Veff_timelike (M L r : ℝ) : ℝ := f M r * (1 + L^2 / r^2)
+noncomputable def Veff_null     (M L r : ℝ) : ℝ := f M r * (L^2 / r^2)
+
+end EffectivePotential
+
 -- Christoffel symbols Γ^μ_νρ (non-zero components only)
 -- Computed symbolically from metric (finite computation)
 

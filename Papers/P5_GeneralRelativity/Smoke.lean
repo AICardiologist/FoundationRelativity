@@ -257,6 +257,19 @@ section ChainRuleSmokeTests
 
 end ChainRuleSmokeTests
 
+-- Effective potential smoke tests
+section EffectivePotentialSmokeTests
+
+#check Schwarzschild.Veff_timelike
+#check Schwarzschild.Veff_null
+#check Schwarzschild.Lsq_div_rsq_hasDerivAt
+#check Schwarzschild.Veff_timelike_hasDerivAt
+#check Schwarzschild.Veff_null_hasDerivAt
+#check Schwarzschild.Veff_timelike_hasDerivAt_comp
+#check Schwarzschild.Veff_null_hasDerivAt_comp
+
+end EffectivePotentialSmokeTests
+
 end SchwarzschildSmokeChecks
 
 def Paper5_Smoke_Success : True := True.intro
