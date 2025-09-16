@@ -102,6 +102,14 @@ theorem f_eq_zero_iff_r_eq_2M (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
       exact mul_ne_zero (ne_of_gt two_pos) (ne_of_gt hM)
     simpa [f, twoM_ne]
 
+/-- Direct evaluation at the horizon: `f M (2M) = 0` when `M > 0`. -/
+@[simp] lemma f_at_horizon (M : ℝ) (hM : 0 < M) :
+    f M (2*M) = 0 := by
+  have twoM_ne : (2*M) ≠ 0 := by
+    have two_pos : 0 < (2 : ℝ) := by norm_num
+    exact mul_ne_zero (ne_of_gt two_pos) (ne_of_gt hM)
+  simp [f, twoM_ne]
+
 /-- Exterior region implies `0 < r`. -/
 lemma r_pos_of_exterior (M r : ℝ) (hM : 0 < M) (hr_ex : 2*M < r) : 0 < r := by
   have two_pos : 0 < (2 : ℝ) := by norm_num
@@ -125,6 +133,7 @@ theorem f_nonpos_iff_r_le_2M (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
     have : 1 ≤ 2*M / r := by rwa [one_le_div hr]
     have : 1 - 2*M / r ≤ 0 := sub_nonpos.mpr this
     simpa [f] using this
+
 
 -- Schwarzschild metric components in coordinate basis
 noncomputable def g_tt (M r : ℝ) : ℝ := -f M r  -- time-time component: -f(r)
@@ -227,6 +236,22 @@ theorem g_inv_tt_neg_of_hr (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) :
   have hpos_inv : 0 < (f M r)⁻¹ := inv_pos.mpr hfpos
   have : -(f M r)⁻¹ < 0 := neg_lt_zero.mpr hpos_inv
   simpa [g_inv_tt] using this
+
+/-- Exterior region ↔ all (inverse) metric signs match Lorentzian signature. -/
+theorem exterior_iff_signs (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
+    (2*M < r)
+  ↔ (0 < g_rr M r ∧ g_tt M r < 0 ∧ 0 < g_inv_rr M r ∧ g_inv_tt M r < 0) := by
+  constructor
+  · intro hr_ex
+    refine ⟨?_, ?_, ?_, ?_⟩
+    · exact g_rr_pos_of_hr M r hM hr_ex
+    · exact g_tt_neg_of_hr M r hM hr_ex
+    · exact g_inv_rr_pos_of_hr M r hM hr_ex
+    · exact g_inv_tt_neg_of_hr M r hM hr_ex
+  · intro ⟨_, _, h_inv_rr, _⟩
+    -- reuse `f_pos_iff_r_gt_2M` through `g_inv_rr = f`
+    have : 0 < f M r := by simpa [g_inv_rr] using h_inv_rr
+    exact (f_pos_iff_r_gt_2M M r hM hr).mp this
 
 -- Christoffel symbols Γ^μ_νρ (non-zero components only)
 -- Computed symbolically from metric (finite computation)
