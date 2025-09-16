@@ -49,7 +49,7 @@ theorem f_hasDerivAt (M r : ℝ) (hr : r ≠ 0) :
   -- 2) Reciprocal derivative of identity: d/dr (r⁻¹) = -(r^2)⁻¹
   have h_inv : HasDerivAt (fun x : ℝ => x⁻¹) (-(r^2)⁻¹) r := by
     convert h_id.inv hr using 1
-    simp only [one_div, sq]
+    simp only [sq]
     ring
   -- 3) Multiply by constant `2*M`
   have h_mul : HasDerivAt (fun x : ℝ => (2*M) * x⁻¹)
@@ -443,6 +443,95 @@ you already proved: `f_hasDerivAt` and the combinators.
 -- Timelike and null effective potentials
 noncomputable def Veff_timelike (M L r : ℝ) : ℝ := f M r * (1 + L^2 / r^2)
 noncomputable def Veff_null     (M L r : ℝ) : ℝ := f M r * (L^2 / r^2)
+
+/-- d/dx (L^2 / x^2) at `r ≠ 0`.  Keep the `inv-of-square` shape. -/
+theorem Lsq_div_rsq_hasDerivAt (L r : ℝ) (hr : r ≠ 0) :
+  HasDerivAt (fun x : ℝ => L^2 / x^2)
+    (L^2 * (-(1 * r + r * 1) / (r^2)^2)) r := by
+  -- d/dx(x) = 1, so d/dx(x*x) at r is 1*r + r*1
+  have hid : HasDerivAt (fun x : ℝ => x) 1 r := hasDerivAt_id r
+  have hxx : HasDerivAt (fun x : ℝ => x * x) (1 * r + r * 1) r := hid.mul hid
+  -- identify x^2 with x*x for the derivative
+  have hsq : HasDerivAt (fun x : ℝ => x^2) (1 * r + r * 1) r := by
+    simpa [pow_two, mul_comm, mul_left_comm, mul_assoc] using hxx
+  -- derivative of the inverse (requires x^2 ≠ 0 at r)
+  have hr2 : r^2 ≠ 0 := pow_ne_zero 2 hr
+  have hinv : HasDerivAt (fun x : ℝ => (x^2)⁻¹)
+                 (-(1 * r + r * 1) / (r^2)^2) r := hsq.inv hr2
+  -- multiply by constant L^2 and rewrite the function as L^2 / x^2
+  have hmul : HasDerivAt (fun x : ℝ => L^2 * (x^2)⁻¹)
+                 (L^2 * (-(1 * r + r * 1) / (r^2)^2)) r :=
+    hinv.const_mul (L^2)
+  simpa [div_eq_mul_inv, pow_two] using hmul
+
+/-- d/dx (1 + L^2 / x^2) at `r ≠ 0`. -/
+theorem one_add_Lsq_over_rsq_hasDerivAt (L r : ℝ) (hr : r ≠ 0) :
+  HasDerivAt (fun x : ℝ => 1 + L^2 / x^2)
+    (L^2 * (-(1 * r + r * 1) / (r^2)^2)) r := by
+  have h1 : HasDerivAt (fun _ : ℝ => (1 : ℝ)) 0 r := hasDerivAt_const r (1 : ℝ)
+  have h2 := Lsq_div_rsq_hasDerivAt L r hr
+  convert h1.add h2 using 1
+  · simp only [zero_add]
+
+/-- Derivative of the **timelike** effective potential. -/
+theorem Veff_timelike_hasDerivAt (M L r : ℝ) (hr : r ≠ 0) :
+  HasDerivAt (fun x : ℝ => Veff_timelike M L x)
+    ((2 * M) / r^2 * (1 + L^2 / r^2) +
+     (f M r) * (L^2 * (-(1 * r + r * 1) / (r^2)^2))) r := by
+  have hf := f_hasDerivAt M r hr
+  have hg := one_add_Lsq_over_rsq_hasDerivAt L r hr
+  -- product rule
+  simpa [Veff_timelike] using hf.mul hg
+
+/-- Derivative of the **null** effective potential. -/
+theorem Veff_null_hasDerivAt (M L r : ℝ) (hr : r ≠ 0) :
+  HasDerivAt (fun x : ℝ => Veff_null M L x)
+    ((2 * M) / r^2 * (L^2 / r^2) +
+     (f M r) * (L^2 * (-(1 * r + r * 1) / (r^2)^2))) r := by
+  have hf := f_hasDerivAt M r hr
+  have hL := Lsq_div_rsq_hasDerivAt L r hr
+  -- product rule
+  simpa [Veff_null] using hf.mul hL
+
+/-- Exterior specialization for `Veff_timelike` (discharges `r ≠ 0`). -/
+theorem Veff_timelike_hasDerivAt_exterior (M L r : ℝ)
+    (hM : 0 < M) (hr_ex : 2 * M < r) :
+    HasDerivAt (fun x : ℝ => Veff_timelike M L x)
+      ((2 * M) / r^2 * (1 + L^2 / r^2) +
+       (f M r) * (L^2 * (-(1 * r + r * 1) / (r^2)^2))) r := by
+  have hr0 : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
+  simpa using Veff_timelike_hasDerivAt M L r hr0
+
+/-- Exterior specialization for `Veff_null` (discharges `r ≠ 0`). -/
+theorem Veff_null_hasDerivAt_exterior (M L r : ℝ)
+    (hM : 0 < M) (hr_ex : 2 * M < r) :
+    HasDerivAt (fun x : ℝ => Veff_null M L x)
+      ((2 * M) / r^2 * (L^2 / r^2) +
+       (f M r) * (L^2 * (-(1 * r + r * 1) / (r^2)^2))) r := by
+  have hr0 : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
+  simpa using Veff_null_hasDerivAt M L r hr0
+
+/-- Trajectory chain rule for `Veff_timelike ∘ r`. -/
+theorem Veff_timelike_hasDerivAt_comp
+    (M L : ℝ) {r : ℝ → ℝ} {t r' : ℝ}
+    (hr0 : r t ≠ 0) (hr : HasDerivAt r r' t) :
+    HasDerivAt (fun τ => Veff_timelike M L (r τ))
+      (((2 * M) / (r t)^2 * (1 + L^2 / (r t)^2) +
+        (f M (r t)) * (L^2 * (-(1 * (r t) + (r t) * 1) / ((r t)^2)^2)))
+        * r') t := by
+  have h := Veff_timelike_hasDerivAt M L (r t) hr0
+  simpa using h.comp t hr
+
+/-- Trajectory chain rule for `Veff_null ∘ r`. -/
+theorem Veff_null_hasDerivAt_comp
+    (M L : ℝ) {r : ℝ → ℝ} {t r' : ℝ}
+    (hr0 : r t ≠ 0) (hr : HasDerivAt r r' t) :
+    HasDerivAt (fun τ => Veff_null M L (r τ))
+      (((2 * M) / (r t)^2 * (L^2 / (r t)^2) +
+        (f M (r t)) * (L^2 * (-(1 * (r t) + (r t) * 1) / ((r t)^2)^2)))
+        * r') t := by
+  have h := Veff_null_hasDerivAt M L (r t) hr0
+  simpa using h.comp t hr
 
 end EffectivePotential
 
