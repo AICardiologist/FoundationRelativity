@@ -243,6 +243,20 @@ example : Schwarzschild.g_inv_tt (1 : ℝ) (3 : ℝ) < 0 := by
   have hr : 2 * (1 : ℝ) < (3 : ℝ) := by norm_num
   exact Schwarzschild.g_inv_tt_neg_of_hr (1 : ℝ) (3 : ℝ) hM hr
 
+-- Chain rule smoke tests: just verify the theorems exist
+section ChainRuleSmokeTests
+
+-- Check that the chain rule wrappers are available
+#check Schwarzschild.f_hasDerivAt_comp
+#check Schwarzschild.f_deriv_comp
+#check Schwarzschild.g_tt_hasDerivAt_comp
+#check Schwarzschild.g_tt_deriv_comp
+#check Schwarzschild.g_inv_rr_hasDerivAt_comp
+#check Schwarzschild.g_rr_hasDerivAt_comp_exterior
+#check Schwarzschild.g_inv_tt_hasDerivAt_comp_exterior
+
+end ChainRuleSmokeTests
+
 end SchwarzschildSmokeChecks
 
 def Paper5_Smoke_Success : True := True.intro

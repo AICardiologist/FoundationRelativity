@@ -348,6 +348,88 @@ theorem g_inv_rr_strictMonoOn_exterior (M : ℝ) (hM : 0 < M) :
 
 end MonotonicityCorollaries
 
+section ChainRuleWrappers
+/-! ## Chain rule wrappers for trajectory composition
+
+These lemmas compose metric components with trajectories r : ℝ → ℝ,
+essential for geodesic analysis and effective potential calculations.
+-/
+
+/-- Chain rule for `f ∘ r`. Requires `r t ≠ 0`. -/
+theorem f_hasDerivAt_comp
+    (M : ℝ) {r : ℝ → ℝ} {t r' : ℝ}
+    (hr0 : r t ≠ 0) (hr : HasDerivAt r r' t) :
+    HasDerivAt (fun τ => f M (r τ)) ((2 * M) / (r t)^2 * r') t := by
+  -- `f_hasDerivAt` at the point `r t`, then compose with `r`.
+  simpa [sq] using (f_hasDerivAt M (r t) hr0).comp t hr
+
+/-- As a `deriv` convenience form. -/
+theorem f_deriv_comp
+    (M : ℝ) {r : ℝ → ℝ} {t : ℝ}
+    (hr0 : r t ≠ 0) (hr : DifferentiableAt ℝ r t) :
+    deriv (fun τ => f M (r τ)) t = ((2 * M) / (r t)^2) * deriv r t := by
+  classical
+  simpa [sq] using ((f_hasDerivAt M (r t) hr0).comp t hr.hasDerivAt).deriv
+
+/-- Chain rule for `g_tt ∘ r`. Requires `r t ≠ 0`. -/
+theorem g_tt_hasDerivAt_comp
+    (M : ℝ) {r : ℝ → ℝ} {t r' : ℝ}
+    (hr0 : r t ≠ 0) (hr : HasDerivAt r r' t) :
+    HasDerivAt (fun τ => g_tt M (r τ)) (-(2 * M) / (r t)^2 * r') t := by
+  -- Use the definition g_tt = -f directly
+  unfold g_tt
+  -- Now use chain rule for f and negate  
+  have h1 := f_hasDerivAt_comp M hr0 hr
+  -- h1 says: HasDerivAt (fun τ => f M (r τ)) ((2 * M) / (r t)^2 * r') t
+  -- We need: HasDerivAt (fun τ => -f M (r τ)) (-(2 * M) / (r t)^2 * r') t
+  convert h1.neg using 1
+  ring
+
+/-- As a `deriv` convenience form for `g_tt ∘ r`. -/
+theorem g_tt_deriv_comp
+    (M : ℝ) {r : ℝ → ℝ} {t : ℝ}
+    (hr0 : r t ≠ 0) (hr : DifferentiableAt ℝ r t) :
+    deriv (fun τ => g_tt M (r τ)) t = (-(2 * M) / (r t)^2) * deriv r t := by
+  classical
+  rw [g_tt_hasDerivAt_comp M hr0 hr.hasDerivAt |>.deriv]
+
+/-- Chain rule for `g_inv_rr ∘ r` (note `g_inv_rr = f`). Requires `r t ≠ 0`. -/
+theorem g_inv_rr_hasDerivAt_comp
+    (M : ℝ) {r : ℝ → ℝ} {t r' : ℝ}
+    (hr0 : r t ≠ 0) (hr : HasDerivAt r r' t) :
+    HasDerivAt (fun τ => g_inv_rr M (r τ)) ((2 * M) / (r t)^2 * r') t := by
+  simpa [g_inv_rr, sq] using (g_inv_rr_hasDerivAt M (r t) hr0).comp t hr
+
+/-- Exterior chain rule for `g_rr ∘ r` (discharges `r t ≠ 0` and `f ≠ 0`). -/
+theorem g_rr_hasDerivAt_comp_exterior
+    (M : ℝ) {r : ℝ → ℝ} {t r' : ℝ}
+    (hM : 0 < M) (hr_ex : 2 * M < r t) (hr : HasDerivAt r r' t) :
+    HasDerivAt (fun τ => g_rr M (r τ))
+      (-(2 * M) / (r t)^2 / (f M (r t))^2 * r') t := by
+  have hr0  : r t ≠ 0 := r_ne_zero_of_exterior M (r t) hM hr_ex
+  have hfnz : f M (r t) ≠ 0 := ne_of_gt (f_pos_of_hr M (r t) hM hr_ex)
+  -- Use g_rr = f⁻¹ directly
+  unfold g_rr
+  have h1 := (f_hasDerivAt_comp M hr0 hr).inv hfnz
+  convert h1 using 1
+  simp [sq, neg_div, mul_div_assoc']; ring
+
+/-- Exterior chain rule for `g_inv_tt ∘ r` (discharges `r t ≠ 0` and `f ≠ 0`). -/
+theorem g_inv_tt_hasDerivAt_comp_exterior
+    (M : ℝ) {r : ℝ → ℝ} {t r' : ℝ}
+    (hM : 0 < M) (hr_ex : 2 * M < r t) (hr : HasDerivAt r r' t) :
+    HasDerivAt (fun τ => g_inv_tt M (r τ))
+      ((2 * M) / (r t)^2 / (f M (r t))^2 * r') t := by
+  have hr0  : r t ≠ 0 := r_ne_zero_of_exterior M (r t) hM hr_ex
+  have hfnz : f M (r t) ≠ 0 := ne_of_gt (f_pos_of_hr M (r t) hM hr_ex)
+  -- Use g_inv_tt = -f⁻¹ directly
+  unfold g_inv_tt
+  have h1 := (f_hasDerivAt_comp M hr0 hr).inv hfnz
+  convert h1.neg using 1
+  ring
+
+end ChainRuleWrappers
+
 -- Christoffel symbols Γ^μ_νρ (non-zero components only)
 -- Computed symbolically from metric (finite computation)
 
