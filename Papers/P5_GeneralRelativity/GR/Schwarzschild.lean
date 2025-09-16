@@ -134,6 +134,32 @@ theorem f_nonpos_iff_r_le_2M (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
     have : 1 - 2*M / r ≤ 0 := sub_nonpos.mpr this
     simpa [f] using this
 
+open Set in
+/-- For `M>0`, `f M` is strictly increasing on `(0, ∞)`. -/
+theorem f_strictMonoOn_Ioi (M : ℝ) (hM : 0 < M) :
+    StrictMonoOn (fun r => f M r) (Ioi (0 : ℝ)) := by
+  intro a ha b hb hlt
+  -- We want: `f a < f b`, i.e. `1 - 2*M/a < 1 - 2*M/b`.
+  -- Since `a < b` and `0 < a`, we have `1/b < 1/a`.
+  have inv_lt : (1 : ℝ) / b < 1 / a :=
+    one_div_lt_one_div_of_lt (ha : 0 < a) (hlt : a < b)
+  -- Multiply by `2*M > 0` to preserve the inequality.
+  have twoM_pos : 0 < 2 * M := by
+    have two_pos : 0 < (2 : ℝ) := by norm_num
+    exact mul_pos two_pos hM
+  have h_div' : 2*M * (1 / b) < 2*M * (1 / a) :=
+    mul_lt_mul_of_pos_left inv_lt twoM_pos
+  -- Convert to division and use `f`'s definition.
+  have h_div : 2*M / b < 2*M / a := by
+    simpa [div_eq_mul_inv, one_div, mul_comm, mul_left_comm, mul_assoc] using h_div'
+  -- From `2M / b < 2M / a` we get `-(2M / a) < -(2M / b)` and then add `1`.
+  have h_neg : -(2*M / a) < -(2*M / b) := by
+    simpa using (neg_lt_neg h_div)
+  have h_add : 1 + (-(2*M / a)) < 1 + (-(2*M / b)) :=
+    add_lt_add_left h_neg 1
+  -- Rewrite back to `f`.
+  simpa [f, sub_eq_add_neg] using h_add
+
 -- Schwarzschild metric components in coordinate basis
 noncomputable def g_tt (M r : ℝ) : ℝ := -f M r  -- time-time component: -f(r)
 noncomputable def g_rr (M r : ℝ) : ℝ := (f M r)⁻¹  -- radial-radial component: 1/f(r)

@@ -34,6 +34,7 @@ open Papers.P5_GeneralRelativity
 #print axioms Papers.P5_GeneralRelativity.Schwarzschild.r_pos_of_exterior
 #print axioms Papers.P5_GeneralRelativity.Schwarzschild.r_ne_zero_of_exterior
 #print axioms Papers.P5_GeneralRelativity.Schwarzschild.f_eq_zero_iff_r_eq_2M
+#print axioms Papers.P5_GeneralRelativity.Schwarzschild.f_strictMonoOn_Ioi
 #print axioms Papers.P5_GeneralRelativity.Schwarzschild.g_inv_rr_pos_of_hr
 #print axioms Papers.P5_GeneralRelativity.Schwarzschild.g_inv_tt_neg_of_hr
 #print axioms Papers.P5_GeneralRelativity.Schwarzschild.f_hasDerivAt

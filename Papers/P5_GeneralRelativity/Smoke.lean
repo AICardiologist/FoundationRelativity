@@ -173,6 +173,14 @@ example : Schwarzschild.f (1 : ℝ) ((3 : ℝ) / 2) ≤ 0 := by
   have := (Schwarzschild.f_nonpos_iff_r_le_2M (1 : ℝ) ((3 : ℝ) / 2) hM hr).2 hle
   exact this
 
+-- Monotonicity sanity: with M=1 and 0 < 2 < 3, we have f(1,2) < f(1,3).
+example : Schwarzschild.f (1 : ℝ) (2 : ℝ) < Schwarzschild.f (1 : ℝ) (3 : ℝ) := by
+  have hmono := Schwarzschild.f_strictMonoOn_Ioi (1 : ℝ) (by norm_num)
+  have ha : (2 : ℝ) ∈ Set.Ioi (0 : ℝ) := by norm_num
+  have hb : (3 : ℝ) ∈ Set.Ioi (0 : ℝ) := by norm_num
+  have hlt : (2 : ℝ) < 3 := by norm_num
+  exact hmono ha hb hlt
+
 -- Derivative of g_tt at (M,r)=(1,3): -(2/9)
 example : deriv (fun r' => Schwarzschild.g_tt (1 : ℝ) r') (3 : ℝ) = -((2 : ℝ) / 9) := by
   have hr0 : (3 : ℝ) ≠ 0 := by norm_num
