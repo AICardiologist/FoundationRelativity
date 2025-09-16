@@ -535,6 +535,48 @@ theorem Veff_null_hasDerivAt_comp
 
 end EffectivePotential
 
+-- ============================================================================
+-- Photon Sphere and Circular Orbit Analysis
+-- ============================================================================
+
+section PhotonSphereAndOrbits
+open Real
+
+/-- Helper lemma: M - f(M,r) * r = 3M - r for r ≠ 0. -/
+lemma M_sub_rf_eq_3M_sub_r (M r : ℝ) (hr0 : r ≠ 0) :
+    M - (f M r) * r = 3 * M - r := by
+  simp only [f]
+  field_simp [hr0]
+  ring
+
+
+/-- On the exterior `r>2M` with `M>0`, the null effective potential has
+    a critical point iff `L=0` (trivial) or `r=3M` (the photon sphere). -/
+theorem Veff_null_deriv_zero_iff_exterior
+    (M L r : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
+    deriv (fun x => Veff_null M L x) r = 0 ↔ (L = 0 ∨ r = 3 * M) := by
+  sorry  -- Proof: Use derivative formula and factor to find critical points
+
+/-- For `L ≠ 0`, `d/dr V_null > 0` on `(2M,3M)` and `< 0` on `(3M,∞)`. -/
+theorem dVeff_null_pos_of_lt_3M
+    (M L r : ℝ) (hM : 0 < M) (hr : 2 * M < r) (hL : L ≠ 0) (h3 : r < 3 * M) :
+    0 < deriv (fun x => Veff_null M L x) r := by
+  sorry  -- Proof: Sign analysis of derivative shows positive on (2M, 3M)
+
+theorem dVeff_null_neg_of_gt_3M
+    (M L r : ℝ) (hM : 0 < M) (hr : 2 * M < r) (hL : L ≠ 0) (h3 : 3 * M < r) :
+    deriv (fun x => Veff_null M L x) r < 0 := by
+  sorry  -- Proof: Sign analysis of derivative shows negative on (3M, ∞)
+
+/-- On the exterior, the timelike circular-orbit condition. -/
+theorem Veff_timelike_deriv_zero_iff_Lsq
+    (M L r : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
+    deriv (fun x => Veff_timelike M L x) r = 0
+    ↔ L^2 = (M * r^2) / (r - 3 * M) := by
+  sorry  -- Proof: Clear denominators and solve for L^2
+
+end PhotonSphereAndOrbits
+
 -- Christoffel symbols Γ^μ_νρ (non-zero components only)
 -- Computed symbolically from metric (finite computation)
 
