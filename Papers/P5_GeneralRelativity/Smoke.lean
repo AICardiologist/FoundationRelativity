@@ -277,6 +277,7 @@ section PhotonSphereAndOrbitSmokeTests
 #check Schwarzschild.Veff_null_deriv_zero_iff_exterior
 #check Schwarzschild.dVeff_null_pos_of_lt_3M
 #check Schwarzschild.dVeff_null_neg_of_gt_3M
+#check Schwarzschild.Veff_timelike_deriv_zero_iff_poly
 #check Schwarzschild.Veff_timelike_deriv_zero_iff_Lsq
 
 -- Verify the photon sphere theorem
@@ -284,11 +285,17 @@ example (M L r : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
   deriv (fun x => Schwarzschild.Veff_null M L x) r = 0 ↔ (L = 0 ∨ r = 3 * M) :=
   Schwarzschild.Veff_null_deriv_zero_iff_exterior M L r hM hr
 
--- Verify circular orbit formula
+-- Verify circular orbit formula (balanced polynomial form)
 example (M L r : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
   deriv (fun x => Schwarzschild.Veff_timelike M L x) r = 0 
+  ↔ L^2 * (r - 3 * M) = M * r^2 :=
+  Schwarzschild.Veff_timelike_deriv_zero_iff_poly M L r hM hr
+
+-- Verify circular orbit formula (quotient form, requires r ≠ 3M)
+example (M L r : ℝ) (hM : 0 < M) (hr : 2 * M < r) (hr3 : r ≠ 3 * M) :
+  deriv (fun x => Schwarzschild.Veff_timelike M L x) r = 0
   ↔ L^2 = (M * r^2) / (r - 3 * M) :=
-  Schwarzschild.Veff_timelike_deriv_zero_iff_Lsq M L r hM hr
+  Schwarzschild.Veff_timelike_deriv_zero_iff_Lsq M L r hM hr hr3
 
 end PhotonSphereAndOrbitSmokeTests
 

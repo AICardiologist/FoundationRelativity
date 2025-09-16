@@ -555,25 +555,34 @@ lemma M_sub_rf_eq_3M_sub_r (M r : ℝ) (hr0 : r ≠ 0) :
 theorem Veff_null_deriv_zero_iff_exterior
     (M L r : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
     deriv (fun x => Veff_null M L x) r = 0 ↔ (L = 0 ∨ r = 3 * M) := by
-  sorry  -- Proof: Use derivative formula and factor to find critical points
+  sorry  -- Proof: Factor derivative and analyze critical points
 
 /-- For `L ≠ 0`, `d/dr V_null > 0` on `(2M,3M)` and `< 0` on `(3M,∞)`. -/
 theorem dVeff_null_pos_of_lt_3M
     (M L r : ℝ) (hM : 0 < M) (hr : 2 * M < r) (hL : L ≠ 0) (h3 : r < 3 * M) :
     0 < deriv (fun x => Veff_null M L x) r := by
-  sorry  -- Proof: Sign analysis of derivative shows positive on (2M, 3M)
+  sorry  -- Proof: Sign analysis shows derivative positive on (2M, 3M)
 
 theorem dVeff_null_neg_of_gt_3M
     (M L r : ℝ) (hM : 0 < M) (hr : 2 * M < r) (hL : L ≠ 0) (h3 : 3 * M < r) :
     deriv (fun x => Veff_null M L x) r < 0 := by
-  sorry  -- Proof: Sign analysis of derivative shows negative on (3M, ∞)
+  sorry  -- Proof: Sign analysis shows derivative negative on (3M, ∞)
 
-/-- On the exterior, the timelike circular-orbit condition. -/
-theorem Veff_timelike_deriv_zero_iff_Lsq
+/-- Balanced polynomial form of the timelike circular-orbit condition (no divisions).
+    On the exterior it is equivalent to the derivative vanishing. -/
+theorem Veff_timelike_deriv_zero_iff_poly
     (M L r : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
     deriv (fun x => Veff_timelike M L x) r = 0
-    ↔ L^2 = (M * r^2) / (r - 3 * M) := by
-  sorry  -- Proof: Clear denominators and solve for L^2
+      ↔ L^2 * (r - 3 * M) = M * r^2 := by
+  sorry  -- Proof: Clear denominators and derive balanced polynomial form
+
+/-- On the exterior and away from `r=3M`, the circular-orbit condition
+    is equivalent to the familiar quotient formula. -/
+theorem Veff_timelike_deriv_zero_iff_Lsq
+    (M L r : ℝ) (hM : 0 < M) (hr : 2 * M < r) (hr3 : r ≠ 3 * M) :
+    deriv (fun x => Veff_timelike M L x) r = 0
+      ↔ L^2 = (M * r^2) / (r - 3 * M) := by
+  sorry  -- Proof: Convert from balanced to quotient form when r ≠ 3M
 
 end PhotonSphereAndOrbits
 
