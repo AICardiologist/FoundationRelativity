@@ -160,6 +160,24 @@ theorem f_strictMonoOn_Ioi (M : ℝ) (hM : 0 < M) :
   -- Rewrite back to `f`.
   simpa [f, sub_eq_add_neg] using h_add
 
+/-- For `M>0` and `r>0`, we have `f M r < 1`. -/
+theorem f_lt_one_of_pos (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
+    f M r < 1 := by
+  -- `2*M / r > 0` since both factors are positive.
+  have hpos : 0 < (2*M) / r := by
+    have h2M : 0 < 2 * M := by
+      have : 0 < (2 : ℝ) := by norm_num
+      exact mul_pos this hM
+    exact div_pos h2M hr
+  -- From `0 < 2M/r` we get `1 - 2M/r < 1 - 0`.
+  simpa [f] using (sub_lt_sub_left hpos (1 : ℝ))
+
+/-- On the exterior `r > 2M`, we have `0 < f M r < 1` (requires `M>0`). -/
+theorem f_mem_Ioo_exterior (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) :
+    0 < f M r ∧ f M r < 1 := by
+  have hrpos : 0 < r := r_pos_of_exterior M r hM hr
+  exact ⟨f_pos_of_hr M r hM hr, f_lt_one_of_pos M r hM hrpos⟩
+
 -- Schwarzschild metric components in coordinate basis
 noncomputable def g_tt (M r : ℝ) : ℝ := -f M r  -- time-time component: -f(r)
 noncomputable def g_rr (M r : ℝ) : ℝ := (f M r)⁻¹  -- radial-radial component: 1/f(r)
@@ -277,6 +295,58 @@ theorem exterior_iff_signs (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
     -- reuse `f_pos_iff_r_gt_2M` through `g_inv_rr = f`
     have : 0 < f M r := by simpa [g_inv_rr] using h_inv_rr
     exact (f_pos_iff_r_gt_2M M r hM hr).mp this
+
+section MonotonicityCorollaries
+open Set
+
+/-- Since `g_tt = -f` and `f` is strictly increasing on `(0,∞)`,
+    `g_tt` is strictly decreasing on `(0,∞)`. -/
+theorem g_tt_strictAntiOn_Ioi (M : ℝ) (hM : 0 < M) :
+    StrictAntiOn (fun r => g_tt M r) (Ioi (0 : ℝ)) := by
+  intro a ha b hb hlt
+  have h := (f_strictMonoOn_Ioi M hM) ha hb hlt
+  -- `a < b` ⟹ `f a < f b`; negation flips: `-f b < -f a`.
+  simpa [g_tt] using (neg_lt_neg h)
+
+/-- On the exterior `(2M,∞)`, since `f` is strictly increasing and positive,
+    `g_rr = 1/f` is strictly decreasing. -/
+theorem g_rr_strictAntiOn_exterior (M : ℝ) (hM : 0 < M) :
+    StrictAntiOn (fun r => g_rr M r) (Ioi (2*M)) := by
+  intro a ha b hb hlt
+  -- `a,b ∈ (2M,∞)` ⇒ `a,b ∈ (0,∞)` and `f a, f b > 0`.
+  have ha0 : 0 < a := r_pos_of_exterior M a hM ha
+  have hb0 : 0 < b := r_pos_of_exterior M b hM hb
+  have hfa : 0 < f M a := f_pos_of_hr M a hM ha
+  -- strict increase of `f` on `(0,∞)`
+  have hmono : f M a < f M b := (f_strictMonoOn_Ioi M hM) ha0 hb0 hlt
+  -- For positives, reciprocal is strictly decreasing: `1/f b < 1/f a`.
+  have hdiv : (1 : ℝ) / f M b < 1 / f M a := one_div_lt_one_div_of_lt hfa hmono
+  simpa [g_rr, one_div] using hdiv
+
+/-- On the exterior `(2M,∞)`, `g_inv_tt = -(1/f)` is strictly increasing:
+    reciprocal is strictly decreasing, then negation flips back to increasing. -/
+theorem g_inv_tt_strictMonoOn_exterior (M : ℝ) (hM : 0 < M) :
+    StrictMonoOn (fun r => g_inv_tt M r) (Ioi (2*M)) := by
+  intro a ha b hb hlt
+  have ha0 : 0 < a := r_pos_of_exterior M a hM ha
+  have hb0 : 0 < b := r_pos_of_exterior M b hM hb
+  have hfa : 0 < f M a := f_pos_of_hr M a hM ha
+  have hmono : f M a < f M b := (f_strictMonoOn_Ioi M hM) ha0 hb0 hlt
+  -- `1/f b < 1/f a`
+  have hdiv : (1 : ℝ) / f M b < 1 / f M a := one_div_lt_one_div_of_lt hfa hmono
+  -- Negate both sides: `-(1/f a) < -(1/f b)` ⇒ `g_inv_tt a < g_inv_tt b`.
+  have hneg : -(1 / f M a) < -(1 / f M b) := neg_lt_neg hdiv
+  simpa [g_inv_tt, one_div] using hneg
+
+/-- `g_inv_rr = f` is strictly increasing on the exterior `(2M,∞)`. -/
+theorem g_inv_rr_strictMonoOn_exterior (M : ℝ) (hM : 0 < M) :
+    StrictMonoOn (fun r => g_inv_rr M r) (Ioi (2*M)) := by
+  intro a ha b hb hlt
+  have ha0 : 0 < a := r_pos_of_exterior M a hM ha
+  have hb0 : 0 < b := r_pos_of_exterior M b hM hb
+  simpa [g_inv_rr] using (f_strictMonoOn_Ioi M hM) ha0 hb0 hlt
+
+end MonotonicityCorollaries
 
 -- Christoffel symbols Γ^μ_νρ (non-zero components only)
 -- Computed symbolically from metric (finite computation)
