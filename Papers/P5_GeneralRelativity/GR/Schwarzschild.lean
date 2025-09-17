@@ -1593,11 +1593,7 @@ section FreezeRadialUnderDeriv
   -- simplify constant derivatives
   simp [deriv_const]
   -- normalize the arithmetic
-  ring_nf
-  -- expand the Γ symbols that were kept opaque
-  simp only [Γ_r_θθ, mul_comm, mul_left_comm, mul_assoc]
-  -- final cleanup
-  rfl
+  ring
 
   /-- Canonical form for `R_{φφ}` (keep the radial derivative symbolic). -/
   @[simp] lemma Ricci_φφ_reduce (M r θ : ℝ) :
@@ -1619,8 +1615,6 @@ section FreezeRadialUnderDeriv
   ring_nf
   -- expand the Γ symbols that were kept opaque
   simp only [Γ_r_φφ, mul_comm, mul_left_comm, mul_assoc]
-  -- final cleanup
-  rfl
 end FreezeRadialUnderDeriv
 
 section DerivativeHelpers
@@ -1691,7 +1685,7 @@ lemma deriv_Γ_r_rr
         = M * (2 * r * f M r + 2 * M) / (r^2 * f M r)^2 := by
     rw [hΓ_plus]
     simp only [hlin, neg_mul, neg_neg, neg_div]
-    ring_nf
+    ring
 
   -- 4) substitute `f` and clear denominators
   field_simp [f, hr0, hf0] at hcompact ⊢
