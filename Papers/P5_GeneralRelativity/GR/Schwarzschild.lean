@@ -1590,8 +1590,12 @@ section FreezeRadialUnderDeriv
              Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
              Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
              Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ]
-  -- simplify constant derivatives
-  simp [deriv_const]
+  -- simplify constant derivatives and evaluate  
+  simp only [deriv_const, Γ_r_θθ, Γ_θ_φφ, Γ_r_φφ]
+  -- evaluate remaining derivatives
+  simp only [deriv_sub, deriv_const, deriv_id'', deriv_mul_const]
+  -- clear field arithmetic
+  field_simp
   -- normalize
   ring
 
@@ -1609,8 +1613,12 @@ section FreezeRadialUnderDeriv
              Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
              Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
              Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ]
-  -- simplify constant derivatives
-  simp [deriv_const]
+  -- simplify constant derivatives and evaluate  
+  simp only [deriv_const, Γ_r_θθ, Γ_θ_φφ, Γ_r_φφ]
+  -- evaluate remaining derivatives
+  simp only [deriv_sub, deriv_const, deriv_id'', deriv_mul_const]
+  -- clear field arithmetic
+  field_simp
   -- normalize
   ring
 end FreezeRadialUnderDeriv
