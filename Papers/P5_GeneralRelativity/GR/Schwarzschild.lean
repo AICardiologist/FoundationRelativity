@@ -1522,8 +1522,8 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
   -- expand sums and use sparsity; keep Γ_r_θθ unevaluated inside deriv
   simp only [sumIdx_expand, sumIdx2_expand, Γtot]
   -- incorporate the θ‑trace alignment
-  simp [htrace]
-  ring_nf
+  rw [htrace]
+  ring
 
 /-- Canonical form for `R_φφ`. -/
 @[simp] lemma Ricci_φφ_reduce (M r θ : ℝ) :
@@ -1548,7 +1548,7 @@ section DerivativeHelpers
       (fun s : ℝ => sumIdx (fun ρ => Γtot M s θ ρ ρ Idx.r))
       = (fun s : ℝ => (2 : ℝ) / s) := by
     funext s
-    simpa [traceGamma_r] using (traceGamma_r M s θ)
+    simpa using (traceGamma_r M s θ)
   -- Differentiate s ↦ 2/s using HasDerivAt for inv and then constant-multiple.
   have hid : HasDerivAt (fun s : ℝ => s) 1 r := hasDerivAt_id r
   have hinv : HasDerivAt (fun s : ℝ => s⁻¹) (-1 / r^2) r :=
@@ -1630,10 +1630,8 @@ lemma deriv_Γ_r_θθ (M r : ℝ) (hr0 : r ≠ 0) :
     have hf : DifferentiableAt ℝ (fun s => s - 2*M) r :=
       differentiableAt_id.sub (differentiableAt_const _)
     have h1 : deriv (fun s => s - 2*M) r = 1 := by
-      rw [deriv_sub_const]
-      simp [deriv_id'']
-    rw [deriv_neg _ _ hf, h1]
-    ring
+      simpa using deriv_sub_const (fun s => s) (2*M) r
+    simpa [h1] using deriv_neg (fun s => s - 2*M) r hf
   -- Show algebraically that -1 = -(f M r) - r*(2*M/r^2)
   rw [hΓ, this]
   simp [f]
