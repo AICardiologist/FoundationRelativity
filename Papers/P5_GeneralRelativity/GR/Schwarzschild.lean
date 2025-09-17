@@ -1521,7 +1521,7 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
         (fun t => sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ))
       = (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) := by
       funext t; simpa using sumIdx_trace_theta_eq M r t
-    simpa [hfun]
+    exact congrArg (fun F => deriv F θ) hfun
   -- Now expand everything; include `hθtrace` so `simp` rewrites the θ-trace term.
   simp [sumIdx_expand, sumIdx2_expand, Γtot, hθtrace]
   ring
@@ -1530,6 +1530,7 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
 @[simp] lemma Ricci_φφ_reduce (M r θ : ℝ) :
   Ricci M r θ Idx.φ Idx.φ =
       deriv (fun s => Γ_r_φφ M s θ) r
+    + deriv (fun t => Γ_θ_φφ t) θ
     + (Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r) * Γ_r_φφ M r θ
     - (Γ_r_θθ M r * Γ_φ_θφ θ + Γ_r_φφ M r θ * Γ_φ_rφ r + Γ_θ_φφ θ * Γ_r_φφ M r θ) := by
   classical
@@ -1662,6 +1663,25 @@ lemma deriv_Γ_r_φφ (M r θ : ℝ) (hr0 : r ≠ 0) :
   simpa [hfun] using
     (deriv_const_right (c := (Real.sin θ)^2) (fun s => Γ_r_θθ M s) r hdiff)
 
+/-- `∂_θ Γ^θ_{φφ}` in closed form. -/
+@[simp] lemma deriv_Γ_θ_φφ (θ : ℝ) :
+  deriv (fun t => Γ_θ_φφ t) θ = (Real.sin θ)^2 - (Real.cos θ)^2 := by
+  classical
+  -- Γ_θ_φφ t = - (sin t * cos t)
+  have hfun : (fun t => Γ_θ_φφ t) = (fun t => -(Real.sin t * Real.cos t)) := by
+    funext t; simp [Γ_θ_φφ, mul_comm]
+  -- (sin·cos)' = cos·cos + sin·(-sin) = cos^2 - sin^2, then negate
+  have hsin := Real.hasDerivAt_sin θ
+  have hcos := Real.hasDerivAt_cos θ
+  have hprod : HasDerivAt (fun t => Real.sin t * Real.cos t)
+                 (Real.cos θ * Real.cos θ + Real.sin θ * (- Real.sin θ)) θ :=
+    hsin.mul hcos
+  have hneg : deriv (fun t => -(Real.sin t * Real.cos t)) θ
+            = - (Real.cos θ * Real.cos θ - Real.sin θ * Real.sin θ) := by
+    simpa using (hprod.neg).deriv
+  -- Clean to (sin θ)^2 - (cos θ)^2
+  simpa [hfun, pow_two] using hneg
+
 /-- `∂_θ Γ^φ_{θφ}` (cotangent derivative). -/
 @[simp] lemma deriv_Γ_φ_θφ_cotangent (θ : ℝ) (hsθ : Real.sin θ ≠ 0) :
   deriv (fun t => Γ_φ_θφ t) θ = - 1 / (Real.sin θ)^2 := by
@@ -1747,7 +1767,9 @@ theorem Ricci_φφ_vanishes
   have ⟨hr0, hf0, hr2M⟩ := exterior_nonzeros hM hr
   have hsθ : Real.sin θ ≠ 0 := sin_theta_ne_zero θ hθ
   simp only [Ricci_φφ_reduce]
-  rw [deriv_Γ_r_φφ M r θ hr0, deriv_Γ_r_θθ M r hr0]
+  -- substitute the radial pieces
+  rw [deriv_Γ_r_φφ M r θ hr0, deriv_Γ_r_θθ M r hr0, deriv_Γ_θ_φφ θ]
+  -- and finish mechanically
   simp [Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_r_φφ, Γ_φ_θφ, Γ_θ_φφ, f]
   field_simp [hr0, hr2M, hsθ]
   ring
