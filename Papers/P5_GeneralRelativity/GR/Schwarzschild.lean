@@ -1353,6 +1353,14 @@ noncomputable def Γtot (M r θ : ℝ) : Idx → Idx → Idx → ℝ
 
 end TotalChristoffel
 
+/-- The two θ–trace shapes that appear in `R_{θθ}` are pointwise equal; expand and compare. -/
+@[simp] lemma sumIdx_trace_theta_eq (M r t : ℝ) :
+  sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ)
+  = sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ) := by
+  classical
+  -- Both sides expand to `Γ_t_tθ + Γ_r_rθ + Γ_θ_θθ + Γ_φ_φθ`, which simplify via sparsity.
+  simp [sumIdx_expand, Γtot]
+
 /-- The two trace shapes that appear in `R_rr` are pointwise equal; expand and compare. -/
 @[simp] lemma sumIdx_trace_r_eq (M s θ : ℝ) :
   sumIdx (fun ρ => Γtot M s θ ρ Idx.r ρ)
@@ -1494,15 +1502,27 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
   simp [sumIdx_expand, sumIdx2_expand, Γtot, htrace]
   ring
 
-/-- Canonical form for `R_θθ`. -/
+/-- Canonical form for `R_{θθ}`: includes the `-∂_θ` trace term. -/
 @[simp] lemma Ricci_θθ_reduce (M r θ : ℝ) :
   Ricci M r θ Idx.θ Idx.θ =
       deriv (fun s => Γ_r_θθ M s) r
+    - deriv (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) θ
     + (Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r) * Γ_r_θθ M r
     - (Γ_r_θθ M r * Γ_θ_rθ r + Γ_θ_φφ θ * Γ_r_φφ M r θ) := by
   classical
   unfold Ricci
-  simp [sumIdx_expand, sumIdx2_expand, Γtot]
+  -- align the θ–trace shapes to the ρρθ form used on the rhs
+  have htrace :
+    deriv (fun t => sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ)) θ
+      = deriv (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) θ := by
+    have : (fun t => sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ))
+          = (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) := by
+      funext t; exact sumIdx_trace_theta_eq M r t
+    rw [this]
+  -- expand sums and use sparsity; keep Γ_r_θθ unevaluated inside deriv
+  simp only [sumIdx_expand, sumIdx2_expand, Γtot]
+  -- incorporate the θ‑trace alignment
+  simp [htrace]
   ring
 
 /-- Canonical form for `R_φφ`. -/
@@ -1544,6 +1564,20 @@ section DerivativeHelpers
       ring
     simpa [this] using hder
   simpa [hfun] using hfinal
+
+/-- θ–trace derivative used in `R_{θθ}`: only `Γ^φ_{θφ}` depends on θ. -/
+@[simp] lemma deriv_traceGamma_θ
+    (M r θ : ℝ) :
+    deriv (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) θ
+      = deriv (fun t => Γ_φ_θφ t) θ := by
+  classical
+  -- Align the two θ-trace shapes (ρ θ ρ) and (ρ ρ θ).
+  have htrace :
+    (fun t => sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ))
+      = (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) := by
+    funext t; simpa using sumIdx_trace_theta_eq M r t
+  -- Only the φ-slot has θ–dependence; others are θ-constant or zero.
+  simp [sumIdx_expand, Γtot, htrace]
 
 /-- `∂_r Γ^r_{rr}` in closed form. -/
 lemma deriv_Γ_r_rr (M r : ℝ) (hr0 : r ≠ 0) (hf0 : f M r ≠ 0) (hr2M : r - 2*M ≠ 0) :
@@ -1596,15 +1630,17 @@ lemma deriv_Γ_r_φφ (M r θ : ℝ) (hr0 : r ≠ 0) :
   deriv (fun s => Γ_r_φφ M s θ) r =
     (deriv (fun s => Γ_r_θθ M s) r) * (Real.sin θ)^2 := by
   classical
-  -- Γ_r_φφ M s θ = Γ_r_θθ M s * (sin θ)^2
-  have hΓ : (fun s => Γ_r_φφ M s θ) = (fun s => Γ_r_θθ M s * (Real.sin θ)^2) := by
-    funext s; simp [Γ_r_φφ]
-  rw [hΓ]
-  -- Use deriv_const_mul for the constant (sin θ)^2
+  -- write Γ_r_φφ as a left constant multiple of Γ_r_θθ
+  have hΓ : (fun s => Γ_r_φφ M s θ) = (fun s => (Real.sin θ)^2 * Γ_r_θθ M s) := by
+    funext s; simp [Γ_r_φφ, Γ_r_θθ, mul_comm, mul_left_comm, mul_assoc]
+  -- Γ_r_θθ is differentiable (it is affine in s)
   have hdiff : DifferentiableAt ℝ (fun s => Γ_r_θθ M s) r := by
-    simp [Γ_r_θθ]
-    exact differentiableAt_id.sub (differentiableAt_const _)
-  simp [deriv_const_mul _ _ _ hdiff]
+    have : (fun s => Γ_r_θθ M s) = fun s => -(s - 2*M) := by
+      funext s; simp [Γ_r_θθ]
+    simpa [this] using (differentiableAt_id.sub (differentiableAt_const _)).neg
+  -- derivative of constant * f
+  have h := deriv_const_mul (c := (Real.sin θ)^2) (fun s => Γ_r_θθ M s) r hdiff
+  simpa [hΓ, mul_comm, mul_left_comm, mul_assoc] using h
 
 /-- `∂_θ Γ^φ_{θφ}` (cotangent derivative). -/
 @[simp] lemma deriv_Γ_φ_θφ_cotangent (θ : ℝ) (hsθ : Real.sin θ ≠ 0) :
@@ -1614,16 +1650,25 @@ lemma deriv_Γ_r_φφ (M r θ : ℝ) (hr0 : r ≠ 0) :
   have hΓ : (fun t => Γ_φ_θφ t) = (fun t => Real.cos t / Real.sin t) := by
     funext t; simp [Γ_φ_θφ]
   rw [hΓ]
-  -- Use quotient rule: d/dx(cos/sin) = -sin²/sin² - cos²/sin² = -1/sin²
+  -- quotient rule and clean algebra to −csc²
   have hcos := Real.hasDerivAt_cos θ
   have hsin := Real.hasDerivAt_sin θ
   have hdiv : HasDerivAt (fun t => Real.cos t / Real.sin t)
     (((-Real.sin θ) * Real.sin θ - Real.cos θ * Real.cos θ) / (Real.sin θ)^2) θ :=
     hcos.div hsin hsθ
-  simp [hdiv.deriv]
-  field_simp [hsθ]
-  ring_nf
-  simp [Real.sin_sq_add_cos_sq]
+  have : deriv (fun t => Real.cos t / Real.sin t) θ
+      = (((-Real.sin θ) * Real.sin θ - Real.cos θ * Real.cos θ) / (Real.sin θ)^2) := by
+    simpa using hdiv.deriv
+  -- simplify to −1 / sin² using 1 = sin² + cos²
+  calc
+    deriv (fun t => Real.cos t / Real.sin t) θ
+        = (((-Real.sin θ) * Real.sin θ - Real.cos θ * Real.cos θ) / (Real.sin θ)^2) := this
+    _   = -1 / (Real.sin θ)^2 := by
+      field_simp [hsθ]; ring_nf; simp [Real.sin_sq_add_cos_sq]
+
+/-- Helper for `sin θ ≠ 0` when `θ∈(0,π)`. -/
+lemma sin_theta_ne_zero (θ : ℝ) (hθ : 0 < θ ∧ θ < Real.pi) : Real.sin θ ≠ 0 :=
+  ne_of_gt (Real.sin_pos_of_mem_Ioo ⟨hθ.1, hθ.2⟩)
 
 end DerivativeHelpers
 
@@ -1664,15 +1709,18 @@ theorem Ricci_rr_vanishes
 theorem Ricci_θθ_vanishes
     (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (hθ : 0 < θ ∧ θ < Real.pi) :
     Ricci M r θ Idx.θ Idx.θ = 0 := by
+  classical
   have ⟨hr0, hf0, hr2M⟩ := exterior_nonzeros hM hr
-  have hsθ : Real.sin θ ≠ 0 := by
-    intro h
-    cases' hθ with hθ_pos hθ_lt_pi
-    simp [Real.sin_eq_zero_iff] at h
-    sorry  -- Need to show contradiction from θ ∈ (0, π) and sin θ = 0
-  simp [Ricci_θθ_reduce]
+  have hsθ : Real.sin θ ≠ 0 := sin_theta_ne_zero θ hθ
+  -- normal form for R_{θθ}
+  simp only [Ricci_θθ_reduce]
+  -- collapse -∂_θ trace to -deriv Γ_φ_θφ
+  have hθtrace := deriv_traceGamma_θ M r θ
+  -- plug derivatives and simplify
   rw [deriv_Γ_r_θθ M r hr0]
-  simp [Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_r_φφ, Γ_θ_φφ, f]
+  -- replace the θ‑trace by Γ_φ_θφ and then its derivative by −csc²
+  simp [hθtrace, deriv_Γ_φ_θφ_cotangent θ hsθ,
+        Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_r_φφ, Γ_θ_φφ, f]
   field_simp [hr0, hr2M, hsθ]
   ring
 
@@ -1680,13 +1728,10 @@ theorem Ricci_θθ_vanishes
 theorem Ricci_φφ_vanishes
     (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (hθ : 0 < θ ∧ θ < Real.pi) :
     Ricci M r θ Idx.φ Idx.φ = 0 := by
+  classical
   have ⟨hr0, hf0, hr2M⟩ := exterior_nonzeros hM hr
-  have hsθ : Real.sin θ ≠ 0 := by
-    intro h
-    cases' hθ with hθ_pos hθ_lt_pi
-    simp [Real.sin_eq_zero_iff] at h
-    sorry  -- Need to show contradiction from θ ∈ (0, π) and sin θ = 0
-  simp [Ricci_φφ_reduce]
+  have hsθ : Real.sin θ ≠ 0 := sin_theta_ne_zero θ hθ
+  simp only [Ricci_φφ_reduce]
   rw [deriv_Γ_r_φφ M r θ hr0, deriv_Γ_r_θθ M r hr0]
   simp [Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_r_φφ, Γ_φ_θφ, Γ_θ_φφ, f]
   field_simp [hr0, hr2M, hsθ]
