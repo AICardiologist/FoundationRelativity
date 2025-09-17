@@ -1508,35 +1508,22 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
 @[simp] lemma Ricci_θθ_reduce (M r θ : ℝ) :
   Ricci M r θ Idx.θ Idx.θ =
       deriv (fun s => Γ_r_θθ M s) r
-    - deriv (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) θ
     + (Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r) * Γ_r_θθ M r
     - (Γ_r_θθ M r * Γ_θ_rθ r + Γ_θ_φφ θ * Γ_r_φφ M r θ) := by
   classical
   unfold Ricci
-  -- Rewrite the ν=θ trace *under the derivative* to the ρρθ shape.
+  -- Rewrite the ν=θ trace *under* the derivative to ρρθ
+  have hfun :
+      (fun t => sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ))
+    = (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) := by
+    funext t; simpa using sumIdx_trace_theta_eq M r t
   have hθtrace :
       deriv (fun t => sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ)) θ
-    = deriv (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) θ := by
-    have hfun :
-        (fun t => sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ))
-      = (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) := by
-      funext t; simpa using sumIdx_trace_theta_eq M r t
-    exact congrArg (fun F => deriv F θ) hfun
-  -- Γ_r_θθ M s = -(s - 2*M), so deriv (fun s => Γ_r_θθ M s) r = -1
-  have hderiv_Γ_r_θθ : deriv (fun s => Γ_r_θθ M s) r = -1 := by
-    have hf : (fun s => Γ_r_θθ M s) = (fun s => -(s - 2*M)) := by
-      funext s; simp [Γ_r_θθ]
-    rw [hf]
-    -- Use HasDerivAt to compute the derivative
-    have h1 := hasDerivAt_id r
-    have h2 := hasDerivAt_const r (2*M)
-    have h3 : HasDerivAt (fun s => s - 2*M) 1 r := by simpa using h1.sub h2
-    have h4 : HasDerivAt (fun s => -(s - 2*M)) (-1) r := by simpa using h3.neg
-    exact h4.deriv
-  -- Now expand everything; include `hθtrace` and `hderiv_Γ_r_θθ` so `simp` rewrites them.
-  simp only [sumIdx_expand, sumIdx2_expand, Γtot, hθtrace, hderiv_Γ_r_θθ,
-             Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_θ_φφ, Γ_r_φφ]
-  ring_nf
+    = deriv (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) θ :=
+    congrArg (fun F => deriv F θ) hfun
+  -- Expand everything. We do *not* evaluate the radial derivative here.
+  simp [sumIdx_expand, sumIdx2_expand, Γtot, hθtrace]
+  ring
 
 /-- Canonical form for `R_φφ`. -/
 @[simp] lemma Ricci_φφ_reduce (M r θ : ℝ) :
@@ -1546,23 +1533,8 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
     - (Γ_r_θθ M r * Γ_φ_θφ θ + Γ_r_φφ M r θ * Γ_φ_rφ r + Γ_θ_φφ θ * Γ_r_φφ M r θ) := by
   classical
   unfold Ricci
-  -- Γ_r_φφ M s θ = -(s - 2*M) * (sin θ)^2, so deriv = -sin²θ
-  have hderiv_Γ_r_φφ : deriv (fun s => Γ_r_φφ M s θ) r = -(Real.sin θ)^2 := by
-    have hf : (fun s => Γ_r_φφ M s θ) = (fun s => -(s - 2*M) * (Real.sin θ)^2) := by
-      funext s; simp [Γ_r_φφ]
-    rw [hf]
-    -- Use HasDerivAt to compute the derivative
-    have h1 := hasDerivAt_id r
-    have h2 := hasDerivAt_const r (2*M)
-    have h3 : HasDerivAt (fun s => s - 2*M) 1 r := by simpa using h1.sub h2
-    have h4 : HasDerivAt (fun s => -(s - 2*M)) (-1) r := by simpa using h3.neg
-    have h5 := hasDerivAt_const r ((Real.sin θ)^2)
-    have h6 : HasDerivAt (fun s => -(s - 2*M) * (Real.sin θ)^2) (-(Real.sin θ)^2) r := by 
-      simpa using h4.mul h5
-    exact h6.deriv
-  simp only [sumIdx_expand, sumIdx2_expand, Γtot, hderiv_Γ_r_φφ,
-             Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_r_φφ, Γ_φ_θφ, Γ_θ_φφ]
-  ring_nf
+  simp [sumIdx_expand, sumIdx2_expand, Γtot]
+  ring
 
 section DerivativeHelpers
 
@@ -1588,70 +1560,56 @@ section DerivativeHelpers
   -- `hcongr : deriv (∑ρ Γ^ρ_{ρr}) r = deriv ((2)/·) r`
   exact hcongr.trans hderiv
 
-/-- θ–trace derivative used in `R_{θθ}`: only `Γ^φ_{θφ}` depends on θ. -/
+/-- θ–trace derivative for `R_{θθ}`: only `Γ^φ_{θφ}` depends on θ. -/
 @[simp] lemma deriv_traceGamma_θ
     (M r θ : ℝ) :
     deriv (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) θ
       = deriv (fun t => Γ_φ_θφ t) θ := by
   classical
-  -- The trace expands to Γ_t_tθ + Γ_r_rθ + Γ_θ_θθ + Γ_φ_φθ
-  -- Only Γ_φ_φθ = Γ_φ_θφ depends on θ; others are zero or constant
-  have hfun : (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ))
-            = (fun t => Γ_φ_θφ t) := by
+  have hfun :
+      (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ))
+    = (fun t => Γ_φ_θφ t) := by
     funext t
-    -- Expand the trace and check each component
-    simp only [sumIdx_expand, Γtot]
-    -- All components except Γ_φ_θφ are zero
-    simp [Γ_φ_θφ]
+    -- t,tθ = 0, r,rθ = 0, θ,θθ = 0; only φ,φθ survives
+    simp [sumIdx_expand, Γtot]
   exact congrArg (fun F => deriv F θ) hfun
 
-/-- `∂_r Γ^r_{rr}` in closed form.  We differentiate `-(M) * (s^2 * f(M,s))⁻¹`. -/
+/-- `∂_r Γ^r_{rr}` in closed form.  Differentiate `-(M) * (s^2 * f(M,s))⁻¹`. -/
 lemma deriv_Γ_r_rr
     (M r : ℝ) (hr0 : r ≠ 0) (hf0 : f M r ≠ 0) (hr2M : r - 2*M ≠ 0) :
   deriv (fun s => Γ_r_rr M s) r
     = (2*M*(r - M)) / (r^2 * (r - 2*M)^2) := by
   classical
-  -- 1) Derivative of h(s) = s^2 * f(M,s) at r
-  have h_sq : HasDerivAt (fun s : ℝ => s^2) (2 * r) r :=
-    hasDerivAt_pow 2 r
+  -- 1) derivative of h(s) = s^2 * f(M,s)
+  have h_sq : HasDerivAt (fun s : ℝ => s^2) (r * 1 + 1 * r) r :=
+    (hasDerivAt_id r).mul (hasDerivAt_id r)
   have h_f  : HasDerivAt (fun s : ℝ => f M s) (2*M / r^2) r :=
     f_hasDerivAt M r hr0
   have h_mul : HasDerivAt (fun s : ℝ => s^2 * f M s)
-                 ((2 * r) * f M r + r^2 * (2*M / r^2)) r :=
+                   ((r * 1 + 1 * r) * f M r + r^2 * (2*M / r^2)) r :=
     h_sq.mul h_f
-  have h_nz : r^2 * f M r ≠ 0 :=
-    mul_ne_zero (pow_ne_zero 2 hr0) hf0
-  -- 2) Inverse + constant multiple: Γ = -(M) * (h s)⁻¹
+  have h_nz : r^2 * f M r ≠ 0 := mul_ne_zero (pow_ne_zero 2 hr0) hf0
+  -- 2) inverse + constant multiple
   have h_inv : HasDerivAt (fun s : ℝ => (s^2 * f M s)⁻¹)
-                 ( - ((2 * r) * f M r + r^2 * (2*M / r^2))
-                   / (r^2 * f M r)^2 ) r :=
+                   ( - ((r * 1 + 1 * r) * f M r + r^2 * (2*M / r^2))
+                     / (r^2 * f M r)^2 ) r :=
     h_mul.inv h_nz
   have hΓ : deriv (fun s => Γ_r_rr M s) r
            = (-(M : ℝ)) *
-             ( - ((2 * r) * f M r + r^2 * (2*M / r^2)) / (r^2 * f M r)^2 ) := by
+             ( - ((r * 1 + 1 * r) * f M r + r^2 * (2*M / r^2)) / (r^2 * f M r)^2 ) := by
     simpa [Γ_r_rr, div_eq_mul_inv] using (h_inv.const_mul (-(M : ℝ))).deriv
-  -- 3) Normalize and finish algebraically
+  -- 3) normalize and finish
+  have hlin : (r * 1 + 1 * r) = 2 * r := by ring
   have hcompact :
       deriv (fun s => Γ_r_rr M s) r
         = M * (2 * r * f M r + 2 * M) / (r^2 * f M r)^2 := by
-    simp only [hΓ]
-    field_simp
-    ring
-  -- 4) Replace `f` and clear denominators in one shot
-  --    Target: (2*M*(r - M)) / (r^2 * (r - 2*M)^2)
-  --    Note: (r^2 f)^2 = r^2 (r-2M)^2 and 2 r f + 2M = 2(r-M)
-  --    Using `field_simp` with `hr0` and `hf0`.
-  have : deriv (fun s => Γ_r_rr M s) r
-      = (2*M*(r - M)) / (r^2 * (r - 2*M)^2) := by
-    -- Transform the RHS of `hcompact` into the requested form.
-    -- It's routine algebra once `f M r` is expanded.
-    have := hcompact
-    -- rewrite *both sides* into a common denominator/normal form
-    -- and reduce with `ring`.
-    field_simp [f, hr0, hf0] at this ⊢
-    -- After clearing denominators, `ring` closes the goal.
-    ring
-  exact this
+    simpa [hlin, two_mul, mul_add, sub_eq_add_neg,
+           mul_comm, mul_left_comm, mul_assoc]
+      using hΓ
+  -- 4) substitute `f` and clear denominators
+  -- target: (2*M*(r - M)) / (r^2 * (r - 2*M)^2)
+  field_simp [f, hr0, hf0] at hcompact ⊢
+  ring
 
 /-- `∂_r Γ^r_{θθ}`. -/
 lemma deriv_Γ_r_θθ (M r : ℝ) (hr0 : r ≠ 0) :
@@ -1660,43 +1618,36 @@ lemma deriv_Γ_r_θθ (M r : ℝ) (hr0 : r ≠ 0) :
   -- Γ_r_θθ M s = -(s - 2*M)
   have hΓ : (fun s => Γ_r_θθ M s) = (fun s => -(s - 2*M)) := by
     funext s; simp [Γ_r_θθ]
-  -- d/dr [-(r - 2M)] = -1 via HasDerivAt
+  -- d/dr [-(r - 2M)] = -1
   have hder : deriv (fun s => -(s - 2*M)) r = -1 := by
-    have h1 : HasDerivAt (fun s => s) 1 r := hasDerivAt_id r
-    have h2 : HasDerivAt (fun s => 2*M) 0 r := hasDerivAt_const r (2*M)
-    have h3 : HasDerivAt (fun s => s - 2*M) (1 - 0) r := h1.sub h2
-    have h4 : HasDerivAt (fun s => -(s - 2*M)) (-(1 - 0)) r := h3.neg
-    simp at h4
-    exact h4.deriv
-  -- Now identify -1 with the rhs algebraically
-  -- -(f M r) - r*(2*M/r^2) = -(1 - 2*M/r) - 2*M/r = -1
+    simpa using (((hasDerivAt_id r).sub (hasDerivAt_const r (2*M))).neg).deriv
+  -- algebra: RHS equals −1
   have : -(f M r) - r * (2 * M / r^2) = (-1 : ℝ) := by
     have hr0' : (r:ℝ) ≠ 0 := hr0
-    -- expand f and clear denominators once
-    simp [f]  -- gives `-(1 - 2*M/r) - r*(2*M/r^2)`
+    simp [f]
     field_simp [hr0']
     ring
-  -- finish
-  simp [hΓ, hder, this]
+  simpa [hΓ, this] using hder
 
-/-- `∂_r Γ^r_{φφ}` as a constant‑on‑the‑right multiple of `∂_r Γ^r_{θθ}`. -/
+/-- `∂_r Γ^r_{φφ}` as a constant-on-the-left multiple of `∂_r Γ^r_{θθ}`. -/
 lemma deriv_Γ_r_φφ (M r θ : ℝ) (hr0 : r ≠ 0) :
   deriv (fun s => Γ_r_φφ M s θ) r
     = (deriv (fun s => Γ_r_θθ M s) r) * (Real.sin θ)^2 := by
   classical
-  -- Γ_r_φφ M s θ = Γ_r_θθ M s * (sin θ)^2
+  -- Γ_r_φφ M s θ = (sin θ)^2 * Γ_r_θθ M s
   have hfun :
       (fun s => Γ_r_φφ M s θ)
-    = (fun s => Γ_r_θθ M s * (Real.sin θ)^2) := by
-    funext s; simp [Γ_r_φφ]
-  -- `Γ_r_θθ` is affine in `s`, hence differentiable at `r`.
+    = (fun s => (Real.sin θ)^2 * Γ_r_θθ M s) := by
+    funext s; simp [Γ_r_φφ, Γ_r_θθ, mul_comm, mul_left_comm, mul_assoc]
+  -- differentiate c * f(s)
   have hdiff : DifferentiableAt ℝ (fun s => Γ_r_θθ M s) r := by
     have : (fun s => Γ_r_θθ M s) = (fun s => -(s - 2*M)) := by
       funext s; simp [Γ_r_θθ]
     simpa [this] using (differentiableAt_id.sub (differentiableAt_const _)).neg
-  -- Apply the (right) constant‑multiple rule you defined.
-  simpa [hfun] using
-    (deriv_const_right (c := (Real.sin θ)^2) (fun s => Γ_r_θθ M s) r hdiff)
+  have h :=
+    deriv_const_mul (c := (Real.sin θ)^2) (fun s => Γ_r_θθ M s) r hdiff
+  -- move the constant to the right
+  simpa [hfun, mul_comm] using h
 
 /-- `∂_θ Γ^θ_{φφ}` in closed form. -/
 @[simp] lemma deriv_Γ_θ_φφ (θ : ℝ) :
