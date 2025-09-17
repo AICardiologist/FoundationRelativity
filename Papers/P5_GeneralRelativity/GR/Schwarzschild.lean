@@ -1547,7 +1547,9 @@ Freeze the radial Christoffels under `simp` *only* for the two Ricci reductions,
 so `deriv (fun s => Γ_r_* … s …) r` stays symbolic.
 -/
 section FreezeRadialUnderDeriv
-  /-- Canonical form for `R_{θθ}` (keep the radial derivative symbolic). -/
+
+
+/-- Canonical form for `R_{θθ}` (keep the radial derivative symbolic). -/
   @[simp] lemma Ricci_θθ_reduce (M r θ : ℝ) :
     Ricci M r θ Idx.θ Idx.θ =
         deriv (fun s => Γ_r_θθ M s) r
@@ -1590,7 +1592,9 @@ section FreezeRadialUnderDeriv
              Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
              Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
              Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ]
-  -- simplify and normalize
+  -- manually convert for CI compatibility
+  conv_lhs => arg 1; change -1
+  conv_rhs => arg 2; arg 1; arg 1; change -1
   simp
   ring
 
@@ -1608,7 +1612,9 @@ section FreezeRadialUnderDeriv
              Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
              Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
              Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ]
-  -- simplify and normalize
+  -- manually convert for CI compatibility
+  conv_lhs => arg 1; change -1
+  conv_rhs => arg 2; arg 1; arg 1; change -1
   simp
   ring
 end FreezeRadialUnderDeriv
