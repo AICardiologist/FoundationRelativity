@@ -1523,7 +1523,7 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
   simp only [sumIdx_expand, sumIdx2_expand, Γtot]
   -- incorporate the θ‑trace alignment
   simp [htrace]
-  ring
+  ring_nf
 
 /-- Canonical form for `R_φφ`. -/
 @[simp] lemma Ricci_φφ_reduce (M r θ : ℝ) :
@@ -1534,7 +1534,7 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
   classical
   unfold Ricci
   simp [sumIdx_expand, sumIdx2_expand, Γtot]
-  ring
+  ring_nf
 
 section DerivativeHelpers
 
@@ -1561,7 +1561,7 @@ section DerivativeHelpers
   have hfinal : deriv (fun s : ℝ => (2 : ℝ) / s) r = - (2 / r^2) := by
     -- avoid fragile simp; use ring_nf over ℝ instead
     have : (2 : ℝ) * (-1 / r^2) = - (2 / r^2) := by
-      ring
+      ring_nf
     simpa [this] using hder
   simpa [hfun] using hfinal
 
@@ -1619,11 +1619,15 @@ lemma deriv_Γ_r_θθ (M r : ℝ) (hr0 : r ≠ 0) :
   have hΓ : (fun s => Γ_r_θθ M s) = (fun s => -(s - 2*M)) := by
     funext s; simp [Γ_r_θθ]
   have : deriv (fun s => -(s - 2*M)) r = -1 := by
-    simp [deriv_sub_const, deriv_id'']
+    have hf : DifferentiableAt ℝ (fun s => s - 2*M) r :=
+      differentiableAt_id.sub (differentiableAt_const _)
+    have h1 : deriv (fun s => s - 2*M) r = 1 := by
+      simpa using deriv_sub_const (fun s => s) (2*M) r
+    simpa [h1] using deriv_neg hf
   -- Show algebraically that -1 = -(f M r) - r*(2*M/r^2)
   simp [hΓ, this, f]
   field_simp [hr0]
-  ring
+  ring_nf
 
 /-- `∂_r Γ^r_{φφ}`. -/
 lemma deriv_Γ_r_φφ (M r θ : ℝ) (hr0 : r ≠ 0) :
@@ -1665,10 +1669,6 @@ lemma deriv_Γ_r_φφ (M r θ : ℝ) (hr0 : r ≠ 0) :
         = (((-Real.sin θ) * Real.sin θ - Real.cos θ * Real.cos θ) / (Real.sin θ)^2) := this
     _   = -1 / (Real.sin θ)^2 := by
       field_simp [hsθ]; ring_nf; simp [Real.sin_sq_add_cos_sq]
-
-/-- Helper for `sin θ ≠ 0` when `θ∈(0,π)`. -/
-lemma sin_theta_ne_zero (θ : ℝ) (hθ : 0 < θ ∧ θ < Real.pi) : Real.sin θ ≠ 0 :=
-  ne_of_gt (Real.sin_pos_of_mem_Ioo ⟨hθ.1, hθ.2⟩)
 
 end DerivativeHelpers
 
