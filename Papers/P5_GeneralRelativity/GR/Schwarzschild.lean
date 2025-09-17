@@ -1524,16 +1524,15 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
     exact congrArg (fun F => deriv F θ) hfun
   -- Γ_r_θθ M s = -(s - 2*M), so deriv (fun s => Γ_r_θθ M s) r = -1
   have hderiv_Γ_r_θθ : deriv (fun s => Γ_r_θθ M s) r = -1 := by
-    have : (fun s => Γ_r_θθ M s) = (fun s => -(s - 2*M)) := by
+    have hf : (fun s => Γ_r_θθ M s) = (fun s => -(s - 2*M)) := by
       funext s; simp [Γ_r_θθ]
-    rw [this]
-    -- The derivative of -(s - 2*M) is -1
-    have h : HasDerivAt (fun s => -(s - 2*M)) (-1) r := by
-      have h1 : HasDerivAt (fun s => s - 2*M) 1 r := 
-        (hasDerivAt_id r).sub (hasDerivAt_const r (2*M))
-      convert h1.neg using 1
-      norm_num
-    exact h.deriv
+    rw [hf]
+    -- Use HasDerivAt to compute the derivative
+    have h1 := hasDerivAt_id r
+    have h2 := hasDerivAt_const r (2*M)
+    have h3 : HasDerivAt (fun s => s - 2*M) 1 r := by simpa using h1.sub h2
+    have h4 : HasDerivAt (fun s => -(s - 2*M)) (-1) r := by simpa using h3.neg
+    exact h4.deriv
   -- Now expand everything; include `hθtrace` and `hderiv_Γ_r_θθ` so `simp` rewrites them.
   simp only [sumIdx_expand, sumIdx2_expand, Γtot, hθtrace, hderiv_Γ_r_θθ,
              Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_θ_φφ, Γ_r_φφ]
@@ -1549,18 +1548,18 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
   unfold Ricci
   -- Γ_r_φφ M s θ = -(s - 2*M) * (sin θ)^2, so deriv = -sin²θ
   have hderiv_Γ_r_φφ : deriv (fun s => Γ_r_φφ M s θ) r = -(Real.sin θ)^2 := by
-    have : (fun s => Γ_r_φφ M s θ) = (fun s => -(s - 2*M) * (Real.sin θ)^2) := by
+    have hf : (fun s => Γ_r_φφ M s θ) = (fun s => -(s - 2*M) * (Real.sin θ)^2) := by
       funext s; simp [Γ_r_φφ]
-    rw [this]
-    have h : HasDerivAt (fun s => -(s - 2*M) * (Real.sin θ)^2) (-(Real.sin θ)^2) r := by
-      have h1 : HasDerivAt (fun s => -(s - 2*M)) (-1) r := by
-        have h' : HasDerivAt (fun s => s - 2*M) 1 r := 
-          (hasDerivAt_id r).sub (hasDerivAt_const r (2*M))
-        convert h'.neg using 1
-        norm_num
-      convert h1.mul (hasDerivAt_const r ((Real.sin θ)^2)) using 1
-      ring
-    exact h.deriv
+    rw [hf]
+    -- Use HasDerivAt to compute the derivative
+    have h1 := hasDerivAt_id r
+    have h2 := hasDerivAt_const r (2*M)
+    have h3 : HasDerivAt (fun s => s - 2*M) 1 r := by simpa using h1.sub h2
+    have h4 : HasDerivAt (fun s => -(s - 2*M)) (-1) r := by simpa using h3.neg
+    have h5 := hasDerivAt_const r ((Real.sin θ)^2)
+    have h6 : HasDerivAt (fun s => -(s - 2*M) * (Real.sin θ)^2) (-(Real.sin θ)^2) r := by 
+      simpa using h4.mul h5
+    exact h6.deriv
   simp only [sumIdx_expand, sumIdx2_expand, Γtot, hderiv_Γ_r_φφ,
              Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_r_φφ, Γ_φ_θφ, Γ_θ_φφ]
   ring_nf
