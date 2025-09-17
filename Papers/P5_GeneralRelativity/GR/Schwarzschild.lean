@@ -1373,6 +1373,31 @@ noncomputable def Γtot (M r θ : ℝ) : Idx → Idx → Idx → ℝ
 
 end TotalChristoffel
 
+/-! CI-stable derivative helpers for linear maps -/
+section DerivSimpHelpers
+  variable {a b r : ℝ}
+
+  @[simp] lemma deriv_id' (r : ℝ) :
+      deriv (fun s : ℝ => s) r = (1 : ℝ) :=
+    (hasDerivAt_id r).deriv
+
+  @[simp] lemma deriv_linear (a b r : ℝ) :
+      deriv (fun s : ℝ => a * s + b) r = a := by
+    -- d/ds (a*s) = a, d/ds (b) = 0
+    have h1 : HasDerivAt (fun s : ℝ => a * s) a r :=
+      (hasDerivAt_id r).const_mul a
+    have h2 : HasDerivAt (fun s : ℝ => a * s + b) a r :=
+      h1.add (hasDerivAt_const r b)
+    simpa using h2.deriv
+
+  /-- Useful special case: d/ds (c - s) = -1. -/
+  @[simp] lemma deriv_const_sub_id (c r : ℝ) :
+      deriv (fun s : ℝ => c - s) r = (-1 : ℝ) := by
+    -- rewrite as a*s + b with a = -1, b = c
+    simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc, one_mul, neg_one_mul]
+      using deriv_linear (-1 : ℝ) c r
+end DerivSimpHelpers
+
 /-- The two θ–trace shapes that appear in `R_{θθ}` are pointwise equal; expand and compare. -/
 @[simp] lemma sumIdx_trace_theta_eq (M r t : ℝ) :
   sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ)
@@ -1547,6 +1572,8 @@ Freeze the radial Christoffels under `simp` *only* for the two Ricci reductions,
 so `deriv (fun s => Γ_r_* … s …) r` stays symbolic.
 -/
 section FreezeRadialUnderDeriv
+  -- Do not let `simp` unfold Γ_r_* inside derivatives.
+  attribute [-simp] Γ_r_θθ Γ_r_φφ
 
 
 /-- Canonical form for `R_{θθ}` (keep the radial derivative symbolic). -/
@@ -1592,11 +1619,9 @@ section FreezeRadialUnderDeriv
              Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
              Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
              Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ]
-  -- manually convert for CI compatibility
-  conv_lhs => arg 1; change -1
-  conv_rhs => arg 2; arg 1; arg 1; change -1
-  simp
-  ring
+  -- evaluate remaining constant derivatives and normalize algebra
+  simp [deriv_const, Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ, deriv_const_sub_id]
+  ring_nf
 
   /-- Canonical form for `R_{φφ}` (keep the radial derivative symbolic). -/
   @[simp] lemma Ricci_φφ_reduce (M r θ : ℝ) :
@@ -1612,11 +1637,9 @@ section FreezeRadialUnderDeriv
              Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
              Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
              Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ]
-  -- manually convert for CI compatibility
-  conv_lhs => arg 1; change -1
-  conv_rhs => arg 2; arg 1; arg 1; change -1
-  simp
-  ring
+  -- evaluate remaining constant derivatives and normalize algebra
+  simp [deriv_const, Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ, deriv_const_sub_id]
+  ring_nf
 end FreezeRadialUnderDeriv
 
 section DerivativeHelpers
