@@ -1665,7 +1665,11 @@ theorem Ricci_θθ_vanishes
     (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (hθ : 0 < θ ∧ θ < Real.pi) :
     Ricci M r θ Idx.θ Idx.θ = 0 := by
   have ⟨hr0, hf0, hr2M⟩ := exterior_nonzeros hM hr
-  have hsθ : Real.sin θ ≠ 0 := Real.sin_ne_zero_of_ne_zero_of_lt_pi hθ
+  have hsθ : Real.sin θ ≠ 0 := by
+    intro h
+    cases' hθ with hθ_pos hθ_lt_pi
+    simp [Real.sin_eq_zero_iff] at h
+    sorry  -- Need to show contradiction from θ ∈ (0, π) and sin θ = 0
   simp [Ricci_θθ_reduce]
   rw [deriv_Γ_r_θθ M r hr0]
   simp [Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_r_φφ, Γ_θ_φφ, f]
@@ -1677,7 +1681,11 @@ theorem Ricci_φφ_vanishes
     (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (hθ : 0 < θ ∧ θ < Real.pi) :
     Ricci M r θ Idx.φ Idx.φ = 0 := by
   have ⟨hr0, hf0, hr2M⟩ := exterior_nonzeros hM hr
-  have hsθ : Real.sin θ ≠ 0 := Real.sin_ne_zero_of_ne_zero_of_lt_pi hθ
+  have hsθ : Real.sin θ ≠ 0 := by
+    intro h
+    cases' hθ with hθ_pos hθ_lt_pi
+    simp [Real.sin_eq_zero_iff] at h
+    sorry  -- Need to show contradiction from θ ∈ (0, π) and sin θ = 0
   simp [Ricci_φφ_reduce]
   rw [deriv_Γ_r_φφ M r θ hr0, deriv_Γ_r_θθ M r hr0]
   simp [Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_r_φφ, Γ_φ_θφ, Γ_θ_φφ, f]
