@@ -1592,8 +1592,7 @@ section FreezeRadialUnderDeriv
              Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ]
   -- simplify constant derivatives
   simp [deriv_const]
-  -- expand the Γ symbols and normalize
-  simp only [Γ_r_θθ]
+  -- normalize
   ring
 
   /-- Canonical form for `R_{φφ}` (keep the radial derivative symbolic). -/
@@ -1612,8 +1611,7 @@ section FreezeRadialUnderDeriv
              Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ]
   -- simplify constant derivatives
   simp [deriv_const]
-  -- expand the Γ symbols and normalize
-  simp only [Γ_r_φφ]
+  -- normalize
   ring
 end FreezeRadialUnderDeriv
 
@@ -1685,7 +1683,7 @@ lemma deriv_Γ_r_rr
         = M * (2 * r * f M r + 2 * M) / (r^2 * f M r)^2 := by
     rw [hΓ_plus]
     simp only [hlin, neg_mul, neg_neg, neg_div]
-    ring
+    ring_nf
 
   -- 4) substitute `f` and clear denominators
   field_simp [f, hr0, hf0] at hcompact ⊢
