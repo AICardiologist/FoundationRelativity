@@ -1592,7 +1592,8 @@ section FreezeRadialUnderDeriv
              Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ]
   -- simplify constant derivatives
   simp [deriv_const]
-  -- normalize the arithmetic
+  -- expand the Γ symbols and normalize
+  simp only [Γ_r_θθ]
   ring
 
   /-- Canonical form for `R_{φφ}` (keep the radial derivative symbolic). -/
@@ -1611,10 +1612,9 @@ section FreezeRadialUnderDeriv
              Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ]
   -- simplify constant derivatives
   simp [deriv_const]
-  -- normalize the arithmetic
-  ring_nf
-  -- expand the Γ symbols that were kept opaque
-  simp only [Γ_r_φφ, mul_comm, mul_left_comm, mul_assoc]
+  -- expand the Γ symbols and normalize
+  simp only [Γ_r_φφ]
+  ring
 end FreezeRadialUnderDeriv
 
 section DerivativeHelpers
