@@ -1524,19 +1524,18 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
     exact congrArg (fun F => deriv F θ) hfun
   -- Now expand everything; include `hθtrace` so `simp` rewrites the θ-trace term.
   simp [sumIdx_expand, sumIdx2_expand, Γtot, hθtrace]
-  ring
+  ring_nf
 
 /-- Canonical form for `R_φφ`. -/
 @[simp] lemma Ricci_φφ_reduce (M r θ : ℝ) :
   Ricci M r θ Idx.φ Idx.φ =
       deriv (fun s => Γ_r_φφ M s θ) r
-    + deriv (fun t => Γ_θ_φφ t) θ
     + (Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r) * Γ_r_φφ M r θ
     - (Γ_r_θθ M r * Γ_φ_θφ θ + Γ_r_φφ M r θ * Γ_φ_rφ r + Γ_θ_φφ θ * Γ_r_φφ M r θ) := by
   classical
   unfold Ricci
   simp [sumIdx_expand, sumIdx2_expand, Γtot]
-  ring
+  ring_nf
 
 section DerivativeHelpers
 
@@ -1551,13 +1550,16 @@ section DerivativeHelpers
       = (fun s : ℝ => (2 : ℝ) / s) := by
     funext s; simpa using (traceGamma_r M s θ)
   -- Differentiate 2/s at r.
-  have hderiv : deriv (fun s : ℝ => (2 : ℝ) / s) r = - (2 / r^2) := by
-    have hid  : HasDerivAt (fun s : ℝ => s) 1 r := hasDerivAt_id r
-    have hinv : HasDerivAt (fun s : ℝ => s⁻¹) (-1 / r^2) r := hid.inv (by simpa using hr0)
-    have h2   : HasDerivAt (fun s : ℝ => (2 : ℝ) * s⁻¹)
+  have hid  : HasDerivAt (fun s : ℝ => s) 1 r := hasDerivAt_id r
+  have hinv : HasDerivAt (fun s : ℝ => s⁻¹) (-1 / r^2) r := hid.inv (by simpa using hr0)
+  have h2   : HasDerivAt (fun s : ℝ => (2 : ℝ) * s⁻¹)
                   ((2 : ℝ) * (-1 / r^2)) r := hinv.const_mul (2 : ℝ)
+  have hderiv : deriv (fun s : ℝ => (2 : ℝ) / s) r = - (2 / r^2) := by
     simpa [div_eq_mul_inv] using h2.deriv
-  simpa [hfun] using hderiv
+  -- Transport the derivative across the function equality `hfun`.
+  have hcongr := congrArg (fun F => deriv F r) hfun
+  -- `hcongr : deriv (∑ρ Γ^ρ_{ρr}) r = deriv ((2)/·) r`
+  exact hcongr.trans hderiv
 
 /-- θ–trace derivative used in `R_{θθ}`: only `Γ^φ_{θφ}` depends on θ. -/
 @[simp] lemma deriv_traceGamma_θ
@@ -1768,8 +1770,8 @@ theorem Ricci_φφ_vanishes
   have hsθ : Real.sin θ ≠ 0 := sin_theta_ne_zero θ hθ
   simp only [Ricci_φφ_reduce]
   -- substitute the radial pieces
-  rw [deriv_Γ_r_φφ M r θ hr0, deriv_Γ_r_θθ M r hr0, deriv_Γ_θ_φφ θ]
-  -- and finish mechanically
+  rw [deriv_Γ_r_φφ M r θ hr0, deriv_Γ_r_θθ M r hr0]
+  -- finish mechanically
   simp [Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_r_φφ, Γ_φ_θφ, Γ_θ_φφ, f]
   field_simp [hr0, hr2M, hsθ]
   ring
