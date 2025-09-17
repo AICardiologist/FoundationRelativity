@@ -1484,7 +1484,15 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
     - deriv (fun s => sumIdx (fun ρ => Γtot M s θ ρ ρ Idx.r)) r
     + (Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r) * Γ_r_rr M r
     - ((Γ_t_tr M r)^2 + (Γ_r_rr M r)^2 + (Γ_θ_rθ r)^2 + (Γ_φ_rφ r)^2) := by
-  sorry  -- Reduction proof simplified
+  classical
+  unfold Ricci
+  -- align the ν‑trace with the ρ‑trace using your helper
+  have htrace :
+    (fun s => sumIdx (fun ρ => Γtot M s θ ρ Idx.r ρ))
+      = (fun s => sumIdx (fun ρ => Γtot M s θ ρ ρ Idx.r)) := by
+    funext s; simpa using sumIdx_trace_r_eq M s θ
+  simp [sumIdx_expand, sumIdx2_expand, Γtot, htrace]
+  ring
 
 /-- Canonical form for `R_θθ`. -/
 @[simp] lemma Ricci_θθ_reduce (M r θ : ℝ) :
@@ -1492,7 +1500,10 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
       deriv (fun s => Γ_r_θθ M s) r
     + (Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r) * Γ_r_θθ M r
     - (Γ_r_θθ M r * Γ_θ_rθ r + Γ_θ_φφ θ * Γ_r_φφ M r θ) := by
-  sorry
+  classical
+  unfold Ricci
+  simp [sumIdx_expand, sumIdx2_expand, Γtot]
+  ring
 
 /-- Canonical form for `R_φφ`. -/
 @[simp] lemma Ricci_φφ_reduce (M r θ : ℝ) :
@@ -1500,37 +1511,119 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
       deriv (fun s => Γ_r_φφ M s θ) r
     + (Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r) * Γ_r_φφ M r θ
     - (Γ_r_θθ M r * Γ_φ_θφ θ + Γ_r_φφ M r θ * Γ_φ_rφ r + Γ_θ_φφ θ * Γ_r_φφ M r θ) := by
-  sorry
+  classical
+  unfold Ricci
+  simp [sumIdx_expand, sumIdx2_expand, Γtot]
+  ring
 
 section DerivativeHelpers
 
-/-- `∂_r Γ^ρ_{ρr} = -2/r^2`. We rewrite to `2 / s` then differentiate. -/
+/-- `∂_r Γ^ρ_{ρr} = -2/r^2`.  We rewrite the trace to `s ↦ 2/s` and differentiate. -/
 @[simp] lemma deriv_traceGamma_r
     (M r θ : ℝ) (hr0 : r ≠ 0) :
     deriv (fun s => sumIdx (fun ρ => Γtot M s θ ρ ρ Idx.r)) r = - 2 / r^2 := by
-  sorry  -- Simplified to avoid mathlib issues
+  classical
+  -- Identify the trace with the simple rational function 2/s.
+  have hfun :
+      (fun s : ℝ => sumIdx (fun ρ => Γtot M s θ ρ ρ Idx.r))
+      = (fun s : ℝ => (2 : ℝ) / s) := by
+    funext s
+    simpa [traceGamma_r] using (traceGamma_r M s θ)
+  -- Differentiate s ↦ 2/s using HasDerivAt for inv and then constant-multiple.
+  have hid : HasDerivAt (fun s : ℝ => s) 1 r := hasDerivAt_id r
+  have hinv : HasDerivAt (fun s : ℝ => s⁻¹) (-1 / r^2) r :=
+    hid.inv (by simpa using hr0)
+  have h2 : HasDerivAt (fun s : ℝ => (2 : ℝ) * s⁻¹) ((2 : ℝ) * (-1 / r^2)) r :=
+    hinv.const_mul (2 : ℝ)
+  have hder : deriv (fun s : ℝ => (2 : ℝ) / s) r = (2 : ℝ) * (-1 / r^2) := by
+    simpa [div_eq_mul_inv] using h2.deriv
+  -- Package the algebra: 2 * (-1/r^2) = -(2/r^2).
+  have hfinal : deriv (fun s : ℝ => (2 : ℝ) / s) r = - (2 / r^2) := by
+    -- avoid fragile simp; use ring_nf over ℝ instead
+    have : (2 : ℝ) * (-1 / r^2) = - (2 / r^2) := by
+      ring
+    simpa [this] using hder
+  simpa [hfun] using hfinal
 
 /-- `∂_r Γ^r_{rr}` in closed form. -/
 lemma deriv_Γ_r_rr (M r : ℝ) (hr0 : r ≠ 0) (hf0 : f M r ≠ 0) (hr2M : r - 2*M ≠ 0) :
   deriv (fun s => Γ_r_rr M s) r
-    = (2*M*(r - M)) / (r^3 * (r - 2*M)^2) := by
-  sorry
+    = (2*M*(r - M)) / (r^2 * (r - 2*M)^2) := by
+  classical
+  -- Γ^r_{rr} = -M / (s * (s - 2M))
+  have hΓ : (fun s => Γ_r_rr M s) = (fun s => -(M : ℝ) / (s * (s - 2*M))) := by
+    funext s; simp [Γ_r_rr, f]; field_simp; ring
+  -- g(s) := s*(s-2M); g'(r) = 2r - 2M
+  have hmul : HasDerivAt (fun s : ℝ => s * (s - 2*M)) (2*r - 2*M) r := by
+    have h1 := hasDerivAt_id r
+    have h2 := (hasDerivAt_id r).sub (hasDerivAt_const r (2*M))
+    simpa using h1.mul h2
+  have hinv : HasDerivAt (fun s : ℝ => (s * (s - 2*M))⁻¹)
+                (-(2*r - 2*M) / (r * (r - 2*M))^2) r :=
+    hmul.inv (by exact mul_ne_zero hr0 hr2M)
+  have hmain : deriv (fun s : ℝ => (s * (s - 2*M))⁻¹) r
+                = -(2*r - 2*M) / (r * (r - 2*M))^2 := hinv.deriv
+  -- pull the constant −M out and simplify denominators
+  have : deriv (fun s => -(M : ℝ) * (s * (s - 2*M))⁻¹) r
+               = (-(M : ℝ)) * (-(2*r - 2*M) / (r * (r - 2*M))^2) := by
+    simpa using (deriv_const_mul (-(M : ℝ))
+                 (fun s => (s * (s - 2*M))⁻¹) r (hinv.differentiableAt))
+  -- put everything together
+  have : deriv (fun s => -(M : ℝ) / (s * (s - 2*M))) r
+               = (2*M*(r - M)) / ((r * (r - 2*M))^2) := by
+    simp [div_eq_mul_inv, two_mul] at this ⊢
+    convert this using 1
+    ring
+  -- (r*(r-2M))^2 = r^2 * (r - 2M)^2
+  simpa [hΓ, pow_two, mul_pow] using this
 
 /-- `∂_r Γ^r_{θθ}`. -/
 lemma deriv_Γ_r_θθ (M r : ℝ) (hr0 : r ≠ 0) :
   deriv (fun s => Γ_r_θθ M s) r = -(f M r) - r * (2 * M / r^2) := by
-  sorry
+  classical
+  -- Γ_r_θθ M s = -(s - 2*M) so derivative is -1
+  have hΓ : (fun s => Γ_r_θθ M s) = (fun s => -(s - 2*M)) := by
+    funext s; simp [Γ_r_θθ]
+  have : deriv (fun s => -(s - 2*M)) r = -1 := by
+    simp [deriv_sub_const, deriv_id'']
+  -- Show algebraically that -1 = -(f M r) - r*(2*M/r^2)
+  simp [hΓ, this, f]
+  field_simp [hr0]
+  ring
 
 /-- `∂_r Γ^r_{φφ}`. -/
 lemma deriv_Γ_r_φφ (M r θ : ℝ) (hr0 : r ≠ 0) :
   deriv (fun s => Γ_r_φφ M s θ) r =
     (deriv (fun s => Γ_r_θθ M s) r) * (Real.sin θ)^2 := by
-  sorry
+  classical
+  -- Γ_r_φφ M s θ = Γ_r_θθ M s * (sin θ)^2
+  have hΓ : (fun s => Γ_r_φφ M s θ) = (fun s => Γ_r_θθ M s * (Real.sin θ)^2) := by
+    funext s; simp [Γ_r_φφ]
+  rw [hΓ]
+  -- Use deriv_const_mul for the constant (sin θ)^2
+  have hdiff : DifferentiableAt ℝ (fun s => Γ_r_θθ M s) r := by
+    simp [Γ_r_θθ]
+    exact differentiableAt_id.sub (differentiableAt_const _)
+  simp [deriv_const_mul _ _ _ hdiff]
 
 /-- `∂_θ Γ^φ_{θφ}` (cotangent derivative). -/
 @[simp] lemma deriv_Γ_φ_θφ_cotangent (θ : ℝ) (hsθ : Real.sin θ ≠ 0) :
   deriv (fun t => Γ_φ_θφ t) θ = - 1 / (Real.sin θ)^2 := by
-  sorry
+  classical
+  -- Γ^φ_{θφ} = cos(θ) / sin(θ)
+  have hΓ : (fun t => Γ_φ_θφ t) = (fun t => Real.cos t / Real.sin t) := by
+    funext t; simp [Γ_φ_θφ]
+  rw [hΓ]
+  -- Use quotient rule: d/dx(cos/sin) = -sin²/sin² - cos²/sin² = -1/sin²
+  have hcos := Real.hasDerivAt_cos θ
+  have hsin := Real.hasDerivAt_sin θ
+  have hdiv : HasDerivAt (fun t => Real.cos t / Real.sin t)
+    (((-Real.sin θ) * Real.sin θ - Real.cos θ * Real.cos θ) / (Real.sin θ)^2) θ :=
+    hcos.div hsin hsθ
+  simp [hdiv.deriv]
+  field_simp [hsθ]
+  ring_nf
+  simp [Real.sin_sq_add_cos_sq]
 
 end DerivativeHelpers
 
@@ -1560,19 +1653,36 @@ theorem Ricci_tt_vanishes
 theorem Ricci_rr_vanishes
     (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) :
     Ricci M r θ Idx.r Idx.r = 0 := by
-  sorry  -- Will complete with full proof after fixing foundation lemmas
+  have ⟨hr0, hf0, hr2M⟩ := exterior_nonzeros hM hr
+  simp [Ricci_rr_reduce]
+  rw [deriv_Γ_r_rr M r hr0 hf0 hr2M, deriv_traceGamma_r M r θ hr0]
+  simp [Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, f]
+  field_simp [hr0, hr2M]
+  ring
 
 /-- R_{θθ} = 0 on the exterior with θ∈(0,π). -/
 theorem Ricci_θθ_vanishes
     (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (hθ : 0 < θ ∧ θ < Real.pi) :
     Ricci M r θ Idx.θ Idx.θ = 0 := by
-  sorry
+  have ⟨hr0, hf0, hr2M⟩ := exterior_nonzeros hM hr
+  have hsθ : Real.sin θ ≠ 0 := Real.sin_ne_zero_of_ne_zero_of_lt_pi hθ
+  simp [Ricci_θθ_reduce]
+  rw [deriv_Γ_r_θθ M r hr0]
+  simp [Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_r_φφ, Γ_θ_φφ, f]
+  field_simp [hr0, hr2M, hsθ]
+  ring
 
 /-- R_{φφ} = 0 on the exterior with θ∈(0,π). -/
 theorem Ricci_φφ_vanishes
     (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (hθ : 0 < θ ∧ θ < Real.pi) :
     Ricci M r θ Idx.φ Idx.φ = 0 := by
-  sorry
+  have ⟨hr0, hf0, hr2M⟩ := exterior_nonzeros hM hr
+  have hsθ : Real.sin θ ≠ 0 := Real.sin_ne_zero_of_ne_zero_of_lt_pi hθ
+  simp [Ricci_φφ_reduce]
+  rw [deriv_Γ_r_φφ M r θ hr0, deriv_Γ_r_θθ M r hr0]
+  simp [Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_r_φφ, Γ_φ_θφ, Γ_θ_φφ, f]
+  field_simp [hr0, hr2M, hsθ]
+  ring
 
 /-- All off-diagonal Ricci components vanish. -/
 theorem Ricci_off_diagonal_vanish
@@ -1584,13 +1694,22 @@ theorem Ricci_off_diagonal_vanish
   unfold Ricci
   simp [sumIdx_expand, sumIdx2_expand, Γtot]
   -- The sparsity pattern of Γtot ensures all terms cancel or vanish
-  sorry  -- Complete the cases analysis
+  cases μ <;> cases ν <;> simp at h_ne ⊢ <;> try contradiction
+  -- Each remaining case reduces to 0 by the structure of Γtot
+  all_goals ring
 
 /-- The Ricci scalar vanishes for the Schwarzschild vacuum solution. -/
 theorem Ricci_scalar_vanishes
     (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (hθ : 0 < θ ∧ θ < Real.pi) :
     sumIdx2 (fun μ ν => gInv M μ ν r θ * Ricci M r θ μ ν) = 0 := by
-  sorry
+  simp only [sumIdx2_expand]
+  -- Use vanishing of all diagonal components
+  rw [Ricci_tt_vanishes M r θ hM hr,
+      Ricci_rr_vanishes M r θ hM hr,
+      Ricci_θθ_vanishes M r θ hM hr hθ,
+      Ricci_φφ_vanishes M r θ hM hr hθ]
+  -- Off-diagonal components are 0 (and gInv is diagonal anyway)
+  simp [Ricci_off_diagonal_vanish M r θ hM hr, gInv]
 
 end RicciTensor
 
