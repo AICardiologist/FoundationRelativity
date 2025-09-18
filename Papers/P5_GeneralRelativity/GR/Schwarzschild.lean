@@ -1579,80 +1579,71 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
     = deriv (fun t => Γ_φ_θφ t) θ :=
   by simpa using deriv_traceGamma_θ M r θ
 
-/-
-Freeze the radial Christoffels under `simp` *only* for the two Ricci reductions,
-so `deriv (fun s => Γ_r_* … s …) r` stays symbolic.
--/
 section RicciReductions
-  attribute [-simp] Γ_r_θθ Γ_r_φφ Γ_φ_θφ in
 
 /-- Canonical form for `R_{θθ}` (keep the radial derivative symbolic). -/
-  @[simp] lemma Ricci_θθ_reduce (M r θ : ℝ) :
-    Ricci M r θ Idx.θ Idx.θ =
-        deriv (fun s => Γ_r_θθ M s) r
-      - deriv (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) θ
-      + (Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r) * Γ_r_θθ M r
-      - (Γ_r_θθ M r * Γ_θ_rθ r + Γ_θ_φφ θ * Γ_r_φφ M r θ) := by
+@[simp] lemma Ricci_θθ_reduce (M r θ : ℝ) :
+  Ricci M r θ Idx.θ Idx.θ =
+      deriv (fun s => Γ_r_θθ M s) r
+    - deriv (fun t => Γ_φ_θφ t) θ
+    + (Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r) * Γ_r_θθ M r
+    - (Γ_r_θθ M r * Γ_θ_rθ r + Γ_φ_θφ θ ^ 2) := by
   classical
   unfold Ricci
-  ----------------------------------------------------------------
-  -- (A) ρ–trace under ∂r: only ρ = r survives in Γ^ρ_{θθ}.
-  ----------------------------------------------------------------
-  have hρ :
-      (fun s : ℝ => sumIdx (fun ρ => Γtot M s θ ρ Idx.θ Idx.θ))
-    = (fun s : ℝ => Γtot M s θ Idx.r Idx.θ Idx.θ) := by
-    funext s; simp [sumIdx_expand, Γtot]
-  have hρ' :
-      deriv (fun s : ℝ => sumIdx (fun ρ => Γtot M s θ ρ Idx.θ Idx.θ)) r
-    = deriv (fun s : ℝ => Γtot M s θ Idx.r Idx.θ Idx.θ) r :=
-    congrArg (fun F => deriv F r) hρ
-  -- keep Γ_r_θθ opaque under the ∂r
-  simp only [hρ', Γtot_r_θθ]
-  ----------------------------------------------------------------
-  -- (B) θ–trace under ∂θ: align to ρρθ then collapse to deriv Γ_φ_θφ.
-  ----------------------------------------------------------------
-  have hfun :
-      (fun t : ℝ => sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ))
-    = (fun t : ℝ => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) := by
-    funext t; simpa using sumIdx_trace_theta_eq M r t
-  have hθtrace :
-      deriv (fun t : ℝ => sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ)) θ
-    = deriv (fun t : ℝ => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) θ :=
-    congrArg (fun F => deriv F θ) hfun
-  -- collapse θ–trace BEFORE expanding sums so the pattern still matches
-  simp only [hθtrace, deriv_traceGamma_θ]
-  ----------------------------------------------------------------
-  -- (C) Two-pass simplification: structure/traces first, then derivatives
-  ----------------------------------------------------------------
-  -- Pass 1: collapse traces & project Γtot, while keeping Γ_r_* and Γ_φ_θφ frozen
+  
+  -- First rewrite the θ-trace 
+  have htrace_eq : deriv (fun t => sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ)) θ = 
+                   deriv (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) θ := by
+    congr 1
+    ext t  
+    exact sumIdx_trace_theta_eq M r t
+  rw [htrace_eq, deriv_traceGamma_θ]
+  
+  -- Protect that derivative so it doesn't unfold to cotangent
+  set Δθ := deriv (fun t => Γ_φ_θφ t) θ with hΔθ
+  
+  -- Pass 1: structure/traces; expand sums and project Γtot; expand θ-only/non-radial Γ's.
   simp [ sumIdx_expand, sumIdx2_expand, Γtot,
          Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
          Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
          Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
          Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ ]
-  -- Pass 2: evaluate only safe derivatives (linear/constant in r or θ)
-  try simp only [deriv_const, deriv_linear, deriv_const_sub_id, deriv_neg_id_add_const]
-  -- Pure algebraic cleanup; Γ_r_* and Γ_φ_θφ are symbolic, so no poles appear
-  ring
+  
+  -- Pass 2: evaluate only safe derivatives (linear/constant in r or θ).
+  simp only [deriv_const, deriv_linear, deriv_const_sub_id, deriv_neg_id_add_const]
+  
+  -- Now expand naked Γ_φ_θφ θ occurrences; Δθ remains opaque so no cot derivative appears.
+  simp [Γ_φ_θφ]
+  
+  -- Algebraic cleanup.
+  ring_nf
 
-  /-- Canonical form for `R_{φφ}` (keep the radial derivative symbolic). -/
-  @[simp] lemma Ricci_φφ_reduce (M r θ : ℝ) :
-    Ricci M r θ Idx.φ Idx.φ =
-        deriv (fun s => Γ_r_φφ M s θ) r
-      + (Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r) * Γ_r_φφ M r θ
-      - (Γ_r_θθ M r * Γ_φ_θφ θ + Γ_r_φφ M r θ * Γ_φ_rφ r + Γ_θ_φφ θ * Γ_r_φφ M r θ) := by
+/-- Canonical form for `R_{φφ}` (keep the radial derivative symbolic). -/
+@[simp] lemma Ricci_φφ_reduce (M r θ : ℝ) :
+  Ricci M r θ Idx.φ Idx.φ =
+      deriv (fun s => Γ_r_φφ M s θ) r
+    + (Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r) * Γ_r_φφ M r θ
+    - (Γ_r_θθ M r * Γ_φ_θφ θ + Γ_r_φφ M r θ * Γ_φ_rφ r + Γ_θ_φφ θ * Γ_r_φφ M r θ) := by
   classical
   unfold Ricci
-  -- Pass 1: collapse traces & project Γtot; keep Γ_r_* and Γ_φ_θφ frozen
+  
+  -- Pass 1: structure/traces; expand sums, project Γtot, expand θ-only/non-radial Γ's.
   simp [ sumIdx_expand, sumIdx2_expand, Γtot,
          Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
          Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
          Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
-         Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ ]
-  -- Pass 2: evaluate safe derivatives; here we *do* use the trig helper
-  try simp only [deriv_const, deriv_neg_sin_mul_cos,
-                 deriv_linear, deriv_const_sub_id, deriv_neg_id_add_const]
+         Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ ]
+  
+  -- Pass 2: evaluate only safe derivatives (linear/constant in r or θ).
+  simp only [deriv_const, deriv_neg_sin_mul_cos,
+             deriv_linear, deriv_const_sub_id, deriv_neg_id_add_const]
+  
+  -- Expand Γ_φ_θφ now (no derivatives to worry about)
+  simp [Γ_φ_θφ]
+  
+  -- Algebraic normalization.
   ring
+
 end RicciReductions
 
 section DerivativeHelpers
@@ -1722,11 +1713,12 @@ lemma deriv_Γ_r_rr
       deriv (fun s => Γ_r_rr M s) r
         = M * (2 * r * f M r + 2 * M) / (r^2 * f M r)^2 := by
     rw [hΓ_plus]
-    simp only [hlin, neg_mul, neg_neg, neg_div]
+    simp only [hlin, neg_mul, neg_div]
     ring_nf
 
   -- 4) substitute `f` and clear denominators
-  field_simp [f, hr0, hf0] at hcompact ⊢
+  rw [hcompact, f]
+  field_simp [hr0, hr2M]
   ring
 
 /-- `∂_r Γ^r_{θθ}`. -/
@@ -1772,6 +1764,22 @@ lemma deriv_Γ_r_φφ (M r θ : ℝ) (hr0 : r ≠ 0) :
   simpa [hfun, mul_comm] using
     ((hdiff.hasDerivAt).const_mul ((Real.sin θ)^2)).deriv
 
+/-- `∂_r Γ^t_{tr}` is just M/r^2. -/
+@[simp] lemma deriv_Γ_t_tr (M r : ℝ) (hr0 : r ≠ 0) :
+  deriv (fun s => Γ_t_tr M s) r = M / r^2 := by
+  classical
+  have : (fun s => Γ_t_tr M s) = (fun s => M / s) := by
+    funext s; simp [Γ_t_tr]
+  rw [this]
+  have h : HasDerivAt (fun s : ℝ => M * s⁻¹) (M * (-1 / r^2)) r := by
+    have hid : HasDerivAt (fun s : ℝ => s) 1 r := hasDerivAt_id r
+    have hinv : HasDerivAt (fun s : ℝ => s⁻¹) (-1 / r^2) r := hid.inv hr0
+    exact hinv.const_mul M
+  have : M * (-1 / r^2) = -(M / r^2) := by ring
+  rw [HasDerivAt.deriv h, this]
+  simp [neg_neg]
+
+
 /-- `∂_θ Γ^θ_{φφ}` in closed form. -/
 @[simp] lemma deriv_Γ_θ_φφ (θ : ℝ) :
   deriv (fun t => Γ_θ_φφ t) θ = (Real.sin θ)^2 - (Real.cos θ)^2 := by
@@ -1789,8 +1797,8 @@ lemma deriv_Γ_r_φφ (M r θ : ℝ) (hr0 : r ≠ 0) :
             = - (Real.cos θ * Real.cos θ - Real.sin θ * Real.sin θ) := by
     have : deriv (fun t => -(Real.sin t * Real.cos t)) θ
          = - (Real.cos θ * Real.cos θ + Real.sin θ * (- Real.sin θ)) := by
-      simpa using (hprod.neg).deriv
-    simp only [this, mul_neg, neg_neg]
+      exact HasDerivAt.deriv hprod.neg
+    simp only [this, mul_neg, neg_mul]
     ring
   simpa [hfun, pow_two] using hneg
 
@@ -1864,8 +1872,8 @@ theorem Ricci_θθ_vanishes
   have hsθ : Real.sin θ ≠ 0 := sin_theta_ne_zero θ hθ
   -- R_{θθ} = 0
   simp only [Ricci_θθ_reduce]
-  rw [deriv_Γ_r_θθ M r hr0, deriv_traceGamma_θ, deriv_Γ_φ_θφ_cotangent θ hsθ]
-  simp [Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_r_φφ, Γ_θ_φφ, f]
+  rw [deriv_Γ_r_θθ M r hr0, deriv_Γ_φ_θφ_cotangent θ hsθ]
+  simp [Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_φ_θφ, f]
   field_simp [hr0, hr2M, hsθ]
   ring
 
@@ -1878,7 +1886,7 @@ theorem Ricci_φφ_vanishes
   have hsθ : Real.sin θ ≠ 0 := sin_theta_ne_zero θ hθ
   -- R_{φφ} = 0
   simp only [Ricci_φφ_reduce]
-  rw [deriv_Γ_r_φφ M r θ hr0, deriv_Γ_r_θθ M r hr0]
+  rw [deriv_Γ_r_φφ M r θ hr0]
   simp [Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_r_φφ, Γ_φ_θφ, Γ_θ_φφ, f]
   field_simp [hr0, hr2M, hsθ]
   ring
