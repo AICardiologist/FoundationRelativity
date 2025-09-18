@@ -1,3 +1,11 @@
+import Papers.P5_GeneralRelativity.GR.Interfaces
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv  -- for Real.deriv_sin
+import Mathlib.Analysis.Calculus.Deriv.Inv  -- for derivative of 1/r
+import Mathlib.Analysis.Calculus.Deriv.Mul  -- for derivative rules
+import Mathlib.Tactic  -- for `norm_num`, basic inequalities
+import Mathlib.Analysis.Calculus.Deriv.Basic
+
 /-!
 # Schwarzschild Vacuum Engine (Deep Dive D2)
 
@@ -10,14 +18,6 @@ of high-level portals) rather than a formal foundational proof in BISH. (See Pap
 Paper 5: General Relativity AxCal Analysis - Schwarzschild Vacuum Engine
 Deep-dive deliverable D2: minimal tensor engine for vacuum check (Height 0)
 -/
-
-import Papers.P5_GeneralRelativity.GR.Interfaces
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv  -- for Real.deriv_sin
-import Mathlib.Analysis.Calculus.Deriv.Inv  -- for derivative of 1/r
-import Mathlib.Analysis.Calculus.Deriv.Mul  -- for derivative rules
-import Mathlib.Tactic  -- for `norm_num`, basic inequalities
-import Mathlib.Analysis.Calculus.Deriv.Basic
 
 namespace Papers.P5_GeneralRelativity
 open Papers.P5_GeneralRelativity

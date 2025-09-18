@@ -1,3 +1,5 @@
+import Papers.P5_GeneralRelativity.GR.Interfaces
+
 /-!
 # EPS Kinematics Core (Deep Dive D1)
 
@@ -10,8 +12,6 @@ of high-level portals) rather than a formal foundational proof in BISH. (See Pap
 Paper 5: General Relativity AxCal Analysis - EPS Kinematics Core
 Deep-dive deliverable D1: Ehlers-Pirani-Schild constructive kinematics (Height 0)
 -/
-
-import Papers.P5_GeneralRelativity.GR.Interfaces
 
 namespace Papers.P5_GeneralRelativity
 open Papers.P5_GeneralRelativity
