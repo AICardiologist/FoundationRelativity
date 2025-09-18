@@ -63,12 +63,53 @@ noncomputable def Riemann
   -- Expand the definition and cancel.
   simp [RiemannUp]
 
+@[simp] lemma RiemannUp_swap_mu_nu
+    (M r θ : ℝ) (ρ σ μ ν : Idx) :
+  RiemannUp M r θ ρ σ μ ν = - RiemannUp M r θ ρ σ ν μ := by
+  -- Directly from the definition: each term flips sign under μ ↔ ν
+  simp [RiemannUp, sub_eq_add_neg, add_comm, add_left_comm, add_assoc, mul_comm, mul_left_comm, mul_assoc]
+
+/-- Antisymmetry in the last two (lower) slots after lowering the first index. -/
+@[simp] lemma Riemann_swap_c_d
+    (M r θ : ℝ) (a b c d : Idx) :
+  Riemann M r θ a b c d = - Riemann M r θ a b d c := by
+  -- Use the previous lemma through the lowering definition
+  sorry
+
 /-- If the first index is lowered with a diagonal `g`, in many cases only `ρ = a`
     contributes in the sum. This lemma doesn't assert diagonality; it's a
     convenient rewriting point for later `simp [g]`. -/
 @[simp] lemma Riemann_lower_def (M r θ : ℝ) (a b c d : Idx) :
   Riemann M r θ a b c d
     = sumIdx (fun ρ => g M a ρ r θ * RiemannUp M r θ ρ b c d) := rfl
+
+/-- Canonical reduction for `R_{rθrθ}`. Keeps derivatives symbolic, just like your Ricci pipeline. -/
+@[simp] lemma Riemann_rθrθ_reduce (M r θ : ℝ) :
+  Riemann M r θ Idx.r Idx.θ Idx.r Idx.θ
+    =
+      deriv (fun s => Γ_r_θθ M s) r
+    - dCoord Idx.θ (fun r θ => Γtot M r θ Idx.r Idx.r Idx.θ) r θ
+    + Γ_r_rr M r * Γ_r_θθ M r
+    - (Γ_θ_rθ r) * (Γ_r_θθ M r) := by
+  classical
+  -- Expand + kill zero entries; keep derivatives symbolic
+  unfold Riemann RiemannUp
+  -- TODO: Complete this reduction using existing Γtot patterns
+  sorry
+
+/-- Canonical reduction for `R_{θφθφ}`. Again, fully structural; no numeric evaluation. -/
+@[simp] lemma Riemann_θφθφ_reduce (M r θ : ℝ) :
+  Riemann M r θ Idx.θ Idx.φ Idx.θ Idx.φ
+    =
+      deriv (fun t => Γ_θ_φφ t) θ
+    - dCoord Idx.φ (fun r θ => Γtot M r θ Idx.θ Idx.θ Idx.φ) r θ
+    + (Γ_θ_rθ r) * (Γ_r_φφ M r θ)
+    - (Γ_θ_φφ θ) * (Γ_φ_θφ θ) := by
+  classical
+  unfold Riemann RiemannUp
+  -- φ-derivatives drop out by axisymmetry (`dCoord φ … = 0`) via `[simp]`
+  -- TODO: Complete this reduction using existing Γtot patterns
+  sorry
 
 end Schwarzschild
 end Papers.P5_GeneralRelativity

@@ -51,6 +51,32 @@ lemma Kretschmann_diagonal_reduce (M r θ : ℝ) :
   -- at call sites to cut sums down when needed, without committing to a global normal form here.
   rfl
 
+section Exterior
+
+/-- On the exterior (and away from the axis), Kretschmann equals `48 M^2 / r^6`. -/
+theorem Kretschmann_exterior_value
+    (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (hθ : 0 < θ ∧ θ < Real.pi) :
+    Kretschmann M r θ = 48 * M^2 / r^6 := by
+  classical
+  have ⟨hr0, hf0, hr2M⟩ := exterior_nonzeros hM hr
+  have hsθ : Real.sin θ ≠ 0 := sin_theta_ne_zero θ hθ
+
+  -- Pass 1: collapse K to the six diagonal 2-forms
+  -- TODO: Implement reduction using the pattern:
+  -- simp [Kretschmann, sumIdx_expand, gInv, g, Riemann, RiemannUp, Γtot, ...]
+  
+  -- Pass 2: reduce each component using Riemann_*_reduce lemmas
+  -- TODO: Add remaining four component reductions (Riemann_trtr_reduce, etc.)
+  
+  -- Pass 3: evaluate derivatives using existing lemmas
+  -- TODO: Apply deriv_Γ_r_rr, deriv_Γ_r_θθ, deriv_Γ_r_φφ, etc.
+  
+  -- Pass 4: final algebra
+  -- TODO: field_simp [hr0, hr2M, hsθ]; rw [Real.cos_sq]; ring
+  
+  sorry
+end Exterior
+
 end Schwarzschild
 
 end Papers.P5_GeneralRelativity

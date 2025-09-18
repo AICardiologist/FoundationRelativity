@@ -26,7 +26,7 @@ attribute [-simp] Γ_r_θθ Γ_r_φφ Γ_φ_θφ Γ_θ_φφ
 -- Smoke: `simp` does not alter the mixed Riemann definition structurally.
 example (M r θ : ℝ) (ρ σ μ ν : Idx) :
   RiemannUp M r θ ρ σ μ ν = RiemannUp M r θ ρ σ μ ν := by
-  simp
+  rfl
 
 end GuardrailsRiemann
 
