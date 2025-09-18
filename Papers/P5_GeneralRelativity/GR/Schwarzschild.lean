@@ -1379,10 +1379,10 @@ section DerivSimpHelpers
 
   @[simp] lemma deriv_linear (a b r : ℝ) :
       deriv (fun s : ℝ => a * s + b) r = a := by
+    -- (a·id)' + (const b)'  →  a·1 + 0
     have h1 : HasDerivAt (fun s : ℝ => a * s) (a * 1) r := by
       have : (fun s : ℝ => a * s) = (fun s => a * id s) := by funext s; rfl
-      rw [this]
-      exact (hasDerivAt_id r).const_mul a
+      rw [this]; exact (hasDerivAt_id r).const_mul a
     have h2 : HasDerivAt (fun s : ℝ => a * s + b) (a * 1 + 0) r :=
       h1.add (hasDerivAt_const r b)
     simpa [mul_one, add_zero] using h2.deriv
@@ -1397,10 +1397,9 @@ section DerivSimpHelpers
     have : (fun s : ℝ => -s + c) = (fun s => c - s) := by funext s; ring
     simpa [this] using deriv_const_sub_id c r
 
-  /-- `∂θ (-(sin θ * cos θ)) = -(cos^2 θ - sin^2 θ)` — used once in `R_{φφ}` reduction. -/
+  /-- `∂θ (-(sin θ * cos θ)) = -(cos^2 θ - sin^2 θ)` — used once in `R_{φφ}`. -/
   @[simp] lemma deriv_neg_sin_mul_cos (θ : ℝ) :
-      deriv (fun t => -(sin t * cos t)) θ
-        = - (cos θ ^ 2 - sin θ ^ 2) := by
+      deriv (fun t => -(sin t * cos t)) θ = - (cos θ ^ 2 - sin θ ^ 2) := by
     have hs : HasDerivAt (fun t => sin t) (cos θ) θ := hasDerivAt_sin θ
     have hc : HasDerivAt (fun t => cos t) (-sin θ) θ := hasDerivAt_cos θ
     have hmul : HasDerivAt (fun t => sin t * cos t)
@@ -1585,9 +1584,9 @@ Freeze the radial Christoffels under `simp` *only* for the two Ricci reductions,
 so `deriv (fun s => Γ_r_* … s …) r` stays symbolic.
 -/
 section RicciReductions
-  -- Freeze the *radial* Γ under `deriv`, and (for θθ) the θ-trace Γ^φ_{φθ}
-  -- so we keep `deriv (fun s => Γ_r_* M s ...) r` and `deriv (fun t => Γ_φ_θφ t) θ` symbolic.
-  attribute [-simp] Γ_r_θθ Γ_r_φφ Γ_φ_θφ in
+  -- Freeze the *radial* Γ under `deriv`
+  -- so we keep `deriv (fun s => Γ_r_* M s ...) r` symbolic.
+  local attribute [-simp] Γ_r_θθ Γ_r_φφ Γ_φ_θφ
 
 /-- Canonical form for `R_{θθ}` (keep the radial derivative symbolic). -/
   @[simp] lemma Ricci_θθ_reduce (M r θ : ℝ) :
@@ -1625,19 +1624,16 @@ section RicciReductions
   -- collapse θ–trace BEFORE expanding sums so the pattern still matches
   simp only [hθtrace, deriv_traceGamma_θ]
   ----------------------------------------------------------------
-  -- (C) now expand indices, project Γtot, expand θ‑only/non‑radial Γ's
+  -- (C) Two-pass simplification: structure/traces first, then derivatives
   ----------------------------------------------------------------
-  simp only [sumIdx_expand, sumIdx2_expand, Γtot,
-             Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
-             Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
-             Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
-             Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ]
-  -- IMPORTANT: do not unfold Γ_r_θθ / Γ_r_φφ / Γ_φ_θφ here (we froze them).
-  -- Evaluate only truly constant/linear derivatives; leave the frozen ones symbolic.
-  simp only [deriv_const, deriv_linear, deriv_const_sub_id, deriv_neg_id_add_const]
-  -- Now unfold the Christoffel symbols for the final normalization
-  simp only [Γ_r_θθ, Γ_r_φφ, Γ_φ_θφ, Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ]
-  field_simp
+  -- Pass 1: Structure/traces (includes the 6 θ-trace sparsity lemmas)
+  simp [sumIdx_expand, sumIdx2_expand, Γtot,
+        Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
+        Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
+        Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
+        Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ]
+  -- Pass 2: Evaluate derivatives (deriv (fun t => cos t - 1) θ = -sin θ)
+  simp only [deriv_const, deriv_const_sub_id]
   ring_nf
 
   /-- Canonical form for `R_{φφ}` (keep the radial derivative symbolic). -/
@@ -1648,15 +1644,16 @@ section RicciReductions
       - (Γ_r_θθ M r * Γ_φ_θφ θ + Γ_r_φφ M r θ * Γ_φ_rφ r + Γ_θ_φφ θ * Γ_r_φφ M r θ) := by
   classical
   unfold Ricci
-  -- expand the two index sums and project Γtot; expand θ‑only/non‑radial Γ's
-  simp only [sumIdx_expand, sumIdx2_expand, Γtot,
-             Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
-             Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
-             Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
-             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ,
-             deriv_const, deriv_neg_sin_mul_cos]
-  -- Now normalize
-  ring
+  -- Two-pass simplification: structure/traces first, then derivatives
+  -- Pass 1: Structure/traces 
+  simp [sumIdx_expand, sumIdx2_expand, Γtot,
+        Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
+        Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
+        Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
+        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ]
+  -- Pass 2: Evaluate derivatives
+  simp only [deriv_const, deriv_neg_sin_mul_cos]
+  ring_nf
 end RicciReductions
 
 section DerivativeHelpers
