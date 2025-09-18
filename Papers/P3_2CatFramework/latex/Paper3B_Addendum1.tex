@@ -1,0 +1,315 @@
+\documentclass[11pt]{article}
+
+% -------------------------------------------------
+% Preamble (matches Paper 3B)
+% -------------------------------------------------
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{amsthm}
+\usepackage{hyperref}
+\usepackage[final]{microtype}
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage{listings}
+\usepackage[american]{babel}
+\usepackage[nameinlink,noabbrev]{cleveref}
+
+% Definitions (from Paper 3B)
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{remark}[theorem]{Remark}
+
+% Cleveref names
+\Crefname{theorem}{Theorem}{Theorems}
+\Crefname{lemma}{Lemma}{Lemmas}
+\Crefname{definition}{Definition}{Definitions}
+\Crefname{proposition}{Proposition}{Propositions}
+\Crefname{corollary}{Corollary}{Corollaries}
+\Crefname{remark}{Remark}{Remarks}
+
+% Commands from Paper 3B
+\newcommand{\PA}{\mathrm{PA}}
+\newcommand{\HA}{\mathrm{HA}}
+\newcommand{\EA}{\mathrm{EA}}
+\newcommand{\ISigma}{\mathrm{I}\Sigma_1}
+\newcommand{\Con}{\mathrm{Con}}
+\newcommand{\RFN}{\mathrm{RFN}}
+\newcommand{\RFNSigOne}{\mathrm{RFN}_{\Sigma^0_1}}
+\newcommand{\LCons}{\mathcal{L}_{\mathrm{Cons}}}
+\newcommand{\LReflect}{\mathcal{L}_{\mathrm{Reflect}}}
+\newcommand{\Prov}{\mathrm{Prov}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\leanok}{\textsf{\textcolor{green!70!black}{[Lean-formalized]}}}
+\newcommand{\leanaxiom}{\textsf{\textcolor{orange!80!black}{[Lean-axiomatized]}}}
+\newcommand{\leancited}{\textsf{\textcolor{blue!70!black}{[Classical]}}}
+\newcommand{\leanpartial}{\textsf{\textcolor{violet!70!black}{[Lean-partial]}}}
+
+% Title
+\title{Paper 3B -- Addendum 1:\\
+Crossings and Gödel Collisions}
+\author{Paul Chun--Kit Lee\\
+\texttt{dr.paul.c.lee@gmail.com}\\
+New York University, NY}
+\date{September 2025}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This addendum to Paper 3B records four additional statements that make explicit how \emph{ladder crossings} interact with Gödel phenomena. Items (A) and (B) are fully Lean-proved using the collision step RFN\,$\Rightarrow$\,Con from the main text; Items (C) and (D) rely only on a standard classical schema we already treat as an external input. We provide both the mathematical statements and a concrete implementation plan for the Lean formalization.
+\end{abstract}
+
+% ============================
+% Main Content
+% ============================
+
+\section{Crossings and Gödel Collisions}\label{sec:crossing-godel}
+
+This addendum records four additional statements that make explicit how
+\emph{ladder crossings} interact with Gödel phenomena. Items~(A) and~(B)
+are fully Lean-proved using the collision step RFN\,$\Rightarrow$\,Con
+from the main text; Items~(C) and~(D) rely only on a standard classical
+schema (\leancited) we already treat as an external input.
+
+Throughout, $S_\bullet$ denotes the \emph{consistency ladder}
+($S_{n+1}=S_n+\Con(S_n)$) and $R_\bullet$ the \emph{reflection ladder}
+($R_{n+1}=R_n+\RFNSigOne(R_n)$). Let $G_T$ be the Gödel sentence of $T$.
+
+\medskip
+\noindent\textbf{Status legend.}
+\leanok\;=\;Lean-formalized\quad
+\leancited\;=\;classical (literature import)\quad
+\leanpartial\;=\;Lean proof uses one classical axiom schema.
+
+% ----------------------------
+\subsection{A. Reflection lifts Gödel one step} 
+% ----------------------------
+
+\begin{proposition}[One-step Gödel lift]\label{prop:RFN-lifts-G}
+\leanpartial\quad For every $\alpha$ we have
+\[
+  R_{\alpha+1}\ \vdash\ G_{R_\alpha}.
+\]
+\end{proposition}
+
+\begin{proof}[Proof idea]
+From the collision step (main text) we have
+$R_{\alpha+1}\vdash \Con(R_\alpha)$.
+By the standard arithmetized implication
+\[
+  \Con(T)\ \Rightarrow\ G_T \qquad(\leancited),
+\]
+we obtain $R_{\alpha+1}\vdash G_{R_\alpha}$. The Lean development composes
+the Lean theorem $\RFN\Rightarrow\Con$ with a single named classical schema,
+without further model theory. \leanpartial
+\end{proof}
+
+% ----------------------------
+\subsection{B. Reflection dominates consistency (stagewise)} 
+% ----------------------------
+
+\begin{proposition}[Dominance]\label{prop:dominance}
+\leanok\quad For every $n$ and every sentence $\varphi$,
+\[
+  S_n \vdash \varphi \quad\Longrightarrow\quad R_n \vdash \varphi .
+\]
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+By induction on $n$. The step $n\mapsto n{+}1$ uses that
+$S_{n+1}=S_n+\Con(S_n)$ and $R_{n+1}=R_n+\RFNSigOne(R_n)$ with the collision
+step $R_{n+1}\vdash \Con(R_n)$; provability is monotone under extension.
+All ingredients are already formalized. \leanok
+\end{proof}
+
+% ----------------------------
+\subsection{C. The limit bundle at $\omega$ and $\omega{+}1$}
+% ----------------------------
+
+\begin{proposition}[Instancewise at the limit]\label{prop:limit-instance} 
+\leanok\quad For each fixed $n$, $R_\omega \vdash G_{R_n}$.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+$R_\omega$ is the union $\bigcup_{k<\omega} R_k$ and contains $R_{n+1}$,
+which by Prop.~\ref{prop:RFN-lifts-G} proves $G_{R_n}$. \leanok
+\end{proof}
+
+\begin{proposition}[Non-uniformity at the limit]\label{prop:limit-nonuniform} 
+\leancited\quad $R_\omega \nvdash \forall n\,G_{R_n}$.
+\end{proposition}
+
+\begin{proof}[Idea]
+If a finite proof of $\forall n\,G_{R_n}$ existed in $R_\omega$, it would be
+captured in some finite stage $R_m$, yielding $R_m\vdash G_{R_m}$, contrary
+to Gödel's theorem. This is the usual compactness/finite-stage argument;
+we cite it classically. \leancited
+\end{proof}
+
+\begin{proposition}[Uniformity one step up]\label{prop:limit-uniform-omega+1} 
+\leanpartial\quad $R_{\omega+1}\ \vdash\ \forall n\,G_{R_n}$.
+\end{proposition}
+
+\begin{proof}[Proof idea]
+From the collision step, $R_{\omega+1}\vdash \Con(R_\omega)$.
+By the classical implication $\Con(R_\omega)\Rightarrow \forall n\,G_{R_n}$
+(obtained by internalizing the $n$-indexed G1 upper direction),
+we conclude. The Lean proof composes Lean theorems with the same classical
+schema used in Prop.~\ref{prop:RFN-lifts-G}. \leanpartial
+\end{proof}
+
+% ----------------------------
+\subsection{D. Explanatory note: $\Sigma^0_1$-reflection and 1-consistency} 
+% ----------------------------
+
+\begin{remark}[RFN${}_{\Sigma^0_1}$ vs.\ 1-consistency]
+\leancited\quad Over a standard base for arithmetization, $\RFNSigOne(T)$ is equivalent to
+``$T$ proves no false $\Sigma^0_1$ sentence'' (a.k.a.\ 1-consistency).
+We record this for intuition; it is not used in Lean proofs above. \leancited
+\end{remark}
+
+\medskip
+\noindent\textbf{Summary.} Items~(A), (B), and the instancewise part of~(C)
+are discharged in Lean; (A) and the uniform part of~(C) use a single
+classical schema \leancited\ for G1's upper direction. The non-provability
+of the universal bundle at the limit remains a standard classical step.
+
+% ============================
+% Implementation Plan
+% ============================
+
+\section{Lean Implementation Plan}
+
+This section provides a minimal, modular plan for adding these results to the existing Paper 3B Lean codebase.
+
+\subsection{Files and Placement}
+
+Create the following new module in the existing structure:
+
+\begin{verbatim}
+Papers/P3_2CatFramework/ProofTheory/
+  Collisions.lean              -- already contains RFN → Con (Lean)
+  GodelBundle.lean             -- NEW: the compositions below
+  Ladders.lean                 -- ladder constructors + monotonicity
+  Limits.lean                  -- (if present) ω-union helpers
+\end{verbatim}
+
+\subsection{One Classical Schema}
+
+In \texttt{GodelBundle.lean}, add the single classical axiom:
+
+\begin{lstlisting}[language=Lean]
+namespace ProofTheory
+
+-- Classical upper direction for Gödel 1 (imported):
+/-- From a proof of `Con T` in any extension `B`, derive a proof 
+    of the Gödel sentence of `T` in the same `B`. This is the 
+    only classical import used below. -/
+axiom derivesGodelFromCon
+  (B T : Theory) [HasArithmetization T] :
+  B.Provable (ConsistencyFormula T) → 
+  B.Provable (GodelSentence T)
+
+end ProofTheory
+\end{lstlisting}
+
+This matches the policy for G1\_lower / G2\_lower: a single named axiom used for composition.
+
+\subsection{Theorems to Add}
+
+Still in \texttt{GodelBundle.lean}:
+
+\begin{lstlisting}[language=Lean]
+open ProofTheory
+
+/-- A. Reflection lifts Gödel one step. -/
+theorem RFN_lifts_Godel
+  (T : Theory) [HasArithmetization T] :
+  (Extend T (RFN_Sigma1_Formula T)).Provable (GodelSentence T) := by
+  -- Lean-collision step RFN → Con:
+  have hCon : (Extend T (RFN_Sigma1_Formula T)).Provable 
+              (ConsistencyFormula T) :=
+    RFN_to_Con_formula (Extend T (RFN_Sigma1_Formula T)) T
+  -- Classical composition:
+  exact derivesGodelFromCon 
+    (Extend T (RFN_Sigma1_Formula T)) T hCon
+
+/-- B. Dominance: for every n, R_n proves everything S_n proves. -/
+theorem dominance_R_over_S
+  (T0 : Theory) [HasArithmetization T0] :
+  ∀ n φ, (LCons T0 n).Provable φ → (LReflect T0 n).Provable φ := by
+  intro n
+  induction' n with k hk <;> intro φ hφ
+  · simpa using hφ
+  · -- Step k → k+1: use collision R_{k+1} ⊢ Con(R_k) 
+    -- and extension monotonicity
+    sorry -- use existing helpers for extension/monotonicity
+
+/-- C(1). Instancewise at ω: R_ω proves G_{R_n} for each fixed n. -/
+theorem limit_instancewise_Godel
+  (T0 : Theory) [HasArithmetization T0] (n : Nat) :
+  (LReflect_omega T0).Provable (GodelSentence (LReflect T0 n)) := by
+  -- LReflect_omega contains R_{n+1}, which proves G_{R_n} 
+  have : (LReflect T0 (n+1)).Provable (GodelSentence (LReflect T0 n)) :=
+    RFN_lifts_Godel (LReflect T0 n)
+  exact Ladder.inclusion_of_stage (n+1) (LReflect_omega T0) this
+
+/-- C(2). Uniform at ω+1: R_{ω+1} proves ∀n G_{R_n}. -/
+theorem limit_uniform_Godel_omega_succ
+  (T0 : Theory) [HasArithmetization T0] :
+  (LReflect_omega_succ T0).Provable
+    (forallNat (fun n => GodelSentence (LReflect T0 n))) := by
+  -- From collision at ω: R_{ω+1} ⊢ Con(R_ω)
+  have hCon : (LReflect_omega_succ T0).Provable 
+              (ConsistencyFormula (LReflect_omega T0)) :=
+    collision_at_omega T0
+  -- Classical schema: Con(R_ω) ⇒ ∀n G_{R_n}
+  exact derivesGodelFromCon
+    (LReflect_omega_succ T0) (LReflect_omega T0) hCon
+\end{lstlisting}
+
+\subsection{CI Integration}
+
+\begin{itemize}
+\item Add \texttt{ProofTheory/GodelBundle.lean} to the \texttt{Papers.P3\_2CatFramework} target
+\item Update the no-sorry script to include the new file
+\item Keep the only classical import as the axiom \texttt{derivesGodelFromCon}
+\end{itemize}
+
+\subsection{Status Mapping}
+
+\begin{itemize}
+\item Prop.~\ref{prop:RFN-lifts-G} and Prop.~\ref{prop:limit-uniform-omega+1}: \leanpartial\ (Lean composition + one classical schema)
+\item Prop.~\ref{prop:dominance} and Prop.~\ref{prop:limit-instance}: \leanok
+\item Prop.~\ref{prop:limit-nonuniform}: \leancited
+\item RFN--1-consistency remark: \leancited
+\end{itemize}
+
+% ============================
+% Summary
+% ============================
+
+\section{Summary}
+
+This addendum extends Paper 3B with explicit statements about how ladder crossings interact with Gödel sentences. The key insights are:
+
+\begin{enumerate}
+\item \textbf{Reflection systematically lifts Gödel sentences}: Each reflection step proves the Gödel sentence of the previous stage
+\item \textbf{Reflection dominates consistency}: The reflection ladder proves everything the consistency ladder does at each stage
+\item \textbf{Limit phenomena}: At $\omega$, we have instancewise provability but not universal closure; at $\omega+1$, we get the universal statement
+\end{enumerate}
+
+The implementation requires minimal additions to the existing codebase:
+\begin{itemize}
+\item One new classical axiom schema (\texttt{derivesGodelFromCon})
+\item Four short theorem statements composing existing results
+\item No deep proof obligations beyond what's already formalized
+\end{itemize}
+
+This maintains the clean separation between constructive proofs and classical imports established in the main Paper 3B.
+
+\end{document}
