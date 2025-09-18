@@ -1384,11 +1384,14 @@ section DerivSimpHelpers
   @[simp] lemma deriv_linear (a b r : ℝ) :
       deriv (fun s : ℝ => a * s + b) r = a := by
     -- d/ds (a*s) = a, d/ds (b) = 0
-    have h1 : HasDerivAt (fun s : ℝ => a * s) a r :=
-      (hasDerivAt_id r).const_mul a
-    have h2 : HasDerivAt (fun s : ℝ => a * s + b) a r :=
+    have h1 : HasDerivAt (fun s : ℝ => a * s) (a * 1) r := by
+      have : (fun s : ℝ => a * s) = (fun s => a * id s) := by
+        funext s; rfl
+      rw [this]
+      exact (hasDerivAt_id r).const_mul a
+    have h2 : HasDerivAt (fun s : ℝ => a * s + b) (a * 1 + 0) r :=
       h1.add (hasDerivAt_const r b)
-    simpa using h2.deriv
+    simpa [mul_one, add_zero] using h2.deriv
 
   /-- Useful special case: d/ds (c - s) = -1. -/
   @[simp] lemma deriv_const_sub_id (c r : ℝ) :
@@ -1396,6 +1399,14 @@ section DerivSimpHelpers
     -- rewrite as a*s + b with a = -1, b = c
     simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc, one_mul, neg_one_mul]
       using deriv_linear (-1 : ℝ) c r
+  
+  /-- Another form: d/ds (-s + c) = -1. -/
+  @[simp] lemma deriv_neg_id_add_const (c r : ℝ) :
+      deriv (fun s : ℝ => -s + c) r = (-1 : ℝ) := by
+    have : (fun s : ℝ => -s + c) = (fun s => c - s) := by
+      funext s; ring
+    rw [this]
+    exact deriv_const_sub_id c r
 end DerivSimpHelpers
 
 /-- The two θ–trace shapes that appear in `R_{θθ}` are pointwise equal; expand and compare. -/
@@ -1573,7 +1584,8 @@ so `deriv (fun s => Γ_r_* … s …) r` stays symbolic.
 -/
 section FreezeRadialUnderDeriv
   -- Do not let `simp` unfold Γ_r_* inside derivatives.
-  attribute [-simp] Γ_r_θθ Γ_r_φφ
+  -- Also freeze Γ_φ_θφ to keep deriv (fun t => Γ_φ_θφ t) θ symbolic
+  attribute [-simp] Γ_r_θθ Γ_r_φφ Γ_φ_θφ
 
 
 /-- Canonical form for `R_{θθ}` (keep the radial derivative symbolic). -/
@@ -1618,9 +1630,11 @@ section FreezeRadialUnderDeriv
              Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
              Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
              Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
-             Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ]
-  -- evaluate remaining constant derivatives and normalize algebra
-  simp [deriv_const, Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ, deriv_const_sub_id]
+             Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ,
+             deriv_const]
+  -- unfold the Christoffel symbols and ring normalize
+  simp only [Γ_r_θθ, Γ_r_φφ, Γ_φ_θφ, Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ, deriv_neg_id_add_const]
+  field_simp
   ring_nf
 
   /-- Canonical form for `R_{φφ}` (keep the radial derivative symbolic). -/
@@ -1636,10 +1650,10 @@ section FreezeRadialUnderDeriv
              Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
              Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
              Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
-             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ]
-  -- evaluate remaining constant derivatives and normalize algebra
-  simp [deriv_const, Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ, deriv_const_sub_id]
-  ring_nf
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ,
+             deriv_const]
+  -- now ring normalize
+  ring
 end FreezeRadialUnderDeriv
 
 section DerivativeHelpers
