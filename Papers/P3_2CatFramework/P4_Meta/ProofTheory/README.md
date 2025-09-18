@@ -26,7 +26,7 @@ import Papers.P3_2CatFramework.Paper3B_Main
 
 Do NOT import individual ProofTheory files directly.
 
-## 📁 Files (All Frozen)
+## 📁 Files
 
 | File | Purpose | Axioms | Status |
 |------|---------|--------|--------|
@@ -35,7 +35,19 @@ Do NOT import individual ProofTheory files directly.
 | Heights.lean | Height certificates for proof theory | 3 | ❄️ FROZEN |
 | Progressions.lean | Progression through consistency levels | 4 | ❄️ FROZEN |
 | Collisions.lean | Main results: RFN→Con, collision theorems | 5 | ❄️ FROZEN |
-| **TOTAL** | | **21** | ❄️ **FROZEN** |
+| **Subtotal (Frozen)** | | **21** | ❄️ **FROZEN** |
+| | | | |
+| GodelBundle.lean | Gödel crossings (Paper 3B Addendum 1) | 3 | ✨ NEW |
+| **TOTAL** | | **24** | |
+
+### 📝 Addendum 1: Gödel Crossings (NEW)
+
+**GodelBundle.lean** implements Paper 3B Addendum 1, adding:
+- Reflection lifts Gödel sentences (Prop A)
+- Reflection dominates consistency (Prop B) 
+- Limit behavior at ω and ω+1 (Props C.1-C.3)
+- Uses 1 classical axiom (`derivesGodelFromCon`) plus 2 limit axioms
+- 1 sorry for technical Con monotonicity detail
 
 ## 🎯 Key Achievements
 

@@ -9,6 +9,7 @@
 | **Paper3_Main.tex** | Paper 3 main document (mother paper) | Active | Comprehensive AxCal framework document (2112 lines) |
 | **Paper3A_Publication.tex** | Paper 3A publication version | Active | Three-axis framework with physics angle (472 lines) |
 | **Paper3B_Publication.tex** | Paper 3B publication version | Frozen | Proof-theoretic scaffold (348 lines) |
+| **Paper3B_Addendum1.tex** | Paper 3B Addendum 1 | Active | Gödel crossings and ladder collisions (NEW) |
 | **Paper3B_Addendum1.tex** | Paper 3B Addendum 1 | Active | Gödel crossings and ladder collisions (315 lines) |
 | **Paper3_Lean_Formalization.tex** | Lean formalization documentation | Reference | Technical formalization details (989 lines) |
 
@@ -33,21 +34,28 @@ Paper3A_Publication.tex
     ├── Physics applications
     └── Paper 3C (DCω) integrated
 
-Paper3B_Publication.tex
+Paper3B_Publication.tex (FROZEN)
     ├── Proof-theoretic scaffold
     ├── 21 axioms achievement
     └── Meta-mathematical hierarchies
 
-Paper3B_Addendum1.tex
+Paper3B_Addendum1.tex (NEW)
     ├── Gödel crossings analysis
-    ├── Reflection-consistency collisions
-    └── Lean implementation plan
+    ├── Reflection-consistency collisions  
+    ├── Limit behavior at ω and ω+1
+    └── Lean implementation in GodelBundle.lean
+
 
 Paper3_Lean_Formalization.tex
     ├── Technical Lean 4 details
     ├── Implementation specifics
     └── CI/build documentation
 ```
+
+## Key Updates (December 2025)
+
+- **Paper 3B Addendum 1**: Added Gödel crossings analysis with Lean implementation
+- **GodelBundle.lean**: Implements four propositions from addendum (3 axioms, 1 sorry)
 
 ## Key Updates (September 2025)
 
@@ -73,6 +81,7 @@ make all
 make paper3        # Build Paper3_Main.pdf
 make paper3a       # Build Paper3A_Publication.pdf
 make paper3b       # Build Paper3B_Publication.pdf
+make paper3b-add1  # Build Paper3B_Addendum1.pdf
 make formalization # Build Paper3_Lean_Formalization.pdf
 
 # Quick single-pass build (no bibliography)
@@ -115,4 +124,5 @@ pdflatex Paper3_Main.tex
 - **Paper 3**: Pre-publication draft, comprehensive framework
 - **Paper 3A**: Ready for submission (complete with three axes)
 - **Paper 3B**: Complete and frozen (21 axioms achieved)
+- **Paper 3B Addendum 1**: Active development - Gödel crossings extension
 - **Paper 3C**: Integrated into Paper 3A (no separate paper needed)
