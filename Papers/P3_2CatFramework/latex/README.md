@@ -9,6 +9,7 @@
 | **Paper3_Main.tex** | Paper 3 main document (mother paper) | Active | Comprehensive AxCal framework document (2112 lines) |
 | **Paper3A_Publication.tex** | Paper 3A publication version | Active | Three-axis framework with physics angle (472 lines) |
 | **Paper3B_Publication.tex** | Paper 3B publication version | Frozen | Proof-theoretic scaffold (348 lines) |
+| **Paper3B_Addendum1.tex** | Paper 3B Addendum 1 | Active | Gödel crossings and ladder collisions (315 lines) |
 | **Paper3_Lean_Formalization.tex** | Lean formalization documentation | Reference | Technical formalization details (989 lines) |
 
 ### Archive/Old Versions
@@ -36,6 +37,11 @@ Paper3B_Publication.tex
     ├── Proof-theoretic scaffold
     ├── 21 axioms achievement
     └── Meta-mathematical hierarchies
+
+Paper3B_Addendum1.tex
+    ├── Gödel crossings analysis
+    ├── Reflection-consistency collisions
+    └── Lean implementation plan
 
 Paper3_Lean_Formalization.tex
     ├── Technical Lean 4 details
