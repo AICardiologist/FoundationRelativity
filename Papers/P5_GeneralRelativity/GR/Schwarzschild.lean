@@ -1631,11 +1631,9 @@ section RicciReductions
     simp (config := { failIfUnchanged := false }) only
       [deriv_const, deriv_linear, deriv_const_sub_id, deriv_neg_id_add_const]
 
-    -- Expand *naked* Γ_φ_θφ θ occurrences (safe: Δθ is already opaque).
-    simp only [Γ_φ_θφ]
-
-    -- Pure algebra.
-    ring_nf
+    -- Pure algebra (keep Γ_φ_θφ symbolic).
+    rw [← hΔθ]
+    ring
 
   /-- Canonical form for `R_{φφ}` (keep the radial derivative symbolic). -/
   @[simp] lemma Ricci_φφ_reduce (M r θ : ℝ) :
@@ -1671,10 +1669,9 @@ section RicciReductions
       [deriv_const, deriv_neg_sin_mul_cos,
        deriv_linear, deriv_const_sub_id, deriv_neg_id_add_const]
 
-    -- Expand naked Γ_φ_θφ θ after Δθ is fixed.
-    simp only [Γ_φ_θφ]
-
-    ring_nf
+    -- Pure algebra (keep Γ_φ_θφ symbolic).
+    rw [← hΔθ]
+    ring
 end RicciReductions
 
 section DerivativeHelpers
