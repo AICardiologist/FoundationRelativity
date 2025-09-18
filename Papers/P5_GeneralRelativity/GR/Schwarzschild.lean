@@ -1373,40 +1373,42 @@ noncomputable def Γtot (M r θ : ℝ) : Idx → Idx → Idx → ℝ
 
 end TotalChristoffel
 
-/-! CI-stable derivative helpers for linear maps -/
+/-! CI-stable derivative helpers for the linear/trig shapes that actually occur. -/
 section DerivSimpHelpers
-  variable {a b r : ℝ}
-
-  @[simp] lemma deriv_id' (r : ℝ) :
-      deriv (fun s : ℝ => s) r = (1 : ℝ) :=
-    (hasDerivAt_id r).deriv
+  open Real
 
   @[simp] lemma deriv_linear (a b r : ℝ) :
       deriv (fun s : ℝ => a * s + b) r = a := by
-    -- d/ds (a*s) = a, d/ds (b) = 0
     have h1 : HasDerivAt (fun s : ℝ => a * s) (a * 1) r := by
-      have : (fun s : ℝ => a * s) = (fun s => a * id s) := by
-        funext s; rfl
+      have : (fun s : ℝ => a * s) = (fun s => a * id s) := by funext s; rfl
       rw [this]
       exact (hasDerivAt_id r).const_mul a
     have h2 : HasDerivAt (fun s : ℝ => a * s + b) (a * 1 + 0) r :=
       h1.add (hasDerivAt_const r b)
     simpa [mul_one, add_zero] using h2.deriv
 
-  /-- Useful special case: d/ds (c - s) = -1. -/
   @[simp] lemma deriv_const_sub_id (c r : ℝ) :
       deriv (fun s : ℝ => c - s) r = (-1 : ℝ) := by
-    -- rewrite as a*s + b with a = -1, b = c
-    simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc, one_mul, neg_one_mul]
-      using deriv_linear (-1 : ℝ) c r
-  
-  /-- Another form: d/ds (-s + c) = -1. -/
+    -- c - s = (-1) * s + c
+    simpa [sub_eq_add_neg, add_comm] using deriv_linear (-1 : ℝ) c r
+
   @[simp] lemma deriv_neg_id_add_const (c r : ℝ) :
       deriv (fun s : ℝ => -s + c) r = (-1 : ℝ) := by
-    have : (fun s : ℝ => -s + c) = (fun s => c - s) := by
-      funext s; ring
-    rw [this]
-    exact deriv_const_sub_id c r
+    have : (fun s : ℝ => -s + c) = (fun s => c - s) := by funext s; ring
+    simpa [this] using deriv_const_sub_id c r
+
+  /-- `∂θ (-(sin θ * cos θ)) = -(cos^2 θ - sin^2 θ)` — used once in `R_{φφ}` reduction. -/
+  @[simp] lemma deriv_neg_sin_mul_cos (θ : ℝ) :
+      deriv (fun t => -(sin t * cos t)) θ
+        = - (cos θ ^ 2 - sin θ ^ 2) := by
+    have hs : HasDerivAt (fun t => sin t) (cos θ) θ := hasDerivAt_sin θ
+    have hc : HasDerivAt (fun t => cos t) (-sin θ) θ := hasDerivAt_cos θ
+    have hmul : HasDerivAt (fun t => sin t * cos t)
+        (cos θ * cos θ + sin θ * (-sin θ)) θ := hs.mul hc
+    have hneg : HasDerivAt (fun t => -(sin t * cos t))
+        (-(cos θ * cos θ + sin θ * (-sin θ))) θ := hmul.neg
+    convert hneg.deriv using 1
+    ring
 end DerivSimpHelpers
 
 /-- The two θ–trace shapes that appear in `R_{θθ}` are pointwise equal; expand and compare. -/
@@ -1583,7 +1585,9 @@ Freeze the radial Christoffels under `simp` *only* for the two Ricci reductions,
 so `deriv (fun s => Γ_r_* … s …) r` stays symbolic.
 -/
 section RicciReductions
-
+  -- Freeze the *radial* Γ under `deriv`, and (for θθ) the θ-trace Γ^φ_{φθ}
+  -- so we keep `deriv (fun s => Γ_r_* M s ...) r` and `deriv (fun t => Γ_φ_θφ t) θ` symbolic.
+  attribute [-simp] Γ_r_θθ Γ_r_φφ Γ_φ_θφ in
 
 /-- Canonical form for `R_{θθ}` (keep the radial derivative symbolic). -/
   @[simp] lemma Ricci_θθ_reduce (M r θ : ℝ) :
@@ -1627,9 +1631,14 @@ section RicciReductions
              Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
              Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
              Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
-             Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ, Γ_r_θθ, Γ_r_φφ, Γ_φ_θφ,
-             deriv_const]
-  ring
+             Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ]
+  -- IMPORTANT: do not unfold Γ_r_θθ / Γ_r_φφ / Γ_φ_θφ here (we froze them).
+  -- Evaluate only truly constant/linear derivatives; leave the frozen ones symbolic.
+  simp only [deriv_const, deriv_linear, deriv_const_sub_id, deriv_neg_id_add_const]
+  -- Now unfold the Christoffel symbols for the final normalization
+  simp only [Γ_r_θθ, Γ_r_φφ, Γ_φ_θφ, Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ]
+  field_simp
+  ring_nf
 
   /-- Canonical form for `R_{φφ}` (keep the radial derivative symbolic). -/
   @[simp] lemma Ricci_φφ_reduce (M r θ : ℝ) :
@@ -1645,8 +1654,8 @@ section RicciReductions
              Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
              Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
              Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ,
-             deriv_const]
-  -- now ring normalize
+             deriv_const, deriv_neg_sin_mul_cos]
+  -- Now normalize
   ring
 end RicciReductions
 
