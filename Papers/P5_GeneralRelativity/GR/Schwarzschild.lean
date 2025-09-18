@@ -1,4 +1,12 @@
-/-
+/-!
+# Schwarzschild Vacuum Engine (Deep Dive D2)
+
+## Methodological Stance: Structural Certification
+The underlying mathematics for G1 is constructive (Mathematical Height 0). However, this 
+implementation uses classical infrastructure from `mathlib` (Infrastructural Cost) for 
+pragmatic reasons. This artifact provides *Structural Certification* (verifying the absence 
+of high-level portals) rather than a formal foundational proof in BISH. (See Paper 5, Section 1.5).
+
 Paper 5: General Relativity AxCal Analysis - Schwarzschild Vacuum Engine
 Deep-dive deliverable D2: minimal tensor engine for vacuum check (Height 0)
 -/

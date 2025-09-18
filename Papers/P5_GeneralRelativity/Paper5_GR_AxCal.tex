@@ -78,7 +78,9 @@
 % -------------------------------------------------
 \title{Axiom Calibration for General Relativity (Paper 5):\\
 Portals, Profiles, and a Hybrid Plan for EPS and Schwarzschild}
-\author{Paul Chun--Kit Lee}
+\author{Paul Chun--Kit Lee\\
+\texttt{dr.paul.c.lee@gmail.com}\\
+New York University, NY}
 \date{October 2025}
 
 \begin{document}
@@ -88,7 +90,7 @@ Portals, Profiles, and a Hybrid Plan for EPS and Schwarzschild}
 We make \emph{Axiom Calibration} (\AxCal) the organizing principle for a foundations‑first study of General Relativity (GR). The paper contributes three AxCal instruments for GR: (I) \emph{witness families} pinned to a fixed $\SigmaZero^{\mathrm{GR}}$ signature; (II) \emph{proof‑route flags} and \emph{portal theorems} that turn standard GR arguments into explicit frontier costs (Zorn$\Rightarrow\{\AC\}$, Limit‑Curve/Ascoli$\Rightarrow\{\FT/\WKLz\}$, Serial‑Chain$\Rightarrow\{\DCw\}$, Reductio$\Rightarrow\{\LEM\}$); and (III) \emph{HeightCertificates} that compose costs across results. On this basis we calibrate five loci: G1 (explicit vacuum checks: mathematically Height~0), G2 (Cauchy/MGHD: PDE core vs.\ Zorn portal), G3 (singularity theorems: compactness and contradiction portals), G4 (maximal extensions: Zorn portal), and G5 (computable evolution: negative template after Pour–El–Richards).
 
 \medskip
-\textbf{Methodological stance.} Our Lean 4 implementation uses \texttt{mathlib}, a classical library (ZFC with LEM and global choice mechanisms). Accordingly, we position the artifact as a form of \emph{Structural Certification}: Lean checks the \AxCal bookkeeping (portals, routes, and height composition), while deep theorems and constructive lower/upper bounds may be imported as named axioms. For G1 (Schwarzschild vacuum), we provide a complete symbolic verification (Sprint 3): all Christoffel symbols and Ricci tensor components are computed explicitly, proving $R_{\mu\nu}=0$ for the Schwarzschild metric. The mathematics is constructive (Height~0), but the current Lean formalization verifies the computation in a classical environment; a formal constructive certificate is deferred to future work or to alternative libraries.
+\textbf{Methodological stance.} Our Lean 4 implementation uses \texttt{mathlib}, a classical library (ZFC). Accordingly, we position the artifact as a form of \emph{Structural Certification}: Lean checks the \AxCal bookkeeping, measuring the Strategic (Portal) Costs of GR arguments, while deep theorems may be imported as named axioms. We distinguish this from the Infrastructural Cost of the environment. For G1 (Schwarzschild vacuum), we establish a Mathematical Height of 0. The Lean formalization structurally certifies this claim by verifying the absence of portals, while executing the computation within the classical environment.
 \end{abstract}
 
 \begin{mdframed}[backgroundcolor=gray!10, linewidth=0pt]
@@ -122,10 +124,10 @@ A \emph{witness family} $\mathcal{W}$ assigns to $F$ a groupoid of witnesses for
 \subsection{Proof-route flags and portals}
 We make explicit route flags that, when present in a proof, trigger an \emph{AxCal portal}:
 \begin{itemize}
-\item \textsf{uses\_zorn}: applies Zorn on a $\SigmaZero$-definable poset of extensions $\Rightarrow$ \emph{Zorn portal} $(\Frontierpos\supseteq\{\AC\})$.
-\item \textsf{uses\_limit\_curve}: invokes Ascoli--Arzelà / compactness of causal curves $\Rightarrow$ \emph{Compactness portal} $(\Frontierpos\supseteq\{\FT/\WKLz\})$.
-\item \textsf{uses\_serial\_chain}: builds an infinite dependent chain (e.g. curve prolongation) $\Rightarrow$ \emph{Dependent-Choice portal} $(\Frontierpos\supseteq\{\DCw\})$.
-\item \textsf{uses\_reductio}: essential proof by contradiction on $\SigmaZero$ data $\Rightarrow$ \emph{LEM portal} $(\Frontierpos\supseteq\{\LEM\})$.
+\item \textsf{uses\_zorn}: applies Zorn on a $\SigmaZero$-definable poset of extensions $\Rightarrow$ \emph{Zorn portal} \textbf{(requiring AC, thus} $\Frontierpos\supseteq\{\AC\}$\textbf{)}.
+\item \textsf{uses\_limit\_curve}: invokes Ascoli--Arzelà / compactness of causal curves $\Rightarrow$ \emph{Compactness portal} \textbf{(requiring FT constructively or WKL}$_0$ \textbf{classically, thus} $\Frontierpos\supseteq\{\FT/\WKLz\}$\textbf{)}.
+\item \textsf{uses\_serial\_chain}: builds an infinite dependent chain (e.g. curve prolongation) $\Rightarrow$ \emph{Dependent-Choice portal} \textbf{(requiring DC}$_\omega$\textbf{, thus} $\Frontierpos\supseteq\{\DCw\}$\textbf{)}.
+\item \textsf{uses\_reductio}: essential proof by contradiction on $\SigmaZero$ data $\Rightarrow$ \emph{LEM portal} \textbf{(requiring LEM, thus} $\Frontierpos\supseteq\{\LEM\}$\textbf{)}.
 \end{itemize}
 
 \begin{proposition}[Portal soundness]\label{prop:portals}
@@ -133,11 +135,28 @@ If a proof of a $\SigmaZero^{\mathrm{GR}}$-pinned statement uses a flagged route
 \end{proposition}
 
 \begin{proof}[Sketch]
-These are standard meta-implications: Zorn is equivalent to AC over $\ZF$; Ascoli-type compactness aligns with $\FT$ constructively (and with $\WKLz$ classically); building infinite dependent sequences is a canonical use of $\DCw$; essential reductio uses $\LEM$. The novelty is the \emph{proof-route} tagging that transports these meta-results to the $\SigmaZero^{\mathrm{GR}}$ pin.
+These are standard meta-implications: Zorn is equivalent to AC over $\ZF$; Ascoli-type compactness aligns with $\FT$ constructively (and with $\WKLz$ classically); building infinite dependent sequences is a canonical use of $\DCw$; essential reductio uses $\LEM$. The novelty is the \emph{proof-route} tagging that transports these meta-results to the $\SigmaZero^{\mathrm{GR}}$ pin. See Appendix~\ref{sec:portal-soundness} for detailed arguments.
 \end{proof}
 
 \subsection{Height certificates and composition}
 Given portals triggered for a witness family $\mathcal{W}$, we record a HeightCertificate with $(\hChoice,\hComp,\hLogic)\in\{0,1,\omega\}^3$. Products of claims compose componentwise by the AxCal product law (Paper~3A).
+
+\subsection{Scope of Calibration: Portals vs. Infrastructure}
+Our hybrid implementation approach, utilizing the classical \texttt{mathlib}, requires a clear distinction regarding the scope of the AxCal measurements.
+
+\begin{definition}[Axiomatic Cost Scopes]
+We distinguish between:
+\begin{itemize}
+    \item \textbf{Infrastructural Cost:} The foundational axioms assumed by the formalization environment (e.g., classical logic within \texttt{mathlib}'s definitions of real numbers and calculus).
+    \item \textbf{Strategic (Portal) Cost:} The axioms required by the high-level mathematical arguments specific to the GR proofs, tracked via the portals defined in Section 1.3.
+\end{itemize}
+\end{definition}
+
+The AxCal framework, as deployed in this paper via \textbf{Structural Certification}, measures the \textbf{Strategic (Portal) Cost}. We refer to this measurement as the \textbf{Mathematical Height}.
+
+\begin{remark}[Interpretation of Height 0]
+A Height 0 certificate (profile $(0,0,0)$) signifies that the proof route does not pass through any high-level portals. It acknowledges the mathematical constructivity of the argument structure, even if the formal artifact relies on a classical infrastructure (Infrastructural Cost) to verify the correctness of the individual steps.
+\end{remark}
 
 % ===========================================================
 \section{Literature anchors mapped to portals}
@@ -147,21 +166,17 @@ Robb and Reichenbach provide axiomatic scaffolding for kinematics; EPS derives L
 % ===========================================================
 \section{Calibration targets (G1--G5) with AxCal profiles}
 % ===========================================================
-\subsection*{G1. Explicit vacuum checks (mathematically Height 0)}
+\subsection*{G1. Explicit vacuum checks (Mathematical Height 0)}
 \begin{definition}[G1 witness]
 $\mathcal{C}^{\mathrm{G1}}$: the pinned Schwarzschild-type metric satisfies vacuum $\EFE$ at the pin.
 \end{definition}
 \begin{proposition}[G1 profile]\label{prop:G1}
-$(\hChoice,\hComp,\hLogic)=(0,0,0)$.
+The Mathematical Height (Strategic Cost) is $(\hChoice,\hComp,\hLogic)=(0,0,0)$.
 \end{proposition}
-\begin{proof}[Sketch]
-Finite symbolic computation of $\Gamma^\alpha_{\mu\nu}$, $R_{\mu\nu}$, and $G_{\mu\nu}$ (cf.\ \cite[§B.4]{Wald1984}); no portals are triggered. In our Sprint 3 implementation, we compute:
-\begin{itemize}
-\item All non-zero Christoffel symbols: $\Gamma^t_{tr} = M/(r^2 f)$, $\Gamma^r_{tt} = Mf/r^2$, $\Gamma^r_{rr} = -M/(r^2f)$, $\Gamma^r_{\theta\theta} = -r+2M$, $\Gamma^r_{\varphi\varphi} = -(r-2M)\sin^2\theta$, $\Gamma^\theta_{r\theta} = 1/r$, $\Gamma^\theta_{\varphi\varphi} = -\sin\theta\cos\theta$, $\Gamma^\varphi_{r\varphi} = 1/r$, $\Gamma^\varphi_{\theta\varphi} = \cot\theta$
-\item Full Ricci tensor via $R_{\mu\nu} = \partial_\rho \Gamma^\rho_{\mu\nu} - \partial_\nu \Gamma^\rho_{\mu\rho} + \Gamma^\rho_{\rho\sigma} \Gamma^\sigma_{\mu\nu} - \Gamma^\rho_{\nu\sigma} \Gamma^\sigma_{\mu\rho}$
-\item Verification that $R_{tt} = R_{rr} = R_{\theta\theta} = R_{\varphi\varphi} = 0$ for $f = 1 - 2M/r$
-\end{itemize}
-\emph{Note:} While the mathematics is constructive, our Lean formalization uses classical \texttt{mathlib}, yielding structural certification rather than formal constructive proof.
+\begin{proof}[Sketch and Certification Status]
+The proof involves finite symbolic computation of $\Gamma^\alpha_{\mu\nu}$, $R_{\mu\nu}$, and $G_{\mu\nu}$ (cf.\ \cite[§B.4]{Wald1984}). This process is inherently constructive and does not trigger any high-level portals.
+
+\emph{Certification Status:} Our Lean artifact provides Structural Certification for this $(0,0,0)$ profile by verifying the absence of portals in the proof route. As noted in Section 1.5, while the implementation (Deep Dive D2) utilizes the classical infrastructure of \texttt{mathlib} (Infrastructural Cost), the AxCal framework correctly certifies that the Strategic Cost is zero.
 \end{proof}
 
 \subsection*{G2. Cauchy problem (local well-posedness and MGHD)}
@@ -169,10 +184,14 @@ Finite symbolic computation of $\Gamma^\alpha_{\mu\nu}$, $R_{\mu\nu}$, and $G_{\
 $\mathcal{C}^{\mathrm{G2}}$: local well-posedness for $\EFE$ and existence/uniqueness of MGHD from data $(\Sigma,h,K)$.
 \end{definition}
 \begin{proposition}[G2 profile (route-separated)]\label{prop:G2}
-Local PDE (harmonic gauge, energy estimates) can be arranged with $(0,0,0)$ or low choice ($\ACw$) in separable settings; the MGHD step has \textsf{uses\_zorn}, so $(\hChoice,\hComp,\hLogic)\ge(1,0,0)$ for the global statement.
+The calibration splits:
+\begin{itemize}
+    \item \textbf{Local PDE:} In standard separable settings (harmonic gauge, energy estimates), the profile is typically $(0,0,0)$. It may rise to $(1,0,0)$ if the analysis requires selecting sequences of approximants without explicit witnesses (via $\ACw$).
+    \item \textbf{MGHD:} The standard maximality step has \textsf{uses\_zorn}, resulting in a profile $(\hChoice,\hComp,\hLogic)\ge(1,0,0)$ for the global statement.
+\end{itemize}
 \end{proposition}
 \begin{proof}[Sketch]
-Local existence follows Choquet--Bruhat's PDE machinery \cite{ChoquetBruhat2009}. MGHD standard proofs invoke Zorn on the poset of developments (Wald \cite[Thm.~10.1.2]{Wald1984}); by Prop.~\ref{prop:portals}, the Zorn portal yields the $\AC$ frontier.
+Local existence follows Choquet--Bruhat's PDE machinery \cite{ChoquetBruhat2009}, which can often be managed constructively or with $\ACw$ in separable spaces. MGHD standard proofs invoke Zorn on the poset of developments (Wald \cite[Thm.~10.1.2]{Wald1984}); by Prop.~\ref{prop:portals}, the Zorn portal yields the $\AC$ frontier.
 \end{proof}
 
 \subsection*{G3. Singularity theorems (Penrose/Hawking)}
@@ -229,6 +248,8 @@ Global hyperbolicity yields compact diamond sets; equicontinuity gives Ascoli--A
 \section{Hybrid plan: structured framework + selective deep dives}
 % ===========================================================
 
+\paragraph{Pragmatic Necessity.} Formalizing the differential geometry and PDE analysis required for General Relativity within a purely constructive framework is currently infeasible due to the lack of mature constructive libraries in Lean. Therefore, we adopt this hybrid approach, leveraging the infrastructure of the classical \texttt{mathlib} to manage domain complexity while strictly enforcing the AxCal methodology to track axiomatic dependencies via Structural Certification.
+
 \subsection{Sprint 3 Milestone: Schwarzschild Vacuum Solution}
 \textbf{Achievement:} Complete symbolic verification of the Schwarzschild vacuum solution, demonstrating that the Schwarzschild metric is a solution to Einstein's vacuum field equations $R_{\mu\nu} = 0$. The implementation includes:
 \begin{enumerate}
@@ -242,9 +263,10 @@ This represents a Height~0 achievement as no axiom portals are triggered—the e
 \paragraph{Structured framework (implemented).} We have registered G1--G5 witness families as abstract propositions over the pinned signature $\Sigma_0^{\mathrm{GR}}$. Route flags are attached per standard proofs, and HeightCertificates are emitted using portal soundness (Prop.~\ref{prop:portals}). The framework maintains a verification ledger of \emph{named axioms} (MGHD existence, Penrose/Hawking singularity theorems, limit-curve compactness) with bibliographic citations. This structured approach provides machine-checkable height profiles while using abstract placeholders (\texttt{True}) for the detailed mathematical content---a deliberate design choice that prioritizes axiomatic calibration over full formalization.
 
 \paragraph{Deep dive anchors (Height 0 demonstrations).}
+\emph{We utilize \texttt{mathlib}'s infrastructure (e.g., calculus, real numbers) for these deep dives due to the pragmatic constraints mentioned above. This allows us to verify the mathematical steps classically while the AxCal framework certifies the absence of high-level axiom portals.}
 \begin{itemize}
 \item \textbf{D1 (EPS Core).} We implement the EPS kinematics framework showing how light rays and free fall determine metric structure. The implementation provides a mathematically Height~0 certificate by avoiding all portals, demonstrating that the EPS reconstruction can be done constructively. The Lean artifact verifies this in classical \texttt{mathlib}, providing structural certification of the portal‑free nature.
-\item \textbf{D2 (Schwarzschild Engine).} We provide a complete symbolic verification of the Schwarzschild vacuum solution. The implementation computes all non-zero Christoffel symbols, Ricci tensor components, and verifies $R_{\mu\nu}=0$ for the Schwarzschild metric in $(t,r,\theta,\varphi)$ coordinates. Key achievements include: (i) systematic computation of all connection coefficients; (ii) full Ricci tensor derivation using the contracted Bianchi identity; (iii) explicit verification that all Ricci components vanish for $f(r) = 1 - 2M/r$. The framework demonstrates mathematically Height~0 structure (no axiom portals) while verifying in classical \texttt{mathlib}.
+\item \textbf{D2 (Schwarzschild Engine).} We implement a tensor engine for the Schwarzschild vacuum check (detailed in \texttt{GR/Schwarzschild.lean}). This includes formalizing the metric components, Christoffel symbols, and the Ricci tensor computation using \texttt{mathlib}'s infrastructure for calculus and real analysis. While the underlying symbolic derivations $G_{\mu\nu}=0$ are mathematically Height~0 (no axiom portals), the Lean artifact verifies the computation using classical definitions, thus providing structural certification.
 \end{itemize}
 
 \begin{mdframed}[style=status]
@@ -278,9 +300,9 @@ lake build Papers.P5_GeneralRelativity.Main
 # Run smoke test (verifies all components)
 lake build Papers.P5_GeneralRelativity.Smoke
 
-# Verify no sorries in implementation
-grep -r "sorry" Papers/P5_GeneralRelativity/*.lean | \
-  grep -v "-- sorry" | wc -l  # Should output: 0
+# Verify no sorries in implementation (checks all subdirectories, excluding comments)
+grep -r "sorry" Papers/P5_GeneralRelativity/ | grep "\.lean:" | \
+  grep -v "--.*sorry" | wc -l  # Should output: 0
 
 # Run schematic/axiom audits (match CI)
 bash scripts/SchematicAudit.sh
@@ -289,6 +311,9 @@ bash scripts/AxiomDeclAudit.sh
 # Optional (informational): print transitive axiom dependencies
 # (will not fail; used for human-readable auditing in CI logs)
 lake env lean scripts/AxiomAudit.lean || true
+# Note: This audit will show dependence on classical axioms (e.g., Classical.choice)
+# imported via mathlib. This reflects the Infrastructural Cost and is consistent 
+# with our Structural Certification methodology (see Section 1.5).
 \end{verbatim}
 
 \noindent\textbf{Verification Outputs:}
@@ -307,9 +332,9 @@ lake env lean scripts/AxiomAudit.lean || true
 \begin{center}
 \begin{tabular}{|l|c|l|l|}
 \hline
-\textbf{Target} & \textbf{Profile $(\hChoice,\hComp,\hLogic)$} & \textbf{Flags/Portals used} & \textbf{Notes} \\
+\textbf{Target} & \textbf{Profile $(\hChoice,\hComp,\hLogic)$}${}^*$ & \textbf{Flags/Portals used} & \textbf{Notes} \\
 \hline
-G1: explicit vacuum & $(0,0,0)$ & none & symbolic tensor algebra (math) \\
+G1: explicit vacuum & $(0,0,0)$ & none & Mathematical Height 0; Structurally Certified \\
 \hline
 G2: Cauchy/MGHD & $\ge(1,0,0)$ (global) & \textsf{uses\_zorn} & local PDE core can be $(0,0,0)$/$\ACw$ \\
 \hline
@@ -323,6 +348,7 @@ G5b: measurement stream & $(1,0,0)$ & \textsf{uses\_serial\_chain} & DC$_\omega$
 \hline
 \end{tabular}
 \end{center}
+${}^*$\footnotesize{Profiles indicate the Mathematical Height (Strategic Costs; see Section 1.5), not the Infrastructural Cost of the classical formalization environment.}
 
 % ===========================================================
 \section{Artifact Mapping: Paper Claims to Lean Implementation}
@@ -376,22 +402,23 @@ Schwarzschild pinning & \texttt{IsPinnedSchwarzschild} & \texttt{GR.Interfaces} 
 \hline
 \textbf{Target} & \textbf{Witness Family} & \textbf{Certificate} & \textbf{Verified Profile} \\
 \hline
-G1: Vacuum & \texttt{GR.G1\_Vacuum\_W} & \texttt{G1\_Vacuum\_Cert} & $(0,0,0)$ \checkmark \\
+G1: Vacuum & \texttt{GR.G1\_Vacuum\_W} & \texttt{G1\_Vacuum\_Cert} & $(0,0,0)$ \checkmark$^S$ \\
 \hline
-G2: Local PDE & \texttt{GR.G2\_LocalPDE\_W} & \texttt{G2\_LocalPDE\_Cert} & $(0,0,0)$ \checkmark \\
+G2: Local PDE & \texttt{GR.G2\_LocalPDE\_W} & \texttt{G2\_LocalPDE\_Cert} & $(0,0,0)$ \checkmark$^S$ \\
 \hline
-G2: MGHD & \texttt{GR.G2\_MGHD\_W} & \texttt{G2\_MGHD\_Cert} & $(1,0,0)$ \checkmark \\
+G2: MGHD & \texttt{GR.G2\_MGHD\_W} & \texttt{G2\_MGHD\_Cert} & $(1,0,0)$ \checkmark$^S$ \\
 \hline
-G3: Penrose & \texttt{GR.G3\_Penrose\_W} & \texttt{G3\_Penrose\_Cert} & $(0,1,1)$ \checkmark \\
+G3: Penrose & \texttt{GR.G3\_Penrose\_W} & \texttt{G3\_Penrose\_Cert} & $(0,1,1)$ \checkmark$^S$ \\
 \hline
-G4: MaxExt & \texttt{GR.G4\_MaxExt\_W} & \texttt{G4\_MaxExt\_Cert} & $(1,0,0)$ \checkmark \\
+G4: MaxExt & \texttt{GR.G4\_MaxExt\_W} & \texttt{G4\_MaxExt\_Cert} & $(1,0,0)$ \checkmark$^S$ \\
 \hline
-G5: CompNeg & \texttt{GR.G5\_CompNeg\_W} & \texttt{G5\_CompNeg\_Cert} & $(0,0,0)$ \checkmark \\
+G5: CompNeg & \texttt{GR.G5\_CompNeg\_W} & \texttt{G5\_CompNeg\_Cert} & $(0,0,0)$ \checkmark$^S$ \\
 \hline
-G5: Stream & \texttt{GR.G5\_MeasStream\_W} & \texttt{G5\_MeasStream\_Cert} & $(1,0,0)$ \checkmark \\
+G5: Stream & \texttt{GR.G5\_MeasStream\_W} & \texttt{G5\_MeasStream\_Cert} & $(1,0,0)$ \checkmark$^S$ \\
 \hline
 \end{tabular}
 \end{center}
+\noindent\small{\checkmark$^S$: Structurally Certified (AxCal bookkeeping verified in Lean using \texttt{mathlib}).}
 
 \subsection{Deep-Dive Deliverables (Height 0 Anchors)}
 
@@ -455,12 +482,19 @@ Certificate registry & \texttt{Certificates.all\_certificates} & Lists all 7 hei
 
 \subsection{Verification Ledger}
 
-The AxCal framework maintains a structured ledger that tracks the provenance of each height assignment. Each certificate in \texttt{GR/Certificates.lean} includes: (i) the witness family defining the mathematical claim, (ii) the list of portal flags triggered by the standard proof route, (iii) the resulting height profile computed via \texttt{route\_to\_profile}, (iv) bibliographic citations to the source literature, and (v) a constructive upper bound proof or axiom import. This ledger design ensures that height costs are auditable and that alternative proof routes (avoiding certain portals) can be systematically explored. The framework correctly computes that Zorn's lemma triggers $\hChoice = 1$, limit‑curve compactness triggers $\hComp = 1$, and proof by contradiction triggers $\hLogic = 1$. All seven certificates (G1 vacuum, G2 local PDE, G2 MGHD, G3 Penrose, G4 maximal extension, G5 computability negative, G5 measurement stream) compile without \texttt{sorry} in classical \texttt{mathlib} and produce the expected height profiles as verified by \texttt{Paper5\_Main} and the smoke tests. This constitutes \emph{Structural Certification} of the AxCal bookkeeping rather than formal constructive proof.
+The AxCal framework maintains a structured ledger that tracks the provenance of each height assignment. Each certificate in \texttt{GR/Certificates.lean} includes: (i) the witness family defining the mathematical claim, (ii) the list of portal flags triggered by the standard proof route, (iii) the resulting height profile computed via \texttt{route\_to\_profile}, (iv) bibliographic citations to the source literature, and (v) a constructive upper bound proof or axiom import. This ledger design ensures that height costs are auditable and that alternative proof routes (avoiding certain portals) can be systematically explored. The framework correctly computes that Zorn's lemma triggers $\hChoice = 1$, limit‑curve compactness triggers $\hComp = 1$, and proof by contradiction triggers $\hLogic = 1$. All seven certificates (G1 vacuum, G2 local PDE, G2 MGHD, G3 Penrose, G4 maximal extension, G5 computability negative, G5 measurement stream) compile without \texttt{sorry} in classical \texttt{mathlib} and produce the expected height profiles as verified by \texttt{Paper5\_Main} and the smoke tests. This constitutes \emph{Structural Certification}—a machine-auditable verification of the AxCal bookkeeping and the logical composition of dependencies—rather than a formal constructive proof of the object-level GR theorems.
 
 % ===========================================================
 \section{Conclusion}
 % ===========================================================
-This paper is not a GR formalization for its own sake: it is an \emph{AxCal map} of GR. Portals, route flags, and HeightCertificates turn the folklore "this uses choice/compactness/LEM" into machine‑checkable artifacts that compose across the theory. The deep‑dive tasks (EPS; Schwarzschild) supply mathematically Height~0 anchors verified via \emph{Structural Certification} in classical \texttt{mathlib}, ensuring the project yields verifiable AxCal infrastructure while the schematic layer documents axiomatic cost with precision. Future work could provide formal constructive certificates using dedicated constructive libraries.
+This paper is not a GR formalization for its own sake: it is an \emph{AxCal map} of GR. Portals, route flags, and HeightCertificates turn the folklore "this uses choice/compactness/LEM" into machine‑checkable artifacts that compose across the theory. The deep‑dive tasks (EPS; Schwarzschild) supply mathematically Height~0 anchors verified via \emph{Structural Certification} in classical \texttt{mathlib}, ensuring the project yields verifiable AxCal infrastructure while the schematic layer documents axiomatic cost with precision. 
+
+\paragraph{Future Work.} To move from Structural Certification to full Foundational Verification for Height 0 targets (G1, D1, D2), future work will involve porting these implementations to a formal constructive library, should one become available for Lean 4.
+
+% ===========================================================
+\section*{Acknowledgments}
+% ===========================================================
+Development assistance provided by: Gemini 2.5 Deep Think (architecture exploration and theoretical framework design), GPT-5 Pro (Lean 4 scaffolding and implementation support), and Claude Code (repository management and development workflow).
 
 % ===========================================================
 \begin{thebibliography}{99}
@@ -572,7 +606,7 @@ Suppose a GR derivation $\mathcal{D}$ invokes a \emph{limit–curve} argument: f
 \end{proposition}
 
 \begin{proof}[Proof sketch]
-Limit–curve arguments in Lorentzian geometry are typically instances of Arzelà–Ascoli–type compactness on spaces of curves (or a diagonal Bolzano–Weierstraß selection). Over the classical base $\RCA_0$, the necessary sequential compactness for $[0,1]$ and the Bolzano–Weierstraß theorem are equivalent to $\WKLz$ (Simpson, \emph{Subsystems of Second Order Arithmetic}, Chs.~III–IV). Over constructive bases, Heine–Borel/compactness of Cantor space (hence $[0,1]$ via coding) is calibrated by the Fan Theorem $\FT$ (Bishop–Bridges, \emph{Constructive Analysis}; Troelstra–van Dalen, \emph{Constructivism in Mathematics}). Thus a non-quantitative subsequence/limit extraction imports compactness strength: classically $\WKLz$; constructively $\FT$. We record this disjunctively, to be resolved by the chosen base. \qedhere
+Limit–curve arguments in Lorentzian geometry are typically instances of Arzelà–Ascoli–type compactness on spaces of curves (or a diagonal Bolzano–Weierstraß selection). Over classical logic (e.g., within the framework of Reverse Mathematics using $\RCA_0$, a system for recursive comprehension), the necessary sequential compactness for $[0,1]$ and the Bolzano–Weierstraß theorem are equivalent to $\WKLz$ (Simpson, \emph{Subsystems of Second Order Arithmetic}, Chs.~III–IV). Over constructive bases, Heine–Borel/compactness of Cantor space (hence $[0,1]$ via coding) is calibrated by the Fan Theorem $\FT$ (Bishop–Bridges, \emph{Constructive Analysis}; Troelstra–van Dalen, \emph{Constructivism in Mathematics}). Thus a non-quantitative subsequence/limit extraction imports compactness strength: classically $\WKLz$; constructively $\FT$. We record this disjunctively, to be resolved by the chosen base. \qedhere
 \end{proof}
 
 \begin{remark}
@@ -631,7 +665,7 @@ class HasWKL0 (F : Foundation) : Prop
 class HasLEM  (F : Foundation) : Prop
 class HasWLPO (F : Foundation) : Prop
 
-/-- Proof-route flags (carried in certificates; see §\ref{app:certs}) -/
+/-- Proof-route flags (carried as hypotheses in witness families; see §\ref{app:witnesses}) -/
 inductive PortalFlag
 | uses_zorn
 | uses_limit_curve
@@ -648,7 +682,7 @@ axiom Reductio_portal  : forall {F}, Uses PortalFlag.uses_reductio     -> HasLEM
 
 \paragraph{Notes.}
 \begin{itemize}
-\item The wrapper \verb|Uses flag| is a Prop recording that the corresponding proof-route is actually used in the provided derivation (not merely available in the library). This is what ties the \emph{route} to the \emph{frontier cost}.
+\item The wrapper \verb|Uses flag| is a Propositional hypothesis attached to the witness (see Appendix B.2). It records that the specific derivation relies on the flagged device (e.g., Zorn's Lemma). This mechanism is what ties the proof \emph{route} to the axiomatic cost.
 \item The compactness portal is recorded disjunctively (\verb|HasFT or HasWKL0|) to reflect constructive/classical bases; the certificate chooses the branch used in the imported argument.
 \end{itemize}
 
@@ -829,5 +863,101 @@ Papers/P5_GR/
 \item Every certificate includes \emph{flags} (route evidence) and \emph{cites} (bibliographic anchors).
 \item Replacing an imported theorem by an internal proof that avoids a flagged portal \emph{automatically} lowers the certificate's profile (the AxCal algebra recomputes heights componentwise).
 \item Disjunctive compactness (\verb|HasFT or HasWKL0|) must be resolved per foundation instance to produce a concrete $(\hComp)$ entry.
+\item \textbf{Environment acknowledgment:} All certifications are structural, executed within a classical (\texttt{mathlib}) environment. Height 0 certificates (G1, D1, D2) certify the absence of high-level portals (like Zorn or LEM), not the foundational constructivity of the underlying calculus implementation used in the Lean artifact.
 \end{itemize}
+
+% ===========================================================
+\section{Methodological Discussion: Structural Certification and Physical Insight}
+\label{app:methodology}
+% ===========================================================
+
+This appendix addresses fundamental questions about the AxCal methodology, its validity, and its value to physics.
+
+\subsection{Defending Structural Certification}
+
+A natural critique of this project might argue: ``You cannot verify constructivity by working in a classical system. The claim of Height (0,0,0) for G1 is contradictory when the verification uses classical \texttt{mathlib}.''
+
+This critique conflates two distinct activities:
+
+\begin{itemize}
+\item \textbf{Foundational Verification:} Proving a theorem \emph{within} a constructive system (e.g., BISH). This indeed requires a constructive proof assistant.
+\item \textbf{Meta-Analysis (Structural Certification):} Reasoning \emph{about} the dependencies of a proof.
+\end{itemize}
+
+It is entirely valid to use a classical meta-theory to analyze proofs in a weaker object theory. For example, Reverse Mathematics practitioners typically use classical logic (ZFC) to prove that a theorem is equivalent to WKL$_0$ over RCA$_0$. They perform meta-analysis.
+
+\textbf{Structural Certification formalizes this meta-analysis.} The claim that G1 has Mathematical Height (0,0,0) means the argument relies only on finite symbolic manipulation and does not invoke high-level non-constructive principles. The Lean artifact verifies:
+\begin{enumerate}
+\item The individual steps (calculus, algebra) are correct (classically).
+\item The overall structure does not invoke the \texttt{uses\_zorn} flag or other portals.
+\end{enumerate}
+
+This combination provides a machine-checked guarantee that the high-level architecture of the proof is free from specific non-constructive principles.
+
+\subsection{Physical Value of Axiom Calibration}
+
+One might ask: ``Is this just math for math's sake? Are we gaining genuine physical insight?''
+
+The AxCal framework offers substantial value to the foundations of physics by systematically mapping logical dependencies within GR:
+
+\subsubsection{Clarifying Physics vs. Mathematical Idealization}
+
+\begin{itemize}
+\item \textbf{The Axiom of Choice and Physical Reality:} G4 (Maximal Extensions) and G2 (MGHD) rely on Zorn's Lemma. AC guarantees \emph{existence} but provides no algorithm to \emph{construct} these spacetimes. This forces physicists to question whether maximal extensions are physical necessities or mathematical artifacts.
+
+\item \textbf{LEM and Singularities:} G3 (Singularity Theorems) uses proof by contradiction. Standard proofs demonstrate geodesic incompleteness must occur but provide no constructive method to locate singularities. AxCal highlights that singularity formation remains constructively elusive.
+\end{itemize}
+
+\subsubsection{The Crisis of Computability}
+
+Physics strives for predictive theories. AxCal rigorously separates constructive (computable) parts of GR from non-constructive ones:
+
+\begin{itemize}
+\item \textbf{Limits of Prediction (G5):} The Pour-El-Richards result shows well-posed PDEs can have computable initial conditions evolving into \emph{non-computable} states. If GR exhibits this behavior, it imposes fundamental limits on predictability, independent of computational power.
+\end{itemize}
+
+\subsubsection{Grounding Theory in Observables}
+
+\begin{itemize}
+\item \textbf{The EPS Framework (D1):} The Ehlers-Pirani-Schild framework derives spacetime structure from light rays and free-falling particles. Formal verification that this reconstruction is constructive (Height 0) demonstrates GR can be grounded in idealized physical observations rather than abstract mathematical assumptions.
+\end{itemize}
+
+\subsubsection{Ensuring Correctness in Critical Computations}
+
+\begin{itemize}
+\item \textbf{Verified Tensor Calculus (G1/D2):} The Schwarzschild Engine provides verified tensor manipulation. The formal proof that $R_{\mu\nu}=0$ for the Schwarzschild metric guarantees algebraic correctness. This is vital for numerical relativity where simulations must faithfully represent the continuum theory.
+\end{itemize}
+
+\subsection{Pragmatic Choices: Classical Tools for Constructive Analysis}
+
+Given the complexity of pure constructive formalization, why not abandon \texttt{mathlib}?
+
+\subsubsection{The Complexity Challenge}
+
+\begin{enumerate}
+\item \textbf{Nature of Analysis:} Constructive analysis requires explicit tracking of witnesses and convergence moduli. Basic principles like real number trichotomy fail without decision algorithms.
+
+\item \textbf{Library Support:} No constructive library matches \texttt{mathlib}'s scope for advanced mathematics. Building the necessary infrastructure would dwarf the GR formalization itself.
+
+\item \textbf{Project Focus:} The primary goal is Axiom Calibration of GR, not developing constructive differential geometry libraries.
+\end{enumerate}
+
+\subsubsection{Strengthening Structural Certification}
+
+While using a classical environment, we strengthen Height 0 claims through:
+
+\begin{itemize}
+\item \textbf{Axiom Auditing:} Using Lean's \texttt{\#print axioms} to inspect dependencies, ensuring Height 0 modules minimize classical principles.
+
+\item \textbf{Linter Discipline:} Forbidding explicit classical mechanisms (like \texttt{by\_contra}) within Height 0 modules, maintaining direct proof style.
+\end{itemize}
+
+\subsection{Conclusion}
+
+The AxCal project is not ``math for math's sake.'' It creates a \textbf{meta-map of GR}, rigorously identifying where the theory relies on abstract principles like AC or LEM. This clarifies limits of computability, predictability, and physical realizability.
+
+Structural Certification provides a rigorous, machine-checked framework achieving the project's primary goals while acknowledging the pragmatic use of classical tools. A formal constructive certificate remains a valuable but separate long-term goal.
+
+The methodology is sound when articulated with precision and demonstrated concretely, as we have done with the Schwarzschild vacuum verification.
+
 \end{document}
