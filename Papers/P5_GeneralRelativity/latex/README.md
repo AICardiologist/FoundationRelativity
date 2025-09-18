@@ -1,36 +1,24 @@
-# Paper 5: LaTeX Documents
+# ⚠️ OLD LaTeX Files - DO NOT USE
 
-This directory contains the LaTeX documentation for Paper 5: "Axiom Calibration for General Relativity".
+**IMPORTANT: These are OLD backup versions from September 11, 2025**
 
-## Files
+## 📍 Current LaTeX File Location
 
-- **Paper5_GR_AxCal.tex** - Main Paper 5 document: "Axiom Calibration for General Relativity (Paper 5): Empirical Axioms, Computability, and Constructive Profiles with Lean 4 Verification Plan"
+The current, active LaTeX file for Paper 5 is:
+- **`Papers/P5_GeneralRelativity/Paper5_GR_AxCal.tex`** (in the parent directory)
 
-## Compilation
+## 🗂️ Files in This Directory (OLD BACKUPS)
 
-The LaTeX file has been prepared to compile without errors:
+These files are kept for historical reference only:
+- `OLD_Paper5_GR_AxCal.tex` - Old version with lstlean package fix
+- `OLD_Paper5_GR_AxCal_backup.tex` - Even older backup
 
-```bash
-cd Papers/P5_NewDirection/latex/
-pdflatex Paper5_GR_AxCal.tex
-pdflatex Paper5_GR_AxCal.tex  # Run twice for references
-```
+## ❌ DO NOT EDIT THESE FILES
 
-## Paper Content Overview
-
-This paper applies the AxCal framework from Papers 3A/3B to General Relativity, featuring:
-
-- **GR-specific pin**: Σ₀^GR with manifolds, tensors, Einstein Field Equations
-- **Three orthogonal axes**: Choice (AC/DCω/ACω), Compactness/Kinematics (FT/WKL₀), Logic/Computability (WLPO/LEM/MP)
-- **Calibration targets (G1-G5)**: From explicit solutions (Height 0) to computable GR evolution
-- **Detailed Lean 4 verification plan**: Structural certification with imported axioms
-- **Literature integration**: Robb, Reichenbach, Ehlers-Pirani-Schild foundations
-
-## Relationship to Frozen Papers
-
-This paper builds on the complete AxCal ecosystem:
-- **Paper 3A**: Core AxCal framework (frozen at `paper3a-freeze-v1.0`)
-- **Paper 3B**: Proof-theoretic scaffold (frozen at `paper3b-freeze-v1.0`) 
-- **Paper 4**: Quantum spectral patterns (frozen at `paper4-freeze-v1.0`)
-
-The frozen foundation provides stable infrastructure for this new GR direction.
+All changes should be made to the main file in the parent directory.
+These old files do not contain recent updates including:
+- Methodological stance clarifications
+- G5 split into G5a/G5b
+- Structural Certification framing
+- DCω axis corrections
+- Current AxCal terminology

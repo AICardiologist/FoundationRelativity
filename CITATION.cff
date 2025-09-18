@@ -7,9 +7,9 @@ authors:
   orcid: "https://orcid.org/0000-0000-0000-0000"
   affiliation: "AICardiologist"
 title: "Foundation Relativity: Axiom Calibration Framework"
-version: v0.4.0
+version: "1.0.1"
 doi: 10.5281/zenodo.17054050
-date-released: 2025-09-03
+date-released: 2025-09-15
 url: "https://github.com/AICardiologist/FoundationRelativity"
 repository-code: "https://github.com/AICardiologist/FoundationRelativity"
 abstract: >-
@@ -53,3 +53,11 @@ references:
     doi: "10.5281/zenodo.17054155"
     url: "https://github.com/AICardiologist/FoundationRelativity/releases/tag/p3b-collisions-v0.2"
     notes: "Lean 4 formalization of proof-theoretic ladders and collision diagrams"
+  - type: software
+    title: "Paper 5: General Relativity AxCal Analysis"
+    authors:
+      - family-names: Lee
+        given-names: Paul Chun-Kit
+    version: "1.0.1"
+    url: "https://github.com/AICardiologist/FoundationRelativity/releases/tag/paper5-v1.0.1"
+    notes: "Maintenance: DCω→Choice axis alignment; axiom-free Schwarzschild anchor (positivity + Γ^r_{tt}≠0); portable build."

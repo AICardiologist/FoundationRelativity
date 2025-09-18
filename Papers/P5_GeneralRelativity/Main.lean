@@ -40,7 +40,7 @@ theorem Paper5_Main :
   True ∧
   True ∧
   -- Portal framework is sound
-  (∀ flags : List PortalFlag, ∃ profile : AxisProfile, True) := by
+  (∀ _ : List PortalFlag, ∃ _ : AxisProfile, True) := by
   constructor
   · exact ⟨Certificates.all_certificates, by rfl⟩
   constructor  
@@ -49,15 +49,23 @@ theorem Paper5_Main :
   · exact True.intro  
   · intro flags; exact ⟨AxisProfile.height_zero, True.intro⟩
 
-/-- Sanity summary using the local flag-based profiles (no external certificates). -/
+/-- Sanity summary using the local flag-based profiles (Diener CRM alignment). -/
 theorem Profile_Computation_Works :
-  -- Zorn portal correctly increases choice height
+  -- Zorn → Choice
   (route_to_profile [PortalFlag.uses_zorn]).hChoice = Height.one ∧
-  -- Limit curve portal correctly increases compactness height
+  -- Limit-curve → Compactness
   (route_to_profile [PortalFlag.uses_limit_curve]).hComp = Height.one ∧
-  -- Logic portals correctly increase logic height
-  (route_to_profile [PortalFlag.uses_serial_chain, PortalFlag.uses_reductio]).hLogic = Height.one := by
-  simp [route_to_profile, memFlag, eqb]
+  -- Serial-chain (DCω) → Choice
+  (route_to_profile [PortalFlag.uses_serial_chain]).hChoice = Height.one ∧
+  -- Reductio → Logic
+  (route_to_profile [PortalFlag.uses_reductio]).hLogic = Height.one := by
+  constructor
+  · simp [route_to_profile, memFlag, eqb]
+  constructor
+  · simp [route_to_profile, memFlag, eqb]
+  constructor
+  · simp [route_to_profile, memFlag, eqb]
+  · simp [route_to_profile, memFlag, eqb]
 
 -- Export key components for external use
 export AxisProfile (height_zero max)

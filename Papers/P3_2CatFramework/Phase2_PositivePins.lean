@@ -15,8 +15,8 @@ open Papers.P3.Phase2API
 /-- Positivity on a chosen set of pins `S`. -/
 def PosUniformizableOnPins
   (W : Foundation → Prop) (WF : WitnessFamily) (S : Set Sigma0) : Prop :=
-  ∃ (U : UniformizableOn W WF),
-    ∀ {F} (hF : W F) {X}, X ∈ S → Nonempty (WF.C F X)
+  ∃ (_ : UniformizableOn W WF),
+    ∀ {F} (_ : W F) {X}, X ∈ S → Nonempty (WF.C F X)
 
 /-- Old (all pins) notion is the special case `S = Set.univ`. -/
 @[simp] lemma PosUniformizableOn_univ {W : Foundation → Prop} {WF : WitnessFamily} :
@@ -42,7 +42,7 @@ lemma posUL_truth_on_iff
   {S : Set Sigma0} :
   PosUniformizableOnPins W (TruthFamily B) S
     ↔ (Nonempty (UniformizableOn W (TruthFamily B)) ∧
-        ∀ {F} (hF : W F) {X}, X ∈ S → B F X = true) := by
+        ∀ {F} (_ : W F) {X}, X ∈ S → B F X = true) := by
   constructor
   · intro h
     rcases h with ⟨U, ne⟩
@@ -64,7 +64,7 @@ theorem pos_UL_or_pointwise_on
   (B C : Foundation → Sigma0 → Bool) :
   PosUniformizableOnPins W (TruthFamily (fun F X => B F X || C F X)) S
     ↔ (Nonempty (UniformizableOn W (TruthFamily (fun F X => B F X || C F X))) ∧
-        ∀ {F} (hF : W F) {X}, X ∈ S → (B F X = true ∨ C F X = true)) := by
+        ∀ {F} (_ : W F) {X}, X ∈ S → (B F X = true ∨ C F X = true)) := by
   rw [posUL_truth_on_iff]
   constructor <;> intro h
   · refine ⟨h.1, ?_⟩
@@ -83,7 +83,7 @@ lemma pos_UL_and_on_elim_bool
   (W : Foundation → Prop) (S : Set Sigma0)
   (B C : Foundation → Sigma0 → Bool)
   (h : PosUniformizableOnPins W (TruthFamily (fun F X => B F X && C F X)) S) :
-  ∀ {F} (hF : W F) {X}, X ∈ S → (B F X = true ∧ C F X = true) := by
+  ∀ {F} (_ : W F) {X}, X ∈ S → (B F X = true ∧ C F X = true) := by
   intro F hF X hXS
   have := (posUL_truth_on_iff (W := W)
               (B := fun F X => B F X && C F X) (S := S)).1 h

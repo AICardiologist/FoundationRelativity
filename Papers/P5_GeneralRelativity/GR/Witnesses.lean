@@ -6,6 +6,13 @@ Witness families for the five GR calibration targets
 import Papers.P5_GeneralRelativity.GR.Portals
 import Papers.P5_GeneralRelativity.GR.Interfaces
 
+/-!
+  This module declares schematic witness-family signatures used by the AxCal ledger.
+  Many binders are intentionally unused in this abstract layer. We silence the
+  `unusedVariables` linter locally to keep CI noise-free.
+-/
+set_option linter.unusedVariables false
+
 namespace Papers.P5_GeneralRelativity
 open Papers.P5_GeneralRelativity
 

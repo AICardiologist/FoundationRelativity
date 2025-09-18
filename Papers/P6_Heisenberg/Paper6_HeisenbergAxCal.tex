@@ -45,6 +45,10 @@
 \newcommand{\lean}[1]{\texttt{#1}}
 \newcommand{\leanok}{\text{\tiny [✓ Lean Verified]}}
 
+% Status badges
+\newcommand{\leanaxiom}{\text{\tiny [Axiom]}}
+\newcommand{\leanpartial}{\text{\tiny [Lean-partial]}}
+
 % Physics/macros
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\C}{\mathbb{C}}
@@ -98,7 +102,7 @@ We prove that preparation uncertainty---embodied in the Robertson--Schrödinger 
 Measurement uncertainty, by contrast, demands the logical strength of Dependent Choice on $\omega$ to construct infinite measurement histories. This yields an AxCal upper bound of $(\mathbf{0},\mathbf{0},\mathbf{1})$ and reveals why sequential quantum experiments carry a fundamentally different logical cost than geometric state properties.
 \end{abstract}
 
-\begin{mdframed}[backgroundcolor=gray!10, linewidth=0pt]
+\begin{mdframed}[backgroundcolor=yellow, linewidth=0pt]
 \textbf{IMPORTANT DISCLAIMER}
 
 \textbf{A Case Study: Using Multi-AI Agents to Tackle Formal Mathematics}
@@ -144,6 +148,15 @@ Sections~\ref{sec:signatures-bridges} through~\ref{sec:Schrodinger} develop the 
 Section~\ref{sec:measurement-DC} analyzes measurement uncertainty and its reliance on Dependent Choice.
 Section~\ref{sec:implications} discusses the foundational implications of this geometric/dynamical separation.
 Technical details on the Lean formalization appear in Appendix~\ref{sec:engineering}.
+
+\paragraph{Scope \& Dependencies (CRM hygiene).}
+Unless stated otherwise, our base theory is \(\BISH\). AxCal heights are reported
+relative to the axes \((\WLPO,\FT,\DCw)\); in this paper the only nonzero axis is
+\(\DCw\) on the measurement track. All preparation‑uncertainty results (RS and
+Schrödinger) are fully constructive (height \(\langle\mathbf{0},\mathbf{0},\mathbf{0}\rangle\)).
+Measurement‑uncertainty results are stated conditionally on a foundation token
+\([{\mathrm{Has}\,\DCw}]\,\) and calibrated at \(\le \langle\mathbf{0},\mathbf{0},\boldsymbol{\omega}\rangle\) with the
+\(\DCw\) component at \(\mathbf{1}\).
 
 % ===========================================================
 \section{Background and Related Work}
@@ -214,13 +227,21 @@ Set $z := \ip{\Delta A\psi}{\Delta B\psi}$. The bridge lemma \lean{comm\_expect\
 \]
 Therefore $\abssq{\E{\comm{A}{B}}_\psi} = \abssq{z - \bar{z}}$.
 
-The exact complex identity gives us $\abssq{z - \bar{z}} \leq 4\abssq{z}$, while Cauchy--Schwarz provides
+Taking squares, the exact complex identity yields $\abssq{z - \bar{z}} \le 4\,\abssq{z}$, while Cauchy--Schwarz provides
 \[
 \abssq{z} = \abssq{\ip{\Delta A\psi}{\Delta B\psi}} \leq \norm{\Delta A\psi}^2 \norm{\Delta B\psi}^2.
 \]
 The variance identity \lean{variance\_centered} connects these norms back to the statistical variances: $\norm{\Delta A\psi}^2 = \Var_\psi(A)$ and similarly for $B$.
 
-Chaining these inequalities and multiplying by $4$ completes the proof.
+Chaining these inequalities gives
+\(
+\abssq{\E{\comm{A}{B}}_\psi}
+=\abssq{z-\bar z}
+\le 4\,\abssq{z}
+\le 4\,\|\Delta A\psi\|^2 \|\Delta B\psi\|^2
+=4\,\Var_\psi(A)\,\Var_\psi(B),
+\)
+as claimed.
 \end{proof}
 
 \begin{remark}[Classical form]
@@ -274,14 +295,14 @@ The Lean bridge \lean{acomm\_expect\_as\_sym\_centered} returns the expression $
 The sequential (disturbance) viewpoint models an experiment producing an infinite history of dependent outcomes.
 Let $H_{\mathrm{fin}}$ be the type of finite histories. Define a \emph{serial} relation $R$ by extending a history by one admissible measurement step. Seriality reflects that every measurement yields some outcome.
 
-\begin{theorem}[Serial DC$\omega$ stream]\leanok
+\begin{theorem}[Serial DC$\omega$ stream]\leanaxiom
 \label{thm:dcomega}
 Assume a foundation $F$ with token $[\mathrm{Has}\DCw\,F]$.
 From any seed in a serial relation there exists an infinite $R$-chain. In particular, the history relation above admits an infinite measurement stream.
 \emph{Lean anchors:} \lean{dcω\_stream} (axiom) and \lean{hupM\_stream\_from\_dcω} (derivation, \texttt{HUP/Witnesses.lean}).
 \end{theorem}
 
-\begin{corollary}[Calibration for HUP--M]\leanok
+\begin{corollary}[Calibration for HUP--M]\leanpartial
 \label{cor:HUPM}
 There is a witness family for measurement uncertainty whose AxCal height is bounded by $\DCwonly$.
 \emph{Lean anchor:} \lean{HUP\_M\_W} and its profile certificate in \texttt{HUP/Witnesses.lean}.

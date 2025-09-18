@@ -14,19 +14,16 @@
 % \usepackage{enumitem}  % Not available
 \usepackage{hyperref}
 \hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
-% \usepackage{mdframed} % For reproducibility box - not available
+
+% Simple frame replacement for mdframed
+\usepackage{framed}
+\newenvironment{graybox}
+  {\begin{shaded}}
+  {\end{shaded}}
 
 % === PATCH A: BEGIN (preamble additions) ======================================
-% \usepackage{booktabs}   % nicer tables - not available
-% \usepackage{array}      % column alignment helpers - not available
-% \usepackage{listings}   % code listings - not available
-% \lstset{
-%   basicstyle=\ttfamily\small,
-%   columns=fullflexible,
-%   frame=single,
-%   breaklines=true,
-%   keepspaces=true
-% }
+% For tables - using standard commands instead of booktabs
+\usepackage{array}
 
 % AxCal macros (logic axes and height shorthand)
 \newcommand{\WLPO}{\mathsf{WLPO}}
@@ -47,6 +44,15 @@
 % Lean monospace shortcut
 \newcommand{\lean}[1]{\texttt{#1}}
 \newcommand{\leanok}{\text{\tiny [✓ Lean]}}
+
+% --- Status badges (to match 3A/3B) ---
+\newcommand{\leanaxiom}{\text{\tiny [Axiom]}}
+\newcommand{\leanpartial}{\text{\tiny [Lean-partial]}}
+
+% --- FT variant and MC token used in S5 hygiene ---
+\newcommand{\FTc}{\mathsf{FAN}_{\mathrm{c}}}
+\newcommand{\MC}{\mathsf{MC}}
+\newcommand{\BDN}{\mathsf{BD}\text{-}\mathsf{N}}
 % === PATCH A: END =============================================================
 
 % Theorem environments (Standard amsthm setup)
@@ -67,8 +73,8 @@
 % Proof sketch environment
 \newenvironment{prfsketch}{\noindent\textit{Proof sketch.} }{}
 
-% Reproducibility macros
-\newcommand{\ReproBox}[1]{\begin{mdframed}[linewidth=1pt,linecolor=blue,backgroundcolor=blue!5] #1 \end{mdframed}}
+% Reproducibility macros (without mdframed)
+\newcommand{\ReproBox}[1]{\fbox{\parbox{\textwidth}{#1}}}
 \newcommand{\LeanTarget}[1]{\texttt{#1}}
 
 % -------------------------------------------------
@@ -84,15 +90,11 @@
 % Foundations and Principles
 \newcommand{\BISH}{\mathsf{BISH}}
 \newcommand{\ZFC}{\mathsf{ZFC}}
-% \newcommand{\WLPO}{\mathrm{WLPO}}  % Already defined above
-% \newcommand{\FT}{\mathrm{FT}}      % Already defined above  
-% \newcommand{\DCw}{\mathrm{DC}_\omega}  % Already defined above (as \DCw)
 \newcommand{\ACw}{\mathrm{AC}_\omega}
 \newcommand{\ACR}{\mathrm{AC}_{\mathbb{R}}}
 \newcommand{\DCR}{\mathrm{DC}_{\mathbb{R}}}
 \newcommand{\WKLz}{\mathrm{WKL}_0}
 \newcommand{\BI}{\mathrm{BI}}
-% \newcommand{\MP}{\mathrm{MP}}      % Already defined above
 \newcommand{\LEM}{\mathrm{LEM}}
 \newcommand{\UCT}{\mathrm{UCT}}
 \newcommand{\BCT}{\mathrm{BCT}}
@@ -107,6 +109,21 @@
 \newcommand{\hWLPO}{h_{\mathrm{WLPO}}}
 \newcommand{\hFT}{h_{\mathrm{FT}}}
 \newcommand{\hDC}{h_{\mathrm{DC}\omega}}
+
+% Additional commands for tables without booktabs
+\newcommand{\toprule}{\hline}
+\newcommand{\midrule}{\hline}
+\newcommand{\bottomrule}{\hline}
+
+% Additional commands
+\newcommand{\HasWLPO}{\mathsf{HasWLPO}}
+\newcommand{\HasFT}{\mathsf{HasFT}}
+\newcommand{\HasDCw}{\mathsf{HasDC}_\omega}
+\newcommand{\HasMP}{\mathsf{HasMP}}
+\newcommand{\UsesSeparationNonSep}{\mathsf{UsesSeparationNonSep}}
+\newcommand{\Requires}{\mathsf{Requires}}
+\newcommand{\ProfileUpper}{\mathsf{ProfileUpper}}
+\newcommand{\RequiresX}{\mathsf{RequiresX}}
 
 % -------------------------------------------------
 % Title
@@ -138,16 +155,19 @@ and S3 (non-separable separation) via a route-conditional \(\WLPO\) portal.
 All artifacts are mathlib-free, zero-sorry, and reproducible with composition mechanized through automatic certificate folding. The result
 is a machine-checked ledger of foundational costs for standard spectral routes in quantum mechanics,
 revealing precisely which non-constructive principles are required for various spectral properties.
+
+\medskip
+\noindent\emph{Dirac/RHS linkage.} We make explicit the route-conditional connection to Dirac's bra--ket formalism via rigged Hilbert spaces (Gelfand triples): standard separation-based constructions of generalized eigenvectors in non-separable duals incur a \WLPO\ cost (S3), while locale- or kernel-based routes can avoid it. We also note the alignment of PVM/direct-integral machinery with the \DCw\ layer (S2) and the approximative-to-exact spectrum step with the orthogonal \MP\ guard (S1).
 \end{abstract}
 % === PATCH B: END ==============================================================
 
-\begin{mdframed}[backgroundcolor=gray!10, linewidth=0pt]
+\fbox{\parbox{0.98\textwidth}{
 \textbf{IMPORTANT DISCLAIMER}
 
 \textbf{A Case Study: Using Multi-AI Agents to Tackle Formal Mathematics}
 
 This entire Lean 4 formalization project was produced by multi-AI agents working under human direction. All proofs, definitions, and mathematical structures in this repository were AI-generated. This represents a case study in using multi-AI agent systems to tackle complex formal mathematics problems with human guidance on project direction.
-\end{mdframed}
+}}
 
 \tableofcontents
 
@@ -189,6 +209,13 @@ This approach allows us to track precisely which axioms are needed for which spe
 \paragraph{What is new here.}
 Compared with earlier drafts, we (i) adopt the \emph{broader axiomatic landscape} of Paper~3A (adding $\ACw$, $\WKLz$, $\BI$, $\MP$, $\ACR/\DCR$ as survey axes), (ii) attach \emph{frontiers/profiles} to physics-salient subclaims (S0--S4), distinguishing carefully between upper bounds and precise frontiers, and (iii) publish a \emph{verification ledger} tracking Lean-feasible parts vs. literature-level inputs.
 
+\paragraph{Scope \& Dependencies (CRM hygiene).}
+Unless stated otherwise, our base is \(\BISH\) (no \(\BDN\), no \(\WKLz\)). Heights and orthogonality are relative to this base.
+When we rely on uniform continuity on \([0,1]\) (UCT), we make this explicit as either
+\(\UCT\) itself or via \(\FTc+\MC\) (and note that \(\WKLz\Rightarrow \UCT\)).
+Our FT‑gated examples therefore use \(\FTc\) (c‑bars) and, where UCT is invoked, record the
+\(\MC\) dependence; any route that already assumes \(\WKLz\) drops UCT costs automatically.
+
 % === PATCH D: BEGIN (contributions box) ======================================
 \noindent\fbox{\parbox{\textwidth}{
 \textbf{Main contributions:}
@@ -198,6 +225,7 @@ Compared with earlier drafts, we (i) adopt the \emph{broader axiomatic landscape
 \item \textbf{S0--S5 calibration:} Compact approximation, Markov spectrum, locale spatiality, WLPO portal, QHO---each with verified profile certificates.
 \item \textbf{Zero-sorry implementation:} Complete Lean 4 verification (700+ lines) with comprehensive CI testing and mathlib-free constraint.
 \item \textbf{Physics implications:} Clear separation between computational core and non-constructive layers in quantum spectral theory.
+\item \textbf{Dirac/RHS connection (route-conditional):} We identify when the Gelfand-triple route to generalized eigenvectors uses non-separable separation and thus incurs the S3 \WLPO\ portal; PVM/direct-integral steps align with the S2 \DCw\ layer; and the Spec\(_{\mathrm{approx}}=\)Spec hinge aligns with the S1 \MP\ guard.
 \end{itemize}
 }}
 % === PATCH D: END =============================================================
@@ -332,7 +360,7 @@ Let $P_V$ be the orthogonal projection onto $V$. Then $\|Tx - P_V Tx\| \leq \|Tx
 
 \textbf{Step 2: Diagonalization in finite dimension.}
 The restriction $T|_V: V \to V$ is a self-adjoint operator on the finite-dimensional space $V$. 
-By the spectral theorem for finite-dimensional self-adjoint operators (constructive via Gram-Schmidt and characteristic polynomial roots), 
+By the finite-dimensional spectral decomposition for self-adjoint operators (constructive via orthogonalization and, e.g., QR/Householder schemes or SVD), 
 we obtain orthonormal eigenvectors $\{e_1, \ldots, e_n\}$ of $T|_V$ with eigenvalues $\{\lambda_1, \ldots, \lambda_n\}$.
 
 \textbf{Step 3: Error bound.}
@@ -354,7 +382,7 @@ Let $\mathrm{Spec}_{\mathrm{approx}}(T)=\{\lambda:\forall k\ \exists v,\ \|v\|=1
 The actual spectrum $\mathrm{Spec}(T)$ consists of $\lambda$ such that $T-\lambda I$ is not invertible.
 Constructively, $\mathrm{Spec}(T) \subseteq \mathrm{Spec}_{\mathrm{approx}}(T)$. The reverse inclusion often relies on Markov's Principle ($\MP$), which asserts that if an algorithm is proven not to run forever, it must terminate (formally: $\neg\neg\exists n P(n) \to \exists n P(n)$ for decidable $P$).
 
-\begin{theorem}[Bridges--Ishihara; provenance \cite{BridgesRichman}] \leanok
+\begin{theorem}[Bridges--Ishihara; provenance \cite{BridgesRichman}] \leanpartial
 Over $\BISH$, for bounded self-adjoint $T$,
 \[
 \mathrm{Spec}_{\mathrm{approx}}(T)=\mathrm{Spec}(T)\quad \Longleftrightarrow\quad \MP.
@@ -381,9 +409,9 @@ But $T$ is not invertible if and only if $\exists n P(n)$ (otherwise $T$ has bou
 Thus $\MP$ holds.
 \end{prfsketch}
 
-\begin{proof}[Formal upper direction (Lean-feasible under $\MP$)]
+\begin{proof}[Formal upper direction (Lean)]
 The forward direction is formalized in Lean as \lean{S1\_iff\_MP} in \texttt{MarkovSpectrum.lean}.
-The converse implication establishing the equivalence with $\MP$ is taken from the literature and axiomatized.
+The converse implication is taken from the literature and recorded as an axiom in the artifact.
 \end{proof}
 
 \noindent\textbf{Profile:} Frontier $\{\MP\}$. We treat $\MP$ as orthogonal to the primary axes (WLPO, FT, DC$\omega$), as it represents a different type of non-constructivity (related to unbounded search).
@@ -462,6 +490,11 @@ It is crucial to distinguish the context:
 \end{itemize}
 \end{remark}
 
+\paragraph{RHS/Dirac link (route-conditional).}
+In the rigged Hilbert space (Gelfand triple) $\Phi \subset H \subset \Phi'$ used to formalize Dirac's bra--ket calculus, standard derivations of generalized eigenvectors proceed in the dual space $\Phi'$. When this step invokes separation/extension on the non-separable dual (e.g.\ via Hahn--Banach on a quotient or in a bidual), it matches our \textsf{uses\_separation} flag and thereby triggers the S3 \WLPO\ portal. 
+By contrast, RHS arguments confined to the pinned test space $\Phi$ (e.g.\ explicit kernel constructions for special operators) or locale-based spectral routes can avoid this portal. 
+This identifies the WLPO bill as a \emph{route cost} for the Dirac/RHS pathway rather than a cost of the spectral statement itself; see, e.g., the Gelfand--Maurin (nuclear spectral) theorem and modern RHS expositions \cite{Maurin,BohmGadella,delaMadrid}.
+
 \noindent\textbf{Profile:} Conditionally $(1,0,0)$ on the WLPO axis, determined by the \emph{proof route}. Alternative locale-based proofs typically avoid this portal.
 
 % === PATCH O: BEGIN (route-conditional portal) =================================
@@ -471,11 +504,11 @@ It is crucial to distinguish the context:
   \begin{minipage}{0.86\linewidth}
   \vspace{0.4em}
   \[
-    \frac{\;\UsesSeparationNonSep(F)\quad \HasWLPO(F)\;}{\; \SeparationRoute\_W(F)\;}
+    \frac{\;\UsesSeparationNonSep(F)\quad \HasWLPO(F)\;}{\; \mathrm{SeparationRoute\_W}(F)\;}
     \qquad\text{(portal discharge)}
   \]
   \[
-    \ProfileUpper\!\big(\WLPOonly,\;\SeparationRoute\_W\big)
+    \ProfileUpper\!\big(\WLPOonly,\;\mathrm{SeparationRoute\_W}\big)
     \quad\text{and}\quad
     \Requires(\WLPOonly,F)\iff \HasWLPO(F).
   \]
@@ -530,23 +563,19 @@ Everything is explicit and constructive: Hermite functions have closed formulas,
 
 To demonstrate the full 3-axis framework, we include an FT-gated witness:
 
-\begin{proposition}[FT portal] \leanok
+\begin{proposition}[UCT / \(\FTc+\MC\) portal] \leanok
 In certain completeness arguments (e.g., proving that $\BISH + \FT$ suffices to show every bounded linear functional on $C[0,1]$ extends to a measure via Riesz representation in the separable case), the Fan Theorem provides the necessary continuity/compactness. Profile: $(0,1,0)$.
 \end{proposition}
 
 \begin{proof}[Proof sketch]
-The Fan Theorem provides uniform continuity for functions on compact metric spaces. In the context of $C[0,1]$:
+\textbf{UCT use.} The step that replaces arbitrary \(f\in C[0,1]\) by uniform dyadic approximants
+uses \(\UCT\) (every continuous \(f:[0,1]\to\mathbb{R}\) is uniformly continuous). Over \(\BISH\),
+\(\UCT\) can be supplied either directly or via \(\FTc+\MC\); any route that already assumes
+\(\WKLz\) also supplies \(\UCT\). With UCT in hand, the dyadic approximation and consistency
+checks yield the measure and the usual representation.
 
-\textbf{Setup:} Given a bounded linear functional $\Lambda: C[0,1] \to \R$.
-
-\textbf{FT application:} For each $f \in C[0,1]$, the Fan Theorem ensures $f$ is uniformly continuous on $[0,1]$. 
-This allows us to approximate $f$ uniformly by step functions on dyadic partitions.
-
-\textbf{Measure construction:} Define the measure $\mu$ on dyadic intervals via $\mu([k2^{-n}, (k+1)2^{-n}]) = \Lambda(\chi_{[k2^{-n}, (k+1)2^{-n}]})$ where $\chi$ denotes characteristic functions. The FT ensures this extends consistently to a measure.
-
-\textbf{Riesz representation:} We obtain $\Lambda(f) = \int_0^1 f \, d\mu$ for all $f \in C[0,1]$.
-
-Without FT, we cannot guarantee the uniform continuity needed for the approximation argument, hence the $(0,1,0)$ profile.
+\textbf{Profile.} We record the FT‑axis upper bound as \((0,1,0)\) relative to \(\FTc+\MC\). On
+any ladder that already includes \(\WKLz\), this cost disappears (UCT becomes height \(0\) there).
 \end{proof}
 
 \noindent\textbf{Physics readout:} The FT axis captures scenarios where uniform continuity or compactness properties are needed beyond the constructive base. In spectral contexts, this might arise when proving density properties or establishing moduli for convergence in functional calculus constructions.
@@ -560,6 +589,16 @@ Without FT, we cannot guarantee the uniform continuity needed for the approximat
 \item \textbf{S5:} FT layer $(0,1,0)$ — completeness/continuity demonstrations
 \end{itemize}
 % === PATCH G: END =============================================================
+
+\subsection{(S6) RHS/Dirac route map (informal, route-conditional)}
+
+\noindent\textbf{Informal upper bound.} 
+For a self-adjoint $T$ on separable $H$ presented via a Gelfand triple $\Phi \subset H \subset \Phi'$, the \emph{standard} RHS route to generalized eigenvectors typically carries at most the profile
+\[
+  \langle \hone,\hzero,\hone\rangle \quad\text{with an orthogonal \MP\ guard},
+\]
+i.e.\ \WLPO\ from non-separable separation (S3), \DCw\ for spectral measures/direct integrals (S2), and \MP\ for the Spec\(_{\mathrm{approx}}=\)Spec hinge (S1). 
+\emph{Route-conditionality:} explicit kernel arguments on $\Phi$ or locale-based spectra can avoid the \WLPO\ cost. Establishing sharp lower bounds for specific RHS steps is left open.
 
 % ===========================================================
 \section{Broader axiomatic landscape for spectra}\label{sec:broad-axes}
@@ -845,6 +884,26 @@ S.~G.~Simpson.
 \newblock {\em Subsystems of Second Order Arithmetic} (2nd ed.).
 \newblock Cambridge University Press, 2009.
 
+\bibitem{Maurin}
+K.~Maurin.
+\newblock {\em Generalized Eigenfunction Expansions and Unitary Representations}.
+\newblock Polish Scientific Publishers, 1968.
+
+\bibitem{GelfandVilenkin}
+I.~M.~Gel'fand and N.~Ya.~Vilenkin.
+\newblock {\em Generalized Functions, Vol.~4: Applications of Harmonic Analysis}.
+\newblock Academic Press, 1964.
+
+\bibitem{BohmGadella}
+A.~Bohm and M.~Gadella.
+\newblock {\em Dirac Kets, Gamow Vectors and Gel'fand Triplets}.
+\newblock Springer, 1989.
+
+\bibitem{delaMadrid}
+R.~de~la~Madrid.
+\newblock The role of the rigged Hilbert space in quantum mechanics.
+\newblock {\em European Journal of Physics}, 26:287--312, 2005.
+
 \end{thebibliography}
 
 % === PATCH C: BEGIN (append before \end{document}) ============================
@@ -897,17 +956,17 @@ On profiles we compute
 \]
 requiring both WLPO and DC$\omega$. The certificate composes automatically:
 
-\begin{lstlisting}
+\begin{verbatim}
 -- Papers/P4_SpectralGeometry/Spectral/ProfileUpper.lean
 def S2_S3_ProfileUpper :
   ProfileUpper S2_S3_profile (LocaleSpatiality_W.and SeparationRoute_W) :=
   (S2_ProfileUpper.and S3_ProfileUpper)
-\end{lstlisting}
+\end{verbatim}
 
 The requirements reduce to the expected tokens:
 \[
-  \mathrm{Requires}(S2\_profile) \iff \DCw,\qquad
-  \mathrm{Requires}(S3\_profile) \iff \WLPO.
+  \mathrm{Requires}(\mathrm{S2\_profile}) \iff \DCw,\qquad
+  \mathrm{Requires}(\mathrm{S3\_profile}) \iff \WLPO.
 \]
 
 \subsection{Route-conditional WLPO portal}
@@ -915,12 +974,12 @@ We separate theorem cost from route cost. If a proof route uses non-separable
 separation, then \(\WLPO\) is required to discharge the \lean{SeparationRoute\_W}
 witness:
 
-\begin{lstlisting}
+\begin{verbatim}
 -- Papers/P4_SpectralGeometry/Spectral/RouteFlags.lean
 def PortalRequiresWLPO :
   UpperBound (fun F => HasWLPO F ∧ UsesSeparationNonSep F) SeparationRoute_W :=
 ⟨fun _ h => h.left⟩
-\end{lstlisting}
+\end{verbatim}
 
 This is a route-conditional obligation: avoiding that route may avoid \(\WLPO\).
 
@@ -1090,6 +1149,7 @@ The calibration results provide a precise map of the logical terrain underlying 
 \item \textbf{Approximation vs. exactness:} The MP layer (S1) quantifies the gap between what can be computed (approximate spectrum) and what can be decided (exact spectrum). This has practical implications for spectral algorithms in quantum chemistry and condensed matter physics.
 
 \item \textbf{Infinite-dimensional contexts:} The WLPO portal (S3) warns that certain standard techniques (separation in non-separable spaces) carry hidden decidability costs, potentially relevant to quantum field theory where non-separable spaces naturally arise.
+\item \textbf{Dirac/RHS route (route-conditional):} The Gelfand-triple pathway to generalized eigenvectors typically requires separation on the non-separable dual $\Phi'$, hence the S3 \WLPO\ portal. The measure-theoretic spectral resolution (PVMs/direct integrals) aligns with the S2 \DCw\ layer, and deciding exact spectral membership from approximants aligns with the S1 \MP\ guard. Axiom-cheap alternatives (explicit constructions on $\Phi$ or locale-based spectra) can bypass \WLPO.
 \end{itemize}
 % === PATCH I: END =============================================================
 
@@ -1108,7 +1168,7 @@ Two immediate directions:
 \section{Artifact Index}
 
 \textbf{Main Lean files:}
-\begin{itemize}[noitemsep]
+\begin{itemize}
 \item \lean{Spectral/Basic.lean} — Foundation, tokens, witness families
 \item \lean{Spectral/Profiles.lean} — 3-axis height algebra and composition  
 \item \lean{Spectral/ProfileUpper.lean} — Profile-based upper bound certificates
@@ -1137,5 +1197,3 @@ lake build Papers.P4_SpectralGeometry.Smoke  # Main target
 Development assistance provided by: Gemini 2.5 Deep Think (architecture exploration and theoretical framework design), GPT-5 Pro (Lean 4 scaffolding and implementation support), and Claude Code (repository management and development workflow).
 
 \end{document}
-
-
