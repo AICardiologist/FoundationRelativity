@@ -9,7 +9,7 @@ for file in $files; do
   # Check for non-comment sorries
   if grep -q "sorry" "$file" 2>/dev/null; then
     # Count actual non-comment sorries in this file
-    file_count=$(grep "sorry" "$file" | grep -vE "^\s*--" | wc -l | tr -d ' ')
+    file_count=$(grep "sorry" "$file" | (grep -vE "^[[:space:]]*--" || true) | wc -l | tr -d ' ')
     count=$((count + file_count))
   fi
 done

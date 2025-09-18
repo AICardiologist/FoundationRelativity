@@ -243,6 +243,62 @@ example : Schwarzschild.g_inv_tt (1 : ℝ) (3 : ℝ) < 0 := by
   have hr : 2 * (1 : ℝ) < (3 : ℝ) := by norm_num
   exact Schwarzschild.g_inv_tt_neg_of_hr (1 : ℝ) (3 : ℝ) hM hr
 
+-- Chain rule smoke tests: just verify the theorems exist
+section ChainRuleSmokeTests
+
+-- Check that the chain rule wrappers are available
+#check Schwarzschild.f_hasDerivAt_comp
+#check Schwarzschild.f_deriv_comp
+#check Schwarzschild.g_tt_hasDerivAt_comp
+#check Schwarzschild.g_tt_deriv_comp
+#check Schwarzschild.g_inv_rr_hasDerivAt_comp
+#check Schwarzschild.g_rr_hasDerivAt_comp_exterior
+#check Schwarzschild.g_inv_tt_hasDerivAt_comp_exterior
+
+end ChainRuleSmokeTests
+
+-- Effective potential smoke tests
+section EffectivePotentialSmokeTests
+
+#check Schwarzschild.Veff_timelike
+#check Schwarzschild.Veff_null
+#check Schwarzschild.Lsq_div_rsq_hasDerivAt
+#check Schwarzschild.Veff_timelike_hasDerivAt
+#check Schwarzschild.Veff_null_hasDerivAt
+#check Schwarzschild.Veff_timelike_hasDerivAt_comp
+#check Schwarzschild.Veff_null_hasDerivAt_comp
+
+end EffectivePotentialSmokeTests
+
+-- Photon sphere and circular orbit smoke tests
+section PhotonSphereAndOrbitSmokeTests
+
+#check Schwarzschild.M_sub_rf_eq_3M_sub_r
+#check Schwarzschild.Veff_null_deriv_zero_iff_exterior
+#check Schwarzschild.dVeff_null_pos_of_lt_3M
+#check Schwarzschild.dVeff_null_neg_of_gt_3M
+#check Schwarzschild.Veff_timelike_deriv_zero_iff_poly
+#check Schwarzschild.Veff_timelike_deriv_zero_iff_Lsq
+
+-- Verify the photon sphere theorem
+example (M L r : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
+  deriv (fun x => Schwarzschild.Veff_null M L x) r = 0 ↔ (L = 0 ∨ r = 3 * M) :=
+  Schwarzschild.Veff_null_deriv_zero_iff_exterior M L r hM hr
+
+-- Verify circular orbit formula (balanced polynomial form)
+example (M L r : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
+  deriv (fun x => Schwarzschild.Veff_timelike M L x) r = 0 
+  ↔ L^2 * (r - 3 * M) = M * r^2 :=
+  Schwarzschild.Veff_timelike_deriv_zero_iff_poly M L r hM hr
+
+-- Verify circular orbit formula (quotient form, requires r ≠ 3M)
+example (M L r : ℝ) (hM : 0 < M) (hr : 2 * M < r) (hr3 : r ≠ 3 * M) :
+  deriv (fun x => Schwarzschild.Veff_timelike M L x) r = 0
+  ↔ L^2 = (M * r^2) / (r - 3 * M) :=
+  Schwarzschild.Veff_timelike_deriv_zero_iff_Lsq M L r hM hr hr3
+
+end PhotonSphereAndOrbitSmokeTests
+
 end SchwarzschildSmokeChecks
 
 def Paper5_Smoke_Success : True := True.intro
