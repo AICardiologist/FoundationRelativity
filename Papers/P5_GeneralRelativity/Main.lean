@@ -25,6 +25,7 @@ import Papers.P5_GeneralRelativity.GR.Certificates
 -- Deep-dive deliverables (Height 0 anchors)
 import Papers.P5_GeneralRelativity.GR.EPSCore
 import Papers.P5_GeneralRelativity.GR.Schwarzschild
+import Papers.P5_GeneralRelativity.GR.Riemann
 import Papers.P5_GeneralRelativity.GR.Invariants
 import Papers.P5_GeneralRelativity.GR.Guardrails
 

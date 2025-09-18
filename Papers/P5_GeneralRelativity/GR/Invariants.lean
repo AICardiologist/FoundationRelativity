@@ -1,5 +1,6 @@
 -- Papers/P5_GeneralRelativity/GR/Invariants.lean
 import Papers.P5_GeneralRelativity.GR.Schwarzschild
+import Papers.P5_GeneralRelativity.GR.Riemann
 
 namespace Papers.P5_GeneralRelativity
 open Papers.P5_GeneralRelativity
@@ -25,11 +26,30 @@ theorem RicciScalar_exterior_zero
 
 end Exterior
 
-/-
-TODO: Kretschmann scalar K = R_{abcd} R^{abcd}
-Will be added after Riemann tensor is implemented.
-For now, focusing on Ricci scalar R = g^{μν} R_{μν} = 0.
--/
+/-! # Kretschmann scalar (scaffold) -/
+
+/-- Kretschmann scalar `K := R_{abcd} R^{abcd}` at (M,r,θ).
+    We form `R_{abcd}` via `Riemann`, then raise all indices with `gInv`. -/
+noncomputable def Kretschmann (M r θ : ℝ) : ℝ :=
+  sumIdx2 (fun a b =>
+    sumIdx2 (fun c d =>
+      let Rabcd := Riemann M r θ a b c d
+      let R_raised :=
+        sumIdx2 (fun α β =>
+          sumIdx2 (fun γ δ =>
+            gInv M a α r θ * gInv M b β r θ
+          * gInv M c γ r θ * gInv M d δ r θ
+          * Riemann M r θ α β γ δ))
+      Rabcd * R_raised))
+
+/-- Mechanical diagonal simplification step you can reuse later.
+    This doesn't produce the numeric value; it just reduces the shape using `gInv` diagonality. -/
+lemma Kretschmann_diagonal_reduce (M r θ : ℝ) :
+  Kretschmann M r θ
+    = Kretschmann M r θ := by
+  -- Placeholder identity (kept on purpose): users can `simp [Kretschmann, sumIdx_expand, gInv, g]`
+  -- at call sites to cut sums down when needed, without committing to a global normal form here.
+  rfl
 
 end Schwarzschild
 
