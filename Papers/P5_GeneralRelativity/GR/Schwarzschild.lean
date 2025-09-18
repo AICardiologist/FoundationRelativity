@@ -1597,42 +1597,47 @@ section RicciReductions
     classical
     unfold Ricci
 
-    -- Align the θ-trace to the ρρθ shape and rewrite it to Γ_φ_θφ.
-    have hfun :
-        (fun t : ℝ => sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ))
-      = (fun t : ℝ => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) := by
+    -- θ-trace → deriv Γ_φ_θφ, protected as Δθ
+    have htrace_eq :
+        deriv (fun t => sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ)) θ
+      = deriv (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) θ := by
+      congr 1
       funext t
-      simpa using sumIdx_trace_theta_eq (M:=M) (r:=r) (t:=t)
-
-    -- Protect the derivative of cot(θ) from unfolding.
+      simpa using sumIdx_trace_theta_eq M r t
+    rw [htrace_eq, deriv_traceGamma_θ]
     set Δθ := deriv (fun t => Γ_φ_θφ t) θ with hΔθ
 
-    -- One-step rewrite lemma turning the θ-trace derivative into Δθ.
-    have hθtrace :
-        deriv (fun t : ℝ => sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ)) θ = Δθ := by
-      -- first congrArg to derivatives, then apply the θ-trace identity, then fold to Δθ
-      have := congrArg (fun F => deriv F θ) hfun
-      -- RHS is now `deriv (fun t => sumIdx (fun ρ => Γtot … t ρ ρ θ)) θ`
-      -- apply the collapse lemma and fold with `hΔθ`
-      simpa [hΔθ, deriv_traceGamma_θ] using this
+    -- Keep the full trace folded
+    set T := Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r with hT
 
-    /- Pass 1: structure/traces.
-       Expand sums, project Γtot, expand θ-only/non-radial Γ's, and
-       use `hθtrace` to replace the θ-trace derivative by Δθ. -/
+    -- NEW: freeze the ρ-trace under ∂r so only ρ=r contributes
+    have hρ :
+        (fun s : ℝ => sumIdx (fun ρ => Γtot M s θ ρ Idx.θ Idx.θ))
+      = (fun s : ℝ => Γtot M s θ Idx.r Idx.θ Idx.θ) := by
+      funext s
+      -- allow `simp` (not `simp only`) to remove the `0 + _ + 0` scaffolding
+      simp [sumIdx_expand, Γtot]
+    have hρ' := congrArg (fun F => deriv F r) hρ
+    simp [hρ', Γtot_r_θθ]   -- first derivative term is now `deriv (fun s => Γ_r_θθ M s) r`
+
+    -- Pass 1: structural expansions only (indices & Γtot projections)
     simp [ sumIdx_expand, sumIdx2_expand, Γtot,
            Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
            Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
-           Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
-           Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ,
-           hθtrace ]
+           Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ ]
 
-    /- Pass 2: evaluate only CI-stable derivatives.
-       Use `failIfUnchanged := false` so we don't error if this step is a no-op. -/
+    -- Pass 2: safe derivatives only
     simp (config := { failIfUnchanged := false }) only
-      [deriv_const, deriv_linear, deriv_const_sub_id, deriv_neg_id_add_const]
+         [deriv_const, deriv_linear, deriv_const_sub_id, deriv_neg_id_add_const]
 
-    -- Pure algebra (keep Γ_φ_θφ symbolic).
-    rw [← hΔθ]
+    -- Normalize names/cancellations; do not expand Γ_φ_θφ here
+    simp (config := { failIfUnchanged := false }) only [hΔθ.symm]
+    simp (config := { failIfUnchanged := false }) [Γ_r_θθ, Γ_r_φφ]   -- expand only non-derivative radials
+
+    -- IMPORTANT: keep the trace folded (use hT.symm to fold, not hT)
+    simp (config := { failIfUnchanged := false }) only [hT.symm]
+    -- Light algebra, no denominator clearing here.
+    simp only [sub_eq_add_neg]
     ring
 
   /-- Canonical form for `R_{φφ}` (keep the radial derivative symbolic). -/
@@ -1643,34 +1648,36 @@ section RicciReductions
       - (Γ_r_θθ M r * Γ_φ_θφ θ + Γ_r_φφ M r θ * Γ_φ_rφ r + Γ_θ_φφ θ * Γ_r_φφ M r θ) := by
     classical
     unfold Ricci
-
-    -- As above, protect the θ-trace derivative in case it appears.
     set Δθ := deriv (fun t => Γ_φ_θφ t) θ with hΔθ
-    have hfun :
-        (fun t : ℝ => sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ))
-      = (fun t : ℝ => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) := by
-      funext t
-      simpa using sumIdx_trace_theta_eq (M:=M) (r:=r) (t:=t)
-    have hθtrace :
-        deriv (fun t : ℝ => sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ)) θ = Δθ := by
-      have := congrArg (fun F => deriv F θ) hfun
-      simpa [hΔθ, deriv_traceGamma_θ] using this
+    set T := Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r with hT
 
-    -- Pass 1: structure/traces (include hθtrace).
+    -- NEW: freeze the ρ-trace under ∂r to ρ=r
+    have hρ :
+        (fun s : ℝ => sumIdx (fun ρ => Γtot M s θ ρ Idx.φ Idx.φ))
+      = (fun s : ℝ => Γtot M s θ Idx.r Idx.φ Idx.φ) := by
+      funext s
+      simp [sumIdx_expand, Γtot]
+    have hρ' := congrArg (fun F => deriv F r) hρ
+    simp [hρ', Γtot_r_φφ]   -- first derivative term is now `deriv (fun s => Γ_r_φφ M s θ) r`
+
+    -- Pass 1: structural expansions only
     simp [ sumIdx_expand, sumIdx2_expand, Γtot,
            Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
            Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
-           Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
-           Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ,
-           hθtrace ]
+           Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ ]
 
-    -- Pass 2: safe derivatives; here the trig helper appears for Γ_θ_φφ.
+    -- Pass 2: safe derivatives (trig helper included)
     simp (config := { failIfUnchanged := false }) only
-      [deriv_const, deriv_neg_sin_mul_cos,
-       deriv_linear, deriv_const_sub_id, deriv_neg_id_add_const]
+         [deriv_const, deriv_neg_sin_mul_cos,
+          deriv_linear, deriv_const_sub_id, deriv_neg_id_add_const]
 
-    -- Pure algebra (keep Γ_φ_θφ symbolic).
-    rw [← hΔθ]
+    -- Normalize; do not expand Γ_φ_θφ
+    simp (config := { failIfUnchanged := false }) only [hΔθ.symm]
+    simp (config := { failIfUnchanged := false }) [Γ_r_θθ, Γ_r_φφ]   -- non-derivative radials only
+
+    -- Keep the trace folded
+    simp (config := { failIfUnchanged := false }) only [hT.symm]
+    simp only [sub_eq_add_neg]
     ring
 end RicciReductions
 
@@ -1706,9 +1713,7 @@ lemma deriv_Γ_r_rr
   classical
   -- 1) derivative of h(s) = s^2 * f(M,s)
   have h_sq' : HasDerivAt (fun s : ℝ => s * s) (r * 1 + 1 * r) r := by
-    have : (fun s : ℝ => s * s) = (fun s => id s * id s) := by
-      funext s; simp
-    simpa [this] using (hasDerivAt_id r).mul (hasDerivAt_id r)
+    simpa using (hasDerivAt_id' (x := r)).mul (hasDerivAt_id' (x := r))
   
   have h_sq : HasDerivAt (fun s : ℝ => s^2) (r * 1 + 1 * r) r := by
     simpa [pow_two, mul_comm, mul_left_comm, mul_assoc] using h_sq'
@@ -1745,9 +1750,9 @@ lemma deriv_Γ_r_rr
     ring_nf
 
   -- 4) substitute `f` and clear denominators
-  rw [hcompact, f]
-  field_simp [hr0, hr2M]
-  ring
+  simp [f] at hcompact ⊢
+  field_simp [hr0, hr2M] at hcompact ⊢
+  simpa [pow_two, mul_comm, mul_left_comm, mul_assoc] using hcompact
 
 /-- `∂_r Γ^r_{θθ}`. -/
 lemma deriv_Γ_r_θθ (M r : ℝ) (hr0 : r ≠ 0) :
@@ -1789,23 +1794,13 @@ lemma deriv_Γ_r_φφ (M r θ : ℝ) (hr0 : r ≠ 0) :
     exact (differentiableAt_id.sub (differentiableAt_const _)).neg
 
   -- derivative of constant * f(s): avoid typeclass noise by staying in ℝ explicitly
-  simpa [hfun, mul_comm] using
-    ((hdiff.hasDerivAt).const_mul ((Real.sin θ)^2)).deriv
+  rw [hfun]
+  simp [deriv_const_mul_field', hdiff]
 
-/-- `∂_r Γ^t_{tr}` is just M/r^2. -/
-@[simp] lemma deriv_Γ_t_tr (M r : ℝ) (hr0 : r ≠ 0) :
-  deriv (fun s => Γ_t_tr M s) r = M / r^2 := by
-  classical
-  have : (fun s => Γ_t_tr M s) = (fun s => M / s) := by
-    funext s; simp [Γ_t_tr]
-  rw [this]
-  have h : HasDerivAt (fun s : ℝ => M * s⁻¹) (M * (-1 / r^2)) r := by
-    have hid : HasDerivAt (fun s : ℝ => s) 1 r := hasDerivAt_id r
-    have hinv : HasDerivAt (fun s : ℝ => s⁻¹) (-1 / r^2) r := hid.inv hr0
-    exact hinv.const_mul M
-  have : M * (-1 / r^2) = -(M / r^2) := by ring
-  rw [HasDerivAt.deriv h, this]
-  simp [neg_neg]
+-- /-- `∂_r Γ^t_{tr}` when `Γ_t_tr M r = M / (r^2 * f M r)`. -/
+-- @[simp] lemma deriv_Γ_t_tr (M r : ℝ) (hr0 : r ≠ 0) :
+--   deriv (fun s => Γ_t_tr M s) r = -(M / r^2) := by
+--   sorry -- TODO: needs f M r ≠ 0 hypothesis
 
 
 /-- `∂_θ Γ^θ_{φφ}` in closed form. -/
@@ -1903,6 +1898,10 @@ theorem Ricci_θθ_vanishes
   rw [deriv_Γ_r_θθ M r hr0, deriv_Γ_φ_θφ_cotangent θ hsθ]
   simp [Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_φ_θφ, f]
   field_simp [hr0, hr2M, hsθ]
+  -- Use sin² + cos² = 1 to simplify
+  have h1 : Real.sin θ ^ 2 + Real.cos θ ^ 2 = 1 := Real.sin_sq_add_cos_sq θ
+  have h2 : Real.cos θ ^ 2 = 1 - Real.sin θ ^ 2 := by linarith
+  simp only [h2]
   ring
 
 /-- R_{φφ} = 0 on the exterior with θ∈(0,π). -/
@@ -1917,6 +1916,10 @@ theorem Ricci_φφ_vanishes
   rw [deriv_Γ_r_φφ M r θ hr0]
   simp [Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_r_θθ, Γ_r_φφ, Γ_φ_θφ, Γ_θ_φφ, f]
   field_simp [hr0, hr2M, hsθ]
+  -- Use sin² + cos² = 1 to simplify
+  have h1 : Real.sin θ ^ 2 + Real.cos θ ^ 2 = 1 := Real.sin_sq_add_cos_sq θ
+  have h2 : Real.cos θ ^ 2 = 1 - Real.sin θ ^ 2 := by linarith
+  simp only [h2]
   ring
 
 /-- All off-diagonal Ricci components vanish. -/
