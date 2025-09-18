@@ -58,15 +58,14 @@ def δ (n : ℕ) : c₀ →L[ℝ] ℝ :=
 
 /-- Normalized coefficient for the sign vector. -/
 def coeff (f : c₀ →L[ℝ] ℝ) (n : ℕ) : ℝ :=
-  if f (e n) = 0 then 0 else (f (e n)) / ‖f (e n)‖
+  if h : f (e n) = 0 then 0 else (f (e n)) / ‖f (e n)‖
 
 lemma abs_coeff_le_one (f : c₀ →L[ℝ] ℝ) (n : ℕ) : |coeff f n| ≤ 1 := by
   by_cases h : f (e n) = 0
   · simp [coeff, h]
-  · -- |(f/‖f‖)| = 1
-    simp only [coeff, if_neg h]
-    rw [abs_div, abs_of_pos (norm_pos_iff.mpr h)]
-    exact div_self_le_one _
+  · have : ‖f (e n)‖ ≠ 0 := by simpa [Real.norm_eq_abs, h] using (norm_ne_zero_iff.mpr (by exact h))
+    -- |(f/‖f‖)| = 1
+    simp [coeff, h, this, Real.norm_eq_abs, abs_div, abs_of_pos (norm_pos_iff.mpr (by exact h))]
 
 lemma coeff_mul_eval_abs (f : c₀ →L[ℝ] ℝ) (n : ℕ) :
     coeff f n * f (e n) = ‖f (e n)‖ := by
@@ -79,6 +78,7 @@ lemma coeff_mul_eval_abs (f : c₀ →L[ℝ] ℝ) (n : ℕ) :
     -- Since f (e n) ≠ 0, we have f (e n) ∈ ℝ \ {0}
     -- For real numbers: x * x = |x| * |x| = ‖x‖ * ‖x‖
     have : f (e n) * f (e n) = ‖f (e n)‖ * ‖f (e n)‖ := by
+      -- For reals, x * x = |x| * |x|; and ‖x‖ = |x|
       simp only [Real.norm_eq_abs]
       exact (abs_mul_abs_self _).symm
     rw [div_mul_eq_mul_div, this, mul_div_cancel_left₀]
@@ -131,7 +131,7 @@ lemma signVector_norm_le_one (f : c₀ →L[ℝ] ℝ) (F : Finset ℕ) :
       simpa [signVector_eval f F m, hm, Real.norm_eq_abs]
            using abs_coeff_le_one f m
     · -- value is 0
-      simp [signVector_eval f F m, hm]
+      simpa [signVector_eval f F m, hm]
   -- pass to the sup norm via BCF
   have : ‖ZeroAtInftyContinuousMap.toBCF (signVector f F)‖ ≤ 1 := by
     -- use the standard "pointwise ≤ r ⇒ ‖·‖ ≤ r"

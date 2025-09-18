@@ -114,7 +114,7 @@
 
 % ---------- Title and author ----------
 \title{The Bidual Gap and WLPO: A Constructive Calibration of Banach Space Non-Reflexivity}
-\author{Paul Chun-Kit Lee\thanks{Lean 4 formalization available at \leanRepo. Code archive: DOI \texttt{10.5281/zenodo.17107493}.} \\ 
+\author{Paul Chun-Kit Lee\thanks{Lean 4 formalization available at \leanRepo. Code archive available at Zenodo: DOI \texttt{10.5281/zenodo.17107493}.} \\ 
 New York University \\ 
 \texttt{dr.paul.c.lee@gmail.com}}
 \date{\today}
@@ -122,47 +122,42 @@ New York University \\
 \begin{document}
 
 \begin{abstract}
-Over Bishop-style constructive mathematics (\BISH), we identify the exact logical strength of a familiar non-reflexivity phenomenon in Banach space theory. Working in a classical meta-theory, we prove that the following are equivalent over \BISH: the Weak Limited Principle of Omniscience (\WLPO); the non-surjectivity of the canonical embedding $J_{\ell^\infty}:\ell^\infty\to(\ell^\infty)^{**}$; and the existence of a real Banach space with a bidual gap. 
-
-This equivalence builds on and refines earlier connections between variants of Hahn--Banach and omniscience principles in constructive reverse mathematics (e.g.\ work of Ishihara; Bridges--Richman; and surveys such as Diener) by isolating the \emph{bare bidual-gap statement} and locating it precisely at \WLPO. Our Lean~4 development separates the (meta-classical) witness-extraction step from the (constructive) analysis that derives \WLPO from an abstract kernel, making the logical hygiene explicit. We also include a constructively careful account of the Boolean algebra of idempotents in $\ell^\infty/c_0$ (a ``Stone window'') and finite-dimensional surrogates via Ces\`{a}ro means. 
-
-We view the contribution as modest but useful: to place a classically standard fact at an exact level in \CRM, and to provide a machine-checked record that may serve future calibrations.
+We calibrate the logical strength of Banach space non-reflexivity over Bishop-style constructive mathematics (BISH). Writing ``bidual gap'' for the failure of surjectivity of the canonical embedding $J_X\!:X\to X^{**}$, we show---\emph{in a classical metatheory}---that over $\BISH$ the following are equivalent: the Weak Limited Principle of Omniscience (WLPO); the existence of a bidual gap for some real Banach space; and, in particular, the non-surjectivity of $J_{\ell^\infty}$. The forward implication proceeds by classically extracting an Ishihara kernel (a finite tuple of functionals and a positive threshold) from a gap; the kernel-to-$\WLPO$ step is intuitionistic. Both directions are formalized in Lean~4. We also give constructive finite-dimensional surrogates via Cesàro means and a ``Stone window'' identifying idempotents of $\ell^\infty/c_0$ with almost-equality classes of subsets of $\mathbb{N}$. These results sharpen the folklore that the bidual gap is ``non-constructive'' by locating it precisely at $\WLPO$ over $\BISH$.
 \end{abstract}
 
 \maketitle
 
-\begin{mdframed}[backgroundcolor=gray!08, linewidth=0.4pt]
-\noindent\textbf{AI-Generated Formalization Disclosure.}
-This entire Lean 4 formalization project was produced by multi-AI agents working under human direction. All proofs, definitions, and mathematical structures in this repository were AI-generated. This represents a case study in using multi-AI agent systems to tackle complex formal mathematics problems with human guidance on project direction. The mathematical content has been verified through Lean's proof checker. Users should be aware that the code was AI-generated as part of an experiment in AI-assisted formal mathematics. The author provided the mathematical goals, project direction, and verification oversight, and takes full responsibility for the content.
+\begin{mdframed}[backgroundcolor=gray!10, linewidth=0pt]
+\textbf{IMPORTANT DISCLAIMER}
+
+\textbf{A Case Study: Using Multi-AI Agents to Tackle Formal Mathematics}
+
+This entire Lean 4 formalization project was produced by multi-AI agents working under human direction. All proofs, definitions, and mathematical structures in this repository were AI-generated. This represents a case study in using multi-AI agent systems to tackle complex formal mathematics problems with human guidance on project direction.
 \end{mdframed}
 
 \tableofcontents
 
 % ===========================================================
-\section{Introduction: Non-reflexivity, Constructivity, and Logical Strength}
+\section{Introduction: Foundation Relativity and Logical Calibration}
 % ===========================================================
 
-For a Banach space $X$, the canonical embedding $J_X:X\to X^{**}$ maps $x$ to evaluation at $x$. Classically, many spaces fail to be reflexive (i.e.\ $J_X$ is not surjective); for example, $\ell^\infty$ is non-reflexive via Hahn--Banach. In Bishop-style constructive mathematics (\BISH), however, the status of such facts can depend on additional logical principles. It is therefore natural, in the spirit of constructive reverse mathematics (\CRM), to ask for the \emph{precise} logical strength of non-reflexivity statements over \BISH. We emphasize that nothing here alters the classical status of these results; the point is to describe their exact logical strength \emph{over \BISH} and to record clean proofs with explicit axiom boundaries.
+\subsection{The foundation-sensitive bidual gap}
 
-Building on prior work that relates forms of Hahn--Banach to omniscience principles (notably Ishihara's calibration results and subsequent surveys), we prove that, over \BISH, the following are equivalent: \WLPO; non-surjectivity of $J_{\ell^\infty}$; and the existence of a real Banach space with a bidual gap. Our aim is modest: to make explicit, and to formalize in Lean~4, a calibration that we have not found written down in this exact form, and to present it with careful separation between meta-classical witness extraction and constructive analysis.
+For any Banach space $X$, the canonical embedding $J_X:X\to X^{**}$ maps $x\in X$ to the evaluation functional $J_X(x)(f)=f(x)$ for $f\in X^*$. A central question in functional analysis is whether $J_X$ is surjective; if not, $X$ is non-reflexive, and there exists a ``bidual gap.''
 
 \begin{definition}[Non-reflexivity and bidual gap]
 A Banach space $X$ is \textbf{non-reflexive} if the canonical embedding $J_X$ is not surjective. In this case, we say $X$ \textbf{has a bidual gap}.
 \end{definition}
 
-\subsection{Related work and positioning}
+For the space $\linf$ of bounded sequences, the answer depends on the foundational setting. In classical mathematics ($\ZFC$), the Hahn--Banach theorem implies that $J_{\linf}$ is not surjective.
 
-This paper fits into a line of results locating analytic theorems over \BISH\ at specific logical principles.
+However, in Bishop-style constructive mathematics ($\BISH$)---a system based on intuitionistic logic without the Law of Excluded Middle ($\LEM$) or full Choice---one cannot prove that this gap exists. This dependence of provability on foundations exemplifies \emph{foundation relativity}.
 
-\begin{itemize}[leftmargin=2em]
-\item \textbf{Hahn--Banach and omniscience.} Ishihara~\cite{Ishihara90,Ishihara06} and others isolated forms of Hahn--Banach that imply or are equivalent to weak omniscience principles such as \WLPO. Bridges and Richman~\cite{Bridges87} present the broader constructive context; Diener~\cite{DienerCRM} surveys \CRM\ calibrations.
+\subsection{Motivation: From independence to precise calibration}
 
-\item \textbf{Classical reverse mathematics.} Brown--Simpson~\cite{BrownSimpson86} analyzed set-existence strength behind analytic theorems in the classical base theory. Our use of a two-stage argument (meta extraction, internal analysis) mirrors that methodology in a constructive setting.
+This project began by probing whether functional-analytic ``pathologies'' might mirror independence phenomena. While no direct connection to G\"odelian incompleteness emerged, the Lean 4 formalization led to a precise calibration result: the exact logical strength of the bidual gap.
 
-\item \textbf{Non-reflexivity folklore.} That $\ell^\infty$ is non-reflexive is a textbook fact (e.g.\ \cite{ConwayFA,Megginson98,AlbiacKalton16}). The \emph{logical} content of the \emph{bare non-reflexivity statement} over \BISH\ appears not to have been recorded explicitly; our contribution is to formulate and verify the bi-implication with \WLPO. To our knowledge, the equivalence between the bare non-reflexivity statements (for $\ell^\infty$ and ``$\exists X$'') and \WLPO over \BISH\ has not been recorded explicitly; we regard the present contribution as making that calibration precise and verifiable.
-\end{itemize}
-
-Compared with the literature above, our novelty lies in identifying the exact logical strength of \emph{non-surjectivity of $J_{\ell^\infty}$ and the existence of a bidual gap} (rather than particular extension/separation schemes) exactly at \WLPO, and in making the meta-classical/constructive separation explicit and machine-checked.
+The bidual gap is not independent in the G\"odelian sense, but its provability over $\BISH$ is exactly that of a specific, weak non-constructive principle. This situates the problem within \emph{Constructive Reverse Mathematics} ($\CRM$), whose goal is to determine minimal axioms needed for classical theorems over constructive bases.
 
 \subsection{The Weak Limited Principle of Omniscience (WLPO)}
 
@@ -187,13 +182,12 @@ Over $\BISH$, the following are equivalent:
 Moreover, this equivalence is fully formalized in Lean~4 (see Section~\ref{sec:lean}).
 \end{thm}
 
-\noindent\emph{Scope.} Throughout, ``over \BISH'' means that the implication is derivable in \BISH; the meta-proof certifying the derivation may use classical reasoning (see Remark~\ref{rem:meta-classical}).
-
 Our contributions are:
 \begin{enumerate}[label=\arabic*.]
-\item \textbf{Exact location over \BISH.} Building on Ishihara's connections between Hahn--Banach and omniscience principles, we show that the \emph{bare bidual-gap statements} (for $\ell^\infty$ and $\exists X$) are each equivalent to \WLPO.
-\item \textbf{Formal verification.} A Lean~4 development makes explicit the separation between meta-classical extraction and constructive analysis, and provides an axiom audit for the consumer lemma.
-\item \textbf{Auxiliary tools.} We package a Prop-level kernel interface, a csSup treatment of partial sums suited to \BISH, and a constructively careful ``Stone window'' for $\ell^\infty/c_0$ used as a tool rather than a headline result.
+\item \textbf{Logical calibration:} an exact equivalence within $\CRM$.
+\item \textbf{Formal verification:} a complete Lean 4 formalization of both directions.
+\item \textbf{Methodology:} a Prop-level Ishihara kernel and a robust csSup treatment of partial sums.
+\item \textbf{Constructive surrogates:} explicit, verified finite-dimensional approximations via Ces\`aro means.
 \end{enumerate}
 
 % ===========================================================
@@ -207,9 +201,7 @@ We explain the equivalence between the bidual gap and $\WLPO$.
 To bridge a bidual-gap witness and a logical decision, we use an ``Ishihara kernel'', adapted from constructive reverse mathematics.
 
 \begin{defi}[Ishihara kernel]
-An \emph{Ishihara kernel} is a specific \emph{CRM witness/test object} with a sharp
-dichotomy, designed so that purely constructive analysis of its properties decides $\WLPO$.
-It consists of a normed space $X$, an element $y\in X^{**}\setminus J(X)$, a functional $f\in X^*$, a family $g:(\N\to\{0,1\})\to X^*$, and a constant $\delta>0$ such that for all binary sequences $\alpha$:
+An Ishihara kernel consists of a normed space $X$, an element $y\in X^{**}\setminus J(X)$, a functional $f\in X^*$, a family $g:(\N\to\{0,1\})\to X^*$, and a constant $\delta>0$ such that for all binary sequences $\alpha$:
 \begin{enumerate}
 \item $|y(f+g(\alpha))|=0$ or $|y(f+g(\alpha))|\ge \delta$ (dichotomy);
 \item $(\forall n,\ \alpha(n)=0)\ \Leftrightarrow\ y(f+g(\alpha))=0$ (decision property).
@@ -225,7 +217,7 @@ Given $\alpha$, compute $s=|y(f+g(\alpha))|$. By dichotomy, either $s=0$ or $s\g
 \end{proof}
 
 \begin{thm}[Gap implies $\WLPO$ (meta-classical)]\label{thm:gap-implies-wlpo}
-Working in a classical meta-theory: if some Banach space $X$ has $J:X\to X^{**}$ not surjective, 
+Working in a classical metatheory: if some Banach space $X$ has $J:X\to X^{**}$ not surjective, 
 then $\WLPO$ holds over $\BISH$.
 \end{thm}
 
@@ -257,25 +249,12 @@ Concretely, we prove the implication:
   \;\Longrightarrow\;
   \big[\BISH \vdash \WLPO\big].
 \]
-This is the standard proof strategy in Constructive Reverse Mathematics (CRM), which follows a two-part structure: \emph{meta-classical witness extraction} followed by \emph{constructive analysis of the witness}. First, operating in a meta-theory, we use non-constructive reasoning to extract a concrete witness---in our case, an Ishihara kernel---from a classical theorem. Second, we analyze this witness using only the logic of the constructive base theory ($\BISH$) to derive a non-constructive principle like $\WLPO$.
+This is the standard proof strategy in Constructive Reverse Mathematics (CRM), which follows a two-part structure that we frame using a \emph{producer/consumer} analogy \cite{Diener2018}. First, a \emph{classical producer}, operating in a meta-theory, uses non-constructive reasoning to extract a concrete ``witness''---in our case, an Ishihara kernel---from a classical theorem. Second, a \emph{constructive consumer} analyzes this witness using only the logic of the constructive base theory ($\BISH$) to derive a non-constructive principle like $\WLPO$. This pattern is conceptually analogous to models of linear logic that separate the unlimited production of resources from their disciplined consumption \cite{PousZdancewic14}, thereby clarifying how the non-constructive content of a theorem is isolated before its logical strength is measured.
 
 In the formalization, we fence the meta-classical reasoning (witness extraction and
-the case split in $g$) inside a dedicated block, and keep the kernel analysis
+the case split in $g$) inside a dedicated block, and keep the kernel consumer
 (\emph{Ishihara kernel} $\Rightarrow \WLPO$) intuitionistic. No classical axiom
 is added to the object theory. This approach follows Ishihara's original pattern for extracting logical principles from functional analysis results \cite{Ishihara90}.
-\end{rem}
-
-\begin{rem}[Terminology: \emph{witness/test object} in CRM]
-In constructive reverse mathematics (CRM), the standard phrasing for the two-stage pattern used here is:
-\emph{(meta-classical) witness extraction} followed by \emph{(constructive) analysis of the witness}.
-The specific witness we use is an \emph{Ishihara-style} test object with a sharp dichotomy
-$|y(f+g(\alpha))|=0 \;\vee\; |y(f+g(\alpha))|\ge \delta$; this is a well-known pattern for calibrating results at
-$\WLPO$ (see Ishihara~\cite{Ishihara90} and the survey~\cite{DienerCRM}).%
-\footnote{In an earlier draft we informally called this a ``producer/consumer'' split. We keep that
-metaphor out of the formal presentation and use the standard CRM terms \emph{witness extraction} and
-\emph{constructive analysis}.}
-A closely related separation of concerns is common in classical reverse mathematics, e.g.\ the work of
-Brown--Simpson~\cite{BrownSimpson86} on the set-existence strength behind analytic theorems.
 \end{rem}
 
 \paragraph{Special note (differences from an earlier draft).}
@@ -386,12 +365,12 @@ Following standard CRM (Constructive Reverse Mathematics) methodology, our forma
 separates the \emph{classical producer} from the \emph{constructive consumer}:
 
 \begin{itemize}
-\item \textbf{Meta-classical witness extraction:} The construction of the Ishihara kernel from the bidual gap,
+\item \textbf{Producer (classical):} The construction of the Ishihara kernel from the bidual gap,
   including extraction of $y \in X^{**} \setminus J(X)$, finding $h^\star$ with $\|y\|/2 < \|y(h^\star)\|$,
   and defining $g(\alpha)$ via case-splitting on the undecidable predicate $(\forall n, \alpha(n) = 0)$.
   This is fenced in \texttt{section ClassicalMeta} in \texttt{Ishihara.lean}.
 
-\item \textbf{Constructive analysis of the witness:} The theorem \texttt{WLPO\_of\_kernel} that derives $\WLPO$ 
+\item \textbf{Consumer (constructive):} The theorem \texttt{WLPO\_of\_kernel} that derives $\WLPO$ 
   from the abstract kernel properties. This is placed \emph{outside} any \texttt{noncomputable} or 
   \texttt{Classical} sections, ensuring pure intuitionistic reasoning.
 \end{itemize}
@@ -405,10 +384,8 @@ This separation can be mechanically verified in Lean:
 -- [propext, Classical.choice, Quot.sound]
 \end{lstlisting}
 
-The result properly demonstrates that in a classical meta-theory, 
+The result properly demonstrates that in a classical metatheory, 
 $\textsf{BISH} \vdash \textsf{BidualGapStrong} \Rightarrow \WLPO$.
-
-This mechanical separation is not mathematically deep, but it reduces the risk of inadvertently importing classical reasoning into the constructive core.
 
 \subsection{Reproducibility information}
 
@@ -423,7 +400,6 @@ This mechanical separation is not mathematically deep, but it reduces the risk o
       top-level target: \texttt{Papers.P2\_BidualGap.gap\_equiv\_wlpo}
 \item \textbf{Code Archive DOI}: \texttt{10.5281/zenodo.17107493}
 \item \textbf{Status}: The main equivalence builds with 0 errors. Three WLPO-conditional lemmas remain in the optional module \texttt{DualIsometriesComplete.lean} concerning completeness of certain dual spaces; they do not affect the main equivalence.
-\item \textbf{AI Generation}: See the front-page disclosure regarding the AI-generated nature of this formalization.
 \end{itemize}
 \end{mdframed}
 
@@ -550,14 +526,14 @@ The Lean development clarified axiom usage, suggested robust approaches to condi
 
 \subsection{Conclusion}
 
-We establish and formalize that detecting the bidual gap has exactly the logical strength of $\WLPO$ over $\BISH$. Finite constructive surrogates illuminate the obstruction at the infinite limit. The approach integrates constructive analysis, reverse mathematics, and mechanized verification. We do not address stronger choice principles, nor do we attempt to calibrate other classical non-reflexivity phenomena; our focus here is solely the bidual-gap statements above.
+We establish and formalize that detecting the bidual gap has exactly the logical strength of $\WLPO$ over $\BISH$. Finite constructive surrogates illuminate the obstruction at the infinite limit. The approach integrates constructive analysis, reverse mathematics, and mechanized verification.
 
 \section*{Acknowledgments}
 
-We are indebted to the constructive analysis and reverse mathematics communities for the conceptual groundwork: in particular E.~Bishop, D.~S.~Bridges, F.~Richman, and H.~Ishihara, and to surveys such as Diener's overview of constructive reverse mathematics. Discussions in the Lean and mathlib communities shaped the formalization style. Any remaining mistakes are the author's alone.
+I thank colleagues and the Lean community for discussions around constructive analysis and formal verification.
 
 \smallskip
-\noindent\textbf{AI note.} The Lean formalization was AI-generated; see the front-page disclosure for details. All results have been machine-checked in Lean~4.
+\noindent\textbf{AI assistance disclosure.} During development we used large language models as programming assistants: Google Gemini 2.5 Pro Deep Think (architectural sketching and refactor suggestions), GPT-5 Pro (Lean code scaffolding/refactoring and error-message triage), and Claude Code (build scripts and repository wiring). All suggested code and text were reviewed, edited, and verified by the author; the final mathematical claims are machine-checked by Lean~4 against mathlib. No model is credited as an author, and the author bears full responsibility for all content and any errors.
 
 \bibliographystyle{alphaurl}
 \begin{thebibliography}{10}
@@ -610,31 +586,6 @@ A.~Pous and S.~Zdancewic.
 \newblock A linear/producer/consumer model of classical linear logic.
 \newblock In \emph{Proceedings of the 29th Annual ACM/IEEE Symposium on Logic in Computer Science (LICS)}, pages 1--10. IEEE, 2014.
 
-\bibitem{BridgesVita06}
-D.~S. Bridges and L.~Vîţă.
-\newblock \emph{Techniques of Constructive Analysis}.
-\newblock Springer, 2006.
-
-\bibitem{Beeson85}
-M.~Beeson.
-\newblock \emph{Foundations of Constructive Mathematics}.
-\newblock Springer, 1985.
-
-\bibitem{TroelstraVanDalen88}
-A.~S. Troelstra and D.~van Dalen.
-\newblock \emph{Constructivism in Mathematics, Vols.~I--II}.
-\newblock North-Holland, 1988.
-
-\bibitem{ConwayFA}
-J.~B. Conway.
-\newblock \emph{A Course in Functional Analysis}.
-\newblock Springer, 2nd ed., 1990.
-
-\bibitem{Megginson98}
-R.~E. Megginson.
-\newblock \emph{An Introduction to Banach Space Theory}.
-\newblock Springer, 1998.
-
 \end{thebibliography}
 
 % ===========================================================
@@ -645,14 +596,14 @@ R.~E. Megginson.
 
 \section{Selected Lean Snippets}
 
-This appendix presents key excerpts from our Lean 4 formalization, demonstrating the witness extraction/analysis architecture and axiom hygiene discussed in the main text. These snippets are illustrative but align with the actual implementation available at \leanRepo.
+This appendix presents key excerpts from our Lean 4 formalization, demonstrating the producer/consumer architecture and axiom hygiene discussed in the main text. These snippets are illustrative but align with the actual implementation available at \leanRepo.
 
-\subsection{Constructive analysis (witness $\Rightarrow$ \texorpdfstring{$\WLPO$}{WLPO})}
+\subsection{Constructive consumer (Ishihara kernel $\to$ WLPO)}
 
-The following shows the purely constructive analysis that derives WLPO from an Ishihara kernel witness without using classical axioms:
+The following shows the purely constructive consumer that derives WLPO from an Ishihara kernel without using classical axioms:
 
-\begin{lstlisting}[caption={Constructive analysis of a witness: no classical axioms},label={lst:consumer}]
-/-! Constructive analysis: no `open Classical`, no `noncomputable`. -/
+\begin{lstlisting}[caption={Constructive consumer: no classical axioms},label={lst:consumer}]
+/-! Constructive consumer: no `open Classical`, no `noncomputable`. -/
 structure IshiharaKernel (X : Type _) [NormedAddCommGroup X] [NormedSpace ℝ X] where
   y  : (X →L[ℝ] ℝ) →L[ℝ] ℝ
   f  : X →L[ℝ] ℝ
@@ -680,12 +631,12 @@ theorem WLPO_of_kernel
     exact Or.inr this
 \end{lstlisting}
 
-\subsection{Meta-classical witness extraction (Gap $\Rightarrow$ witness)}
+\subsection{Classical producer (Gap $\to$ kernel)}
 
-The meta-classical witness extraction obtains an Ishihara kernel from a bidual gap. Note the explicit \texttt{noncomputable} and \texttt{open Classical} declarations:
+The classical producer extracts an Ishihara kernel from a bidual gap. Note the explicit \texttt{noncomputable} and \texttt{open Classical} declarations:
 
-\begin{lstlisting}[caption={Meta-classical witness extraction from a bidual gap},label={lst:producer}]
-/-! Meta-classical witness extraction: fenced. Extract a kernel from a bidual gap. -/
+\begin{lstlisting}[caption={Classical producer: extracting kernel from gap},label={lst:producer}]
+/-! Classical producer: fenced. Extract a kernel from a bidual gap. -/
 noncomputable section
 section ClassicalMeta
 open Classical
@@ -715,12 +666,12 @@ lemma exists_on_unitBall_gt_half_opNorm
   exact hT (ContinuousLinearMap.norm_eq_zero.mp this)
 \end{lstlisting}
 
-\subsection{Gap $\Rightarrow$ \texorpdfstring{$\WLPO$}{WLPO} (meta-classical bridge)}
+\subsection{Gap $\to$ WLPO (full bridge)}
 
 This shows the complete meta-classical construction:
 
 \begin{lstlisting}[caption={Meta-classical: from bidual gap to WLPO},label={lst:bridge}]
-/-- Meta-classical bridge: from a bidual gap, extract a witness and apply the constructive analysis. -/
+/-- Meta-classical: from a bidual gap, build a kernel and consume it. -/
 theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
   classical
   rcases hGap with ⟨X, Xng, Xns, Xc, _dualBan, _bidualBan, hNotSurj⟩
@@ -888,379 +839,5 @@ Finally, we can verify the axiom usage as discussed in Section~\ref{sec:axioms}:
 \end{lstlisting}
 
 The output confirms that the constructive consumer (\texttt{WLPO\_of\_kernel}) uses no classical axioms, while the meta-classical producer (\texttt{WLPO\_of\_gap}) requires classical choice. This validates our CRM methodology claim that the consumer remains purely constructive.
-
-% ===========================================================
-\section{Code--Theorem Correspondence for the Direct Dual Construction}
-% ===========================================================
-\label{app:DirectDualCorrespondence}
-
-This appendix explains how the Lean file
-\[
-\texttt{Papers/P2\_BidualGap/HB/DirectDual.lean}
-\]
-formalizes the standard ``direct construction'' used in the reverse direction (WLPO $\Rightarrow$ Gap) and in the classical non--reflexivity argument for $c_0$. Concretely, the file builds a bounded linear functional
-\[
-G : (c_0^\ast) \to \mathbb R
-\qquad\text{via}\qquad
-G(f)\;=\;\sum_{n=0}^\infty f(e_n),
-\]
-and proves that $G(\delta_m)=1$ for all $m$. From this, one derives that $G$ cannot be represented by evaluation at any $x\in c_0$, whence the canonical embedding $J_{c_0}:c_0\to c_0^{\ast\ast}$ is not surjective. The last step is carried out in the file that imports this construction (see remark at the end of this appendix).
-
-\subsection*{A. The target theorem (mathematical form)}
-
-\begin{mdframed}[backgroundcolor=gray!5,linewidth=0pt]
-\textbf{Theorem (Direct dual witness for non-surjectivity of $J_{c_0}$).}
-Define $G:(c_0^\ast)\to\mathbb{R}$ by $G(f)=\sum_{n} f(e_n)$, where $e_n\in c_0$ is the $n$-th standard basis vector and the series is absolutely convergent. Then for every $m$,
-\[
-G(\delta_m)=1.
-\]
-Consequently, if $G=J_{c_0}(x)$ for some $x\in c_0$, then $x_m=G(\delta_m)=1$ for all $m$, contradicting $x\in c_0$. Hence $G\notin \mathrm{im}(J_{c_0})$ and $J_{c_0}$ is not surjective.
-\end{mdframed}
-
-This is the classical ``basis/coordinate'' argument: the values of $G$ on the coordinate functionals force the representing vector to be the constant sequence $(1,1,\dots)$, which is not in $c_0$.
-
-\subsection*{B. Modeling choices and core definitions (Lean $\leftrightarrow$ mathematics)}
-
-We model $c_0$ over the discrete space $\mathbb N$ using the standard mathlib type:
-
-\begin{center}
-\begin{tabular}{p{0.44\textwidth} p{0.52\textwidth}}
-\toprule
-\textbf{Lean artifact} & \textbf{Mathematical meaning}\\
-\midrule
-\verb|abbrev c₀ := ZeroAtInftyContinuousMap ℕ ℝ|
-& $c_0=\{x:\mathbb N\to\mathbb R : x_n\to 0\}$ with $\|\cdot\|_\infty$ \\[2pt]
-\verb|def e (n : ℕ) : c₀ := …|
-& Basis vector $e_n$ ($1$ at $n$, $0$ elsewhere); tends to $0$ outside the singleton $\{n\}$ \\[2pt]
-\verb|def δ (n : ℕ) : c₀ →L[ℝ] ℝ := …|
-& Coordinate evaluation $\delta_n(x)=x_n$, a bounded linear functional \\[2pt]
-\verb|def coeff …|
-& Scalar $\mathrm{coeff}(f,n) = f(e_n)/\|f(e_n)\|$ (or $0$ if $f(e_n)=0$) \\[2pt]
-\verb|def signVector …|
-& Finite ``sign vector'' $\sum_{n\in F}\mathrm{coeff}(f,n)\,e_n \in c_0$ \\[2pt]
-\verb|noncomputable def G …|
-& $G(f)=\sum_n f(e_n)$ as a continuous linear functional on $c_0^\ast$ \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-The choice \verb|ZeroAtInftyContinuousMap ℕ ℝ| is mathlib's canonical $c_0$; it is isometrically the usual Banach space of real sequences tending to $0$. The proof uses the built--in sup--norm via the map \verb|toBCF| into \verb|BoundedContinuousFunction|.
-
-\subsection*{C. The ``finite signs'' inequality $\sum_{n\in F}\|f(e_n)\|\le \|f\|$}
-
-The core analytic estimate is proved exactly as on paper, using ``sign vectors'':
-\[
-x_F:=\sum_{n\in F}\mathrm{coeff}(f,n)\,e_n,\qquad \|x_F\|_\infty\le 1,\qquad
-f(x_F)=\sum_{n\in F}\|f(e_n)\|.
-\]
-In Lean this is the lemma:
-\begin{itemize}
-\item \verb|lemma finite_sum_bound … : ∑ n∈F ‖f (e n)‖ ≤ ‖f‖|,
-\end{itemize}
-which follows from:
-\begin{itemize}
-\item \verb|lemma abs_coeff_le_one …| (the sign coefficients have absolute value $\le 1$),
-\item \verb|lemma signVector_norm_le_one …| ($\|x_F\|\le 1$),
-\item \verb|lemma coeff_mul_eval_abs …| ($\mathrm{coeff}(f,n)\cdot f(e_n)=\|f(e_n)\|$).
-\end{itemize}
-The proof path is the textbook argument and matches the handwritten derivation line--by--line.
-
-\subsection*{D. Absolute summability and definition of $G$}
-
-From the finite--sum bound, Lean derives the absolute summability of $n\mapsto f(e_n)$:
-\begin{itemize}
-\item \verb|lemma summable_abs_eval … : Summable (λ n, ‖f (e n)‖)|,
-\end{itemize}
-and hence summability of $n\mapsto f(e_n)$:
-\begin{itemize}
-\item \verb|lemma summable_eval … : Summable (λ n, f (e n))|.
-\end{itemize}
-With this, the series defining $G$ exists and is used to build a continuous linear map:
-\begin{itemize}
-\item \verb|noncomputable def G : (c₀ →L[ℝ] ℝ) →L[ℝ] ℝ := …|,
-\end{itemize}
-together with the operator--norm bound
-\[
-\|G(f)\|\ \le\ \sum_n \|f(e_n)\|\ \le\ \|f\|,
-\]
-encoded in the Lipschitz proof obligation for \verb|LinearMap.mkContinuous|.
-
-\subsection*{E. Computing $G(\delta_m)=1$}
-
-The key computation is:
-\begin{itemize}
-\item \verb|lemma G_delta (m : ℕ) : G (δ m) = 1|.
-\end{itemize}
-Mathematically, $(\delta_m)(e_n)=\mathbf 1_{n=m}$, so the series is the sum of a single $1$. The Lean proof implements exactly this: it identifies the (finite) support of $n\mapsto \delta_m(e_n)$, reduces the $\mathsf{tsum}$ to a finite sum over $\{m\}$, and computes it to be $1$.
-
-\subsection*{F. From $G(\delta_m)=1$ to the non-surjectivity of $J_{c_0}$}
-
-The last step is a purely formal consequence. If $G=J_{c_0}(x)$ for some $x\in c_0$, then
-\[
-x_m \;=\; J_{c_0}(x)(\delta_m) \;=\; G(\delta_m)\;=\;1 \quad\text{for all }m,
-\]
-so $x=(1,1,\dots)\notin c_0$. Therefore $G\not\in \mathrm{im}(J_{c_0})$. In the repository this implication is proven in the file that imports \texttt{DirectDual.lean} (see the lemma named along the lines of \texttt{c0\_not\_reflexive\_via\_direct} in \texttt{HB/WLPO\_to\_Gap\_HB.lean}), where the contradiction is discharged using the evaluation identity $J_{c_0}(x)(\delta_m)=x_m$.
-
-\medskip
-\noindent\emph{Conclusion.} The sequence of Lean lemmas \texttt{finite\_sum\_bound} $\Rightarrow$ \texttt{summable\_eval} $\Rightarrow$ definition of \texttt{G} $\Rightarrow$ \texttt{G\_delta} formalizes the standard analytical argument and yields the intended witness $G\in c_0^{\ast\ast}\setminus\mathrm{im}(J_{c_0})$ once paired with the short evaluation argument above.
-
-\subsection*{G. Axiom profile and scope}
-
-The file begins with \verb|noncomputable section| and \verb|open Classical| because mathlib's infinite--sum API (\verb|tsum|) and some norm inequalities live in the classical namespace. No additional axioms are introduced by the definitions and lemmas in \texttt{DirectDual.lean}; the construction uses only:
-\begin{itemize}
-\item the discrete--space model for $c_0$ (\verb|ZeroAtInftyContinuousMap|),
-\item basic sup--norm bounds via \verb|BoundedContinuousFunction|,
-\item standard series facts (\verb|Summable|, \verb|tsum|),
-\item linearity and operator--norm estimates for continuous linear maps.
-\end{itemize}
-
-For reproducibility, an axiom audit can be inspected with:
-\begin{lstlisting}[language={},numbers=none]
-#print axioms Papers.P2.HB.G
-#print axioms Papers.P2.HB.G_delta
-#print axioms Papers.P2.HB.finite_sum_bound
-\end{lstlisting}
-which (on our build) report no extra axioms beyond classical logic used by mathlib's series machinery.
-
-\subsection*{H. Minimal crosswalk (code $\leftrightarrow$ paper)}
-
-\begin{center}
-\begin{tabular}{@{}p{0.44\textwidth} p{0.52\textwidth}@{}}
-\toprule
-\textbf{Lean name (this file)} & \textbf{Paper step} \\
-\midrule
-\verb|abbrev c₀| & $c_0$ as sequences $\to 0$ with $\|\cdot\|_\infty$ \\
-\verb|def e (n)| & Basis vector $e_n$ \\
-\verb|def δ (n)| & Coordinate functional $\delta_n$ \\
-\verb|def coeff|, \verb|def signVector| & Sign--vector device for Hölder--type bound \\
-\verb|lemma finite_sum_bound| & $\sum_{n\in F}\|f(e_n)\|\le \|f\|$ \\
-\verb|lemma summable_abs_eval|, \verb|summable_eval| & Absolute summability of $n\mapsto f(e_n)$ \\
-\verb|noncomputable def G| & $G(f)=\sum_n f(e_n)$, linear and bounded \\
-\verb|lemma G_delta| & $G(\delta_m)=1$ \\
-\textit{(importing file)} & Conclude $G\notin \mathrm{im}(J_{c_0})$ and so $J_{c_0}$ not surjective \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\paragraph{Where the final contradiction is discharged.}
-The contradiction ``$G=J_{c_0}(x)\Rightarrow x=(1,1,\dots)\notin c_0$'' is proved in the file that imports this module (Section~\ref{sec:lean}; see the lemma titled \emph{c_0 is not reflexive via direct construction}). That lemma uses only the two facts exported here: the definition of $G$ and $G(\delta_m)=1$ for all $m$.
-
-\medskip
-This establishes that the Lean development in \texttt{DirectDual.lean} exactly represents the handwritten theorem and proof structure, with each mathematical step mirrored by a named Lean definition or lemma and no elided reasoning.
-
-\section{Meta-Classical Witness Extraction and the Producer/Consumer Analogy}
-\label{app:MetaWitnessPC}
-
-This appendix explains the proof architecture in standard Constructive Reverse Mathematics (CRM) terms and clarifies the intended role of the producer/consumer metaphor.
-
-\subsection*{A. CRM terminology and proof shape}
-
-In CRM one typically proves implications of the form
-\[
-\text{(classically)}\qquad \big[\mathsf{BISH} \vdash \mathsf{Thm}\big] \;\Longrightarrow\; \big[\mathsf{BISH} \vdash \mathsf{Prin}\big],
-\]
-where the \emph{meta-proof} is classical, but the \emph{object-level} target theory is $\mathsf{BISH}$ (intuitionistic). The standard two-stage pattern is:
-\begin{enumerate}
-\item \textbf{Meta-classical witness extraction.}
-Working in classical logic \emph{about} $\mathsf{BISH}$, use the assumed theorem to \emph{produce} a concrete mathematical \emph{witness} (sometimes called a \emph{test object}) whose existence is provable in $\mathsf{BISH}$ and whose properties will be sufficient to derive the target principle.
-\item \textbf{Constructive consumption.}
-Still inside $\mathsf{BISH}$ (no classical axioms), \emph{consume} only the abstract properties of that witness to derive the logical principle.
-\end{enumerate}
-
-Formally, the meta-argument composes two $\mathsf{BISH}$-internal arrows:
-\[
-\mathsf{BISH} \vdash \big(\mathsf{Thm} \Rightarrow \exists W\,.\,\mathsf{Adequate}(W)\big)
-\quad\text{and}\quad
-\mathsf{BISH} \vdash \big(\mathsf{Adequate}(W)\Rightarrow \mathsf{Prin}\big).
-\]
-The first arrow is \emph{proved} meta-classically; the second arrow is proved intuitionistically. (See \cite{Ishihara06,DienerCRM,Ishihara90} for surveys and examples of this pattern.)
-
-\subsection*{B. The witness schema used in this paper}
-
-In our setting the witness is an \emph{Ishihara-style test object} with a sharp \emph{dichotomy} and a \emph{decision} property:
-\begin{itemize}
-\item A Banach-analytic package $W=(y,f,g,\delta)$ such that for each binary sequence $\alpha$,
-\[
-\big|y(f + g(\alpha))\big| = 0 \;\;\text{or}\;\; \delta \le \big|y(f + g(\alpha))\big|
-\]
-\[\text{and}\qquad
-\big(\forall n,\,\alpha(n)=0\big)\ \Leftrightarrow\ y(f + g(\alpha))=0.
-\]
-\item The consumer (\S\ref{sec:lean}, App.~\ref{app:DirectDualCorrespondence}) shows \emph{constructively} that this suffices to decide each WLPO instance $\alpha$.
-\end{itemize}
-
-The only logically delicate step is the \emph{extraction} of $W$ from a gap witness in the bidual, where one (i) chooses $y\in X^{**}\setminus J(X)$, (ii) obtains $h^\star\in X^\ast$ with $|y(h^\star)|>\tfrac12|y|$, and (iii) defines $g(\alpha)$ by a global case split on the undecidable predicate $(\forall n, \alpha(n)=0)$. As is standard in CRM, that case split happens in the \emph{meta-classical} part, while the consumer uses only the abstract properties of $W$ and remains intuitionistic. Compare \cite{Ishihara90} for earlier uses of such dichotomy-style witnesses and \cite{DienerCRM} for a general CRM perspective; see also \cite{BrownSimpson86} for related calibrations around Hahn--Banach.
-
-\subsection*{C. How this is organized in Lean (axiom hygiene)}
-
-We make this separation \emph{mechanical}:
-\begin{itemize}
-\item \textbf{Producer (meta-classical block).}
-In the file \texttt{CRM\_MetaClassical/Ishihara.lean}, the witness $W$ is extracted inside a fenced section
-\begin{center}
-\texttt{noncomputable section}\quad\texttt{section ClassicalMeta}\quad\texttt{open Classical}
-\end{center}
-which licenses classical reasoning needed for choice and global case splits.
-\item \textbf{Consumer (constructive block).}
-The theorem \texttt{WLPO\_of\_kernel} (App.\ref{app:DirectDualCorrespondence}, Listing\ref{lst:consumer}) lives \emph{outside} any classical section and uses no classical axioms:
-\begin{verbatim}
-#print axioms WLPO_of_kernel
--- (no axioms)
-\end{verbatim}
-\item \textbf{Audit (meta composition).}
-The bridge \texttt{WLPO\_of\_gap} composes the two $\mathsf{BISH}$-internal arrows and reports exactly the expected meta-classical footprint:
-\begin{verbatim}
-#print axioms WLPO_of_gap
--- [propext, Classical.choice, Quot.sound]
-\end{verbatim}
-\end{itemize}
-
-This confirms the intended CRM architecture: only the extraction uses classical logic; the consumption is purely constructive.
-
-\subsection*{D. The producer/consumer analogy---useful, but just an analogy}
-
-The terms ``producer'' and ``consumer'' are \emph{not} standard CRM jargon; they are metaphors we use to communicate the separation of concerns:
-\begin{itemize}
-\item The producer is the meta-classical routine that \emph{produces} a witness $W$ from the assumed theorem (here, the bidual gap).
-\item The consumer is the constructive routine that \emph{consumes} only the abstract API of $W$ to derive the target principle (here, WLPO).
-\end{itemize}
-
-This is an explanatory overlay on the standard witness-extraction pattern in CRM; our paper and code use the precise terms \emph{meta-classical witness extraction} and \emph{constructive consumption} as the primary terminology and ``producer/consumer'' only as a helpful guide.
-
-\paragraph{Relation to linear-logic intuitions (optional).}
-There is a useful conceptual parallel to resource sensitivity in linear logic: meta-classical inferences (strong resources) are confined to the extraction phase, while the consumer manipulates only the \emph{type} of $W$ (its API) using constructive rules. We do not rely on any linear-logic machinery; the connection is heuristic and pedagogical.
-
-\subsection*{E. How others use the same mechanism}
-\begin{itemize}
-\item \textbf{Ishihara (1990):} Uses an Ishihara-style dichotomy witness to calibrate variants of Hahn--Banach and omniscience principles, deriving WLPO-level consequences from analytic hypotheses \cite{Ishihara90}.
-\item \textbf{Brown--Simpson (1986):} Calibrate set-existence axioms needed for separable Hahn--Banach, a closely related program in classical reverse mathematics \cite{BrownSimpson86}.
-\item \textbf{Diener (CRM overview):} Describes the general two-stage CRM pattern (extract a witness/test object classically; analyze it constructively) across many examples \cite{DienerCRM}.
-\end{itemize}
-
-Our development follows this well-trodden schema: the specific \emph{shape} of $W$ is tailored to the bidual-gap setting (the ``Ishihara-style kernel'' used here), but the methodology is the standard CRM pattern of witness extraction and constructive consumption.
-
-\subsection*{F. Minimal formal schema (for readers comparing paper and code)}
-
-\begin{center}
-\fbox{\begin{minipage}{0.9\textwidth}
-\textbf{Meta-classical step (witness extraction).}
-\[
-\text{(classically)}\quad
-\mathsf{BISH} \vdash \Big(\mathsf{Gap}\ \Rightarrow\ \exists W\,.\,\mathsf{Adequate}(W)\Big)
-\]
-\textbf{Constructive step (witness consumption).}
-\[
-\mathsf{BISH} \vdash \Big(\mathsf{Adequate}(W)\ \Rightarrow\ \mathsf{WLPO}\Big)
-\]
-\textbf{Composition (CRM conclusion).}
-\[
-\text{(classically)}\quad
-\mathsf{BISH} \vdash \big(\mathsf{Gap}\ \Rightarrow\ \mathsf{WLPO}\big).
-\]
-\end{minipage}}
-\end{center}
-
-In our formalization, the first arrow is implemented in \texttt{Ishihara.lean} (producer block) and the second arrow is \texttt{WLPO\_of\_kernel} (consumer block). App.~\ref{app:DirectDualCorrespondence} explains how the direct dual construction (\texttt{DirectDual.lean}) supplies the complementary witness $G$ used for the reverse direction.
-
-\section{WLPO $\Rightarrow$ Bidual Gap via Direct Dual Witness $G$}
-\label{app:WLPOtoGap-Direct}
-
-This appendix documents the reverse direction of the equivalence---the direct construction of a non-representable element of $c_0^{**}$---and shows that the Lean code in
-\texttt{Papers/P2\_BidualGap/HB/WLPO\_to\_Gap\_HB.lean}
-faithfully implements the informal proof.
-
-\subsection*{A. Mathematical statement and proof sketch}
-
-Over $\mathsf{BISH}$ with $\mathsf{WLPO}$ as a hypothesis, we claim that
-$J_{c_0}:c_0\to c_0^{**}$ is not surjective.
-
-\textbf{Witness $G$.} For $f\in c_0^\ast$, write $f(e_n)$ for the evaluation of $f$ on the standard basis $e_n\in c_0$ (the function that is 1 at $n$ and 0 elsewhere). Define
-\[G(f) \;:=\; \sum_{n=0}^{\infty} f(e_n).\]
-Two key facts:
-\begin{enumerate}
-\item The series $\sum_n f(e_n)$ is absolutely summable (uniform bound on partial sums), hence $G$ is a well-defined bounded linear functional on $c_0^\ast$, i.e. $G\in (c_0^\ast)^\ast=c_0^{**}$.
-\item For the coordinate functionals $\delta_m\in c_0^\ast$ (evaluation at $m$), we have $G(\delta_m)=1$ for all $m$.
-\end{enumerate}
-
-\textbf{Contradiction.} If $G=J_{c_0}(x)$ for some $x\in c_0$, then
-$x_m=J_{c_0}(x)(\delta_m)=G(\delta_m)=1$ for all $m$, so $x$ is the constant sequence 1, which is not in $c_0$ (does not vanish at infinity). Hence $G\notin \mathrm{im}(J_{c_0})$, i.e. $J_{c_0}$ is not surjective.
-
-\subsection*{B. Lean $\leftrightarrow$ Math crosswalk}
-
-The following table matches the informal proof objects to their Lean definitions.
-
-\begin{center}
-\begin{tabular}{lll}
-\toprule
-\textbf{Mathematics} & \textbf{Lean symbol / fact} & \textbf{Where} \\
-\midrule
-The space $c_0$ on $\mathbb{N}$ & \verb|abbrev c₀ := ZeroAtInftyContinuousMap ℕ ℝ| & DirectDual.lean \\
-Basis $e_n\in c_0$ & \verb|def e (n : ℕ) : c₀| & DirectDual.lean \\
-Coordinate $\delta_m\in c_0^\ast$ & \verb|def δ (m : ℕ) : c₀ →L[ℝ] ℝ| & DirectDual.lean \\
-Witness $G(f)=\sum_n f(e_n)$ & \verb|def G : (c₀ →L[ℝ] ℝ) →L[ℝ] ℝ| & DirectDual.lean \\
-Key property $G(\delta_m)=1$ & \verb|lemma G_delta (m) : G (δ m) = 1| & DirectDual.lean \\
-Non-surjectivity of $J_{c_0}$ & \verb|lemma c0_not_reflexive_via_direct :| & WLPO\_to\_Gap\_HB.lean \\
-& \verb|  ¬ Surjective (inclusionInDoubleDual ℝ c₀)| & \\
-Packaging as BidualGapStrong & \verb|lemma wlpo_implies_gap :| & WLPO\_to\_Gap\_HB.lean \\
-& \verb|  WLPO → BidualGapStrong.{0}| & \\
-Equivalence & \verb|theorem gap_equiv_wlpo :| & WLPO\_to\_Gap\_HB.lean \\
-& \verb|  BidualGapStrong.{0} ↔ WLPO| & \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\textbf{Notes on the core steps}
-\begin{itemize}
-\item \textbf{Absolute summability:}
-DirectDual.lean proves \verb|summable_abs_eval| and \verb|summable_eval| for the sequence $n\mapsto f(e_n)$, then uses \verb|norm_tsum_le_tsum_norm| to bound $\|G\|$. This is the formal counterpart of the textbook estimate $\sum_{n\in F} |f(e_n)| \le \|f\|$ for any finite $F$.
-\item \textbf{Computing $G(\delta_m)$:}
-\verb|G_delta| reduces the tsum to a finite sum over the support, which is just $\{m\}$, and evaluates $(\delta_m)(e_m)=1$.
-\item \textbf{The contradiction:}
-In \verb|c0_not_reflexive_via_direct|, assuming surjectivity gives $x$ with $J(x)=G$. Evaluating both sides at $\delta_m$ yields $x_m=1$ for all $m$, contradicting \verb|x.zero_at_infty'| (the vanishing-at-infinity property). This is exactly the informal argument.
-\end{itemize}
-
-\subsection*{C. Where $\mathsf{WLPO}$ appears (and where it does not)}
-
-The \emph{contradiction} that $G\notin \mathrm{im}(J_{c_0})$ uses only:
-\begin{itemize}
-\item the concrete model of $c_0$,
-\item the basis $e_n$, coordinates $\delta_m$,
-\item the definition and summability of $G$, and
-\item the topological fact that elements of $c_0$ tend to 0 at infinity.
-\end{itemize}
-
-It does not use any instance of $\mathsf{WLPO}$.
-In \verb|wlpo_implies_gap| the hypothesis WLPO is threaded in only to satisfy the packaging requirements of the predicate \verb|BidualGapStrong| (see the two declarations below). The core non-representability of $G$ is independent of WLPO.
-
-\subsection*{D. On the two auxiliary axioms}
-
-The file currently contains
-\begin{verbatim}
-axiom dual_is_banach_c0_from_WLPO :
-  WLPO → DualIsBanach c₀
-
-axiom dual_is_banach_c0_dual_from_WLPO :
-  WLPO → DualIsBanach (c₀ →L[ℝ] ℝ)
-\end{verbatim}
-
-These are \emph{packaging stubs} for the fields that \verb|BidualGapStrong| asks for (completeness/Banachness of the space and its duals). They are deliberately placed here to avoid entangling the direct $G$-construction with library-level completeness proofs. Two remarks:
-\begin{enumerate}
-\item \textbf{They do not touch the core argument.}
-The contradiction $J_{c_0}(x)=G\Rightarrow x=1$ is proved in \verb|c0_not_reflexive_via_direct| \emph{without} these axioms.
-\item \textbf{They are dischargeable.}
-In mathlib, one has completeness of $E\to_L F$ once $F$ is complete, and $c_0$ is complete as a closed subspace of bounded continuous functions on a discrete space. Thus these stubs can be replaced by ordinary lemmas/instances (or the \verb|BidualGapStrong| record can be relaxed to require only the standard \verb|CompleteSpace| instances). We keep them localized here solely to decouple the direct dual argument from auxiliary typeclass plumbing.
-\end{enumerate}
-
-We highlight this so that readers can see that the formalization mirrors the informal proof structure: the hard analytic content is in DirectDual.lean; the ``gap witness packaging'' around it is orthogonal.
-
-\subsection*{E. Relation to $G=S\circ\Phi_1$ in the text}
-
-Analytically, one often identifies $c_0^\ast \cong \ell^1$ via the coordinate map $\Phi_1(f)=(f(e_n))_n$ and takes $S$ to be the summation functional on $\ell^1$. Our Lean definition of
-\[G(f)=\sum_n f(e_n)\]
-is exactly the composition $S\circ \Phi_1$ at the level of behavior, but avoids committing to the explicit $c_0^\ast\cong \ell^1$ isomorphism. This keeps the construction lightweight: we use only the unconditional summability proved in DirectDual.lean.
-
-\subsection*{F. CRM positioning (standard terms)}
-
-Unlike the Gap $\Rightarrow$ WLPO direction---where we used a meta-classical \emph{witness extraction} followed by a constructive \emph{consumer}---this WLPO $\Rightarrow$ Gap direction is a direct explicit construction: we build $G\in c_0^{**}$, prove $G\notin J(c_0)$, and then package $c_0$ as the witness space in \verb|BidualGapStrong|. The producer/consumer terminology is still a helpful mental model for the other direction, but here the proof is purely ``producer-style'': we produce the object $G$ outright.
 
 \end{document}
