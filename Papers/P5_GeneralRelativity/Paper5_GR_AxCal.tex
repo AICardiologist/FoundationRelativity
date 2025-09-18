@@ -898,7 +898,9 @@ This combination provides a machine-checked guarantee that the high-level archit
 
 One might ask: ``Is this just math for math's sake? Are we gaining genuine physical insight?''
 
-The AxCal framework offers substantial value to the foundations of physics by systematically mapping logical dependencies within GR:
+The skepticism is understandable. Physicists typically operate within a standard mathematical framework (effectively ZFC set theory with classical logic) without constantly auditing foundational axioms. Their focus is on modeling reality and making predictions.
+
+However, the AxCal framework offers substantial value to the foundations of physics. It is not merely about verifying known theorems; it is about systematically mapping the \emph{logical and axiomatic dependencies} within GR. This mapping clarifies the physical realizability, computational limits, and structural assumptions of the theory:
 
 \subsubsection{Clarifying Physics vs. Mathematical Idealization}
 
@@ -924,8 +926,20 @@ Physics strives for predictive theories. AxCal rigorously separates constructive
 
 \subsubsection{Ensuring Correctness in Critical Computations}
 
+General Relativity involves intricate tensor calculus where errors are easy to make and hard to detect. While intuition suffices for textbook problems, it often fails in extreme scenarios or complex simulations.
+
 \begin{itemize}
-\item \textbf{Verified Tensor Calculus (G1/D2):} The Schwarzschild Engine provides verified tensor manipulation. The formal proof that $R_{\mu\nu}=0$ for the Schwarzschild metric guarantees algebraic correctness. This is vital for numerical relativity where simulations must faithfully represent the continuum theory.
+\item \textbf{Verified Tensor Calculus (G1/D2):} The Schwarzschild Engine provides a verified framework for tensor manipulation. The formal proof that the Ricci tensor vanishes for the Schwarzschild metric guarantees algebraic correctness:
+
+\begin{verbatim}
+/-- R_{tt} vanishes for the Schwarzschild metric. -/
+theorem Ricci_tt_vanishes
+    (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) :
+    Ricci M r θ Idx.t Idx.t = 0 := by
+    ... -- (Verified algebraic computation)
+\end{verbatim}
+
+This provides the highest degree of trust in mathematical reasoning, ensuring predictions stem from physical assumptions rather than subtle algebraic errors. This is vital for numerical relativity and computational astrophysics, where simulations must faithfully represent the continuum theory.
 \end{itemize}
 
 \subsection{Pragmatic Choices: Classical Tools for Constructive Analysis}
@@ -954,10 +968,12 @@ While using a classical environment, we strengthen Height 0 claims through:
 
 \subsection{Conclusion}
 
-The AxCal project is not ``math for math's sake.'' It creates a \textbf{meta-map of GR}, rigorously identifying where the theory relies on abstract principles like AC or LEM. This clarifies limits of computability, predictability, and physical realizability.
+Is the Lean formalization of General Relativity just adding complexity? Yes, the process is immensely complex.
 
-Structural Certification provides a rigorous, machine-checked framework achieving the project's primary goals while acknowledging the pragmatic use of classical tools. A formal constructive certificate remains a valuable but separate long-term goal.
+Is it ``math for math's sake''? No.
 
-The methodology is sound when articulated with precision and demonstrated concretely, as we have done with the Schwarzschild vacuum verification.
+The Axiom Calibration project is not just about certifying that the mathematics is correct. It is about creating a \textbf{meta-map of the theory}. By rigorously identifying where GR relies on abstract principles like the Axiom of Choice or the Law of Excluded Middle, AxCal clarifies the limits of computability, predictability, and physical realizability within the theory. This provides genuine value to the conceptual foundations of physics, offering essential clarity as we push towards the boundaries of classical spacetime and into the realm of quantum gravity.
+
+Structural Certification provides a rigorous, machine-checked framework achieving these goals while acknowledging the pragmatic use of classical tools. The methodology is sound when articulated with precision and demonstrated concretely, as we have done with the Schwarzschild vacuum verification. A formal constructive certificate remains a valuable but separate long-term goal.
 
 \end{document}
