@@ -79,7 +79,7 @@ theorem f_derivative (M r : ℝ) (hr : r ≠ 0) :
   simpa using (f_hasDerivAt M r hr).deriv
 
 /-- Outside the horizon, positivity of `f` is equivalent to `r > 2M`. -/
-theorem f_pos_iff_r_gt_2M (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
+theorem f_pos_iff_r_gt_2M (M r : ℝ) (_hM : 0 < M) (hr : 0 < r) :
     0 < f M r ↔ 2*M < r := by
   constructor
   · -- `0 < 1 - 2M/r` ⇒ `2M/r < 1` ⇒ `2M < r`
@@ -479,18 +479,18 @@ lemma deriv_sin_sq (θ : ℝ) :
 
 /-- Derivative of a function times a constant on the right -/
 lemma deriv_const_right (c : ℝ) (f : ℝ → ℝ) (x : ℝ)
-    (hf : DifferentiableAt ℝ f x) :
+    (_hf : DifferentiableAt ℝ f x) :
   deriv (fun t => f t * c) x = deriv f x * c :=
-by simpa using deriv_mul_const (c := c) hf
+by simpa using deriv_mul_const (c := c)
 
 /-- Derivative of a constant times a function on the left -/
 lemma deriv_const_left (c : ℝ) (f : ℝ → ℝ) (x : ℝ)
-    (hf : DifferentiableAt ℝ f x) :
+    (_hf : DifferentiableAt ℝ f x) :
   deriv (fun t => c * f t) x = c * deriv f x := by
   -- rewrite to right-constant form, then apply the previous lemma
   have : (fun t => c * f t) = (fun t => f t * c) := by
     funext t; simp [mul_comm]
-  simpa [this, mul_comm] using deriv_mul_const (c := c) hf
+  simpa [this, mul_comm] using deriv_mul_const (c := c)
 
 end DerivHelpers
 
@@ -990,17 +990,17 @@ open Idx
 
 /-- Covariant metric components as a function of indices -/
 noncomputable def g (M : ℝ) : Idx → Idx → ℝ → ℝ → ℝ
-| t, t => fun r θ => -(f M r)
-| r, r => fun r θ => (f M r)⁻¹
-| θ, θ => fun r θ => r^2
+| t, t => fun r _θ => -(f M r)
+| r, r => fun r _θ => (f M r)⁻¹
+| θ, θ => fun r _θ => r^2
 | φ, φ => fun r θ => r^2 * (Real.sin θ)^2
 | _, _ => fun _ _ => 0
 
 /-- Contravariant metric components (inverse) -/
 noncomputable def gInv (M : ℝ) : Idx → Idx → ℝ → ℝ → ℝ
-| t, t => fun r θ => -(f M r)⁻¹
-| r, r => fun r θ => f M r
-| θ, θ => fun r θ => r⁻¹^2
+| t, t => fun r _θ => -(f M r)⁻¹
+| r, r => fun r _θ => f M r
+| θ, θ => fun r _θ => r⁻¹^2
 | φ, φ => fun r θ => (r * Real.sin θ)⁻¹^2
 | _, _ => fun _ _ => 0
 
@@ -1176,7 +1176,7 @@ theorem Gamma_r_θθ_from_LeviCivita
 
 /-- From Levi–Civita: Γ^r_{φφ} = -(1/2) g^{rr} ∂_r g_{φφ} = -(r - 2M) sin^2 θ. -/
 theorem Gamma_r_φφ_from_LeviCivita
-    (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (hθ : 0 < θ ∧ θ < Real.pi) :
+    (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (_hθ : 0 < θ ∧ θ < Real.pi) :
     Γ_r_φφ M r θ
       = -(1/2) * (gInv M Idx.r Idx.r r θ) * (deriv (fun s => g_φφ s θ) r) := by
   have hr0 : r ≠ 0 := r_ne_zero_of_exterior M r hM hr
@@ -1234,7 +1234,7 @@ theorem Gamma_φ_rφ_from_LeviCivita
 
 /-- From Levi–Civita: Γ^θ_{φφ} = -(1/2) g^{θθ} ∂_θ g_{φφ} = -sin θ cos θ. -/
 theorem Gamma_θ_φφ_from_LeviCivita
-    (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (hθ : 0 < θ ∧ θ < Real.pi) :
+    (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (_hθ : 0 < θ ∧ θ < Real.pi) :
     Γ_θ_φφ θ
       = -(1/2) * (gInv M Idx.θ Idx.θ r θ) * (deriv (fun t => g_φφ r t) θ) := by
   have hr0 : r ≠ 0 := r_ne_zero_of_exterior M r hM hr
@@ -1711,7 +1711,7 @@ section DerivativeHelpers
 
 /-- `∂_r Γ^r_{rr}` in closed form.  Differentiate `-(M) * (s^2 * f(M,s))⁻¹`. -/
 lemma deriv_Γ_r_rr
-    (M r : ℝ) (hr0 : r ≠ 0) (hf0 : f M r ≠ 0) (hr2M : r - 2*M ≠ 0) :
+    (M r : ℝ) (hr0 : r ≠ 0) (hf0 : f M r ≠ 0) (_hr2M : r - 2*M ≠ 0) :
   deriv (fun s => Γ_r_rr M s) r
     = (2*M*(r - M)) / (r^2 * (r - 2*M)^2) := by
   classical
@@ -1753,7 +1753,7 @@ lemma deriv_Γ_r_rr
   -- 4) substitute `f` and simplify algebra
   simp only [f]
   -- Clear denominators and normalize
-  field_simp [hr0, hr2M]
+  field_simp [hr0, _hr2M]
   -- The goal should now be provable by ring.
   ring
 
@@ -1941,7 +1941,7 @@ theorem Ricci_φφ_vanishes
 
 /-- All off-diagonal Ricci components vanish. -/
 theorem Ricci_off_diagonal_vanish
-    (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (μ ν : Idx) (h_ne : μ ≠ ν) :
+    (M r θ : ℝ) (_hM : 0 < M) (hr : 2*M < r) (μ ν : Idx) (h_ne : μ ≠ ν) :
     Ricci M r θ μ ν = 0 := by
   classical
   -- For diagonal static spherically symmetric metrics, 
