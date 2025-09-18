@@ -1618,7 +1618,8 @@ section RicciReductions
     have hρ' := congrArg (fun F => deriv F r) hρ
 
     -- Pass 1: structural expansions only (indices & Γtot projections)
-    simp [ hρ', sumIdx_expand, sumIdx2_expand, Γtot,
+    -- This will apply hρ' when it expands the sumIdx
+    simp [ sumIdx_expand, sumIdx2_expand, Γtot, hρ',
            Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
            Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
            Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ ]
@@ -1638,8 +1639,8 @@ section RicciReductions
     simp (config := { failIfUnchanged := false }) only [hT.symm]
     
     simp only [sub_eq_add_neg]
-    field_simp
     ring
+    simp [mul_comm, mul_left_comm, mul_assoc] -- normalize multiplication
 
   /-- Canonical form for `R_{φφ}` (keep the radial derivative symbolic). -/
   @[simp] lemma Ricci_φφ_reduce (M r θ : ℝ) :
@@ -1661,7 +1662,8 @@ section RicciReductions
     have hρ' := congrArg (fun F => deriv F r) hρ
 
     -- Pass 1: structural expansions only
-    simp [ hρ', sumIdx_expand, sumIdx2_expand, Γtot,
+    -- This will apply hρ' when it expands the sumIdx
+    simp [ sumIdx_expand, sumIdx2_expand, Γtot, hρ',
            Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
            Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
            Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ ]
@@ -1681,8 +1683,8 @@ section RicciReductions
     -- Keep the trace folded
     simp (config := { failIfUnchanged := false }) only [hT.symm]
     simp only [sub_eq_add_neg]
-    field_simp
     ring
+    simp [mul_comm, mul_left_comm, mul_assoc] -- normalize multiplication
 end RicciReductions
 
 section DerivativeHelpers
