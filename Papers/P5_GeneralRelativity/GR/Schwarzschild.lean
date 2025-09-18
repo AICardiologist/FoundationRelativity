@@ -1598,33 +1598,34 @@ section RicciReductions
     unfold Ricci
 
     -- θ-trace → deriv Γ_φ_θφ, protected as Δθ
-    have htrace_eq :
-        deriv (fun t => sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ)) θ
-      = deriv (fun t => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) θ := by
-      congr 1
+    have hfun :
+        (fun t : ℝ => sumIdx (fun ρ => Γtot M r t ρ Idx.θ ρ))
+      = (fun t : ℝ => sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ)) := by
       funext t
       simpa using sumIdx_trace_theta_eq M r t
-    rw [htrace_eq, deriv_traceGamma_θ]
+    
+    have htrace_eq := congrArg (fun F => deriv F θ) hfun
+    simp only [htrace_eq, deriv_traceGamma_θ]
     set Δθ := deriv (fun t => Γ_φ_θφ t) θ with hΔθ
 
-    -- Keep the full trace folded
-    set T := Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r with hT
-
-    -- NEW: freeze the ρ-trace under ∂r so only ρ=r contributes
+    -- freeze the ρ-trace under ∂r so only ρ=r contributes
     have hρ :
         (fun s : ℝ => sumIdx (fun ρ => Γtot M s θ ρ Idx.θ Idx.θ))
       = (fun s : ℝ => Γtot M s θ Idx.r Idx.θ Idx.θ) := by
       funext s
-      -- allow `simp` (not `simp only`) to remove the `0 + _ + 0` scaffolding
-      simp [sumIdx_expand, Γtot]
+      simp [sumIdx_expand, Γtot]    -- NOTE: not `simp only`
+    
+    -- Apply derivative to the ρ-trace equality
     have hρ' := congrArg (fun F => deriv F r) hρ
-    simp [hρ', Γtot_r_θθ]   -- first derivative term is now `deriv (fun s => Γ_r_θθ M s) r`
 
     -- Pass 1: structural expansions only (indices & Γtot projections)
     simp [ sumIdx_expand, sumIdx2_expand, Γtot,
            Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
            Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
-           Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ ]
+           Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ, hρ' ]
+    
+    -- Keep the full trace folded
+    set T := Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r with hT
 
     -- Pass 2: safe derivatives only
     simp (config := { failIfUnchanged := false }) only
@@ -1649,22 +1650,25 @@ section RicciReductions
     classical
     unfold Ricci
     set Δθ := deriv (fun t => Γ_φ_θφ t) θ with hΔθ
-    set T := Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r with hT
 
-    -- NEW: freeze the ρ-trace under ∂r to ρ=r
+    -- freeze the ρ-trace under ∂r so only ρ=r contributes
     have hρ :
         (fun s : ℝ => sumIdx (fun ρ => Γtot M s θ ρ Idx.φ Idx.φ))
       = (fun s : ℝ => Γtot M s θ Idx.r Idx.φ Idx.φ) := by
       funext s
-      simp [sumIdx_expand, Γtot]
+      simp [sumIdx_expand, Γtot]    -- NOTE: not `simp only`
+    
+    -- Apply derivative to the ρ-trace equality
     have hρ' := congrArg (fun F => deriv F r) hρ
-    simp [hρ', Γtot_r_φφ]   -- first derivative term is now `deriv (fun s => Γ_r_φφ M s θ) r`
 
     -- Pass 1: structural expansions only
     simp [ sumIdx_expand, sumIdx2_expand, Γtot,
            Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
            Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
-           Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ ]
+           Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ, hρ' ]
+    
+    -- Keep the full trace folded
+    set T := Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r with hT
 
     -- Pass 2: safe derivatives (trig helper included)
     simp (config := { failIfUnchanged := false }) only
