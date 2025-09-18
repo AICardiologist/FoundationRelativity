@@ -1,36 +1,51 @@
-\contentsline {section}{\numberline {1}AxCal instrumentation for GR}{2}{section.1}%
-\contentsline {subsection}{\numberline {1.1}Pinned signature $\Sigma _0^{\mathrm {GR}}$}{2}{subsection.1.1}%
-\contentsline {subsection}{\numberline {1.2}Tokens and witness families}{2}{subsection.1.2}%
+\contentsline {section}{\numberline {1}AxCal instrumentation for GR}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Pinned signature $\Sigma _0^{\mathrm {GR}}$}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Tokens and witness families}{3}{subsection.1.2}%
 \contentsline {subsection}{\numberline {1.3}Proof-route flags and portals}{3}{subsection.1.3}%
 \contentsline {subsection}{\numberline {1.4}Height certificates and composition}{3}{subsection.1.4}%
-\contentsline {section}{\numberline {2}Literature anchors mapped to portals}{3}{section.2}%
-\contentsline {section}{\numberline {3}Calibration targets (G1--G5) with AxCal profiles}{3}{section.3}%
-\contentsline {section}{\numberline {4}Auxiliary lemmas (EPS; limit-curve) with sketches}{4}{section.4}%
-\contentsline {section}{\numberline {5}Hybrid plan: structured framework + selective deep dives}{5}{section.5}%
-\contentsline {paragraph}{Structured framework (implemented).}{5}{section*.7}%
-\contentsline {paragraph}{Deep dive anchors (Height 0 demonstrations).}{5}{section*.8}%
-\contentsline {section}{\numberline {6}Calibration table (profiles at a glance)}{6}{section.6}%
-\contentsline {section}{\numberline {7}Artifact Mapping: Paper Claims to Lean Implementation}{6}{section.7}%
-\contentsline {subsection}{\numberline {7.1}Core AxCal Infrastructure}{6}{subsection.7.1}%
-\contentsline {subsection}{\numberline {7.2}GR-Specific Components}{7}{subsection.7.2}%
-\contentsline {subsection}{\numberline {7.3}Calibration Targets (G1--G5)}{7}{subsection.7.3}%
-\contentsline {subsection}{\numberline {7.4}Deep-Dive Deliverables (Height 0 Anchors)}{7}{subsection.7.4}%
-\contentsline {subsection}{\numberline {7.5}Portal Theorems}{7}{subsection.7.5}%
-\contentsline {subsection}{\numberline {7.6}Verification Infrastructure}{7}{subsection.7.6}%
-\contentsline {subsection}{\numberline {7.7}Verification Ledger}{7}{subsection.7.7}%
-\contentsline {section}{\numberline {8}Conclusion}{8}{section.8}%
-\contentsline {section}{\numberline {A}Portals and Proof–Route Flags: Soundness}{8}{appendix.A}%
-\contentsline {subsection}{\numberline {A.1}Route flags and their semantics}{9}{subsection.A.1}%
-\contentsline {subsection}{\numberline {A.2}Zorn's lemma portal (Choice axis)}{9}{subsection.A.2}%
-\contentsline {subsection}{\numberline {A.3}Limit–curve portal (Compactness axis)}{9}{subsection.A.3}%
-\contentsline {subsection}{\numberline {A.4}Serial–chain portal (Dependent Choice axis)}{10}{subsection.A.4}%
-\contentsline {subsection}{\numberline {A.5}Reductio portal (Logic axis)}{10}{subsection.A.5}%
-\contentsline {subsection}{\numberline {A.6}Portal soundness summary}{10}{subsection.A.6}%
-\contentsline {section}{\numberline {B}AxCal--Lean Ledger}{10}{appendix.B}%
-\contentsline {subsection}{\numberline {B.1}Axis tokens and portal axioms}{10}{subsection.B.1}%
-\contentsline {paragraph}{Notes.}{11}{section*.10}%
-\contentsline {subsection}{\numberline {B.2}Witness families for G1--G5}{11}{subsection.B.2}%
-\contentsline {subsection}{\numberline {B.3}Height certificates (profiles and routes)}{12}{subsection.B.3}%
-\contentsline {subsection}{\numberline {B.4}Verification table (names / profiles / portals)}{14}{subsection.B.4}%
-\contentsline {subsection}{\numberline {B.5}File map (proposed layout)}{14}{subsection.B.5}%
-\contentsline {subsection}{\numberline {B.6}Ledger policy}{14}{subsection.B.6}%
+\contentsline {subsection}{\numberline {1.5}Scope of Calibration: Portals vs. Infrastructure}{4}{subsection.1.5}%
+\contentsline {section}{\numberline {2}Literature anchors mapped to portals}{4}{section.2}%
+\contentsline {section}{\numberline {3}Calibration targets (G1--G5) with AxCal profiles}{4}{section.3}%
+\contentsline {section}{\numberline {4}Auxiliary lemmas (EPS; limit-curve) with sketches}{6}{section.4}%
+\contentsline {section}{\numberline {5}Hybrid plan: structured framework + selective deep dives}{6}{section.5}%
+\contentsline {paragraph}{Pragmatic Necessity.}{6}{section*.7}%
+\contentsline {subsection}{\numberline {5.1}Sprint 3 Milestone: Schwarzschild Vacuum Solution}{6}{subsection.5.1}%
+\contentsline {paragraph}{Structured framework (implemented).}{7}{section*.8}%
+\contentsline {paragraph}{Deep dive anchors (Height 0 demonstrations).}{7}{section*.9}%
+\contentsline {section}{\numberline {6}Calibration table (profiles at a glance)}{8}{section.6}%
+\contentsline {section}{\numberline {7}Artifact Mapping: Paper Claims to Lean Implementation}{9}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Core AxCal Infrastructure}{9}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}GR-Specific Components}{9}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Calibration Targets (G1--G5)}{9}{subsection.7.3}%
+\contentsline {subsection}{\numberline {7.4}Deep-Dive Deliverables (Height 0 Anchors)}{9}{subsection.7.4}%
+\contentsline {subsection}{\numberline {7.5}Portal Theorems}{9}{subsection.7.5}%
+\contentsline {subsection}{\numberline {7.6}Verification Infrastructure}{10}{subsection.7.6}%
+\contentsline {subsection}{\numberline {7.7}Verification Ledger}{10}{subsection.7.7}%
+\contentsline {section}{\numberline {8}Conclusion}{10}{section.8}%
+\contentsline {paragraph}{Future Work.}{10}{section*.10}%
+\contentsline {section}{\numberline {A}Portals and Proof–Route Flags: Soundness}{11}{appendix.A}%
+\contentsline {subsection}{\numberline {A.1}Route flags and their semantics}{11}{subsection.A.1}%
+\contentsline {subsection}{\numberline {A.2}Zorn's lemma portal (Choice axis)}{11}{subsection.A.2}%
+\contentsline {subsection}{\numberline {A.3}Limit–curve portal (Compactness axis)}{11}{subsection.A.3}%
+\contentsline {subsection}{\numberline {A.4}Serial–chain portal (Dependent Choice axis)}{12}{subsection.A.4}%
+\contentsline {subsection}{\numberline {A.5}Reductio portal (Logic axis)}{12}{subsection.A.5}%
+\contentsline {subsection}{\numberline {A.6}Portal soundness summary}{12}{subsection.A.6}%
+\contentsline {section}{\numberline {B}AxCal--Lean Ledger}{12}{appendix.B}%
+\contentsline {subsection}{\numberline {B.1}Axis tokens and portal axioms}{13}{subsection.B.1}%
+\contentsline {paragraph}{Notes.}{13}{section*.13}%
+\contentsline {subsection}{\numberline {B.2}Witness families for G1--G5}{13}{subsection.B.2}%
+\contentsline {subsection}{\numberline {B.3}Height certificates (profiles and routes)}{14}{subsection.B.3}%
+\contentsline {subsection}{\numberline {B.4}Verification table (names / profiles / portals)}{16}{subsection.B.4}%
+\contentsline {subsection}{\numberline {B.5}File map (proposed layout)}{16}{subsection.B.5}%
+\contentsline {subsection}{\numberline {B.6}Ledger policy}{16}{subsection.B.6}%
+\contentsline {section}{\numberline {C}Methodological Discussion: Structural Certification and Physical Insight}{16}{appendix.C}%
+\contentsline {subsection}{\numberline {C.1}Defending Structural Certification}{16}{subsection.C.1}%
+\contentsline {subsection}{\numberline {C.2}Physical Value of Axiom Calibration}{17}{subsection.C.2}%
+\contentsline {subsubsection}{\numberline {C.2.1}Clarifying Physics vs. Mathematical Idealization}{17}{subsubsection.C.2.1}%
+\contentsline {subsubsection}{\numberline {C.2.2}The Crisis of Computability}{17}{subsubsection.C.2.2}%
+\contentsline {subsubsection}{\numberline {C.2.3}Grounding Theory in Observables}{17}{subsubsection.C.2.3}%
+\contentsline {subsubsection}{\numberline {C.2.4}Ensuring Correctness in Critical Computations}{18}{subsubsection.C.2.4}%
+\contentsline {subsection}{\numberline {C.3}Pragmatic Choices: Classical Tools for Constructive Analysis}{18}{subsection.C.3}%
+\contentsline {subsubsection}{\numberline {C.3.1}The Complexity Challenge}{18}{subsubsection.C.3.1}%
+\contentsline {subsubsection}{\numberline {C.3.2}Strengthening Structural Certification}{18}{subsubsection.C.3.2}%
+\contentsline {subsection}{\numberline {C.4}Conclusion}{18}{subsection.C.4}%

@@ -31,6 +31,8 @@
 
 🚀 **CURRENT DEVELOPMENT**: 
 • **Paper 5 (General Relativity AxCal)**: ✅ **COMPLETE** - Axiom calibration for Einstein Field Equations, GR pin (Σ₀^GR), three orthogonal axes (0 sorries)
+  - **Sprint 3 Complete**: Full symbolic verification of Schwarzschild vacuum solution
+  - All Christoffel symbols computed, Ricci tensor vanishing proved (R_μν = 0)
 
 ## 🎯 Overview
 
@@ -93,6 +95,10 @@ A Lean 4 formalization project that calibrates the exact logical strength requir
    - GR pin (Σ₀^GR): Manifolds, tensors, Einstein tensor
    - Three orthogonal axes: Choice (AC/DCω/ACω), Compactness/Kinematics (FT/WKL₀), Logic/Computability (WLPO/LEM/MP)
    - Targets G1-G5: Explicit solutions → Computable GR evolution
+   - **Sprint 3 Milestone**: Complete Schwarzschild vacuum solution
+     - All 9 non-zero Christoffel symbols: Γ^t_{tr}, Γ^r_{tt}, Γ^r_{rr}, Γ^r_{θθ}, Γ^r_{φφ}, Γ^θ_{rθ}, Γ^θ_{φφ}, Γ^φ_{rφ}, Γ^φ_{θφ}
+     - Full Ricci tensor computation via contracted Bianchi identity
+     - Vacuum verification: R_{μν} = 0 for Schwarzschild metric with f(r) = 1 - 2M/r
    - Portal→Profile mappings (v1.0.1):
      - Zorn → (1,0,0) on Choice axis
      - Serial-Chain (DCω) → (1,0,0) on Choice axis

@@ -1,9 +1,17 @@
-/-
+import Papers.P5_GeneralRelativity.GR.Interfaces
+
+/-!
+# EPS Kinematics Core (Deep Dive D1)
+
+## Methodological Stance: Structural Certification
+The underlying mathematics for EPS kinematics is constructive (Mathematical Height 0). However, this 
+implementation uses classical infrastructure from `mathlib` (Infrastructural Cost) for 
+pragmatic reasons. This artifact provides *Structural Certification* (verifying the absence 
+of high-level portals) rather than a formal foundational proof in BISH. (See Paper 5, Section 1.5).
+
 Paper 5: General Relativity AxCal Analysis - EPS Kinematics Core
 Deep-dive deliverable D1: Ehlers-Pirani-Schild constructive kinematics (Height 0)
 -/
-
-import Papers.P5_GeneralRelativity.GR.Interfaces
 
 namespace Papers.P5_GeneralRelativity
 open Papers.P5_GeneralRelativity

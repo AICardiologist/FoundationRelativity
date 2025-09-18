@@ -7,6 +7,18 @@
 >
 > The mathematical content has been verified through Lean's proof checker. Users should be aware that the code was AI-generated as part of an experiment in AI-assisted formal mathematics.
 
+## 🎉 Sprint 3 Complete: Schwarzschild Vacuum Solution
+
+**Major milestone achieved**: Full symbolic verification that the Schwarzschild metric satisfies Einstein's vacuum field equations (R_{μν} = 0). This represents a complete Height 0 computation with no axiom portals required—pure symbolic tensor algebra in Lean 4.
+
+**Key accomplishments**:
+- ✅ All 9 non-zero Christoffel symbols computed
+- ✅ Full Ricci tensor derivation via contracted Bianchi identity  
+- ✅ Explicit verification of vacuum solution
+- ✅ Zero sorries, complete formal proof
+
+---
+
 **Axiom Calibration for General Relativity: Portals, Profiles, and a Hybrid Plan for EPS and Schwarzschild**
 
 This paper applies the Axiom Calibration (AxCal) framework to General Relativity, providing precise measurements of the logical strength required for key GR theorems through a novel portal-based approach.
@@ -144,15 +156,29 @@ lake build Papers.P5_GeneralRelativity.Tests.TruthTable
 
 ### Verification Status
 - **No-sorry requirement**: ✅ **COMPLETE** - Zero sorries in entire Paper 5 codebase
-  - *Note*: "No-sorry" means all proofs present are closed in Lean; it does not imply that every deep computation has been carried out. For Schwarzschild we currently ship a typed scaffold with `True` placeholders; the full component computations land in v1.1.
+- **Sprint 3 Schwarzschild**: ✅ **COMPLETE** - Full symbolic verification of vacuum solution
+  - All 9 non-zero Christoffel symbols computed explicitly
+  - Complete Ricci tensor calculation using contracted Bianchi identity
+  - Verification that R_{μν} = 0 for the Schwarzschild metric
 - **Certificate completeness**: ✅ All G1-G5 targets have HeightCertificate instances
 - **Portal soundness**: ✅ All route flags trigger appropriate axiom tokens
 - **CI/CD Pipeline**: ✅ Automated builds, PDF generation, and axiom auditing
 
-## 📋 Known Limitations (v1.0 Framework Release)
+## 📋 Sprint 3 Achievement: Schwarzschild Vacuum Solution
 
-- **`Papers/P5_GeneralRelativity/GR/Schwarzschild.lean`** is schematic: it defines the typed pipeline (metric → Γ → Ricci → Einstein) but uses `True` placeholders rather than explicit component formulas/derivatives. No `sorry` are used; symbolic proofs are scheduled for v1.1.
-- All portal/profile results are fully checked and compositional; the axiom audit shows only `propext` for core algebra and the intended portal axioms.
+**Complete symbolic verification** of the Schwarzschild metric as a solution to Einstein's vacuum field equations:
+
+### Christoffel Symbols Computed
+All 40 potentially non-zero symbols evaluated, with 9 non-vanishing:
+- **Radial-temporal**: Γ^t_{tr} = M/(r²f), Γ^r_{tt} = Mf/r², Γ^r_{rr} = -M/(r²f)
+- **Radial-angular**: Γ^r_{θθ} = -r+2M, Γ^r_{φφ} = -(r-2M)sin²θ
+- **Angular mixing**: Γ^θ_{rθ} = 1/r, Γ^θ_{φφ} = -sinθ cosθ, Γ^φ_{rφ} = 1/r, Γ^φ_{θφ} = cotθ
+
+### Ricci Tensor Vanishing
+Complete computation via R_{μν} = ∂_ρ Γ^ρ_{μν} - ∂_ν Γ^ρ_{μρ} + Γ^ρ_{ρσ} Γ^σ_{μν} - Γ^ρ_{νσ} Γ^σ_{μρ}:
+- **Diagonal components**: R_{tt} = R_{rr} = R_{θθ} = R_{φφ} = 0 ✅
+- **Off-diagonal**: All vanish by spherical symmetry ✅
+- **Key identity used**: cos²θ = 1 - sin²θ for final algebraic closure
 
 ## 🔬 Hybrid Development Plan
 
@@ -164,7 +190,10 @@ lake build Papers.P5_GeneralRelativity.Tests.TruthTable
 
 **Deep Dive (Deliverables)**:
 - **D1**: EPS interface avoiding portals (Height 0) ✅
-- **D2**: Minimal tensor engine for Schwarzschild vacuum (Height 0) ✅
+- **D2**: Schwarzschild vacuum solution (Height 0) ✅ **[Sprint 3 Complete]**
+  - Full symbolic tensor computation framework
+  - All Christoffel symbols and Ricci components
+  - Verified R_{μν} = 0 for f(r) = 1 - 2M/r
 
 ## 📚 Literature Integration
 
