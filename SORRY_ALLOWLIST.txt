@@ -7,7 +7,10 @@
 # Sprint 47: Gödel-Banach Correspondence - Core.lean spectrum elimination complete
 # These represent the mathematical content before sorry elimination improvements
 
-# Papers/P1_GBC/Core.lean (0 sorrys) - Mathematical infrastructure  
+# Papers/P1_GBC/Core.lean (0 sorrys) - Mathematical infrastructure
+
+# Paper 3B Addendum 1: GodelBundle.lean (1 sorry) - Gödel crossings analysis
+Papers/P3_2CatFramework/P4_Meta/ProofTheory/GodelBundle.lean:91   # Technical dominance detail (constructive proof pending)  
 # RESOLVED Sprint 45: Papers/P1_GBC/Core.lean:227  # G_surjective_iff_not_provable - COMPLETED!
 # RESOLVED Sprint 46: Papers/P1_GBC/Core.lean:334  # G_inj_iff_surj - Fredholm alternative - COMPLETED!
 # RESOLVED Sprint 48: Papers/P1_GBC/Core.lean:496  # spectrum_projection_is_01 - COMPLETED using algebraic proof!

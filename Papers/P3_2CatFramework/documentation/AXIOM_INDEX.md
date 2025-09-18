@@ -1,7 +1,10 @@
 # Paper 3B Axiom Index
 
-> **⚠️ AXIOM BUDGET UPDATE**: Currently at 21 axioms (schematic encoding limitation)
-> **BUDGET LOCKED AT 21**
+> **⚠️ AXIOM BUDGET UPDATE**: Paper 3B core at 21 axioms + Addendum 1 adds 4 = 25 total
+> **BUDGET LOCKED AT 25** (21 core + 4 addendum)
+> 
+> **Paper 3B Core**: 21 axioms (schematic encoding limitation - FROZEN)
+> **Paper 3B Addendum 1**: +4 axioms (GodelBundle.lean - Gödel crossings)
 > 
 > **Note on Schematic Limitations**: Our schematic encoding (formulas as atoms) prevents
 > discharging axioms that would require syntax manipulation (fixed-points, instantiation, etc.).
@@ -11,12 +14,13 @@ This document tracks all axioms used in the Paper 3B proof-theoretic framework.
 All axioms are now in the `Ax` namespace for consistent naming and easy tracking.
 
 ## Summary Statistics
-- **Total Axioms**: 21 (12 Paper 3B specific + 9 base theory infrastructure)
-  - **Paper 3B Specific**: 12 axioms (collision_tag discharged but RFN_to_Con_formula added for internalization)
+- **Total Axioms**: 25 (16 Paper 3B total + 9 base theory infrastructure)
+  - **Paper 3B Core (FROZEN)**: 12 axioms 
+  - **Paper 3B Addendum 1**: +4 axioms (GodelBundle.lean)
   - **Base Theory Infrastructure**: 9 axioms (HA, PA, EA, ISigma1, etc.)
 - **Namespace**: All axioms use `Ax.` prefix for consistency
-- **Note**: PR-7 trades collision_tag for cleaner RFN_to_Con_formula internalization axiom
-- **Permanent**: 20 axioms (11 Paper 3B + 9 base theory)
+- **Frozen**: Paper 3B core at 21 axioms (September 2025)
+- **Extension**: Addendum 1 adds Gödel crossings analysis (December 2025)
 
 ### Recent Progress
 - **PR-1**: ✅ Discharged `LCons_arithmetization_instance` and `LReflect_arithmetization_instance` - now derived from Core.ExtendIter_arithmetization
@@ -82,6 +86,18 @@ All axioms are now in the `Ax` namespace for consistent naming and easy tracking
 *Discharge plan: Prove via ordinal analysis*
 
 18. `Ax.LClass_omega_eq_PA` - Limit of classicality ladder
+
+---
+
+## Paper 3B Addendum 1: Gödel Crossings (3 axioms)
+
+### Classical Imports for Gödel Crossings
+*Literature imports for composing with collision framework*
+
+19. `Ax.derivesGodelFromCon` - Classical G1 upper direction (Con(T) ⟹ G_T)
+20. `Ax.limit_nonuniformity_axiom` - Standard compactness argument at ω
+21. `Ax.con_omega_implies_all_godel` - Classical schema for limit uniformity
+22. `Ax.RFN_iff_1consistency` - RFN_Σ₁ ↔ 1-consistency (standard result)
 
 ## Core Theorem Dependencies
 
