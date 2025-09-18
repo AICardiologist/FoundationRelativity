@@ -1586,7 +1586,7 @@ so `deriv (fun s => Γ_r_* … s …) r` stays symbolic.
 section RicciReductions
   -- Freeze the *radial* Γ under `deriv`
   -- so we keep `deriv (fun s => Γ_r_* M s ...) r` symbolic.
-  local attribute [-simp] Γ_r_θθ Γ_r_φφ Γ_φ_θφ
+  attribute [-simp] Γ_r_θθ Γ_r_φφ Γ_φ_θφ in
 
 /-- Canonical form for `R_{θθ}` (keep the radial derivative symbolic). -/
   @[simp] lemma Ricci_θθ_reduce (M r θ : ℝ) :
@@ -1631,9 +1631,8 @@ section RicciReductions
         Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
         Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
         Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
-        Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ]
-  -- Pass 2: Evaluate derivatives (deriv (fun t => cos t - 1) θ = -sin θ)
-  simp only [deriv_const, deriv_const_sub_id]
+        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_r_φφ, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ,
+        deriv_const, deriv_const_sub_id]
   ring_nf
 
   /-- Canonical form for `R_{φφ}` (keep the radial derivative symbolic). -/
@@ -1645,14 +1644,12 @@ section RicciReductions
   classical
   unfold Ricci
   -- Two-pass simplification: structure/traces first, then derivatives
-  -- Pass 1: Structure/traces 
   simp [sumIdx_expand, sumIdx2_expand, Γtot,
         Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
         Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
         Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ]
-  -- Pass 2: Evaluate derivatives
-  simp only [deriv_const, deriv_neg_sin_mul_cos]
+        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ,
+        deriv_const, deriv_neg_sin_mul_cos]
   ring_nf
 end RicciReductions
 
