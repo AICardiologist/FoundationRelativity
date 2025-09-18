@@ -1,6 +1,6 @@
 # Makefile for Paper 3 LaTeX documents
 # Usage: make [target]
-# Targets: all, paper3, paper3a, paper3b, formalization, clean
+# Targets: all, paper3, paper3a, paper3b, paper3b-add1, formalization, clean
 
 # LaTeX compiler
 LATEX = pdflatex
@@ -11,10 +11,11 @@ LATEXFLAGS = -interaction=nonstopmode
 PAPER3 = Paper3_Main
 PAPER3A = Paper3A_Publication
 PAPER3B = Paper3B_Publication
+PAPER3B_ADD1 = Paper3B_Addendum1
 FORMALIZATION = Paper3_Lean_Formalization
 
 # All main targets
-PDFS = $(PAPER3).pdf $(PAPER3A).pdf $(PAPER3B).pdf $(FORMALIZATION).pdf
+PDFS = $(PAPER3).pdf $(PAPER3A).pdf $(PAPER3B).pdf $(PAPER3B_ADD1).pdf $(FORMALIZATION).pdf
 
 # Default target
 all: $(PDFS)
@@ -23,6 +24,7 @@ all: $(PDFS)
 paper3: $(PAPER3).pdf
 paper3a: $(PAPER3A).pdf
 paper3b: $(PAPER3B).pdf
+paper3b-add1: $(PAPER3B_ADD1).pdf
 formalization: $(FORMALIZATION).pdf
 
 # Generic rule for building PDFs
