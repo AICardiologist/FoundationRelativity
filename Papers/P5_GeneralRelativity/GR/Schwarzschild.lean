@@ -1615,14 +1615,13 @@ section RicciReductions
       funext s
       simp [sumIdx_expand, Γtot]    -- NOTE: not `simp only`
     
-    -- Apply derivative to the ρ-trace equality
     have hρ' := congrArg (fun F => deriv F r) hρ
 
     -- Pass 1: structural expansions only (indices & Γtot projections)
-    simp [ sumIdx_expand, sumIdx2_expand, Γtot,
+    simp [ hρ', sumIdx_expand, sumIdx2_expand, Γtot,
            Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
            Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
-           Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ, hρ' ]
+           Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ ]
     
     -- Keep the full trace folded
     set T := Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r with hT
@@ -1637,8 +1636,9 @@ section RicciReductions
 
     -- IMPORTANT: keep the trace folded (use hT.symm to fold, not hT)
     simp (config := { failIfUnchanged := false }) only [hT.symm]
-    -- Light algebra, no denominator clearing here.
+    
     simp only [sub_eq_add_neg]
+    field_simp
     ring
 
   /-- Canonical form for `R_{φφ}` (keep the radial derivative symbolic). -/
@@ -1658,14 +1658,13 @@ section RicciReductions
       funext s
       simp [sumIdx_expand, Γtot]    -- NOTE: not `simp only`
     
-    -- Apply derivative to the ρ-trace equality
     have hρ' := congrArg (fun F => deriv F r) hρ
 
     -- Pass 1: structural expansions only
-    simp [ sumIdx_expand, sumIdx2_expand, Γtot,
+    simp [ hρ', sumIdx_expand, sumIdx2_expand, Γtot,
            Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
            Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
-           Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ, hρ' ]
+           Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ ]
     
     -- Keep the full trace folded
     set T := Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r with hT
@@ -1682,6 +1681,7 @@ section RicciReductions
     -- Keep the trace folded
     simp (config := { failIfUnchanged := false }) only [hT.symm]
     simp only [sub_eq_add_neg]
+    field_simp
     ring
 end RicciReductions
 
