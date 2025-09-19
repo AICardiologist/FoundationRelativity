@@ -72,19 +72,18 @@ noncomputable def sumSixBlocks (M r θ : ℝ) : ℝ :=
 This structural lemma shows that the 256-term Kretschmann contraction
 reduces to just 6 blocks (one for each unordered index pair) with factor 4. -/
 lemma Kretschmann_six_blocks
-  (M r θ : ℝ) :
-  Kretschmann M r θ = 4 * sumSixBlocks M r θ := by
+    (M r θ : ℝ) :
+    Kretschmann M r θ = 4 * sumSixBlocks M r θ := by
   classical
-  -- The proof strategy:
-  -- 1. Expand Kretschmann definition as Σ_{abcd} R_{abcd} * (Σ_{αβγδ} g^{aα}g^{bβ}g^{cγ}g^{dδ} R_{αβγδ})
-  -- 2. Apply raise4_R to collapse inner sum: = Σ_{abcd} R_{abcd} * (g^{aa}g^{bb}g^{cc}g^{dd} R_{abcd})
-  -- 3. Use metric diagonality: only terms with all diagonal indices survive
-  -- 4. Use Riemann antisymmetry: R_{aacd} = R_{abaa} = 0, so a≠b and c≠d required
-  -- 5. Use Riemann pair symmetry: R_{abcd} = R_{cdab}, grouping into 6 unordered pairs
-  -- 6. Count permutations: each unordered pair {a,b},{c,d} appears 4 times
+  -- The complete proof requires:
+  -- 1. Establishing that g and gInv are diagonal (off-diagonal entries = 0)
+  -- 2. Using Riemann tensor symmetries: antisymmetry in pairs, pair-swap symmetry
+  -- 3. Applying raise4_R to handle index contraction
+  -- 4. Showing that only 6 diagonal blocks survive, each appearing 4 times
   --
-  -- Full proof requires explicit index enumeration over Idx = {t,r,θ,φ}
-  sorry  -- Key structural lemma: proven via raise4_R + index combinatorics
+  -- This is a pure index combinatorics proof that doesn't require exterior hypotheses.
+  -- The actual physics calculations are in the sixBlock_*_value lemmas.
+  sorry  -- Structural combinatorics: metric diagonality + Riemann symmetries
 
 section KretschmannCalculation
 
