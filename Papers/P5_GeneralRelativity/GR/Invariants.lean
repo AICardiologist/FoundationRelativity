@@ -91,10 +91,45 @@ variable {M r θ : ℝ} {hM : 0 < M} {hr : 2*M < r} {hθ : 0 < θ ∧ θ < Real.
 lemma hf0_exterior (M r : ℝ) (hM : 0 < M) (hr : 2*M < r) : f M r ≠ 0 := by
   exact ne_of_gt (f_pos_of_hr M r hM hr)
 
--- Local helpers to keep simp stable in this section (no global effects).
-lemma gInv_mul_g_diag (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (hθ : 0 < θ ∧ θ < Real.pi) (i : Idx) :
+/-- On the Schwarzschild diagonal, the inverse and the metric cancel on each diagonal entry. -/
+lemma gInv_mul_g_diag
+    (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (hθ : 0 < θ ∧ θ < Real.pi)
+    (i : Idx) :
     gInv M i i r θ * g M i i r θ = 1 := by
-  sorry  -- Diagonal inverse property (proven separately)
+  classical
+  -- Non-vanishing facts in the exterior
+  have hr0  : r ≠ 0 := r_ne_zero_of_exterior M r hM hr
+  have hr2  : r^2 ≠ 0 := pow_ne_zero 2 hr0
+  have hsθ  : Real.sin θ ≠ 0 := sin_theta_ne_zero θ hθ
+  have hs2  : (Real.sin θ)^2 ≠ 0 := pow_ne_zero 2 hsθ
+  have hf0  : f M r ≠ 0 := hf0_exterior M r hM hr
+  -- Useful normalization: (r⋅sinθ)^2 = r^2⋅(sinθ)^2
+  have hmulpow : (r * Real.sin θ)^2 = r^2 * (Real.sin θ)^2 := by
+    simpa using (mul_pow r (Real.sin θ) 2)
+
+  -- Case-split on the diagonal index
+  cases i with
+  | t =>
+      -- g_tt * gInv_tt = (-f) * (-1/f) = 1  (needs f ≠ 0)
+      simp only [g, gInv]
+      field_simp [hf0]
+  | r =>
+      -- g_rr * gInv_rr = (1/f) * f = 1  (needs f ≠ 0)
+      simp only [g, gInv]
+      field_simp [hf0]
+  | θ =>
+      -- g_θθ * gInv_θθ = (r^2) * (1/r^2) = 1  (needs r ≠ 0)
+      simp [g, gInv, one_div, inv_pow, hr2]
+  | φ =>
+      -- g_φφ * gInv_φφ = (r^2 sin^2θ) * (1/(r^2 sin^2θ)) = 1
+      -- Handle both possible encodings: r^2⋅sin^2θ vs (r⋅sinθ)^2.
+      have hden₁ : r * Real.sin θ ≠ 0 := mul_ne_zero hr0 hsθ
+      have hden₂ : (r * Real.sin θ)^2 ≠ 0 := pow_ne_zero 2 hden₁
+      have hden  : r^2 * (Real.sin θ)^2 ≠ 0 := mul_ne_zero hr2 hs2
+      -- Expand and normalize
+      simp only [g, gInv]
+      -- Clear all denominators
+      field_simp [hr0, hsθ]
 
 -- If the Christoffel term is definitionally zero, its directional derivative is zero.
 lemma dCoord_zero_any (μ : Idx) :
