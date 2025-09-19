@@ -492,6 +492,11 @@ lemma deriv_const_left (c : ℝ) (f : ℝ → ℝ) (x : ℝ)
     funext t; simp [mul_comm]
   simpa [this, mul_comm] using deriv_mul_const (c := c)
 
+-- Generic and robust: derivative of a negated function.
+@[simp] lemma deriv_neg_fun (f : ℝ → ℝ) (x : ℝ) :
+  deriv (fun t => - f t) x = - deriv f x :=
+by simpa using (deriv.neg (f := f) (x := x))
+
 end DerivHelpers
 
 section DerivHelpers_Extra
@@ -1100,6 +1105,14 @@ noncomputable def Γ_θ_φφ (θ : ℝ) : ℝ := -Real.sin θ * Real.cos θ  -- 
 noncomputable def Γ_φ_rφ (r : ℝ) : ℝ := 1/r  -- Γ^φ_{rφ} = Γ^φ_{φr}
 noncomputable def Γ_φ_θφ (θ : ℝ) : ℝ := Real.cos θ / Real.sin θ  -- Γ^φ_{θφ} = cot θ
 
+-- Pointwise identity for simplification
+@[simp] lemma Γ_t_tr_eq_neg_Γ_r_rr (M r : ℝ) :
+  Γ_t_tr M r = - Γ_r_rr M r := by
+  -- Both sides are just the same scalar with opposite signs
+  unfold Γ_t_tr Γ_r_rr
+  -- M / (r^2 * f M r) = - (-M / (r^2 * f M r)) ⇒ by simp
+  simp [neg_div]
+
 -- ============================================================================
 -- Sprint 2: Christoffel Symbols via Levi-Civita Formula
 -- ============================================================================
@@ -1307,6 +1320,17 @@ local notation "∑ιι" => sumIdx2
   classical
   simp only [sumIdx, Idx.all, List.map, List.sum, List.foldr]
   ring
+
+lemma sumIdx_neg (f : Idx → ℝ) :
+  sumIdx (fun i => - f i) = - sumIdx f := by
+  classical
+  -- expand into the finite 4-entry sum and cancel; your `sumIdx_expand` does this
+  simp [sumIdx_expand, add_comm, add_left_comm, add_assoc]
+
+lemma sumIdx_mul_left (c : ℝ) (f : Idx → ℝ) :
+  sumIdx (fun i => c * f i) = c * sumIdx f := by
+  classical
+  simp [sumIdx_expand, mul_add, add_comm, add_left_comm, add_assoc, mul_comm, mul_left_comm, mul_assoc]
 
 /-- Expansion of sumIdx2 into explicit double sum over all indices -/
 @[simp] lemma sumIdx2_expand (f : Idx → Idx → ℝ) :
@@ -1757,6 +1781,21 @@ lemma deriv_Γ_r_rr
   -- The goal should now be provable by ring.
   ring
 
+/-- `∂_r Γ^t_{tr}` in closed form. -/
+lemma deriv_Γ_t_tr
+    (M r : ℝ) (hr0 : r ≠ 0) (hf0 : f M r ≠ 0) (hr2M : r - 2*M ≠ 0) :
+  deriv (fun s => Γ_t_tr M s) r
+    = -(2*M*(r - M)) / (r^2 * (r - 2*M)^2) := by
+  -- rewrite the function by the pointwise identity
+  have hfun : (fun s => Γ_t_tr M s) = (fun s => - Γ_r_rr M s) := by
+    funext s; simpa using Γ_t_tr_eq_neg_Γ_r_rr M s
+  -- derivative of a negation
+  rw [hfun, deriv_neg_fun]
+  -- closed form for ∂_r Γ^r_{rr}
+  rw [deriv_Γ_r_rr M r hr0 hf0 hr2M]
+  -- algebraic normalization
+  simp [neg_div]
+
 /-- `∂_r Γ^r_{θθ}`. -/
 lemma deriv_Γ_r_θθ (M r : ℝ) (hr0 : r ≠ 0) :
   deriv (fun s => Γ_r_θθ M s) r = -(f M r) - r * (2 * M / r^2) := by
@@ -1853,6 +1892,7 @@ lemma deriv_Γ_r_φφ (M r θ : ℝ) (hr0 : r ≠ 0) :
       field_simp [hsθ]
       have : Real.sin θ^2 + Real.cos θ^2 = 1 := Real.sin_sq_add_cos_sq θ
       linarith
+
 
 end DerivativeHelpers
 
