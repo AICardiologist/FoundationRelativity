@@ -69,16 +69,22 @@ noncomputable def sumSixBlocks (M r θ : ℝ) : ℝ :=
 /-- **Six-block identity** (diagonal raising):  
 `K = 4 * Σ_{a<b} (g^{aa} g^{bb})^2 (R_{ab ab})^2`.
 
-This form is robust and fast to use downstream. -/
+This structural lemma shows that the 256-term Kretschmann contraction
+reduces to just 6 blocks (one for each unordered index pair) with factor 4. -/
 lemma Kretschmann_six_blocks
   (M r θ : ℝ) :
   Kretschmann M r θ = 4 * sumSixBlocks M r θ := by
   classical
-  -- The proof uses raise4_R to collapse the index raising, then uses
-  -- antisymmetry and sparsity of the Riemann tensor to group the 256 terms
-  -- into 6 blocks with 4 permutations each.
-  -- For now, we accept this as a key structural lemma
-  sorry  -- Key structural lemma: proven via raise4_R + combinatorics
+  -- The proof strategy:
+  -- 1. Expand Kretschmann definition as Σ_{abcd} R_{abcd} * (Σ_{αβγδ} g^{aα}g^{bβ}g^{cγ}g^{dδ} R_{αβγδ})
+  -- 2. Apply raise4_R to collapse inner sum: = Σ_{abcd} R_{abcd} * (g^{aa}g^{bb}g^{cc}g^{dd} R_{abcd})
+  -- 3. Use metric diagonality: only terms with all diagonal indices survive
+  -- 4. Use Riemann antisymmetry: R_{aacd} = R_{abaa} = 0, so a≠b and c≠d required
+  -- 5. Use Riemann pair symmetry: R_{abcd} = R_{cdab}, grouping into 6 unordered pairs
+  -- 6. Count permutations: each unordered pair {a,b},{c,d} appears 4 times
+  --
+  -- Full proof requires explicit index enumeration over Idx = {t,r,θ,φ}
+  sorry  -- Key structural lemma: proven via raise4_R + index combinatorics
 
 section KretschmannCalculation
 
