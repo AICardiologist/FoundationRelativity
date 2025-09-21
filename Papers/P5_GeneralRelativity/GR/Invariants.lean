@@ -66,6 +66,23 @@ noncomputable def sumSixBlocks (M r θ : ℝ) : ℝ :=
   sixBlock M r θ Idx.r Idx.φ +
   sixBlock M r θ Idx.θ Idx.φ
 
+/-- Helper for rewriting squares. -/
+@[simp] lemma pow_two (x : ℝ) : x^2 = x * x := by ring
+
+/-- After raising all indices, `K` becomes a sum of squared components with diagonal weights. -/
+lemma Kretschmann_after_raise_sq (M r θ : ℝ) :
+  Kretschmann M r θ
+    = sumIdx2 (fun a b => sumIdx2 (fun c d =>
+        (gInv M a a r θ * gInv M b b r θ * gInv M c c r θ * gInv M d d r θ)
+      * (Riemann M r θ a b c d)^2)) := by
+  classical
+  unfold Kretschmann
+  -- Apply raise4_R to simplify the raised contraction, then normalize algebraically
+  congr; ext a b; congr; ext c d
+  rw [raise4_R]
+  simp only [pow_two]
+  ring
+
 /-- **Six-block identity** (diagonal raising):  
 `K = 4 * Σ_{a<b} (g^{aa} g^{bb})^2 (R_{ab ab})^2`.
 
@@ -75,15 +92,23 @@ lemma Kretschmann_six_blocks
     (M r θ : ℝ) :
     Kretschmann M r θ = 4 * sumSixBlocks M r θ := by
   classical
-  -- The complete proof requires:
-  -- 1. Establishing that g and gInv are diagonal (off-diagonal entries = 0)
-  -- 2. Using Riemann tensor symmetries: antisymmetry in pairs, pair-swap symmetry
-  -- 3. Applying raise4_R to handle index contraction
-  -- 4. Showing that only 6 diagonal blocks survive, each appearing 4 times
-  --
-  -- This is a pure index combinatorics proof that doesn't require exterior hypotheses.
-  -- The actual physics calculations are in the sixBlock_*_value lemmas.
-  sorry  -- Structural combinatorics: metric diagonality + Riemann symmetries
+  -- Strategy using the normalized form and off-block vanishing:
+  -- 1. Start from Kretschmann_after_raise_sq to get squared form
+  -- 2. Terms with c=d vanish by Riemann_last_equal_zero
+  -- 3. Off-block terms vanish by specific lemmas
+  -- 4. Each block contributes 4 times (2 from c,d ordering × 2 from a,b ordering)
+  
+  -- Off-block vanishing lemmas completed:
+  -- (t,r) block: ✓ all 5 off-blocks 
+  -- (t,θ) block: ✓ all 5 off-blocks 
+  -- (t,φ) block: ✓ all 5 off-blocks 
+  -- (r,θ) block: ✓ all 5 off-blocks
+  -- (r,φ) block: ✓ all 5 off-blocks (one with sorry)
+  -- (θ,φ) block: ✓ all 5 off-blocks (one with sorry)
+  -- 
+  -- Total: 60 off-block vanishing lemmas (30 @[simp] + 30 companions)
+  -- Ready for final simp sweep to eliminate all off-blocks
+  sorry
 
 section KretschmannCalculation
 
@@ -124,7 +149,8 @@ lemma gInv_mul_g_diag
       field_simp [hf0]
   | θ =>
       -- g_θθ * gInv_θθ = (r^2) * (1/r^2) = 1  (needs r ≠ 0)
-      simp [g, gInv, one_div, inv_pow, hr2]
+      simp only [g, gInv]
+      field_simp [hr2]
   | φ =>
       -- g_φφ * gInv_φφ = (r^2 sin^2θ) * (1/(r^2 sin^2θ)) = 1
       -- Handle both possible encodings: r^2⋅sin^2θ vs (r⋅sinθ)^2.
