@@ -11,7 +11,7 @@ open scoped BigOperators
 namespace Schwarzschild
 open Idx
 
-/-! -------------- BEGIN: adapter + simp setup for Riemann.lean -------------- -/
+-- -------------- BEGIN: adapter + simp setup for Riemann.lean --------------
 
 section SimpSetup
   -- Always useful:
@@ -87,7 +87,7 @@ end SimpSetup
 @[simp] lemma Γtot_φ_θφ (M r θ : ℝ) : Γtot M r θ Idx.φ Idx.θ Idx.φ = Γ_φ_θφ θ := by simp [Γtot, Γ_φ_θφ]
 @[simp] lemma Γtot_φ_φφ (M r θ : ℝ) : Γtot M r θ Idx.φ Idx.φ Idx.φ = 0 := by simp [Γtot]
 
-/-! -------------- END: adapter + simp setup for Riemann.lean ---------------- -/
+-- -------------- END: adapter + simp setup for Riemann.lean ----------------
 
 /-!
   # Riemann tensor (scaffold)
