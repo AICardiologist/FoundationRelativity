@@ -13,6 +13,8 @@ open Idx
 
 -- -------------- BEGIN: adapter + simp setup for Riemann.lean --------------
 
+-- Temporarily disabled SimpSetup to fix attribute ordering
+/-
 section SimpSetup
   -- Always useful:
   attribute [local simp] dCoord_t dCoord_r dCoord_θ dCoord_φ deriv_const
@@ -30,6 +32,7 @@ section SimpSetup
   attribute [local simp]
     Γtot_t_θt_zero Γtot_t_θr_zero Γtot_r_θr_zero Γtot_θ_θθ_zero
 end SimpSetup
+-/
 
 -- Adapter layer:
 -- If Riemann.lean refers to projection names WITHOUT the `_zero` suffix,
@@ -84,7 +87,7 @@ end SimpSetup
 @[simp] lemma Γtot_φ_rθ (M r θ : ℝ) : Γtot M r θ Idx.φ Idx.r Idx.θ = 0 := by simp [Γtot]
 @[simp] lemma Γtot_φ_θr (M r θ : ℝ) : Γtot M r θ Idx.φ Idx.θ Idx.r = 0 := by simp [Γtot]
 @[simp] lemma Γtot_φ_θθ (M r θ : ℝ) : Γtot M r θ Idx.φ Idx.θ Idx.θ = 0 := by simp [Γtot]
-@[simp] lemma Γtot_φ_θφ (M r θ : ℝ) : Γtot M r θ Idx.φ Idx.θ Idx.φ = Γ_φ_θφ θ := by simp [Γtot, Γ_φ_θφ]
+-- Removed duplicate: Γtot_φ_θφ is already defined in Schwarzschild.lean
 @[simp] lemma Γtot_φ_φφ (M r θ : ℝ) : Γtot M r θ Idx.φ Idx.φ Idx.φ = 0 := by simp [Γtot]
 
 -- -------------- END: adapter + simp setup for Riemann.lean ----------------
@@ -397,10 +400,7 @@ lemma Γtot_symmetry (M r θ : ℝ) (i j k : Idx) :
   cases c
   all_goals (cases a; all_goals (cases b; simp only [nabla_g]))
 
--- Helper to split sumIdx with subtraction
-lemma sumIdx_sub (f g : Idx → ℝ) :
-  sumIdx (fun i => f i - g i) = sumIdx f - sumIdx g := by
-  simp only [sumIdx, Finset.sum_sub_distrib]
+-- Removed duplicate: sumIdx_sub is already defined in Schwarzschild.lean
 
 /-- From `∇g = 0`: rewrite `∂_x g_{ab}` as a Γ–`g` contraction. -/
 @[simp] lemma dCoord_g_via_compat
@@ -1412,24 +1412,21 @@ lemma raise2_T (M r θ : ℝ) (a b : Idx) (T : Idx → Idx → ℝ) :
   unfold sumIdx2
   -- Use Finset.sum_eq_single to collapse the abstract sum
   rw [Finset.sum_eq_single a]
-  rotate_left
+  · -- Main goal after sum_eq_single
+    simp only [Finset.mul_sum]
+    congr 1
+    rw [Finset.sum_eq_single b]
+    · simp
+    · -- Case β ≠ b: gInv[b,β] = 0
+      intro β _ hβ_ne_b
+      have h_gInv_bβ : gInv M b β r θ = 0 := gInv_off_diagonal M r θ b β (Ne.symm hβ_ne_b)
+      simp [h_gInv_bβ]
+    · intro hb_not_mem; exfalso; exact hb_not_mem (Finset.mem_univ b)
   · -- Case α ≠ a: gInv[a,α] = 0
     intro α _ hα_ne_a
-    have h_gInv_aα : gInv M a α r θ = 0 := gInv_off_diagonal M r θ a α hα_ne_a
+    have h_gInv_aα : gInv M a α r θ = 0 := gInv_off_diagonal M r θ a α (Ne.symm hα_ne_a)
     simp [h_gInv_aα]
-  · intro h; exfalso; exact h (Finset.mem_univ a)
-
-  -- Apply sum_eq_single to the inner sum over β
-  simp only [Finset.mul_sum]
-  congr 1
-  rw [Finset.sum_eq_single b]
-  rotate_left
-  · -- Case β ≠ b: gInv[b,β] = 0
-    intro β _ hβ_ne_b
-    have h_gInv_bβ : gInv M b β r θ = 0 := gInv_off_diagonal M r θ b β hβ_ne_b
-    simp [h_gInv_bβ]
-  · intro h; exfalso; exact h (Finset.mem_univ b)
-  simp
+  · intro ha_not_mem; exfalso; exact ha_not_mem (Finset.mem_univ a)
 
 /-- Four-index raiser: compose the two-index raiser twice. -/
 lemma raise4_R
