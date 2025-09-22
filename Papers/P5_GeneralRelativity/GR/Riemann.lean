@@ -148,6 +148,29 @@ end SimpSetup
   dCoord Idx.φ (fun _ _ => c) r θ = 0 := by
   simp [dCoord_φ]
 
+/-- Linearity of `dCoord` over addition (kept local, mirrors `dCoord_sub`). -/
+@[simp] lemma dCoord_add (μ : Idx) (f g : ℝ → ℝ → ℝ) (r θ : ℝ) :
+  dCoord μ (fun r θ => f r θ + g r θ) r θ
+    = dCoord μ f r θ + dCoord μ g r θ := by
+  cases μ <;> simp [dCoord, deriv_add]
+
+-- Minimal SimpSetup after dCoord definitions
+section SimpSetup
+  -- dCoord lemmas now defined above
+  attribute [local simp] dCoord_t dCoord_r dCoord_θ dCoord_φ deriv_const
+
+  -- From Schwarzschild (already @[simp] there)
+  -- deriv_pow_two_at deriv_sin_sq_at are already simp in Schwarzschild
+
+  -- Abstract-sum algebra from Schwarzschild
+  attribute [local simp] sumIdx_expand sumIdx2_expand
+
+  -- Nonzero Γtot projections from Schwarzschild
+  attribute [local simp]
+    Γtot_t_tr Γtot_t_rt Γtot_r_tt Γtot_r_rr Γtot_r_θθ Γtot_r_φφ
+    Γtot_θ_rθ Γtot_θ_θr Γtot_φ_rφ Γtot_φ_φr Γtot_θ_φφ Γtot_φ_θφ Γtot_φ_φθ
+end SimpSetup
+
 /-- A convenient `dCoord` form of the θ-derivative of Γ^r_{φφ} for use inside `RiemannUp`. -/
 @[simp] lemma dCoord_θ_Γ_r_φφ (M r θ : ℝ) :
   dCoord Idx.θ (fun r θ => Γtot M r θ Idx.r Idx.φ Idx.φ) r θ
@@ -191,11 +214,18 @@ noncomputable def Riemann
   -- Expand the definition and cancel.
   simp [RiemannUp]
 
-@[simp] lemma RiemannUp_swap_mu_nu
+/-- Antisymmetry of `RiemannUp` in the last two indices. -/
+lemma RiemannUp_swap_mu_nu
     (M r θ : ℝ) (ρ σ μ ν : Idx) :
   RiemannUp M r θ ρ σ μ ν = - RiemannUp M r θ ρ σ ν μ := by
-  -- Directly from the definition: each term flips sign under μ ↔ ν
-  simp [RiemannUp, sub_eq_add_neg, add_comm, add_left_comm, add_assoc, mul_comm, mul_left_comm, mul_assoc]
+  classical
+  -- Expand definition once and normalize sums to (Σ a) - (Σ b) form.
+  unfold RiemannUp
+  -- Turn "sum of differences" into "difference of sums", then group algebraically.
+  -- NOTE: we do not add any global simp attrs here on purpose.
+  simp [sumIdx, Finset.sum_sub_distrib, dCoord_sub, dCoord_add,
+        sub_eq_add_neg, add_comm, add_left_comm, add_assoc,
+        mul_comm, mul_left_comm, mul_assoc]
 
 /-- Antisymmetry in the last two (lower) slots after lowering the first index. -/
 lemma Riemann_swap_c_d
@@ -282,7 +312,8 @@ lemma Γtot_symmetry (M r θ : ℝ) (i j k : Idx) :
 @[simp] lemma compat_r_θθ (M r θ : ℝ) :
   dCoord Idx.r (fun r θ => g M Idx.θ Idx.θ r θ) r θ
     = 2 * Γtot M r θ Idx.θ Idx.r Idx.θ * g M Idx.θ Idx.θ r θ := by
-  simp only [dCoord_r, g_θθ, Γtot_θ_rθ, deriv_pow_two_at, Γ_θ_rθ]
+  simp only [dCoord_r, g_θθ, Γtot_θ_rθ, Γ_θ_rθ]
+  rw [deriv_pow_two_at]
   ring
 
 /-- ∂_r g_{φφ} = 2 Γ^φ_{r φ} g_{φφ}. -/
@@ -291,7 +322,7 @@ lemma Γtot_symmetry (M r θ : ℝ) (i j k : Idx) :
     = 2 * Γtot M r θ Idx.φ Idx.r Idx.φ * g M Idx.φ Idx.φ r θ := by
   simp only [dCoord_r, g_φφ, Γtot_φ_rφ]
   conv_lhs => arg 1; ext s; rw [mul_comm (s^2) _]
-  simp only [deriv_const_mul, deriv_pow_two_at, Γ_φ_rφ]
+  rw [deriv_const_mul, deriv_pow_two_at, Γ_φ_rφ]
   ring
 
 /-- ∂_θ g_{φφ} = 2 Γ^φ_{θ φ} g_{φφ}. -/
@@ -300,7 +331,7 @@ lemma Γtot_symmetry (M r θ : ℝ) (i j k : Idx) :
     = 2 * Γtot M r θ Idx.φ Idx.θ Idx.φ * g M Idx.φ Idx.φ r θ := by
   simp only [dCoord_θ, g_φφ, Γtot_φ_θφ]
   conv_lhs => arg 1; ext t; rw [mul_comm]
-  simp only [deriv_const_mul, deriv_sin_sq_at, Γ_φ_θφ]
+  rw [deriv_const_mul, deriv_sin_sq_at, Γ_φ_θφ]
   by_cases h : Real.sin θ = 0
   · simp [h]
   · field_simp; ring
@@ -314,9 +345,9 @@ lemma Γtot_symmetry (M r θ : ℝ) (i j k : Idx) :
   classical
   simp only [dCoord_r, g_tt, Γtot_t_tr, Γ_t_tr]
   by_cases hr : r = 0
-  · simp only [hr, pow_two, sub_eq_add_neg, mul_zero, zero_mul, deriv_const]
+  · simp [hr, deriv_const]
   · by_cases hf : f M r = 0
-    · simp only [hf, pow_two, sub_eq_add_neg, mul_zero, zero_mul, deriv_const]
+    · simp [hf, deriv_const]
     · have hf' := f_hasDerivAt M r hr
       have h_deriv : deriv (fun s => -f M s) r = -(2 * M / r^2) := by simpa using (hf'.neg).deriv
       simp only [h_deriv]
@@ -330,9 +361,9 @@ lemma Γtot_symmetry (M r θ : ℝ) (i j k : Idx) :
   classical
   simp only [dCoord_r, g_rr, Γtot_r_rr, Γ_r_rr]
   by_cases hr : r = 0
-  · simp only [hr, pow_two, sub_eq_add_neg, mul_zero, zero_mul, deriv_const]
+  · simp [hr, deriv_const]
   · by_cases hf : f M r = 0
-    · simp only [hf, pow_two, sub_eq_add_neg, mul_zero, zero_mul, deriv_const]
+    · simp [hf, deriv_const]
     · have hf' := f_hasDerivAt M r hr
       have h_deriv : deriv (fun s => (f M s)⁻¹) r = -(2 * M / r^2) / (f M r)^2 := by simpa using (hf'.inv hf).deriv
       simp only [h_deriv]
@@ -391,7 +422,6 @@ lemma Γtot_symmetry (M r θ : ℝ) (i j k : Idx) :
   field_simp [hsin, pow_two]
   ring
 
-/-- Schwarzschild Levi-Civita: `∇ g = 0` componentwise. -/
 /-- Schwarzschild Levi-Civita: `∇ g = 0` componentwise. -/
 @[simp] lemma nabla_g_zero (M r θ : ℝ) (c a b : Idx) :
   nabla_g M r θ c a b = 0 := by
