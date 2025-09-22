@@ -3,6 +3,7 @@ import Papers.P5_GeneralRelativity.GR.Schwarzschild
 import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Analysis.Calculus.Deriv.Pow
 import Mathlib.Analysis.Calculus.Deriv.Add
+import Mathlib.Analysis.Calculus.Deriv.Sub
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Analysis.Calculus.Deriv.Mul
 import Mathlib.Data.Finset.Basic
@@ -162,15 +163,20 @@ lemma differentiable_hack (f : ℝ → ℝ) (x : ℝ) : DifferentiableAt ℝ f x
   dCoord μ (fun r θ => f r θ - g r θ) r θ
     = dCoord μ f r θ - dCoord μ g r θ := by
   cases μ
+  -- t (zero derivative)
   case t => simp [dCoord]
+  -- r: Apply deriv_sub using the hacked hypotheses.
   case r =>
     have hf := differentiable_hack (fun r' => f r' θ) r
     have hg := differentiable_hack (fun r' => g r' θ) r
+    -- Use simp and include dCoord definition to apply the rule robustly.
     simp [dCoord, deriv_sub hf hg]
+  -- θ: Apply deriv_sub using the hacked hypotheses.
   case θ =>
     have hf := differentiable_hack (fun θ' => f r θ') θ
     have hg := differentiable_hack (fun θ' => g r θ') θ
     simp [dCoord, deriv_sub hf hg]
+  -- φ (zero derivative)
   case φ => simp [dCoord]
 
 /-- Linearity of `dCoord` over addition. -/
@@ -178,15 +184,19 @@ lemma differentiable_hack (f : ℝ → ℝ) (x : ℝ) : DifferentiableAt ℝ f x
   dCoord μ (fun r θ => f r θ + g r θ) r θ
     = dCoord μ f r θ + dCoord μ g r θ := by
   cases μ
+  -- t
   case t => simp [dCoord]
+  -- r: Apply deriv_add using the hacked hypotheses.
   case r =>
     have hf := differentiable_hack (fun r' => f r' θ) r
     have hg := differentiable_hack (fun r' => g r' θ) r
     simp [dCoord, deriv_add hf hg]
+  -- θ: Apply deriv_add using the hacked hypotheses.
   case θ =>
     have hf := differentiable_hack (fun θ' => f r θ') θ
     have hg := differentiable_hack (fun θ' => g r θ') θ
     simp [dCoord, deriv_add hf hg]
+  -- φ
   case φ => simp [dCoord]
 
 -- Minimal SimpSetup after dCoord definitions
@@ -326,7 +336,7 @@ open Real
 @[simp] lemma sumIdx2_mul_const (c : ℝ) (f : Idx → Idx → ℝ) :
   sumIdx2 (fun i j => c * f i j) = c * sumIdx2 f := by
   classical
-  unfold sumIdx2 sumIdx
+  simp only [sumIdx2, sumIdx]
   simp_rw [Finset.mul_sum]
 
 -- Calculus helpers are now imported from Schwarzschild.lean, not redefined here
@@ -349,39 +359,38 @@ lemma Γtot_symmetry (M r θ : ℝ) (i j k : Idx) :
 @[simp] lemma compat_r_θθ (M r θ : ℝ) :
   dCoord Idx.r (fun r θ => g M Idx.θ Idx.θ r θ) r θ
     = 2 * Γtot M r θ Idx.θ Idx.r Idx.θ * g M Idx.θ Idx.θ r θ := by
-  simp [g_θθ, Γtot, Γ_θ_rθ, dCoord]
-  by_cases hr : r = 0
-  · simp [hr]
-  · field_simp
-    ring
+  classical
+  -- Unfold definitions and apply derivative rules (assumes deriv_pow_two_at is available).
+  simp only [dCoord_r, g_θθ, Γtot_θ_rθ, Γ_θ_rθ, deriv_pow_two_at]
+  -- Handle the singularity at r=0 due to 1/r term in Γ.
+  by_cases h_r : r = 0
+  · simp [h_r]
+  -- If r ≠ 0, use field_simp to clear denominators.
+  · field_simp [h_r, pow_two]; ring
 
 /-- ∂_r g_{φφ} = 2 Γ^φ_{r φ} g_{φφ}. -/
 @[simp] lemma compat_r_φφ (M r θ : ℝ) :
   dCoord Idx.r (fun r θ => g M Idx.φ Idx.φ r θ) r θ
     = 2 * Γtot M r θ Idx.φ Idx.r Idx.φ * g M Idx.φ Idx.φ r θ := by
-  simp [g_φφ, Γtot, Γ_φ_rφ, dCoord]
-  by_cases hr : r = 0
-  · simp [hr]
-  · have : deriv (fun r' => r'^2 * (sin θ)^2) r = 2 * r * (sin θ)^2 := by
-      rw [deriv_mul_const]
-      simp [deriv_pow_two_at]
-      ring
-    simp [this]
-    ring
+  classical
+  -- Apply derivative rules: deriv_mul_const because sin²θ is constant w.r.t r.
+  simp only [dCoord_r, g_φφ, Γtot_φ_rφ, Γ_φ_rφ, deriv_mul_const, deriv_pow_two_at]
+  -- Handle the singularity at r=0.
+  by_cases h_r : r = 0
+  · simp [h_r]
+  · field_simp [h_r, pow_two]; ring
 
 /-- ∂_θ g_{φφ} = 2 Γ^φ_{θ φ} g_{φφ}. -/
 @[simp] lemma compat_θ_φφ (M r θ : ℝ) :
   dCoord Idx.θ (fun r θ => g M Idx.φ Idx.φ r θ) r θ
     = 2 * Γtot M r θ Idx.φ Idx.θ Idx.φ * g M Idx.φ Idx.φ r θ := by
-  simp [g_φφ, Γtot, Γ_φ_θφ, dCoord]
-  by_cases hsin : sin θ = 0
-  · simp [hsin]
-  · have : deriv (fun θ' => r^2 * (sin θ')^2) θ = r^2 * 2 * sin θ * cos θ := by
-      rw [deriv_const_mul]
-      simp [deriv_sin_sq_at]
-    simp [this, g_φφ, Γ_φ_θφ]
-    field_simp
-    ring
+  classical
+  -- Apply derivative rules: deriv_const_mul for r², and deriv_sin_sq_at.
+  simp only [dCoord_θ, g_φφ, Γtot_φ_θφ, Γ_φ_θφ, deriv_const_mul, deriv_sin_sq_at]
+  -- Handle the singularity on the axis (sin θ = 0) due to cot θ term in Γ.
+  by_cases h_sin : Real.sin θ = 0
+  · simp [h_sin]
+  · field_simp [h_sin, pow_two]; ring
 
 /-! #### Compatibility equalities that touch `f(r)` -/
 
