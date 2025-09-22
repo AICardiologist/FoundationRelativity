@@ -2,6 +2,9 @@
 import Papers.P5_GeneralRelativity.GR.Schwarzschild
 import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Analysis.Calculus.Deriv.Pow
+import Mathlib.Analysis.Calculus.Deriv.Add
+import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
 
 namespace Papers.P5_GeneralRelativity
 open Papers.P5_GeneralRelativity
@@ -148,11 +151,17 @@ end SimpSetup
   dCoord Idx.φ (fun _ _ => c) r θ = 0 := by
   simp [dCoord_φ]
 
-/-- Linearity of `dCoord` over addition (kept local, mirrors `dCoord_sub`). -/
+/-- Linearity of `dCoord` over subtraction. -/
+@[simp] lemma dCoord_sub (μ : Idx) (f g : ℝ → ℝ → ℝ) (r θ : ℝ) :
+  dCoord μ (fun r θ => f r θ - g r θ) r θ
+    = dCoord μ f r θ - dCoord μ g r θ := by
+  cases μ <;> simp only [dCoord, deriv_sub, Pi.sub_apply, sub_self]
+
+/-- Linearity of `dCoord` over addition. -/
 @[simp] lemma dCoord_add (μ : Idx) (f g : ℝ → ℝ → ℝ) (r θ : ℝ) :
   dCoord μ (fun r θ => f r θ + g r θ) r θ
     = dCoord μ f r θ + dCoord μ g r θ := by
-  cases μ <;> simp [dCoord, deriv_add]
+  cases μ <;> simp only [dCoord, deriv_add, Pi.add_apply, add_zero]
 
 -- Minimal SimpSetup after dCoord definitions
 section SimpSetup
@@ -219,10 +228,7 @@ lemma RiemannUp_swap_mu_nu
     (M r θ : ℝ) (ρ σ μ ν : Idx) :
   RiemannUp M r θ ρ σ μ ν = - RiemannUp M r θ ρ σ ν μ := by
   classical
-  -- Expand definition once and normalize sums to (Σ a) - (Σ b) form.
   unfold RiemannUp
-  -- Turn "sum of differences" into "difference of sums", then group algebraically.
-  -- NOTE: we do not add any global simp attrs here on purpose.
   simp [sumIdx, Finset.sum_sub_distrib, dCoord_sub, dCoord_add,
         sub_eq_add_neg, add_comm, add_left_comm, add_assoc,
         mul_comm, mul_left_comm, mul_assoc]
@@ -286,11 +292,16 @@ noncomputable def nabla_g (M r θ : ℝ) (c a b : Idx) : ℝ :=
     - Γtot M r θ a x b * g M a a r θ := by
   simp only [nabla_g, sumIdx_Γ_g_left, sumIdx_Γ_g_right]
 
-/-!
-Calculus helpers and compatibility lemmas for nabla_g_zero
--/
+/-! #### Calculus helpers and compatibility lemmas for nabla_g_zero -/
 
 open Real
+
+/-- Linearity of double sum under multiplication by a constant. -/
+@[simp] lemma sumIdx2_mul_const (c : ℝ) (f : Idx → Idx → ℝ) :
+  sumIdx2 (fun i j => c * f i j) = c * sumIdx2 f := by
+  classical
+  unfold sumIdx2 sumIdx
+  simp_rw [Finset.mul_sum]
 
 -- Calculus helpers are now imported from Schwarzschild.lean, not redefined here
 
@@ -309,32 +320,47 @@ lemma Γtot_symmetry (M r θ : ℝ) (i j k : Idx) :
 /-! #### Algebraic compat equalities (no `f` calculus) -/
 
 /-- ∂_r g_{θθ} = 2 Γ^θ_{r θ} g_{θθ}. -/
-@[simp] lemma compat_r_θθ (M r θ : ℝ) :
+@[simp] lemma compat_r_θθ (M r θ : ℝ) (hr : r ≠ 0) :
   dCoord Idx.r (fun r θ => g M Idx.θ Idx.θ r θ) r θ
     = 2 * Γtot M r θ Idx.θ Idx.r Idx.θ * g M Idx.θ Idx.θ r θ := by
   simp only [dCoord_r, g_θθ, Γtot_θ_rθ, Γ_θ_rθ]
-  rw [deriv_pow_two_at]
+  have : deriv (fun r => r^2) r = 2 * r := by
+    rw [deriv_pow']; norm_num
+    exact differentiableAt_id
+  rw [this]
   ring
 
 /-- ∂_r g_{φφ} = 2 Γ^φ_{r φ} g_{φφ}. -/
-@[simp] lemma compat_r_φφ (M r θ : ℝ) :
+@[simp] lemma compat_r_φφ (M r θ : ℝ) (hr : r ≠ 0) :
   dCoord Idx.r (fun r θ => g M Idx.φ Idx.φ r θ) r θ
     = 2 * Γtot M r θ Idx.φ Idx.r Idx.φ * g M Idx.φ Idx.φ r θ := by
-  simp only [dCoord_r, g_φφ, Γtot_φ_rφ]
-  conv_lhs => arg 1; ext s; rw [mul_comm (s^2) _]
-  rw [deriv_const_mul, deriv_pow_two_at, Γ_φ_rφ]
+  simp only [dCoord_r, g_φφ, Γtot_φ_rφ, Γ_φ_rφ]
+  have : deriv (fun r => r^2 * Real.sin θ ^ 2) r = 2 * r * Real.sin θ ^ 2 := by
+    rw [deriv_const_mul]
+    · have : deriv (fun r => r^2) r = 2 * r := by
+        rw [deriv_pow']; norm_num
+        exact differentiableAt_id
+      rw [this]
+    · exact differentiableAt_pow 2
+  rw [this]
   ring
 
 /-- ∂_θ g_{φφ} = 2 Γ^φ_{θ φ} g_{φφ}. -/
-@[simp] lemma compat_θ_φφ (M r θ : ℝ) :
+@[simp] lemma compat_θ_φφ (M r θ : ℝ) (hr : r ≠ 0) :
   dCoord Idx.θ (fun r θ => g M Idx.φ Idx.φ r θ) r θ
     = 2 * Γtot M r θ Idx.φ Idx.θ Idx.φ * g M Idx.φ Idx.φ r θ := by
-  simp only [dCoord_θ, g_φφ, Γtot_φ_θφ]
-  conv_lhs => arg 1; ext t; rw [mul_comm]
-  rw [deriv_const_mul, deriv_sin_sq_at, Γ_φ_θφ]
-  by_cases h : Real.sin θ = 0
-  · simp [h]
-  · field_simp; ring
+  classical
+  simp only [dCoord_θ, g_φφ, Γtot_φ_θφ, Γ_φ_θφ]
+  by_cases hθ : Real.sin θ = 0
+  · -- When sin θ = 0, both sides are 0
+    simp [hθ]
+  · -- When sin θ ≠ 0, use derivative formula
+    have : deriv (fun θ => Real.sin θ ^ 2) θ = 2 * Real.sin θ * Real.cos θ := by
+      rw [deriv_pow']; simp [Real.deriv_sin]; ring
+      exact Real.differentiableAt_sin
+    simp only [deriv_const_mul, this]
+    field_simp [hθ]
+    ring
 
 /-! #### Compatibility equalities that touch `f(r)` -/
 
@@ -349,9 +375,10 @@ lemma Γtot_symmetry (M r θ : ℝ) (i j k : Idx) :
   · by_cases hf : f M r = 0
     · simp [hf, deriv_const]
     · have hf' := f_hasDerivAt M r hr
-      have h_deriv : deriv (fun s => -f M s) r = -(2 * M / r^2) := by simpa using (hf'.neg).deriv
-      simp only [h_deriv]
-      field_simp [hr, hf, pow_two, sub_eq_add_neg]
+      have h_deriv : deriv (fun s => -f M s) r = -(2 * M / r^2) := by
+        simpa using (hf'.neg).deriv
+      simp only [h_deriv, hf, hr]
+      field_simp [pow_two, sub_eq_add_neg]
       ring
 
 /-- ∂_r g_rr = 2 Γ^r_{r r} · g_rr. -/
@@ -365,9 +392,10 @@ lemma Γtot_symmetry (M r θ : ℝ) (i j k : Idx) :
   · by_cases hf : f M r = 0
     · simp [hf, deriv_const]
     · have hf' := f_hasDerivAt M r hr
-      have h_deriv : deriv (fun s => (f M s)⁻¹) r = -(2 * M / r^2) / (f M r)^2 := by simpa using (hf'.inv hf).deriv
-      simp only [h_deriv]
-      field_simp [hr, hf, pow_two]
+      have h_deriv : deriv (fun s => (f M s)⁻¹) r = -(2 * M / r^2) / (f M r)^2 := by
+        simpa using (hf'.inv hf).deriv
+      simp only [h_deriv, hf, hr]
+      field_simp [pow_two]
       ring
 
 /-! #### Off-diagonal compatibility lemmas (crucial for completeness) -/
@@ -1443,20 +1471,24 @@ lemma raise2_T (M r θ : ℝ) (a b : Idx) (T : Idx → Idx → ℝ) :
   -- Use Finset.sum_eq_single to collapse the abstract sum
   rw [Finset.sum_eq_single a]
   · -- Main goal after sum_eq_single
-    simp only [Finset.mul_sum]
+    simp only []
     congr 1
     rw [Finset.sum_eq_single b]
-    · simp
+    · -- Main case: β = b
+      simp only [Ne.eq_self_iff_false, not_false_eq_true]
     · -- Case β ≠ b: gInv[b,β] = 0
       intro β _ hβ_ne_b
       have h_gInv_bβ : gInv M b β r θ = 0 := gInv_off_diagonal M r θ b β (Ne.symm hβ_ne_b)
       simp [h_gInv_bβ]
-    · intro hb_not_mem; exfalso; exact hb_not_mem (Finset.mem_univ b)
-  · -- Case α ≠ a: gInv[a,α] = 0
+    · -- impossible: β ∉ univ
+      intro hb_not_mem; exact (hb_not_mem (Finset.mem_univ b)).elim
+  · -- case: α ≠ a  ⇒  off-diagonal entry of gInv vanishes
     intro α _ hα_ne_a
-    have h_gInv_aα : gInv M a α r θ = 0 := gInv_off_diagonal M r θ a α (Ne.symm hα_ne_a)
-    simp [h_gInv_aα]
-  · intro ha_not_mem; exfalso; exact ha_not_mem (Finset.mem_univ a)
+    have h0 : gInv M a α r θ = 0 :=
+      gInv_off_diagonal M r θ a α (Ne.symm hα_ne_a)
+    simp [h0]
+  · -- impossible: α ∉ univ
+    intro ha_not_mem; exact (ha_not_mem (Finset.mem_univ a)).elim
 
 /-- Four-index raiser: compose the two-index raiser twice. -/
 lemma raise4_R
