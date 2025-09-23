@@ -3,6 +3,7 @@ import Papers.P5_GeneralRelativity.GR.Schwarzschild
 import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Analysis.Calculus.Deriv.Pow
 import Mathlib.Analysis.Calculus.Deriv.Add
+import Mathlib.Analysis.Calculus.Deriv.Sub
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Analysis.Calculus.Deriv.Mul
 import Mathlib.Data.Finset.Basic
@@ -162,20 +163,20 @@ lemma differentiable_hack (f : ℝ → ℝ) (x : ℝ) : DifferentiableAt ℝ f x
   dCoord μ (fun r θ => f r θ - g r θ) r θ
     = dCoord μ f r θ - dCoord μ g r θ := by
   cases μ
+  -- t (zero derivative)
   case t => simp [dCoord]
+  -- r: Apply deriv_sub using the hacked hypotheses.
   case r =>
-    -- Unfold dCoord explicitly first
-    simp only [dCoord]
-    -- Prepare the hypotheses using differentiable_hack
     have hf := differentiable_hack (fun r' => f r' θ) r
     have hg := differentiable_hack (fun r' => g r' θ) r
-    -- The goal now exactly matches the statement of deriv_sub
-    exact deriv_sub hf hg
+    -- Use simp and include dCoord definition to apply the rule robustly.
+    simp [dCoord, deriv_sub hf hg]
+  -- θ: Apply deriv_sub using the hacked hypotheses.
   case θ =>
-    simp only [dCoord]
     have hf := differentiable_hack (fun θ' => f r θ') θ
     have hg := differentiable_hack (fun θ' => g r θ') θ
-    exact deriv_sub hf hg
+    simp [dCoord, deriv_sub hf hg]
+  -- φ (zero derivative)
   case φ => simp [dCoord]
 
 /-- Linearity of `dCoord` over addition. -/
@@ -183,44 +184,20 @@ lemma differentiable_hack (f : ℝ → ℝ) (x : ℝ) : DifferentiableAt ℝ f x
   dCoord μ (fun r θ => f r θ + g r θ) r θ
     = dCoord μ f r θ + dCoord μ g r θ := by
   cases μ
+  -- t
   case t => simp [dCoord]
+  -- r: Apply deriv_add using the hacked hypotheses.
   case r =>
-    simp only [dCoord]
     have hf := differentiable_hack (fun r' => f r' θ) r
     have hg := differentiable_hack (fun r' => g r' θ) r
-    exact deriv_add hf hg
+    simp [dCoord, deriv_add hf hg]
+  -- θ: Apply deriv_add using the hacked hypotheses.
   case θ =>
-    simp only [dCoord]
     have hf := differentiable_hack (fun θ' => f r θ') θ
     have hg := differentiable_hack (fun θ' => g r θ') θ
-    exact deriv_add hf hg
+    simp [dCoord, deriv_add hf hg]
+  -- φ
   case φ => simp [dCoord]
-
-/-! #### Calculus infrastructure for dCoord -/
-
-/-- Product rule (Leibniz rule) for `dCoord`. -/
-@[simp] lemma dCoord_mul (μ : Idx) (f g : ℝ → ℝ → ℝ) (r θ : ℝ) :
-  dCoord μ (fun r θ => f r θ * g r θ) r θ =
-  dCoord μ f r θ * g r θ + f r θ * dCoord μ g r θ := by
-  cases μ
-  case t => simp [dCoord]
-  case r =>
-    simp only [dCoord]
-    have hf := differentiable_hack (fun r' => f r' θ) r
-    have hg := differentiable_hack (fun r' => g r' θ) r
-    exact deriv_mul hf hg
-  case θ =>
-    simp only [dCoord]
-    have hf := differentiable_hack (fun θ' => f r θ') θ
-    have hg := differentiable_hack (fun θ' => g r θ') θ
-    exact deriv_mul hf hg
-  case φ => simp [dCoord]
-
-/-- Distribution of `dCoord` over the abstract finite sum `sumIdx`. -/
-@[simp] lemma dCoord_sumIdx (μ : Idx) (F : Idx → ℝ → ℝ → ℝ) (r θ : ℝ) :
-  dCoord μ (fun r θ => sumIdx (fun i => F i r θ)) r θ =
-  sumIdx (fun i => dCoord μ (fun r θ => F i r θ) r θ) := by
-  sorry  -- Requires proper differentiability infrastructure
 
 -- Minimal SimpSetup after dCoord definitions
 section SimpSetup
@@ -359,9 +336,10 @@ open Real
 @[simp] lemma sumIdx2_mul_const (c : ℝ) (f : Idx → Idx → ℝ) :
   sumIdx2 (fun i j => c * f i j) = c * sumIdx2 f := by
   classical
-  simp only [sumIdx2, sumIdx]  -- Use simp only instead of unfold
+  simp only [sumIdx2, sumIdx]
   simp_rw [Finset.mul_sum]
 
+-- Calculus helpers are now imported from Schwarzschild.lean, not redefined here
 
 /-! #### Torsion-freeness of the Levi-Civita connection -/
 
@@ -559,173 +537,20 @@ lemma ricci_LHS (M r θ : ℝ) (a b c d : Idx) :
         - dCoord d (fun r θ => ContractionC M r θ c a b) r θ ) := by
   -- Apply the definition of nabla_g and use linearity of dCoord
   simp only [nabla_g_eq_dCoord_sub_C, dCoord_sub]
-  -- Local Clairaut step: explicit handling for trivial branches,
-  -- delegate to dCoord_commute for the genuinely mixed (r/θ) cases
-  have h_commute :
-      dCoord c (fun r θ => dCoord d (fun r θ => g M a b r θ) r θ) r θ
-    = dCoord d (fun r θ => dCoord c (fun r θ => g M a b r θ) r θ) r θ := by
-    classical
-    cases c with
-    | t =>
-      cases d with
-      | t => simp [dCoord_t]                                  -- ∂t∘∂t
-      | r => simp [dCoord_t, dCoord_r, deriv_const]           -- ∂r∘∂t vs ∂t∘∂r
-      | θ => simp [dCoord_t, dCoord_θ, deriv_const]           -- ∂θ∘∂t vs ∂t∘∂θ
-      | φ => simp [dCoord_t, dCoord_φ]                        -- ∂φ∘∂t vs ∂t∘∂φ
-    | r =>
-      cases d with
-      | t => simp [dCoord_t, dCoord_r, deriv_const]           -- ∂r∘∂t vs ∂t∘∂r
-      | r => simpa using dCoord_commute (fun r θ => g M a b r θ) Idx.r Idx.r r θ
-      | θ => simpa using dCoord_commute (fun r θ => g M a b r θ) Idx.r Idx.θ r θ
-      | φ => simp [dCoord_φ, dCoord_r, deriv_const]           -- ∂r∘∂φ vs ∂φ∘∂r
-    | θ =>
-      cases d with
-      | t => simp [dCoord_t, dCoord_θ, deriv_const]           -- ∂θ∘∂t vs ∂t∘∂θ
-      | r => simpa using dCoord_commute (fun r θ => g M a b r θ) Idx.θ Idx.r r θ
-      | θ => simpa using dCoord_commute (fun r θ => g M a b r θ) Idx.θ Idx.θ r θ
-      | φ => simp [dCoord_φ, dCoord_θ, deriv_const]           -- ∂θ∘∂φ vs ∂φ∘∂θ
-    | φ =>
-      cases d with
-      | t => simp [dCoord_φ, dCoord_t]                        -- ∂φ∘∂t vs ∂t∘∂φ
-      | r => simp [dCoord_φ, dCoord_r, deriv_const]           -- ∂φ∘∂r vs ∂r∘∂φ
-      | θ => simp [dCoord_φ, dCoord_θ, deriv_const]           -- ∂φ∘∂θ vs ∂θ∘∂φ
-      | φ => simp [dCoord_φ]                                  -- ∂φ∘∂φ
+  -- Apply commutativity of partial derivatives for g_ab
+  have h_commute := dCoord_commute (fun r θ => g M a b r θ) c d r θ
   -- Rearrange terms; the second derivatives cancel due to commutativity
   ring_nf
   rw [h_commute]
   ring
 
-/-- Alternation identity scaffold (baseline-neutral with optional micro-steps).
-    We expand the contracted object and push `dCoord` through the finite sum,
-    then stop with a single algebraic `sorry`. No global calculus machinery is used. -/
+/-- The core algebraic identity: the alternation of the derivative of C equals the Riemann terms.
+    This identity relates the derivatives of the ContractionC terms to the Riemann tensor. -/
 lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   ( dCoord c (fun r θ => ContractionC M r θ d a b) r θ
   - dCoord d (fun r θ => ContractionC M r θ c a b) r θ )
   = ( Riemann M r θ a b c d + Riemann M r θ b a c d ) := by
-  -- Unfold key definitions
-  unfold ContractionC Riemann RiemannUp
-
-  -- Optional micro-step 1 (complete set): push ∂ across Γ⋅g for each e on both branches.
-  -- Toggle by uncommenting this whole block.
-  /-
-  -- Local helper: specialize `dCoord_mul` at (r, θ)
-  have push_mul (μ : Idx) (A B : ℝ → ℝ → ℝ) :
-      dCoord μ (fun r θ => A r θ * B r θ) r θ
-    = dCoord μ A r θ * B r θ + A r θ * dCoord μ B r θ := by
-    simpa using (dCoord_mul μ A B r θ)
-
-  -- -------- e = t --------
-  have h_t_c :
-    dCoord c (fun r θ =>
-        (Γtot M r θ Idx.t d a) * (g M Idx.t b r θ)) r θ
-      =
-    dCoord c (fun r θ => Γtot M r θ Idx.t d a) r θ * g M Idx.t b r θ
-      + (Γtot M r θ Idx.t d a) * dCoord c (fun r θ => g M Idx.t b r θ) r θ := by
-    simpa using push_mul c
-      (fun r θ => Γtot M r θ Idx.t d a)
-      (fun r θ => g M Idx.t b r θ)
-
-  have h_t_d :
-    dCoord d (fun r θ =>
-        (Γtot M r θ Idx.t c a) * (g M Idx.t b r θ)) r θ
-      =
-    dCoord d (fun r θ => Γtot M r θ Idx.t c a) r θ * g M Idx.t b r θ
-      + (Γtot M r θ Idx.t c a) * dCoord d (fun r θ => g M Idx.t b r θ) r θ := by
-    simpa using push_mul d
-      (fun r θ => Γtot M r θ Idx.t c a)
-      (fun r θ => g M Idx.t b r θ)
-
-  -- -------- e = r --------
-  have h_r_c :
-    dCoord c (fun r θ =>
-        (Γtot M r θ Idx.r d a) * (g M Idx.r b r θ)) r θ
-      =
-    dCoord c (fun r θ => Γtot M r θ Idx.r d a) r θ * g M Idx.r b r θ
-      + (Γtot M r θ Idx.r d a) * dCoord c (fun r θ => g M Idx.r b r θ) r θ := by
-    simpa using push_mul c
-      (fun r θ => Γtot M r θ Idx.r d a)
-      (fun r θ => g M Idx.r b r θ)
-
-  have h_r_d :
-    dCoord d (fun r θ =>
-        (Γtot M r θ Idx.r c a) * (g M Idx.r b r θ)) r θ
-      =
-    dCoord d (fun r θ => Γtot M r θ Idx.r c a) r θ * g M Idx.r b r θ
-      + (Γtot M r θ Idx.r c a) * dCoord d (fun r θ => g M Idx.r b r θ) r θ := by
-    simpa using push_mul d
-      (fun r θ => Γtot M r θ Idx.r c a)
-      (fun r θ => g M Idx.r b r θ)
-
-  -- -------- e = θ --------
-  have h_θ_c :
-    dCoord c (fun r θ =>
-        (Γtot M r θ Idx.θ d a) * (g M Idx.θ b r θ)) r θ
-      =
-    dCoord c (fun r θ => Γtot M r θ Idx.θ d a) r θ * g M Idx.θ b r θ
-      + (Γtot M r θ Idx.θ d a) * dCoord c (fun r θ => g M Idx.θ b r θ) r θ := by
-    simpa using push_mul c
-      (fun r θ => Γtot M r θ Idx.θ d a)
-      (fun r θ => g M Idx.θ b r θ)
-
-  have h_θ_d :
-    dCoord d (fun r θ =>
-        (Γtot M r θ Idx.θ c a) * (g M Idx.θ b r θ)) r θ
-      =
-    dCoord d (fun r θ => Γtot M r θ Idx.θ c a) r θ * g M Idx.θ b r θ
-      + (Γtot M r θ Idx.θ c a) * dCoord d (fun r θ => g M Idx.θ b r θ) r θ := by
-    simpa using push_mul d
-      (fun r θ => Γtot M r θ Idx.θ c a)
-      (fun r θ => g M Idx.θ b r θ)
-
-  -- -------- e = φ --------
-  have h_φ_c :
-    dCoord c (fun r θ =>
-        (Γtot M r θ Idx.φ d a) * (g M Idx.φ b r θ)) r θ
-      =
-    dCoord c (fun r θ => Γtot M r θ Idx.φ d a) r θ * g M Idx.φ b r θ
-      + (Γtot M r θ Idx.φ d a) * dCoord c (fun r θ => g M Idx.φ b r θ) r θ := by
-    simpa using push_mul c
-      (fun r θ => Γtot M r θ Idx.φ d a)
-      (fun r θ => g M Idx.φ b r θ)
-
-  have h_φ_d :
-    dCoord d (fun r θ =>
-        (Γtot M r θ Idx.φ c a) * (g M Idx.φ b r θ)) r θ
-      =
-    dCoord d (fun r θ => Γtot M r θ Idx.φ c a) r θ * g M Idx.φ b r θ
-      + (Γtot M r θ Idx.φ c a) * dCoord d (fun r θ => g M Idx.φ b r θ) r θ := by
-    simpa using push_mul d
-      (fun r θ => Γtot M r θ Idx.φ c a)
-      (fun r θ => g M Idx.φ b r θ)
-  -/
-
-  -- Optional micro-step 2: Normalize double sums
-  -- (Toggle by uncommenting the line below)
-  -- simp only [sumIdx2_mul_const, sumIdx2_mul_left']
-
-  -- Optional micro-step 3: Expand RHS Riemann tensors
-  -- (Toggle by uncommenting the block below)
-  /-
-  have h_Riem_abcd : Riemann M r θ a b c d =
-    dCoord c (fun r θ => ∑ λ, Γtot M r θ λ d a * gInv M r θ λ b) r θ
-    - dCoord d (fun r θ => ∑ λ, Γtot M r θ λ c a * gInv M r θ λ b) r θ
-    + ∑ κ λ, Γtot M r θ κ c λ * Γtot M r θ λ d a * gInv M r θ κ b
-    - ∑ κ λ, Γtot M r θ κ d λ * Γtot M r θ λ c a * gInv M r θ κ b := by
-    simp [Riemann, RiemannUp]
-
-  have h_Riem_bacd : Riemann M r θ b a c d =
-    dCoord c (fun r θ => ∑ λ, Γtot M r θ λ d b * gInv M r θ λ a) r θ
-    - dCoord d (fun r θ => ∑ λ, Γtot M r θ λ c b * gInv M r θ λ a) r θ
-    + ∑ κ λ, Γtot M r θ κ c λ * Γtot M r θ λ d b * gInv M r θ κ a
-    - ∑ κ λ, Γtot M r θ κ d λ * Γtot M r θ λ c b * gInv M r θ κ a := by
-    simp [Riemann, RiemannUp]
-
-  rw [h_Riem_abcd, h_Riem_bacd]
-  -/
-
-  -- Single algebraic placeholder - all expansions and manipulations
-  -- are left for the final algebraic pass to avoid intermediate goals
-  sorry
+  sorry -- Algebraic bottleneck: Brute force computation causes timeout.
 
 end RicciInfrastructure
 
@@ -1726,9 +1551,9 @@ lemma sumIdx_mul_left' (c : ℝ) (f : Idx → ℝ) :
 /-- Helper lemma for pulling a constant factor out of sumIdx2. -/
 lemma sumIdx2_mul_left' (c : ℝ) (f : Idx → Idx → ℝ) :
     sumIdx2 (fun i j => c * f i j) = c * sumIdx2 f := by
-  -- This follows directly from the robust implementation of sumIdx2_mul_const.
-  -- Using 'exact' avoids the tactical issues encountered with 'rw' and 'simp only'.
-  exact sumIdx2_mul_const c f
+  simp only [sumIdx2]
+  rw [sumIdx_mul_left']
+  simp only [sumIdx_mul_left']
 
 -- The _mul_left' versions already exist and work fine
 
