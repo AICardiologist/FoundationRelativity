@@ -559,8 +559,37 @@ lemma ricci_LHS (M r θ : ℝ) (a b c d : Idx) :
         - dCoord d (fun r θ => ContractionC M r θ c a b) r θ ) := by
   -- Apply the definition of nabla_g and use linearity of dCoord
   simp only [nabla_g_eq_dCoord_sub_C, dCoord_sub]
-  -- Apply commutativity of partial derivatives for g_ab
-  have h_commute := dCoord_commute (fun r θ => g M a b r θ) c d r θ
+  -- Local Clairaut step: explicit handling for trivial branches,
+  -- delegate to dCoord_commute for the genuinely mixed (r/θ) cases
+  have h_commute :
+      dCoord c (fun r θ => dCoord d (fun r θ => g M a b r θ) r θ) r θ
+    = dCoord d (fun r θ => dCoord c (fun r θ => g M a b r θ) r θ) r θ := by
+    classical
+    cases c with
+    | t =>
+      cases d with
+      | t => simp [dCoord_t]                                  -- ∂t∘∂t
+      | r => simp [dCoord_t, dCoord_r, deriv_const]           -- ∂r∘∂t vs ∂t∘∂r
+      | θ => simp [dCoord_t, dCoord_θ, deriv_const]           -- ∂θ∘∂t vs ∂t∘∂θ
+      | φ => simp [dCoord_t, dCoord_φ]                        -- ∂φ∘∂t vs ∂t∘∂φ
+    | r =>
+      cases d with
+      | t => simp [dCoord_t, dCoord_r, deriv_const]           -- ∂r∘∂t vs ∂t∘∂r
+      | r => simpa using dCoord_commute (fun r θ => g M a b r θ) Idx.r Idx.r r θ
+      | θ => simpa using dCoord_commute (fun r θ => g M a b r θ) Idx.r Idx.θ r θ
+      | φ => simp [dCoord_φ, dCoord_r, deriv_const]           -- ∂r∘∂φ vs ∂φ∘∂r
+    | θ =>
+      cases d with
+      | t => simp [dCoord_t, dCoord_θ, deriv_const]           -- ∂θ∘∂t vs ∂t∘∂θ
+      | r => simpa using dCoord_commute (fun r θ => g M a b r θ) Idx.θ Idx.r r θ
+      | θ => simpa using dCoord_commute (fun r θ => g M a b r θ) Idx.θ Idx.θ r θ
+      | φ => simp [dCoord_φ, dCoord_θ, deriv_const]           -- ∂θ∘∂φ vs ∂φ∘∂θ
+    | φ =>
+      cases d with
+      | t => simp [dCoord_φ, dCoord_t]                        -- ∂φ∘∂t vs ∂t∘∂φ
+      | r => simp [dCoord_φ, dCoord_r, deriv_const]           -- ∂φ∘∂r vs ∂r∘∂φ
+      | θ => simp [dCoord_φ, dCoord_θ, deriv_const]           -- ∂φ∘∂θ vs ∂θ∘∂φ
+      | φ => simp [dCoord_φ]                                  -- ∂φ∘∂φ
   -- Rearrange terms; the second derivatives cancel due to commutativity
   ring_nf
   rw [h_commute]
