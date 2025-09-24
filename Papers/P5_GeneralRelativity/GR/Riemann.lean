@@ -196,6 +196,15 @@ lemma differentiable_hack (f : ℝ → ℝ) (x : ℝ) : DifferentiableAt ℝ f x
     exact deriv_add hf hg
   case φ => simp [dCoord]
 
+/-
+/-- Linearity of `dCoord` across 4 terms. -/
+lemma dCoord_add4 (μ : Idx) (A B C D : ℝ → ℝ → ℝ) (r θ : ℝ) :
+  dCoord μ (fun r θ => A r θ + B r θ + C r θ + D r θ) r θ
+  = dCoord μ A r θ + dCoord μ B r θ + dCoord μ C r θ + dCoord μ D r θ := by
+  simp only [dCoord_add]
+  ring
+-/
+
 /-! #### Calculus infrastructure for dCoord -/
 
 /-- Product rule (Leibniz rule) for `dCoord`. -/
@@ -216,11 +225,149 @@ lemma differentiable_hack (f : ℝ → ℝ) (x : ℝ) : DifferentiableAt ℝ f x
     exact deriv_mul hf hg
   case φ => simp [dCoord]
 
+/-- Push `dCoord` across a 4-term sum via two applications of `dCoord_add`. -/
+lemma dCoord_add4 (μ : Idx)
+  (A B C D : ℝ → ℝ → ℝ) (r θ : ℝ) :
+  dCoord μ (fun r θ => A r θ + B r θ + C r θ + D r θ) r θ
+  =
+  dCoord μ A r θ + dCoord μ B r θ + dCoord μ C r θ + dCoord μ D r θ := by
+  -- First group as (A+B) + (C+D)
+  have h1 :
+    dCoord μ
+      (fun r θ => (A r θ + B r θ) + (C r θ + D r θ)) r θ
+    =
+    dCoord μ (fun r θ => A r θ + B r θ) r θ
+    + dCoord μ (fun r θ => C r θ + D r θ) r θ := by
+    simpa [add_comm, add_left_comm, add_assoc] using
+      dCoord_add μ (fun r θ => A r θ + B r θ) (fun r θ => C r θ + D r θ) r θ
+  have hAB : dCoord μ (fun r θ => A r θ + B r θ) r θ
+             = dCoord μ A r θ + dCoord μ B r θ := by
+    simpa using dCoord_add μ A B r θ
+  have hCD : dCoord μ (fun r θ => C r θ + D r θ) r θ
+             = dCoord μ C r θ + dCoord μ D r θ := by
+    simpa using dCoord_add μ C D r θ
+  have h2 :
+    dCoord μ (fun r θ => A r θ + B r θ) r θ
+    + dCoord μ (fun r θ => C r θ + D r θ) r θ
+    =
+    (dCoord μ A r θ + dCoord μ B r θ)
+    + (dCoord μ C r θ + dCoord μ D r θ) := by
+    congr 1 <;> assumption
+  simpa [add_comm, add_left_comm, add_assoc] using h1.trans h2
+
+/-- `dCoord_add4` specialized to a fully flattened 4-term sum. -/
+lemma dCoord_add4_flat (μ : Idx)
+  (A B C D : ℝ → ℝ → ℝ) (r θ : ℝ) :
+  dCoord μ (fun r θ => A r θ + B r θ + C r θ + D r θ) r θ
+  =
+  dCoord μ A r θ + dCoord μ B r θ + dCoord μ C r θ + dCoord μ D r θ := by
+  simpa [add_comm, add_left_comm, add_assoc] using
+    dCoord_add4 μ A B C D r θ
+
+/-- Push `dCoord` across `sumIdx` using a function-level expansion of `sumIdx`.
+    This is designed to pair with a local `sumIdx_expand_local` proved by `funext`. -/
+lemma dCoord_sumIdx_via_funext
+  (μ : Idx) (F : Idx → ℝ → ℝ → ℝ) (r θ : ℝ)
+  (hexp_fun :
+    (fun r θ => sumIdx (fun i => F i r θ))
+    =
+    (fun r θ =>
+      F Idx.t r θ + F Idx.r r θ + F Idx.θ r θ + F Idx.φ r θ)) :
+  dCoord μ (fun r θ => sumIdx (fun i => F i r θ)) r θ
+  =
+    dCoord μ (F Idx.t) r θ
+  + dCoord μ (F Idx.r) r θ
+  + dCoord μ (F Idx.θ) r θ
+  + dCoord μ (F Idx.φ) r θ := by
+  -- Rewrite the function under `dCoord` via the function-level expansion
+  have h₁ := congrArg (fun H => dCoord μ H r θ) hexp_fun
+  -- Then push `dCoord` through the 4-term sum
+  have h₂ := dCoord_add4_flat μ (F Idx.t) (F Idx.r) (F Idx.θ) (F Idx.φ) r θ
+  -- Compose and normalize
+  simpa [add_comm, add_left_comm, add_assoc] using h₁.trans h₂
+
+/-- Same as `dCoord_sumIdx_via_funext` but takes the *pointwise* local expansion
+    and builds the function-level equality internally via `funext`. -/
+lemma dCoord_sumIdx_via_local_expand
+  (μ : Idx) (F : Idx → ℝ → ℝ → ℝ) (r θ : ℝ)
+  (hexp_pointwise :
+    ∀ r θ, sumIdx (fun i => F i r θ)
+            = F Idx.t r θ + F Idx.r r θ + F Idx.θ r θ + F Idx.φ r θ) :
+  dCoord μ (fun r θ => sumIdx (fun i => F i r θ)) r θ
+  =
+    dCoord μ (F Idx.t) r θ
+  + dCoord μ (F Idx.r) r θ
+  + dCoord μ (F Idx.θ) r θ
+  + dCoord μ (F Idx.φ) r θ := by
+  have hexp_fun :
+      (fun r θ => sumIdx (fun i => F i r θ))
+      =
+      (fun r θ =>
+        F Idx.t r θ + F Idx.r r θ + F Idx.θ r θ + F Idx.φ r θ) := by
+    funext r θ; simpa using hexp_pointwise r θ
+  exact dCoord_sumIdx_via_funext μ F r θ hexp_fun
+
 /-- Distribution of `dCoord` over the abstract finite sum `sumIdx`. -/
 @[simp] lemma dCoord_sumIdx (μ : Idx) (F : Idx → ℝ → ℝ → ℝ) (r θ : ℝ) :
   dCoord μ (fun r θ => sumIdx (fun i => F i r θ)) r θ =
   sumIdx (fun i => dCoord μ (fun r θ => F i r θ) r θ) := by
   sorry  -- Requires proper differentiability infrastructure
+
+/-
+-- === gInv activation note ===
+-- Choose ONE domain strategy when enabling `gInv`:
+--   (A) Local, hypothesis-gated lemmas:
+--       State metric_inverse_id with assumptions `hr : r ≠ 0`, `hs : Real.sin θ ≠ 0`.
+--       Keeps `gInv` total, lemmas are valid where denominators are nonzero.
+--   (B) Chart-restricted sections:
+--       `section Domain; variable (hr : r ≠ 0) (hs : Real.sin θ ≠ 0) ... end`
+--       Clean simp behavior inside the chart; no global assumptions leak.
+--
+-- In either case, keep `[simp]` facts local to RHS sections.
+-/
+
+/-
+-- === Metric inverse (ready to enable when domain/regularity choices are fixed) ===
+-- Diagonal inverse for the usual Schwarzschild-like diagonal metric.
+-- NOTE: you may want domain guards (r ≠ 0, sin θ ≠ 0) or work in a chart where those hold.
+
+def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
+  match μ, ν with
+  | Idx.t, Idx.t => 1 / (f M r)
+  | Idx.r, Idx.r => f M r
+  | Idx.θ, Idx.θ => 1 / (r * r)
+  | Idx.φ, Idx.φ => 1 / (r * r * (Real.sin θ) * (Real.sin θ))
+  | _, _         => 0
+
+-- Metric-inverse identity (statement; choose both left and right identities if you like):
+-- lemma metric_inverse_id_left (M : ℝ) :
+--   ∀ (μ ν : Idx) (r θ : ℝ),
+--     sumIdx (fun e => g M μ e r θ * gInv M e ν r θ) = if μ = ν then 1 else 0 := by
+--   -- diagonal-by-diagonal case split; reduce off-diagonal terms by `simp [g, gInv]`
+--   -- use standard algebraic identities, then handle domain conditions if needed
+--   sorry
+
+-- lemma metric_inverse_id_right (M : ℝ) :
+--   ∀ (μ ν : Idx) (r θ : ℝ),
+--     sumIdx (fun e => gInv M μ e r θ * g M e ν r θ) = if μ = ν then 1 else 0 := by
+--   sorry
+
+-- When `gInv` is enabled, these diagonality simp facts help a lot.
+-- Keep them local (`local attribute [simp]`) in RHS sections if you prefer.
+
+-- Off-diagonal vanishes:
+-- @[simp] lemma gInv_offdiag (M : ℝ) (μ ν : Idx) (r θ : ℝ) :
+--   μ ≠ ν → gInv M μ ν r θ = 0 := by
+--   intro h
+--   cases μ <;> cases ν <;> simp [gInv, h]  -- `simp` handles the non-matching branches
+
+-- Diagonal cases (optional granular versions; helpful for `simp`):
+-- @[simp] lemma gInv_tt (M r θ) : gInv M Idx.t Idx.t r θ = 1 / (f M r) := by simp [gInv]
+-- @[simp] lemma gInv_rr (M r θ) : gInv M Idx.r Idx.r r θ = f M r       := by simp [gInv]
+-- @[simp] lemma gInv_θθ (M r θ) : gInv M Idx.θ Idx.θ r θ = 1 / (r*r)   := by simp [gInv]
+-- @[simp] lemma gInv_φφ (M r θ) : gInv M Idx.φ Idx.φ r θ = 1 / (r*r*(Real.sin θ)^2) := by
+--   simp [gInv, sq, pow_two]
+-/
 
 -- Minimal SimpSetup after dCoord definitions
 section SimpSetup
@@ -532,6 +679,26 @@ noncomputable section RicciInfrastructure
 def ContractionC (M r θ : ℝ) (d a b : Idx) : ℝ :=
   sumIdx (fun e => Γtot M r θ e d a * g M e b r θ + Γtot M r θ e d b * g M a e r θ)
 
+/-
+-- Namespace wrapper to avoid naming conflicts when upstream definitions arrive
+namespace DraftRiemann
+
+/-- Riemann tensor with one index raised (mixed form).
+    R^a_{bcd} = ∂_c Γ^a_{db} - ∂_d Γ^a_{cb} + Γ^a_{cλ} Γ^λ_{db} - Γ^a_{dλ} Γ^λ_{cb} -/
+def RiemannUp (M r θ : ℝ) (a b c d : Idx) : ℝ :=
+  dCoord c (fun r θ => Γtot M r θ a d b) r θ
+  - dCoord d (fun r θ => Γtot M r θ a c b) r θ
+  + sumIdx (fun e => Γtot M r θ a c e * Γtot M r θ e d b)
+  - sumIdx (fun e => Γtot M r θ a d e * Γtot M r θ e c b)
+
+/-- Riemann tensor with all indices lowered.
+    R_{abcd} = g_{aμ} R^μ_{bcd} -/
+def Riemann (M r θ : ℝ) (a b c d : Idx) : ℝ :=
+  sumIdx (fun μ => g M a μ r θ * RiemannUp M r θ μ b c d)
+
+end DraftRiemann
+-/
+
 /-- Lemma relating nabla_g and ContractionC. By definition: ∇_d g_ab = ∂_d g_ab - C_dab. -/
 lemma nabla_g_eq_dCoord_sub_C (M r θ : ℝ) (d a b : Idx) :
   nabla_g M r θ d a b = dCoord d (fun r θ => g M a b r θ) r θ - ContractionC M r θ d a b := by
@@ -595,6 +762,310 @@ lemma ricci_LHS (M r θ : ℝ) (a b c d : Idx) :
   rw [h_commute]
   ring
 
+/-
+-- Activation switch (names only; keeps statements unchanged)
+
+-- EITHER (A) keep everything fully qualified via local abbrevs:
+local abbrev Riemann := DraftRiemann.Riemann
+local abbrev RiemannUp := DraftRiemann.RiemannUp
+
+-- OR (B) open the namespace *only if* there is no conflicting top-level `Riemann`:
+-- open DraftRiemann
+
+-- When active, update unfolds inside the proof to:
+--   unfold ContractionC Riemann RiemannUp
+-/
+
+/-
+-- ACTIVATION_STATUS: baseline
+-- Change when toggling:
+--   ACTIVATION_STATUS: stage1-lhs-first
+--   ACTIVATION_STATUS: stage1-lhs-both
+--   ACTIVATION_STATUS: stage1-full
+-/
+
+/-
+-- DEPENDENCY CHAIN for full activation:
+-- 1. Required: dCoord_add, dCoord_mul (for Stage-1 blocks)
+-- 2. Required: gInv definition (for RHS blocks)
+-- 3. Optional: sumIdx_expand (for split proofs)
+-- Currently blocked on: (1)
+-- Status: baseline 51, all infrastructure commented and ready
+-/
+
+/-
+  [[STAGE1-READY]] Top-level, baseline-neutral Stage-1 LHS facts (first family).
+  These lemmas are validated independently of the main alternation proof and do not
+  increase the unsolved-goal count (they introduce no `sorry`).
+
+  When ready to activate, these can be referenced as:
+    have Hc := Stage1LHS.Hc_one M r θ a b c d    -- First family, c-branch
+    have Hd := Stage1LHS.Hd_one M r θ a b c d    -- First family, d-branch
+    have Hc2 := Stage1LHS.Hc2_one M r θ a b c d  -- Second family, c-branch
+    have Hd2 := Stage1LHS.Hd2_one M r θ a b c d  -- Second family, d-branch
+-/
+namespace Stage1LHS
+
+section FirstFamily
+  -- Keep the facts fully parametric to avoid depending on any ambient context.
+  variable (M r θ : ℝ) (a b c d : Idx)
+
+  /- Four first-family summands on the c-branch -/
+  private def Pt (M : ℝ) (a b d : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.t d a) * (g M Idx.t b r θ)
+  private def Pr (M : ℝ) (a b d : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.r d a) * (g M Idx.r b r θ)
+  private def Pθ (M : ℝ) (a b d : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.θ d a) * (g M Idx.θ b r θ)
+  private def Pφ (M : ℝ) (a b d : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.φ d a) * (g M Idx.φ b r θ)
+
+  /-- Stage-1 fact: LHS c-branch, first family (expand only the e = t summand). -/
+  lemma Hc_one :
+    dCoord c (fun r θ =>
+        Pt M a b d r θ
+      + Pr M a b d r θ
+      + Pθ M a b d r θ
+      + Pφ M a b d r θ) r θ
+    =
+      (dCoord c (fun r θ => Γtot M r θ Idx.t d a) r θ) * g M Idx.t b r θ
+    + (Γtot M r θ Idx.t d a) * dCoord c (fun r θ => g M Idx.t b r θ) r θ
+    + dCoord c (Pr M a b d) r θ
+    + dCoord c (Pθ M a b d) r θ
+    + dCoord c (Pφ M a b d) r θ := by
+    -- 4-term linearity in one step via dCoord_add4_flat
+    have hsum_c := dCoord_add4_flat c (Pt M a b d) (Pr M a b d) (Pθ M a b d) (Pφ M a b d) r θ
+
+    -- Product rule on the t-summand
+    have hPt_push :
+      dCoord c (Pt M a b d) r θ
+      =
+      dCoord c (fun r θ => Γtot M r θ Idx.t d a) r θ * g M Idx.t b r θ
+      + (Γtot M r θ Idx.t d a) * dCoord c (fun r θ => g M Idx.t b r θ) r θ := by
+      simpa using
+        dCoord_mul c
+          (fun r θ => Γtot M r θ Idx.t d a)
+          (fun r θ => g M Idx.t b r θ) r θ
+
+    have H := hsum_c
+    rw [hPt_push] at H
+    simpa [add_comm, add_left_comm, add_assoc] using H
+
+  /- Four first-family summands on the d-branch -/
+  private def Qt (M : ℝ) (a b c : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.t c a) * (g M Idx.t b r θ)
+  private def Qr (M : ℝ) (a b c : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.r c a) * (g M Idx.r b r θ)
+  private def Qθ (M : ℝ) (a b c : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.θ c a) * (g M Idx.θ b r θ)
+  private def Qφ (M : ℝ) (a b c : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.φ c a) * (g M Idx.φ b r θ)
+
+  /-- Stage-1 fact: LHS d-branch, first family (expand only the e = t summand). -/
+  lemma Hd_one :
+    dCoord d (fun r θ =>
+        Qt M a b c r θ
+      + Qr M a b c r θ
+      + Qθ M a b c r θ
+      + Qφ M a b c r θ) r θ
+    =
+      (dCoord d (fun r θ => Γtot M r θ Idx.t c a) r θ) * g M Idx.t b r θ
+    + (Γtot M r θ Idx.t c a) * dCoord d (fun r θ => g M Idx.t b r θ) r θ
+    + dCoord d (Qr M a b c) r θ
+    + dCoord d (Qθ M a b c) r θ
+    + dCoord d (Qφ M a b c) r θ := by
+    -- 4-term linearity in one step via dCoord_add4_flat
+    have hsum_d := dCoord_add4_flat d (Qt M a b c) (Qr M a b c) (Qθ M a b c) (Qφ M a b c) r θ
+
+    -- Product rule on the t-summand
+    have hQt_push :
+      dCoord d (Qt M a b c) r θ
+      =
+      dCoord d (fun r θ => Γtot M r θ Idx.t c a) r θ * g M Idx.t b r θ
+      + (Γtot M r θ Idx.t c a) * dCoord d (fun r θ => g M Idx.t b r θ) r θ := by
+      simpa using
+        dCoord_mul d
+          (fun r θ => Γtot M r θ Idx.t c a)
+          (fun r θ => g M Idx.t b r θ) r θ
+
+    have H := hsum_d
+    rw [hQt_push] at H
+    simpa [add_comm, add_left_comm, add_assoc] using H
+end FirstFamily
+
+end Stage1LHS
+
+-- === Stage-1 LHS (second family, Γtot · g orientation) ===
+namespace Stage1LHS
+
+section SecondFamily
+  -- Keep the facts fully parametric to avoid depending on any ambient context.
+  variable (M r θ : ℝ) (a b c d : Idx)
+
+  /- Four second-family summands on the c-branch:
+     P2* := (Γtot M … * g M a …) with e ∈ {t, r, θ, φ}, using (d, b) on Γtot. -/
+  private def P2t (M : ℝ) (a b d : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.t d b) * (g M a Idx.t r θ)
+  private def P2r (M : ℝ) (a b d : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.r d b) * (g M a Idx.r r θ)
+  private def P2θ (M : ℝ) (a b d : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.θ d b) * (g M a Idx.θ r θ)
+  private def P2φ (M : ℝ) (a b d : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.φ d b) * (g M a Idx.φ r θ)
+
+  /-- Stage-1 fact: **LHS c-branch, second family** (expand only the `e = t` summand). -/
+  lemma Hc2_one :
+    dCoord c (fun r θ =>
+        P2t M a b d r θ
+      + P2r M a b d r θ
+      + P2θ M a b d r θ
+      + P2φ M a b d r θ) r θ
+    =
+      (dCoord c (fun r θ => Γtot M r θ Idx.t d b) r θ) * (g M a Idx.t r θ)
+    + (Γtot M r θ Idx.t d b) * dCoord c (fun r θ => g M a Idx.t r θ) r θ
+    + dCoord c (P2r M a b d) r θ
+    + dCoord c (P2θ M a b d) r θ
+    + dCoord c (P2φ M a b d) r θ := by
+    -- 4-term linearity in one step via dCoord_add4_flat
+    have hsum2_c := dCoord_add4_flat c (P2t M a b d) (P2r M a b d) (P2θ M a b d) (P2φ M a b d) r θ
+
+    -- Product rule on the t-summand (Γtot first, g second)
+    have hP2t_push :
+      dCoord c (P2t M a b d) r θ
+        =
+      dCoord c (fun r θ => Γtot M r θ Idx.t d b) r θ * (g M a Idx.t r θ)
+      + (Γtot M r θ Idx.t d b) * dCoord c (fun r θ => g M a Idx.t r θ) r θ := by
+      simpa using
+        dCoord_mul c
+          (fun r θ => Γtot M r θ Idx.t d b)
+          (fun r θ => g M a Idx.t r θ) r θ
+
+    -- Finish: substitute the product rule into the 4-term linearity
+    have H := hsum2_c
+    rw [hP2t_push] at H
+    simpa [add_comm, add_left_comm, add_assoc] using H
+
+
+  /- Four second-family summands on the d-branch:
+     Q2* := (Γtot M … * g M a …) with e ∈ {t, r, θ, φ}, using (c, b) on Γtot. -/
+  private def Q2t (M : ℝ) (a b c : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.t c b) * (g M a Idx.t r θ)
+  private def Q2r (M : ℝ) (a b c : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.r c b) * (g M a Idx.r r θ)
+  private def Q2θ (M : ℝ) (a b c : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.θ c b) * (g M a Idx.θ r θ)
+  private def Q2φ (M : ℝ) (a b c : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.φ c b) * (g M a Idx.φ r θ)
+
+  /-- Stage-1 fact: **LHS d-branch, second family** (expand only the `e = t` summand). -/
+  lemma Hd2_one :
+    dCoord d (fun r θ =>
+        Q2t M a b c r θ
+      + Q2r M a b c r θ
+      + Q2θ M a b c r θ
+      + Q2φ M a b c r θ) r θ
+    =
+      (dCoord d (fun r θ => Γtot M r θ Idx.t c b) r θ) * (g M a Idx.t r θ)
+    + (Γtot M r θ Idx.t c b) * dCoord d (fun r θ => g M a Idx.t r θ) r θ
+    + dCoord d (Q2r M a b c) r θ
+    + dCoord d (Q2θ M a b c) r θ
+    + dCoord d (Q2φ M a b c) r θ := by
+    -- 4-term linearity in one step via dCoord_add4_flat
+    have hsum2_d := dCoord_add4_flat d (Q2t M a b c) (Q2r M a b c) (Q2θ M a b c) (Q2φ M a b c) r θ
+
+    -- Product rule on the t-summand (Γtot first, g second)
+    have hQ2t_push :
+      dCoord d (Q2t M a b c) r θ
+        =
+      dCoord d (fun r θ => Γtot M r θ Idx.t c b) r θ * (g M a Idx.t r θ)
+      + (Γtot M r θ Idx.t c b) * dCoord d (fun r θ => g M a Idx.t r θ) r θ := by
+      simpa using
+        dCoord_mul d
+          (fun r θ => Γtot M r θ Idx.t c b)
+          (fun r θ => g M a Idx.t r θ) r θ
+
+    -- Finish
+    have H := hsum2_d
+    rw [hQ2t_push] at H
+    simpa [add_comm, add_left_comm, add_assoc] using H
+
+end SecondFamily
+end Stage1LHS
+
+/- === ACTIVATION DEMONSTRATION: Wiring Bridge Lemmas ===
+   This section shows how to use the bridge lemmas to connect Stage-1 facts
+   to the alternation proof without needing the global dCoord_sumIdx.
+
+   When ready to activate, uncomment and place in the alternation proof. -/
+
+/-
+section ActivationDemo
+  variable (M r θ : ℝ) (a b c d : Idx)
+
+  -- Local sumIdx expander using Option A (definitional)
+  -- Place this inside each split section when activating
+  local lemma sumIdx_expand_local {α : Type*} [AddCommMonoid α] (f : Idx → α) :
+    sumIdx f = f Idx.t + f Idx.r + f Idx.θ + f Idx.φ := by
+    -- Option A: definitional approach
+    simp only [sumIdx, Idx.decEq]
+    simp [add_comm, add_left_comm, add_assoc]
+  local attribute [simp] sumIdx_expand_local
+
+  -- Example: Using the bridge to expand ContractionC first family
+  example :
+    dCoord c (fun r θ =>
+      sumIdx (fun e => Γtot M r θ e d a * g M e b r θ)) r θ
+    =
+      dCoord c (fun r θ => Γtot M r θ Idx.t d a * g M Idx.t b r θ) r θ
+    + dCoord c (fun r θ => Γtot M r θ Idx.r d a * g M Idx.r b r θ) r θ
+    + dCoord c (fun r θ => Γtot M r θ Idx.θ d a * g M Idx.θ b r θ) r θ
+    + dCoord c (fun r θ => Γtot M r θ Idx.φ d a * g M Idx.φ b r θ) r θ := by
+    -- Step 1: Use bridge lemma with local expander
+    have hexp := dCoord_sumIdx_via_local_expand c
+      (fun e r θ => Γtot M r θ e d a * g M e b r θ) r θ sumIdx_expand_local
+    convert hexp using 2 <;> simp only [sumIdx_expand_local]
+
+  -- Example: Connect to Stage-1 fact
+  example :
+    dCoord c (fun r θ =>
+      sumIdx (fun e => Γtot M r θ e d a * g M e b r θ)) r θ
+    =
+      -- Expanded t-summand (from Stage1LHS.Hc_one)
+      (dCoord c (fun r θ => Γtot M r θ Idx.t d a) r θ) * g M Idx.t b r θ
+    + (Γtot M r θ Idx.t d a) * dCoord c (fun r θ => g M Idx.t b r θ) r θ
+      -- Other summands stay deferred
+    + dCoord c (fun r θ => Γtot M r θ Idx.r d a * g M Idx.r b r θ) r θ
+    + dCoord c (fun r θ => Γtot M r θ Idx.θ d a * g M Idx.θ b r θ) r θ
+    + dCoord c (fun r θ => Γtot M r θ Idx.φ d a * g M Idx.φ b r θ) r θ := by
+    -- Step 1: Expand sumIdx using bridge
+    rw [dCoord_sumIdx_via_local_expand c _ r θ sumIdx_expand_local]
+    -- Step 2: Apply Stage-1 fact to t-summand
+    rw [Stage1LHS.Hc_one M r θ a b c d]
+    -- Done - other summands remain as dCoord of products
+
+end ActivationDemo
+-/
+
+/-
+  -- === RiemannUp skeleton (comment-only; enable when the math is finalized) ===
+  -- Convention note: adjust index order/signs to match your Γtot/Riemann conventions.
+
+  -- def RiemannUp (M : ℝ) (a b c d : Idx) (r θ : ℝ) : ℝ :=
+  --   dCoord c (fun r θ => Γtot M r θ a d b) r θ
+  -- - dCoord d (fun r θ => Γtot M r θ a c b) r θ
+  -- + sumIdx (fun e =>
+  --     (Γtot M r θ a e c) * (Γtot M r θ e d b)
+  --   - (Γtot M r θ a e d) * (Γtot M r θ e c b))
+
+  -- lemma alternation_dC_eq_Riem_complete : ... := by
+  --   -- Outline (mechanical with your helpers):
+  --   -- 1) Expand the LHS via sumIdx_expand_local (local [simp]).
+  --   -- 2) Use Stage1LHS.{Hc_one,Hd_one,Hc2_one,Hd2_one}.
+  --   -- 3) Normalize with [add_comm, add_left_comm, add_assoc].
+  --   -- 4) Push products using dCoord_mul and use dCoord_add4_flat for 4-term sums.
+  --   sorry
+-/
+
 /-- Alternation identity scaffold (baseline-neutral with optional micro-steps).
     We expand the contracted object and push `dCoord` through the finite sum,
     then stop with a single algebraic `sorry`. No global calculus machinery is used. -/
@@ -602,8 +1073,917 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   ( dCoord c (fun r θ => ContractionC M r θ d a b) r θ
   - dCoord d (fun r θ => ContractionC M r θ c a b) r θ )
   = ( Riemann M r θ a b c d + Riemann M r θ b a c d ) := by
-  -- Unfold key definitions
-  unfold ContractionC Riemann RiemannUp
+  /-
+  -- ACTIVATION CHECKLIST (test each step individually):
+  -- [ ] Stage 0: Uncomment namespace DraftRiemann block (lines 545-561)
+  -- [ ] Stage 0b: Uncomment activation switch (lines 630-632) - use option (A)
+  -- [ ] Stage 1a: Uncomment Stage-1 c-branch micro-pack (lines 667-728)
+  -- [ ] Stage 1b: Uncomment Stage-1 d-branch micro-pack (lines 731-791)
+  -- [ ] Stage 1c: Uncomment Stage-1 RHS ∂_c micro-pack (lines 794-851)
+  -- [ ] Stage 1d: Uncomment Stage-1 RHS ∂_d micro-pack (lines 854-910)
+  -- [ ] Stage 2: Uncomment original Pass-1 facts if needed (lines 957-1095)
+  -- [ ] Stage 3: Uncomment split shapes (lines 1097-1154)
+  -- [ ] Final: Uncomment unfold line (664) and complete proof
+  -/
+
+  -- Unfold key definitions (uncomment when DraftRiemann namespace is active)
+  -- unfold ContractionC Riemann RiemannUp
+
+  /-
+  -- === Stage 1: LHS c-branch (first family) ===
+  section Stage1_LHS_c_first
+
+  -- Name the 4 product summands so linearity matches robustly
+  set P_t : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.t d a) * (g M Idx.t b r θ)) with hPt
+  set P_r : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.r d a) * (g M Idx.r b r θ)) with hPr
+  set P_θ : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.θ d a) * (g M Idx.θ b r θ)) with hPθ
+  set P_φ : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.φ d a) * (g M Idx.φ b r θ)) with hPφ
+
+  -- Local binary linearity helpers (works with your existing dCoord_add)
+  have hAB :
+    dCoord c (fun r θ => P_t r θ + P_r r θ) r θ
+      = dCoord c P_t r θ + dCoord c P_r r θ := by
+    simpa using dCoord_add c P_t P_r r θ
+  have hCD :
+    dCoord c (fun r θ => P_θ r θ + P_φ r θ) r θ
+      = dCoord c P_θ r θ + dCoord c P_φ r θ := by
+    simpa using dCoord_add c P_θ P_φ r θ
+  have hABCD :
+    dCoord c (fun r θ => (P_t r θ + P_r r θ) + (P_θ r θ + P_φ r θ)) r θ
+      = (dCoord c P_t r θ + dCoord c P_r r θ)
+      + (dCoord c P_θ r θ + dCoord c P_φ r θ) := by
+    simpa [add_comm, add_left_comm, add_assoc] using
+      dCoord_add c (fun r θ => P_t r θ + P_r r θ)
+                   (fun r θ => P_θ r θ + P_φ r θ) r θ
+
+  -- 4-term linearity (derived locally from the binary steps above)
+  have hsum_c :
+    dCoord c (fun r θ => P_t r θ + P_r r θ + P_θ r θ + P_φ r θ) r θ
+      = dCoord c P_t r θ + dCoord c P_r r θ + dCoord c P_θ r θ + dCoord c P_φ r θ := by
+    simpa [add_comm, add_left_comm, add_assoc] using hABCD
+
+  -- Per-summand product rule (t-summand only), keep r,θ,φ deferred
+  have hPt_push :
+    dCoord c P_t r θ
+      =
+    dCoord c (fun r θ => Γtot M r θ Idx.t d a) r θ * g M Idx.t b r θ
+    + (Γtot M r θ Idx.t d a) * dCoord c (fun r θ => g M Idx.t b r θ) r θ := by
+    -- Uses your existing product rule `dCoord_mul`
+    simpa [hPt] using
+      dCoord_mul c
+        (fun r θ => Γtot M r θ Idx.t d a)
+        (fun r θ => g M Idx.t b r θ) r θ
+
+  -- Assemble the "one-summand expanded, others deferred" fact (no goal rewrite)
+  have Hc_one :
+    dCoord c (fun r θ =>
+      (Γtot M r θ Idx.t d a) * (g M Idx.t b r θ)
+    + (Γtot M r θ Idx.r d a) * (g M Idx.r b r θ)
+    + (Γtot M r θ Idx.θ d a) * (g M Idx.θ b r θ)
+    + (Γtot M r θ Idx.φ d a) * (g M Idx.φ b r θ)) r θ
+    =
+    (dCoord c (fun r θ => Γtot M r θ Idx.t d a) r θ) * g M Idx.t b r θ
+    + (Γtot M r θ Idx.t d a) * dCoord c (fun r θ => g M Idx.t b r θ) r θ
+    + dCoord c P_r r θ + dCoord c P_θ r θ + dCoord c P_φ r θ := by
+    -- Combine hsum_c with hPt_push; normalize with the hP* names
+    have H := hsum_c
+    rw [hPt_push] at H
+    simpa [hPt, hPr, hPθ, hPφ, add_comm, add_left_comm, add_assoc] using H
+
+  end Stage1_LHS_c_first
+  -/
+
+  /-
+  -- === Stage 1: LHS c-branch (second family) ===
+  section Stage1_LHS_c_second
+
+  -- Name the 4 product summands for second family g_{a e} (Γtot * g orientation)
+  set P2_t : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.t d b) * (g M a Idx.t r θ)) with hP2t
+  set P2_r : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.r d b) * (g M a Idx.r r θ)) with hP2r
+  set P2_θ : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.θ d b) * (g M a Idx.θ r θ)) with hP2θ
+  set P2_φ : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.φ d b) * (g M a Idx.φ r θ)) with hP2φ
+
+  -- Local 4-term linearity for c-branch (second family)
+  have hAB2_c :
+    dCoord c (fun r θ => P2_t r θ + P2_r r θ) r θ
+      = dCoord c P2_t r θ + dCoord c P2_r r θ := by
+    simpa using dCoord_add c P2_t P2_r r θ
+  have hCD2_c :
+    dCoord c (fun r θ => P2_θ r θ + P2_φ r θ) r θ
+      = dCoord c P2_θ r θ + dCoord c P2_φ r θ := by
+    simpa using dCoord_add c P2_θ P2_φ r θ
+  have hABCD2_c :
+    dCoord c (fun r θ => (P2_t r θ + P2_r r θ) + (P2_θ r θ + P2_φ r θ)) r θ
+      = (dCoord c P2_t r θ + dCoord c P2_r r θ)
+      + (dCoord c P2_θ r θ + dCoord c P2_φ r θ) := by
+    simpa [add_comm, add_left_comm, add_assoc] using
+      dCoord_add c (fun r θ => P2_t r θ + P2_r r θ)
+                   (fun r θ => P2_θ r θ + P2_φ r θ) r θ
+
+  have hsum2_c :
+    dCoord c (fun r θ => P2_t r θ + P2_r r θ + P2_θ r θ + P2_φ r θ) r θ
+      = dCoord c P2_t r θ + dCoord c P2_r r θ + dCoord c P2_θ r θ + dCoord c P2_φ r θ := by
+    simpa [add_comm, add_left_comm, add_assoc] using hABCD2_c
+
+  -- Per-summand product rule (t-summand only for second family, Γtot first)
+  have hP2t_push :
+    dCoord c P2_t r θ
+      =
+    dCoord c (fun r θ => Γtot M r θ Idx.t d b) r θ * (g M a Idx.t r θ)
+    + (Γtot M r θ Idx.t d b) * dCoord c (fun r θ => g M a Idx.t r θ) r θ := by
+    simpa [hP2t] using
+      dCoord_mul c
+        (fun r θ => Γtot M r θ Idx.t d b)
+        (fun r θ => g M a Idx.t r θ) r θ
+
+  have Hc2_one :
+    dCoord c (fun r θ =>
+      (Γtot M r θ Idx.t d b) * (g M a Idx.t r θ)
+    + (Γtot M r θ Idx.r d b) * (g M a Idx.r r θ)
+    + (Γtot M r θ Idx.θ d b) * (g M a Idx.θ r θ)
+    + (Γtot M r θ Idx.φ d b) * (g M a Idx.φ r θ)) r θ
+    =
+    (dCoord c (fun r θ => Γtot M r θ Idx.t d b) r θ) * (g M a Idx.t r θ)
+    + (Γtot M r θ Idx.t d b) * dCoord c (fun r θ => g M a Idx.t r θ) r θ
+    + dCoord c P2_r r θ + dCoord c P2_θ r θ + dCoord c P2_φ r θ := by
+    -- Combine hsum2_c with hP2t_push; normalize with the hP2* names
+    have H := hsum2_c
+    rw [hP2t_push] at H
+    simpa [hP2t, hP2r, hP2θ, hP2φ, add_comm, add_left_comm, add_assoc] using H
+
+  end Stage1_LHS_c_second
+  -/
+
+  /-
+  -- === Stage 1: LHS d-branch (first family) ===
+  section Stage1_LHS_d_first
+
+  -- Name the 4 product summands so linearity matches robustly
+  set Q_t : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.t c a) * (g M Idx.t b r θ)) with hQt
+  set Q_r : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.r c a) * (g M Idx.r b r θ)) with hQr
+  set Q_θ : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.θ c a) * (g M Idx.θ b r θ)) with hQθ
+  set Q_φ : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.φ c a) * (g M Idx.φ b r θ)) with hQφ
+
+  -- Local binary linearity (reuse dCoord_add)
+  have hAB_d :
+    dCoord d (fun r θ => Q_t r θ + Q_r r θ) r θ
+      = dCoord d Q_t r θ + dCoord d Q_r r θ := by
+    simpa using dCoord_add d Q_t Q_r r θ
+  have hCD_d :
+    dCoord d (fun r θ => Q_θ r θ + Q_φ r θ) r θ
+      = dCoord d Q_θ r θ + dCoord d Q_φ r θ := by
+    simpa using dCoord_add d Q_θ Q_φ r θ
+  have hABCD_d :
+    dCoord d (fun r θ => (Q_t r θ + Q_r r θ) + (Q_θ r θ + Q_φ r θ)) r θ
+      = (dCoord d Q_t r θ + dCoord d Q_r r θ)
+      + (dCoord d Q_θ r θ + dCoord d Q_φ r θ) := by
+    simpa [add_comm, add_left_comm, add_assoc] using
+      dCoord_add d (fun r θ => Q_t r θ + Q_r r θ)
+                   (fun r θ => Q_θ r θ + Q_φ r θ) r θ
+
+  -- 4-term linearity for d-branch
+  have hsum_d :
+    dCoord d (fun r θ => Q_t r θ + Q_r r θ + Q_θ r θ + Q_φ r θ) r θ
+      = dCoord d Q_t r θ + dCoord d Q_r r θ + dCoord d Q_θ r θ + dCoord d Q_φ r θ := by
+    simpa [add_comm, add_left_comm, add_assoc] using hABCD_d
+
+  -- Per-summand product rule (t-summand only), keep r,θ,φ deferred
+  have hQt_push :
+    dCoord d Q_t r θ
+      =
+    dCoord d (fun r θ => Γtot M r θ Idx.t c a) r θ * g M Idx.t b r θ
+    + (Γtot M r θ Idx.t c a) * dCoord d (fun r θ => g M Idx.t b r θ) r θ := by
+    simpa [hQt] using
+      dCoord_mul d
+        (fun r θ => Γtot M r θ Idx.t c a)
+        (fun r θ => g M Idx.t b r θ) r θ
+
+  -- Assemble the "one-summand expanded, others deferred" fact (no goal rewrite)
+  have Hd_one :
+    dCoord d (fun r θ =>
+      (Γtot M r θ Idx.t c a) * (g M Idx.t b r θ)
+    + (Γtot M r θ Idx.r c a) * (g M Idx.r b r θ)
+    + (Γtot M r θ Idx.θ c a) * (g M Idx.θ b r θ)
+    + (Γtot M r θ Idx.φ c a) * (g M Idx.φ b r θ)) r θ
+    =
+    (dCoord d (fun r θ => Γtot M r θ Idx.t c a) r θ) * g M Idx.t b r θ
+    + (Γtot M r θ Idx.t c a) * dCoord d (fun r θ => g M Idx.t b r θ) r θ
+    + dCoord d Q_r r θ + dCoord d Q_θ r θ + dCoord d Q_φ r θ := by
+    -- Combine hsum_d with hQt_push; normalize with the hQ* names
+    have H := hsum_d
+    rw [hQt_push] at H
+    simpa [hQt, hQr, hQθ, hQφ, add_comm, add_left_comm, add_assoc] using H
+
+  end Stage1_LHS_d_first
+  -/
+
+  /-
+  -- === Stage 1: LHS d-branch (second family) ===
+  section Stage1_LHS_d_second
+
+  -- Name the 4 product summands for second family g_{a e} (Γtot * g orientation)
+  set Q2_t : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.t c b) * (g M a Idx.t r θ)) with hQ2t
+  set Q2_r : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.r c b) * (g M a Idx.r r θ)) with hQ2r
+  set Q2_θ : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.θ c b) * (g M a Idx.θ r θ)) with hQ2θ
+  set Q2_φ : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.φ c b) * (g M a Idx.φ r θ)) with hQ2φ
+
+  -- Local 4-term linearity for d-branch (second family)
+  have hAB2_d :
+    dCoord d (fun r θ => Q2_t r θ + Q2_r r θ) r θ
+      = dCoord d Q2_t r θ + dCoord d Q2_r r θ := by
+    simpa using dCoord_add d Q2_t Q2_r r θ
+  have hCD2_d :
+    dCoord d (fun r θ => Q2_θ r θ + Q2_φ r θ) r θ
+      = dCoord d Q2_θ r θ + dCoord d Q2_φ r θ := by
+    simpa using dCoord_add d Q2_θ Q2_φ r θ
+  have hABCD2_d :
+    dCoord d (fun r θ => (Q2_t r θ + Q2_r r θ) + (Q2_θ r θ + Q2_φ r θ)) r θ
+      = (dCoord d Q2_t r θ + dCoord d Q2_r r θ)
+      + (dCoord d Q2_θ r θ + dCoord d Q2_φ r θ) := by
+    simpa [add_comm, add_left_comm, add_assoc] using
+      dCoord_add d (fun r θ => Q2_t r θ + Q2_r r θ)
+                   (fun r θ => Q2_θ r θ + Q2_φ r θ) r θ
+
+  have hsum2_d :
+    dCoord d (fun r θ => Q2_t r θ + Q2_r r θ + Q2_θ r θ + Q2_φ r θ) r θ
+      = dCoord d Q2_t r θ + dCoord d Q2_r r θ + dCoord d Q2_θ r θ + dCoord d Q2_φ r θ := by
+    simpa [add_comm, add_left_comm, add_assoc] using hABCD2_d
+
+  -- Per-summand product rule (t-summand only for second family, Γtot first)
+  have hQ2t_push :
+    dCoord d Q2_t r θ
+      =
+    dCoord d (fun r θ => Γtot M r θ Idx.t c b) r θ * (g M a Idx.t r θ)
+    + (Γtot M r θ Idx.t c b) * dCoord d (fun r θ => g M a Idx.t r θ) r θ := by
+    simpa [hQ2t] using
+      dCoord_mul d
+        (fun r θ => Γtot M r θ Idx.t c b)
+        (fun r θ => g M a Idx.t r θ) r θ
+
+  have Hd2_one :
+    dCoord d (fun r θ =>
+      (Γtot M r θ Idx.t c b) * (g M a Idx.t r θ)
+    + (Γtot M r θ Idx.r c b) * (g M a Idx.r r θ)
+    + (Γtot M r θ Idx.θ c b) * (g M a Idx.θ r θ)
+    + (Γtot M r θ Idx.φ c b) * (g M a Idx.φ r θ)) r θ
+    =
+    (dCoord d (fun r θ => Γtot M r θ Idx.t c b) r θ) * (g M a Idx.t r θ)
+    + (Γtot M r θ Idx.t c b) * dCoord d (fun r θ => g M a Idx.t r θ) r θ
+    + dCoord d Q2_r r θ + dCoord d Q2_θ r θ + dCoord d Q2_φ r θ := by
+    -- Combine hsum2_d with hQ2t_push; normalize with the hQ2* names
+    have H := hsum2_d
+    rw [hQ2t_push] at H
+    simpa [hQ2t, hQ2r, hQ2θ, hQ2φ, add_comm, add_left_comm, add_assoc] using H
+
+  end Stage1_LHS_d_second
+  -/
+
+  /-
+  -- === sumIdx enumerator (ready to enable) ===
+  -- Choose ONE of the two depending on how `sumIdx` is defined.
+
+  -- Option A (definitional): If `sumIdx f` is definitionally `f t + f r + f θ + f φ`.
+  -- lemma sumIdx_expand (f : Idx → ℝ) :
+  --   sumIdx f = f Idx.t + f Idx.r + f Idx.θ + f Idx.φ := by
+  --   simp [sumIdx, add_comm, add_left_comm, add_assoc]
+
+  -- Option B (finite-type version): If `sumIdx` is a fold over the finite type `Idx`.
+  -- Requires `[DecidableEq Idx] [Fintype Idx]` and `sumIdx` matching `Finset.universe.sum`.
+  -- lemma sumIdx_expand (f : Idx → ℝ) :
+  --   sumIdx f = f Idx.t + f Idx.r + f Idx.θ + f Idx.φ := by
+  --   classical
+  --   -- unfold sumIdx to the underlying finite sum, then enumerate Idx = {t,r,θ,φ}
+  --   -- simp [sumIdx, Finset.universe, add_comm, add_left_comm, add_assoc]
+
+  -- When you choose Option A or B and enable `sumIdx_expand`, consider keeping it *local*:
+  --   local attribute [simp] sumIdx_expand
+  -- That lets you `simp [sumIdx_expand]` inside split sections without changing global behavior.
+  -/
+
+  /-
+  -- === Local enumerator pattern for split sections (paste inside each) ===
+  -- local lemma sumIdx_expand_local (f : Idx → ℝ) :
+  --   sumIdx f = f Idx.t + f Idx.r + f Idx.θ + f Idx.φ := by
+  --   -- Option A: definitional `sumIdx`
+  --   --   simp [sumIdx, add_comm, add_left_comm, add_assoc]
+  --   -- Option B: finite type enumeration
+  --   --   classical
+  --   --   -- unfold to finset sum; enumerate Idx = {t,r,θ,φ}
+  --   --   -- simp [sumIdx, Finset.universe, add_comm, add_left_comm, add_assoc]
+  --   sorry
+  -- local attribute [simp] sumIdx_expand_local
+  -- Then use: simp [sumIdx_expand_local] to expand locally
+  -/
+
+  /-
+  -- === ACTIVATION GUIDE for Stage-1 Splits ===
+  -- When ready to activate, the diff is minimal:
+  -- 1. Uncomment the section
+  -- 2. After the pointwise split, add:
+  --    have h_add := dCoord_add c (first_family_sum) (second_family_sum) r θ
+  -- 3. Apply 4-term linearity:
+  --    have h_linP  := dCoord_add4_flat c P_t  P_r  P_θ  P_φ  r θ
+  --    have h_linP2 := dCoord_add4_flat c P2_t P2_r P2_θ P2_φ r θ
+  -- 4. Chain: pointwise_split.trans h_add |>.trans (by rw [h_linP, h_linP2])
+  --
+  -- Uses: dCoord_add4_flat for 4-term linearity, dCoord_mul for product rules
+  -- Normalization: [add_comm, add_left_comm, add_assoc]
+  -/
+
+  /-
+  -- === Stage 1: LHS c-branch (split both families) ===
+  section Stage1_LHS_c_split
+
+  have Hsplit_c_both :
+    dCoord c (fun r θ => ContractionC M r θ d a b) r θ
+      =
+    dCoord c (fun r θ => P_t  r θ + P_r  r θ + P_θ  r θ + P_φ  r θ) r θ
+    + dCoord c (fun r θ => P2_t r θ + P2_r r θ + P2_θ r θ + P2_φ r θ) r θ := by
+    -- idea:
+    --   unfold ContractionC;  -- when DraftRiemann is active, no change needed here
+    --   -- rewrite  ∑_e [Γ^e_{d a} g_{e b} + Γ^e_{d b} g_{a e}]  as  (∑ first) + (∑ second)
+    --   -- then expand each finite ∑ to 4 terms using your enumerator, and `simpa` with:
+    --   --   [hPt, hPr, hPθ, hPφ, hP2t, hP2r, hP2θ, hP2φ, add_comm, add_left_comm, add_assoc]
+
+    -- Pre-wired 4-term linearity for first family (when activated):
+    -- have hLinP :
+    --   dCoord c (fun r θ => P_t r θ + P_r r θ + P_θ r θ + P_φ r θ) r θ
+    --   =
+    --   dCoord c P_t r θ + dCoord c P_r r θ + dCoord c P_θ r θ + dCoord c P_φ r θ := by
+    --   simpa [add_comm, add_left_comm, add_assoc] using
+    --     dCoord_add4 c P_t P_r P_θ P_φ r θ
+
+    -- Pre-wired 4-term linearity for second family (when activated):
+    -- have hLinP2 :
+    --   dCoord c (fun r θ => P2_t r θ + P2_r r θ + P2_θ r θ + P2_φ r θ) r θ
+    --   =
+    --   dCoord c P2_t r θ + dCoord c P2_r r θ + dCoord c P2_θ r θ + dCoord c P2_φ r θ := by
+    --   simpa [add_comm, add_left_comm, add_assoc] using
+    --     dCoord_add4 c P2_t P2_r P2_θ P2_φ r θ
+
+    sorry
+
+  end Stage1_LHS_c_split
+  -/
+
+  /-
+  -- === Stage 1: LHS d-branch (split both families) ===
+  section Stage1_LHS_d_split
+  have Hsplit_d_both :
+    dCoord d (fun r θ => ContractionC M r θ c a b) r θ
+      =
+    dCoord d (fun r θ => Q_t  r θ + Q_r  r θ + Q_θ  r θ + Q_φ  r θ) r θ
+    + dCoord d (fun r θ => Q2_t r θ + Q2_r r θ + Q2_θ r θ + Q2_φ r θ) r θ := by
+    -- mirrored idea of Hsplit_c_both; same `simpa` hint set for the Q/Q2 names
+
+    -- Pre-wired 4-term linearity for first family (when activated):
+    -- have hLinQ :
+    --   dCoord d (fun r θ => Q_t r θ + Q_r r θ + Q_θ r θ + Q_φ r θ) r θ
+    --   =
+    --   dCoord d Q_t r θ + dCoord d Q_r r θ + dCoord d Q_θ r θ + dCoord d Q_φ r θ := by
+    --   simpa [add_comm, add_left_comm, add_assoc] using
+    --     dCoord_add4 d Q_t Q_r Q_θ Q_φ r θ
+
+    -- Pre-wired 4-term linearity for second family (when activated):
+    -- have hLinQ2 :
+    --   dCoord d (fun r θ => Q2_t r θ + Q2_r r θ + Q2_θ r θ + Q2_φ r θ) r θ
+    --   =
+    --   dCoord d Q2_t r θ + dCoord d Q2_r r θ + dCoord d Q2_θ r θ + dCoord d Q2_φ r θ := by
+    --   simpa [add_comm, add_left_comm, add_assoc] using
+    --     dCoord_add4 d Q2_t Q2_r Q2_θ Q2_φ r θ
+
+    sorry
+
+  end Stage1_LHS_d_split
+  -/
+
+  /-
+  -- Proof skeleton for Hsplit_c_both (replace the `sorry` above when ready):
+
+  -- Self-contained: define all 8 names locally (so this works without Stage-1 blocks)
+  set P_t  : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.t d a) * (g M Idx.t b r θ)) with hPt
+  set P_r  : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.r d a) * (g M Idx.r b r θ)) with hPr
+  set P_θ  : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.θ d a) * (g M Idx.θ b r θ)) with hPθ
+  set P_φ  : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.φ d a) * (g M Idx.φ b r θ)) with hPφ
+
+  set P2_t : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.t d b) * (g M a Idx.t r θ)) with hP2t
+  set P2_r : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.r d b) * (g M a Idx.r r θ)) with hP2r
+  set P2_θ : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.θ d b) * (g M a Idx.θ r θ)) with hP2θ
+  set P2_φ : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.φ d b) * (g M a Idx.φ r θ)) with hP2φ
+
+  -- Local simp bundle (scoped to this proof only)
+  local attribute [simp] hPt hPr hPθ hPφ hP2t hP2r hP2θ hP2φ
+
+  -- Step A: rewrite ContractionC pointwise into (first family) + (second family)
+  have h_split_c_pointwise :
+    (fun r θ => ContractionC M r θ d a b)
+      =
+    (fun r θ =>
+        (P_t  r θ + P_r  r θ + P_θ  r θ + P_φ  r θ)
+      + (P2_t r θ + P2_r r θ + P2_θ r θ + P2_φ r θ)) := by
+    funext r θ
+    -- Expand ContractionC, expand the finite sum, and normalize into P_* + P2_*:
+    --   ContractionC = ∑e [ Γ^e_{d a}·g_{e b}  +  Γ^e_{d b}·g_{a e} ]
+    -- Use your enumerator (t, r, θ, φ), then `simpa` with the names.
+    -- NOTE: keep all `add_*` comm/assoc rewrites local for determinism.
+    -- With local simp bundle, the normalization is cleaner:
+    --   simp [ContractionC, sumIdx_expand, add_comm, add_left_comm, add_assoc]
+    -- The hP*/hP2* names are already marked as simp
+    sorry
+
+  -- Step B: apply binary linearity across the two families, then normalize
+  have h_lin_c :
+    dCoord c
+      (fun r θ =>
+          (P_t  r θ + P_r  r θ + P_θ  r θ + P_φ  r θ)
+        + (P2_t r θ + P2_r r θ + P2_θ r θ + P2_φ r θ)) r θ
+    =
+    dCoord c (fun r θ => P_t  r θ + P_r  r θ + P_θ  r θ + P_φ  r θ) r θ
+    + dCoord c (fun r θ => P2_t r θ + P2_r r θ + P2_θ r θ + P2_φ r θ) r θ := by
+    -- single application of binary linearity
+    simpa [add_comm, add_left_comm, add_assoc]
+      using dCoord_add c
+        (fun r θ => P_t  r θ + P_r  r θ + P_θ  r θ + P_φ  r θ)
+        (fun r θ => P2_t r θ + P2_r r θ + P2_θ r θ + P2_φ r θ) r θ
+
+  -- Step C: tie it together with one rewrite and a `simpa`
+  have Hsplit_c_both :
+    dCoord c (fun r θ => ContractionC M r θ d a b) r θ
+      =
+    dCoord c (fun r θ => P_t  r θ + P_r  r θ + P_θ  r θ + P_φ  r θ) r θ
+    + dCoord c (fun r θ => P2_t r θ + P2_r r θ + P2_θ r θ + P2_φ r θ) r θ := by
+    -- pointwise rewrite, then linearity, then normalize
+    have := congrArg (fun F => dCoord c F r θ) h_split_c_pointwise
+    -- `this` : dCoord c (ContractionC …) = dCoord c ((P-sum)+(P2-sum))
+    -- Now replace RHS via `h_lin_c`:
+    simpa using this.trans h_lin_c
+
+  -- As always, build & verify error count immediately after enabling.
+  -/
+
+  /-
+  -- Proof skeleton for Hsplit_d_both (replace the `sorry` above when ready):
+
+  -- Self-contained: define all 8 names locally (so this works without Stage-1 blocks)
+  set Q_t  : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.t c a) * (g M Idx.t b r θ)) with hQt
+  set Q_r  : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.r c a) * (g M Idx.r b r θ)) with hQr
+  set Q_θ  : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.θ c a) * (g M Idx.θ b r θ)) with hQθ
+  set Q_φ  : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.φ c a) * (g M Idx.φ b r θ)) with hQφ
+
+  set Q2_t : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.t c b) * (g M a Idx.t r θ)) with hQ2t
+  set Q2_r : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.r c b) * (g M a Idx.r r θ)) with hQ2r
+  set Q2_θ : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.θ c b) * (g M a Idx.θ r θ)) with hQ2θ
+  set Q2_φ : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.φ c b) * (g M a Idx.φ r θ)) with hQ2φ
+
+  -- Local simp bundle (scoped to this proof only)
+  local attribute [simp] hQt hQr hQθ hQφ hQ2t hQ2r hQ2θ hQ2φ
+
+  -- Step A: pointwise split of ContractionC on the d-branch
+  have h_split_d_pointwise :
+    (fun r θ => ContractionC M r θ c a b)
+      =
+    (fun r θ =>
+        (Q_t  r θ + Q_r  r θ + Q_θ  r θ + Q_φ  r θ)
+      + (Q2_t r θ + Q2_r r θ + Q2_θ r θ + Q2_φ r θ)) := by
+    funext r θ
+    -- Mirror the same enumerator-based expansion used for Hsplit_c_both:
+    -- With local simp bundle, the normalization is cleaner:
+    --   simp [ContractionC, sumIdx_expand, add_comm, add_left_comm, add_assoc]
+    -- The hQ*/hQ2* names are already marked as simp
+    sorry
+
+  -- Step B: binary linearity across the two families
+  have h_lin_d :
+    dCoord d
+      (fun r θ =>
+          (Q_t  r θ + Q_r  r θ + Q_θ  r θ + Q_φ  r θ)
+        + (Q2_t r θ + Q2_r r θ + Q2_θ r θ + Q2_φ r θ)) r θ
+    =
+    dCoord d (fun r θ => Q_t  r θ + Q_r  r θ + Q_θ  r θ + Q_φ  r θ) r θ
+    + dCoord d (fun r θ => Q2_t r θ + Q2_r r θ + Q2_θ r θ + Q2_φ r θ) r θ := by
+    simpa [add_comm, add_left_comm, add_assoc]
+      using dCoord_add d
+        (fun r θ => Q_t  r θ + Q_r  r θ + Q_θ  r θ + Q_φ  r θ)
+        (fun r θ => Q2_t r θ + Q2_r r θ + Q2_θ r θ + Q2_φ r θ) r θ
+
+  -- Step C: assemble
+  have Hsplit_d_both :
+    dCoord d (fun r θ => ContractionC M r θ c a b) r θ
+      =
+    dCoord d (fun r θ => Q_t  r θ + Q_r  r θ + Q_θ  r θ + Q_φ  r θ) r θ
+    + dCoord d (fun r θ => Q2_t r θ + Q2_r r θ + Q2_θ r θ + Q2_φ r θ) r θ := by
+    have := congrArg (fun F => dCoord d F r θ) h_split_d_pointwise
+    simpa using this.trans h_lin_d
+  -/
+
+  /-
+  -- Fallback enumerator lemma (if sumIdx_expand isn't available)
+  lemma sumIdx_expand_local (f : Idx → ℝ) :
+    sumIdx f = f Idx.t + f Idx.r + f Idx.θ + f Idx.φ := by
+    -- Expand the finite sum over Idx = {t, r, θ, φ}
+    simp [sumIdx]
+    -- Manual enumeration if needed:
+    -- cases on Idx, normalize each case
+    sorry
+  -/
+
+  /-
+  -- Local normalization hints (paste next to the split proof when enabling it)
+  -- `simp` normalization set used across c/d splits:
+  --   [hPt, hPr, hPθ, hPφ, hP2t, hP2r, hP2θ, hP2φ,
+  --    hQt, hQr, hQθ, hQφ, hQ2t, hQ2r, hQ2θ, hQ2φ,
+  --    add_comm, add_left_comm, add_assoc]
+  -/
+
+  /-
+  -- LHS-only dry run (safe: facts-only or rewrite a local copy)
+  have Hc_local := Hsplit_c_both
+  -- Rewriting each addend independently keeps control:
+  -- rw [Hc_one]  at Hc_local   -- first family: expands only e = t
+  -- rw [Hc2_one] at Hc_local   -- second family: expands only e = t
+  -- Now `Hc_local` has "expanded t + deferred (r,θ,φ)" on both families.
+  -- Stop here; do not touch the main goal.
+
+  -- Mirror for d-branch:
+  have Hd_local := Hsplit_d_both
+  -- rw [Hd_one]  at Hd_local   -- first family: expands only e = t
+  -- rw [Hd2_one] at Hd_local   -- second family: expands only e = t
+  -/
+
+  /-
+  -- === RHS Preview: Clean pattern with dCoord_add4 (once gInv exists) ===
+  -- Example RHS c-branch (first family) with dCoord_add4:
+
+  -- Let RC_* be your four RHS summands (Γtot • gInv orientation)
+  -- have hLinRC :
+  --   dCoord c (fun r θ => RC_t r θ + RC_r r θ + RC_θ r θ + RC_φ r θ) r θ
+  --   =
+  --   dCoord c RC_t r θ + dCoord c RC_r r θ + dCoord c RC_θ r θ + dCoord c RC_φ r θ := by
+  --   simpa [add_comm, add_left_comm, add_assoc] using
+  --     dCoord_add4 c RC_t RC_r RC_θ RC_φ r θ
+
+  -- Product rule on the selected summand then `rw` into hLinRC, exactly like LHS.
+  -/
+
+  /-
+  -- === RHS micro-pattern (copy/paste inside each Stage-1 RHS lemma) ===
+  -- 1) 4-term linearity
+  -- have hsum := dCoord_add4_flat μ RC_t RC_r RC_θ RC_φ r θ
+  -- 2) Product rule on the chosen summand
+  -- have hpush := by
+  --   simpa [RC_t] using
+  --     dCoord_mul μ (fun r θ => Γtot M r θ Idx.t d a)
+  --                   (fun r θ => gInv M Idx.t b r θ) r θ
+  -- 3) Substitute + normalize
+  -- have H := hsum
+  -- rw [hpush] at H
+  -- simpa [add_comm, add_left_comm, add_assoc] using H
+  -/
+
+  /-
+  -- === RHS Stage-1 (first family, c-branch) — ready to enable when `gInv` exists ===
+  -- section Stage1_RHS_c_first_flat
+  --   variable (M r θ : ℝ) (a b c d : Idx)
+
+  --   private def RC_t : ℝ → ℝ → ℝ := fun r θ => (Γtot M r θ Idx.t d a) * (gInv M Idx.t b r θ)
+  --   private def RC_r : ℝ → ℝ → ℝ := fun r θ => (Γtot M r θ Idx.r d a) * (gInv M Idx.r b r θ)
+  --   private def RC_θ : ℝ → ℝ → ℝ := fun r θ => (Γtot M r θ Idx.θ d a) * (gInv M Idx.θ b r θ)
+  --   private def RC_φ : ℝ → ℝ → ℝ := fun r θ => (Γtot M r θ Idx.φ d a) * (gInv M Idx.φ b r θ)
+
+  --   lemma HRc_one :
+  --     dCoord c (fun r θ => RC_t r θ + RC_r r θ + RC_θ r θ + RC_φ r θ) r θ
+  --     =
+  --       dCoord c (fun r θ => Γtot M r θ Idx.t d a) r θ * (gInv M Idx.t b r θ)
+  --     + (Γtot M r θ Idx.t d a) * dCoord c (fun r θ => gInv M Idx.t b r θ) r θ
+  --     + dCoord c RC_r r θ + dCoord c RC_θ r θ + dCoord c RC_φ r θ := by
+  --     -- 4-term linearity in one step
+  --     have hsum := dCoord_add4_flat c RC_t RC_r RC_θ RC_φ r θ
+  --     -- Product rule on the t-summand
+  --     have hpush : dCoord c RC_t r θ =
+  --       dCoord c (fun r θ => Γtot M r θ Idx.t d a) r θ * (gInv M Idx.t b r θ)
+  --       + (Γtot M r θ Idx.t d a) * dCoord c (fun r θ => gInv M Idx.t b r θ) r θ := by
+  --       simpa [RC_t] using dCoord_mul c
+  --         (fun r θ => Γtot M r θ Idx.t d a)
+  --         (fun r θ => gInv M Idx.t b r θ) r θ
+  --     -- Substitute and normalize
+  --     have H := hsum
+  --     rw [hpush] at H
+  --     simpa [add_comm, add_left_comm, add_assoc] using H
+  -- end Stage1_RHS_c_first_flat
+  -/
+
+  /-
+  -- === Stage 1: RHS ∂_c (first family) ===
+  section Stage1_RHS_c_first
+
+  -- Note: uses gInv syntactically; safe while commented even if gInv isn't defined yet.
+  set RC_t : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.t d a) * (gInv M r θ Idx.t b)) with hRCt
+  set RC_r : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.r d a) * (gInv M r θ Idx.r b)) with hRCr
+  set RC_θ : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.θ d a) * (gInv M r θ Idx.θ b)) with hRCθ
+  set RC_φ : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.φ d a) * (gInv M r θ Idx.φ b)) with hRCφ
+
+  have hAB_c :
+    dCoord c (fun r θ => RC_t r θ + RC_r r θ) r θ
+      = dCoord c RC_t r θ + dCoord c RC_r r θ := by
+    simpa using dCoord_add c RC_t RC_r r θ
+  have hCD_c :
+    dCoord c (fun r θ => RC_θ r θ + RC_φ r θ) r θ
+      = dCoord c RC_θ r θ + dCoord c RC_φ r θ := by
+    simpa using dCoord_add c RC_θ RC_φ r θ
+  have hABCD_c :
+    dCoord c (fun r θ => (RC_t r θ + RC_r r θ) + (RC_θ r θ + RC_φ r θ)) r θ
+      = (dCoord c RC_t r θ + dCoord c RC_r r θ)
+      + (dCoord c RC_θ r θ + dCoord c RC_φ r θ) := by
+    simpa [add_comm, add_left_comm, add_assoc] using
+      dCoord_add c (fun r θ => RC_t r θ + RC_r r θ)
+                   (fun r θ => RC_θ r θ + RC_φ r θ) r θ
+
+  have hsum_RC :
+    dCoord c (fun r θ => RC_t r θ + RC_r r θ + RC_θ r θ + RC_φ r θ) r θ
+      = dCoord c RC_t r θ + dCoord c RC_r r θ + dCoord c RC_θ r θ + dCoord c RC_φ r θ := by
+    simpa [add_comm, add_left_comm, add_assoc] using hABCD_c
+
+  -- e = t product rule on RHS
+  have hRCt_push :
+    dCoord c RC_t r θ
+      =
+    dCoord c (fun r θ => Γtot M r θ Idx.t d a) r θ * gInv M r θ Idx.t b
+    + (Γtot M r θ Idx.t d a) * dCoord c (fun r θ => gInv M r θ Idx.t b) r θ := by
+    simpa [hRCt] using
+      dCoord_mul c
+        (fun r θ => Γtot M r θ Idx.t d a)
+        (fun r θ => gInv M r θ Idx.t b) r θ
+
+  have HRc_one :
+    dCoord c (fun r θ =>
+      (Γtot M r θ Idx.t d a) * (gInv M r θ Idx.t b)
+    + (Γtot M r θ Idx.r d a) * (gInv M r θ Idx.r b)
+    + (Γtot M r θ Idx.θ d a) * (gInv M r θ Idx.θ b)
+    + (Γtot M r θ Idx.φ d a) * (gInv M r θ Idx.φ b)) r θ
+    =
+    (dCoord c (fun r θ => Γtot M r θ Idx.t d a) r θ) * gInv M r θ Idx.t b
+    + (Γtot M r θ Idx.t d a) * dCoord c (fun r θ => gInv M r θ Idx.t b) r θ
+    + dCoord c RC_r r θ + dCoord c RC_θ r θ + dCoord c RC_φ r θ := by
+    -- Combine hsum_RC with hRCt_push; normalize with hRC* names; keep goal untouched
+    have H := hsum_RC
+    rw [hRCt_push] at H
+    simpa [hRCt, hRCr, hRCθ, hRCφ, add_comm, add_left_comm, add_assoc] using H
+
+  -- Local simp bundle (optional, for cleaner normalization)
+  -- local attribute [simp] hRCt hRCr hRCθ hRCφ
+
+  end Stage1_RHS_c_first
+  -/
+
+  /-
+  -- === Stage 1: RHS ∂_d (first family) ===
+  section Stage1_RHS_d_first
+
+  set RD_t : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.t c a) * (gInv M r θ Idx.t b)) with hRDt
+  set RD_r : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.r c a) * (gInv M r θ Idx.r b)) with hRDr
+  set RD_θ : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.θ c a) * (gInv M r θ Idx.θ b)) with hRDθ
+  set RD_φ : ℝ → ℝ → ℝ :=
+    (fun r θ => (Γtot M r θ Idx.φ c a) * (gInv M r θ Idx.φ b)) with hRDφ
+
+  have hAB_d2 :
+    dCoord d (fun r θ => RD_t r θ + RD_r r θ) r θ
+      = dCoord d RD_t r θ + dCoord d RD_r r θ := by
+    simpa using dCoord_add d RD_t RD_r r θ
+  have hCD_d2 :
+    dCoord d (fun r θ => RD_θ r θ + RD_φ r θ) r θ
+      = dCoord d RD_θ r θ + dCoord d RD_φ r θ := by
+    simpa using dCoord_add d RD_θ RD_φ r θ
+  have hABCD_d2 :
+    dCoord d (fun r θ => (RD_t r θ + RD_r r θ) + (RD_θ r θ + RD_φ r θ)) r θ
+      = (dCoord d RD_t r θ + dCoord d RD_r r θ)
+      + (dCoord d RD_θ r θ + dCoord d RD_φ r θ) := by
+    simpa [add_comm, add_left_comm, add_assoc] using
+      dCoord_add d (fun r θ => RD_t r θ + RD_r r θ)
+                   (fun r θ => RD_θ r θ + RD_φ r θ) r θ
+
+  have hsum_RD :
+    dCoord d (fun r θ => RD_t r θ + RD_r r θ + RD_θ r θ + RD_φ r θ) r θ
+      = dCoord d RD_t r θ + dCoord d RD_r r θ + dCoord d RD_θ r θ + dCoord d RD_φ r θ := by
+    simpa [add_comm, add_left_comm, add_assoc] using hABCD_d2
+
+  -- e = t product rule on RHS (∂d)
+  have hRDt_push :
+    dCoord d RD_t r θ
+      =
+    dCoord d (fun r θ => Γtot M r θ Idx.t c a) r θ * gInv M r θ Idx.t b
+    + (Γtot M r θ Idx.t c a) * dCoord d (fun r θ => gInv M r θ Idx.t b) r θ := by
+    simpa [hRDt] using
+      dCoord_mul d
+        (fun r θ => Γtot M r θ Idx.t c a)
+        (fun r θ => gInv M r θ Idx.t b) r θ
+
+  have HRd_one :
+    dCoord d (fun r θ =>
+      (Γtot M r θ Idx.t c a) * (gInv M r θ Idx.t b)
+    + (Γtot M r θ Idx.r c a) * (gInv M r θ Idx.r b)
+    + (Γtot M r θ Idx.θ c a) * (gInv M r θ Idx.θ b)
+    + (Γtot M r θ Idx.φ c a) * (gInv M r θ Idx.φ b)) r θ
+    =
+    (dCoord d (fun r θ => Γtot M r θ Idx.t c a) r θ) * gInv M r θ Idx.t b
+    + (Γtot M r θ Idx.t c a) * dCoord d (fun r θ => gInv M r θ Idx.t b) r θ
+    + dCoord d RD_r r θ + dCoord d RD_θ r θ + dCoord d RD_φ r θ := by
+    -- Combine hsum_RD with hRDt_push; normalize with hRD* names; keep goal untouched
+    have H := hsum_RD
+    rw [hRDt_push] at H
+    simpa [hRDt, hRDr, hRDθ, hRDφ, add_comm, add_left_comm, add_assoc] using H
+
+  -- Local simp bundle (optional, for cleaner normalization)
+  -- local attribute [simp] hRDt hRDr hRDθ hRDφ
+
+  end Stage1_RHS_d_first
+  -/
+
+  /-
+  -- Local 4-term linearity for `dCoord` (derive from binary linearity, no globals)
+  -- Works with existing `dCoord_add`. Paste inside any proof that needs it:
+  have hAB (μ : Idx) (A B : ℝ → ℝ → ℝ) :
+    dCoord μ (fun r θ => A r θ + B r θ) r θ
+      = dCoord μ A r θ + dCoord μ B r θ := by
+    simpa using dCoord_add μ A B r θ
+
+  have hCD (μ : Idx) (C D : ℝ → ℝ → ℝ) :
+    dCoord μ (fun r θ => C r θ + D r θ) r θ
+      = dCoord μ C r θ + dCoord μ D r θ := by
+    simpa using dCoord_add μ C D r θ
+
+  have hAB_CD (μ : Idx) (A B C D : ℝ → ℝ → ℝ) :
+    dCoord μ (fun r θ => (A r θ + B r θ) + (C r θ + D r θ)) r θ
+      = (dCoord μ A r θ + dCoord μ B r θ) + (dCoord μ C r θ + dCoord μ D r θ) := by
+    simpa [add_comm, add_left_comm, add_assoc] using
+      dCoord_add μ (fun r θ => A r θ + B r θ) (fun r θ => C r θ + D r θ) r θ
+
+  have h4 (μ : Idx) (A B C D : ℝ → ℝ → ℝ) :
+    dCoord μ (fun r θ => A r θ + B r θ + C r θ + D r θ) r θ
+      = dCoord μ A r θ + dCoord μ B r θ + dCoord μ C r θ + dCoord μ D r θ := by
+    simpa [hAB μ A B, hCD μ C D, add_comm, add_left_comm, add_assoc]
+      using hAB_CD μ A B C D
+  -/
+
+  /-
+  -- Pass 1 facts (t-summand only) and split shape facts
+  -- These will be uncommented when the infrastructure exists
+
+  -- Pass 1 (t-summand only, LHS c-branch, first family g_{e b})
+  have Hc_one :
+      dCoord c (fun r θ =>
+          (Γtot M r θ Idx.t d a) * (g M Idx.t b r θ)
+        + (Γtot M r θ Idx.r d a) * (g M Idx.r b r θ)
+        + (Γtot M r θ Idx.θ d a) * (g M Idx.θ b r θ)
+        + (Γtot M r θ Idx.φ d a) * (g M Idx.φ b r θ)) r θ
+    =
+      dCoord c (fun r θ => Γtot M r θ Idx.t d a) r θ * g M Idx.t b r θ
+        + (Γtot M r θ Idx.t d a) * dCoord c (fun r θ => g M Idx.t b r θ) r θ
+      + dCoord c (fun r θ => (Γtot M r θ Idx.r d a) * (g M Idx.r b r θ)) r θ
+      + dCoord c (fun r θ => (Γtot M r θ Idx.θ d a) * (g M Idx.θ b r θ)) r θ
+      + dCoord c (fun r θ => (Γtot M r θ Idx.φ d a) * (g M Idx.φ b r θ)) r θ := by
+    sorry
+
+  -- Pass 1 (t-summand only, LHS d-branch, first family g_{e b})
+  have Hd_one :
+      dCoord d (fun r θ =>
+          (Γtot M r θ Idx.t c a) * (g M Idx.t b r θ)
+        + (Γtot M r θ Idx.r c a) * (g M Idx.r b r θ)
+        + (Γtot M r θ Idx.θ c a) * (g M Idx.θ b r θ)
+        + (Γtot M r θ Idx.φ c a) * (g M Idx.φ b r θ)) r θ
+    =
+      dCoord d (fun r θ => Γtot M r θ Idx.t c a) r θ * g M Idx.t b r θ
+        + (Γtot M r θ Idx.t c a) * dCoord d (fun r θ => g M Idx.t b r θ) r θ
+      + dCoord d (fun r θ => (Γtot M r θ Idx.r c a) * (g M Idx.r b r θ)) r θ
+      + dCoord d (fun r θ => (Γtot M r θ Idx.θ c a) * (g M Idx.θ b r θ)) r θ
+      + dCoord d (fun r θ => (Γtot M r θ Idx.φ c a) * (g M Idx.φ b r θ)) r θ := by
+    sorry
+
+  -- Pass 1 (t-summand only, RHS ∂_c, first family gInv^{e b})
+  have HRc_one :
+      dCoord c (fun r θ =>
+          (Γtot M r θ Idx.t d a) * (gInv M r θ Idx.t b)
+        + (Γtot M r θ Idx.r d a) * (gInv M r θ Idx.r b)
+        + (Γtot M r θ Idx.θ d a) * (gInv M r θ Idx.θ b)
+        + (Γtot M r θ Idx.φ d a) * (gInv M r θ Idx.φ b)) r θ
+    =
+      dCoord c (fun r θ => Γtot M r θ Idx.t d a) r θ * gInv M r θ Idx.t b
+        + (Γtot M r θ Idx.t d a) * dCoord c (fun r θ => gInv M r θ Idx.t b) r θ
+      + dCoord c (fun r θ => (Γtot M r θ Idx.r d a) * (gInv M r θ Idx.r b)) r θ
+      + dCoord c (fun r θ => (Γtot M r θ Idx.θ d a) * (gInv M r θ Idx.θ b)) r θ
+      + dCoord c (fun r θ => (Γtot M r θ Idx.φ d a) * (gInv M r θ Idx.φ b)) r θ := by
+    sorry
+
+  -- Pass 1 (t-summand only, RHS ∂_d, first family gInv^{e b})
+  have HRd_one :
+      dCoord d (fun r θ =>
+          (Γtot M r θ Idx.t c a) * (gInv M r θ Idx.t b)
+        + (Γtot M r θ Idx.r c a) * (gInv M r θ Idx.r b)
+        + (Γtot M r θ Idx.θ c a) * (gInv M r θ Idx.θ b)
+        + (Γtot M r θ Idx.φ c a) * (gInv M r θ Idx.φ b)) r θ
+    =
+      dCoord d (fun r θ => Γtot M r θ Idx.t c a) r θ * gInv M r θ Idx.t b
+        + (Γtot M r θ Idx.t c a) * dCoord d (fun r θ => gInv M r θ Idx.t b) r θ
+      + dCoord d (fun r θ => (Γtot M r θ Idx.r c a) * (gInv M r θ Idx.r b)) r θ
+      + dCoord d (fun r θ => (Γtot M r θ Idx.θ c a) * (gInv M r θ Idx.θ b)) r θ
+      + dCoord d (fun r θ => (Γtot M r θ Idx.φ c a) * (gInv M r θ Idx.φ b)) r θ := by
+    sorry
+
+  -- Split LHS c-branch contraction into two 4-term families (derivative level)
+  have Hsplit_c :
+      dCoord c (fun r θ => ContractionC M r θ d a b) r θ
+    =
+      dCoord c (fun r θ =>
+          (Γtot M r θ Idx.t d a) * (g M Idx.t b r θ)
+        + (Γtot M r θ Idx.r d a) * (g M Idx.r b r θ)
+        + (Γtot M r θ Idx.θ d a) * (g M Idx.θ b r θ)
+        + (Γtot M r θ Idx.φ d a) * (g M Idx.φ b r θ)) r θ
+    +
+      dCoord c (fun r θ =>
+          (Γtot M r θ Idx.t d b) * (g M a Idx.t r θ)
+        + (Γtot M r θ Idx.r d b) * (g M a Idx.r r θ)
+        + (Γtot M r θ Idx.θ d b) * (g M a Idx.θ r θ)
+        + (Γtot M r θ Idx.φ d b) * (g M a Idx.φ r θ)) r θ := by
+    -- idea later: unfold ContractionC; sumIdx_expand; regroup into the two families; use dCoord linearity
+    sorry
+
+  -- Split LHS d-branch contraction into two 4-term families (derivative level)
+  have Hsplit_d :
+      dCoord d (fun r θ => ContractionC M r θ c a b) r θ
+    =
+      dCoord d (fun r θ =>
+          (Γtot M r θ Idx.t c a) * (g M Idx.t b r θ)
+        + (Γtot M r θ Idx.r c a) * (g M Idx.r b r θ)
+        + (Γtot M r θ Idx.θ c a) * (g M Idx.θ b r θ)
+        + (Γtot M r θ Idx.φ c a) * (g M Idx.φ b r θ)) r θ
+    +
+      dCoord d (fun r θ =>
+          (Γtot M r θ Idx.t c b) * (g M a Idx.t r θ)
+        + (Γtot M r θ Idx.r c b) * (g M a Idx.r r θ)
+        + (Γtot M r θ Idx.θ c b) * (g M a Idx.θ r θ)
+        + (Γtot M r θ Idx.φ c b) * (g M a Idx.φ r θ)) r θ := by
+    -- mirrored idea of Hsplit_c
+    sorry
+
+  have HRc_split : sumIdx (fun e => Γtot M r θ e d a * gInv M r θ e b)
+    = (Γtot M r θ Idx.t d a) * (gInv M r θ Idx.t b)
+      + (Γtot M r θ Idx.r d a) * (gInv M r θ Idx.r b)
+      + (Γtot M r θ Idx.θ d a) * (gInv M r θ Idx.θ b)
+      + (Γtot M r θ Idx.φ d a) * (gInv M r θ Idx.φ b) := by
+    sorry
+
+  have HRd_split : sumIdx (fun e => Γtot M r θ e c a * gInv M r θ e b)
+    = (Γtot M r θ Idx.t c a) * (gInv M r θ Idx.t b)
+      + (Γtot M r θ Idx.r c a) * (gInv M r θ Idx.r b)
+      + (Γtot M r θ Idx.θ c a) * (gInv M r θ Idx.θ b)
+      + (Γtot M r θ Idx.φ c a) * (gInv M r θ Idx.φ b) := by
+    sorry
+  -/
+
+  /-
+  -- Micro-pass safety pattern (for single summand expansion)
+  -- Use this pattern when enabling a single summand to minimize algebraic pressure:
+
+  -- Step 1: Name the block robustly
+  set S_c : ℝ → ℝ → ℝ :=
+    (fun r θ =>
+         (Γtot M r θ Idx.t d a) * (g M Idx.t b r θ)
+       + (Γtot M r θ Idx.r d a) * (g M Idx.r b r θ)
+       + (Γtot M r θ Idx.θ d a) * (g M Idx.θ b r θ)
+       + (Γtot M r θ Idx.φ d a) * (g M Idx.φ b r θ)) with hS_c
+
+  -- Step 2: Apply the t-summand expansion (use h4 or chain dCoord_add)
+  have Hc_expanded := Hc_one
+
+  -- Step 3: DO NOT rewrite the main goal yet
+  -- Store as a fact: have Hc_partial := Hsplit_c
+  -- Then: rw [Hc_expanded] at Hc_partial
+
+  -- Step 4: Build and check error count
+  -- If it moves, re-comment the last 2-3 lines
+  -/
 
   -- Optional micro-step 1 (complete set): push ∂ across Γ⋅g for each e on both branches.
   -- Toggle by uncommenting this whole block.
@@ -721,6 +2101,26 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
     simp [Riemann, RiemannUp]
 
   rw [h_Riem_abcd, h_Riem_bacd]
+  -/
+
+  /-
+  -- Local rewrite experiment (facts-only, no goal touch)
+  -- Testing the Stage-1 micro-packs we just enabled
+
+  -- Create local copies to test rewrites without touching the main goal
+  have test_c : dCoord c (fun r θ => P_t r θ + P_r r θ + P_θ r θ + P_φ r θ) r θ
+    = dCoord c (fun r θ => P_t r θ + P_r r θ + P_θ r θ + P_φ r θ) r θ := by rfl
+
+  -- Rewrite with Hc_one to expand only the t-summand
+  rw [← Hc_one] at test_c
+  -- test_c now shows the expanded form for e=t
+
+  have test_d : dCoord d (fun r θ => Q_t r θ + Q_r r θ + Q_θ r θ + Q_φ r θ) r θ
+    = dCoord d (fun r θ => Q_t r θ + Q_r r θ + Q_θ r θ + Q_φ r θ) r θ := by rfl
+
+  -- Rewrite with Hd_one to expand only the t-summand
+  rw [← Hd_one] at test_d
+  -- test_d now shows the expanded form for e=t
   -/
 
   -- Single algebraic placeholder - all expansions and manipulations

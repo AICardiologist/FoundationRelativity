@@ -42,6 +42,18 @@ jobs:
           lake build Papers.P5_GeneralRelativity.Smoke
           echo "✅ Smoke test build completed"
 
+      - name: Riemann Quality Gates (informational)
+        run: |
+          echo "Running Riemann tensor activation quality gates..."
+          # Non-blocking for now - remove '|| true' when ready to enforce
+          make -C . check || true
+          echo "See Papers/P5_GeneralRelativity/GR/README.md for activation documentation"
+
+      - name: Docs link audit (informational)
+        run: |
+          echo "Auditing documentation links..."
+          make -C . audit || true
+
       - name: No sorries (Paper 5)
         run: |
           echo "Checking for sorries in Paper 5..."

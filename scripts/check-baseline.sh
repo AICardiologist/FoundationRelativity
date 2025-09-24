@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Check that the Riemann.lean file maintains its baseline error count
+ERRS=$(lake build Papers.P5_GeneralRelativity.GR.Riemann 2>&1 | grep -c "error:" || true)
+if [ "$ERRS" -ne 51 ]; then
+  echo "❌ Expected 51 errors (baseline), got $ERRS"
+  exit 1
+fi
+echo "✅ Baseline OK (51 errors)."

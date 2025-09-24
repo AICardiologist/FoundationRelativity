@@ -66,6 +66,13 @@ This paper applies the Axiom Calibration (AxCal) framework to General Relativity
 
 ## 🏗️ Lean 4 Implementation
 
+### 📖 Riemann Tensor Activation Documentation
+For detailed information about the Riemann tensor formalization and activation infrastructure, see:
+- **[GR/README.md](GR/README.md)** - Central documentation hub for the GR module
+- **[GR/ROADMAP_Schwarzschild_Vacuum.md](GR/ROADMAP_Schwarzschild_Vacuum.md)** - Development roadmap
+- **[GR/ACTIVATION_TRACKING.md](GR/ACTIVATION_TRACKING.md)** - Live status and decision tracking
+- **[GR/ACTIVATION_QUICKREF.md](GR/ACTIVATION_QUICKREF.md)** - Quick command reference
+
 ### File Structure
 ```
 Papers/P5_GeneralRelativity/
@@ -81,7 +88,8 @@ Papers/P5_GeneralRelativity/
 │   ├── EPSCore.lean              # Deep-dive D1: EPS kinematics (Height 0)
 │   ├── Schwarzschild.lean        # Deep-dive D2: vacuum check (Height 0)
 │   ├── Riemann.lean              # Riemann tensor components and reductions
-│   └── Invariants.lean           # Kretschmann scalar K = 48M²/r⁶
+│   ├── Invariants.lean           # Kretschmann scalar K = 48M²/r⁶
+│   └── README.md                 # 📚 GR Module Documentation Hub
 ├── Ledger/
 │   └── Citations.lean            # Structured bibliography
 └── Smoke.lean                    # CI aggregator and verification

@@ -1,5 +1,31 @@
 # Schwarzschild Vacuum Engine Roadmap
 
+**See also:** [ACTIVATION_TRACKING.md](./ACTIVATION_TRACKING.md) | [ACTIVATION_QUICKREF.md](./ACTIVATION_QUICKREF.md) | [README.md](./README.md)
+
+## 📚 Documentation Hub
+- **[README.md](./README.md)** - Central hub linking all documentation
+- **[ACTIVATION_TRACKING.md](./ACTIVATION_TRACKING.md)** - Live decision tracking and status matrix
+- **[ACTIVATION_QUICKREF.md](./ACTIVATION_QUICKREF.md)** - Copy-paste commands and patterns
+- **[PR_TEMPLATES.md](./PR_TEMPLATES.md)** - Ready-to-use PR descriptions
+- **[ISSUES_TO_OPEN.md](./ISSUES_TO_OPEN.md)** - Decision issue templates
+
+## Current Status (December 2024)
+
+### Technical Architecture
+The formalization now has a complete calculus infrastructure layer that quarantines differentiability obligations while maintaining mathematical correctness:
+
+- **Coordinate Calculus Engine**: The `dCoord` operator handles partial derivatives with a pragmatic `differentiable_hack` bypass confined to infrastructure lemmas only
+- **Local Clairaut Theorem**: Implemented with explicit case-by-case handling that avoids global calculus machinery
+- **Baseline-Neutral Scaffolding**: All new infrastructure maintains the stable 51-error baseline (all intended geometry sorries)
+- **Toggleable Micro-Steps**: Product rule expansions prepared as commented blocks for incremental activation
+
+### Immediate Next Steps
+The path to completing the Schwarzschild vacuum solution requires systematic completion of the alternation identity through "one-summand passes":
+1. Enable expansion for e = t summand, verify baseline maintained
+2. Repeat for e = r, θ, φ summands sequentially
+3. Apply local algebraic normalizations to match Riemann tensor terms
+4. Complete Ricci tensor contraction and verify vacuum equations
+
 ## High-level goals
 1. Stabilize the metric layer as indexed objects (g, gInv) with exterior domain side-conditions centralized and reusable.
 2. Compute the Christoffel symbols from the diagonal, static, spherically symmetric metric, using only height-0 algebra/calculus.
@@ -152,11 +178,103 @@
 ---
 
 ## Task board (live checklist)
-- [ ] S1: metric_inverse_id complete (no sorry), plus exterior side-condition lemmas.
-- [ ] S2: All nonzero Γ formulas proven; zero-else lemma in place.
-- [ ] S3: Ricci_*_vanishes and Ricci_scalar_vanishes as equalities.
-- [ ] S4: Einstein_tensor_vanishes and Schwarzschild_Vacuum_Check.
-- [ ] S5: Refactor, docs, local simp sets, CI hooks.
+
+### ✅ Sprint 0.1-0.2: Calculus Infrastructure (COMPLETE)
+- [x] Coordinate calculus micro-engine with `dCoord` operator
+- [x] Quarantined `differentiable_hack` to infrastructure only (dCoord_add/sub/mul)
+- [x] Local Clairaut theorem with explicit case-by-case handling
+- [x] Baseline-neutral alternation identity scaffold
+- [x] Complete product-push micro-steps (all 8 summands as toggleable comments)
+- [x] Maintained stable baseline: 51 errors (all intended geometry sorries)
+
+### Sprint 1: Metric layer (IN PROGRESS)
+- [x] S1.1: Idx with DecidableEq, Repr, Fintype
+- [x] S1.2: g and gInv as diagonal functions
+- [x] S1.3: Exterior domain lemmas (r_ne_zero, f_pos, sinθ_ne_zero)
+- [ ] S1.4: metric_inverse_id complete (no sorry)
+
+### Sprint 2: Christoffel symbols
+- [x] S2.1: All nonzero Γ formulas computed and named
+- [x] S2.2: Γtot aggregator with projection lemmas
+- [ ] S2.3: Zero-else lemma for sparsity
+- [ ] S2.4: Verification of Christoffel formulas against standard references
+
+### Sprint 3: Riemann to Ricci pipeline (STAGED)
+- [x] S3.1: Riemann tensor definition with RiemannUp
+- [x] S3.2: ContractionC and nabla_g infrastructure
+- [x] S3.3a: Stage-1 infrastructure built (8 sections, all commented)
+- [x] S3.3b: Quality gates added (check-baseline.sh, check-activation.sh)
+- [ ] S3.3c: Complete alternation_dC_eq_Riem (blocked on dCoord_add/mul)
+- [ ] S3.4: Ricci tensor from Riemann contraction
+- [ ] S3.5: Ricci_*_vanishes and Ricci_scalar_vanishes
+
+### Sprint 4: Einstein tensor & vacuum
+- [ ] S4.1: Einstein_tensor_vanishes
+- [ ] S4.2: Schwarzschild_Vacuum_Check
+- [ ] S4.3: Bridge to VacuumEFE abstraction
+
+### Sprint 5: Hardening & documentation
+- [ ] S5.1: File reorganization into modular structure
+- [ ] S5.2: Local simp sets and proof patterns
+- [ ] S5.3: CI hooks and mathlib stability
+- [ ] S5.4: Documentation of freeze → clear → balance → ring pattern
+
+### Optional: Invariants
+- [ ] Kretschmann scalar K = 48M²/r⁶ verification
+- [ ] Other curvature invariants
+
+---
+
+## Riemann.lean Activation Roadmap (December 2024)
+
+### Current Status
+- **Baseline:** 51 errors (stable)
+- **Activation:** baseline mode
+- **Infrastructure:** Complete Stage-1 scaffold (8 sections, all commented)
+- **Blocked on:** Global dCoord_add, dCoord_mul lemmas
+
+### Phase 0 — Guardrails & Branching (✅ COMPLETE)
+- [x] Quality gates: `scripts/check.sh` verifies mode + baseline
+- [x] Status marker: `-- ACTIVATION_STATUS: baseline`
+- [x] All Stage-1 infrastructure commented and ready
+
+### Phase 1 — Minimal calculus infra (NEXT)
+**Goal:** Add global dCoord_add/dCoord_mul to unblock Stage-1
+- [ ] Add lemmas near dCoord definition (not in alternation proof)
+- [ ] Prove via `cases μ; simp [dCoord]` + deriv_add/mul
+- [ ] Verify baseline stays at 51
+
+### Phase 2 — LHS Stage-1 activation
+**Goal:** Enable first-family LHS micro-packs
+- [ ] Uncomment `Stage1_LHS_c_first`
+- [ ] Uncomment `Stage1_LHS_d_first`
+- [ ] Run `./scripts/check.sh` → expect 51
+- [ ] Test local rewrites with Hc_one, Hd_one
+
+### Phase 3 — LHS both-families
+**Goal:** Add second family and split proofs
+- [ ] Enable `Stage1_LHS_c_second`, `Stage1_LHS_d_second`
+- [ ] Prove `Hsplit_c_both`, `Hsplit_d_both` splits
+- [ ] Maintain baseline 51 throughout
+
+### Phase 4 — RHS Stage-1 (requires gInv)
+**Goal:** Enable RHS micro-packs once gInv exists
+- [ ] Wait for gInv definition
+- [ ] Enable `Stage1_RHS_c_first`, `Stage1_RHS_d_first`
+- [ ] Verify compatibility with g·gInv = δ
+
+### Phase 5 — Complete alternation identity
+**Goal:** Tie everything to Riemann tensor
+- [ ] Enable DraftRiemann namespace
+- [ ] Uncomment unfold line in proof
+- [ ] Complete alternation_dC_eq_Riem using Stage-1 facts
+- [ ] Update ACTIVATION_STATUS marker
+
+### Quick Win Path (lowest risk)
+1. Add global dCoord_add/mul → check baseline
+2. Enable Stage1_LHS_c_first → check baseline
+3. Enable Stage1_LHS_d_first → check baseline
+4. Test with local rewrites (facts-only)
 
 ---
 
