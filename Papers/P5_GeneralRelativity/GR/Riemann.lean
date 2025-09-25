@@ -1412,6 +1412,7 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
 
   -- Apply the pushed versions to the goal (combined for better normalization)
   rw [← hD_pushed, ← hC_pushed]
+
   -- Let Stage-1 facts discharge derivative components with multiplicative normalization
   -- Include metric compatibility and constants by value (not as attributes)
   simp_all [add_comm, add_left_comm, add_assoc,
