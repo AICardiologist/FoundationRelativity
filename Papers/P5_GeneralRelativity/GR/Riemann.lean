@@ -1144,6 +1144,11 @@ section Stage1_LHS_Splits
 
 end Stage1_LHS_Splits
 
+-- File-scope helper for zero derivatives (not marked [simp])
+private lemma dCoord_zero_fun (μ : Idx) (r θ : ℝ) :
+  dCoord μ (fun (_r : ℝ) (_θ : ℝ) => (0 : ℝ)) r θ = 0 := by
+  simpa using dCoord_const μ (c := (0 : ℝ)) r θ
+
 /-- Alternation identity scaffold (baseline-neutral with optional micro-steps).
     We expand the contracted object and push `dCoord` through the finite sum,
     then stop with a single algebraic `sorry`. No global calculus machinery is used. -/
@@ -1417,7 +1422,7 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   -- Include metric compatibility and constants by value (not as attributes)
   simp_all [add_comm, add_left_comm, add_assoc,
             mul_comm, mul_left_comm, mul_assoc,
-            nabla_g_zero, dCoord_const]
+            nabla_g_zero, dCoord_const, dCoord_zero_fun]
 
   -- Unfold key definitions (uncomment when DraftRiemann namespace is active)
   -- unfold ContractionC Riemann RiemannUp
