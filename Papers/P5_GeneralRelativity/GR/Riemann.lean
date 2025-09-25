@@ -1209,6 +1209,14 @@ private lemma dCoord_zero_fun (μ : Idx) (r θ : ℝ) :
   dCoord μ (fun (_r : ℝ) (_θ : ℝ) => (0 : ℝ)) r θ = 0 := by
   simpa using dCoord_const μ (c := (0 : ℝ)) r θ
 
+-- Targeted regroupers for common shapes produced after compatibility on g
+-- (These are *not* global [simp]; we call them by name via `simp [..]`.)
+private lemma regroup₂ (A₁ A₂ B₁ B₂ : ℝ) :
+    A₁ * B₁ + A₂ * B₂ = (A₁ + A₂) * B₁ + A₂ * (B₂ - B₁) := by ring
+
+private lemma regroup_same_right (A₁ A₂ B : ℝ) :
+    A₁ * B + A₂ * B = (A₁ + A₂) * B := by ring
+
 /-- Alternation identity scaffold (baseline-neutral with optional micro-steps).
     We expand the contracted object and push `dCoord` through the finite sum,
     then stop with a single algebraic `sorry`. No global calculus machinery is used. -/
@@ -1228,10 +1236,6 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   -- [ ] Stage 3: Uncomment split shapes (lines 1097-1154)
   -- [ ] Final: Uncomment unfold line (664) and complete proof
   -/
-
-  -- Make Stage-1 facts available as local simp rules
-  local attribute [simp] Stage1LHS.Hc_one Stage1LHS.Hd_one
-  local attribute [simp] Stage1LHS.Hc2_one Stage1LHS.Hd2_one
 
   -- Stage-1 splits (both families)
   have hC := Stage1_LHS_Splits.Hsplit_c_both M r θ a b c d
@@ -1478,18 +1482,29 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   -- Apply the pushed versions to the goal (combined for better normalization)
   rw [← hD_pushed, ← hC_pushed]
 
-  -- Let Stage-1 facts discharge derivative components with multiplicative normalization
-  -- Include metric compatibility and constants by value (not as attributes)
+  -- Expand RHS once and normalize, then *stop* (no further re-expansion)
+  have hRHS₀ : Riemann M r θ a b c d + Riemann M r θ b a c d
+    =
+      (g M a Idx.t r θ * RiemannUp M r θ Idx.t b c d
+     + g M a Idx.r r θ * RiemannUp M r θ Idx.r b c d
+     + g M a Idx.θ r θ * RiemannUp M r θ Idx.θ b c d
+     + g M a Idx.φ r θ * RiemannUp M r θ Idx.φ b c d)
+    +
+      (g M b Idx.t r θ * RiemannUp M r θ Idx.t a c d
+     + g M b Idx.r r θ * RiemannUp M r θ Idx.r a c d
+     + g M b Idx.θ r θ * RiemannUp M r θ Idx.θ a c d
+     + g M b Idx.φ r θ * RiemannUp M r θ Idx.φ a c d) := by
+    -- Use the pre-expanded lemma directly
+    exact Stage1_RHS_Splits.Hsplit_RHS_combined M r θ a b c d
+
+  -- Use hRHS₀ *once*; then avoid re-expanding to prevent churn
+  rw [hRHS₀]
+
+  -- Now normalize add/mul structure with regrouping helpers
   simp_all [add_comm, add_left_comm, add_assoc,
             mul_comm, mul_left_comm, mul_assoc,
-            nabla_g_zero, dCoord_const, dCoord_zero_fun]
-
-  -- Apply RHS splits to expand the Riemann tensor terms
-  rw [Hsplit_RHS_combined]
-
-  -- Simplify the expanded RHS with normalization
-  simp_all [add_comm, add_left_comm, add_assoc,
-            mul_comm, mul_left_comm, mul_assoc]
+            nabla_g_zero, dCoord_const, dCoord_zero_fun,
+            regroup₂, regroup_same_right]
 
   -- Unfold key definitions (uncomment when DraftRiemann namespace is active)
   -- unfold ContractionC Riemann RiemannUp
