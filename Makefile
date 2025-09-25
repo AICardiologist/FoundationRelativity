@@ -20,6 +20,7 @@ audit:
 	@./scripts/audit-riemann.sh
 	@./scripts/audit-doc-links.sh
 	@./scripts/audit-doc-anchors.sh
+	@./scripts/audit-doc-hub.sh
 	@./scripts/audit-riemann-signatures.sh
 
 # Help

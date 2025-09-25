@@ -3,17 +3,18 @@ set -euo pipefail
 MODE="${1:-baseline}"
 FILE="Papers/P5_GeneralRelativity/GR/Riemann.lean"
 
+# Cross-platform in-place sed (define early for use in functions)
+if sed --version >/dev/null 2>&1; then
+  SED=(sed -i -E)          # GNU
+else
+  SED=(sed -i '' -E)       # BSD/macOS
+fi
+
 # Confirm the marker exists
 if ! grep -qE '^-- ACTIVATION_STATUS:' "$FILE"; then
   echo "❌ ACTIVATION_STATUS marker not found in $FILE" >&2
   exit 2
 fi
-
-# Cross-platform in-place sed
-case "$(uname -s)" in
-  Darwin) SED=(sed -i '') ;;
-  *)      SED=(sed -i)     ;;
-esac
 
 # Update the marker
 "${SED[@]}" -E "s/^-- ACTIVATION_STATUS:.*/-- ACTIVATION_STATUS: ${MODE}/" "$FILE"

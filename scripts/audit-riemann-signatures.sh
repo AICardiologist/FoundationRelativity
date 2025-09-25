@@ -23,6 +23,13 @@ for n in "${needles[@]}"; do
 done
 echo "  ✅ Stage-1 invariants found"
 
+echo "▶ Audit: Activation marker present"
+if ! rg -n '^-- ACTIVATION_STATUS:' "$FILE" >/dev/null; then
+  echo "  ❌ Missing ACTIVATION_STATUS marker at top of Riemann.lean"
+  exit 1
+fi
+echo "  ✅ Marker present"
+
 echo "▶ Audit: ActivationDemo remains commented"
 # Check if ActivationDemo section exists and is preceded by comment marker
 if grep -B1 "section ActivationDemo" "$FILE" 2>/dev/null | grep -q '^/-'; then

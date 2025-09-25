@@ -42,6 +42,11 @@ jobs:
           lake build Papers.P5_GeneralRelativity.Smoke
           echo "✅ Smoke test build completed"
 
+      - name: Check dependencies
+        run: |
+          echo "Checking for required tools..."
+          ./scripts/check-deps.sh
+
       - name: Riemann Quality Gates (informational)
         run: |
           echo "Running Riemann tensor activation quality gates..."
@@ -53,7 +58,7 @@ jobs:
         run: |
           echo "Running comprehensive audit suite..."
           make -C . audit || true
-          echo "Audit includes: Riemann checks, doc links, anchors, and signatures"
+          echo "Audit includes: Riemann checks, doc links, anchors, hub, and signatures"
 
       - name: No sorries (Paper 5)
         run: |
