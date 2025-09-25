@@ -1212,9 +1212,7 @@ section RHS_microfacts
   private lemma RiemannUp_antisymm_cd_local
       (μ a b c d : Idx) :
       RiemannUp M r θ μ b c d = - RiemannUp M r θ μ b d c := by
-    -- The antisymmetry is mathematically correct but requires
-    -- proving that sumIdx lambda expressions are equal under index swapping
-    sorry  -- TODO: Complete with proper index handling
+    sorry  -- TODO: Complete antisymmetry proof
 
 end RHS_microfacts
 
@@ -1550,9 +1548,9 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   -- -- Use antisymmetry locally to cancel paired terms (sumIdx remains opaque).
   -- have _ := True.intro  -- keeps attribute scope well-defined
   -- local attribute [simp] RHS_microfacts.RiemannUp_antisymm_cd_local
-  -- simp [add_comm, add_left_comm, add_assoc,
-  --       mul_comm, mul_left_comm, mul_assoc,
-  --       sub_eq_add_neg]
+  -- -- Keep this `simp` narrow and structure-only
+  -- simp only [RHS_microfacts.RiemannUp_antisymm_cd_local,
+  --            sub_eq_add_neg, add_comm, add_left_comm, add_assoc]
 
   -- Replace the RHS μ=t pair by the equivalent LHS-style differential chunk.
   -- This aligns the μ=t row with the already-pushed LHS structure.
