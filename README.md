@@ -161,6 +161,9 @@ Examples: Bidual gap has profile (WLPO, FT, DC_ω) = (1, 0, 0); UCT has (0, 1, 0
   - Applies AxCal framework to Einstein Field Equations
   - 45-page theoretical foundation with Lean 4 verification plan
   - Three orthogonal axes tailored for GR: Choice, Compactness/Kinematics, Logic/Computability
+  - **[📚 GR Module Documentation Hub](Papers/P5_GeneralRelativity/GR/README.md)** - Riemann tensor activation infrastructure
+  - **[📊 Activation Tracking](Papers/P5_GeneralRelativity/GR/ACTIVATION_TRACKING.md)** - Live status and decisions
+  - **[🗺️ Development Roadmap](Papers/P5_GeneralRelativity/GR/ROADMAP_Schwarzschild_Vacuum.md)** - Sprint breakdown
 
 ## 🏗️ Project Structure
 
@@ -275,6 +278,9 @@ lake build Papers.P4_SpectralGeometry.Smoke && ./scripts/no_sorry_p4.sh
 
 # Paper 5: General Relativity AxCal (active development)
 lake build Papers.P5_GeneralRelativity
+
+# Paper 5: Riemann tensor quality gates (activation infrastructure)
+make check  # Runs baseline and activation checks for Riemann.lean
 ```
 
 **Note**: We recommend building per-paper targets during development. `lake build` builds everything, including archived code, and is not necessary for day-to-day work.
@@ -318,7 +324,16 @@ axiom wlpo_independent_of_ft : WLPO ⊬ FT
 
 ## 🤝 Contributing
 
-See [`CONTRIBUTING.md`](docs/CONTRIBUTING.md) for development guidelines.
+### First-time Setup
+```bash
+# Install repo-managed git hooks (runs audits on commit)
+make install-hooks
+
+# Verify your environment
+make audit  # Runs all quality checks
+```
+
+See [`CONTRIBUTING.md`](Papers/P5_GeneralRelativity/CONTRIBUTING.md) for development guidelines.
 
 ## 📄 License
 

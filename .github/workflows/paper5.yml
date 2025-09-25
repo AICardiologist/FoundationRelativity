@@ -10,7 +10,9 @@ on:
     paths:
       - 'Papers/P5_GeneralRelativity/**'
       - 'scripts/**'
-      - '.github/workflows/paper5.yml'
+      - '.github/**'
+      - 'README.md'
+      - 'Makefile'
 
 env:
   LEAN_ABORT_ON_SORRY: 1
@@ -19,6 +21,7 @@ jobs:
   lean:
     name: Build Lean + No-sorry + Axiom audit
     runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
     steps:
       - uses: actions/checkout@v4
 
@@ -41,6 +44,24 @@ jobs:
           echo "Building Paper 5 Smoke test..."
           lake build Papers.P5_GeneralRelativity.Smoke
           echo "✅ Smoke test build completed"
+
+      - name: Check dependencies
+        run: |
+          echo "Checking for required tools..."
+          ./scripts/check-deps.sh
+
+      - name: Riemann Quality Gates (informational)
+        run: |
+          echo "Running Riemann tensor activation quality gates..."
+          # Non-blocking for now - remove '|| true' when ready to enforce
+          make -C . check || true
+          echo "See Papers/P5_GeneralRelativity/GR/README.md for activation documentation"
+
+      - name: Documentation and signature audits (informational)
+        run: |
+          echo "Running comprehensive audit suite..."
+          make -C . audit || true
+          echo "Audit includes: Riemann checks, doc links, anchors, hub, and signatures"
 
       - name: No sorries (Paper 5)
         run: |

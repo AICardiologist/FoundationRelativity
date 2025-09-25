@@ -18,6 +18,7 @@ env:
 jobs:
   paper5-build:
     runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
     steps:
       - uses: actions/checkout@v4
 

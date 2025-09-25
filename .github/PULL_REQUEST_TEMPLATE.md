@@ -39,5 +39,16 @@
 - [ ] ProofTheory changes reviewed carefully
 - [ ] Frozen markers preserved
 
+### If modifying Paper 5 (Riemann activation):
+- [ ] ACTIVATION_STATUS marker updated (baseline | stage1-lhs-first | stage1-lhs-both | stage1-full)
+- [ ] Baseline verified: `./scripts/check-baseline.sh` shows 51 errors
+- [ ] Activation verified: `./scripts/check-activation.sh <mode>` passes
+- [ ] sumIdx_expand choice documented (Option A/B/N/A)
+- [ ] gInv status documented (enabled/disabled, domain strategy)
+- [ ] All `[simp]` attributes kept local (no global changes)
+- [ ] Proof pattern: `dCoord_add4_flat` + `dCoord_mul` + normalize
+- [ ] Stage-1 facts remain outside main alternation proof
+- [ ] Rollback documented: re-comment sections + reset marker
+
 ## Additional Notes
 <!-- Any additional information that reviewers should know -->

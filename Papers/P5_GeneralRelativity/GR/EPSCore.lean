@@ -32,20 +32,20 @@ structure FreeFall (S : Spacetime) where
 
 -- EPS Axiom 1: Light propagation determines conformal structure
 axiom EPS_Light_Conformal (S : Spacetime) :
-  ∀ (rays : Type), ∃ conformal_class : Type,
+  ∀ (_rays : Type), ∃ _conformal_class : Type,
     -- Light cones determine conformal equivalence class
     True  -- placeholder for conformal structure determination
 
 -- EPS Axiom 2: Free fall determines projective structure
 axiom EPS_FreeFall_Projective (S : Spacetime) :
-  ∀ (particles : Type), ∃ projective_structure : Type,
+  ∀ (_particles : Type), ∃ _projective_structure : Type,
     -- Unparameterized timelike geodesics determine projective connection
     True  -- placeholder
 
 -- EPS Axiom 3: Compatibility condition
 axiom EPS_Compatibility (S : Spacetime) :
-  ∀ (conformal_class projective_structure : Type),
-    ∃ weyl_connection : Type,
+  ∀ (_conformal_class _projective_structure : Type),
+    ∃ _weyl_connection : Type,
       -- Compatibility yields Weyl connection preserving conformal class
       True  -- placeholder
 
@@ -64,7 +64,7 @@ def ScaleIntegrable (W : WeylConnection S) : Prop :=
 theorem EPS_Lorentz_Recovery (S : Spacetime) :
   ∀ (W : WeylConnection S), 
     ScaleIntegrable W → 
-    ∃ lorentz_class : Type,
+    ∃ _lorentz_class : Type,
       -- Integrable Weyl connection yields Lorentz metric up to scale
       True := by
   intro W h_integrable
@@ -105,7 +105,7 @@ def EPS_Algorithm (S : Spacetime) : EPS_DerivationSteps S := {
 
 -- Structured Height 0 theorem using the step-by-step framework
 theorem EPS_Height_Zero_Structured (S : Spacetime) :
-  ∃ (impl : EPS_Implementation S), 
+  ∃ (_impl : EPS_Implementation S), 
     -- EPS derivation is fully constructive via structured steps
     True := by
   -- Uses the structured EPS_Algorithm framework:
@@ -123,7 +123,7 @@ theorem EPS_Height_Zero_Structured (S : Spacetime) :
 
 -- Main entry point (facade for compatibility with origin/main)
 theorem EPS_Height_Zero (S : Spacetime) :
-  ∃ (impl : EPS_Implementation S), 
+  ∃ (_impl : EPS_Implementation S), 
     -- EPS derivation is fully constructive
     True := 
   EPS_Height_Zero_Structured S
@@ -134,12 +134,12 @@ structure Kinematics (S : Spacetime) where
   fall  : FreeFall S
 
 /-- Construct a schematic Lorentz metric from kinematics (height 0). -/
-def derive_metric {S : Spacetime} (_k : Kinematics S) : LorentzMetric S.M :=
+def derive_metric {S : Spacetime} (_ : Kinematics S) : LorentzMetric S.M :=
   { components := fun _ => True, lorentzian := True, nondeg := True }
 
 /-- Structured Height 0: given kinematics, recover a metric constructively. -/
 theorem EPS_Kinematics_Height0 (S : Spacetime) :
-  ∀ k : Kinematics S, ∃ m : LorentzMetric S.M, True := by
+  ∀ _k : Kinematics S, ∃ _m : LorentzMetric S.M, True := by
   intro k
   exact ⟨derive_metric k, True.intro⟩
 

@@ -1,11 +1,37 @@
-#!/bin/bash
-# Install pre-commit hooks for Paper 3 Framework
+#!/usr/bin/env bash
+# Install versioned git hooks for the repository
 set -euo pipefail
 
-echo "Installing Paper 3 Framework git hooks..."
+echo "▶ Installing repo-managed git hooks..."
 
-# Create pre-commit hook
-cat > .git/hooks/pre-commit << 'EOF'
+# Use versioned hooks directory instead of .git/hooks
+git config core.hooksPath .githooks
+
+# Ensure hooks are executable
+chmod +x .githooks/* 2>/dev/null || true
+
+# Legacy: Also create a copy in .git/hooks for backwards compatibility
+if [ -f ".githooks/pre-commit" ]; then
+  cp .githooks/pre-commit .git/hooks/pre-commit 2>/dev/null || true
+  chmod +x .git/hooks/pre-commit 2>/dev/null || true
+fi
+
+echo "✅ Hooks installed (core.hooksPath = .githooks)"
+echo ""
+echo "The following hooks are active:"
+ls -la .githooks/ | grep -v "^total\|^d" | awk '{print "  • " $NF}'
+echo ""
+echo "To bypass hooks temporarily:"
+echo "  git commit --no-verify"
+echo ""
+echo "To uninstall:"
+echo "  git config --unset core.hooksPath"
+
+exit 0
+
+# The original hook content is now maintained in .githooks/pre-commit
+# Below is the legacy installation for reference only
+cat > /dev/null << 'EOF'
 #!/bin/bash
 # Pre-commit hook for Paper 3 Framework
 # Runs essential checks before allowing commits

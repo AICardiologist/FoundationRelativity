@@ -1,0 +1,41 @@
+name: "Paper 5: Riemann Activation Decision"
+description: Choose options for sumIdx_expand and gInv domain strategy
+title: "[P5][Decision] sumIdx/gInv choice"
+labels: ["paper5", "decision", "activation"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this issue to record the *explicit* choices before activation PRs.
+        Cross-check with `Papers/P5_GeneralRelativity/GR/ACTIVATION_TRACKING.md`.
+
+  - type: checkboxes
+    id: sumidx
+    attributes:
+      label: Choose `sumIdx_expand` strategy
+      options:
+        - label: Option A — definitional expansion
+        - label: Option B — finite-type enumeration
+
+  - type: checkboxes
+    id: ginv
+    attributes:
+      label: Choose `gInv` domain strategy
+      options:
+        - label: A — hypothesis-gated lemmas (assumptions `r ≠ 0`, `sin θ ≠ 0`)
+        - label: B — chart-restricted sections (keep assumptions local)
+
+  - type: input
+    id: mode
+    attributes:
+      label: Target activation mode
+      description: baseline / stage1-lhs-first / stage1-lhs-both / stage1-full
+      placeholder: stage1-lhs-both
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes / references
+      description: Link commits, PRs, or math references here
