@@ -1204,6 +1204,14 @@ section Stage1_RHS_Splits
 
 end Stage1_RHS_Splits
 
+-- Targeted regroupers for common shapes produced after compatibility on g
+-- (These are *not* global [simp]; we call them by name via `simp [..]`.)
+private lemma regroup₂ (A₁ A₂ B₁ B₂ : ℝ) :
+    A₁ * B₁ + A₂ * B₂ = (A₁ + A₂) * B₁ + A₂ * (B₂ - B₁) := by ring
+
+private lemma regroup_same_right (A₁ A₂ B : ℝ) :
+    A₁ * B + A₂ * B = (A₁ + A₂) * B := by ring
+
 -- Stage-2 preview: μ = t component equivalence.
 -- We prove (with a placeholder `sorry`) that the μ=t slice on the RHS equals
 -- the corresponding LHS-style differential chunk.
@@ -1229,12 +1237,9 @@ section Stage2_mu_t_preview
   /-- Equivalence of μ=t slice: LHS-style differential chunk equals RHS μ=t pair. -/
   lemma mu_t_component_eq :
       LHS_mu_t_chunk M r θ a b c d = RHS_mu_t_chunk M r θ a b c d := by
-    /- Sketch (what we'd finish in Stage-2):
-       * `simp` with your product-rule pushes (hpush_ct₁/_ct₂/_dt₁/_dt₂) to expand ∂(Γ⋅g)
-       * apply metric compatibility `nabla_g_zero` to the ∂g terms
-       * use `regroup_same_right` / `regroup₂` to pull common g-weights
-       * unfold/align with the `RiemannUp` definition (μ=t row)
-       The algebra is routine but verbose; we leave it as a placeholder for now. -/
+    -- The proof hits timeout issues even with opaque sumIdx
+    -- The expansion of nabla_g_zero and regrouping creates large terms
+    -- Leave as sorry - completing this would likely drop UG by 1-2
     sorry
 
 end Stage2_mu_t_preview
@@ -1243,14 +1248,6 @@ end Stage2_mu_t_preview
 private lemma dCoord_zero_fun (μ : Idx) (r θ : ℝ) :
   dCoord μ (fun (_r : ℝ) (_θ : ℝ) => (0 : ℝ)) r θ = 0 := by
   simpa using dCoord_const μ (c := (0 : ℝ)) r θ
-
--- Targeted regroupers for common shapes produced after compatibility on g
--- (These are *not* global [simp]; we call them by name via `simp [..]`.)
-private lemma regroup₂ (A₁ A₂ B₁ B₂ : ℝ) :
-    A₁ * B₁ + A₂ * B₂ = (A₁ + A₂) * B₁ + A₂ * (B₂ - B₁) := by ring
-
-private lemma regroup_same_right (A₁ A₂ B : ℝ) :
-    A₁ * B + A₂ * B = (A₁ + A₂) * B := by ring
 
 /-- Alternation identity scaffold (baseline-neutral with optional micro-steps).
     We expand the contracted object and push `dCoord` through the finite sum,
@@ -1554,7 +1551,8 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   simp_all [add_comm, add_left_comm, add_assoc,
             mul_comm, mul_left_comm, mul_assoc,
             nabla_g_zero, dCoord_const, dCoord_zero_fun,
-            regroup₂, regroup_same_right]
+            regroup₂, regroup_same_right,
+            sub_eq_add_neg]  -- Help align minus signs from μ=t row
 
   -- Unfold key definitions (uncomment when DraftRiemann namespace is active)
   -- unfold ContractionC Riemann RiemannUp
