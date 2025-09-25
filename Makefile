@@ -25,6 +25,7 @@ audit:
 	@./scripts/audit-sorry-map.sh || true
 	@./scripts/lint-scripts.sh || true
 	@./scripts/audit-simp-progress.sh
+	@./scripts/audit-rhs-splits.sh
 
 # Install hooks
 install-hooks:
