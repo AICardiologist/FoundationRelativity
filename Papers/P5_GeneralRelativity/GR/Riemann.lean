@@ -1208,13 +1208,13 @@ end Stage1_RHS_Splits
 section RHS_microfacts
   variable (M r θ : ℝ)
 
-  /-- `RiemannUp` is antisymmetric in `(c,d)` (local micro-fact).
-      Proof avoids expanding finite sums; it only re-associates and flips signs. -/
+  /-- `RiemannUp` is antisymmetric in `(c,d)` (local micro-fact). -/
   private lemma RiemannUp_antisymm_cd_local
       (μ a b c d : Idx) :
       RiemannUp M r θ μ b c d = - RiemannUp M r θ μ b d c := by
-    -- For now left as sorry - completing this needs careful index handling
-    sorry  -- TODO: Complete without expanding sumIdx
+    -- The antisymmetry is mathematically correct but requires
+    -- proving that sumIdx lambda expressions are equal under index swapping
+    sorry  -- TODO: Complete with proper index handling
 
 end RHS_microfacts
 
@@ -1546,8 +1546,8 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   -- Use hRHS₀ *once*; then avoid re-expanding to prevent churn
   rw [hRHS₀]
 
-  -- TODO: Apply antisymmetry once the proof is complete
-  -- -- Use antisymmetry locally to cancel paired terms.
+  -- TODO: Enable antisymmetry once proof is complete
+  -- -- Use antisymmetry locally to cancel paired terms (sumIdx remains opaque).
   -- have _ := True.intro  -- keeps attribute scope well-defined
   -- local attribute [simp] RHS_microfacts.RiemannUp_antisymm_cd_local
   -- simp [add_comm, add_left_comm, add_assoc,
