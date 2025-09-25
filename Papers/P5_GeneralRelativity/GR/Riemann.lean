@@ -1212,7 +1212,7 @@ section RHS_microfacts
   private lemma RiemannUp_antisymm_cd_local
       (μ a b c d : Idx) :
       RiemannUp M r θ μ b c d = - RiemannUp M r θ μ b d c := by
-    sorry  -- TODO: Complete antisymmetry proof
+    sorry  -- The antisymmetry requires showing sumIdx lambdas cancel under index swap
 
 end RHS_microfacts
 
@@ -1255,6 +1255,32 @@ section Stage2_mu_t_preview
     sorry
 
 end Stage2_mu_t_preview
+
+-- Stage-2 preview: μ = r component equivalence (structure-only).
+-- Mirrors μ = t: leaves a single `sorry`; meant for *local* rewriting.
+section Stage2_mu_r_preview
+  variable (M r θ : ℝ) (a b c d : Idx)
+
+  private def LHS_mu_r_chunk : ℝ :=
+    dCoord c (fun r θ =>
+                 Γtot M r θ Idx.r d a * g M Idx.r b r θ
+               + Γtot M r θ Idx.r d b * g M a Idx.r r θ) r θ
+    -
+    dCoord d (fun r θ =>
+                 Γtot M r θ Idx.r c a * g M Idx.r b r θ
+               + Γtot M r θ Idx.r c b * g M a Idx.r r θ) r θ
+
+  private def RHS_mu_r_chunk : ℝ :=
+      g M a Idx.r r θ * RiemannUp M r θ Idx.r b c d
+    + g M b Idx.r r θ * RiemannUp M r θ Idx.r a c d
+
+  lemma mu_r_component_eq :
+      LHS_mu_r_chunk M r θ a b c d = RHS_mu_r_chunk M r θ a b c d := by
+    -- Same game plan as μ = t; kept as a single `sorry` for now.
+    -- When you complete μ = t, copy the argument here 1:1.
+    sorry
+
+end Stage2_mu_r_preview
 
 -- File-scope helper for zero derivatives (not marked [simp])
 private lemma dCoord_zero_fun (μ : Idx) (r θ : ℝ) :
@@ -1548,24 +1574,30 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   -- -- Use antisymmetry locally to cancel paired terms (sumIdx remains opaque).
   -- have _ := True.intro  -- keeps attribute scope well-defined
   -- local attribute [simp] RHS_microfacts.RiemannUp_antisymm_cd_local
-  -- -- Keep this `simp` narrow and structure-only
+  -- -- Apply only the antisymmetry + sign normalization; avoid any re-expansion churn.
   -- simp only [RHS_microfacts.RiemannUp_antisymm_cd_local,
   --            sub_eq_add_neg, add_comm, add_left_comm, add_assoc]
 
-  -- Replace the RHS μ=t pair by the equivalent LHS-style differential chunk.
-  -- This aligns the μ=t row with the already-pushed LHS structure.
+  -- Replace the RHS μ=t and μ=r pairs by their LHS-style differential chunks
+  -- (structure-only; both lemmas currently end in `sorry`).
   have hμt_rw :
     g M a Idx.t r θ * RiemannUp M r θ Idx.t b c d
   + g M b Idx.t r θ * RiemannUp M r θ Idx.t a c d
     =
-    (Stage2_mu_t_preview.LHS_mu_t_chunk M r θ a b c d) := by
-    -- Use the preview lemma in reverse direction:
+    Stage2_mu_t_preview.LHS_mu_t_chunk M r θ a b c d := by
     simpa using (Stage2_mu_t_preview.mu_t_component_eq M r θ a b c d).symm
 
-  -- Rewrite the μ=t pair in-place. `simp [hμt_rw, ...]` will find it inside the big sum.
-  simp [hμt_rw,
+  have hμr_rw :
+    g M a Idx.r r θ * RiemannUp M r θ Idx.r b c d
+  + g M b Idx.r r θ * RiemannUp M r θ Idx.r a c d
+    =
+    Stage2_mu_r_preview.LHS_mu_r_chunk M r θ a b c d := by
+    simpa using (Stage2_mu_r_preview.mu_r_component_eq M r θ a b c d).symm
+
+  -- Let simp take both rewrites and normalize *structure only*.
+  simp [hμt_rw, hμr_rw,
         add_comm, add_left_comm, add_assoc,
-        mul_comm, mul_left_comm, mul_assoc]  -- structure only (no re-expansion)
+        mul_comm, mul_left_comm, mul_assoc, sub_eq_add_neg]
 
   -- Now normalize add/mul structure with regrouping helpers
   simp_all [add_comm, add_left_comm, add_assoc,
