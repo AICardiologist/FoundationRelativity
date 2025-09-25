@@ -49,10 +49,11 @@ jobs:
           make -C . check || true
           echo "See Papers/P5_GeneralRelativity/GR/README.md for activation documentation"
 
-      - name: Docs link audit (informational)
+      - name: Documentation and signature audits (informational)
         run: |
-          echo "Auditing documentation links..."
+          echo "Running comprehensive audit suite..."
           make -C . audit || true
+          echo "Audit includes: Riemann checks, doc links, anchors, and signatures"
 
       - name: No sorries (Paper 5)
         run: |
