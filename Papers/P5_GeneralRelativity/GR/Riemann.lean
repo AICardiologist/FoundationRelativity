@@ -576,9 +576,9 @@ lemma Γtot_symmetry (M r θ : ℝ) (i j k : Idx) :
     · have hf' := f_hasDerivAt M r hr
       have h_deriv : deriv (fun s => -f M s) r = -(2 * M / r^2) := by
         simpa using (hf'.neg).deriv
-      simp only [h_deriv]
+      simp [h_deriv]
       push_neg at hf hr
-      field_simp [pow_two, sub_eq_add_neg, hf, hr]
+      field_simp [pow_two, sub_eq_add_neg]
       ring
 
 /-- ∂_r g_rr = 2 Γ^r_{r r} · g_rr. -/
@@ -594,9 +594,8 @@ lemma Γtot_symmetry (M r θ : ℝ) (i j k : Idx) :
     · have hf' := f_hasDerivAt M r hr
       have h_deriv : deriv (fun s => (f M s)⁻¹) r = -(2 * M / r^2) / (f M r)^2 := by
         simpa using (hf'.inv hf).deriv
-      simp only [h_deriv]
       push_neg at hf hr
-      field_simp [pow_two, hf, hr]
+      field_simp [pow_two, h_deriv]
       ring
 
 /-! #### Off-diagonal compatibility lemmas (crucial for completeness) -/
