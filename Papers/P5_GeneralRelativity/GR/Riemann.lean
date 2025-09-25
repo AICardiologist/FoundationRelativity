@@ -777,7 +777,7 @@ local abbrev RiemannUp := DraftRiemann.RiemannUp
 -/
 
 /-
--- ACTIVATION_STATUS: baseline
+-- ACTIVATION_STATUS: stage1-lhs-both
 -- Change when toggling:
 --   ACTIVATION_STATUS: stage1-lhs-first
 --   ACTIVATION_STATUS: stage1-lhs-both
