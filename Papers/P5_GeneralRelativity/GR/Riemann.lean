@@ -1204,6 +1204,41 @@ section Stage1_RHS_Splits
 
 end Stage1_RHS_Splits
 
+-- Stage-2 preview: μ = t component equivalence.
+-- We prove (with a placeholder `sorry`) that the μ=t slice on the RHS equals
+-- the corresponding LHS-style differential chunk.
+-- This is designed for *local* rewriting inside the main lemma only.
+section Stage2_mu_t_preview
+  variable (M r θ : ℝ) (a b c d : Idx)
+
+  private def LHS_mu_t_chunk :
+      ℝ :=
+    dCoord c (fun r θ =>
+         Γtot M r θ Idx.t d a * g M Idx.t b r θ
+       + Γtot M r θ Idx.t d b * g M a Idx.t r θ) r θ
+    -
+    dCoord d (fun r θ =>
+         Γtot M r θ Idx.t c a * g M Idx.t b r θ
+       + Γtot M r θ Idx.t c b * g M a Idx.t r θ) r θ
+
+  private def RHS_mu_t_chunk :
+      ℝ :=
+      g M a Idx.t r θ * RiemannUp M r θ Idx.t b c d
+    + g M b Idx.t r θ * RiemannUp M r θ Idx.t a c d
+
+  /-- Equivalence of μ=t slice: LHS-style differential chunk equals RHS μ=t pair. -/
+  lemma mu_t_component_eq :
+      LHS_mu_t_chunk M r θ a b c d = RHS_mu_t_chunk M r θ a b c d := by
+    /- Sketch (what we'd finish in Stage-2):
+       * `simp` with your product-rule pushes (hpush_ct₁/_ct₂/_dt₁/_dt₂) to expand ∂(Γ⋅g)
+       * apply metric compatibility `nabla_g_zero` to the ∂g terms
+       * use `regroup_same_right` / `regroup₂` to pull common g-weights
+       * unfold/align with the `RiemannUp` definition (μ=t row)
+       The algebra is routine but verbose; we leave it as a placeholder for now. -/
+    sorry
+
+end Stage2_mu_t_preview
+
 -- File-scope helper for zero derivatives (not marked [simp])
 private lemma dCoord_zero_fun (μ : Idx) (r θ : ℝ) :
   dCoord μ (fun (_r : ℝ) (_θ : ℝ) => (0 : ℝ)) r θ = 0 := by
@@ -1499,6 +1534,21 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
 
   -- Use hRHS₀ *once*; then avoid re-expanding to prevent churn
   rw [hRHS₀]
+
+  -- Replace the RHS μ=t pair by the equivalent LHS-style differential chunk.
+  -- This aligns the μ=t row with the already-pushed LHS structure.
+  have hμt_rw :
+    g M a Idx.t r θ * RiemannUp M r θ Idx.t b c d
+  + g M b Idx.t r θ * RiemannUp M r θ Idx.t a c d
+    =
+    (Stage2_mu_t_preview.LHS_mu_t_chunk M r θ a b c d) := by
+    -- Use the preview lemma in reverse direction:
+    simpa using (Stage2_mu_t_preview.mu_t_component_eq M r θ a b c d).symm
+
+  -- Rewrite the μ=t pair in-place. `simp [hμt_rw, ...]` will find it inside the big sum.
+  simp [hμt_rw,
+        add_comm, add_left_comm, add_assoc,
+        mul_comm, mul_left_comm, mul_assoc]  -- structure only (no re-expansion)
 
   -- Now normalize add/mul structure with regrouping helpers
   simp_all [add_comm, add_left_comm, add_assoc,
