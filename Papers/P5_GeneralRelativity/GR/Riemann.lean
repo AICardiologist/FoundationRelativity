@@ -1151,10 +1151,6 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   ( dCoord c (fun r θ => ContractionC M r θ d a b) r θ
   - dCoord d (fun r θ => ContractionC M r θ c a b) r θ )
   = ( Riemann M r θ a b c d + Riemann M r θ b a c d ) := by
-  -- Make Stage-1 facts available as local simp rules
-  local attribute [simp] Stage1LHS.Hc_one Stage1LHS.Hd_one
-  local attribute [simp] Stage1LHS.Hc2_one Stage1LHS.Hd2_one
-
   /-
   -- ACTIVATION CHECKLIST (test each step individually):
   -- [ ] Stage 0: Uncomment namespace DraftRiemann block (lines 545-561)
@@ -1167,6 +1163,10 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   -- [ ] Stage 3: Uncomment split shapes (lines 1097-1154)
   -- [ ] Final: Uncomment unfold line (664) and complete proof
   -/
+
+  -- Make Stage-1 facts available as local simp rules
+  local attribute [simp] Stage1LHS.Hc_one Stage1LHS.Hd_one
+  local attribute [simp] Stage1LHS.Hc2_one Stage1LHS.Hd2_one
 
   -- Stage-1 splits (both families)
   have hC := Stage1_LHS_Splits.Hsplit_c_both M r θ a b c d
@@ -1410,10 +1410,11 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   rw [← hpush_dφ₂] at hD_pushed
   simp_all [add_comm, add_left_comm, add_assoc]
 
-  -- Apply the pushed versions to the goal
+  -- Apply the pushed versions to the goal (combined for better normalization)
   rw [← hD_pushed, ← hC_pushed]
-  -- Let Stage-1 facts discharge derivative components
-  simp_all [add_comm, add_left_comm, add_assoc]
+  -- Let Stage-1 facts discharge derivative components with multiplicative normalization
+  simp_all [add_comm, add_left_comm, add_assoc,
+            mul_comm, mul_left_comm, mul_assoc]
 
   -- Unfold key definitions (uncomment when DraftRiemann namespace is active)
   -- unfold ContractionC Riemann RiemannUp
