@@ -40,10 +40,29 @@ if git diff --cached -U0 -- Papers/P5_GeneralRelativity/GR/Riemann.lean \
   fi
 fi
 
-# Only run for files touching the Riemann pipeline
+# Only run for GR changes to keep commits snappy
 if git diff --cached --name-only | grep -qE '^Papers/P5_GeneralRelativity/GR/'; then
   echo "▶ Running Riemann quality gates…"
-  ./scripts/check.sh baseline
+
+  # Mode from STAGED file (robust trim, CR-safe)
+  MODE="$(
+    git show :Papers/P5_GeneralRelativity/GR/Riemann.lean 2>/dev/null \
+    | sed -n 's/^[[:space:]]*--[[:space:]]*ACTIVATION_STATUS:[[:space:]]*\(.*\)$/\1/p' \
+    | head -1 | tr -d '\r' | xargs
+  )"
+
+  # Fallback to working tree if not staged (e.g., partial commits)
+  if [ -z "${MODE:-}" ]; then
+    MODE="$(
+      sed -n 's/^[[:space:]]*--[[:space:]]*ACTIVATION_STATUS:[[:space:]]*\(.*\)$/\1/p' \
+      Papers/P5_GeneralRelativity/GR/Riemann.lean | head -1 | tr -d '\r' | xargs
+    )"
+  fi
+
+  : "${MODE:=baseline}"
+  echo "  • activation mode (staged/WT): '${MODE}'"
+
+  ./scripts/check.sh "$MODE"
 fi
 
 # If Markdown changed, audit docs links

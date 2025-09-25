@@ -35,7 +35,7 @@ case "$MODE" in
     ;;
   stage1-lhs-both)
     MAX_UG=46  # After helper lemma fixes
-    MAX_OE=11  # Reduced after removing simp no progress
+    MAX_OE=8   # Tightened after RHS activation improvements
     ;;
   stage1-full)
     MAX_UG=40
