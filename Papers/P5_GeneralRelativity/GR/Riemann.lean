@@ -576,8 +576,9 @@ lemma Γtot_symmetry (M r θ : ℝ) (i j k : Idx) :
     · have hf' := f_hasDerivAt M r hr
       have h_deriv : deriv (fun s => -f M s) r = -(2 * M / r^2) := by
         simpa using (hf'.neg).deriv
-      simp only [h_deriv, hf, hr]
-      field_simp [pow_two, sub_eq_add_neg]
+      simp only [h_deriv]
+      push_neg at hf hr
+      field_simp [pow_two, sub_eq_add_neg, hf, hr]
       ring
 
 /-- ∂_r g_rr = 2 Γ^r_{r r} · g_rr. -/
@@ -593,8 +594,9 @@ lemma Γtot_symmetry (M r θ : ℝ) (i j k : Idx) :
     · have hf' := f_hasDerivAt M r hr
       have h_deriv : deriv (fun s => (f M s)⁻¹) r = -(2 * M / r^2) / (f M r)^2 := by
         simpa using (hf'.inv hf).deriv
-      simp only [h_deriv, hf, hr]
-      field_simp [pow_two]
+      simp only [h_deriv]
+      push_neg at hf hr
+      field_simp [pow_two, hf, hr]
       ring
 
 /-! #### Off-diagonal compatibility lemmas (crucial for completeness) -/
@@ -1210,11 +1212,11 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   -- Replace each dCoord of sum with sum of dCoords
   have hC' := hC
   rw [← hC₁, ← hC₂] at hC'
-  simp [add_comm, add_left_comm, add_assoc] at hC'
+  simp_all [add_comm, add_left_comm, add_assoc]
 
   have hD' := hD
   rw [← hD₁, ← hD₂] at hD'
-  simp [add_comm, add_left_comm, add_assoc] at hD'
+  simp_all [add_comm, add_left_comm, add_assoc]
 
   -- Push product rule on t-summands using Stage-1 facts
   -- C-branch, first family, t-summand
@@ -1393,7 +1395,7 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   rw [← hpush_cr₂] at hC_pushed
   rw [← hpush_cθ₂] at hC_pushed
   rw [← hpush_cφ₂] at hC_pushed
-  simp [add_comm, add_left_comm, add_assoc] at hC_pushed
+  simp_all [add_comm, add_left_comm, add_assoc]
 
   -- D-branch: apply all 8 product pushes
   have hD_pushed := hD'
@@ -1407,13 +1409,13 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   rw [← hpush_dr₂] at hD_pushed
   rw [← hpush_dθ₂] at hD_pushed
   rw [← hpush_dφ₂] at hD_pushed
-  simp [add_comm, add_left_comm, add_assoc] at hD_pushed
+  simp_all [add_comm, add_left_comm, add_assoc]
 
   -- Apply the pushed versions to the goal
   rw [← hC_pushed]
   rw [← hD_pushed]
   -- Let Stage-1 facts discharge derivative components
-  simp [add_comm, add_left_comm, add_assoc]
+  simp_all [add_comm, add_left_comm, add_assoc]
 
   -- Unfold key definitions (uncomment when DraftRiemann namespace is active)
   -- unfold ContractionC Riemann RiemannUp
