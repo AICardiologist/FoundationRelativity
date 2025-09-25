@@ -578,7 +578,7 @@ lemma Γtot_symmetry (M r θ : ℝ) (i j k : Idx) :
         simpa using (hf'.neg).deriv
       simp [h_deriv]
       push_neg at hf hr
-      field_simp [pow_two, sub_eq_add_neg]
+      field_simp [pow_two, sub_eq_add_neg, hf, hr]
       ring
 
 /-- ∂_r g_rr = 2 Γ^r_{r r} · g_rr. -/
@@ -595,7 +595,7 @@ lemma Γtot_symmetry (M r θ : ℝ) (i j k : Idx) :
       have h_deriv : deriv (fun s => (f M s)⁻¹) r = -(2 * M / r^2) / (f M r)^2 := by
         simpa using (hf'.inv hf).deriv
       push_neg at hf hr
-      field_simp [pow_two, h_deriv]
+      field_simp [pow_two, h_deriv, hf, hr]
       ring
 
 /-! #### Off-diagonal compatibility lemmas (crucial for completeness) -/
@@ -1411,8 +1411,7 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   simp_all [add_comm, add_left_comm, add_assoc]
 
   -- Apply the pushed versions to the goal
-  rw [← hC_pushed]
-  rw [← hD_pushed]
+  rw [← hD_pushed, ← hC_pushed]
   -- Let Stage-1 facts discharge derivative components
   simp_all [add_comm, add_left_comm, add_assoc]
 

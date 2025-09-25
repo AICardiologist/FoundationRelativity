@@ -24,6 +24,7 @@ audit:
 	@./scripts/audit-riemann-signatures.sh
 	@./scripts/audit-sorry-map.sh || true
 	@./scripts/lint-scripts.sh || true
+	@./scripts/audit-simp-progress.sh
 
 # Install hooks
 install-hooks:
