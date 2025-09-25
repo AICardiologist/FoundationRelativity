@@ -21,6 +21,7 @@ jobs:
   lean:
     name: Build Lean + No-sorry + Axiom audit
     runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
     steps:
       - uses: actions/checkout@v4
 
