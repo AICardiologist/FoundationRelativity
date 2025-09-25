@@ -1216,6 +1216,12 @@ section RHS_microfacts
 
 end RHS_microfacts
 
+-- Pure additive canceler, used via `simp [antisymm_add_cancel]` when helpful.
+private lemma antisymm_add_cancel
+    (A₁ A₂ S_cd S_dc : ℝ) :
+  (A₁ - A₂ + S_cd - S_dc) + (A₂ - A₁ + S_dc - S_cd) = 0 := by
+  ring
+
 -- Targeted regroupers for common shapes produced after compatibility on g
 -- (These are *not* global [simp]; we call them by name via `simp [..]`.)
 private lemma regroup₂ (A₁ A₂ B₁ B₂ : ℝ) :
