@@ -1066,6 +1066,84 @@ end ActivationDemo
   --   sorry
 -/
 
+-- Stage-1 split helpers (file-scope; safe to activate)
+section Stage1_LHS_Splits
+  variable (M r θ : ℝ) (a b c d : Idx)
+
+  -- Local enumerator (Option A; keep it local to this section)
+  private lemma sumIdx_expand_local (f : Idx → ℝ → ℝ → ℝ) (r θ : ℝ) :
+    sumIdx (fun e => f e r θ)
+    = f Idx.t r θ + f Idx.r r θ + f Idx.θ r θ + f Idx.φ r θ := by
+    -- Expand the finite sum
+    simp only [sumIdx]
+    -- Normalize the addition
+    ring
+
+  -- c-branch: split both families to 4+4 via the bridge; no global effects.
+  lemma Hsplit_c_both :
+    dCoord c (fun r θ => ContractionC M r θ d a b) r θ
+    =
+    dCoord c (fun r θ =>
+       Γtot M r θ Idx.t d a * g M Idx.t b r θ
+     + Γtot M r θ Idx.r d a * g M Idx.r b r θ
+     + Γtot M r θ Idx.θ d a * g M Idx.θ b r θ
+     + Γtot M r θ Idx.φ d a * g M Idx.φ b r θ) r θ
+  +
+    dCoord c (fun r θ =>
+       Γtot M r θ Idx.t d b * g M a Idx.t r θ
+     + Γtot M r θ Idx.r d b * g M a Idx.r r θ
+     + Γtot M r θ Idx.θ d b * g M a Idx.θ r θ
+     + Γtot M r θ Idx.φ d b * g M a Idx.φ r θ) r θ := by
+    -- Expand ContractionC's two finite sums to 4 terms each using the bridge
+    unfold ContractionC
+    have h₁ := dCoord_sumIdx_via_local_expand c
+      (fun e r θ => Γtot M r θ e d a * g M e b r θ) r θ
+      sumIdx_expand_local
+    have h₂ := dCoord_sumIdx_via_local_expand c
+      (fun e r θ => Γtot M r θ e d b * g M a e r θ) r θ
+      sumIdx_expand_local
+    -- Split the outer addition and rewrite each side
+    have h_add :=
+      dCoord_add c
+        (fun r θ => sumIdx (fun e => Γtot M r θ e d a * g M e b r θ))
+        (fun r θ => sumIdx (fun e => Γtot M r θ e d b * g M a e r θ)) r θ
+    -- Apply both expansions and normalize
+    simpa [add_comm, add_left_comm, add_assoc] using
+      h_add.trans (by
+        rw [h₁, h₂])
+
+  -- d-branch: same idea, roles of c/d swapped accordingly.
+  lemma Hsplit_d_both :
+    dCoord d (fun r θ => ContractionC M r θ c a b) r θ
+    =
+    dCoord d (fun r θ =>
+       Γtot M r θ Idx.t c a * g M Idx.t b r θ
+     + Γtot M r θ Idx.r c a * g M Idx.r b r θ
+     + Γtot M r θ Idx.θ c a * g M Idx.θ b r θ
+     + Γtot M r θ Idx.φ c a * g M Idx.φ b r θ) r θ
+  +
+    dCoord d (fun r θ =>
+       Γtot M r θ Idx.t c b * g M a Idx.t r θ
+     + Γtot M r θ Idx.r c b * g M a Idx.r r θ
+     + Γtot M r θ Idx.θ c b * g M a Idx.θ r θ
+     + Γtot M r θ Idx.φ c b * g M a Idx.φ r θ) r θ := by
+    unfold ContractionC
+    have h₁ := dCoord_sumIdx_via_local_expand d
+      (fun e r θ => Γtot M r θ e c a * g M e b r θ) r θ
+      sumIdx_expand_local
+    have h₂ := dCoord_sumIdx_via_local_expand d
+      (fun e r θ => Γtot M r θ e c b * g M a e r θ) r θ
+      sumIdx_expand_local
+    have h_add :=
+      dCoord_add d
+        (fun r θ => sumIdx (fun e => Γtot M r θ e c a * g M e b r θ))
+        (fun r θ => sumIdx (fun e => Γtot M r θ e c b * g M a e r θ)) r θ
+    simpa [add_comm, add_left_comm, add_assoc] using
+      h_add.trans (by
+        rw [h₁, h₂])
+
+end Stage1_LHS_Splits
+
 /-- Alternation identity scaffold (baseline-neutral with optional micro-steps).
     We expand the contracted object and push `dCoord` through the finite sum,
     then stop with a single algebraic `sorry`. No global calculus machinery is used. -/
@@ -2156,7 +2234,7 @@ lemma Riemann_swap_a_b (M r θ : ℝ) (a b c d : Idx) :
     -- Apply metric compatibility
     simp only [nabla_g_zero]
     -- The derivative of the zero function is zero
-    have h_zero_fn : (fun r θ => (0:ℝ)) = (fun _ _ => (0:ℝ)) := by rfl
+    have h_zero_fn : (fun r θ => (0:ℝ)) = (fun (_r : ℝ) (_θ : ℝ) => (0:ℝ)) := by rfl
     rw [h_zero_fn]
     simp only [dCoord_const, sub_self]
   rw [hLHS_zero] at hRic
