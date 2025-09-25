@@ -14,11 +14,15 @@ jobs:
         with:
           fetch-depth: 0  # Need full history for git diff checks
 
-      - name: Install dependencies
+      - name: Install elan (Lean toolchain)
         run: |
-          # Install basic tools needed for audits
-          sudo apt-get update
-          sudo apt-get install -y curl git make
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | bash -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Get Lean version
+        run: |
+          lean --version || true
+          lake --version || true
 
       - name: Run audits
         run: |
