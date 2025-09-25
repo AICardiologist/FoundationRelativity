@@ -1210,11 +1210,11 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   -- Replace each dCoord of sum with sum of dCoords
   have hC' := hC
   rw [← hC₁, ← hC₂] at hC'
-  simp only [add_comm, add_left_comm, add_assoc] at hC'
+  simp [add_comm, add_left_comm, add_assoc] at hC'
 
   have hD' := hD
   rw [← hD₁, ← hD₂] at hD'
-  simp only [add_comm, add_left_comm, add_assoc] at hD'
+  simp [add_comm, add_left_comm, add_assoc] at hD'
 
   -- Push product rule on t-summands using Stage-1 facts
   -- C-branch, first family, t-summand
@@ -1393,7 +1393,7 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   rw [← hpush_cr₂] at hC_pushed
   rw [← hpush_cθ₂] at hC_pushed
   rw [← hpush_cφ₂] at hC_pushed
-  simp only [add_comm, add_left_comm, add_assoc] at hC_pushed
+  simp [add_comm, add_left_comm, add_assoc] at hC_pushed
 
   -- D-branch: apply all 8 product pushes
   have hD_pushed := hD'
@@ -1407,13 +1407,13 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   rw [← hpush_dr₂] at hD_pushed
   rw [← hpush_dθ₂] at hD_pushed
   rw [← hpush_dφ₂] at hD_pushed
-  simp only [add_comm, add_left_comm, add_assoc] at hD_pushed
+  simp [add_comm, add_left_comm, add_assoc] at hD_pushed
 
   -- Apply the pushed versions to the goal
   rw [← hC_pushed]
   rw [← hD_pushed]
   -- Let Stage-1 facts discharge derivative components
-  simp only [add_comm, add_left_comm, add_assoc]
+  simp [add_comm, add_left_comm, add_assoc]
 
   -- Unfold key definitions (uncomment when DraftRiemann namespace is active)
   -- unfold ContractionC Riemann RiemannUp
