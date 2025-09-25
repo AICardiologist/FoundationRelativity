@@ -1,0 +1,78 @@
+name: Stage1 Activation Gate
+
+on:
+  pull_request:
+    branches: [ main, master, develop, feat/p0.2-invariants ]
+  workflow_dispatch:
+
+jobs:
+  stage1-budgets:
+    name: Audits & Activation Budget (required)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for git diff checks
+
+      - name: Install dependencies
+        run: |
+          # Install basic tools needed for audits
+          sudo apt-get update
+          sudo apt-get install -y curl git make
+
+      - name: Run audits
+        run: |
+          echo "▶ Running audit suite..."
+          make audit || {
+            echo "❌ Audit failed"
+            exit 1
+          }
+
+      - name: Check activation budget
+        run: |
+          echo "▶ Checking activation budget..."
+          ./scripts/check-activation-budget.sh || {
+            echo "❌ Budget check failed"
+            exit 1
+          }
+
+      - name: Report metrics
+        if: always()
+        run: |
+          echo "### Metrics Summary"
+          ./scripts/check-activation-budget.sh 2>&1 | head -5 || true
+
+  lean-build:
+    name: Full lake build (optional for drafts)
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | bash -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Get Lean version
+        run: |
+          lean --version || true
+          lake --version || true
+
+      - name: Cache .lake
+        uses: actions/cache@v3
+        with:
+          path: .lake
+          key: ${{ runner.os }}-lake-${{ hashFiles('lake-manifest.json') }}
+          restore-keys: |
+            ${{ runner.os }}-lake-
+
+      - name: Build Riemann.lean
+        run: |
+          echo "▶ Building Papers.P5_GeneralRelativity.GR.Riemann..."
+          lake build Papers.P5_GeneralRelativity.GR.Riemann || {
+            echo "⚠️ Build failed (expected for Stage-1 activation)"
+            echo "Errors are tracked by activation budget"
+            true  # Don't fail the job
+          }
