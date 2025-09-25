@@ -34,8 +34,8 @@ case "$MODE" in
     MAX_OE=12
     ;;
   stage1-lhs-both)
-    MAX_UG=45  # Current achievement
-    MAX_OE=10  # Current other errors
+    MAX_UG=45  # Achieved after splits + t-summand pushes
+    MAX_OE=10  # Infrastructure additions
     ;;
   stage1-full)
     MAX_UG=40

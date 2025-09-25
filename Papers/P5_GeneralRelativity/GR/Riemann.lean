@@ -1070,14 +1070,13 @@ end ActivationDemo
 section Stage1_LHS_Splits
   variable (M r θ : ℝ) (a b c d : Idx)
 
-  -- Local enumerator (Option A; keep it local to this section)
-  private lemma sumIdx_expand_local (f : Idx → ℝ → ℝ → ℝ) (r θ : ℝ) :
-    sumIdx (fun e => f e r θ)
-    = f Idx.t r θ + f Idx.r r θ + f Idx.θ r θ + f Idx.φ r θ := by
-    -- Expand the finite sum
-    simp only [sumIdx]
-    -- Normalize the addition
-    ring
+  -- Local enumerator with cleaner bridge shape
+  private lemma sumIdx_expand_local (f : Idx → ℝ → ℝ → ℝ) :
+    ∀ r θ,
+      sumIdx (fun e => f e r θ)
+      = f Idx.t r θ + f Idx.r r θ + f Idx.θ r θ + f Idx.φ r θ := by
+    intro r θ
+    simp [sumIdx, add_comm, add_left_comm, add_assoc]
 
   -- c-branch: split both families to 4+4 via the bridge; no global effects.
   lemma Hsplit_c_both :
@@ -1253,6 +1252,158 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
     exact dCoord_mul d
       (fun r θ => Γtot M r θ Idx.t c b)
       (fun r θ => g M a Idx.t r θ) r θ
+
+  -- Push product rule on r-summands (all 4 branches)
+  -- C-branch, first family, r-summand
+  have hpush_cr₁ :
+    dCoord c (fun r θ => Γtot M r θ Idx.r d a * g M Idx.r b r θ) r θ
+    =
+    (dCoord c (fun r θ => Γtot M r θ Idx.r d a) r θ) * g M Idx.r b r θ
+    + (Γtot M r θ Idx.r d a) * dCoord c (fun r θ => g M Idx.r b r θ) r θ := by
+    simpa using dCoord_mul c
+      (fun r θ => Γtot M r θ Idx.r d a)
+      (fun r θ => g M Idx.r b r θ) r θ
+
+  -- C-branch, second family, r-summand
+  have hpush_cr₂ :
+    dCoord c (fun r θ => Γtot M r θ Idx.r d b * g M a Idx.r r θ) r θ
+    =
+    (dCoord c (fun r θ => Γtot M r θ Idx.r d b) r θ) * g M a Idx.r r θ
+    + (Γtot M r θ Idx.r d b) * dCoord c (fun r θ => g M a Idx.r r θ) r θ := by
+    simpa using dCoord_mul c
+      (fun r θ => Γtot M r θ Idx.r d b)
+      (fun r θ => g M a Idx.r r θ) r θ
+
+  -- D-branch, first family, r-summand
+  have hpush_dr₁ :
+    dCoord d (fun r θ => Γtot M r θ Idx.r c a * g M Idx.r b r θ) r θ
+    =
+    (dCoord d (fun r θ => Γtot M r θ Idx.r c a) r θ) * g M Idx.r b r θ
+    + (Γtot M r θ Idx.r c a) * dCoord d (fun r θ => g M Idx.r b r θ) r θ := by
+    simpa using dCoord_mul d
+      (fun r θ => Γtot M r θ Idx.r c a)
+      (fun r θ => g M Idx.r b r θ) r θ
+
+  -- D-branch, second family, r-summand
+  have hpush_dr₂ :
+    dCoord d (fun r θ => Γtot M r θ Idx.r c b * g M a Idx.r r θ) r θ
+    =
+    (dCoord d (fun r θ => Γtot M r θ Idx.r c b) r θ) * g M a Idx.r r θ
+    + (Γtot M r θ Idx.r c b) * dCoord d (fun r θ => g M a Idx.r r θ) r θ := by
+    simpa using dCoord_mul d
+      (fun r θ => Γtot M r θ Idx.r c b)
+      (fun r θ => g M a Idx.r r θ) r θ
+
+  -- Push product rule on θ-summands (all 4 branches)
+  -- C-branch, first family, θ-summand
+  have hpush_cθ₁ :
+    dCoord c (fun r θ => Γtot M r θ Idx.θ d a * g M Idx.θ b r θ) r θ
+    =
+    (dCoord c (fun r θ => Γtot M r θ Idx.θ d a) r θ) * g M Idx.θ b r θ
+    + (Γtot M r θ Idx.θ d a) * dCoord c (fun r θ => g M Idx.θ b r θ) r θ := by
+    simpa using dCoord_mul c
+      (fun r θ => Γtot M r θ Idx.θ d a)
+      (fun r θ => g M Idx.θ b r θ) r θ
+
+  -- C-branch, second family, θ-summand
+  have hpush_cθ₂ :
+    dCoord c (fun r θ => Γtot M r θ Idx.θ d b * g M a Idx.θ r θ) r θ
+    =
+    (dCoord c (fun r θ => Γtot M r θ Idx.θ d b) r θ) * g M a Idx.θ r θ
+    + (Γtot M r θ Idx.θ d b) * dCoord c (fun r θ => g M a Idx.θ r θ) r θ := by
+    simpa using dCoord_mul c
+      (fun r θ => Γtot M r θ Idx.θ d b)
+      (fun r θ => g M a Idx.θ r θ) r θ
+
+  -- D-branch, first family, θ-summand
+  have hpush_dθ₁ :
+    dCoord d (fun r θ => Γtot M r θ Idx.θ c a * g M Idx.θ b r θ) r θ
+    =
+    (dCoord d (fun r θ => Γtot M r θ Idx.θ c a) r θ) * g M Idx.θ b r θ
+    + (Γtot M r θ Idx.θ c a) * dCoord d (fun r θ => g M Idx.θ b r θ) r θ := by
+    simpa using dCoord_mul d
+      (fun r θ => Γtot M r θ Idx.θ c a)
+      (fun r θ => g M Idx.θ b r θ) r θ
+
+  -- D-branch, second family, θ-summand
+  have hpush_dθ₂ :
+    dCoord d (fun r θ => Γtot M r θ Idx.θ c b * g M a Idx.θ r θ) r θ
+    =
+    (dCoord d (fun r θ => Γtot M r θ Idx.θ c b) r θ) * g M a Idx.θ r θ
+    + (Γtot M r θ Idx.θ c b) * dCoord d (fun r θ => g M a Idx.θ r θ) r θ := by
+    simpa using dCoord_mul d
+      (fun r θ => Γtot M r θ Idx.θ c b)
+      (fun r θ => g M a Idx.θ r θ) r θ
+
+  -- Push product rule on φ-summands (all 4 branches)
+  -- C-branch, first family, φ-summand
+  have hpush_cφ₁ :
+    dCoord c (fun r θ => Γtot M r θ Idx.φ d a * g M Idx.φ b r θ) r θ
+    =
+    (dCoord c (fun r θ => Γtot M r θ Idx.φ d a) r θ) * g M Idx.φ b r θ
+    + (Γtot M r θ Idx.φ d a) * dCoord c (fun r θ => g M Idx.φ b r θ) r θ := by
+    simpa using dCoord_mul c
+      (fun r θ => Γtot M r θ Idx.φ d a)
+      (fun r θ => g M Idx.φ b r θ) r θ
+
+  -- C-branch, second family, φ-summand
+  have hpush_cφ₂ :
+    dCoord c (fun r θ => Γtot M r θ Idx.φ d b * g M a Idx.φ r θ) r θ
+    =
+    (dCoord c (fun r θ => Γtot M r θ Idx.φ d b) r θ) * g M a Idx.φ r θ
+    + (Γtot M r θ Idx.φ d b) * dCoord c (fun r θ => g M a Idx.φ r θ) r θ := by
+    simpa using dCoord_mul c
+      (fun r θ => Γtot M r θ Idx.φ d b)
+      (fun r θ => g M a Idx.φ r θ) r θ
+
+  -- D-branch, first family, φ-summand
+  have hpush_dφ₁ :
+    dCoord d (fun r θ => Γtot M r θ Idx.φ c a * g M Idx.φ b r θ) r θ
+    =
+    (dCoord d (fun r θ => Γtot M r θ Idx.φ c a) r θ) * g M Idx.φ b r θ
+    + (Γtot M r θ Idx.φ c a) * dCoord d (fun r θ => g M Idx.φ b r θ) r θ := by
+    simpa using dCoord_mul d
+      (fun r θ => Γtot M r θ Idx.φ c a)
+      (fun r θ => g M Idx.φ b r θ) r θ
+
+  -- D-branch, second family, φ-summand
+  have hpush_dφ₂ :
+    dCoord d (fun r θ => Γtot M r θ Idx.φ c b * g M a Idx.φ r θ) r θ
+    =
+    (dCoord d (fun r θ => Γtot M r θ Idx.φ c b) r θ) * g M a Idx.φ r θ
+    + (Γtot M r θ Idx.φ c b) * dCoord d (fun r θ => g M a Idx.φ r θ) r θ := by
+    simpa using dCoord_mul d
+      (fun r θ => Γtot M r θ Idx.φ c b)
+      (fun r θ => g M a Idx.φ r θ) r θ
+
+  -- Apply all product pushes to the split equalities
+  -- C-branch: apply all 8 product pushes (t already done, now r, θ, φ)
+  have hC_pushed := hC'
+  -- First family
+  rw [← hpush_ct₁] at hC_pushed
+  rw [← hpush_cr₁] at hC_pushed
+  rw [← hpush_cθ₁] at hC_pushed
+  rw [← hpush_cφ₁] at hC_pushed
+  -- Second family
+  rw [← hpush_ct₂] at hC_pushed
+  rw [← hpush_cr₂] at hC_pushed
+  rw [← hpush_cθ₂] at hC_pushed
+  rw [← hpush_cφ₂] at hC_pushed
+  simp only [add_comm, add_left_comm, add_assoc] at hC_pushed
+
+  -- D-branch: apply all 8 product pushes
+  have hD_pushed := hD'
+  -- First family
+  rw [← hpush_dt₁] at hD_pushed
+  rw [← hpush_dr₁] at hD_pushed
+  rw [← hpush_dθ₁] at hD_pushed
+  rw [← hpush_dφ₁] at hD_pushed
+  -- Second family
+  rw [← hpush_dt₂] at hD_pushed
+  rw [← hpush_dr₂] at hD_pushed
+  rw [← hpush_dθ₂] at hD_pushed
+  rw [← hpush_dφ₂] at hD_pushed
+  simp only [add_comm, add_left_comm, add_assoc] at hD_pushed
 
   -- Unfold key definitions (uncomment when DraftRiemann namespace is active)
   -- unfold ContractionC Riemann RiemannUp
