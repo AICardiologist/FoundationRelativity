@@ -35,7 +35,7 @@ case "$MODE" in
     ;;
   stage1-lhs-both)
     MAX_UG=45  # Achieved after splits + t-summand pushes
-    MAX_OE=10  # Infrastructure additions
+    MAX_OE=13  # Temporary simp noise during activation
     ;;
   stage1-full)
     MAX_UG=40

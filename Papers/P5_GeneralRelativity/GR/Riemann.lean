@@ -1150,6 +1150,10 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   ( dCoord c (fun r θ => ContractionC M r θ d a b) r θ
   - dCoord d (fun r θ => ContractionC M r θ c a b) r θ )
   = ( Riemann M r θ a b c d + Riemann M r θ b a c d ) := by
+  -- Make Stage-1 facts available as local simp rules
+  local attribute [simp] Stage1LHS.Hc_one Stage1LHS.Hd_one
+  local attribute [simp] Stage1LHS.Hc2_one Stage1LHS.Hd2_one
+
   /-
   -- ACTIVATION CHECKLIST (test each step individually):
   -- [ ] Stage 0: Uncomment namespace DraftRiemann block (lines 545-561)
@@ -1404,6 +1408,12 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   rw [← hpush_dθ₂] at hD_pushed
   rw [← hpush_dφ₂] at hD_pushed
   simp only [add_comm, add_left_comm, add_assoc] at hD_pushed
+
+  -- Apply the pushed versions to the goal
+  rw [← hC_pushed]
+  rw [← hD_pushed]
+  -- Let Stage-1 facts discharge derivative components
+  simp only [add_comm, add_left_comm, add_assoc]
 
   -- Unfold key definitions (uncomment when DraftRiemann namespace is active)
   -- unfold ContractionC Riemann RiemannUp
