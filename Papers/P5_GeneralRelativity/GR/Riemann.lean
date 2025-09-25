@@ -1098,10 +1098,10 @@ section Stage1_LHS_Splits
     unfold ContractionC
     have h₁ := dCoord_sumIdx_via_local_expand c
       (fun e r θ => Γtot M r θ e d a * g M e b r θ) r θ
-      sumIdx_expand_local
+      (sumIdx_expand_local (fun e r θ => Γtot M r θ e d a * g M e b r θ))
     have h₂ := dCoord_sumIdx_via_local_expand c
       (fun e r θ => Γtot M r θ e d b * g M a e r θ) r θ
-      sumIdx_expand_local
+      (sumIdx_expand_local (fun e r θ => Γtot M r θ e d b * g M a e r θ))
     -- Split the outer addition and rewrite each side
     have h_add :=
       dCoord_add c
@@ -1130,10 +1130,10 @@ section Stage1_LHS_Splits
     unfold ContractionC
     have h₁ := dCoord_sumIdx_via_local_expand d
       (fun e r θ => Γtot M r θ e c a * g M e b r θ) r θ
-      sumIdx_expand_local
+      (sumIdx_expand_local (fun e r θ => Γtot M r θ e c a * g M e b r θ))
     have h₂ := dCoord_sumIdx_via_local_expand d
       (fun e r θ => Γtot M r θ e c b * g M a e r θ) r θ
-      sumIdx_expand_local
+      (sumIdx_expand_local (fun e r θ => Γtot M r θ e c b * g M a e r θ))
     have h_add :=
       dCoord_add d
         (fun r θ => sumIdx (fun e => Γtot M r θ e c a * g M e b r θ))
@@ -1143,6 +1143,66 @@ section Stage1_LHS_Splits
         rw [h₁, h₂])
 
 end Stage1_LHS_Splits
+
+-- Stage-1 RHS splits (file-scope; safe to activate)
+section Stage1_RHS_Splits
+  variable (M r θ : ℝ) (a b c d : Idx)
+
+  -- Local μ-expander for RHS terms (μ summation in Riemann definition)
+  private lemma sumIdx_expand_local_rhs (f : Idx → ℝ → ℝ → ℝ) :
+    ∀ r θ, sumIdx (fun μ => f μ r θ)
+      = f Idx.t r θ + f Idx.r r θ + f Idx.θ r θ + f Idx.φ r θ := by
+    intro r θ
+    simp [sumIdx, add_comm, add_left_comm, add_assoc]
+
+  -- Split for first Riemann term: Riemann M r θ a b c d
+  lemma Hsplit_RHS₁ :
+    Riemann M r θ a b c d
+      = sumIdx (fun μ => g M a μ r θ * RiemannUp M r θ μ b c d) := by
+    -- This is just the definition
+    rfl
+
+  -- Expand the μ summation using the bridge lemma pattern
+  lemma Hsplit_RHS₁_expanded :
+    Riemann M r θ a b c d
+      = g M a Idx.t r θ * RiemannUp M r θ Idx.t b c d
+      + g M a Idx.r r θ * RiemannUp M r θ Idx.r b c d
+      + g M a Idx.θ r θ * RiemannUp M r θ Idx.θ b c d
+      + g M a Idx.φ r θ * RiemannUp M r θ Idx.φ b c d := by
+    rw [Hsplit_RHS₁]
+    exact sumIdx_expand_local_rhs (fun μ r θ => g M a μ r θ * RiemannUp M r θ μ b c d) r θ
+
+  -- Split for second Riemann term: Riemann M r θ b a c d
+  lemma Hsplit_RHS₂ :
+    Riemann M r θ b a c d
+      = sumIdx (fun μ => g M b μ r θ * RiemannUp M r θ μ a c d) := by
+    -- This is just the definition
+    rfl
+
+  -- Expand the μ summation for second term
+  lemma Hsplit_RHS₂_expanded :
+    Riemann M r θ b a c d
+      = g M b Idx.t r θ * RiemannUp M r θ Idx.t a c d
+      + g M b Idx.r r θ * RiemannUp M r θ Idx.r a c d
+      + g M b Idx.θ r θ * RiemannUp M r θ Idx.θ a c d
+      + g M b Idx.φ r θ * RiemannUp M r θ Idx.φ a c d := by
+    rw [Hsplit_RHS₂]
+    exact sumIdx_expand_local_rhs (fun μ r θ => g M b μ r θ * RiemannUp M r θ μ a c d) r θ
+
+  -- Combined RHS split: expand both Riemann terms
+  lemma Hsplit_RHS_combined :
+    Riemann M r θ a b c d + Riemann M r θ b a c d
+      = (g M a Idx.t r θ * RiemannUp M r θ Idx.t b c d
+        + g M a Idx.r r θ * RiemannUp M r θ Idx.r b c d
+        + g M a Idx.θ r θ * RiemannUp M r θ Idx.θ b c d
+        + g M a Idx.φ r θ * RiemannUp M r θ Idx.φ b c d)
+      + (g M b Idx.t r θ * RiemannUp M r θ Idx.t a c d
+        + g M b Idx.r r θ * RiemannUp M r θ Idx.r a c d
+        + g M b Idx.θ r θ * RiemannUp M r θ Idx.θ a c d
+        + g M b Idx.φ r θ * RiemannUp M r θ Idx.φ a c d) := by
+    rw [Hsplit_RHS₁_expanded, Hsplit_RHS₂_expanded]
+
+end Stage1_RHS_Splits
 
 -- File-scope helper for zero derivatives (not marked [simp])
 private lemma dCoord_zero_fun (μ : Idx) (r θ : ℝ) :
@@ -1423,6 +1483,13 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   simp_all [add_comm, add_left_comm, add_assoc,
             mul_comm, mul_left_comm, mul_assoc,
             nabla_g_zero, dCoord_const, dCoord_zero_fun]
+
+  -- Apply RHS splits to expand the Riemann tensor terms
+  rw [Hsplit_RHS_combined]
+
+  -- Simplify the expanded RHS with normalization
+  simp_all [add_comm, add_left_comm, add_assoc,
+            mul_comm, mul_left_comm, mul_assoc]
 
   -- Unfold key definitions (uncomment when DraftRiemann namespace is active)
   -- unfold ContractionC Riemann RiemannUp
