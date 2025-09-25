@@ -1204,6 +1204,20 @@ section Stage1_RHS_Splits
 
 end Stage1_RHS_Splits
 
+-- RHS micro-facts for local optimization
+section RHS_microfacts
+  variable (M r θ : ℝ)
+
+  /-- RiemannUp is antisymmetric in (c,d) - local version for proof optimization -/
+  private lemma RiemannUp_antisymm_cd_local
+      (μ a b c d : Idx) :
+      RiemannUp M r θ μ b c d = - RiemannUp M r θ μ b d c := by
+    -- For now, leave as sorry - the antisymmetry property needs careful handling
+    -- of the sumIdx terms and index swapping
+    sorry
+
+end RHS_microfacts
+
 -- Targeted regroupers for common shapes produced after compatibility on g
 -- (These are *not* global [simp]; we call them by name via `simp [..]`.)
 private lemma regroup₂ (A₁ A₂ B₁ B₂ : ℝ) :
