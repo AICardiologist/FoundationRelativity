@@ -324,6 +324,15 @@ axiom wlpo_independent_of_ft : WLPO ⊬ FT
 
 ## 🤝 Contributing
 
+### First-time Setup
+```bash
+# Install repo-managed git hooks (runs audits on commit)
+make install-hooks
+
+# Verify your environment
+make audit  # Runs all quality checks
+```
+
 See [`CONTRIBUTING.md`](Papers/P5_GeneralRelativity/CONTRIBUTING.md) for development guidelines.
 
 ## 📄 License

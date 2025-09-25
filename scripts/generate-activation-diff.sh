@@ -27,6 +27,16 @@ if ! git diff --quiet -- "$FILE"; then
   STASHED=true
 fi
 
+# Setup cleanup trap to always restore state
+restore() {
+  # Best-effort: restore marker + stash
+  ./scripts/set-activation.sh "$CURRENT" >/dev/null 2>&1 || true
+  if [ "$STASHED" = true ]; then
+    git stash pop -q >/dev/null 2>&1 || true
+  fi
+}
+trap restore EXIT
+
 # Flip to requested mode (mutates working tree)
 ./scripts/set-activation.sh "$MODE" >/dev/null
 
@@ -35,14 +45,6 @@ git --no-pager diff -- "$FILE" > "$OUT"
 
 # Count the changes
 LINES_CHANGED=$(git diff --stat -- "$FILE" | awk '{print $(NF-1)}')
-
-# Restore original mode
-./scripts/set-activation.sh "$CURRENT" >/dev/null
-
-# Restore stash if any
-if [ "$STASHED" = true ]; then
-  git stash pop -q >/dev/null || true
-fi
 
 echo "✅ Wrote activation diff to: $OUT"
 echo "  (${LINES_CHANGED:-0} insertions/deletions)"
