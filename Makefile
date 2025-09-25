@@ -22,6 +22,7 @@ audit:
 	@./scripts/audit-doc-anchors.sh
 	@./scripts/audit-doc-hub.sh
 	@./scripts/audit-riemann-signatures.sh
+	@./scripts/audit-sorry-map.sh || true
 
 # Help
 help:
