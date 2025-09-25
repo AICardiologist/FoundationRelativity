@@ -1164,6 +1164,96 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   -- [ ] Final: Uncomment unfold line (664) and complete proof
   -/
 
+  -- Stage-1 splits (both families)
+  have hC := Stage1_LHS_Splits.Hsplit_c_both M r θ a b c d
+  have hD := Stage1_LHS_Splits.Hsplit_d_both M r θ a b c d
+
+  -- First family c-branch: push dCoord across 4-term sum
+  have hC₁ :=
+    dCoord_add4_flat c
+      (fun r θ => Γtot M r θ Idx.t d a * g M Idx.t b r θ)
+      (fun r θ => Γtot M r θ Idx.r d a * g M Idx.r b r θ)
+      (fun r θ => Γtot M r θ Idx.θ d a * g M Idx.θ b r θ)
+      (fun r θ => Γtot M r θ Idx.φ d a * g M Idx.φ b r θ)
+      r θ
+
+  -- Second family c-branch: same pattern with (d,b) and (a,·)
+  have hC₂ :=
+    dCoord_add4_flat c
+      (fun r θ => Γtot M r θ Idx.t d b * g M a Idx.t r θ)
+      (fun r θ => Γtot M r θ Idx.r d b * g M a Idx.r r θ)
+      (fun r θ => Γtot M r θ Idx.θ d b * g M a Idx.θ r θ)
+      (fun r θ => Γtot M r θ Idx.φ d b * g M a Idx.φ r θ)
+      r θ
+
+  -- First family d-branch: push dCoord across 4-term sum
+  have hD₁ :=
+    dCoord_add4_flat d
+      (fun r θ => Γtot M r θ Idx.t c a * g M Idx.t b r θ)
+      (fun r θ => Γtot M r θ Idx.r c a * g M Idx.r b r θ)
+      (fun r θ => Γtot M r θ Idx.θ c a * g M Idx.θ b r θ)
+      (fun r θ => Γtot M r θ Idx.φ c a * g M Idx.φ b r θ)
+      r θ
+
+  -- Second family d-branch: same pattern with (c,b) and (a,·)
+  have hD₂ :=
+    dCoord_add4_flat d
+      (fun r θ => Γtot M r θ Idx.t c b * g M a Idx.t r θ)
+      (fun r θ => Γtot M r θ Idx.r c b * g M a Idx.r r θ)
+      (fun r θ => Γtot M r θ Idx.θ c b * g M a Idx.θ r θ)
+      (fun r θ => Γtot M r θ Idx.φ c b * g M a Idx.φ r θ)
+      r θ
+
+  -- Replace each dCoord of sum with sum of dCoords
+  have hC' := hC
+  rw [← hC₁, ← hC₂] at hC'
+  simp only [add_comm, add_left_comm, add_assoc] at hC'
+
+  have hD' := hD
+  rw [← hD₁, ← hD₂] at hD'
+  simp only [add_comm, add_left_comm, add_assoc] at hD'
+
+  -- Push product rule on t-summands using Stage-1 facts
+  -- C-branch, first family, t-summand
+  have hpush_ct₁ :
+    dCoord c (fun r θ => Γtot M r θ Idx.t d a * g M Idx.t b r θ) r θ
+    =
+    (dCoord c (fun r θ => Γtot M r θ Idx.t d a) r θ) * g M Idx.t b r θ
+    + (Γtot M r θ Idx.t d a) * dCoord c (fun r θ => g M Idx.t b r θ) r θ := by
+    exact dCoord_mul c
+      (fun r θ => Γtot M r θ Idx.t d a)
+      (fun r θ => g M Idx.t b r θ) r θ
+
+  -- C-branch, second family, t-summand
+  have hpush_ct₂ :
+    dCoord c (fun r θ => Γtot M r θ Idx.t d b * g M a Idx.t r θ) r θ
+    =
+    (dCoord c (fun r θ => Γtot M r θ Idx.t d b) r θ) * g M a Idx.t r θ
+    + (Γtot M r θ Idx.t d b) * dCoord c (fun r θ => g M a Idx.t r θ) r θ := by
+    exact dCoord_mul c
+      (fun r θ => Γtot M r θ Idx.t d b)
+      (fun r θ => g M a Idx.t r θ) r θ
+
+  -- D-branch, first family, t-summand
+  have hpush_dt₁ :
+    dCoord d (fun r θ => Γtot M r θ Idx.t c a * g M Idx.t b r θ) r θ
+    =
+    (dCoord d (fun r θ => Γtot M r θ Idx.t c a) r θ) * g M Idx.t b r θ
+    + (Γtot M r θ Idx.t c a) * dCoord d (fun r θ => g M Idx.t b r θ) r θ := by
+    exact dCoord_mul d
+      (fun r θ => Γtot M r θ Idx.t c a)
+      (fun r θ => g M Idx.t b r θ) r θ
+
+  -- D-branch, second family, t-summand
+  have hpush_dt₂ :
+    dCoord d (fun r θ => Γtot M r θ Idx.t c b * g M a Idx.t r θ) r θ
+    =
+    (dCoord d (fun r θ => Γtot M r θ Idx.t c b) r θ) * g M a Idx.t r θ
+    + (Γtot M r θ Idx.t c b) * dCoord d (fun r θ => g M a Idx.t r θ) r θ := by
+    exact dCoord_mul d
+      (fun r θ => Γtot M r θ Idx.t c b)
+      (fun r θ => g M a Idx.t r θ) r θ
+
   -- Unfold key definitions (uncomment when DraftRiemann namespace is active)
   -- unfold ContractionC Riemann RiemannUp
 
