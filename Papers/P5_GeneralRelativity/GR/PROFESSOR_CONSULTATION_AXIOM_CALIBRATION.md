@@ -179,19 +179,51 @@ Instead of eliminating axioms from the current formalization, should we:
 
 **Q5a:** Which approach best serves the axiom calibration research?
 
+### Beyond Level 3: Is There a Level 4?
+
+**Q6:** **Are there additional rigor levels beyond Level 3 we should be aware of?**
+
+For axiom calibration / reverse mathematics, possible Level 4+ concerns:
+
+- **Level 4a - Constructive content:**
+  - Eliminate classical axioms (LEM, Choice, Propext)?
+  - Extract computational content?
+  - Relevant for constructive reverse mathematics?
+
+- **Level 4b - Mathlib axiom audit:**
+  - What axioms does Mathlib itself use?
+  - Should we track/minimize dependency on Mathlib axioms?
+  - Relevant for calibration graph completeness?
+
+- **Level 4c - Meta-theoretic concerns:**
+  - Proof-theoretic strength?
+  - Ordinal analysis?
+  - Subsystem classification (RCA₀, WKL₀, etc.)?
+
+**Q6a:** For axiom calibration purposes, is there a "Level 4" or beyond that we should target?
+
+**Q6b:** Are there meta-theoretic properties we should be tracking/documenting?
+
+**Q6c:** Should we be auditing which Mathlib axioms we depend on (e.g., Quot.sound, propext, funext)?
+
 ---
 
 ## Part IV: Specific Technical Questions Summary
 
 ### Critical Questions (need answers to proceed):
 
-**Q2a** (MOST URGENT): Does Mathlib have a lemma for "derivative of locally constant function is zero"?
+**Q6a** (STRATEGIC): Is there a "Level 4" beyond Level 3 for axiom calibration?
+- Constructive content (no LEM/Choice)?
+- Mathlib axiom tracking?
+- Meta-theoretic properties?
+
+**Q3a** (STRATEGIC): For axiom calibration, is Level 2.5 (critical path clean) sufficient, or do we need true Level 3 (zero axioms everywhere)?
+
+**Q2a** (TECHNICAL - MOST URGENT): Does Mathlib have a lemma for "derivative of locally constant function is zero"?
 - If YES: Where? (we can use it immediately)
 - If NO: Can we prove it ourselves without deep topology?
 
-**Q3a**: For axiom calibration, is Level 2.5 (critical path clean) sufficient, or do we need true Level 3 (zero axioms everywhere)?
-
-**Q1a**: If we need Level 3, should we grind through the 76-use refactoring, or is there a smarter approach?
+**Q1a** (TACTICAL): If we need Level 3, should we grind through the 76-use refactoring, or is there a smarter approach?
 
 ### Secondary Questions (nice to know):
 
