@@ -174,6 +174,47 @@ end SimpSetup
 lemma differentiable_hack (f : ℝ → ℝ) (x : ℝ) : DifferentiableAt ℝ f x := by
   sorry -- This is a temporary bypass for CI.
 
+/-! ### Differentiability Lemmas for Schwarzschild Components
+
+These lemmas establish differentiability of the metric components and related functions,
+eliminating the need for `differentiable_hack` in critical proofs.
+-/
+
+/-- The function r ↦ r is differentiable everywhere. -/
+lemma differentiableAt_id (r : ℝ) : DifferentiableAt ℝ id r :=
+  differentiableAt_fun_id
+
+/-- The function r ↦ r^n is differentiable everywhere for natural n. -/
+lemma differentiableAt_pow (n : ℕ) (r : ℝ) : DifferentiableAt ℝ (fun x => x^n) r :=
+  Differentiable.differentiableAt (differentiable_pow n)
+
+/-- The function r ↦ 1/r is differentiable for r ≠ 0. -/
+lemma differentiableAt_inv (r : ℝ) (hr : r ≠ 0) : DifferentiableAt ℝ (fun x => x⁻¹) r :=
+  DifferentiableAt.inv differentiableAt_fun_id hr
+
+/-- The Schwarzschild function f(r) = 1 - 2M/r is differentiable on Exterior (r > 2M). -/
+lemma differentiableAt_f (M r : ℝ) (h_ext : Exterior M r 0) :
+    DifferentiableAt ℝ (fun r' => f M r') r := by
+  have hr_ne := Exterior.r_ne_zero h_ext
+  simp only [f]
+  -- f(r) = 1 - 2M/r = 1 - 2M * r⁻¹
+  apply DifferentiableAt.sub
+  · exact differentiableAt_const 1
+  · apply DifferentiableAt.const_mul
+    exact differentiableAt_inv r hr_ne
+
+/-- sin θ is differentiable everywhere. -/
+lemma differentiableAt_sin (θ : ℝ) : DifferentiableAt ℝ Real.sin θ :=
+  Real.differentiableAt_sin
+
+/-- cos θ is differentiable everywhere. -/
+lemma differentiableAt_cos (θ : ℝ) : DifferentiableAt ℝ Real.cos θ :=
+  Real.differentiableAt_cos
+
+/-- sin²θ is differentiable everywhere. -/
+lemma differentiableAt_sin_sq (θ : ℝ) : DifferentiableAt ℝ (fun θ' => (Real.sin θ')^2) θ :=
+  DifferentiableAt.pow (Real.differentiableAt_sin) 2
+
 /-- Linearity of `dCoord` over subtraction. -/
 @[simp] lemma dCoord_sub (μ : Idx) (f g : ℝ → ℝ → ℝ) (r θ : ℝ) :
   dCoord μ (fun r θ => f r θ - g r θ) r θ
