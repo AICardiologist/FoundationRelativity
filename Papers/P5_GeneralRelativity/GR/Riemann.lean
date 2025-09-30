@@ -369,7 +369,12 @@ lemma dCoord_sumIdx_via_local_expand
 @[simp] lemma dCoord_sumIdx (μ : Idx) (F : Idx → ℝ → ℝ → ℝ) (r θ : ℝ) :
   dCoord μ (fun r θ => sumIdx (fun i => F i r θ)) r θ =
   sumIdx (fun i => dCoord μ (fun r θ => F i r θ) r θ) := by
-  sorry  -- Requires proper differentiability infrastructure
+  -- Expand sumIdx on both sides and apply dCoord_add repeatedly
+  simp only [sumIdx_expand]
+  -- LHS: dCoord μ (fun r θ => F t r θ + F r r θ + F θ r θ + F φ r θ) r θ
+  -- RHS: dCoord μ (F t) r θ + dCoord μ (F r) r θ + dCoord μ (F θ) r θ + dCoord μ (F φ) r θ
+  -- Apply dCoord_add three times to distribute dCoord over the sum
+  rw [dCoord_add, dCoord_add, dCoord_add]
 
 /-
 -- === gInv activation note ===
