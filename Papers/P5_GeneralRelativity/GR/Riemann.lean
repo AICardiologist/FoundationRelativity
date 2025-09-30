@@ -1155,54 +1155,24 @@ with no f(r) dependence. This is kept for backwards compatibility with existing 
   field_simp [hsin, pow_two]
   ring
 
-/-- ⚠️  QUARANTINED AXIOM - DE-AXIOMATIZATION MANDATE (2025-09-30)
+/-! ## ✅ AX_nabla_g_zero ELIMINATED (Level 3 Priority 1 - 2025-09-30)
 
-**RESTRICTIONS:**
-- ❌ @[simp] attribute REMOVED (dangerous global rewriting)
-- ❌ MUST NOT be used in new code
-- ✅ Sound version `nabla_g_zero_ext` MUST be used instead when possible
-- ✅ Retained ONLY for `Riemann_swap_a_b` antisymmetry proof (requires derivative of ∇g)
+The axiom AX_nabla_g_zero has been successfully eliminated from the codebase.
 
-**ISSUE:** Global metric compatibility without domain restriction.
+**Replacement:**
+- Sound version: `nabla_g_zero_ext` (line 1055) with explicit Exterior hypothesis
+- Uses topology infrastructure: `isOpen_exterior_set` from Level 2.5
 
-This axiom asserts ∇g = 0 unconditionally, which is mathematically unsound at the
-event horizon r = 2M. The SOUND version is `nabla_g_zero_ext` with explicit `Exterior` hypothesis.
+**Downstream refactored:**
+- `dCoord_g_via_compat` → `dCoord_g_via_compat_ext` (line 1017, from Level 2.5)
+- `Riemann_swap_a_b` → `Riemann_swap_a_b_ext` (line 3195)
+- `Riemann_sq_swap_a_b` → `Riemann_sq_swap_a_b_ext` (line 3220)
+- `Riemann_first_equal_zero` → `Riemann_first_equal_zero_ext` (line 3228)
 
-**JUSTIFICATION FOR RETENTION (temporary):**
-- Required by `Riemann_swap_a_b` to prove d/d(∇g) = 0
-- Replacing it requires topological infrastructure (Exterior_isOpen)
-- This is PRIORITY 2 work (deferred per mandate)
-- Critical path (R_μν = 0) uses sound version `nabla_g_zero_ext`
-
-**ELIMINATION PATH:**
-1. ✅ Sound version with Exterior hypothesis exists (nabla_g_zero_ext)
-2. ✅ @[simp] attribute removed (quarantined)
-3. ⏳ Implement Exterior_isOpen (PRIORITY 2)
-4. ⏳ Refactor Riemann_swap_a_b_ext to use topological version
-5. ⏳ Remove axiom entirely (Level 3)
-
-**AUDIT:** Verify critical path uses only `nabla_g_zero_ext` before Level 3 submission.
+**Status:** Level 3 Priority 1 COMPLETE ✅
 -/
-lemma AX_nabla_g_zero (M r θ : ℝ) (c a b : Idx) :
-  nabla_g M r θ c a b = 0 := by
-  sorry -- QUARANTINED AXIOM - See documentation above.
 
 -- Removed duplicate: sumIdx_sub is already defined in Schwarzschild.lean
-
-/-- From `∇g = 0`: rewrite `∂_x g_{ab}` as a Γ–`g` contraction.
-
-    NOTE: This axiom-dependent version will be replaced by dCoord_g_via_compat_ext
-    (which already exists at line 1017) once all call sites are updated.
--/
-@[simp] lemma dCoord_g_via_compat
-    (M r θ : ℝ) (x a b : Idx) :
-  dCoord x (fun r θ => g M a b r θ) r θ
-    =
-    sumIdx (fun e => Γtot M r θ e x a * g M e b r θ)
-  + sumIdx (fun e => Γtot M r θ e x b * g M a e r θ) := by
-  have h := AX_nabla_g_zero M r θ x a b
-  simp only [nabla_g] at h
-  linarith
 
 /-! ### Structured proof infrastructure for the Ricci identity -/
 
@@ -3166,31 +3136,10 @@ lemma ricci_identity_on_g
   -- 3. Trivial algebraic rearrangement (goal already solved by rewrites)
   -- ring -- Not needed
 
-/-- Antisymmetry in the first two (lower) slots. `R_{abcd} = - R_{bacd}`. -/
-lemma Riemann_swap_a_b (M r θ : ℝ) (a b c d : Idx) :
-  Riemann M r θ a b c d = - Riemann M r θ b a c d := by
-  classical
-  -- Apply the Ricci identity
-  have hRic := ricci_identity_on_g M r θ a b c d
-  -- The LHS vanishes because the connection is metric compatible (∇g = 0)
-  -- Since ∇g = 0 everywhere, its derivative (∇∇g) is also 0
-  have hLHS_zero : ( dCoord c (fun r θ => nabla_g M r θ d a b) r θ
-                  - dCoord d (fun r θ => nabla_g M r θ c a b) r θ ) = 0 := by
-    -- Apply metric compatibility
-    simp only [AX_nabla_g_zero]
-    -- The derivative of the zero function is zero
-    have h_zero_fn : (fun r θ => (0:ℝ)) = (fun (_r : ℝ) (_θ : ℝ) => (0:ℝ)) := by rfl
-    rw [h_zero_fn]
-    simp only [dCoord_const, sub_self]
-  rw [hLHS_zero] at hRic
-  -- We now have 0 = - (R_abcd + R_bacd), which implies R_abcd = -R_bacd
-  linarith
+/-- Antisymmetry in the first two (lower) slots. `R_{abcd} = - R_{bacd}`.
 
-/-- Antisymmetry in the first two (lower) slots on Exterior. `R_{abcd} = - R_{bacd}`.
-
-    This is the Exterior-hypothesis version that eliminates AX_nabla_g_zero.
-    This lemma will eventually replace Riemann_swap_a_b once all call sites
-    are updated to pass the Exterior hypothesis.
+    This is the axiom-free version that uses topology infrastructure instead of AX_nabla_g_zero.
+    Requires explicit Exterior hypothesis to ensure metric compatibility.
 -/
 lemma Riemann_swap_a_b_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (a b c d : Idx) :
   Riemann M r θ a b c d = - Riemann M r θ b a c d := by
@@ -3232,25 +3181,12 @@ lemma Riemann_sq_swap_a_b_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (a b c d 
   -- The only number equal to its negation is 0
   linarith
 
-/-- Squared symmetry in the first pair. Safer for simp. -/
-lemma Riemann_sq_swap_a_b (M r θ : ℝ) (a b c d : Idx) :
-  (Riemann M r θ b a c d)^2 = (Riemann M r θ a b c d)^2 := by
-  rw [Riemann_swap_a_b, sq_neg]
-
 /-- Squared symmetry in the last pair. Safer for simp. -/
 lemma Riemann_sq_swap_c_d (M r θ : ℝ) (a b c d : Idx) :
   (Riemann M r θ a b d c)^2 = (Riemann M r θ a b c d)^2 := by
   rw [Riemann_swap_c_d, sq_neg]
 
 /-! ### New: vanishing lemmas for equal indices -/
-
-/-- If the first two indices coincide, the Riemann component vanishes. -/
-@[simp] lemma Riemann_first_equal_zero (M r θ : ℝ) (a c d : Idx) :
-  Riemann M r θ a a c d = 0 := by
-  -- By antisymmetry: R_aacd = -R_aacd
-  have h := Riemann_swap_a_b M r θ a a c d
-  -- The only number equal to its negation is 0
-  linarith
 
 /-- If the last two indices are equal, the fully-lowered component vanishes. -/
 @[simp] lemma Riemann_last_equal_zero (M r θ : ℝ) (a b c : Idx) :
