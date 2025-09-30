@@ -2872,8 +2872,10 @@ lemma Riemann_sq_swap_c_d (M r θ : ℝ) (a b c d : Idx) :
   -- Expand the mixed-index Riemann and use staticity/axisymmetry + Christoffel sparsity.
   unfold RiemannUp
   -- `∂_t` pieces vanish; θ-derivative hits a θ-constant term here; Γ-combinations are sparse.
-  simp [dCoord_t, dCoord_θ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_t, dCoord_θ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{tr θt} = 0 -/
 @[simp] lemma R_tr_θt_zero (M r θ : ℝ) :
@@ -2887,8 +2889,10 @@ lemma Riemann_sq_swap_c_d (M r θ : ℝ) (a b c d : Idx) :
   classical
   rw [Riemann_contract_first]
   unfold RiemannUp
-  simp [dCoord_t, dCoord_φ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_t, dCoord_φ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By antisymmetry: R_{tr φt} = 0 -/
 @[simp] lemma R_tr_φt_zero (M r θ : ℝ) :
@@ -2902,8 +2906,10 @@ lemma Riemann_sq_swap_c_d (M r θ : ℝ) (a b c d : Idx) :
   classical
   rw [Riemann_contract_first]
   unfold RiemannUp
-  simp [dCoord_r, dCoord_θ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_r, dCoord_θ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By antisymmetry: R_{tr θr} = 0 -/
 @[simp] lemma R_tr_θr_zero (M r θ : ℝ) :
@@ -2919,8 +2925,10 @@ lemma Riemann_sq_swap_c_d (M r θ : ℝ) (a b c d : Idx) :
   rw [Riemann_contract_first]
   unfold RiemannUp
   -- Staticity/axisymmetry and Γ-sparsity kill all terms.
-  simp [dCoord_r, dCoord_φ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_r, dCoord_φ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{tr φr} = 0. (No `[simp]` to avoid loops.) -/
 lemma R_tr_φr_zero (M r θ : ℝ) :
@@ -2935,8 +2943,10 @@ lemma R_tr_φr_zero (M r θ : ℝ) :
   classical
   rw [Riemann_contract_first]
   unfold RiemannUp
-  simp [dCoord_θ, dCoord_φ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_θ, dCoord_φ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{tr φθ} = 0. (No `[simp]` to avoid loops.) -/
 lemma R_tr_φθ_zero (M r θ : ℝ) :
@@ -2953,8 +2963,10 @@ lemma R_tr_φθ_zero (M r θ : ℝ) :
   classical
   rw [Riemann_contract_first]
   unfold RiemannUp
-  simp [dCoord_t, dCoord_r, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_t, dCoord_r, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{tθ rt} = 0. (No `[simp]` to avoid loops.) -/
 lemma R_tθ_rt_zero (M r θ : ℝ) :
@@ -2968,8 +2980,10 @@ lemma R_tθ_rt_zero (M r θ : ℝ) :
   classical
   rw [Riemann_contract_first]
   unfold RiemannUp
-  simp [dCoord_t, dCoord_φ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_t, dCoord_φ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{tθ φt} = 0. (No `[simp]` to avoid loops.) -/
 lemma R_tθ_φt_zero (M r θ : ℝ) :
@@ -2985,8 +2999,10 @@ lemma R_tθ_φt_zero (M r θ : ℝ) :
   classical
   rw [Riemann_contract_first]
   unfold RiemannUp
-  simp [dCoord_r, dCoord_θ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_r, dCoord_θ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{tθ θr} = 0. (No `[simp]` to avoid loops.) -/
 lemma R_tθ_θr_zero (M r θ : ℝ) :
@@ -3000,8 +3016,10 @@ lemma R_tθ_θr_zero (M r θ : ℝ) :
   classical
   rw [Riemann_contract_first]
   unfold RiemannUp
-  simp [dCoord_r, dCoord_φ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_r, dCoord_φ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{tθ φr} = 0. (No `[simp]` to avoid loops.) -/
 lemma R_tθ_φr_zero (M r θ : ℝ) :
@@ -3015,8 +3033,10 @@ lemma R_tθ_φr_zero (M r θ : ℝ) :
   classical
   rw [Riemann_contract_first]
   unfold RiemannUp
-  simp [dCoord_θ, dCoord_φ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_θ, dCoord_φ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{tθ φθ} = 0. (No `[simp]` to avoid loops.) -/
 lemma R_tθ_φθ_zero (M r θ : ℝ) :
@@ -3032,8 +3052,10 @@ lemma R_tθ_φθ_zero (M r θ : ℝ) :
   classical
   rw [Riemann_contract_first]
   unfold RiemannUp
-  simp [dCoord_t, dCoord_r, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_t, dCoord_r, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{tφ rt} = 0. -/
 lemma R_tφ_rt_zero (M r θ : ℝ) :
@@ -3047,8 +3069,10 @@ lemma R_tφ_rt_zero (M r θ : ℝ) :
   classical
   rw [Riemann_contract_first]
   unfold RiemannUp
-  simp [dCoord_t, dCoord_θ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_t, dCoord_θ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{tφ θt} = 0. -/
 lemma R_tφ_θt_zero (M r θ : ℝ) :
@@ -3062,8 +3086,10 @@ lemma R_tφ_θt_zero (M r θ : ℝ) :
   classical
   rw [Riemann_contract_first]
   unfold RiemannUp
-  simp [dCoord_r, dCoord_φ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_r, dCoord_φ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{tφ φr} = 0. -/
 lemma R_tφ_φr_zero (M r θ : ℝ) :
@@ -3077,8 +3103,10 @@ lemma R_tφ_φr_zero (M r θ : ℝ) :
   classical
   rw [Riemann_contract_first]
   unfold RiemannUp
-  simp [dCoord_r, dCoord_θ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_r, dCoord_θ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{tφ θr} = 0. -/
 lemma R_tφ_θr_zero (M r θ : ℝ) :
@@ -3111,8 +3139,10 @@ lemma R_tφ_φθ_zero (M r θ : ℝ) :
   classical
   rw [Riemann_contract_first]
   unfold RiemannUp
-  simp [dCoord_t, dCoord_r, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_t, dCoord_r, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{rθ rt} = 0. -/
 lemma R_rθ_rt_zero (M r θ : ℝ) :
@@ -3124,8 +3154,10 @@ lemma R_rθ_rt_zero (M r θ : ℝ) :
   Riemann M r θ Idx.r Idx.θ Idx.t Idx.θ = 0 := by
   classical
   rw [Riemann_contract_first]; unfold RiemannUp
-  simp [dCoord_t, dCoord_θ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_t, dCoord_θ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{rθ θt} = 0. -/
 lemma R_rθ_θt_zero (M r θ : ℝ) :
@@ -3137,8 +3169,10 @@ lemma R_rθ_θt_zero (M r θ : ℝ) :
   Riemann M r θ Idx.r Idx.θ Idx.t Idx.φ = 0 := by
   classical
   rw [Riemann_contract_first]; unfold RiemannUp
-  simp [dCoord_t, dCoord_φ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_t, dCoord_φ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{rθ φt} = 0. -/
 lemma R_rθ_φt_zero (M r θ : ℝ) :
@@ -3150,8 +3184,10 @@ lemma R_rθ_φt_zero (M r θ : ℝ) :
   Riemann M r θ Idx.r Idx.θ Idx.r Idx.φ = 0 := by
   classical
   rw [Riemann_contract_first]; unfold RiemannUp
-  simp [dCoord_r, dCoord_φ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_r, dCoord_φ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{rθ φr} = 0. -/
 lemma R_rθ_φr_zero (M r θ : ℝ) :
@@ -3163,8 +3199,10 @@ lemma R_rθ_φr_zero (M r θ : ℝ) :
   Riemann M r θ Idx.r Idx.θ Idx.θ Idx.φ = 0 := by
   classical
   rw [Riemann_contract_first]; unfold RiemannUp
-  simp [dCoord_θ, dCoord_φ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_θ, dCoord_φ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{rθ φθ} = 0. -/
 lemma R_rθ_φθ_zero (M r θ : ℝ) :
@@ -3180,8 +3218,10 @@ lemma R_rθ_φθ_zero (M r θ : ℝ) :
   Riemann M r θ Idx.r Idx.φ Idx.t Idx.r = 0 := by
   classical
   rw [Riemann_contract_first]; unfold RiemannUp
-  simp [dCoord_t, dCoord_r, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_t, dCoord_r, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{rφ rt} = 0. -/
 lemma R_rφ_rt_zero (M r θ : ℝ) :
@@ -3193,8 +3233,10 @@ lemma R_rφ_rt_zero (M r θ : ℝ) :
   Riemann M r θ Idx.r Idx.φ Idx.t Idx.θ = 0 := by
   classical
   rw [Riemann_contract_first]; unfold RiemannUp
-  simp [dCoord_t, dCoord_θ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_t, dCoord_θ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{rφ θt} = 0. -/
 lemma R_rφ_θt_zero (M r θ : ℝ) :
@@ -3206,8 +3248,10 @@ lemma R_rφ_θt_zero (M r θ : ℝ) :
   Riemann M r θ Idx.r Idx.φ Idx.t Idx.φ = 0 := by
   classical
   rw [Riemann_contract_first]; unfold RiemannUp
-  simp [dCoord_t, dCoord_φ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_t, dCoord_φ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{rφ φt} = 0. -/
 lemma R_rφ_φt_zero (M r θ : ℝ) :
@@ -3219,8 +3263,10 @@ lemma R_rφ_φt_zero (M r θ : ℝ) :
   Riemann M r θ Idx.r Idx.φ Idx.r Idx.θ = 0 := by
   classical
   rw [Riemann_contract_first]; unfold RiemannUp
-  simp [dCoord_r, dCoord_θ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_r, dCoord_θ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{rφ θr} = 0. -/
 lemma R_rφ_θr_zero (M r θ : ℝ) :
@@ -3480,8 +3526,10 @@ lemma R_θφ_φt_zero (M r θ : ℝ) :
   Riemann M r θ Idx.θ Idx.φ Idx.r Idx.θ = 0 := by
   classical
   rw [Riemann_contract_first]; unfold RiemannUp
-  simp [dCoord_r, dCoord_θ, Γtot,
-        Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+  simp only [dCoord_r, dCoord_θ, Γtot,
+             Γ_t_tr, Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ,
+             sumIdx_expand, g, deriv_const]
+  norm_num
 
 /-- By last-pair antisymmetry: R_{θφ θr} = 0. -/
 lemma R_θφ_θr_zero (M r θ : ℝ) :
