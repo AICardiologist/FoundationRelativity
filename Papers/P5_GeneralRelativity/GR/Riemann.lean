@@ -1362,23 +1362,10 @@ section Stage1_LHS_Splits
      + Γtot M r θ Idx.r d b * g M a Idx.r r θ
      + Γtot M r θ Idx.θ d b * g M a Idx.θ r θ
      + Γtot M r θ Idx.φ d b * g M a Idx.φ r θ) r θ := by
-    -- Expand ContractionC's two finite sums to 4 terms each using the bridge
-    unfold ContractionC
-    have h₁ := dCoord_sumIdx_via_local_expand c
-      (fun e r θ => Γtot M r θ e d a * g M e b r θ) r θ
-      (sumIdx_expand_local (fun e r θ => Γtot M r θ e d a * g M e b r θ))
-    have h₂ := dCoord_sumIdx_via_local_expand c
-      (fun e r θ => Γtot M r θ e d b * g M a e r θ) r θ
-      (sumIdx_expand_local (fun e r θ => Γtot M r θ e d b * g M a e r θ))
-    -- Split the outer addition and rewrite each side
-    have h_add :=
-      dCoord_add c
-        (fun r θ => sumIdx (fun e => Γtot M r θ e d a * g M e b r θ))
-        (fun r θ => sumIdx (fun e => Γtot M r θ e d b * g M a e r θ)) r θ
-    -- Apply both expansions and normalize
-    -- Note: Using sorry temporarily due to simpa timeout (400k+ heartbeats)
-    -- The proof is mathematically correct but computationally expensive
-    sorry
+    -- Expand ContractionC, distribute dCoord over sums, expand sumIdx
+    simp only [ContractionC, dCoord_sumIdx, sumIdx_expand, dCoord_add]
+    -- Normalize associativity/commutativity
+    ring
 
   -- d-branch: same idea, roles of c/d swapped accordingly.
   set_option maxHeartbeats 400000 in
@@ -1396,20 +1383,10 @@ section Stage1_LHS_Splits
      + Γtot M r θ Idx.r c b * g M a Idx.r r θ
      + Γtot M r θ Idx.θ c b * g M a Idx.θ r θ
      + Γtot M r θ Idx.φ c b * g M a Idx.φ r θ) r θ := by
-    unfold ContractionC
-    have h₁ := dCoord_sumIdx_via_local_expand d
-      (fun e r θ => Γtot M r θ e c a * g M e b r θ) r θ
-      (sumIdx_expand_local (fun e r θ => Γtot M r θ e c a * g M e b r θ))
-    have h₂ := dCoord_sumIdx_via_local_expand d
-      (fun e r θ => Γtot M r θ e c b * g M a e r θ) r θ
-      (sumIdx_expand_local (fun e r θ => Γtot M r θ e c b * g M a e r θ))
-    have h_add :=
-      dCoord_add d
-        (fun r θ => sumIdx (fun e => Γtot M r θ e c a * g M e b r θ))
-        (fun r θ => sumIdx (fun e => Γtot M r θ e c b * g M a e r θ)) r θ
-    -- Note: Using sorry temporarily due to simpa timeout (400k+ heartbeats)
-    -- The proof is mathematically correct but computationally expensive
-    sorry
+    -- Expand ContractionC, distribute dCoord over sums, expand sumIdx
+    simp only [ContractionC, dCoord_sumIdx, sumIdx_expand, dCoord_add]
+    -- Normalize associativity/commutativity
+    ring
 
 end Stage1_LHS_Splits
 
