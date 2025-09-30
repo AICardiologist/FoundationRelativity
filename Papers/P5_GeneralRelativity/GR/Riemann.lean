@@ -223,11 +223,7 @@ lemma differentiableAt_cos (θ : ℝ) : DifferentiableAt ℝ Real.cos θ :=
 lemma differentiableAt_sin_sq (θ : ℝ) : DifferentiableAt ℝ (fun θ' => (Real.sin θ')^2) θ :=
   DifferentiableAt.pow (Real.differentiableAt_sin) 2
 
-/-! ### Hypothesis-Carrying `dCoord` Infrastructure (De-Axiomatization)
-
-The following lemmas provide rigorous versions of dCoord linearity rules with explicit
-differentiability hypotheses. These replace the axiom-dependent versions for the critical path.
--/
+/-! ### Helper Predicates for De-Axiomatization -/
 
 /-- Helper predicate: f is differentiable at (r,θ) in the r-direction. -/
 def DifferentiableAt_r (f : ℝ → ℝ → ℝ) (r θ : ℝ) : Prop :=
@@ -236,6 +232,54 @@ def DifferentiableAt_r (f : ℝ → ℝ → ℝ) (r θ : ℝ) : Prop :=
 /-- Helper predicate: f is differentiable at (r,θ) in the θ-direction. -/
 def DifferentiableAt_θ (f : ℝ → ℝ → ℝ) (r θ : ℝ) : Prop :=
   DifferentiableAt ℝ (fun θ' => f r θ') θ
+
+/-! ### Metric Component Differentiability -/
+
+/-- g_tt(r) = -f(r) is differentiable in r-direction on Exterior. -/
+lemma differentiableAt_g_tt_r (M r θ : ℝ) (h_ext : Exterior M r θ) :
+    DifferentiableAt_r (fun r θ => g M Idx.t Idx.t r θ) r θ := by
+  simp only [DifferentiableAt_r, g]
+  -- Build Exterior M r 0 from h_ext : Exterior M r θ
+  have h_ext_0 : Exterior M r 0 := ⟨h_ext.hM, h_ext.hr_ex⟩
+  exact DifferentiableAt.neg (differentiableAt_f M r h_ext_0)
+
+/-- g_rr(r) = 1/f(r) is differentiable in r-direction on Exterior. -/
+lemma differentiableAt_g_rr_r (M r θ : ℝ) (h_ext : Exterior M r θ) :
+    DifferentiableAt_r (fun r θ => g M Idx.r Idx.r r θ) r θ := by
+  simp only [DifferentiableAt_r, g]
+  -- Build Exterior M r 0 from h_ext : Exterior M r θ
+  have h_ext_0 : Exterior M r 0 := ⟨h_ext.hM, h_ext.hr_ex⟩
+  exact DifferentiableAt.inv (differentiableAt_f M r h_ext_0) (Exterior.f_ne_zero h_ext)
+
+/-- g_θθ(r) = r² is differentiable in r-direction everywhere. -/
+lemma differentiableAt_g_θθ_r (M r θ : ℝ) :
+    DifferentiableAt_r (fun r θ => g M Idx.θ Idx.θ r θ) r θ := by
+  simp only [DifferentiableAt_r, g]
+  exact differentiableAt_pow 2 r
+
+/-- g_φφ(r,θ) = r²sin²θ is differentiable in r-direction everywhere. -/
+lemma differentiableAt_g_φφ_r (M r θ : ℝ) :
+    DifferentiableAt_r (fun r θ => g M Idx.φ Idx.φ r θ) r θ := by
+  simp only [DifferentiableAt_r, g]
+  apply DifferentiableAt.mul
+  · exact differentiableAt_pow 2 r
+  · exact differentiableAt_const _
+
+/-- g_φφ(r,θ) = r²sin²θ is differentiable in θ-direction everywhere. -/
+lemma differentiableAt_g_φφ_θ (M r θ : ℝ) :
+    DifferentiableAt_θ (fun r θ => g M Idx.φ Idx.φ r θ) r θ := by
+  simp only [DifferentiableAt_θ, g]
+  apply DifferentiableAt.mul
+  · exact differentiableAt_const _
+  · exact differentiableAt_sin_sq θ
+
+/-! ### Hypothesis-Carrying `dCoord` Infrastructure (De-Axiomatization)
+
+The following lemmas provide rigorous versions of dCoord linearity rules with explicit
+differentiability hypotheses. These replace the axiom-dependent versions for the critical path.
+
+The helper predicates `DifferentiableAt_r` and `DifferentiableAt_θ` are defined above.
+-/
 
 /-- Linearity of dCoord over addition with explicit differentiability hypotheses. -/
 lemma dCoord_add_of_diff (μ : Idx) (f g : ℝ → ℝ → ℝ) (r θ : ℝ)
