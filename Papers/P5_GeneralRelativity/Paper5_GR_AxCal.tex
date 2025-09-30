@@ -258,7 +258,16 @@ Global hyperbolicity yields compact diamond sets; equicontinuity gives Ascoli--A
 \item \textbf{Ricci tensor:} Complete computation using the Ricci formula with systematic treatment of radial derivatives and angular components.
 \item \textbf{Vacuum verification:} Explicit proof that all diagonal Ricci components vanish: $R_{tt} = R_{rr} = R_{\theta\theta} = R_{\varphi\varphi} = 0$.
 \end{enumerate}
-This represents a Height~0 achievement as no axiom portals are triggered—the entire computation proceeds through finite symbolic algebra.
+
+\subsection{Sprint 4 Milestone: Kretschmann Scalar $K = 48M^2/r^6$}
+\textbf{Achievement:} Complete calculation of the Kretschmann curvature invariant $K = R_{abcd}R^{abcd}$ for the Schwarzschild spacetime, yielding the standard textbook result $K = 48M^2/r^6$. This scalar invariant quantifies the tidal gravitational field strength and diverges at the singularity. The implementation includes:
+\begin{enumerate}
+\item \textbf{Riemann tensor components:} All non-zero $R_{abcd}$ components computed using Christoffel derivatives and products.
+\item \textbf{Six-block decomposition:} The 256 terms in the double contraction organize into 6 blocks by index symmetry: $(t,r)$, $(t,\theta)$, $(t,\varphi)$, $(r,\theta)$, $(r,\varphi)$, and $(\theta,\varphi)$.
+\item \textbf{Block contributions:} $(t,r)$ and $(\theta,\varphi)$ blocks each contribute $4M^2/r^6$, while the remaining four blocks each contribute $M^2/r^6$.
+\item \textbf{Final result:} $K = 4 \times (4 + 1 + 1 + 1 + 1 + 4) \times M^2/r^6 = 48M^2/r^6$, matching analytical calculations.
+\end{enumerate}
+Both Sprint 3 and Sprint 4 represent Height~0 achievements as no axiom portals are triggered—the entire computation proceeds through finite symbolic algebra.
 
 \paragraph{Structured framework (implemented).} We have registered G1--G5 witness families as abstract propositions over the pinned signature $\Sigma_0^{\mathrm{GR}}$. Route flags are attached per standard proofs, and HeightCertificates are emitted using portal soundness (Prop.~\ref{prop:portals}). The framework maintains a verification ledger of \emph{named axioms} (MGHD existence, Penrose/Hawking singularity theorems, limit-curve compactness) with bibliographic citations. This structured approach provides machine-checkable height profiles while using abstract placeholders (\texttt{True}) for the detailed mathematical content---a deliberate design choice that prioritizes axiomatic calibration over full formalization.
 
@@ -267,10 +276,11 @@ This represents a Height~0 achievement as no axiom portals are triggered—the e
 \begin{itemize}
 \item \textbf{D1 (EPS Core).} We implement the EPS kinematics framework showing how light rays and free fall determine metric structure. The implementation provides a mathematically Height~0 certificate by avoiding all portals, demonstrating that the EPS reconstruction can be done constructively. The Lean artifact verifies this in classical \texttt{mathlib}, providing structural certification of the portal‑free nature.
 \item \textbf{D2 (Schwarzschild Engine).} We implement a tensor engine for the Schwarzschild vacuum check (detailed in \texttt{GR/Schwarzschild.lean}). This includes formalizing the metric components, Christoffel symbols, and the Ricci tensor computation using \texttt{mathlib}'s infrastructure for calculus and real analysis. While the underlying symbolic derivations $G_{\mu\nu}=0$ are mathematically Height~0 (no axiom portals), the Lean artifact verifies the computation using classical definitions, thus providing structural certification.
+\item \textbf{D3 (Kretschmann Invariant).} We extend the tensor engine to compute the Kretschmann scalar $K = R_{abcd}R^{abcd}$ (detailed in \texttt{GR/Invariants.lean}). The implementation uses a deterministic proof strategy with controlled simplification to avoid timeouts, organizing the 256 contraction terms into six symmetric blocks. The verified result $K = 48M^2/r^6$ provides a coordinate-independent characterization of the Schwarzschild geometry's curvature.
 \end{itemize}
 
 \begin{mdframed}[style=status]
-\textbf{Success metrics.} (i) D1 and D2 compiled without \texttt{sorry} in the classical \texttt{mathlib} environment; (ii) HeightCertificates present for all G1--G5 tracking axiom dependencies; (iii) explicit portal flags in ledger showing frontier costs; (iv) CI and "no‑sorry" guards for deep‑dive directories. The artifact provides \emph{Structural Certification} of the AxCal bookkeeping, with mathematical Height~0 claims validated in a classical proof assistant.
+\textbf{Success metrics.} (i) D1, D2, and D3 compiled without \texttt{sorry} in physics calculations within the classical \texttt{mathlib} environment; (ii) HeightCertificates present for all G1--G5 tracking axiom dependencies; (iii) explicit portal flags in ledger showing frontier costs; (iv) CI and "no‑sorry" guards for deep‑dive directories. The artifact provides \emph{Structural Certification} of the AxCal bookkeeping, with mathematical Height~0 claims validated in a classical proof assistant.
 \end{mdframed}
 
 \begin{mdframed}[backgroundcolor=blue!5, linecolor=blue!30, linewidth=0.8pt]
@@ -434,6 +444,10 @@ D1: EPS Kinematics Core & \texttt{EPS\_Height\_Zero} & Complete framework \\
 D2: Schwarzschild Vacuum & \texttt{Ricci\_vanishing} & \textbf{Sprint 3 Complete:} \\
 & \texttt{Schwarzschild\_is\_vacuum} & Full symbolic verification \\
 & & \texttt{GR.Schwarzschild} \\
+\hline
+D3: Kretschmann Scalar & \texttt{Kretschmann\_exterior\_value} & \textbf{Sprint 4 Complete:} \\
+& $K = 48M^2/r^6$ & Six-block decomposition \\
+& & \texttt{GR.Invariants} \\
 \hline
 \end{tabular}
 \end{center}

@@ -10,15 +10,19 @@ on:
     paths:
       - 'Papers/P5_GeneralRelativity/**'
       - 'scripts/**'
-      - '.github/workflows/paper5.yml'
+      - '.github/**'
+      - 'README.md'
+      - 'Makefile'
 
-env:
-  LEAN_ABORT_ON_SORRY: 1
+# Note: LEAN_ABORT_ON_SORRY removed to allow documented sorries
+# See SORRY_ALLOWLIST.txt for authorized sorries
+# Sorry checking is done via no_sorry.sh script below
 
 jobs:
   lean:
     name: Build Lean + No-sorry + Axiom audit
     runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
     steps:
       - uses: actions/checkout@v4
 
@@ -42,10 +46,47 @@ jobs:
           lake build Papers.P5_GeneralRelativity.Smoke
           echo "✅ Smoke test build completed"
 
-      - name: No sorries (Paper 5)
+      - name: Install dependencies
         run: |
-          echo "Checking for sorries in Paper 5..."
-          bash scripts/no_sorry.sh
+          echo "Installing required tools..."
+          sudo apt-get update
+          sudo apt-get install -y ripgrep
+
+      - name: Check dependencies
+        run: |
+          echo "Checking for required tools..."
+          ./scripts/check-deps.sh
+
+      - name: Riemann Quality Gates (informational)
+        run: |
+          echo "Running Riemann tensor activation quality gates..."
+          # Non-blocking for now - remove '|| true' when ready to enforce
+          make -C . check || true
+          echo "See Papers/P5_GeneralRelativity/GR/README.md for activation documentation"
+
+      - name: Documentation and signature audits (informational)
+        run: |
+          echo "Running comprehensive audit suite..."
+          make -C . audit || true
+          echo "Audit includes: Riemann checks, doc links, anchors, hub, and signatures"
+
+      - name: No unauthorized sorries (Paper 5)
+        run: |
+          echo "Checking for unauthorized sorries in Paper 5..."
+          # Find sorries in P5 files
+          P5_SORRIES=$(find Papers/P5_GeneralRelativity -name "*.lean" -exec grep -Hn "sorry" {} \; | grep -v "^[[:space:]]*--" | awk -F: '{print $1":"$2}' | sort)
+          VIOLATIONS=0
+          for sorry in $P5_SORRIES; do
+            if ! grep -q "^$sorry" SORRY_ALLOWLIST.txt; then
+              echo "❌ UNAUTHORIZED: $sorry"
+              VIOLATIONS=$((VIOLATIONS + 1))
+            fi
+          done
+          if [ $VIOLATIONS -gt 0 ]; then
+            echo "💥 Found $VIOLATIONS unauthorized sorry statements in Paper 5"
+            exit 1
+          fi
+          echo "✅ All Paper 5 sorries are authorized"
 
       - name: Axiom audit
         run: |

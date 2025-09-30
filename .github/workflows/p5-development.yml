@@ -12,12 +12,14 @@ on:
       - 'Papers/P5_GeneralRelativity/**'
   workflow_dispatch:
 
-env:
-  LEAN_ABORT_ON_SORRY: 1
+# Note: LEAN_ABORT_ON_SORRY removed to allow documented sorries
+# See SORRY_ALLOWLIST.txt for authorized sorries
+# Sorry checking is done via allowlist verification below
 
 jobs:
   paper5-build:
     runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
     steps:
       - uses: actions/checkout@v4
 

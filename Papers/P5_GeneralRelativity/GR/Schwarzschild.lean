@@ -3,8 +3,11 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv  -- for Real.deriv_sin
 import Mathlib.Analysis.Calculus.Deriv.Inv  -- for derivative of 1/r
 import Mathlib.Analysis.Calculus.Deriv.Mul  -- for derivative rules
-import Mathlib.Tactic  -- for `norm_num`, basic inequalities
+import Mathlib.Tactic  -- for `norm_num`, basic inequalities, and BigOperators
 import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Data.Fintype.Basic  -- for Fintype instance
+import Mathlib.Data.Fintype.BigOperators  -- for Fintype sum operations
+import Mathlib.Analysis.Calculus.Deriv.Pow  -- for deriv_pow'' and deriv_pow'
 
 /-!
 # Schwarzschild Vacuum Engine (Deep Dive D2)
@@ -79,7 +82,7 @@ theorem f_derivative (M r : ℝ) (hr : r ≠ 0) :
   simpa using (f_hasDerivAt M r hr).deriv
 
 /-- Outside the horizon, positivity of `f` is equivalent to `r > 2M`. -/
-theorem f_pos_iff_r_gt_2M (M r : ℝ) (hM : 0 < M) (hr : 0 < r) :
+theorem f_pos_iff_r_gt_2M (M r : ℝ) (_hM : 0 < M) (hr : 0 < r) :
     0 < f M r ↔ 2*M < r := by
   constructor
   · -- `0 < 1 - 2M/r` ⇒ `2M/r < 1` ⇒ `2M < r`
@@ -479,18 +482,23 @@ lemma deriv_sin_sq (θ : ℝ) :
 
 /-- Derivative of a function times a constant on the right -/
 lemma deriv_const_right (c : ℝ) (f : ℝ → ℝ) (x : ℝ)
-    (hf : DifferentiableAt ℝ f x) :
+    (_hf : DifferentiableAt ℝ f x) :
   deriv (fun t => f t * c) x = deriv f x * c :=
-by simpa using deriv_mul_const (c := c) hf
+by simpa using deriv_mul_const (c := c)
 
 /-- Derivative of a constant times a function on the left -/
 lemma deriv_const_left (c : ℝ) (f : ℝ → ℝ) (x : ℝ)
-    (hf : DifferentiableAt ℝ f x) :
+    (_hf : DifferentiableAt ℝ f x) :
   deriv (fun t => c * f t) x = c * deriv f x := by
   -- rewrite to right-constant form, then apply the previous lemma
   have : (fun t => c * f t) = (fun t => f t * c) := by
     funext t; simp [mul_comm]
-  simpa [this, mul_comm] using deriv_mul_const (c := c) hf
+  simpa [this, mul_comm] using deriv_mul_const (c := c)
+
+-- Generic and robust: derivative of a negated function.
+@[simp] lemma deriv_neg_fun (f : ℝ → ℝ) (x : ℝ) :
+  deriv (fun t => - f t) x = - deriv f x :=
+by simpa using (deriv.neg (f := f) (x := x))
 
 end DerivHelpers
 
@@ -988,19 +996,30 @@ inductive Idx | t | r | θ | φ
   deriving DecidableEq, Repr
 open Idx
 
+/-- Idx is a finite type with 4 elements -/
+instance : Fintype Idx where
+  elems := {t, r, θ, φ}
+  complete := by intro x; cases x <;> simp
+
 /-- Covariant metric components as a function of indices -/
-noncomputable def g (M : ℝ) : Idx → Idx → ℝ → ℝ → ℝ
-| t, t => fun r θ => -(f M r)
-| r, r => fun r θ => (f M r)⁻¹
-| θ, θ => fun r θ => r^2
+@[simp] noncomputable def g (M : ℝ) : Idx → Idx → ℝ → ℝ → ℝ
+| t, t => fun r _θ => -(f M r)
+| r, r => fun r _θ => (f M r)⁻¹
+| θ, θ => fun r _θ => r^2
 | φ, φ => fun r θ => r^2 * (Real.sin θ)^2
 | _, _ => fun _ _ => 0
 
+-- Simp lemmas for g component reduction
+@[simp] lemma g_apply_tt (M r θ : ℝ) : g M Idx.t Idx.t r θ = -(f M r) := rfl
+@[simp] lemma g_apply_rr (M r θ : ℝ) : g M Idx.r Idx.r r θ = (f M r)⁻¹ := rfl
+@[simp] lemma g_apply_θθ (M r θ : ℝ) : g M Idx.θ Idx.θ r θ = r^2 := rfl
+@[simp] lemma g_apply_φφ (M r θ : ℝ) : g M Idx.φ Idx.φ r θ = r^2 * (Real.sin θ)^2 := rfl
+
 /-- Contravariant metric components (inverse) -/
 noncomputable def gInv (M : ℝ) : Idx → Idx → ℝ → ℝ → ℝ
-| t, t => fun r θ => -(f M r)⁻¹
-| r, r => fun r θ => f M r
-| θ, θ => fun r θ => r⁻¹^2
+| t, t => fun r _θ => -(f M r)⁻¹
+| r, r => fun r _θ => f M r
+| θ, θ => fun r _θ => r⁻¹^2
 | φ, φ => fun r θ => (r * Real.sin θ)⁻¹^2
 | _, _ => fun _ _ => 0
 
@@ -1100,6 +1119,46 @@ noncomputable def Γ_θ_φφ (θ : ℝ) : ℝ := -Real.sin θ * Real.cos θ  -- 
 noncomputable def Γ_φ_rφ (r : ℝ) : ℝ := 1/r  -- Γ^φ_{rφ} = Γ^φ_{φr}
 noncomputable def Γ_φ_θφ (θ : ℝ) : ℝ := Real.cos θ / Real.sin θ  -- Γ^φ_{θφ} = cot θ
 
+-- Pointwise identity for simplification
+@[simp] lemma Γ_t_tr_eq_neg_Γ_r_rr (M r : ℝ) :
+  Γ_t_tr M r = - Γ_r_rr M r := by
+  -- Both sides are just the same scalar with opposite signs
+  unfold Γ_t_tr Γ_r_rr
+  -- M / (r^2 * f M r) = - (-M / (r^2 * f M r)) ⇒ by simp
+  simp [neg_div]
+
+/-- θ-derivative of `Γ^r_{φφ}`.  Using `Γ^r_{φφ} = -(r - 2*M) * (sin θ)^2`,
+    we get `∂_θ Γ^r_{φφ} = -2 * (r - 2*M) * sin θ * cos θ`. -/
+@[simp] lemma deriv_Γ_r_φφ_θ (M r θ : ℝ) :
+  deriv (fun t => Γ_r_φφ M r t) θ
+    = -2 * (r - 2*M) * Real.sin θ * Real.cos θ := by
+  classical
+  -- rewrite Γ^r_{φφ} into a θ-only form
+  have hΓ : (fun t => Γ_r_φφ M r t)
+           = (fun t => -(r - 2*M) * (Real.sin t)^2) := by
+    funext t; simp [Γ_r_φφ, pow_two]
+
+  -- derivative of sin·sin, then fold to (sin t)^2
+  have hmul : HasDerivAt (fun t => Real.sin t * Real.sin t)
+                 (Real.cos θ * Real.sin θ + Real.sin θ * Real.cos θ) θ :=
+    (Real.hasDerivAt_sin θ).mul (Real.hasDerivAt_sin θ)
+  -- constant multiple rule
+  have hconst :
+      HasDerivAt (fun t => -(r - 2*M) * (Real.sin t)^2)
+        (-(r - 2*M) * (Real.cos θ * Real.sin θ + Real.sin θ * Real.cos θ)) θ := by
+    -- just rephrase (sin t)^2 and apply const_mul to `hmul`
+    simpa [pow_two] using hmul.const_mul (-(r - 2*M))
+
+  -- convert to `deriv`, switch back to the Γ-form, and normalize algebra
+  have hderiv :
+      deriv (fun t => Γ_r_φφ M r t) θ
+        = -(r - 2*M) * (Real.cos θ * Real.sin θ + Real.sin θ * Real.cos θ) := by
+    simpa [hΓ, pow_two] using hconst.deriv
+
+  -- (cos·sin + sin·cos) = 2·sin·cos, and re-associate factors
+  rw [hderiv]
+  ring
+
 -- ============================================================================
 -- Sprint 2: Christoffel Symbols via Levi-Civita Formula
 -- ============================================================================
@@ -1176,7 +1235,7 @@ theorem Gamma_r_θθ_from_LeviCivita
 
 /-- From Levi–Civita: Γ^r_{φφ} = -(1/2) g^{rr} ∂_r g_{φφ} = -(r - 2M) sin^2 θ. -/
 theorem Gamma_r_φφ_from_LeviCivita
-    (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (hθ : 0 < θ ∧ θ < Real.pi) :
+    (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (_hθ : 0 < θ ∧ θ < Real.pi) :
     Γ_r_φφ M r θ
       = -(1/2) * (gInv M Idx.r Idx.r r θ) * (deriv (fun s => g_φφ s θ) r) := by
   have hr0 : r ≠ 0 := r_ne_zero_of_exterior M r hM hr
@@ -1234,7 +1293,7 @@ theorem Gamma_φ_rφ_from_LeviCivita
 
 /-- From Levi–Civita: Γ^θ_{φφ} = -(1/2) g^{θθ} ∂_θ g_{φφ} = -sin θ cos θ. -/
 theorem Gamma_θ_φφ_from_LeviCivita
-    (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (hθ : 0 < θ ∧ θ < Real.pi) :
+    (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (_hθ : 0 < θ ∧ θ < Real.pi) :
     Γ_θ_φφ θ
       = -(1/2) * (gInv M Idx.θ Idx.θ r θ) * (deriv (fun t => g_φφ r t) θ) := by
   have hr0 : r ≠ 0 := r_ne_zero_of_exterior M r hM hr
@@ -1286,38 +1345,117 @@ These utilities allow finite sums over indices without needing Fintype for Idx.
 
 open Idx
 
-/-- All four spacetime indices as a list -/
-def Idx.all : List Idx := [t, r, θ, φ]
+-- Enable the ∑ notation for Finset.sum
+open scoped BigOperators
 
-/-- Sum over indices using Lists (no Fintype needed) -/
-def sumIdx {α} [AddCommMonoid α] (f : Idx → α) : α :=
-  (Idx.all.map f).sum
+/-- Abstract summation over the 4D spacetime indices. Prevents term explosion. -/
+@[inline] def sumIdx {α} [AddCommMonoid α] (f : Idx → α) : α := ∑ i : Idx, f i
 
-/-- Double sum over indices -/
-def sumIdx2 {α} [AddCommMonoid α] (f : Idx → Idx → α) : α :=
-  sumIdx (fun i => sumIdx (f i))
+/-- Abstract double summation over spacetime indices. -/
+@[inline] def sumIdx2 {α} [AddCommMonoid α] (f : Idx → Idx → α) : α := ∑ i : Idx, ∑ j : Idx, f i j
+
+/-- The universe of Idx is exactly {t, r, θ, φ} -/
+@[simp] lemma univ_Idx :
+    (Finset.univ : Finset Idx) = {t, r, θ, φ} := by
+  ext i
+  cases i <;> simp
+
+/-- Expanding sumIdx for case analysis (proven before marking irreducible) -/
+lemma sumIdx_expand_gen {α} [AddCommMonoid α] (f : Idx → α) :
+    sumIdx f = f t + f r + f θ + f φ := by
+  unfold sumIdx
+  simp only [univ_Idx, Finset.sum_insert, Finset.mem_insert, Finset.mem_singleton,
+             Finset.not_mem_singleton]
+  simp [add_assoc, add_comm, add_left_comm]
+
+/-- Expanding sumIdx2 for case analysis (proven before marking irreducible) -/
+lemma sumIdx2_expand_gen {α} [AddCommMonoid α] (f : Idx → Idx → α) :
+    sumIdx2 f = sumIdx (fun i => sumIdx (f i)) := by
+  unfold sumIdx2
+  rfl
+
+-- Guardrail #1: prevent accidental unfolding in elaboration
+attribute [irreducible] sumIdx sumIdx2
 
 -- Local notation for sums
 local notation "∑ι" => sumIdx
 local notation "∑ιι" => sumIdx2
 
-/-- Expansion of sumIdx into explicit sum over all indices -/
-@[simp] lemma sumIdx_expand (f : Idx → ℝ) :
-  sumIdx f = f Idx.t + f Idx.r + f Idx.θ + f Idx.φ := by
-  classical
-  simp only [sumIdx, Idx.all, List.map, List.sum, List.foldr]
-  ring
+-- Tiny algebraic lemmas (work on the abstract sums)
+@[simp] lemma sumIdx_const_zero : sumIdx (fun _ => 0 : Idx → ℝ) = 0 := by
+  rw [sumIdx]
+  simp
 
-/-- Expansion of sumIdx2 into explicit double sum over all indices -/
-@[simp] lemma sumIdx2_expand (f : Idx → Idx → ℝ) :
+@[simp] lemma sumIdx_add (f g : Idx → ℝ) :
+  sumIdx (fun i => f i + g i) = sumIdx f + sumIdx g := by
+  rw [sumIdx, sumIdx, sumIdx]
+  simp [Finset.sum_add_distrib]
+
+@[simp] lemma sumIdx_sub (f g : Idx → ℝ) :
+  sumIdx (fun i => f i - g i) = sumIdx f - sumIdx g := by
+  rw [sumIdx, sumIdx, sumIdx]
+  simp [Finset.sum_sub_distrib]
+
+lemma sumIdx_neg (f : Idx → ℝ) :
+  sumIdx (fun i => - f i) = - sumIdx f := by
+  rw [sumIdx, sumIdx]
+  simp only [Finset.sum_neg_distrib]
+
+lemma sumIdx_smul_left (a : ℝ) (f : Idx → ℝ) :
+  sumIdx (fun i => a * f i) = a * sumIdx f := by
+  rw [sumIdx, sumIdx]
+  simp [← Finset.mul_sum]
+
+lemma sumIdx_smul_right (a : ℝ) (f : Idx → ℝ) :
+  sumIdx (fun i => f i * a) = sumIdx f * a := by
+  rw [sumIdx, sumIdx]
+  simp [← Finset.sum_mul]
+
+-- Renamed for compatibility
+lemma sumIdx_mul_left (c : ℝ) (f : Idx → ℝ) :
+  sumIdx (fun i => c * f i) = c * sumIdx f := sumIdx_smul_left c f
+
+@[simp] lemma sumIdx2_const_zero :
+  sumIdx2 (fun _ _ => 0 : Idx → Idx → ℝ) = 0 := by
+  rw [sumIdx2]
+  simp
+
+@[simp] lemma sumIdx2_add_left (f g : Idx → Idx → ℝ) :
+  sumIdx2 (fun i j => f i j + g i j) = sumIdx2 f + sumIdx2 g := by
+  rw [sumIdx2, sumIdx2, sumIdx2]
+  simp [Finset.sum_add_distrib]
+
+@[simp] lemma sumIdx2_sub_left (f g : Idx → Idx → ℝ) :
+  sumIdx2 (fun i j => f i j - g i j) = sumIdx2 f - sumIdx2 g := by
+  rw [sumIdx2, sumIdx2, sumIdx2]
+  simp [Finset.sum_sub_distrib]
+
+lemma sumIdx2_smul_left (a : ℝ) (f : Idx → Idx → ℝ) :
+  sumIdx2 (fun i j => a * f i j) = a * sumIdx2 f := by
+  rw [sumIdx2, sumIdx2]
+  simp [← Finset.mul_sum]
+
+lemma sumIdx2_pull_inner (f : Idx → ℝ) (g : Idx → Idx → ℝ) :
+  sumIdx2 (fun i j => f i * g i j) = sumIdx (fun i => f i * sumIdx (g i)) := by
+  rw [sumIdx2, sumIdx]
+  congr 1
+  funext i
+  rw [sumIdx]
+  simp [← Finset.mul_sum]
+
+-- Keep expansion lemmas non-simp (optional utilities)
+-- NOT marked with @[simp] to prevent automatic expansion
+lemma sumIdx_expand (f : Idx → ℝ) :
+  sumIdx f = f Idx.t + f Idx.r + f Idx.θ + f Idx.φ := sumIdx_expand_gen f
+
+lemma sumIdx2_expand (f : Idx → Idx → ℝ) :
   sumIdx2 f =
     (f Idx.t Idx.t + f Idx.t Idx.r + f Idx.t Idx.θ + f Idx.t Idx.φ) +
     (f Idx.r Idx.t + f Idx.r Idx.r + f Idx.r Idx.θ + f Idx.r Idx.φ) +
     (f Idx.θ Idx.t + f Idx.θ Idx.r + f Idx.θ Idx.θ + f Idx.θ Idx.φ) +
     (f Idx.φ Idx.t + f Idx.φ Idx.r + f Idx.φ Idx.θ + f Idx.φ Idx.φ) := by
-  classical
-  simp only [sumIdx2, sumIdx, Idx.all, List.map, List.sum, List.foldr]
-  ring
+  rw [sumIdx2_expand_gen]
+  simp only [sumIdx_expand]
 
 end IdxSums
 
@@ -1358,6 +1496,9 @@ noncomputable def Γtot (M r θ : ℝ) : Idx → Idx → Idx → ℝ
 @[simp] lemma Γtot_φ_φr (M r θ : ℝ) : Γtot M r θ Idx.φ Idx.φ Idx.r = Γ_φ_rφ r := rfl
 @[simp] lemma Γtot_φ_θφ (M r θ : ℝ) : Γtot M r θ Idx.φ Idx.θ Idx.φ = Γ_φ_θφ θ := rfl
 @[simp] lemma Γtot_φ_φθ (M r θ : ℝ) : Γtot M r θ Idx.φ Idx.φ Idx.θ = Γ_φ_θφ θ := rfl
+
+-- Guardrail #2: Don't make Γtot irreducible - just keep sumIdx/sumIdx2 irreducible
+-- This avoids complications with the component lemmas
 
 /-- Extra θ–trace sparsity: these Γtot components are zero in Schwarzschild. -/
 @[simp] lemma Γtot_θ_θθ_zero (M r θ : ℝ) :
@@ -1417,6 +1558,18 @@ section DerivSimpHelpers
           = - (Real.cos θ * Real.cos θ + Real.sin θ * (- Real.sin θ)) := by
       simpa using hmul.deriv
     simpa [pow_two, sub_eq_add_neg, mul_comm, mul_left_comm, mul_assoc] using this
+
+  /-- Helper: deriv (r^2) = 2*r -/
+  @[simp] lemma deriv_pow_two_at (r : ℝ) : deriv (fun s => s^2) r = 2 * r := by
+    convert deriv_pow_field (n := 2) (x := r) using 1
+    simp [sq, pow_two]
+
+  /-- Helper: deriv (sin²θ) = 2 * sinθ * cosθ -/
+  @[simp] lemma deriv_sin_sq_at (θ : ℝ) : deriv (fun φ => sin φ^2) θ = 2 * sin θ * cos θ := by
+    have h : DifferentiableAt ℝ sin θ := differentiableAt_sin
+    convert deriv_pow h 2 using 1
+    simp [Real.deriv_sin, sq, pow_two]
+
 end DerivSimpHelpers
 
 /-- The two θ–trace shapes that appear in `R_{θθ}` are pointwise equal; expand and compare. -/
@@ -1425,7 +1578,11 @@ end DerivSimpHelpers
   = sumIdx (fun ρ => Γtot M r t ρ ρ Idx.θ) := by
   classical
   -- Both sides expand to `Γ_t_tθ + Γ_r_rθ + Γ_θ_θθ + Γ_φ_φθ`, which simplify via sparsity.
-  simp [sumIdx_expand, Γtot]
+  -- Manual controlled expansion
+  conv_lhs => rw [sumIdx_expand]
+  conv_rhs => rw [sumIdx_expand]
+  -- Now expand using Γtot values directly
+  simp only [Γtot]
 
 /-- The two trace shapes that appear in `R_rr` are pointwise equal; expand and compare. -/
 @[simp] lemma sumIdx_trace_r_eq (M s θ : ℝ) :
@@ -1433,7 +1590,10 @@ end DerivSimpHelpers
   = sumIdx (fun ρ => Γtot M s θ ρ ρ Idx.r) := by
   classical
   -- Both sides expand to `Γ_t_tr + Γ_r_rr + Γ_θ_rθ + Γ_φ_rφ`.
-  simp [sumIdx_expand, Γtot]
+  -- Manual controlled expansion
+  conv_lhs => rw [sumIdx_expand]
+  conv_rhs => rw [sumIdx_expand]
+  simp only [Γtot_t_tr, Γtot_r_rr, Γtot_θ_rθ, Γtot_φ_rφ, Γtot]
 
 section RicciTensor
 /-! # Ricci tensor computation
@@ -1444,6 +1604,8 @@ R_{μν} = ∂_ρ Γ^ρ_{μν} - ∂_ν Γ^ρ_{μρ} + Γ^ρ_{ρσ} Γ^σ_{μν}
 
 -- No namespace needed, sumIdx is already in scope
 
+-- Helper lemma already covered by sumIdx_expand, so removing duplicate
+
 /-- The ρ-trace `Γ^ρ_{ρ r}` on Schwarzschild is `2/r`. -/
 @[simp] lemma traceGamma_r (M r θ : ℝ) :
   sumIdx (fun ρ => Γtot M r θ ρ ρ Idx.r) = 2 / r := by
@@ -1451,7 +1613,17 @@ R_{μν} = ∂_ρ Γ^ρ_{μν} - ∂_ν Γ^ρ_{μρ} + Γ^ρ_{ρσ} Γ^σ_{μν}
   -- Only ρ = t,r,θ,φ contribute as per Γtot cases
   -- Γ^t_{tr} = M/(r^2 f), Γ^r_{rr} = -M/(r^2 f), Γ^θ_{θr} = 1/r, Γ^φ_{φr} = 1/r
   -- The M/(r^2 f) terms cancel; 1/r + 1/r = 2/r.
-  simp [sumIdx_expand, Γtot, Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ]
+
+  -- Controlled expansion using sumIdx_expand
+  rw [sumIdx_expand]
+
+  -- Apply the component lemmas
+  simp only [Γtot_t_tr, Γtot_r_rr, Γtot_θ_θr, Γtot_φ_φr]
+
+  -- Expand the Christoffel symbols
+  simp only [Γ_t_tr, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ]
+
+  -- The M/(r^2 f) terms cancel, and 1/r + 1/r = 2/r
   ring
 
 /-- `∂_r Γ^r_{tt}` in closed form on the exterior (`r ≠ 0`). -/
@@ -1503,7 +1675,7 @@ lemma deriv_Γ_r_tt (M r : ℝ) (hr0 : r ≠ 0) :
 -- Local simp attributes for this section
 attribute [local simp] deriv_sin_sq deriv_const_left deriv_const_right
 attribute [local simp] deriv_sq_id deriv_inv_sq deriv_f_exterior
-attribute [local simp] sumIdx_expand sumIdx2_expand
+-- Removed [local simp] from sumIdx_expand sumIdx2_expand to prevent term explosion
 -- Mark the Christoffel formulas as local simp lemmas  
 attribute [local simp] Γ_t_tr Γ_r_tt Γ_r_rr Γ_r_θθ Γ_r_φφ Γ_θ_rθ Γ_θ_φφ Γ_φ_rφ Γ_φ_θφ
 -- Mark the Γtot projections as local simp lemmas
@@ -1546,10 +1718,16 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
       + Γ_θ_rθ r * Γ_r_tt M r
       + Γ_φ_rφ r * Γ_r_tt M r)
     - (Γ_t_tr M r * Γ_r_tt M r + Γ_r_tt M r * Γ_t_tr M r) := by
-  classical
-  -- Unfold definition and expand the (list-based) sums. The `Γtot` cases kill almost everything.
   unfold Ricci
-  simp [sumIdx_expand, sumIdx2_expand, Γtot]
+  -- Controlled expansion: expand only what's needed
+  simp only [sumIdx_expand, sumIdx2_expand]
+  -- Now simplify with specific projections and all zero lemmas
+  simp only [Γtot_r_tt, Γtot_t_tr, Γtot_r_rr, Γtot_θ_rθ, Γtot_φ_rφ,
+            Γtot_θ_θr, Γtot_φ_φr, Γtot_t_rt, Γtot_θ_rθ, Γtot_φ_rφ, Γtot_φ_φr,
+            Γtot_θ_θθ_zero, Γtot_t_θt_zero, Γtot_r_θr_zero, Γtot]
+  simp only [Γ_t_tr, Γ_r_tt, Γ_r_rr, Γ_θ_rθ, Γ_φ_rφ]
+  simp only [deriv_const]
+  ring
 
 /-- Canonical 3-term form for `R_rr`. -/
 @[simp] lemma Ricci_rr_reduce (M r θ : ℝ) :
@@ -1565,7 +1743,15 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
     (fun s => sumIdx (fun ρ => Γtot M s θ ρ Idx.r ρ))
       = (fun s => sumIdx (fun ρ => Γtot M s θ ρ ρ Idx.r)) := by
     funext s; simpa using sumIdx_trace_r_eq M s θ
-  simp [sumIdx_expand, sumIdx2_expand, Γtot, htrace]
+  -- Use the trace helper
+  rw [htrace]
+  -- Controlled expansion for the Ricci formula
+  simp only [sumIdx_expand, sumIdx2_expand]
+  -- Simplify with specific projections and zero lemmas
+  simp only [Γtot_r_rr, Γtot_t_tr, Γtot_θ_rθ, Γtot_φ_rφ, Γtot_t_rt, Γtot_θ_θr, Γtot_φ_φr,
+            Γtot_θ_θθ_zero, Γtot_t_θt_zero, Γtot_r_θr_zero, Γtot]
+  simp only [Γ_r_rr, Γ_t_tr, Γ_θ_rθ, Γ_φ_rφ, traceGamma_r_expand]
+  simp only [deriv_const]
   ring
 
 /-- θ–trace derivative for `R_{θθ}`: only `Γ^φ_{θφ}` depends on θ. -/
@@ -1579,7 +1765,9 @@ noncomputable def Ricci (M r θ : ℝ) (μ ν : Idx) : ℝ :=
     = (fun t => Γ_φ_θφ t) := by
     funext t
     -- t,tθ = 0, r,rθ = 0, θ,θθ = 0; only φ,φθ survives
-    simp [sumIdx_expand, Γtot]
+    rw [sumIdx_expand]
+    simp only [Γtot_φ_φθ, Γtot]
+    simp [Γ_φ_θφ]
   exact congrArg (fun F => deriv F θ) hfun
 
 /-- ASCII alias for `deriv_traceGamma_θ` to avoid input/encoding issues. -/
@@ -1625,30 +1813,22 @@ section RicciReductions
         (fun s : ℝ => sumIdx (fun ρ => Γtot M s θ ρ Idx.θ Idx.θ))
       = (fun s : ℝ => Γtot M s θ Idx.r Idx.θ Idx.θ) := by
       funext s
-      simp [sumIdx_expand, Γtot]
+      rw [sumIdx_expand]
+      simp only [Γtot_r_θθ, Γtot_θ_θθ_zero, Γtot_t_θt_zero, Γtot]
+      simp [Γ_r_θθ]
     
     have hρ' := congrArg (fun F => deriv F r) hρ
 
-    -- Pass 1: structural expansions. This handles Term 3 and Term 4 correctly, including the factor of 2.
-    simp [ sumIdx_expand, sumIdx2_expand, Γtot, hρ',
-           Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
-           Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
-           Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ ]
-    
-    -- Keep the full trace folded
-    set T := Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r with hT
-
-    -- Pass 2: Evaluate safe derivatives. We keep the key derivatives symbolic via [-simp].
-    simp (config := { failIfUnchanged := false }) only
-         [deriv_const, deriv_linear]
-
-    -- Normalize names/cancellations
-    simp (config := { failIfUnchanged := false }) only [hΔθ.symm]
-
-    -- IMPORTANT: keep the trace folded
-    simp (config := { failIfUnchanged := false }) only [hT.symm]
-    
-    simp only [sub_eq_add_neg]
+    -- Controlled expansion
+    simp only [sumIdx_expand, sumIdx2_expand]
+    -- Project to named symbols and simplify with all zero lemmas
+    simp only [Γtot_r_θθ, Γtot_θ_rθ, Γtot_φ_θφ, Γtot_θ_θr, Γtot_φ_φθ,
+              Γtot_t_tr, Γtot_r_rr, Γtot_φ_rφ, Γtot_φ_φr,
+              Γtot_θ_θθ_zero, Γtot_t_θt_zero, Γtot_r_θr_zero, Γtot]
+    simp only [deriv_traceGamma_theta, Γ_r_θθ, Γ_θ_rθ, Γ_φ_θφ, Γ_t_tr, Γ_r_rr, Γ_φ_rφ, traceGamma_r_expand]
+    -- The derivative term has been handled by the simp simplification above
+    -- rw [hρ']  -- not needed as already simplified
+    simp only [Γtot_r_θθ, deriv_const]
     ring
 
   /-- Canonical form for `R_{φφ}`.
@@ -1665,24 +1845,13 @@ section RicciReductions
     unfold Ricci
     -- Term 2 (dν=dφ) vanishes automatically as the metric is independent of φ.
 
-    -- Pass 1: structural expansions.
-    -- Term 1 (∂_ρ Γ^ρ_{φφ}) correctly expands to ∂_r Γ^r_{φφ} + ∂_θ Γ^θ_{φφ}.
-    -- Term 3 and 4 expand and partially cancel (Γ^ρ_{ρσ} Γ^σ_{φφ} - Γ^ρ_{φσ} Γ^σ_{φρ}).
-    simp [ sumIdx_expand, sumIdx2_expand, Γtot,
-           Γtot_t_tr, Γtot_t_rt, Γtot_r_tt, Γtot_r_rr, Γtot_r_θθ, Γtot_r_φφ,
-           Γtot_θ_rθ, Γtot_θ_θr, Γtot_θ_φφ,
-           Γtot_φ_rφ, Γtot_φ_φr, Γtot_φ_θφ, Γtot_φ_φθ ]
-    
-    -- Keep the full trace folded
-    set T := Γ_t_tr M r + Γ_r_rr M r + Γ_θ_rθ r + Γ_φ_rφ r with hT
-
-    -- Pass 2: Handle derivatives of constants if any slipped through.
-    simp (config := { failIfUnchanged := false }) only [deriv_const]
-
-    -- Keep the trace folded
-    simp (config := { failIfUnchanged := false }) only [hT.symm]
-    simp only [sub_eq_add_neg, pow_two]
+    -- Controlled expansion
+    simp only [sumIdx_expand, sumIdx2_expand]
+    -- Term 2 (dν=dφ) vanishes automatically as the metric is independent of φ.
+    simp only [Γtot_r_φφ, Γtot_φ_rφ, Γtot_φ_θφ, Γtot_φ_φr, Γtot_φ_φθ, Γtot]
+    simp only [Γ_r_φφ, Γ_φ_rφ, Γ_φ_θφ, traceGamma_r_expand]
     ring
+
 end RicciReductions
 
 section DerivativeHelpers
@@ -1711,7 +1880,7 @@ section DerivativeHelpers
 
 /-- `∂_r Γ^r_{rr}` in closed form.  Differentiate `-(M) * (s^2 * f(M,s))⁻¹`. -/
 lemma deriv_Γ_r_rr
-    (M r : ℝ) (hr0 : r ≠ 0) (hf0 : f M r ≠ 0) (hr2M : r - 2*M ≠ 0) :
+    (M r : ℝ) (hr0 : r ≠ 0) (hf0 : f M r ≠ 0) (_hr2M : r - 2*M ≠ 0) :
   deriv (fun s => Γ_r_rr M s) r
     = (2*M*(r - M)) / (r^2 * (r - 2*M)^2) := by
   classical
@@ -1753,9 +1922,24 @@ lemma deriv_Γ_r_rr
   -- 4) substitute `f` and simplify algebra
   simp only [f]
   -- Clear denominators and normalize
-  field_simp [hr0, hr2M]
+  field_simp [hr0, _hr2M]
   -- The goal should now be provable by ring.
   ring
+
+/-- `∂_r Γ^t_{tr}` in closed form. -/
+lemma deriv_Γ_t_tr
+    (M r : ℝ) (hr0 : r ≠ 0) (hf0 : f M r ≠ 0) (hr2M : r - 2*M ≠ 0) :
+  deriv (fun s => Γ_t_tr M s) r
+    = -(2*M*(r - M)) / (r^2 * (r - 2*M)^2) := by
+  -- rewrite the function by the pointwise identity
+  have hfun : (fun s => Γ_t_tr M s) = (fun s => - Γ_r_rr M s) := by
+    funext s; simpa using Γ_t_tr_eq_neg_Γ_r_rr M s
+  -- derivative of a negation
+  rw [hfun, deriv_neg_fun]
+  -- closed form for ∂_r Γ^r_{rr}
+  rw [deriv_Γ_r_rr M r hr0 hf0 hr2M]
+  -- algebraic normalization
+  simp [neg_div]
 
 /-- `∂_r Γ^r_{θθ}`. -/
 lemma deriv_Γ_r_θθ (M r : ℝ) (hr0 : r ≠ 0) :
@@ -1854,6 +2038,7 @@ lemma deriv_Γ_r_φφ (M r θ : ℝ) (hr0 : r ≠ 0) :
       have : Real.sin θ^2 + Real.cos θ^2 = 1 := Real.sin_sq_add_cos_sq θ
       linarith
 
+
 end DerivativeHelpers
 
 /-- R_{tt} vanishes for the Schwarzschild metric. -/
@@ -1941,23 +2126,24 @@ theorem Ricci_φφ_vanishes
 
 /-- All off-diagonal Ricci components vanish. -/
 theorem Ricci_off_diagonal_vanish
-    (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (μ ν : Idx) (h_ne : μ ≠ ν) :
+    (M r θ : ℝ) (_hM : 0 < M) (hr : 2*M < r) (μ ν : Idx) (h_ne : μ ≠ ν) :
     Ricci M r θ μ ν = 0 := by
-  classical
-  -- For diagonal static spherically symmetric metrics, 
-  -- all off-diagonal Ricci components vanish by sparsity
+  -- The Schwarzschild metric is diagonal and spherically symmetric
+  -- All off-diagonal Christoffel symbols vanish, hence off-diagonal Ricci vanish
   unfold Ricci
-  simp [sumIdx_expand, sumIdx2_expand, Γtot]
-  -- The sparsity pattern of Γtot ensures all terms cancel or vanish
-  cases μ <;> cases ν <;> simp at h_ne ⊢ <;> try contradiction
-  -- Each remaining case reduces to 0 by the structure of Γtot
-  all_goals ring
+  -- Expand sums
+  simp only [sumIdx_expand, sumIdx2_expand]
+  -- For all off-diagonal pairs (μ,ν) with μ ≠ ν, the Christoffel products vanish
+  -- This is because Γ^ρ_μν ≠ 0 only when {μ,ν} forms a diagonal pair or specific angular pairs
+  -- Case analysis on all off-diagonal combinations
+  cases μ <;> cases ν <;> simp [h_ne] at * <;> simp [Γtot] <;> ring
 
 /-- The Ricci scalar vanishes for the Schwarzschild vacuum solution. -/
 theorem Ricci_scalar_vanishes
     (M r θ : ℝ) (hM : 0 < M) (hr : 2*M < r) (hθ : 0 < θ ∧ θ < Real.pi) :
     sumIdx2 (fun μ ν => gInv M μ ν r θ * Ricci M r θ μ ν) = 0 := by
-  simp only [sumIdx2_expand]
+  -- Use the expansion lemma instead of unfold (since sumIdx is irreducible)
+  rw [sumIdx2_expand]
   -- Use vanishing of all diagonal components
   rw [Ricci_tt_vanishes M r θ hM hr,
       Ricci_rr_vanishes M r θ hM hr,
