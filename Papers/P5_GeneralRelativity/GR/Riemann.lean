@@ -728,7 +728,8 @@ must cancel to 0.
   have hf_ne := Exterior.f_ne_zero h_ext
   simp only [sumIdx_expand, g, dCoord_φ, deriv_const]
   simp only [Γtot_φ_rφ, Γ_φ_rφ, Γtot_r_φφ, Γ_r_φφ, Γtot_φ_φr, f]
-  field_simp [hr_ne, hf_ne]
+  have h_sub_ne : r - 2*M ≠ 0 := by linarith [h_ext.hr_ex]
+  field_simp [hr_ne, hf_ne, h_sub_ne, pow_two]
   ring
 
 /-- Off-diagonal cancellation: ∂_φ g_θφ = 0 = RHS on Exterior Domain. -/
@@ -785,18 +786,23 @@ lemma dCoord_g_via_compat_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (x a b : 
     | exact compat_φ_rφ_ext M r θ h_ext
     | exact compat_φ_θφ_ext M r θ h_ext
 
-    -- Stage 2: Automated Fallback (Trivial Zeros)
+    -- Stage 2: Automated Fallback (Trivial Zeros + Symmetry)
     | {
+        -- Extract nonzero hypotheses for field operations
+        have hr_ne := Exterior.r_ne_zero h_ext
+        have hf_ne := Exterior.f_ne_zero h_ext
+        have h_sub_ne : r - 2*M ≠ 0 := by linarith [h_ext.hr_ex]
+
         -- LHS expansion (dCoord x (g a b) -> 0)
         dsimp only [g] -- Simplify binder (e.g., g t θ -> 0)
         simp only [dCoord_t, dCoord_r, dCoord_θ, dCoord_φ, deriv_const]
 
         -- RHS expansion (sumIdx + sumIdx -> 0)
         simp only [sumIdx_expand, g]
-        simp only [Γtot]
+        simp only [Γtot, Γ_t_tr, Γ_r_tt, Γ_r_θθ, Γ_θ_rθ, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ, f]
 
-        -- Final closure (0=0)
-        try { ring }
+        -- Final closure (0=0 or Christoffel cancellations)
+        try { field_simp [hr_ne, hf_ne, h_sub_ne, pow_two]; ring }
       }
   }
 
