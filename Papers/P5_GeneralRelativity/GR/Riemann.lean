@@ -1023,24 +1023,37 @@ with no f(r) dependence. This is kept for backwards compatibility with existing 
   field_simp [hsin, pow_two]
   ring
 
-/-- Metric compatibility ∇_c g_{ab} = 0.
+/-- ⚠️  QUARANTINED AXIOM - DE-AXIOMATIZATION MANDATE (2025-09-30)
 
-    AXIOM/DEFERRED: Global Metric Compatibility.
+**RESTRICTIONS:**
+- ❌ @[simp] attribute REMOVED (dangerous global rewriting)
+- ❌ MUST NOT be used in new code
+- ✅ Sound version `nabla_g_zero_ext` MUST be used instead when possible
+- ✅ Retained ONLY for `Riemann_swap_a_b` antisymmetry proof (requires derivative of ∇g)
 
-    This lemma asserts that ∇g = 0 unconditionally. This is mathematically unsound at the
-    event horizon (see consultation memos). The sound version is `nabla_g_zero_ext`.
+**ISSUE:** Global metric compatibility without domain restriction.
 
-    We retain this global version because it is required by `Riemann_swap_a_b` to prove that
-    the derivative of `nabla_g` is zero. Replacing it requires topological infrastructure
-    (proving the Exterior domain is open) which is deferred.
+This axiom asserts ∇g = 0 unconditionally, which is mathematically unsound at the
+event horizon r = 2M. The SOUND version is `nabla_g_zero_ext` with explicit `Exterior` hypothesis.
 
-    We treat this lemma as an axiom justified by the mathematical fact that ∇g=0 on the
-    relevant (Exterior) domain, which is sufficient for use inside derivatives.
-    The critical path (Ricci vanishing) relies primarily on the sound nabla_g_zero_ext.
+**JUSTIFICATION FOR RETENTION (temporary):**
+- Required by `Riemann_swap_a_b` to prove d/d(∇g) = 0
+- Replacing it requires topological infrastructure (Exterior_isOpen)
+- This is PRIORITY 2 work (deferred per mandate)
+- Critical path (R_μν = 0) uses sound version `nabla_g_zero_ext`
+
+**ELIMINATION PATH:**
+1. ✅ Sound version with Exterior hypothesis exists (nabla_g_zero_ext)
+2. ✅ @[simp] attribute removed (quarantined)
+3. ⏳ Implement Exterior_isOpen (PRIORITY 2)
+4. ⏳ Refactor Riemann_swap_a_b_ext to use topological version
+5. ⏳ Remove axiom entirely (Level 3)
+
+**AUDIT:** Verify critical path uses only `nabla_g_zero_ext` before Level 3 submission.
 -/
-@[simp] lemma nabla_g_zero (M r θ : ℝ) (c a b : Idx) :
+lemma AX_nabla_g_zero (M r θ : ℝ) (c a b : Idx) :
   nabla_g M r θ c a b = 0 := by
-  sorry -- See AXIOM/DEFERRED note above.
+  sorry -- QUARANTINED AXIOM - See documentation above.
 
 -- Removed duplicate: sumIdx_sub is already defined in Schwarzschild.lean
 
@@ -1051,7 +1064,7 @@ with no f(r) dependence. This is kept for backwards compatibility with existing 
     =
     sumIdx (fun e => Γtot M r θ e x a * g M e b r θ)
   + sumIdx (fun e => Γtot M r θ e x b * g M a e r θ) := by
-  have h := nabla_g_zero M r θ x a b
+  have h := AX_nabla_g_zero M r θ x a b
   simp only [nabla_g] at h
   linarith
 
@@ -3028,7 +3041,7 @@ lemma Riemann_swap_a_b (M r θ : ℝ) (a b c d : Idx) :
   have hLHS_zero : ( dCoord c (fun r θ => nabla_g M r θ d a b) r θ
                   - dCoord d (fun r θ => nabla_g M r θ c a b) r θ ) = 0 := by
     -- Apply metric compatibility
-    simp only [nabla_g_zero]
+    simp only [AX_nabla_g_zero]
     -- The derivative of the zero function is zero
     have h_zero_fn : (fun r θ => (0:ℝ)) = (fun (_r : ℝ) (_θ : ℝ) => (0:ℝ)) := by rfl
     rw [h_zero_fn]
