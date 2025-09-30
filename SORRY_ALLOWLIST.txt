@@ -456,6 +456,8 @@ Papers/P5_GeneralRelativity/GR/Riemann.lean:1693  # Comment: documentation menti
 Papers/P5_GeneralRelativity/GR/Riemann.lean:1695  # Comment: documentation mentions "sorry"
 Papers/P5_GeneralRelativity/GR/Riemann.lean:1714  # Comment: "-- NOTE: Early sorry" documentation
 Papers/P5_GeneralRelativity/GR/Riemann.lean:2303  # Comment: "-- sorry" in commented-out code
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2391  # Comment: inside /- -/ block, mentions "sorry"
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2455  # Comment: inside /- -/ block, mentions "sorry"
 
 # Comment references in Invariants.lean
 Papers/P5_GeneralRelativity/GR/Invariants.lean:106  # Comment: mentions "sorry" in checklist
