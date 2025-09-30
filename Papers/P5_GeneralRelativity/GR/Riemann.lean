@@ -1498,9 +1498,27 @@ private lemma regroup₂ (A₁ A₂ B₁ B₂ : ℝ) :
 private lemma regroup_same_right (A₁ A₂ B : ℝ) :
     A₁ * B + A₂ * B = (A₁ + A₂) * B := by ring
 
+/-! ### DEFERRED: Alternation Identity Infrastructure (Category C)
+
+The following lemmas (alternation_dC_eq_Riem and related Stage-1 scaffolding in commented
+sections) are part of the alternation identity completion. This infrastructure is non-essential
+for the vacuum solution and is deferred to future work per professor's mandate (PRIORITY 4).
+
+**Status**: Complete scaffold ready (Stage-1 micro-packs), proofs deferred.
+**Impact**: Does not block Ricci vanishing or any critical path theorems.
+**Sorries**: ~15 in this section (including commented scaffolding).
+
+The alternation identity is used in ricci_identity_on_g, which ultimately proves Riemann
+antisymmetry. While this lemma has a sorry, the critical vacuum solution path (Ricci vanishing)
+does not depend on completing this infrastructure.
+-/
+
 /-- Alternation identity scaffold (baseline-neutral with optional micro-steps).
     We expand the contracted object and push `dCoord` through the finite sum,
-    then stop with a single algebraic `sorry`. No global calculus machinery is used. -/
+    then stop with a single algebraic `sorry`. No global calculus machinery is used.
+
+    DEFERRED: This sorry is part of Category C (alternation identity infrastructure).
+    See documentation block above. -/
 lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   ( dCoord c (fun r θ => ContractionC M r θ d a b) r θ
   - dCoord d (fun r θ => ContractionC M r θ c a b) r θ )
