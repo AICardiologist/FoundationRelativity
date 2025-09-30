@@ -411,32 +411,33 @@ Papers/P3_2CatFramework/Examples/Example2_HeightComposition.lean:49
 Papers/P3_2CatFramework/Examples/Example3_StoneWindow.lean:42
 Papers/P3_2CatFramework/Examples/Example3_StoneWindow.lean:55
 
-# Paper 5 - General Relativity: Sorry Elimination Sprint (17 documented sorries)
-# Updated: 2025-09-30 - Level 2 publication ready
+# Paper 5 - General Relativity: Level 2.5 Achievement (17 documented sorries)
+# Updated: 2025-09-30 - Level 2.5 publication ready
 # All sorries are documented, justified, and non-blocking for vacuum solution
+# Critical path (Schwarzschild.lean) has 0 sorries - R_μν = 0 fully verified
 
-# Documented Axioms (2 sorries)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:183   # differentiable_hack - Justified by 7 concrete proofs
-Papers/P5_GeneralRelativity/GR/Riemann.lean:906   # nabla_g_zero - Justified by sound version on physical domain
+# Documented Axioms (2 sorries) - Quarantined with AX_ prefix
+Papers/P5_GeneralRelativity/GR/Riemann.lean:221   # AX_differentiable_hack - Justified by 7 concrete proofs + hypothesis-carrying alternatives
+Papers/P5_GeneralRelativity/GR/Riemann.lean:1081  # AX_nabla_g_zero - Justified by sound version nabla_g_zero_ext on Exterior domain
 
 # Deferred Infrastructure (2 sorries)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:1484  # Stage2 preview - Future work demonstration
-Papers/P5_GeneralRelativity/GR/Riemann.lean:1541  # alternation_dC_eq_Riem - Category C per professor's mandate
+Papers/P5_GeneralRelativity/GR/Riemann.lean:1659  # Stage2 preview - Future work demonstration (μ=t component)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:1716  # alternation_dC_eq_Riem - Category C per professor's mandate
 
-# Inactive Scaffolding (13 sorries - all in commented blocks)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2179  # Stage-1 LHS c-branch split (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2210  # Stage-1 LHS c-branch split (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2247  # Stage-1 LHS d-branch split (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2308  # Stage-1 LHS d-branch split (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2342  # Hsplit_c_both skeleton (commented, now obsolete)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2606  # RHS c-first family (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2621  # RHS c-first family (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2636  # RHS c-first family (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2651  # RHS c-first family (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2669  # RHS d-first family (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2687  # RHS d-first family (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2694  # RHS d-first family (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2701  # RHS d-first family (commented)
+# Inactive Scaffolding (13 sorries - all in commented blocks, lines 2763-2900)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2781  # Stage-1 micro-pack Hc_one (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2796  # Stage-1 micro-pack Hd_one (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2811  # Stage-1 micro-pack HRc_one (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2826  # Stage-1 micro-pack HRd_one (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2844  # Stage-1 micro-pack Hc2_one (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2862  # Stage-1 micro-pack Hd2_one (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2869  # Stage-1 micro-pack HRc2_one (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2876  # Stage-1 micro-pack HRd2_one (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2354  # Stage-1 micro-pack (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2385  # Stage-1 micro-pack (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2422  # Stage-1 micro-pack (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2483  # Stage-1 micro-pack (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2517  # Stage-1 micro-pack (commented)
 
 # Note: Schwarzschild.lean has 0 sorries - vacuum solution R_μν = 0 fully verified
 # See Papers/P5_GeneralRelativity/GR/README_SORRY_ELIMINATION.md for complete documentation
@@ -445,18 +446,16 @@ Papers/P5_GeneralRelativity/GR/Riemann.lean:2701  # RHS d-first family (commente
 Papers/P5_GeneralRelativity/GR/Invariants.lean:111  # Ricci components - infrastructure pending
 
 # Comment references in Riemann.lean (detected by grep but not actual sorry statements)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:419   # Comment: "-- sorry"
-Papers/P5_GeneralRelativity/GR/Riemann.lean:424   # Comment: "-- sorry"
-Papers/P5_GeneralRelativity/GR/Riemann.lean:1067  # Comment: mentions "sorry" in text
-Papers/P5_GeneralRelativity/GR/Riemann.lean:1334  # Comment: "-- sorry"
-Papers/P5_GeneralRelativity/GR/Riemann.lean:1454  # Comment: mentions "sorry" in documentation
-Papers/P5_GeneralRelativity/GR/Riemann.lean:1512  # Comment: mentions "sorry" in documentation
-Papers/P5_GeneralRelativity/GR/Riemann.lean:1518  # Comment: mentions "sorry" in documentation
-Papers/P5_GeneralRelativity/GR/Riemann.lean:1520  # Comment: mentions "sorry" in documentation
-Papers/P5_GeneralRelativity/GR/Riemann.lean:1539  # Comment: "-- NOTE: Early sorry"
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2128  # Comment: "-- sorry"
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2216  # Comment: mentions "sorry" in documentation
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2280  # Comment: mentions "sorry" in documentation
+Papers/P5_GeneralRelativity/GR/Riemann.lean:581   # Comment: "-- sorry" in commented-out code
+Papers/P5_GeneralRelativity/GR/Riemann.lean:586   # Comment: "-- sorry" in commented-out code
+Papers/P5_GeneralRelativity/GR/Riemann.lean:1242  # Comment: documentation mentions "no sorry"
+Papers/P5_GeneralRelativity/GR/Riemann.lean:1509  # Comment: "-- sorry" in commented-out code
+Papers/P5_GeneralRelativity/GR/Riemann.lean:1629  # Comment: documentation mentions "sorry"
+Papers/P5_GeneralRelativity/GR/Riemann.lean:1687  # Comment: documentation mentions "sorry"
+Papers/P5_GeneralRelativity/GR/Riemann.lean:1693  # Comment: documentation mentions "sorry"
+Papers/P5_GeneralRelativity/GR/Riemann.lean:1695  # Comment: documentation mentions "sorry"
+Papers/P5_GeneralRelativity/GR/Riemann.lean:1714  # Comment: "-- NOTE: Early sorry" documentation
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2303  # Comment: "-- sorry" in commented-out code
 
 # Comment references in Invariants.lean
 Papers/P5_GeneralRelativity/GR/Invariants.lean:106  # Comment: mentions "sorry" in checklist
