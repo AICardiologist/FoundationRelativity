@@ -584,77 +584,162 @@ The following lemmas prove specific cases of metric compatibility on the Exterio
 with minimal, case-specific simp sets to avoid timeout. Each lemma uses the REPP pattern.
 -/
 
-/-- ∂_r g_{θθ} = 2 Γ^θ_{r θ} g_{θθ} on Exterior Domain. -/
+/-- ∂_r g_{θθ} = Σ_k Γ^k_{rθ} g_{kθ} + Σ_k Γ^k_{rθ} g_{θk} on Exterior Domain.
+    Refactored to match unified lemma structure. -/
 @[simp] lemma compat_r_θθ_ext (M r θ : ℝ) (h_ext : Exterior M r θ) :
-  dCoord Idx.r (fun r θ => g M Idx.θ Idx.θ r θ) r θ
-    = 2 * Γtot M r θ Idx.θ Idx.r Idx.θ * g M Idx.θ Idx.θ r θ := by
+  dCoord Idx.r (fun r θ => g M Idx.θ Idx.θ r θ) r θ =
+    sumIdx (fun k => Γtot M r θ k Idx.r Idx.θ * g M k Idx.θ r θ) +
+    sumIdx (fun k => Γtot M r θ k Idx.r Idx.θ * g M Idx.θ k r θ) := by
   classical
-  dsimp only [g]
+  -- 1. Preparation
   have hr_ne := Exterior.r_ne_zero h_ext
-  simp only [dCoord_r, Γtot_θ_rθ, Γ_θ_rθ, g_θθ, deriv_pow_two_at]
+  -- 2. Normalize RHS Structure (expand sums and use diagonality)
+  simp only [sumIdx_expand, g]
+  -- RHS is now (Γ θ r θ * r²) + (Γ θ r θ * r²)
+  -- 3. Simplify LHS
+  simp only [dCoord_r, Γtot_θ_rθ, Γ_θ_rθ, deriv_pow_two_at]
+  -- 4. Algebraic Closure
   field_simp [hr_ne, pow_two]
+  ring
 
-/-- ∂_r g_{φφ} = 2 Γ^φ_{r φ} g_{φφ} on Exterior Domain. -/
+/-- ∂_r g_{φφ} = Σ_k Γ^k_{rφ} g_{kφ} + Σ_k Γ^k_{rφ} g_{φk} on Exterior Domain.
+    Refactored to match unified lemma structure. -/
 @[simp] lemma compat_r_φφ_ext (M r θ : ℝ) (h_ext : Exterior M r θ) :
-  dCoord Idx.r (fun r θ => g M Idx.φ Idx.φ r θ) r θ
-    = 2 * Γtot M r θ Idx.φ Idx.r Idx.φ * g M Idx.φ Idx.φ r θ := by
+  dCoord Idx.r (fun r θ => g M Idx.φ Idx.φ r θ) r θ =
+    sumIdx (fun k => Γtot M r θ k Idx.r Idx.φ * g M k Idx.φ r θ) +
+    sumIdx (fun k => Γtot M r θ k Idx.r Idx.φ * g M Idx.φ k r θ) := by
   classical
-  dsimp only [g]
+  -- 1. Preparation
   have hr_ne := Exterior.r_ne_zero h_ext
+  -- 2. Normalize RHS Structure (expand sums and use diagonality)
+  simp only [sumIdx_expand, g]
+  -- 3. Simplify LHS
   simp only [dCoord_r, Γtot_φ_rφ, Γ_φ_rφ, deriv_mul_const, deriv_pow_two_at]
+  -- 4. Algebraic Closure
   field_simp [hr_ne, pow_two]
+  ring
 
-/-- ∂_θ g_{φφ} = 2 Γ^φ_{θ φ} g_{φφ} on Exterior Domain. -/
+/-- ∂_θ g_{φφ} = Σ_k Γ^k_{θφ} g_{kφ} + Σ_k Γ^k_{θφ} g_{φk} on Exterior Domain.
+    Refactored to match unified lemma structure. -/
 @[simp] lemma compat_θ_φφ_ext (M r θ : ℝ) (h_ext : Exterior M r θ) :
-  dCoord Idx.θ (fun r θ => g M Idx.φ Idx.φ r θ) r θ
-    = 2 * Γtot M r θ Idx.φ Idx.θ Idx.φ * g M Idx.φ Idx.φ r θ := by
+  dCoord Idx.θ (fun r θ => g M Idx.φ Idx.φ r θ) r θ =
+    sumIdx (fun k => Γtot M r θ k Idx.θ Idx.φ * g M k Idx.φ r θ) +
+    sumIdx (fun k => Γtot M r θ k Idx.θ Idx.φ * g M Idx.φ k r θ) := by
   classical
-  dsimp only [g]
+  -- 1. Preparation
   have hr_ne := Exterior.r_ne_zero h_ext
+  -- 2. Normalize RHS Structure (expand sums and use diagonality)
+  simp only [sumIdx_expand, g]
+  -- 3. Simplify LHS
   simp only [dCoord_θ, Γtot_φ_θφ, Γ_φ_θφ, deriv_const_mul, deriv_sin_sq_at]
+  -- 4. Algebraic Closure
   field_simp [hr_ne, pow_two, sq]
+  ring
 
-/-- ∂_r g_{tt} = 2 Γ^t_{r t} g_{tt} on the Exterior Domain. -/
+/-- ∂_r g_{tt} = Σ_k Γ^k_{rt} g_{kt} + Σ_k Γ^k_{rt} g_{tk} on the Exterior Domain.
+    Refactored to match unified lemma structure. -/
 @[simp] lemma compat_r_tt_ext (M r θ : ℝ) (h_ext : Exterior M r θ) :
-  dCoord Idx.r (fun r θ => g M Idx.t Idx.t r θ) r θ
-    = 2 * Γtot M r θ Idx.t Idx.r Idx.t * g M Idx.t Idx.t r θ := by
+  dCoord Idx.r (fun r θ => g M Idx.t Idx.t r θ) r θ =
+    sumIdx (fun k => Γtot M r θ k Idx.r Idx.t * g M k Idx.t r θ) +
+    sumIdx (fun k => Γtot M r θ k Idx.r Idx.t * g M Idx.t k r θ) := by
   classical
-  -- Preparation
+  -- 1. Preparation
   have hr_ne := Exterior.r_ne_zero h_ext
   have hf_ne := Exterior.f_ne_zero h_ext
-  -- Binder penetration
-  dsimp only [g]
-  -- Derivative infrastructure
+  -- 2. Normalize RHS Structure (CRITICAL STEP: expand sums and use diagonality)
+  simp only [sumIdx_expand, g]
+  -- RHS is now (Γ t r t * (-f)) + (Γ t r t * (-f))
+  -- 3. Sequenced Simplification (LHS)
   have hf' := f_hasDerivAt M r hr_ne
   have h_deriv : deriv (fun s => -f M s) r = -(2 * M / r^2) := by
     simpa using (hf'.neg).deriv
-  -- Sequenced simplification: expand structure WITHOUT unfolding f
   simp only [dCoord_r, Γtot_t_rt, Γ_t_tr]
-  -- Apply derivative lemma while f is still abstract
   rw [h_deriv]
-  -- Algebraic closure
+  -- 4. Algebraic Closure
   field_simp [hr_ne, hf_ne, pow_two, sq]
+  ring
 
-/-- ∂_r g_{rr} = 2 Γ^r_{r r} g_{rr} on the Exterior Domain. -/
+/-- ∂_r g_{rr} = Σ_k Γ^k_{rr} g_{kr} + Σ_k Γ^k_{rr} g_{rk} on the Exterior Domain.
+    Refactored to match unified lemma structure. -/
 @[simp] lemma compat_r_rr_ext (M r θ : ℝ) (h_ext : Exterior M r θ) :
-  dCoord Idx.r (fun r θ => g M Idx.r Idx.r r θ) r θ
-    = 2 * Γtot M r θ Idx.r Idx.r Idx.r * g M Idx.r Idx.r r θ := by
+  dCoord Idx.r (fun r θ => g M Idx.r Idx.r r θ) r θ =
+    sumIdx (fun k => Γtot M r θ k Idx.r Idx.r * g M k Idx.r r θ) +
+    sumIdx (fun k => Γtot M r θ k Idx.r Idx.r * g M Idx.r k r θ) := by
   classical
-  -- Preparation
+  -- 1. Preparation
   have hr_ne := Exterior.r_ne_zero h_ext
   have hf_ne := Exterior.f_ne_zero h_ext
-  -- Binder penetration
-  dsimp only [g]
-  -- Derivative infrastructure
+  -- 2. Normalize RHS Structure (expand sums and use diagonality)
+  simp only [sumIdx_expand, g]
+  -- 3. Sequenced Simplification (LHS)
   have hf' := f_hasDerivAt M r hr_ne
   have h_deriv : deriv (fun s => (f M s)⁻¹) r = -(2 * M / r^2) / (f M r)^2 := by
     simpa using (hf'.inv hf_ne).deriv
-  -- Sequenced simplification: expand structure WITHOUT unfolding f
   simp only [dCoord_r, Γtot_r_rr, Γ_r_rr]
-  -- Apply derivative lemma while f is still abstract
   rw [h_deriv]
-  -- Algebraic closure
+  -- 4. Algebraic Closure
   field_simp [hr_ne, hf_ne, pow_two, sq]
+  ring
+
+/-! #### Off-Diagonal Cancellation Lemmas
+
+Schwarzschild metric is diagonal, so g_tr = g_tθ = g_tφ = g_rθ = g_rφ = g_θφ = 0.
+Therefore ∂_x g_ab = 0 for off-diagonal components, and the RHS Christoffel products
+must cancel to 0.
+-/
+
+/-- Off-diagonal cancellation: ∂_t g_tr = 0 = RHS on Exterior Domain.
+    Covers cases like x=t, a=t, b=r. -/
+@[simp] lemma compat_t_tr_ext (M r θ : ℝ) (h_ext : Exterior M r θ) :
+  dCoord Idx.t (fun r θ => g M Idx.t Idx.r r θ) r θ =
+    sumIdx (fun k => Γtot M r θ k Idx.t Idx.t * g M k Idx.r r θ) +
+    sumIdx (fun k => Γtot M r θ k Idx.t Idx.r * g M Idx.t k r θ) := by
+  classical
+  have hr_ne := Exterior.r_ne_zero h_ext
+  have hf_ne := Exterior.f_ne_zero h_ext
+  -- LHS: deriv of g_tr = deriv of 0 = 0
+  simp only [sumIdx_expand, g, dCoord_t, deriv_const]
+  -- RHS: Christoffel cancellation
+  simp only [Γtot_r_tt, Γ_r_tt, Γtot_t_tr, Γ_t_tr]
+  field_simp [hr_ne, hf_ne]
+  ring
+
+/-- Off-diagonal cancellation: ∂_θ g_rθ = 0 = RHS on Exterior Domain. -/
+@[simp] lemma compat_θ_rθ_ext (M r θ : ℝ) (h_ext : Exterior M r θ) :
+  dCoord Idx.θ (fun r θ => g M Idx.r Idx.θ r θ) r θ =
+    sumIdx (fun k => Γtot M r θ k Idx.θ Idx.r * g M k Idx.θ r θ) +
+    sumIdx (fun k => Γtot M r θ k Idx.θ Idx.θ * g M Idx.r k r θ) := by
+  classical
+  have hr_ne := Exterior.r_ne_zero h_ext
+  simp only [sumIdx_expand, g, dCoord_θ, deriv_const]
+  simp only [Γtot_θ_rθ, Γ_θ_rθ, Γtot_r_θθ, Γ_r_θθ]
+  field_simp [hr_ne]
+  ring
+
+/-- Off-diagonal cancellation: ∂_φ g_rφ = 0 = RHS on Exterior Domain. -/
+@[simp] lemma compat_φ_rφ_ext (M r θ : ℝ) (h_ext : Exterior M r θ) :
+  dCoord Idx.φ (fun r θ => g M Idx.r Idx.φ r θ) r θ =
+    sumIdx (fun k => Γtot M r θ k Idx.φ Idx.r * g M k Idx.φ r θ) +
+    sumIdx (fun k => Γtot M r θ k Idx.φ Idx.φ * g M Idx.r k r θ) := by
+  classical
+  have hr_ne := Exterior.r_ne_zero h_ext
+  have hf_ne := Exterior.f_ne_zero h_ext
+  simp only [sumIdx_expand, g, dCoord_φ, deriv_const]
+  simp only [Γtot_φ_rφ, Γ_φ_rφ, Γtot_r_φφ, Γ_r_φφ]
+  field_simp [hr_ne, hf_ne]
+  ring
+
+/-- Off-diagonal cancellation: ∂_φ g_θφ = 0 = RHS on Exterior Domain. -/
+@[simp] lemma compat_φ_θφ_ext (M r θ : ℝ) (h_ext : Exterior M r θ) :
+  dCoord Idx.φ (fun r θ => g M Idx.θ Idx.φ r θ) r θ =
+    sumIdx (fun k => Γtot M r θ k Idx.φ Idx.θ * g M k Idx.φ r θ) +
+    sumIdx (fun k => Γtot M r θ k Idx.φ Idx.φ * g M Idx.θ k r θ) := by
+  classical
+  have hr_ne := Exterior.r_ne_zero h_ext
+  simp only [sumIdx_expand, g, dCoord_φ, deriv_const]
+  simp only [Γtot_φ_θφ, Γ_φ_θφ, Γtot_θ_φφ, Γ_θ_φφ]
+  field_simp [hr_ne]
+  ring
 
 /-! #### Unified Exterior Domain Compatibility
 
@@ -681,9 +766,25 @@ lemma dCoord_g_via_compat_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (x a b : 
     sumIdx (fun k => Γtot M r θ k x a * g M k b r θ) +
     sumIdx (fun k => Γtot M r θ k x b * g M a k r θ) := by
   classical
-  cases x <;> cases a <;> cases b <;>
-    simp (config := {contextual := true})
-         [sumIdx_expand, sumIdx, dCoord_t, dCoord_r, dCoord_θ, dCoord_φ, g, Γtot]
+  cases x <;> cases a <;> cases b
+  all_goals {
+    -- Try direct exact application first
+    try { exact compat_r_θθ_ext M r θ h_ext }
+    try { exact compat_r_φφ_ext M r θ h_ext }
+    try { exact compat_θ_φφ_ext M r θ h_ext }
+    try { exact compat_r_tt_ext M r θ h_ext }
+    try { exact compat_r_rr_ext M r θ h_ext }
+    try { exact compat_t_tr_ext M r θ h_ext }
+    try { exact compat_θ_rθ_ext M r θ h_ext }
+    try { exact compat_φ_rφ_ext M r θ h_ext }
+    try { exact compat_φ_θφ_ext M r θ h_ext }
+
+    -- Stage 2: Fallback for trivial zeros
+    try {
+      simp only [g, dCoord_t, dCoord_r, dCoord_θ, dCoord_φ, deriv_const, sumIdx_expand, Γtot]
+      ring
+    }
+  }
 
 /-- Metric compatibility (∇g = 0) on the Exterior Domain.
     This is the key identity that the unified dCoord_g_via_compat_ext proves. -/
