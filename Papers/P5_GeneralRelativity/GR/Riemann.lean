@@ -13,6 +13,7 @@ import Mathlib.Topology.MetricSpace.Basic
 namespace Papers.P5_GeneralRelativity
 open Papers.P5_GeneralRelativity
 open Real
+open Filter Topology
 open scoped BigOperators
 
 namespace Schwarzschild
@@ -55,6 +56,38 @@ lemma isOpen_exterior_set (M : ℝ) (hM : 0 < M) :
   rw [this]
   -- Projection is continuous and (2M, ∞) is open in ℝ
   exact IsOpen.preimage continuous_fst isOpen_Ioi
+
+/-- **PRIORITY 1.1: General topology helper for Level 3**
+
+    If a function f equals zero on an open set U containing x,
+    then its derivative at x is zero.
+
+    This is the key lemma for eliminating AX_nabla_g_zero.
+
+    **Strategy (from professor):**
+    1. U is a neighborhood of x (since U is open and x ∈ U)
+    2. f is eventually equal to the zero function near x
+    3. The derivative of f equals the derivative of the zero function
+    4. The derivative of a constant is zero
+-/
+lemma deriv_zero_of_locally_zero {f : ℝ → ℝ} {x : ℝ} {U : Set ℝ}
+    (hU_open : IsOpen U) (hx : x ∈ U) (hf_zero : ∀ y ∈ U, f y = 0) :
+    deriv f x = 0 := by
+  -- Step 1: U is a neighborhood of x
+  have h_nhds : U ∈ 𝓝 x := hU_open.mem_nhds hx
+
+  -- Step 2: f is eventually equal to the zero function near x
+  have h_eventually_eq_zero : f =ᶠ[𝓝 x] (fun _ => 0) := by
+    apply eventually_of_mem h_nhds
+    intro y hy
+    simp [hf_zero y hy]
+
+  -- Step 3: The derivative of f equals the derivative of the zero function
+  -- Use Filter.EventuallyEq.deriv_eq
+  rw [h_eventually_eq_zero.deriv_eq]
+
+  -- Step 4: The derivative of a constant is zero
+  simp [deriv_const]
 
 end Exterior
 
