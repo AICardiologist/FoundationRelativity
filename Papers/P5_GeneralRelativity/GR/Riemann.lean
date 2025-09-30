@@ -3213,6 +3213,25 @@ lemma Riemann_swap_a_b_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (a b c d : I
   -- We now have 0 = - (R_abcd + R_bacd), which implies R_abcd = -R_bacd
   linarith
 
+/-- Squared symmetry in the first pair on Exterior. Safer for simp.
+
+    This is the Exterior-hypothesis version that eliminates AX_nabla_g_zero.
+-/
+lemma Riemann_sq_swap_a_b_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (a b c d : Idx) :
+  (Riemann M r θ b a c d)^2 = (Riemann M r θ a b c d)^2 := by
+  rw [Riemann_swap_a_b_ext M r θ h_ext, sq_neg]
+
+/-- If the first two indices coincide, the Riemann component vanishes on Exterior.
+
+    This is the Exterior-hypothesis version that eliminates AX_nabla_g_zero.
+-/
+@[simp] lemma Riemann_first_equal_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (a c d : Idx) :
+  Riemann M r θ a a c d = 0 := by
+  -- By antisymmetry: R_aacd = -R_aacd
+  have h := Riemann_swap_a_b_ext M r θ h_ext a a c d
+  -- The only number equal to its negation is 0
+  linarith
+
 /-- Squared symmetry in the first pair. Safer for simp. -/
 lemma Riemann_sq_swap_a_b (M r θ : ℝ) (a b c d : Idx) :
   (Riemann M r θ b a c d)^2 = (Riemann M r θ a b c d)^2 := by
