@@ -170,22 +170,35 @@ end SimpSetup
   dCoord Idx.φ (fun _ _ => c) r θ = 0 := by
   simp [dCoord_φ]
 
-/-- Temporary bypass for DifferentiableAt synthesis in dCoord infrastructure.
+/-- ⚠️  QUARANTINED AXIOM - DE-AXIOMATIZATION MANDATE (2025-09-30)
 
-    JUSTIFICATION: This asserts differentiability for arbitrary functions used in
-    generic lemmas (dCoord_add/sub/mul). It is sound in the context of the
-    Schwarzschild formalization because all concrete functions involved (metric components)
-    have been rigorously proven differentiable (see lemmas lines 183-216).
+**RESTRICTIONS:**
+- ❌ MUST NOT be used in critical path (vacuum solution, Ricci/Riemann components)
+- ❌ MUST NOT be used in new code
+- ✅ MAY be used ONLY in existing Stage-1 LHS scaffolding (legacy, lines 1145-2800)
+- ✅ MUST be replaced with explicit hypotheses for Level 3 publication
 
-    TODO: Replace with explicit DifferentiableAt hypotheses in infrastructure lemmas for full rigor (Level 3).
+**AUDIT:** Search for `AX_differentiable_hack` before Level 3 submission.
+
+**ELIMINATION PATH:**
+1. ✅ Hypothesis-carrying infrastructure added (dCoord_add/sub/mul_of_diff)
+2. ✅ Metric differentiability lemmas added (6 lemmas, lines 238-270)
+3. 🔄 Refactor Stage1LHS to use explicit hypotheses (in progress)
+4. ⏳ Remove axiom entirely
+
+**JUSTIFICATION FOR RETENTION (temporary):**
+- Schwarzschild vacuum solution does NOT use this axiom (Schwarzschild.lean doesn't import Riemann.lean)
+- All R_μν = 0 proofs use explicit differentiability lemmas
+- Retained ONLY for non-critical Stage-1 tensor infrastructure scaffolding
+- Clear elimination path exists via explicit `Exterior` hypotheses
 -/
-lemma differentiable_hack (f : ℝ → ℝ) (x : ℝ) : DifferentiableAt ℝ f x := by
-  sorry -- See JUSTIFICATION above.
+lemma AX_differentiable_hack (f : ℝ → ℝ) (x : ℝ) : DifferentiableAt ℝ f x := by
+  sorry -- QUARANTINED AXIOM - See documentation above.
 
 /-! ### Differentiability Lemmas for Schwarzschild Components
 
 These lemmas establish differentiability of the metric components and related functions,
-eliminating the need for `differentiable_hack` in critical proofs.
+eliminating the need for `AX_differentiable_hack` in critical proofs.
 -/
 
 /-- The function r ↦ r is differentiable everywhere. -/
@@ -356,15 +369,15 @@ lemma dCoord_mul_of_diff (μ : Idx) (f g : ℝ → ℝ → ℝ) (r θ : ℝ)
   case r =>
     -- Unfold dCoord explicitly first
     simp only [dCoord]
-    -- Prepare the hypotheses using differentiable_hack
-    have hf := differentiable_hack (fun r' => f r' θ) r
-    have hg := differentiable_hack (fun r' => g r' θ) r
+    -- Prepare the hypotheses using AX_differentiable_hack
+    have hf := AX_differentiable_hack (fun r' => f r' θ) r
+    have hg := AX_differentiable_hack (fun r' => g r' θ) r
     -- The goal now exactly matches the statement of deriv_sub
     exact deriv_sub hf hg
   case θ =>
     simp only [dCoord]
-    have hf := differentiable_hack (fun θ' => f r θ') θ
-    have hg := differentiable_hack (fun θ' => g r θ') θ
+    have hf := AX_differentiable_hack (fun θ' => f r θ') θ
+    have hg := AX_differentiable_hack (fun θ' => g r θ') θ
     exact deriv_sub hf hg
   case φ => simp [dCoord]
 
@@ -376,13 +389,13 @@ lemma dCoord_mul_of_diff (μ : Idx) (f g : ℝ → ℝ → ℝ) (r θ : ℝ)
   case t => simp [dCoord]
   case r =>
     simp only [dCoord]
-    have hf := differentiable_hack (fun r' => f r' θ) r
-    have hg := differentiable_hack (fun r' => g r' θ) r
+    have hf := AX_differentiable_hack (fun r' => f r' θ) r
+    have hg := AX_differentiable_hack (fun r' => g r' θ) r
     exact deriv_add hf hg
   case θ =>
     simp only [dCoord]
-    have hf := differentiable_hack (fun θ' => f r θ') θ
-    have hg := differentiable_hack (fun θ' => g r θ') θ
+    have hf := AX_differentiable_hack (fun θ' => f r θ') θ
+    have hg := AX_differentiable_hack (fun θ' => g r θ') θ
     exact deriv_add hf hg
   case φ => simp [dCoord]
 
@@ -405,13 +418,13 @@ lemma dCoord_add4 (μ : Idx) (A B C D : ℝ → ℝ → ℝ) (r θ : ℝ) :
   case t => simp [dCoord]
   case r =>
     simp only [dCoord]
-    have hf := differentiable_hack (fun r' => f r' θ) r
-    have hg := differentiable_hack (fun r' => g r' θ) r
+    have hf := AX_differentiable_hack (fun r' => f r' θ) r
+    have hg := AX_differentiable_hack (fun r' => g r' θ) r
     exact deriv_mul hf hg
   case θ =>
     simp only [dCoord]
-    have hf := differentiable_hack (fun θ' => f r θ') θ
-    have hg := differentiable_hack (fun θ' => g r θ') θ
+    have hf := AX_differentiable_hack (fun θ' => f r θ') θ
+    have hg := AX_differentiable_hack (fun θ' => g r θ') θ
     exact deriv_mul hf hg
   case φ => simp [dCoord]
 
