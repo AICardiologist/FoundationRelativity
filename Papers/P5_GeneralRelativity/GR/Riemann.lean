@@ -959,11 +959,31 @@ lemma dCoord_const (μ : Idx) (c : ℝ) (r θ : ℝ) :
   dCoord μ (fun _ _ => c) r θ = 0 := by
   cases μ <;> simp [dCoord, deriv_const]
 
-/-- Commutativity of partial derivatives (Clairaut's theorem).
-    This requires the assumption that the metric components are sufficiently smooth (C²). -/
-lemma dCoord_commute (f : ℝ → ℝ → ℝ) (c d : Idx) (r θ : ℝ) :
-  dCoord c (fun r θ => dCoord d f r θ) r θ = dCoord d (fun r θ => dCoord c f r θ) r θ := by
-  sorry -- Calculus prerequisite: requires formalizing smoothness and Clairaut's theorem.
+/-! ### Clairaut's Theorem for Schwarzschild Metric (Specialized Lemmas)
+
+The general `dCoord_commute` for arbitrary functions requires C² smoothness infrastructure.
+Instead, we prove commutativity specifically for the metric components via explicit calculation.
+-/
+
+/-- Mixed partial derivatives commute for the metric: ∂r∂θ g = ∂θ∂r g.
+    Proven by explicit calculation for each metric component. -/
+lemma dCoord_r_θ_commute_for_g (M r θ : ℝ) (a b : Idx) :
+  dCoord Idx.r (fun r θ => dCoord Idx.θ (fun r θ => g M a b r θ) r θ) r θ =
+  dCoord Idx.θ (fun r θ => dCoord Idx.r (fun r θ => g M a b r θ) r θ) r θ := by
+  cases a <;> cases b
+  all_goals {
+    -- 1. Binder Penetration + Expand Coordinate Derivatives
+    simp only [g, dCoord_r, dCoord_θ]
+
+    -- 2. Calculate Iterated Derivatives
+    -- Most cases: g is constant in one variable → deriv = 0
+    -- Non-trivial cases: g_θθ = r², g_φφ = r²sin²θ
+    simp only [deriv_const, deriv_const_mul, deriv_mul_const,
+               deriv_pow_two_at, deriv_sin_sq_at, deriv_mul]
+
+    -- 3. Algebraic Closure
+    try { ring }
+  }
 
 /-- The LHS of the Ricci identity simplifies using commutativity of derivatives.
     The second partial derivatives of the metric cancel out. -/
@@ -990,14 +1010,14 @@ lemma ricci_LHS (M r θ : ℝ) (a b c d : Idx) :
     | r =>
       cases d with
       | t => simp [dCoord_t, dCoord_r, deriv_const]           -- ∂r∘∂t vs ∂t∘∂r
-      | r => simpa using dCoord_commute (fun r θ => g M a b r θ) Idx.r Idx.r r θ
-      | θ => simpa using dCoord_commute (fun r θ => g M a b r θ) Idx.r Idx.θ r θ
+      | r => rfl                                              -- ∂r∘∂r (trivial)
+      | θ => exact dCoord_r_θ_commute_for_g M r θ a b         -- ∂r∘∂θ vs ∂θ∘∂r
       | φ => simp [dCoord_φ, dCoord_r, deriv_const]           -- ∂r∘∂φ vs ∂φ∘∂r
     | θ =>
       cases d with
       | t => simp [dCoord_t, dCoord_θ, deriv_const]           -- ∂θ∘∂t vs ∂t∘∂θ
-      | r => simpa using dCoord_commute (fun r θ => g M a b r θ) Idx.θ Idx.r r θ
-      | θ => simpa using dCoord_commute (fun r θ => g M a b r θ) Idx.θ Idx.θ r θ
+      | r => rw [dCoord_r_θ_commute_for_g M r θ a b]          -- ∂θ∘∂r vs ∂r∘∂θ (symmetric)
+      | θ => rfl                                              -- ∂θ∘∂θ (trivial)
       | φ => simp [dCoord_φ, dCoord_θ, deriv_const]           -- ∂θ∘∂φ vs ∂φ∘∂θ
     | φ =>
       cases d with
