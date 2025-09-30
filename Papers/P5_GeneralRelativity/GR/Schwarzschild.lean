@@ -1002,12 +1002,18 @@ instance : Fintype Idx where
   complete := by intro x; cases x <;> simp
 
 /-- Covariant metric components as a function of indices -/
-noncomputable def g (M : ℝ) : Idx → Idx → ℝ → ℝ → ℝ
+@[simp] noncomputable def g (M : ℝ) : Idx → Idx → ℝ → ℝ → ℝ
 | t, t => fun r _θ => -(f M r)
 | r, r => fun r _θ => (f M r)⁻¹
 | θ, θ => fun r _θ => r^2
 | φ, φ => fun r θ => r^2 * (Real.sin θ)^2
 | _, _ => fun _ _ => 0
+
+-- Simp lemmas for g component reduction
+@[simp] lemma g_apply_tt (M r θ : ℝ) : g M Idx.t Idx.t r θ = -(f M r) := rfl
+@[simp] lemma g_apply_rr (M r θ : ℝ) : g M Idx.r Idx.r r θ = (f M r)⁻¹ := rfl
+@[simp] lemma g_apply_θθ (M r θ : ℝ) : g M Idx.θ Idx.θ r θ = r^2 := rfl
+@[simp] lemma g_apply_φφ (M r θ : ℝ) : g M Idx.φ Idx.φ r θ = r^2 * (Real.sin θ)^2 := rfl
 
 /-- Contravariant metric components (inverse) -/
 noncomputable def gInv (M : ℝ) : Idx → Idx → ℝ → ℝ → ℝ

@@ -711,9 +711,11 @@ must cancel to 0.
     sumIdx (fun k => Γtot M r θ k Idx.θ Idx.θ * g M Idx.r k r θ) := by
   classical
   have hr_ne := Exterior.r_ne_zero h_ext
+  have hf_ne := Exterior.f_ne_zero h_ext
   simp only [sumIdx_expand, g, dCoord_θ, deriv_const]
-  simp only [Γtot_θ_rθ, Γ_θ_rθ, Γtot_r_θθ, Γ_r_θθ]
-  field_simp [hr_ne]
+  simp only [Γtot_θ_rθ, Γ_θ_rθ, Γtot_r_θθ, Γ_r_θθ, Γtot_θ_θr, f]
+  have h_sub_ne : r - 2*M ≠ 0 := by linarith [h_ext.hr_ex]
+  field_simp [hr_ne, hf_ne, h_sub_ne, pow_two]
   ring
 
 /-- Off-diagonal cancellation: ∂_φ g_rφ = 0 = RHS on Exterior Domain. -/
@@ -725,7 +727,7 @@ must cancel to 0.
   have hr_ne := Exterior.r_ne_zero h_ext
   have hf_ne := Exterior.f_ne_zero h_ext
   simp only [sumIdx_expand, g, dCoord_φ, deriv_const]
-  simp only [Γtot_φ_rφ, Γ_φ_rφ, Γtot_r_φφ, Γ_r_φφ]
+  simp only [Γtot_φ_rφ, Γ_φ_rφ, Γtot_r_φφ, Γ_r_φφ, Γtot_φ_φr, f]
   field_simp [hr_ne, hf_ne]
   ring
 
@@ -736,9 +738,10 @@ must cancel to 0.
     sumIdx (fun k => Γtot M r θ k Idx.φ Idx.φ * g M Idx.θ k r θ) := by
   classical
   have hr_ne := Exterior.r_ne_zero h_ext
+  have hf_ne := Exterior.f_ne_zero h_ext
   simp only [sumIdx_expand, g, dCoord_φ, deriv_const]
-  simp only [Γtot_φ_θφ, Γ_φ_θφ, Γtot_θ_φφ, Γ_θ_φφ]
-  field_simp [hr_ne]
+  simp only [Γtot_φ_θφ, Γ_φ_θφ, Γtot_θ_φφ, Γ_θ_φφ, Γtot_φ_φθ, f]
+  field_simp [hr_ne, hf_ne]
   ring
 
 /-! #### Unified Exterior Domain Compatibility
@@ -768,22 +771,33 @@ lemma dCoord_g_via_compat_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (x a b : 
   classical
   cases x <;> cases a <;> cases b
   all_goals {
-    -- Try direct exact application first
-    try { exact compat_r_θθ_ext M r θ h_ext }
-    try { exact compat_r_φφ_ext M r θ h_ext }
-    try { exact compat_θ_φφ_ext M r θ h_ext }
-    try { exact compat_r_tt_ext M r θ h_ext }
-    try { exact compat_r_rr_ext M r θ h_ext }
-    try { exact compat_t_tr_ext M r θ h_ext }
-    try { exact compat_θ_rθ_ext M r θ h_ext }
-    try { exact compat_φ_rφ_ext M r θ h_ext }
-    try { exact compat_φ_θφ_ext M r θ h_ext }
+    -- Stage 1: Explicit Dispatch (Reliable Application)
+    first
+    -- Diagonal Cases
+    | exact compat_r_tt_ext M r θ h_ext
+    | exact compat_r_rr_ext M r θ h_ext
+    | exact compat_r_θθ_ext M r θ h_ext
+    | exact compat_r_φφ_ext M r θ h_ext
+    | exact compat_θ_φφ_ext M r θ h_ext
+    -- Off-Diagonal Cancellation Cases
+    | exact compat_t_tr_ext M r θ h_ext
+    | exact compat_θ_rθ_ext M r θ h_ext
+    | exact compat_φ_rφ_ext M r θ h_ext
+    | exact compat_φ_θφ_ext M r θ h_ext
 
-    -- Stage 2: Fallback for trivial zeros
-    try {
-      simp only [g, dCoord_t, dCoord_r, dCoord_θ, dCoord_φ, deriv_const, sumIdx_expand, Γtot]
-      ring
-    }
+    -- Stage 2: Automated Fallback (Trivial Zeros)
+    | {
+        -- LHS expansion (dCoord x (g a b) -> 0)
+        dsimp only [g] -- Simplify binder (e.g., g t θ -> 0)
+        simp only [dCoord_t, dCoord_r, dCoord_θ, dCoord_φ, deriv_const]
+
+        -- RHS expansion (sumIdx + sumIdx -> 0)
+        simp only [sumIdx_expand, g]
+        simp only [Γtot]
+
+        -- Final closure (0=0)
+        try { ring }
+      }
   }
 
 /-- Metric compatibility (∇g = 0) on the Exterior Domain.
