@@ -7,6 +7,8 @@ import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Analysis.Calculus.Deriv.Mul
 import Mathlib.Data.Finset.Basic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
+import Mathlib.Topology.Basic
+import Mathlib.Topology.MetricSpace.Basic
 
 namespace Papers.P5_GeneralRelativity
 open Papers.P5_GeneralRelativity
@@ -30,6 +32,29 @@ lemma r_ne_zero {M r θ : ℝ} (h : Exterior M r θ) : r ≠ 0 :=
 
 lemma f_ne_zero {M r θ : ℝ} (h : Exterior M r θ) : f M r ≠ 0 :=
   ne_of_gt (f_pos_of_hr M r h.hM h.hr_ex)
+
+/-- The Exterior domain (for fixed M > 0) forms an open set in ℝ × ℝ.
+
+    TOPOLOGICAL INFRASTRUCTURE (Level 3 De-Axiomatization):
+    This lemma establishes that {(r,θ) | r > 2M} is open in the product topology.
+
+    **Significance:** Proving Exterior is open would allow us to:
+    1. Show nabla_g = 0 holds in a neighborhood of any Exterior point
+    2. Conclude derivatives of nabla_g are zero (derivative of constant = 0)
+    3. Eliminate AX_nabla_g_zero from Riemann_swap_a_b
+
+    However, this requires additional infrastructure (deriv of locally constant function)
+    which is deferred. The critical path (R_μν = 0) doesn't need this lemma.
+-/
+lemma isOpen_exterior_set (M : ℝ) (hM : 0 < M) :
+    IsOpen {p : ℝ × ℝ | 2 * M < p.1} := by
+  -- The set {(r,θ) | 2M < r} is the preimage of (2M, ∞) under projection π₁
+  have : {p : ℝ × ℝ | 2 * M < p.1} = Prod.fst ⁻¹' Set.Ioi (2 * M) := by
+    ext p
+    simp [Set.mem_preimage, Set.mem_Ioi]
+  rw [this]
+  -- Projection is continuous and (2M, ∞) is open in ℝ
+  exact IsOpen.preimage continuous_fst isOpen_Ioi
 
 end Exterior
 
