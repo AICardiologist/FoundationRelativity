@@ -1064,6 +1064,80 @@ lemma nabla_g_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (c a b : Idx) :
   -- The terms cancel exactly by definition of nabla_g
   abel
 
+/-- **PRIORITY 1.2-1.4: Derivative of nabla_g is zero on Exterior**
+
+    The coordinate derivative of nabla_g is zero on the Exterior domain.
+
+    This eliminates the need for AX_nabla_g_zero by using:
+    - nabla_g_zero_ext: nabla_g = 0 on Exterior
+    - Exterior.isOpen_exterior_set: Exterior is an open set
+    - Exterior.deriv_zero_of_locally_zero: derivative of locally constant function is zero
+
+    This lemma will replace AX_nabla_g_zero in Riemann_swap_a_b and dCoord_g_via_compat.
+-/
+lemma dCoord_nabla_g_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ)
+    (μ c a b : Idx) :
+    dCoord μ (fun r θ => nabla_g M r θ c a b) r θ = 0 := by
+  cases μ
+
+  -- ===== Case: μ = t (trivial) =====
+  case t =>
+    simp [dCoord_t]
+
+  -- ===== Case: μ = φ (trivial) =====
+  case φ =>
+    simp [dCoord_φ]
+
+  -- ===== Case: μ = r (requires topology) =====
+  case r =>
+    simp only [dCoord_r]
+    -- Goal: deriv (fun r' => nabla_g M r' θ c a b) r = 0
+
+    -- Define the open set U = {r' : ℝ | 2 * M < r'}
+    let U := {r' : ℝ | 2 * M < r'}
+
+    -- U is open (it's the open interval (2M, ∞))
+    have hU_open : IsOpen U := isOpen_Ioi
+
+    -- (r, θ) ∈ Exterior means r ∈ U
+    have hx : r ∈ U := h_ext.hr_ex
+
+    -- Apply the general lemma
+    apply Exterior.deriv_zero_of_locally_zero hU_open hx
+
+    -- Prove that nabla_g is zero on U
+    intro r' hr'_ex
+    -- For any r' > 2M, we can construct Exterior M r' θ
+    have hM_pos := h_ext.hM
+    have h_ext' : Exterior M r' θ := { hM := hM_pos, hr_ex := hr'_ex }
+    -- nabla_g_zero_ext tells us nabla_g = 0 on Exterior
+    exact nabla_g_zero_ext M r' θ h_ext' c a b
+
+  -- ===== Case: μ = θ (requires topology) =====
+  case θ =>
+    simp only [dCoord_θ]
+    -- Goal: deriv (fun θ' => nabla_g M r θ' c a b) θ = 0
+
+    -- The Exterior condition is independent of θ (only depends on r > 2M)
+    -- So nabla_g = 0 for ALL θ, which means U = ℝ (the universal set)
+    let U : Set ℝ := Set.univ
+
+    -- The universal set is always open
+    have hU_open : IsOpen U := isOpen_univ
+
+    -- θ is in the universal set
+    have hx : θ ∈ U := Set.mem_univ θ
+
+    -- Apply the general lemma
+    apply Exterior.deriv_zero_of_locally_zero hU_open hx
+
+    -- Prove that nabla_g is zero on U (for all θ')
+    intro θ' _
+    -- The Exterior hypothesis for (r, θ') can be constructed from h_ext
+    -- because Exterior only depends on r > 2M and M > 0, not on θ
+    have h_ext' : Exterior M r θ' := { hM := h_ext.hM, hr_ex := h_ext.hr_ex }
+    exact nabla_g_zero_ext M r θ' h_ext' c a b
+
 /-! #### Legacy Compatibility Lemmas (θ-φ sector only)
 
 The following lemma remains valid unconditionally because it involves only r² and sin²θ terms,
