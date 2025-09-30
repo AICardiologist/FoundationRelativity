@@ -1457,6 +1457,11 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   -- [ ] Final: Uncomment unfold line (664) and complete proof
   -/
 
+  -- NOTE: Early sorry due to Hsplit lemmas having performance issues
+  -- The full proof scaffold is below but currently non-operational
+  sorry
+
+  /-
   -- Stage-1 splits (both families)
   have hC := Stage1_LHS_Splits.Hsplit_c_both M r θ a b c d
   have hD := Stage1_LHS_Splits.Hsplit_d_both M r θ a b c d
@@ -2778,9 +2783,7 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   -- test_d now shows the expanded form for e=t
   -/
 
-  -- Single algebraic placeholder - all expansions and manipulations
-  -- are left for the final algebraic pass to avoid intermediate goals
-  sorry
+  -/ -- Close the comment block started at line 1464
 
 end RicciInfrastructure
 
