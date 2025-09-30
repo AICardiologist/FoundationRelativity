@@ -282,6 +282,59 @@ all_goals {
 
 ---
 
+### 🎯 Priority 4: Kretschmann Scalar Completion (Optional - 1-2 days)
+
+**Why Optional:** Not on critical path (Ricci = 0 doesn't need Kretschmann scalar)
+
+**File:** `Papers/P5_GeneralRelativity/GR/Invariants.lean:111`
+
+**Status:**
+- ✅ Tracked in SORRY_ALLOWLIST.txt
+- Non-blocking for Level 3 achievement
+- Nice-to-have for complete curvature invariant computation
+
+**Tasks:**
+
+| # | Task | Estimated | Success Check |
+|---|------|-----------|---------------|
+| 4.1 | Expand Kretschmann 256-term sum | 2 hours | Sum expanded |
+| 4.2 | Apply 60 off-block vanishing lemmas | 4 hours | Off-blocks eliminated |
+| 4.3 | Apply `Riemann_last_equal_zero` for diagonals | 1 hour | Diagonal terms handled |
+| 4.4 | Prove factor-of-4 for each block | 2 hours | Combinatorial counting done |
+| 4.5 | Complete `Kretschmann_six_blocks` proof | 2 hours | Lemma proven |
+| 4.6 | Full build verification | 30 min | Invariants.lean builds |
+
+**Proof Strategy:**
+```lean
+lemma Kretschmann_six_blocks (M r θ : ℝ) :
+    Kretschmann M r θ = 4 * sumSixBlocks M r θ := by
+  classical
+  -- 1. Start from squared form
+  rw [Kretschmann_after_raise_sq]
+  -- 2. Expand the 256-term double sum (4×4×4×4)
+  simp only [sumIdx2, sumIdx_expand]
+  -- 3. Apply off-block vanishing (60 lemmas from Riemann.lean)
+  simp only [R_tr_tθ_zero, R_tr_tφ_zero, ...] -- all 60 lemmas
+  -- 4. Apply diagonal vanishing (c=d terms)
+  simp only [Riemann_last_equal_zero]
+  -- 5. Each of 6 blocks contributes 4 times:
+  --    - Factor of 2 from (c,d) ordering (c<d vs d<c)
+  --    - Factor of 2 from (a,b) ordering (a<b vs b<a)
+  unfold sumSixBlocks sixBlock
+  ring
+```
+
+**Dependencies:**
+- ✅ All 60 off-block vanishing lemmas exist in Riemann.lean
+- ✅ `Kretschmann_after_raise_sq` already proven (line 73)
+- ✅ `Riemann_last_equal_zero` already proven in Riemann.lean
+
+**Difficulty:** Easy - pure mechanical proof work, no research needed
+
+**Deliverable:** `Kretschmann_six_blocks` proven, Invariants.lean sorry-free ✅
+
+---
+
 ## Branch and PR Strategy
 
 ### Branch Structure
