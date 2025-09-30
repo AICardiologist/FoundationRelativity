@@ -1189,7 +1189,11 @@ lemma AX_nabla_g_zero (M r θ : ℝ) (c a b : Idx) :
 
 -- Removed duplicate: sumIdx_sub is already defined in Schwarzschild.lean
 
-/-- From `∇g = 0`: rewrite `∂_x g_{ab}` as a Γ–`g` contraction. -/
+/-- From `∇g = 0`: rewrite `∂_x g_{ab}` as a Γ–`g` contraction.
+
+    NOTE: This axiom-dependent version will be replaced by dCoord_g_via_compat_ext
+    (which already exists at line 1017) once all call sites are updated.
+-/
 @[simp] lemma dCoord_g_via_compat
     (M r θ : ℝ) (x a b : Idx) :
   dCoord x (fun r θ => g M a b r θ) r θ
@@ -3178,6 +3182,33 @@ lemma Riemann_swap_a_b (M r θ : ℝ) (a b c d : Idx) :
     have h_zero_fn : (fun r θ => (0:ℝ)) = (fun (_r : ℝ) (_θ : ℝ) => (0:ℝ)) := by rfl
     rw [h_zero_fn]
     simp only [dCoord_const, sub_self]
+  rw [hLHS_zero] at hRic
+  -- We now have 0 = - (R_abcd + R_bacd), which implies R_abcd = -R_bacd
+  linarith
+
+/-- Antisymmetry in the first two (lower) slots on Exterior. `R_{abcd} = - R_{bacd}`.
+
+    This is the Exterior-hypothesis version that eliminates AX_nabla_g_zero.
+    This lemma will eventually replace Riemann_swap_a_b once all call sites
+    are updated to pass the Exterior hypothesis.
+-/
+lemma Riemann_swap_a_b_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (a b c d : Idx) :
+  Riemann M r θ a b c d = - Riemann M r θ b a c d := by
+  classical
+  -- Apply the Ricci identity
+  have hRic := ricci_identity_on_g M r θ a b c d
+  -- The LHS vanishes because the connection is metric compatible on Exterior
+  -- Since ∇g = 0 on Exterior, its derivative (∇∇g) is also 0
+  have hLHS_zero : ( dCoord c (fun r θ => nabla_g M r θ d a b) r θ
+                  - dCoord d (fun r θ => nabla_g M r θ c a b) r θ ) = 0 := by
+    -- Apply metric compatibility on Exterior
+    have h1 := dCoord_nabla_g_zero_ext M r θ h_ext c d a b
+    have h2 := dCoord_nabla_g_zero_ext M r θ h_ext d c a b
+    calc
+      dCoord c (fun r θ => nabla_g M r θ d a b) r θ
+      - dCoord d (fun r θ => nabla_g M r θ c a b) r θ
+        = 0 - 0 := by rw [h1, h2]
+      _ = 0 := by ring
   rw [hLHS_zero] at hRic
   -- We now have 0 = - (R_abcd + R_bacd), which implies R_abcd = -R_bacd
   linarith
