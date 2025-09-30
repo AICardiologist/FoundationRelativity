@@ -223,6 +223,86 @@ lemma differentiableAt_cos (θ : ℝ) : DifferentiableAt ℝ Real.cos θ :=
 lemma differentiableAt_sin_sq (θ : ℝ) : DifferentiableAt ℝ (fun θ' => (Real.sin θ')^2) θ :=
   DifferentiableAt.pow (Real.differentiableAt_sin) 2
 
+/-! ### Hypothesis-Carrying `dCoord` Infrastructure (De-Axiomatization)
+
+The following lemmas provide rigorous versions of dCoord linearity rules with explicit
+differentiability hypotheses. These replace the axiom-dependent versions for the critical path.
+-/
+
+/-- Helper predicate: f is differentiable at (r,θ) in the r-direction. -/
+def DifferentiableAt_r (f : ℝ → ℝ → ℝ) (r θ : ℝ) : Prop :=
+  DifferentiableAt ℝ (fun r' => f r' θ) r
+
+/-- Helper predicate: f is differentiable at (r,θ) in the θ-direction. -/
+def DifferentiableAt_θ (f : ℝ → ℝ → ℝ) (r θ : ℝ) : Prop :=
+  DifferentiableAt ℝ (fun θ' => f r θ') θ
+
+/-- Linearity of dCoord over addition with explicit differentiability hypotheses. -/
+lemma dCoord_add_of_diff (μ : Idx) (f g : ℝ → ℝ → ℝ) (r θ : ℝ)
+    (hf_r : DifferentiableAt_r f r θ ∨ μ ≠ Idx.r)
+    (hg_r : DifferentiableAt_r g r θ ∨ μ ≠ Idx.r)
+    (hf_θ : DifferentiableAt_θ f r θ ∨ μ ≠ Idx.θ)
+    (hg_θ : DifferentiableAt_θ g r θ ∨ μ ≠ Idx.θ) :
+    dCoord μ (fun r θ => f r θ + g r θ) r θ =
+    dCoord μ f r θ + dCoord μ g r θ := by
+  cases μ
+  case t => simp [dCoord]
+  case r =>
+    simp only [dCoord]
+    apply deriv_add
+    · exact hf_r.resolve_right (by simp)
+    · exact hg_r.resolve_right (by simp)
+  case θ =>
+    simp only [dCoord]
+    apply deriv_add
+    · exact hf_θ.resolve_right (by simp)
+    · exact hg_θ.resolve_right (by simp)
+  case φ => simp [dCoord]
+
+/-- Linearity of dCoord over subtraction with explicit differentiability hypotheses. -/
+lemma dCoord_sub_of_diff (μ : Idx) (f g : ℝ → ℝ → ℝ) (r θ : ℝ)
+    (hf_r : DifferentiableAt_r f r θ ∨ μ ≠ Idx.r)
+    (hg_r : DifferentiableAt_r g r θ ∨ μ ≠ Idx.r)
+    (hf_θ : DifferentiableAt_θ f r θ ∨ μ ≠ Idx.θ)
+    (hg_θ : DifferentiableAt_θ g r θ ∨ μ ≠ Idx.θ) :
+    dCoord μ (fun r θ => f r θ - g r θ) r θ =
+    dCoord μ f r θ - dCoord μ g r θ := by
+  cases μ
+  case t => simp [dCoord]
+  case r =>
+    simp only [dCoord]
+    apply deriv_sub
+    · exact hf_r.resolve_right (by simp)
+    · exact hg_r.resolve_right (by simp)
+  case θ =>
+    simp only [dCoord]
+    apply deriv_sub
+    · exact hf_θ.resolve_right (by simp)
+    · exact hg_θ.resolve_right (by simp)
+  case φ => simp [dCoord]
+
+/-- Product rule for dCoord with explicit differentiability hypotheses. -/
+lemma dCoord_mul_of_diff (μ : Idx) (f g : ℝ → ℝ → ℝ) (r θ : ℝ)
+    (hf_r : DifferentiableAt_r f r θ ∨ μ ≠ Idx.r)
+    (hg_r : DifferentiableAt_r g r θ ∨ μ ≠ Idx.r)
+    (hf_θ : DifferentiableAt_θ f r θ ∨ μ ≠ Idx.θ)
+    (hg_θ : DifferentiableAt_θ g r θ ∨ μ ≠ Idx.θ) :
+    dCoord μ (fun r θ => f r θ * g r θ) r θ =
+    dCoord μ f r θ * g r θ + f r θ * dCoord μ g r θ := by
+  cases μ
+  case t => simp [dCoord]
+  case r =>
+    simp only [dCoord]
+    apply deriv_mul
+    · exact hf_r.resolve_right (by simp)
+    · exact hg_r.resolve_right (by simp)
+  case θ =>
+    simp only [dCoord]
+    apply deriv_mul
+    · exact hf_θ.resolve_right (by simp)
+    · exact hg_θ.resolve_right (by simp)
+  case φ => simp [dCoord]
+
 /-- Linearity of `dCoord` over subtraction. -/
 @[simp] lemma dCoord_sub (μ : Idx) (f g : ℝ → ℝ → ℝ) (r θ : ℝ) :
   dCoord μ (fun r θ => f r θ - g r θ) r θ
