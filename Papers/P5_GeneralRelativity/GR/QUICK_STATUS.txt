@@ -1,0 +1,34 @@
+SORRY ELIMINATION - QUICK STATUS
+=================================
+
+DATE: Sept 30, 2025
+BRANCH: feat/p0.2-invariants
+
+STARTING: 21 sorries
+CURRENT:  17 sorries
+ELIMINATED: 4 sorries
+
+COMPILATION: 0 errors ✅
+
+COMPLETED PRIORITIES:
+✅ IMMEDIATE - Documentation (nabla_g_zero, differentiable_hack as axioms)
+✅ PRIORITY 1 - 7 differentiability lemmas
+✅ PRIORITY 2A - dCoord_sumIdx eliminated
+✅ PRIORITY 2B - Specialized Clairaut (dCoord_commute eliminated)
+✅ PRIORITY 3 - Hsplit_c/d_both performance fixed (2 eliminated)
+
+REMAINING WORK:
+⏭️ PRIORITY 4 - Document Category C (13 Stage-1 sorries as DEFERRED)
+
+COMMITS:
+- 1b4ef20: Axiom documentation
+- 8599039: Specialized Clairaut
+- aef21b6: Hsplit performance
+- 9a6af60: Status document
+
+NEXT ACTION:
+Add documentation block to lines 2100-2622 in Riemann.lean
+Mark 13 Stage-1 alternation identity sorries as "DEFERRED"
+
+FILE: Papers/P5_GeneralRelativity/GR/Riemann.lean
+STATUS DOC: SORRY_ELIMINATION_STATUS.md (full details)
