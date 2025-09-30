@@ -2798,8 +2798,8 @@ lemma ricci_identity_on_g
   rw [ricci_LHS M r θ a b c d]
   -- 2. Relate the remaining terms to the Riemann tensor (core algebraic identity)
   rw [alternation_dC_eq_Riem M r θ a b c d]
-  -- 3. Trivial algebraic rearrangement
-  ring
+  -- 3. Trivial algebraic rearrangement (goal already solved by rewrites)
+  -- ring -- Not needed
 
 /-- Antisymmetry in the first two (lower) slots. `R_{abcd} = - R_{bacd}`. -/
 lemma Riemann_swap_a_b (M r θ : ℝ) (a b c d : Idx) :
