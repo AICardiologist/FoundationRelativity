@@ -1509,27 +1509,7 @@ lemma dCoord_r_θ_commute_for_g (M r θ : ℝ) (a b : Idx) :
   }
 
 -- ========== C2 Smoothness Lemmas (Second-Order Differentiability) ==========
--- Required for ricci_LHS proof (Contingency Plan per Phase 3.1 guidance)
-
-/-- ContractionC is differentiable in r (sum of products of differentiable functions). -/
-@[simp]
-lemma ContractionC_differentiable_r (M r θ : ℝ) (a b c : Idx)
-    (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
-  DifferentiableAt_r (fun r θ => ContractionC M r θ a b c) r θ := by
-  -- ContractionC = ∑ e, (Γ(e,c,a)·g(e,b) + Γ(e,c,b)·g(a,e))
-  -- Dependencies: Γtot_differentiable_r, g_differentiable_r (proven later in file)
-  -- Will be proven after those C1 lemmas using manual 4-term expansion
-  sorry
-
-/-- ContractionC is differentiable in θ. -/
-@[simp]
-lemma ContractionC_differentiable_θ (M r θ : ℝ) (a b c : Idx)
-    (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
-  DifferentiableAt_θ (fun r θ => ContractionC M r θ a b c) r θ := by
-  -- ContractionC = ∑ e, (Γ(e,c,a)·g(e,b) + Γ(e,c,b)·g(a,e))
-  -- Dependencies: Γtot_differentiable_θ, g_differentiable_θ (proven later in file)
-  -- Will be proven after those C1 lemmas using manual 4-term expansion
-  sorry
+-- These are now MOVED to after C1 lemmas (after line 1722) to satisfy dependencies
 
 /-- The first derivative of g (wrt any coordinate) is itself differentiable in r (C2 smoothness).
     Note: This is about the partially-applied function (dCoord μ g) as a function of (r,θ). -/
@@ -1719,6 +1699,55 @@ lemma DifferentiableAt_θ_mul_of_cond (A B : ℝ → ℝ → ℝ) (r θ : ℝ) (
     exact DifferentiableAt.mul hA_diff hB_diff
   · right  -- Case 2: μ ≠ Idx.θ, trivially true
     exact h_coord
+
+-- ========== C2 Smoothness: ContractionC Differentiability ==========
+-- NOW PROVEN using manual 4-term expansion (Professor's guidance)
+
+/-- ContractionC is differentiable in r (sum of products of differentiable functions). -/
+@[simp]
+lemma ContractionC_differentiable_r (M r θ : ℝ) (a b c : Idx)
+    (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
+  DifferentiableAt_r (fun r θ => ContractionC M r θ a b c) r θ := by
+  -- ContractionC = ∑ e∈{t,r,θ,φ}, (Γ(e,c,a)·g(e,b) + Γ(e,c,b)·g(a,e))
+  -- Manual 4-term expansion, then apply DifferentiableAt.add/mul
+  unfold ContractionC DifferentiableAt_r
+  simp only [sumIdx_expand_gen]
+  -- Now: DifferentiableAt ℝ (fun r => [t-term] + [r-term] + [θ-term] + [φ-term]) r
+  -- Chain DifferentiableAt.add for 3 + operations (creates 4 goals)
+  apply DifferentiableAt.add; apply DifferentiableAt.add; apply DifferentiableAt.add
+  -- Each goal: (Γ·g + Γ·g) for index e ∈ {t,r,θ,φ}
+  all_goals {
+    apply DifferentiableAt.add
+    · apply DifferentiableAt.mul
+      · apply Γtot_differentiable_r; assumption; assumption; assumption
+      · apply g_differentiable_r; assumption; assumption; assumption
+    · apply DifferentiableAt.mul
+      · apply Γtot_differentiable_r; assumption; assumption; assumption
+      · apply g_differentiable_r; assumption; assumption; assumption
+  }
+
+/-- ContractionC is differentiable in θ. -/
+@[simp]
+lemma ContractionC_differentiable_θ (M r θ : ℝ) (a b c : Idx)
+    (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
+  DifferentiableAt_θ (fun r θ => ContractionC M r θ a b c) r θ := by
+  -- ContractionC = ∑ e∈{t,r,θ,φ}, (Γ(e,c,a)·g(e,b) + Γ(e,c,b)·g(a,e))
+  -- Manual 4-term expansion, then apply DifferentiableAt.add/mul
+  unfold ContractionC DifferentiableAt_θ
+  simp only [sumIdx_expand_gen]
+  -- Now: DifferentiableAt ℝ (fun θ => [t-term] + [r-term] + [θ-term] + [φ-term]) θ
+  -- Chain DifferentiableAt.add for 3 + operations (creates 4 goals)
+  apply DifferentiableAt.add; apply DifferentiableAt.add; apply DifferentiableAt.add
+  -- Each goal: (Γ·g + Γ·g) for index e ∈ {t,r,θ,φ}
+  all_goals {
+    apply DifferentiableAt.add
+    · apply DifferentiableAt.mul
+      · apply Γtot_differentiable_θ; assumption; assumption; assumption
+      · apply g_differentiable_θ; assumption; assumption; assumption
+    · apply DifferentiableAt.mul
+      · apply Γtot_differentiable_θ; assumption; assumption; assumption
+      · apply g_differentiable_θ; assumption; assumption; assumption
+  }
 
 /-- The LHS of the Ricci identity simplifies using commutativity of derivatives.
     The second partial derivatives of the metric cancel out. -/

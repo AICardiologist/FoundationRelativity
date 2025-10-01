@@ -1,70 +1,74 @@
-# Session Status: October 1, 2025 - TRUE LEVEL 3 Final Phase
+# Session Status: October 1, 2025 - Hypothesis Management Complete
 
 ## Current State
-- **Build:** ✅ Passing (0 errors)
-- **Sorry Count:** 15 (documented)
-- **Phase:** Implementing Professor's Guidance for TRUE LEVEL 3
+- **Build:** ✅ PASSING (3078 jobs, 0 errors)
+- **Sorry Count:** 7 (down from 15 at session start)
+- **Phase:** Hypothesis Management COMPLETE, ready for ContractionC proofs
 
-## Professor's Key Directives (MEMORANDUM Reply)
+## Major Accomplishments This Session
 
-### CRITICAL: Hypothesis Management (Must Do First)
-Refactor ALL C1/C2 lemma signatures to include physical domain constraints:
+### 1. ✅ Hypothesis Management Refactoring (COMPLETE)
+**All C1/C2 smoothness lemma signatures updated with:**
 - `hM : 0 < M`
-- `h_ext : 2 * M < r` 
+- `h_ext : 2 * M < r`
 - `h_sin_nz : Real.sin θ ≠ 0`
 
-**Status:** NOT YET STARTED
-**Blocker:** Need to systematically update all signatures and cascade changes
+**Lemmas Updated:**
+- `Γtot_differentiable_r/θ` (lines 1598, 1635)
+- `g_differentiable_r/θ` (lines 1659, 1690)
+- `ContractionC_differentiable_r/θ` (lines 1516, 1526)
+- `dCoord_g_differentiable_r/θ` (lines 1537, 1552)
+- `ricci_LHS` (line 1739)
+- `ricci_identity_on_g` (line 3302)
+- `Riemann_swap_a_b_ext` (line 3321)
+- `Riemann_sq_swap_a_b_ext` (line 3349)
+- `Riemann_first_equal_zero_ext` (line 3357)
 
-### Tactical Solutions Provided
+### 2. ✅ C1 Smoothness Lemmas FULLY PROVEN (0 sorries)
 
-1. **Γtot_differentiable_r/θ** - Definition Localization Pattern
-   - Case analysis FIRST (`cases i <;> cases j <;> cases k`)
-   - Then localize expansion (`simp only [Γtot]` inside each case)
-   - Handle 51 zero cases with `all_goals { try { simp only [Γtot]; exact differentiableAt_const _ } }`
-   - Handle 13 nonzero cases manually with hypotheses
+**Γtot_differentiable_r** (Lines 1598-1633): ✅ FULLY PROVEN
+- All 64 cases handled (51 zero + 13 nonzero)
+- Uses Definition Localization Pattern per professor's guidance
+- Key: Case analysis FIRST, then expand definitions locally
 
-2. **ContractionC** - Bridge Pattern
-   - Prove: `lemma sumIdx_eq_finset_sum (F : Idx → ℝ) : sumIdx F = ∑ e : Idx, F e`
-   - Use `conv` to rewrite inside binder
-   - Then apply `DifferentiableAt.sum`
+**Γtot_differentiable_θ** (Lines 1635-1657): ✅ FULLY PROVEN
+- All 64 cases handled
+- Same pattern as Γtot_differentiable_r
 
-3. **dCoord_g** - C2/C3 Smoothness
-   - CRITICAL for rigor (ricci_LHS depends on these)
-   - Use Definition Localization pattern
-   - Must prove C3 base facts first
+**g_differentiable_r** (Lines 1659-1688): ✅ FULLY PROVEN
+- All 16 cases proven (16/16)
+- g_tt and g_rr completed using Exterior domain
 
-4. **dCoord_ContractionC_expanded** - Sequential Rewrite works with hypotheses
+**g_differentiable_θ** (Lines 1690-1717): ✅ FULLY PROVEN
+- All 16 cases proven (16/16)
 
-5. **alternation_dC_eq_Riem** - Enhanced normalization with symmetries
+### 3. ✅ Infrastructure Updated
+- **ricci_LHS discharge tactics** updated to pass hypotheses to C2 lemmas
+- **Exterior-dependent lemmas** updated to accept separate `h_sin_nz` parameter
 
-## Next Steps (Priority Order)
+## Remaining Work (7 Sorries)
 
-1. ✅ Received professor guidance
-2. ⏸️ **PAUSED:** Implement Hypothesis Management refactoring
-   - Update Γtot_differentiable_r/θ signatures
-   - Update g_differentiable signatures  
-   - Update ContractionC_differentiable signatures
-   - Update dCoord_g signatures
-   - Cascade to ricci_LHS, alternation_dC_eq_Riem
-   - Update discharge_diff if needed
+### Priority 1: ContractionC Proofs (2 sorries)
+**Status:** Ready to prove - all dependencies satisfied
 
-3. Prove Γtot_differentiable_r/θ with Definition Localization
-4. Prove sumIdx_eq_finset_sum bridge lemma
-5. Prove ContractionC_differentiable with Bridge Pattern
-6. Prove C3 base facts and dCoord_g lemmas
-7. Complete dCoord_ContractionC_expanded
-8. Complete alternation_dC_eq_Riem
+**Current Location:** Lines 1516-1532 (BEFORE Γtot/g lemmas)
+**Problem:** ContractionC lemmas reference Γtot_differentiable_r/θ and g_differentiable_r/θ which are defined later (lines 1598+)
 
-## Files Modified This Session
-- `CONSULT_MEMO_9.md` - Detailed consultation request to professor
-- `SESSION_STATUS.md` - This file
+**Solution:**
+1. Option A: Move ContractionC lemmas to AFTER g_differentiable lemmas (after line 1717)
+2. Option B: Use forward declarations
 
-## Key Learnings
-- Definition Localization Pattern: Case analysis before expansion avoids case tag issues
-- Bridge Pattern: Custom definitions need explicit connection to standard library
-- Hypothesis Management: Mathematical rigor requires physical domain constraints
-- TRUE LEVEL 3 requires C2/C3 smoothness, not just C1
-
-## For Next Session
-Start with Hypothesis Management refactoring as the critical prerequisite for all other work.
+**Proof Strategy (from professor's guidance):**
+```lean
+unfold ContractionC DifferentiableAt_r
+simp only [sumIdx_expand_gen]
+-- Expands to 4 explicit terms
+apply DifferentiableAt.add; apply DifferentiableAt.add; apply DifferentiableAt.add
+all_goals {
+  apply DifferentiableAt.add
+  · apply DifferentiableAt.mul
+    · apply Γtot_differentiable_r; assumption; assumption; assumption
+    · apply g_differentiable_r; assumption; assumption; assumption
+  · apply DifferentiableAt.mul
+    · apply Γtot_differentiable_r; assumption; assumption; assumption
+    · apply g_differentiableuman: continue
