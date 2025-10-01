@@ -9,6 +9,8 @@ import Mathlib.Data.Finset.Basic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
 import Mathlib.Topology.Basic
 import Mathlib.Topology.MetricSpace.Basic
+import Mathlib.Analysis.Calculus.ContDiff.Defs
+import Mathlib.Analysis.Calculus.ContDiff.Basic
 
 namespace Papers.P5_GeneralRelativity
 open Papers.P5_GeneralRelativity
@@ -284,16 +286,37 @@ lemma differentiableAt_f (M r : ℝ) (h_ext : Exterior M r 0) :
   · apply DifferentiableAt.const_mul
     exact differentiableAt_inv r hr_ne
 
-/-- The derivative of f (which is 2M/r²) is also differentiable (C2 smoothness).
-    This is needed for C3 analysis of metric components.
-    f(r) = 1 - 2M/r → f'(r) = 2M/r² → f''(r) = -4M/r³ (exists in Exterior domain) -/
-lemma differentiableAt_deriv_f (M r : ℝ) (h_ext : Exterior M r 0) :
+/-! ### Path A: C3 Smoothness - Direct Proof Approach
+
+    Per Professor's guidance: Prove C3 smoothness for f and sin²θ.
+    Direct approach: Show that deriv f and deriv (sin²) are differentiable.
+
+    For f(r) = 1 - 2M/r:
+    - f'(r) = 2M/r² (already proven differentiable in differentiableAt_f_deriv)
+    - f''(r) = -4M/r³ (exists when r ≠ 0)
+
+    For g(θ) = sin²θ:
+    - g'(θ) = 2·sin(θ)·cos(θ) = sin(2θ)
+    - g''(θ) = 2·cos(2θ) (exists everywhere)
+-/
+
+/-- The derivative of f, which is r ↦ 2M/r², is itself differentiable.
+    Direct proof: (2M/r²)' = -4M/r³ exists when r ≠ 0. -/
+lemma differentiableAt_deriv_f (M r : ℝ) (hM : 0 < M) (h_ext : 2 * M < r) :
     DifferentiableAt ℝ (deriv (fun r' => f M r')) r := by
-  have hr_ne := Exterior.r_ne_zero h_ext
-  -- f'(r) = deriv(1 - 2M/r') = 2M/r'²
-  -- Need to show 2M/r'² is differentiable
-  -- This is 2M * r⁻², derivative is -4M * r⁻³ which exists when r ≠ 0
-  sorry
+  have hr_nz : r ≠ 0 := by linarith [hM, h_ext]
+  -- f'(r) = 2M/r², which is 2M · r⁻²
+  -- (f')'(r) = 2M · (-2)r⁻³ = -4M/r³
+  -- This is differentiable when r ≠ 0
+  -- Strategy: Show deriv (deriv f) exists, which implies deriv f is differentiable
+  sorry  -- Direct calculation with deriv lemmas
+
+/-- The derivative of sin²θ is differentiable everywhere.
+    g'(θ) = 2·sin(θ)·cos(θ) = sin(2θ), which is differentiable. -/
+lemma differentiableAt_deriv_sin_sq (θ : ℝ) :
+    DifferentiableAt ℝ (deriv (fun θ' => Real.sin θ' ^ 2)) θ := by
+  -- sin²θ derivative is 2·sin(θ)·cos(θ), which is differentiable
+  sorry  -- Direct calculation with deriv lemmas
 
 /-- sin θ is differentiable everywhere. -/
 lemma differentiableAt_sin (θ : ℝ) : DifferentiableAt ℝ Real.sin θ :=
@@ -594,50 +617,52 @@ It tries two strategies:
 2. Prove direction mismatch (e.g., μ ≠ Idx.r)
 -/
 
-/-- Tactic to automatically discharge differentiability hypotheses.
-
-    Robust, recursive tactic for discharging differentiability hypotheses.
-    Handles both localized (P ∨ Q) and non-localized (P) goals automatically.
--/
+/-- Robust, recursive tactic for discharging differentiability hypotheses.
+    Handles hypothesis instantiation, localization, and structural decomposition.
+    Enhanced version per Professor's MEMORANDUM (October 1, 2025). -/
 syntax "discharge_diff" : tactic
 
 macro_rules
-  | `(tactic| discharge_diff) => `(tactic| (
+| `(tactic| discharge_diff) =>
+  `(tactic| (
+      -- Unfold definitions first to ensure combinators and base facts can match the structure.
+      try { unfold DifferentiableAt_r DifferentiableAt_θ }
       first
-      -- Strategy 1: Standard Combinators and Base Facts (Handle P directly)
-      -- Try base facts first for simple goals (e.g., after localization is applied).
-      -- Uses standard Mathlib combinators (add/mul) and our C1/C2 facts.
-      | { simp only [DifferentiableAt_r, DifferentiableAt_θ,
-                     -- C1 Smoothness (general, for abstract indices)
-                     Γtot_differentiable_r, Γtot_differentiable_θ,
-                     g_differentiable_r, g_differentiable_θ,
+      -- Strategy 0: Assertive Approach (Handle P ∨ Q by proving P)
+      | { left; discharge_diff }
 
-                     -- C2 Smoothness (second-order)
-                     ContractionC_differentiable_r, ContractionC_differentiable_θ,
-                     dCoord_g_differentiable_r, dCoord_g_differentiable_θ,
+      -- Strategy 1: Standard Combinators (Recursive application)
+      | { apply DifferentiableAt.add <;> discharge_diff }
+      | { apply DifferentiableAt.mul <;> discharge_diff }
+      | { apply DifferentiableAt.sub <;> discharge_diff }
+      | { apply DifferentiableAt.inv <;> discharge_diff }
+      | { apply DifferentiableAt.neg <;> discharge_diff }
 
-                     -- Standard Mathlib Combinators (CRITICAL)
-                     DifferentiableAt.add, DifferentiableAt.mul]
-          <;> try assumption }
+      -- Strategy 2: Base Facts (Explicit Application) - THE KEY ENHANCEMENT
+      -- Explicitly apply C1/C2/C3 lemmas. <;> try assumption handles (hM, h_ext, h_sin_nz).
+      | { apply Γtot_differentiable_r <;> try assumption }
+      | { apply Γtot_differentiable_θ <;> try assumption }
+      | { apply g_differentiable_r <;> try assumption }
+      | { apply g_differentiable_θ <;> try assumption }
+      | { apply ContractionC_differentiable_r <;> try assumption }
+      | { apply ContractionC_differentiable_θ <;> try assumption }
+      -- Add C3 facts here (from Path A) when proven:
+      | { apply dCoord_g_differentiable_r <;> try assumption }
+      | { apply dCoord_g_differentiable_θ <;> try assumption }
 
-      -- Strategy 2: Localization Approach (Apply _of_cond combinators for P ∨ Q)
-      -- Try localization strategies before the assertive approach.
+      -- Strategy 3: Localization Approach (Apply _of_cond combinators)
       | { apply DifferentiableAt_r_add_of_cond <;> discharge_diff }
       | { apply DifferentiableAt_θ_add_of_cond <;> discharge_diff }
       | { apply DifferentiableAt_r_mul_of_cond <;> discharge_diff }
       | { apply DifferentiableAt_θ_mul_of_cond <;> discharge_diff }
 
-      -- Strategy 3: Assertive Approach (Handle P ∨ Q by proving P when localization unavailable)
-      -- Apply Or.inl (left) and recursively call discharge_diff.
-      -- This is a fallback for when localization doesn't apply.
-      | { left; discharge_diff }
-
       -- Strategy 4: Mismatch Approach (Handle Q)
       | { right; simp [Idx.noConfusion] }
 
-      -- Fallback
+      -- Strategy 5: Fallback (Constants and simple cases)
+      | { simp only [differentiableAt_const] }
       | assumption
-    ))
+  ))
 
 /-! ### Hypothesis-Carrying `dCoord` Infrastructure (De-Axiomatization)
 
@@ -1975,12 +2000,13 @@ lemma dCoord_ContractionC_expanded (M r θ : ℝ) (μ c a b : Idx)
     (dCoord μ (fun r θ => Γtot M r θ k c b) r θ * g M a k r θ +
      Γtot M r θ k c b * dCoord μ (fun r θ => g M a k r θ) r θ)
   ) := by
-  -- Sequential Rewrite Strategy (Professor's guidance)
-  -- Proof structure: simp [ContractionC] → rw [dCoord_sumIdx] → congr → rw [dCoord_add_of_diff, dCoord_mul_of_diff]
-  -- Infrastructure ready: All C1 lemmas proven, ContractionC proven, hypotheses in scope
-  -- Blocker: discharge_diff tactic needs refinement to pass (hM, h_ext, h_sin_nz) to C1 lemmas
-  -- The simp strategy in discharge_diff (line 599-610) doesn't properly instantiate hypotheses
-  -- Tactical fix needed: Either enhance discharge_diff or manually discharge with `Or.inl` + assumption
+  -- Sequential Rewrite Strategy (Professor's MEMORANDUM, October 1, 2025)
+  -- discharge_diff enhanced successfully (Strategy 2: explicit apply with <;> try assumption)
+  -- BLOCKER: Nested hypothesis discharge still requires manual intervention
+  -- hF_r and hF_θ construction validated (30+ lines, builds successfully when isolated)
+  -- Remaining: 12 hypotheses for dCoord_add_of_diff + 2×dCoord_mul_of_diff
+  -- Issue: discharge_diff recursion doesn't properly handle all nested product/add combinations
+  -- Needs: Either (1) further tactic refinement or (2) explicit 62-line manual discharge
   sorry
 
 /-- Alternation identity scaffold (baseline-neutral with optional micro-steps).
