@@ -344,6 +344,286 @@ lemma differentiableAt_g_φφ_θ (M r θ : ℝ) :
   · exact differentiableAt_const _
   · exact differentiableAt_sin_sq θ
 
+/-! ### Christoffel Symbol Differentiability
+
+Differentiability lemmas for all nonzero Christoffel symbol components.
+These are needed to eliminate AX_differentiable_hack from Stage-1 Riemann computations.
+
+NOTE: These lemmas are currently admitted with sorry as placeholders. The Christoffel symbols
+are explicit rational/algebraic/trigonometric functions, so differentiability is mathematically
+obvious. Full proofs can be filled in if needed, but for now we prioritize getting the
+infrastructure working.
+-/
+
+-- Γ^t_{tr} = M/(r²f(r)) - depends on r only
+lemma differentiableAt_Γ_t_tr_r (M r : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
+    DifferentiableAt ℝ (fun r' => Γ_t_tr M r') r := by
+  simp only [Γ_t_tr]
+  -- Γ_t_tr M r = M / (r^2 * f M r)
+  apply DifferentiableAt.div
+  · -- M is constant
+    exact differentiableAt_const M
+  · -- r^2 * f M r is differentiable
+    apply DifferentiableAt.mul
+    · -- r^2 is differentiable
+      exact differentiable_pow 2 |>.differentiableAt
+    · -- f M r is differentiable
+      -- f M r = 1 - 2*M/r
+      show DifferentiableAt ℝ (fun r' => f M r') r
+      unfold f
+      apply DifferentiableAt.sub
+      · exact differentiableAt_const 1
+      · apply DifferentiableAt.div
+        · exact differentiableAt_const (2 * M)
+        · exact differentiableAt_id r
+        · exact r_ne_zero_of_exterior M r hM hr
+  · -- Denominator ≠ 0: r^2 * f M r ≠ 0
+    have hr0 : r ≠ 0 := r_ne_zero_of_exterior M r hM hr
+    have hf : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr)
+    exact mul_ne_zero (pow_ne_zero 2 hr0) hf
+
+-- Γ^r_{tt} = Mf(r)/r² - depends on r only
+lemma differentiableAt_Γ_r_tt_r (M r : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
+    DifferentiableAt ℝ (fun r' => Γ_r_tt M r') r := by
+  simp only [Γ_r_tt]
+  -- Γ_r_tt M r = M * f M r / r^2
+  apply DifferentiableAt.div
+  · apply DifferentiableAt.mul
+    · exact differentiableAt_const M
+    · show DifferentiableAt ℝ (fun r' => f M r') r
+      unfold f
+      apply DifferentiableAt.sub
+      · exact differentiableAt_const 1
+      · apply DifferentiableAt.div
+        · exact differentiableAt_const (2 * M)
+        · exact differentiableAt_id r
+        · exact r_ne_zero_of_exterior M r hM hr
+  · exact differentiable_pow 2 |>.differentiableAt
+  · exact pow_ne_zero 2 (r_ne_zero_of_exterior M r hM hr)
+
+-- Γ^r_{rr} = -M/(r²f(r)) - depends on r only
+lemma differentiableAt_Γ_r_rr_r (M r : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
+    DifferentiableAt ℝ (fun r' => Γ_r_rr M r') r := by
+  simp only [Γ_r_rr, Γ_t_tr]
+  -- Γ_r_rr M r = -M / (r^2 * f M r), which is -Γ_t_tr
+  have h := differentiableAt_Γ_t_tr_r M r hM hr
+  simpa using h.const_mul (-1)
+
+-- Γ^r_{θθ} = -(r - 2M) - depends on r only
+lemma differentiableAt_Γ_r_θθ_r (M r : ℝ) :
+    DifferentiableAt ℝ (fun r' => Γ_r_θθ M r') r := by
+  simp only [Γ_r_θθ]
+  -- Γ_r_θθ M r = -(r - 2*M)
+  apply DifferentiableAt.neg
+  apply DifferentiableAt.sub
+  · exact differentiableAt_id r
+  · exact differentiableAt_const (2 * M)
+
+-- Γ^r_{φφ} = -(r - 2M)sin²θ - depends on both r and θ
+lemma differentiableAt_Γ_r_φφ_r (M r θ : ℝ) :
+    DifferentiableAt ℝ (fun r' => Γ_r_φφ M r' θ) r := by
+  simp only [Γ_r_φφ]
+  -- Γ_r_φφ M r θ = -(r - 2*M) * sin²θ
+  apply DifferentiableAt.mul
+  · apply DifferentiableAt.neg
+    apply DifferentiableAt.sub
+    · exact differentiableAt_id r
+    · exact differentiableAt_const (2 * M)
+  · exact differentiableAt_const (Real.sin θ ^ 2)
+
+lemma differentiableAt_Γ_r_φφ_θ (M r θ : ℝ) :
+    DifferentiableAt ℝ (fun θ' => Γ_r_φφ M r θ') θ := by
+  simp only [Γ_r_φφ]
+  -- Γ_r_φφ M r θ = -(r - 2*M) * sin²θ
+  apply DifferentiableAt.mul
+  · exact differentiableAt_const (-(r - 2*M))
+  · exact differentiableAt_sin_sq θ
+
+-- Γ^θ_{rθ} = 1/r - depends on r only
+lemma differentiableAt_Γ_θ_rθ_r (r : ℝ) (hr : r ≠ 0) :
+    DifferentiableAt ℝ (fun r' => Γ_θ_rθ r') r := by
+  simp only [Γ_θ_rθ]
+  -- Γ_θ_rθ r = 1/r
+  apply DifferentiableAt.div
+  · exact differentiableAt_const 1
+  · exact differentiableAt_id r
+  · exact hr
+
+-- Γ^θ_{φφ} = -cos(θ)sin(θ) - depends on θ only
+lemma differentiableAt_Γ_θ_φφ_θ (θ : ℝ) :
+    DifferentiableAt ℝ (fun θ' => Γ_θ_φφ θ') θ := by
+  simp only [Γ_θ_φφ]
+  -- Γ_θ_φφ θ = -(cos θ * sin θ)
+  have h := (differentiableAt_cos θ).mul (differentiableAt_sin θ)
+  simpa using h.const_mul (-1)
+
+-- Γ^φ_{rφ} = 1/r - depends on r only
+lemma differentiableAt_Γ_φ_rφ_r (r : ℝ) (hr : r ≠ 0) :
+    DifferentiableAt ℝ (fun r' => Γ_φ_rφ r') r := by
+  simp only [Γ_φ_rφ]
+  -- Γ_φ_rφ r = 1/r (same as Γ_θ_rθ)
+  exact differentiableAt_Γ_θ_rθ_r r hr
+
+-- Γ^φ_{θφ} = cos(θ)/sin(θ) - depends on θ only
+lemma differentiableAt_Γ_φ_θφ_θ (θ : ℝ) (hθ : Real.sin θ ≠ 0) :
+    DifferentiableAt ℝ (fun θ' => Γ_φ_θφ θ') θ := by
+  simp only [Γ_φ_θφ]
+  -- Γ_φ_θφ θ = cos θ / sin θ
+  apply DifferentiableAt.div
+  · exact differentiableAt_cos θ
+  · exact differentiableAt_sin θ
+  · exact hθ
+
+-- Now the composite Γtot differentiability lemmas
+-- These handle the case-by-case structure of Γtot
+
+lemma differentiableAt_Γtot_t_tr_r (M r θ : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
+    DifferentiableAt_r (fun r θ => Γtot M r θ Idx.t Idx.t Idx.r) r θ := by
+  simp only [DifferentiableAt_r, Γtot_t_tr]
+  exact differentiableAt_Γ_t_tr_r M r hM hr
+
+lemma differentiableAt_Γtot_r_tt_r (M r θ : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
+    DifferentiableAt_r (fun r θ => Γtot M r θ Idx.r Idx.t Idx.t) r θ := by
+  simp only [DifferentiableAt_r, Γtot_r_tt]
+  exact differentiableAt_Γ_r_tt_r M r hM hr
+
+lemma differentiableAt_Γtot_r_rr_r (M r θ : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
+    DifferentiableAt_r (fun r θ => Γtot M r θ Idx.r Idx.r Idx.r) r θ := by
+  simp only [DifferentiableAt_r, Γtot_r_rr]
+  exact differentiableAt_Γ_r_rr_r M r hM hr
+
+lemma differentiableAt_Γtot_r_θθ_r (M r θ : ℝ) :
+    DifferentiableAt_r (fun r θ => Γtot M r θ Idx.r Idx.θ Idx.θ) r θ := by
+  simp only [DifferentiableAt_r, Γtot_r_θθ]
+  exact differentiableAt_Γ_r_θθ_r M r
+
+lemma differentiableAt_Γtot_r_φφ_r (M r θ : ℝ) :
+    DifferentiableAt_r (fun r θ => Γtot M r θ Idx.r Idx.φ Idx.φ) r θ := by
+  simp only [DifferentiableAt_r, Γtot_r_φφ]
+  exact differentiableAt_Γ_r_φφ_r M r θ
+
+lemma differentiableAt_Γtot_r_φφ_θ (M r θ : ℝ) :
+    DifferentiableAt_θ (fun r θ => Γtot M r θ Idx.r Idx.φ Idx.φ) r θ := by
+  simp only [DifferentiableAt_θ, Γtot_r_φφ]
+  exact differentiableAt_Γ_r_φφ_θ M r θ
+
+lemma differentiableAt_Γtot_θ_rθ_r (M r θ : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
+    DifferentiableAt_r (fun r θ => Γtot M r θ Idx.θ Idx.r Idx.θ) r θ := by
+  simp only [DifferentiableAt_r, Γtot_θ_rθ]
+  have hr0 : r ≠ 0 := r_ne_zero_of_exterior M r hM hr
+  exact differentiableAt_Γ_θ_rθ_r r hr0
+
+lemma differentiableAt_Γtot_θ_φφ_θ (M r θ : ℝ) :
+    DifferentiableAt_θ (fun r θ => Γtot M r θ Idx.θ Idx.φ Idx.φ) r θ := by
+  simp only [DifferentiableAt_θ, Γtot_θ_φφ]
+  exact differentiableAt_Γ_θ_φφ_θ θ
+
+lemma differentiableAt_Γtot_φ_rφ_r (M r θ : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
+    DifferentiableAt_r (fun r θ => Γtot M r θ Idx.φ Idx.r Idx.φ) r θ := by
+  simp only [DifferentiableAt_r, Γtot_φ_rφ]
+  have hr0 : r ≠ 0 := r_ne_zero_of_exterior M r hM hr
+  exact differentiableAt_Γ_φ_rφ_r r hr0
+
+lemma differentiableAt_Γtot_φ_θφ_θ (M r θ : ℝ) (hθ : Real.sin θ ≠ 0) :
+    DifferentiableAt_θ (fun r θ => Γtot M r θ Idx.φ Idx.θ Idx.φ) r θ := by
+  simp only [DifferentiableAt_θ, Γtot_φ_θφ]
+  exact differentiableAt_Γ_φ_θφ_θ θ hθ
+
+/-! ### Differentiability for Γtot_nonzero (Dependent Type Version)
+
+This is the key lemma that allows us to prove differentiability for Γtot with arbitrary indices,
+by requiring a proof that the indices form a nonzero combination. The proof proceeds by case
+analysis on the NonzeroChristoffel predicate, mapping each of the 13 cases to the corresponding
+base differentiability lemma.
+-/
+
+lemma differentiableAt_Γtot_nonzero_r (M r θ : ℝ) (μ ν ρ : Idx) (h : NonzeroChristoffel μ ν ρ)
+    (hM : 0 < M) (hr : 2 * M < r) :
+    DifferentiableAt ℝ (fun r' => Γtot_nonzero M r' θ μ ν ρ h) r := by
+  cases h
+  case t_tr => exact differentiableAt_Γ_t_tr_r M r hM hr
+  case t_rt => exact differentiableAt_Γ_t_tr_r M r hM hr
+  case r_tt => exact differentiableAt_Γ_r_tt_r M r hM hr
+  case r_rr => exact differentiableAt_Γ_r_rr_r M r hM hr
+  case r_θθ => exact differentiableAt_Γ_r_θθ_r M r
+  case r_φφ => exact differentiableAt_Γ_r_φφ_r M r θ
+  case θ_rθ => exact differentiableAt_Γ_θ_rθ_r r (r_ne_zero_of_exterior M r hM hr)
+  case θ_θr => exact differentiableAt_Γ_θ_rθ_r r (r_ne_zero_of_exterior M r hM hr)
+  case θ_φφ => exact differentiableAt_const (Γ_θ_φφ θ)
+  case φ_rφ => exact differentiableAt_Γ_φ_rφ_r r (r_ne_zero_of_exterior M r hM hr)
+  case φ_φr => exact differentiableAt_Γ_φ_rφ_r r (r_ne_zero_of_exterior M r hM hr)
+  case φ_θφ => exact differentiableAt_const (Γ_φ_θφ θ)
+  case φ_φθ => exact differentiableAt_const (Γ_φ_θφ θ)
+
+lemma differentiableAt_Γtot_nonzero_θ (M r θ : ℝ) (μ ν ρ : Idx) (h : NonzeroChristoffel μ ν ρ)
+    (hθ : Real.sin θ ≠ 0) :
+    DifferentiableAt ℝ (fun θ' => Γtot_nonzero M r θ' μ ν ρ h) θ := by
+  cases h
+  case t_tr => exact differentiableAt_const (Γ_t_tr M r)
+  case t_rt => exact differentiableAt_const (Γ_t_tr M r)
+  case r_tt => exact differentiableAt_const (Γ_r_tt M r)
+  case r_rr => exact differentiableAt_const (Γ_r_rr M r)
+  case r_θθ => exact differentiableAt_const (Γ_r_θθ M r)
+  case r_φφ => exact differentiableAt_Γ_r_φφ_θ M r θ
+  case θ_rθ => exact differentiableAt_const (Γ_θ_rθ r)
+  case θ_θr => exact differentiableAt_const (Γ_θ_rθ r)
+  case θ_φφ => exact differentiableAt_Γ_θ_φφ_θ θ
+  case φ_rφ => exact differentiableAt_const (Γ_φ_rφ r)
+  case φ_φr => exact differentiableAt_const (Γ_φ_rφ r)
+  case φ_θφ => exact differentiableAt_Γ_φ_θφ_θ θ hθ
+  case φ_φθ => exact differentiableAt_Γ_φ_θφ_θ θ hθ
+
+/-! ### Automated Tactic for Differentiability Hypothesis Discharge
+
+This tactic automatically discharges differentiability hypotheses for the `_of_diff` lemmas.
+It tries two strategies:
+1. Prove differentiability using concrete lemmas and combinators
+2. Prove direction mismatch (e.g., μ ≠ Idx.r)
+-/
+
+/-- Tactic to automatically discharge differentiability hypotheses.
+
+    Usage: `all_goals { discharge_diff }`
+
+    Tries two strategies:
+    1. Prove differentiability using concrete lemmas and combinators
+    2. Prove direction mismatch (e.g., μ ≠ Idx.r)
+-/
+syntax "discharge_diff" : tactic
+
+macro_rules
+  | `(tactic| discharge_diff) => `(tactic| (
+      first
+      | -- Strategy 1: Prove differentiability
+        simp only [DifferentiableAt_r, DifferentiableAt_θ,
+                   -- Metric components
+                   differentiableAt_g_tt_r, differentiableAt_g_rr_r,
+                   differentiableAt_g_θθ_r, differentiableAt_g_φφ_r,
+                   differentiableAt_g_φφ_θ,
+                   -- Christoffel symbol components
+                   differentiableAt_Γtot_t_tr_r, differentiableAt_Γtot_r_tt_r,
+                   differentiableAt_Γtot_r_rr_r, differentiableAt_Γtot_r_θθ_r,
+                   differentiableAt_Γtot_r_φφ_r, differentiableAt_Γtot_r_φφ_θ,
+                   differentiableAt_Γtot_θ_rθ_r, differentiableAt_Γtot_θ_φφ_θ,
+                   differentiableAt_Γtot_φ_rφ_r, differentiableAt_Γtot_φ_θφ_θ,
+                   -- Differentiability combinators
+                   DifferentiableAt.add, DifferentiableAt.sub,
+                   DifferentiableAt.mul, DifferentiableAt.div,
+                   DifferentiableAt.comp, DifferentiableAt.const_mul,
+                   DifferentiableAt.neg, DifferentiableAt.inv,
+                   DifferentiableAt.pow,
+                   -- Standard functions
+                   differentiableAt_sin, differentiableAt_cos,
+                   differentiableAt_sin_sq,
+                   differentiableAt_const, differentiableAt_id,
+                   differentiableAt_pow, differentiableAt_inv,
+                   differentiableAt_f]
+        <;> try assumption
+      | -- Strategy 2: Prove direction mismatch
+        simp only [Idx.t, Idx.r, Idx.θ, Idx.φ]
+        <;> decide
+    ))
+
 /-! ### Hypothesis-Carrying `dCoord` Infrastructure (De-Axiomatization)
 
 The following lemmas provide rigorous versions of dCoord linearity rules with explicit
@@ -425,12 +705,9 @@ lemma dCoord_mul_of_diff (μ : Idx) (f g : ℝ → ℝ → ℝ) (r θ : ℝ)
   cases μ
   case t => simp [dCoord]
   case r =>
-    -- Unfold dCoord explicitly first
     simp only [dCoord]
-    -- Prepare the hypotheses using AX_differentiable_hack
     have hf := AX_differentiable_hack (fun r' => f r' θ) r
     have hg := AX_differentiable_hack (fun r' => g r' θ) r
-    -- The goal now exactly matches the statement of deriv_sub
     exact deriv_sub hf hg
   case θ =>
     simp only [dCoord]
@@ -457,15 +734,6 @@ lemma dCoord_mul_of_diff (μ : Idx) (f g : ℝ → ℝ → ℝ) (r θ : ℝ)
     exact deriv_add hf hg
   case φ => simp [dCoord]
 
-/-
-/-- Linearity of `dCoord` across 4 terms. -/
-lemma dCoord_add4 (μ : Idx) (A B C D : ℝ → ℝ → ℝ) (r θ : ℝ) :
-  dCoord μ (fun r θ => A r θ + B r θ + C r θ + D r θ) r θ
-  = dCoord μ A r θ + dCoord μ B r θ + dCoord μ C r θ + dCoord μ D r θ := by
-  simp only [dCoord_add]
-  ring
--/
-
 /-! #### Calculus infrastructure for dCoord -/
 
 /-- Product rule (Leibniz rule) for `dCoord`. -/
@@ -486,35 +754,13 @@ lemma dCoord_add4 (μ : Idx) (A B C D : ℝ → ℝ → ℝ) (r θ : ℝ) :
     exact deriv_mul hf hg
   case φ => simp [dCoord]
 
-/-- Push `dCoord` across a 4-term sum via two applications of `dCoord_add`. -/
+/-- Push `dCoord` across a 4-term sum via dCoord_add. -/
 lemma dCoord_add4 (μ : Idx)
   (A B C D : ℝ → ℝ → ℝ) (r θ : ℝ) :
   dCoord μ (fun r θ => A r θ + B r θ + C r θ + D r θ) r θ
   =
   dCoord μ A r θ + dCoord μ B r θ + dCoord μ C r θ + dCoord μ D r θ := by
-  -- First group as (A+B) + (C+D)
-  have h1 :
-    dCoord μ
-      (fun r θ => (A r θ + B r θ) + (C r θ + D r θ)) r θ
-    =
-    dCoord μ (fun r θ => A r θ + B r θ) r θ
-    + dCoord μ (fun r θ => C r θ + D r θ) r θ := by
-    simpa [add_comm, add_left_comm, add_assoc] using
-      dCoord_add μ (fun r θ => A r θ + B r θ) (fun r θ => C r θ + D r θ) r θ
-  have hAB : dCoord μ (fun r θ => A r θ + B r θ) r θ
-             = dCoord μ A r θ + dCoord μ B r θ := by
-    simpa using dCoord_add μ A B r θ
-  have hCD : dCoord μ (fun r θ => C r θ + D r θ) r θ
-             = dCoord μ C r θ + dCoord μ D r θ := by
-    simpa using dCoord_add μ C D r θ
-  have h2 :
-    dCoord μ (fun r θ => A r θ + B r θ) r θ
-    + dCoord μ (fun r θ => C r θ + D r θ) r θ
-    =
-    (dCoord μ A r θ + dCoord μ B r θ)
-    + (dCoord μ C r θ + dCoord μ D r θ) := by
-    congr 1 <;> assumption
-  simpa [add_comm, add_left_comm, add_assoc] using h1.trans h2
+  rw [dCoord_add, dCoord_add, dCoord_add]
 
 /-- `dCoord_add4` specialized to a fully flattened 4-term sum. -/
 lemma dCoord_add4_flat (μ : Idx)
@@ -574,9 +820,6 @@ lemma dCoord_sumIdx_via_local_expand
   sumIdx (fun i => dCoord μ (fun r θ => F i r θ) r θ) := by
   -- Expand sumIdx on both sides and apply dCoord_add repeatedly
   simp only [sumIdx_expand]
-  -- LHS: dCoord μ (fun r θ => F t r θ + F r r θ + F θ r θ + F φ r θ) r θ
-  -- RHS: dCoord μ (F t) r θ + dCoord μ (F r) r θ + dCoord μ (F θ) r θ + dCoord μ (F φ) r θ
-  -- Apply dCoord_add three times to distribute dCoord over the sum
   rw [dCoord_add, dCoord_add, dCoord_add]
 
 /-
@@ -1272,7 +1515,7 @@ lemma ricci_LHS (M r θ : ℝ) (a b c d : Idx) :
     | θ =>
       cases d with
       | t => simp [dCoord_t, dCoord_θ, deriv_const]           -- ∂θ∘∂t vs ∂t∘∂θ
-      | r => rw [dCoord_r_θ_commute_for_g M r θ a b]          -- ∂θ∘∂r vs ∂r∘∂θ (symmetric)
+      | r => exact (dCoord_r_θ_commute_for_g M r θ a b).symm  -- ∂θ∘∂r vs ∂r∘∂θ (symmetric)
       | θ => rfl                                              -- ∂θ∘∂θ (trivial)
       | φ => simp [dCoord_φ, dCoord_θ, deriv_const]           -- ∂θ∘∂φ vs ∂φ∘∂θ
     | φ =>
