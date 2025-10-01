@@ -1567,15 +1567,59 @@ lemma Γtot_differentiable_θ (M r θ : ℝ) (i j k : Idx) :
 @[simp]
 lemma g_differentiable_r (M r θ : ℝ) (i j : Idx) :
   DifferentiableAt_r (fun r θ => g M i j r θ) r θ := by
-  -- TODO: Case analysis on i, j; apply concrete differentiability lemmas
-  sorry
+  -- Case analysis on metric components (g is diagonal)
+  cases i <;> cases j
+  · -- g_tt: -f(r) requires Exterior for differentiability of f
+    simp only [DifferentiableAt_r, g]
+    sorry
+  · -- Off-diagonal: 0 is trivially differentiable
+    simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
+  · -- g_rr: 1/f(r) requires Exterior for differentiability of f
+    simp only [DifferentiableAt_r, g]
+    sorry
+  · simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
+  · -- g_θθ: r² is differentiable everywhere
+    exact differentiableAt_g_θθ_r M r θ
+  · simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
+  · -- g_φφ: r²sin²θ is differentiable in r everywhere
+    exact differentiableAt_g_φφ_r M r θ
 
 /-- Metric tensor components are differentiable in θ (general lemma for abstract indices). -/
 @[simp]
 lemma g_differentiable_θ (M r θ : ℝ) (i j : Idx) :
   DifferentiableAt_θ (fun r θ => g M i j r θ) r θ := by
-  -- TODO: Case analysis on i, j; apply concrete differentiability lemmas
-  sorry
+  -- Case analysis on metric components (g is diagonal)
+  cases i <;> cases j
+  · -- g_tt: -f(r) doesn't depend on θ
+    simp only [DifferentiableAt_θ, g]; exact differentiableAt_const _
+  · -- Off-diagonal: 0 is trivially differentiable
+    simp only [DifferentiableAt_θ, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_θ, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_θ, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_θ, g]; exact differentiableAt_const _
+  · -- g_rr: 1/f(r) doesn't depend on θ
+    simp only [DifferentiableAt_θ, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_θ, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_θ, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_θ, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_θ, g]; exact differentiableAt_const _
+  · -- g_θθ: r² doesn't depend on θ
+    simp only [DifferentiableAt_θ, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_θ, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_θ, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_θ, g]; exact differentiableAt_const _
+  · simp only [DifferentiableAt_θ, g]; exact differentiableAt_const _
+  · -- g_φφ: r²sin²θ is differentiable in θ everywhere
+    exact differentiableAt_g_φφ_θ M r θ
 
 -- ========== Product Condition Localization (Phase 3.2a) ==========
 -- Multiplicative analogue of additive Condition Localization from Priority 2
