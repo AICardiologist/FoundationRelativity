@@ -318,20 +318,19 @@ lemma contDiffAt_sin_sq (θ : ℝ) :
 /-- The derivative of f is differentiable (C3 smoothness via specialization pattern). -/
 lemma differentiableAt_deriv_f (M r : ℝ) (hM : 0 < M) (h_ext : 2 * M < r) :
     DifferentiableAt ℝ (deriv (fun r' => f M r')) r := by
-  have hr_nz : r ≠ 0 := by linarith [hM, h_ext]
-  -- f is C^∞ implies f' is C^∞ implies f' is differentiable
-  have h_C_inf := contDiffAt_f M r hr_nz
-  -- ContDiffAt ⊤ f means all derivatives exist and are continuous
-  -- In particular, f is twice differentiable, so f' is differentiable
-  sorry  -- Requires specific ContDiffAt.deriv lemma we don't have the right form for
+  -- Mathematical fact: f(r) = 1-2M/r is C^∞ for r ≠ 0
+  -- Therefore f'(r) = 2M/r² is also C^∞ for r ≠ 0
+  -- And f''(r) = -4M/r³ exists for r ≠ 0
+  -- This requires mathlib lemmas for differentiability of derivatives of ContDiffAt functions
+  sorry  -- TODO: Use ContDiffAt infrastructure to extract that deriv f is differentiable
 
 /-- The derivative of sin²θ is differentiable (C3 smoothness via specialization pattern). -/
 lemma differentiableAt_deriv_sin_sq (θ : ℝ) :
     DifferentiableAt ℝ (deriv (fun θ' => Real.sin θ' ^ 2)) θ := by
-  have h_C_inf := contDiffAt_sin_sq θ
-  -- ContDiffAt ⊤ (sin²θ) means all derivatives exist
-  -- In particular, sin²θ is twice differentiable, so (sin²θ)' is differentiable
-  sorry  -- Requires specific ContDiffAt.deriv lemma
+  -- sin²θ is C^∞ (contDiffAt_sin_sq), so all derivatives exist and are continuous
+  -- In particular, (sin²θ)' = 2sinθcosθ = sin(2θ) is differentiable
+  -- This requires mathlib lemmas for differentiability of derivatives
+  sorry  -- TODO: Use ContDiffAt infrastructure to extract that deriv (sin²) is differentiable
 
 /-- sin θ is differentiable everywhere. -/
 lemma differentiableAt_sin (θ : ℝ) : DifferentiableAt ℝ Real.sin θ :=
@@ -1569,14 +1568,9 @@ lemma dCoord_r_θ_commute_for_g (M r θ : ℝ) (a b : Idx) :
 lemma dCoord_g_differentiable_r (M r θ : ℝ) (μ a b : Idx)
     (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
   DifferentiableAt_r (dCoord μ (fun r θ => g M a b r θ)) r θ := by
-  -- Proof strategy: Case analysis on μ and (a,b) - most cases trivial
-  -- - μ=t or φ: dCoord gives 0 (constant, trivial)
-  -- - μ=θ: dCoord_θ g is constant in r (trivial)
-  -- - μ=r, off-diagonal: ∂_r(0) = 0 (trivial)
-  -- - μ=r, g_θθ: ∂_r(r²) = 2r, then ∂_r(2r) = 2 (constant, trivial)
-  -- - μ=r, g_φφ: ∂_r(r²sin²θ) = 2r·sin²θ, then ∂_r(...) constant in r (trivial)
-  -- Blocked: μ=r, g_tt/g_rr need C3 smoothness of f(r) = 1-2M/r
-  sorry
+  -- Most cases are trivial (constants or simple polynomials)
+  -- Only μ=r with g_tt/g_rr requires C3 smoothness of f
+  sorry  -- TODO: Complete after differentiableAt_deriv_f is proven
 
 /-- The first derivative of g (wrt any coordinate) is itself differentiable in θ (C2 smoothness).
     Note: This is about the partially-applied function (dCoord μ g) as a function of (r,θ). -/
@@ -1584,13 +1578,9 @@ lemma dCoord_g_differentiable_r (M r θ : ℝ) (μ a b : Idx)
 lemma dCoord_g_differentiable_θ (M r θ : ℝ) (μ a b : Idx)
     (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
   DifferentiableAt_θ (dCoord μ (fun r θ => g M a b r θ)) r θ := by
-  -- Proof strategy: Case analysis on μ and (a,b) - most cases trivial
-  -- - μ=t or φ: dCoord gives 0 (constant, trivial)
-  -- - μ=r: ∂_r g is constant in θ (trivial)
-  -- - μ=θ, non-φφ: All components constant in θ (trivial)
-  -- Blocked: μ=θ, g_φφ needs C3 smoothness lemma for sin²θ
-  --   g_φφ = r²sin²θ → ∂_θ(r²·2sinθcosθ) = r²·2(cos²θ-sin²θ) → ∂_θ(...) needs analysis
-  sorry
+  -- Most cases are trivial (constants)
+  -- Only μ=θ with g_φφ requires C3 smoothness of sin²θ
+  sorry  -- TODO: Complete after differentiableAt_deriv_sin_sq is proven
 
 -- ========== C1 Smoothness Lemmas (Γtot Differentiability) ==========
 -- Required for alternation_dC_eq_Riem proof (Phase 3.2a per professor's guidance)
@@ -2016,13 +2006,11 @@ lemma dCoord_ContractionC_expanded (M r θ : ℝ) (μ c a b : Idx)
     (dCoord μ (fun r θ => Γtot M r θ k c b) r θ * g M a k r θ +
      Γtot M r θ k c b * dCoord μ (fun r θ => g M a k r θ) r θ)
   ) := by
-  -- Professor's Final MEMORANDUM guidance attempted
-  -- BLOCKER: Both refined discharge_diff and explicit approaches hit mathlib limitations
-  -- - Refined tactic has recursion/ordering issues in nested contexts
-  -- - Explicit simp [dCoord_add_of_diff, dCoord_mul_of_diff] requires hypotheses that can't be auto-discharged
-  -- - Manual construction validated (hF_r/hF_θ work), but product rule expansions need 12+ explicit discharges
-  -- Requires either: (1) Working discharge_diff recursion fix, or (2) Complete 62-line manual proof
-  sorry
+  -- Strategy: Distribute dCoord through sum and products
+  -- Blocked: Requires dCoord_g_differentiable_r/θ to be fully proven (currently sorry)
+  -- Those lemmas need differentiableAt_deriv_f and differentiableAt_deriv_sin_sq
+  -- which in turn need the correct mathlib lemmas for ContDiffAt → differentiability of derivatives
+  sorry  -- TODO: Complete after C3 lemmas are proven
 
 /-- Alternation identity scaffold (baseline-neutral with optional micro-steps).
     We expand the contracted object and push `dCoord` through the finite sum,
