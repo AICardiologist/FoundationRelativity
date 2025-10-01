@@ -596,8 +596,9 @@ syntax "discharge_diff" : tactic
 macro_rules
   | `(tactic| discharge_diff) => `(tactic| (
       first
-      | -- Strategy 1: Prove differentiability
-        simp only [DifferentiableAt_r, DifferentiableAt_θ,
+      | -- Strategy 1: Prove differentiability (handle disjunctive goals)
+        (try apply Or.inl)
+        <;> simp only [DifferentiableAt_r, DifferentiableAt_θ,
                    -- Metric components
                    differentiableAt_g_tt_r, differentiableAt_g_rr_r,
                    differentiableAt_g_θθ_r, differentiableAt_g_φφ_r,
@@ -608,6 +609,9 @@ macro_rules
                    differentiableAt_Γtot_r_φφ_r, differentiableAt_Γtot_r_φφ_θ,
                    differentiableAt_Γtot_θ_rθ_r, differentiableAt_Γtot_θ_φφ_θ,
                    differentiableAt_Γtot_φ_rφ_r, differentiableAt_Γtot_φ_θφ_θ,
+                   -- C2 smoothness (second-order differentiability)
+                   ContractionC_differentiable_r, ContractionC_differentiable_θ,
+                   dCoord_g_differentiable_r, dCoord_g_differentiable_θ,
                    -- Differentiability combinators
                    DifferentiableAt.add, DifferentiableAt.sub,
                    DifferentiableAt.mul, DifferentiableAt.div,
@@ -621,8 +625,9 @@ macro_rules
                    differentiableAt_pow, differentiableAt_inv,
                    differentiableAt_f]
         <;> try assumption
-      | -- Strategy 2: Prove direction mismatch
-        simp only [Idx.t, Idx.r, Idx.θ, Idx.φ]
+      | -- Strategy 2: Prove direction mismatch (handle disjunctive goals)
+        apply Or.inr
+        <;> simp only [Idx.t, Idx.r, Idx.θ, Idx.φ]
         <;> decide
     ))
 
@@ -1506,6 +1511,42 @@ lemma dCoord_r_θ_commute_for_g (M r θ : ℝ) (a b : Idx) :
     try { ring }
   }
 
+-- ========== C2 Smoothness Lemmas (Second-Order Differentiability) ==========
+-- Required for ricci_LHS proof (Contingency Plan per Phase 3.1 guidance)
+
+/-- ContractionC is differentiable in r (sum of products of differentiable functions). -/
+@[simp]
+lemma ContractionC_differentiable_r (M r θ : ℝ) (a b c : Idx) :
+  DifferentiableAt_r (fun r θ => ContractionC M r θ a b c) r θ := by
+  -- TODO: Prove using DifferentiableAt.sum, DifferentiableAt.mul,
+  -- Γ_differentiable_r, g_differentiable_r
+  sorry
+
+/-- ContractionC is differentiable in θ. -/
+@[simp]
+lemma ContractionC_differentiable_θ (M r θ : ℝ) (a b c : Idx) :
+  DifferentiableAt_θ (fun r θ => ContractionC M r θ a b c) r θ := by
+  -- TODO: Prove using DifferentiableAt.sum, DifferentiableAt.mul,
+  -- Γ_differentiable_θ, g_differentiable_θ
+  sorry
+
+/-- The first derivative of g (wrt any coordinate) is itself differentiable in r (C2 smoothness).
+    Note: This is about the partially-applied function (dCoord μ g) as a function of (r,θ). -/
+@[simp]
+lemma dCoord_g_differentiable_r (M r θ : ℝ) (μ a b : Idx) :
+  DifferentiableAt_r (dCoord μ (fun r θ => g M a b r θ)) r θ := by
+  -- TODO: Case analysis on μ, a, b; apply differentiation rules for concrete functions
+  -- (derivatives of 1-2M/r, r^2, sin^2θ)
+  sorry
+
+/-- The first derivative of g (wrt any coordinate) is itself differentiable in θ (C2 smoothness).
+    Note: This is about the partially-applied function (dCoord μ g) as a function of (r,θ). -/
+@[simp]
+lemma dCoord_g_differentiable_θ (M r θ : ℝ) (μ a b : Idx) :
+  DifferentiableAt_θ (dCoord μ (fun r θ => g M a b r θ)) r θ := by
+  -- TODO: Case analysis on μ, a, b; apply differentiation rules for concrete functions
+  sorry
+
 /-- The LHS of the Ricci identity simplifies using commutativity of derivatives.
     The second partial derivatives of the metric cancel out. -/
 lemma ricci_LHS (M r θ : ℝ) (a b c d : Idx) :
@@ -1513,10 +1554,23 @@ lemma ricci_LHS (M r θ : ℝ) (a b c d : Idx) :
   - dCoord d (fun r θ => nabla_g M r θ c a b) r θ )
   = - ( dCoord c (fun r θ => ContractionC M r θ d a b) r θ
         - dCoord d (fun r θ => ContractionC M r θ c a b) r θ ) := by
-  -- Expand definition and apply Clairaut's theorem for second derivatives
+  -- 1. Expand definition
   simp only [nabla_g_eq_dCoord_sub_C]
 
-  -- Prove commutativity of mixed partials (Clairaut's theorem)
+  -- 2. Force Linearization (distribute dCoord over subtraction)
+  -- This generates differentiability subgoals which we'll discharge next
+  repeat (rw [dCoord_sub_of_diff])
+
+  -- 3. Discharge Differentiability Preconditions (8 hypotheses + 1 main goal = 9 total)
+  -- Use manual discharge since discharge_diff isn't matching C2 lemmas
+  all_goals (try (first
+    | apply Or.inl; apply dCoord_g_differentiable_r
+    | apply Or.inl; apply dCoord_g_differentiable_θ
+    | apply Or.inl; apply ContractionC_differentiable_r
+    | apply Or.inl; apply ContractionC_differentiable_θ
+  ))
+
+  -- 4. Apply Commutativity (Clairaut's theorem)
   have h_commute :
       dCoord c (fun r θ => dCoord d (fun r θ => g M a b r θ) r θ) r θ
     = dCoord d (fun r θ => dCoord c (fun r θ => g M a b r θ) r θ) r θ := by
@@ -1547,11 +1601,11 @@ lemma ricci_LHS (M r θ : ℝ) (a b c d : Idx) :
       | θ => simp [dCoord_φ, dCoord_θ, deriv_const]
       | φ => simp [dCoord_φ]
 
-  -- Apply commutativity and normalize
-  -- TODO: h_commute pattern doesn't match after nabla_g expansion.
-  -- Needs conv-based targeting or different proof structure.
-  -- Deferring to professor for specific tactical guidance on this lemma.
-  sorry
+  -- Apply commutativity
+  rw [h_commute]
+
+  -- 5. Normalize
+  ring
 
 /-
 -- Activation switch (names only; keeps statements unchanged)
