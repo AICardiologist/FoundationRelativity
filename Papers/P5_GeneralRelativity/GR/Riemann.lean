@@ -284,6 +284,17 @@ lemma differentiableAt_f (M r : ℝ) (h_ext : Exterior M r 0) :
   · apply DifferentiableAt.const_mul
     exact differentiableAt_inv r hr_ne
 
+/-- The derivative of f (which is 2M/r²) is also differentiable (C2 smoothness).
+    This is needed for C3 analysis of metric components.
+    f(r) = 1 - 2M/r → f'(r) = 2M/r² → f''(r) = -4M/r³ (exists in Exterior domain) -/
+lemma differentiableAt_deriv_f (M r : ℝ) (h_ext : Exterior M r 0) :
+    DifferentiableAt ℝ (deriv (fun r' => f M r')) r := by
+  have hr_ne := Exterior.r_ne_zero h_ext
+  -- f'(r) = deriv(1 - 2M/r') = 2M/r'²
+  -- Need to show 2M/r'² is differentiable
+  -- This is 2M * r⁻², derivative is -4M * r⁻³ which exists when r ≠ 0
+  sorry
+
 /-- sin θ is differentiable everywhere. -/
 lemma differentiableAt_sin (θ : ℝ) : DifferentiableAt ℝ Real.sin θ :=
   Real.differentiableAt_sin
