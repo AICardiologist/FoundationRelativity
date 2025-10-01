@@ -1567,16 +1567,32 @@ lemma dCoord_g_differentiable_θ (M r θ : ℝ) (μ a b : Idx) :
 @[simp]
 lemma Γtot_differentiable_r (M r θ : ℝ) (i j k : Idx) :
   DifferentiableAt_r (fun r θ => Γtot M r θ i j k) r θ := by
-  -- TODO: Prove using DifferentiableAt.sum, DifferentiableAt.mul,
-  -- and differentiability of metric inverse and metric derivatives
+  -- Strategy: Case analysis on (i,j,k) - 13 nonzero cases from Γtot definition
+  -- Proof approach for each nonzero case:
+  -- - Γ_t_tr = M/(r²·f): Needs differentiability of 1/f (blocked on Exterior)
+  -- - Γ_r_tt = M·f/r²: Needs differentiability of f (blocked on Exterior)
+  -- - Γ_r_rr = -M/(r²·f): Similar to Γ_t_tr
+  -- - Γ_r_θθ = -(r-2M): Polynomial, trivially differentiable
+  -- - Γ_r_φφ = -(r-2M)·sin²θ: Differentiable in r (sin²θ constant wrt r)
+  -- - Γ_θ_rθ = 1/r: Rational function, differentiable for r≠0
+  -- - Γ_φ_rφ = 1/r: Same as Γ_θ_rθ
+  -- - Γ_θ_φφ = -sinθ·cosθ: Constant in r (only depends on θ)
+  -- - Γ_φ_θφ = cotθ: Constant in r (only depends on θ)
+  -- Zero cases: All other (i,j,k) combinations give 0 (trivially differentiable)
   sorry
 
 /-- Christoffel symbols are differentiable in θ. -/
 @[simp]
 lemma Γtot_differentiable_θ (M r θ : ℝ) (i j k : Idx) :
   DifferentiableAt_θ (fun r θ => Γtot M r θ i j k) r θ := by
-  -- TODO: Prove using DifferentiableAt.sum, DifferentiableAt.mul,
-  -- and differentiability of metric inverse and metric derivatives
+  -- Strategy: Case analysis on (i,j,k) - 13 nonzero cases from Γtot definition
+  -- Proof approach for each nonzero case:
+  -- - Γ_t_tr, Γ_r_tt, Γ_r_rr, Γ_r_θθ: Constant in θ (only depend on r,M)
+  -- - Γ_θ_rθ, Γ_φ_rφ: Constant in θ (only depend on r)
+  -- - Γ_r_φφ = -(r-2M)·sin²θ: Differentiable (polynomial in sinθ)
+  -- - Γ_θ_φφ = -sinθ·cosθ: Differentiable (standard trig)
+  -- - Γ_φ_θφ = cotθ: Differentiable for θ ∉ {0,π} (standard trig)
+  -- Zero cases: All other combinations give 0 (trivially differentiable)
   sorry
 
 /-- Metric tensor components are differentiable in r (general lemma for abstract indices). -/
