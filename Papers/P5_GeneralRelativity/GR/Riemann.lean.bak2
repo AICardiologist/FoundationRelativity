@@ -1513,10 +1513,11 @@ lemma ricci_LHS (M r θ : ℝ) (a b c d : Idx) :
   - dCoord d (fun r θ => nabla_g M r θ c a b) r θ )
   = - ( dCoord c (fun r θ => ContractionC M r θ d a b) r θ
         - dCoord d (fun r θ => ContractionC M r θ c a b) r θ ) := by
-  -- Expand definition and apply Clairaut's theorem for second derivatives
+  -- Apply the definition of nabla_g and use linearity of dCoord
+  -- Note: dCoord_sub removed - simp uses @[simp] dCoord_sub_of_diff automatically
   simp only [nabla_g_eq_dCoord_sub_C]
-
-  -- Prove commutativity of mixed partials (Clairaut's theorem)
+  -- Local Clairaut step: explicit handling for trivial branches,
+  -- delegate to dCoord_commute for the genuinely mixed (r/θ) cases
   have h_commute :
       dCoord c (fun r θ => dCoord d (fun r θ => g M a b r θ) r θ) r θ
     = dCoord d (fun r θ => dCoord c (fun r θ => g M a b r θ) r θ) r θ := by
@@ -1524,33 +1525,30 @@ lemma ricci_LHS (M r θ : ℝ) (a b c d : Idx) :
     cases c with
     | t =>
       cases d with
-      | t => simp [dCoord_t]
-      | r => simp [dCoord_t, dCoord_r, deriv_const]
-      | θ => simp [dCoord_t, dCoord_θ, deriv_const]
-      | φ => simp [dCoord_t, dCoord_φ]
+      | t => simp [dCoord_t]                                  -- ∂t∘∂t
+      | r => simp [dCoord_t, dCoord_r, deriv_const]           -- ∂r∘∂t vs ∂t∘∂r
+      | θ => simp [dCoord_t, dCoord_θ, deriv_const]           -- ∂θ∘∂t vs ∂t∘∂θ
+      | φ => simp [dCoord_t, dCoord_φ]                        -- ∂φ∘∂t vs ∂t∘∂φ
     | r =>
       cases d with
-      | t => simp [dCoord_t, dCoord_r, deriv_const]
-      | r => rfl
-      | θ => exact dCoord_r_θ_commute_for_g M r θ a b
-      | φ => simp [dCoord_φ, dCoord_r, deriv_const]
+      | t => simp [dCoord_t, dCoord_r, deriv_const]           -- ∂r∘∂t vs ∂t∘∂r
+      | r => rfl                                              -- ∂r∘∂r (trivial)
+      | θ => exact dCoord_r_θ_commute_for_g M r θ a b         -- ∂r∘∂θ vs ∂θ∘∂r
+      | φ => simp [dCoord_φ, dCoord_r, deriv_const]           -- ∂r∘∂φ vs ∂φ∘∂r
     | θ =>
       cases d with
-      | t => simp [dCoord_t, dCoord_θ, deriv_const]
-      | r => exact (dCoord_r_θ_commute_for_g M r θ a b).symm
-      | θ => rfl
-      | φ => simp [dCoord_φ, dCoord_θ, deriv_const]
+      | t => simp [dCoord_t, dCoord_θ, deriv_const]           -- ∂θ∘∂t vs ∂t∘∂θ
+      | r => exact (dCoord_r_θ_commute_for_g M r θ a b).symm  -- ∂θ∘∂r vs ∂r∘∂θ (symmetric)
+      | θ => rfl                                              -- ∂θ∘∂θ (trivial)
+      | φ => simp [dCoord_φ, dCoord_θ, deriv_const]           -- ∂θ∘∂φ vs ∂φ∘∂θ
     | φ =>
       cases d with
-      | t => simp [dCoord_φ, dCoord_t]
-      | r => simp [dCoord_φ, dCoord_r, deriv_const]
-      | θ => simp [dCoord_φ, dCoord_θ, deriv_const]
-      | φ => simp [dCoord_φ]
-
-  -- Apply commutativity and normalize
-  -- TODO: h_commute pattern doesn't match after nabla_g expansion.
-  -- Needs conv-based targeting or different proof structure.
-  -- Deferring to professor for specific tactical guidance on this lemma.
+      | t => simp [dCoord_φ, dCoord_t]                        -- ∂φ∘∂t vs ∂t∘∂φ
+      | r => simp [dCoord_φ, dCoord_r, deriv_const]           -- ∂φ∘∂r vs ∂r∘∂φ
+      | θ => simp [dCoord_φ, dCoord_θ, deriv_const]           -- ∂φ∘∂θ vs ∂θ∘∂φ
+      | φ => simp [dCoord_φ]                                  -- ∂φ∘∂φ
+  -- Rearrange terms; the second derivatives cancel due to commutativity
+  -- TODO: ring_nf changed goal structure; h_commute no longer matches. Fix when activating.
   sorry
 
 /-
@@ -1582,6 +1580,248 @@ local abbrev RiemannUp := DraftRiemann.RiemannUp
 -- 3. Optional: sumIdx_expand (for split proofs)
 -- Currently blocked on: (1)
 -- Status: baseline 51, all infrastructure commented and ready
+-/
+
+/-
+  [[STAGE1-READY]] Top-level, baseline-neutral Stage-1 LHS facts (first family).
+  These lemmas are validated independently of the main alternation proof and do not
+  increase the unsolved-goal count (they introduce no `sorry`).
+
+  When ready to activate, these can be referenced as:
+    have Hc := Stage1LHS.Hc_one M r θ a b c d    -- First family, c-branch
+    have Hd := Stage1LHS.Hd_one M r θ a b c d    -- First family, d-branch
+    have Hc2 := Stage1LHS.Hc2_one M r θ a b c d  -- Second family, c-branch
+    have Hd2 := Stage1LHS.Hd2_one M r θ a b c d  -- Second family, d-branch
+-/
+
+/-
+namespace Stage1LHS
+
+section FirstFamily
+  -- Keep the facts fully parametric to avoid depending on any ambient context.
+  variable (M r θ : ℝ) (a b c d : Idx)
+
+  /- Four first-family summands on the c-branch -/
+  private def Pt (M : ℝ) (a b d : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.t d a) * (g M Idx.t b r θ)
+  private def Pr (M : ℝ) (a b d : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.r d a) * (g M Idx.r b r θ)
+  private def Pθ (M : ℝ) (a b d : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.θ d a) * (g M Idx.θ b r θ)
+  private def Pφ (M : ℝ) (a b d : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.φ d a) * (g M Idx.φ b r θ)
+
+  /-- Stage-1 fact: LHS c-branch, first family (expand only the e = t summand). -/
+  lemma Hc_one :
+    dCoord c (fun r θ =>
+        Pt M a b d r θ
+      + Pr M a b d r θ
+      + Pθ M a b d r θ
+      + Pφ M a b d r θ) r θ
+    =
+      (dCoord c (fun r θ => Γtot M r θ Idx.t d a) r θ) * g M Idx.t b r θ
+    + (Γtot M r θ Idx.t d a) * dCoord c (fun r θ => g M Idx.t b r θ) r θ
+    + dCoord c (Pr M a b d) r θ
+    + dCoord c (Pθ M a b d) r θ
+    + dCoord c (Pφ M a b d) r θ := by
+    -- 4-term linearity in one step via dCoord_add4_flat
+    have hsum_c := dCoord_add4_flat c (Pt M a b d) (Pr M a b d) (Pθ M a b d) (Pφ M a b d) r θ
+      (by left; unfold Pt DifferentiableAt_r; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Pr DifferentiableAt_r; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Pθ DifferentiableAt_r; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Pφ DifferentiableAt_r; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Pt DifferentiableAt_θ; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Pr DifferentiableAt_θ; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Pθ DifferentiableAt_θ; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Pφ DifferentiableAt_θ; apply DifferentiableAt.mul <;> discharge_diff)
+
+    -- Product rule on the t-summand
+    have hPt_push :
+      dCoord c (Pt M a b d) r θ
+      =
+      dCoord c (fun r θ => Γtot M r θ Idx.t d a) r θ * g M Idx.t b r θ
+      + (Γtot M r θ Idx.t d a) * dCoord c (fun r θ => g M Idx.t b r θ) r θ := by
+      simpa using
+        dCoord_mul_of_diff c
+          (fun r θ => Γtot M r θ Idx.t d a)
+          (fun r θ => g M Idx.t b r θ) r θ
+          (by discharge_diff) (by discharge_diff)
+          (by discharge_diff) (by discharge_diff)
+
+    have H := hsum_c
+    rw [hPt_push] at H
+    simpa [add_comm, add_left_comm, add_assoc] using H
+
+  /- Four first-family summands on the d-branch -/
+  private def Qt (M : ℝ) (a b c : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.t c a) * (g M Idx.t b r θ)
+  private def Qr (M : ℝ) (a b c : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.r c a) * (g M Idx.r b r θ)
+  private def Qθ (M : ℝ) (a b c : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.θ c a) * (g M Idx.θ b r θ)
+  private def Qφ (M : ℝ) (a b c : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.φ c a) * (g M Idx.φ b r θ)
+
+  /-- Stage-1 fact: LHS d-branch, first family (expand only the e = t summand). -/
+  lemma Hd_one :
+    dCoord d (fun r θ =>
+        Qt M a b c r θ
+      + Qr M a b c r θ
+      + Qθ M a b c r θ
+      + Qφ M a b c r θ) r θ
+    =
+      (dCoord d (fun r θ => Γtot M r θ Idx.t c a) r θ) * g M Idx.t b r θ
+    + (Γtot M r θ Idx.t c a) * dCoord d (fun r θ => g M Idx.t b r θ) r θ
+    + dCoord d (Qr M a b c) r θ
+    + dCoord d (Qθ M a b c) r θ
+    + dCoord d (Qφ M a b c) r θ := by
+    -- 4-term linearity in one step via dCoord_add4_flat
+    have hsum_d := dCoord_add4_flat d (Qt M a b c) (Qr M a b c) (Qθ M a b c) (Qφ M a b c) r θ
+      (by left; unfold Qt DifferentiableAt_r; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Qr DifferentiableAt_r; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Qθ DifferentiableAt_r; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Qφ DifferentiableAt_r; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Qt DifferentiableAt_θ; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Qr DifferentiableAt_θ; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Qθ DifferentiableAt_θ; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Qφ DifferentiableAt_θ; apply DifferentiableAt.mul <;> discharge_diff)
+
+    -- Product rule on the t-summand
+    have hQt_push :
+      dCoord d (Qt M a b c) r θ
+      =
+      dCoord d (fun r θ => Γtot M r θ Idx.t c a) r θ * g M Idx.t b r θ
+      + (Γtot M r θ Idx.t c a) * dCoord d (fun r θ => g M Idx.t b r θ) r θ := by
+      simpa using
+        dCoord_mul_of_diff d
+          (fun r θ => Γtot M r θ Idx.t c a)
+          (fun r θ => g M Idx.t b r θ) r θ
+          (by discharge_diff) (by discharge_diff)
+          (by discharge_diff) (by discharge_diff)
+
+    have H := hsum_d
+    rw [hQt_push] at H
+    simpa [add_comm, add_left_comm, add_assoc] using H
+end FirstFamily
+
+end Stage1LHS
+
+-- === Stage-1 LHS (second family, Γtot · g orientation) ===
+namespace Stage1LHS
+
+section SecondFamily
+  -- Keep the facts fully parametric to avoid depending on any ambient context.
+  variable (M r θ : ℝ) (a b c d : Idx)
+
+  /- Four second-family summands on the c-branch:
+     P2* := (Γtot M … * g M a …) with e ∈ {t, r, θ, φ}, using (d, b) on Γtot. -/
+  private def P2t (M : ℝ) (a b d : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.t d b) * (g M a Idx.t r θ)
+  private def P2r (M : ℝ) (a b d : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.r d b) * (g M a Idx.r r θ)
+  private def P2θ (M : ℝ) (a b d : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.θ d b) * (g M a Idx.θ r θ)
+  private def P2φ (M : ℝ) (a b d : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.φ d b) * (g M a Idx.φ r θ)
+
+  /-- Stage-1 fact: **LHS c-branch, second family** (expand only the `e = t` summand). -/
+  lemma Hc2_one :
+    dCoord c (fun r θ =>
+        P2t M a b d r θ
+      + P2r M a b d r θ
+      + P2θ M a b d r θ
+      + P2φ M a b d r θ) r θ
+    =
+      (dCoord c (fun r θ => Γtot M r θ Idx.t d b) r θ) * (g M a Idx.t r θ)
+    + (Γtot M r θ Idx.t d b) * dCoord c (fun r θ => g M a Idx.t r θ) r θ
+    + dCoord c (P2r M a b d) r θ
+    + dCoord c (P2θ M a b d) r θ
+    + dCoord c (P2φ M a b d) r θ := by
+    -- 4-term linearity in one step via dCoord_add4_flat
+    have hsum2_c := dCoord_add4_flat c (P2t M a b d) (P2r M a b d) (P2θ M a b d) (P2φ M a b d) r θ
+      (by left; unfold P2t DifferentiableAt_r; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold P2r DifferentiableAt_r; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold P2θ DifferentiableAt_r; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold P2φ DifferentiableAt_r; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold P2t DifferentiableAt_θ; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold P2r DifferentiableAt_θ; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold P2θ DifferentiableAt_θ; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold P2φ DifferentiableAt_θ; apply DifferentiableAt.mul <;> discharge_diff)
+
+    -- Product rule on the t-summand (Γtot first, g second)
+    have hP2t_push :
+      dCoord c (P2t M a b d) r θ
+        =
+      dCoord c (fun r θ => Γtot M r θ Idx.t d b) r θ * (g M a Idx.t r θ)
+      + (Γtot M r θ Idx.t d b) * dCoord c (fun r θ => g M a Idx.t r θ) r θ := by
+      simpa using
+        dCoord_mul_of_diff c
+          (fun r θ => Γtot M r θ Idx.t d b)
+          (fun r θ => g M a Idx.t r θ) r θ
+          (by discharge_diff) (by discharge_diff)
+          (by discharge_diff) (by discharge_diff)
+
+    -- Finish: substitute the product rule into the 4-term linearity
+    have H := hsum2_c
+    rw [hP2t_push] at H
+    simpa [add_comm, add_left_comm, add_assoc] using H
+
+
+  /- Four second-family summands on the d-branch:
+     Q2* := (Γtot M … * g M a …) with e ∈ {t, r, θ, φ}, using (c, b) on Γtot. -/
+  private def Q2t (M : ℝ) (a b c : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.t c b) * (g M a Idx.t r θ)
+  private def Q2r (M : ℝ) (a b c : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.r c b) * (g M a Idx.r r θ)
+  private def Q2θ (M : ℝ) (a b c : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.θ c b) * (g M a Idx.θ r θ)
+  private def Q2φ (M : ℝ) (a b c : Idx) : ℝ → ℝ → ℝ :=
+    fun r θ => (Γtot M r θ Idx.φ c b) * (g M a Idx.φ r θ)
+
+  /-- Stage-1 fact: **LHS d-branch, second family** (expand only the `e = t` summand). -/
+  lemma Hd2_one :
+    dCoord d (fun r θ =>
+        Q2t M a b c r θ
+      + Q2r M a b c r θ
+      + Q2θ M a b c r θ
+      + Q2φ M a b c r θ) r θ
+    =
+      (dCoord d (fun r θ => Γtot M r θ Idx.t c b) r θ) * (g M a Idx.t r θ)
+    + (Γtot M r θ Idx.t c b) * dCoord d (fun r θ => g M a Idx.t r θ) r θ
+    + dCoord d (Q2r M a b c) r θ
+    + dCoord d (Q2θ M a b c) r θ
+    + dCoord d (Q2φ M a b c) r θ := by
+    -- 4-term linearity in one step via dCoord_add4_flat
+    have hsum2_d := dCoord_add4_flat d (Q2t M a b c) (Q2r M a b c) (Q2θ M a b c) (Q2φ M a b c) r θ
+      (by left; unfold Q2t DifferentiableAt_r; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Q2r DifferentiableAt_r; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Q2θ DifferentiableAt_r; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Q2φ DifferentiableAt_r; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Q2t DifferentiableAt_θ; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Q2r DifferentiableAt_θ; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Q2θ DifferentiableAt_θ; apply DifferentiableAt.mul <;> discharge_diff)
+      (by left; unfold Q2φ DifferentiableAt_θ; apply DifferentiableAt.mul <;> discharge_diff)
+
+    -- Product rule on the t-summand (Γtot first, g second)
+    have hQ2t_push :
+      dCoord d (Q2t M a b c) r θ
+        =
+      dCoord d (fun r θ => Γtot M r θ Idx.t c b) r θ * (g M a Idx.t r θ)
+      + (Γtot M r θ Idx.t c b) * dCoord d (fun r θ => g M a Idx.t r θ) r θ := by
+      simpa using
+        dCoord_mul_of_diff d
+          (fun r θ => Γtot M r θ Idx.t c b)
+          (fun r θ => g M a Idx.t r θ) r θ
+          (by discharge_diff) (by discharge_diff)
+          (by discharge_diff) (by discharge_diff)
+
+    -- Finish
+    have H := hsum2_d
+    rw [hQ2t_push] at H
+    simpa [add_comm, add_left_comm, add_assoc] using H
+
+end SecondFamily
+end Stage1LHS
 -/
 
 /- === ACTIVATION DEMONSTRATION: Wiring Bridge Lemmas ===
@@ -1658,6 +1898,125 @@ end ActivationDemo
   --   sorry
 -/
 
+/-
+-- Stage-1 split helpers (file-scope; safe to activate)
+section Stage1_LHS_Splits
+  variable (M r θ : ℝ) (a b c d : Idx)
+
+  -- Local enumerator with cleaner bridge shape
+  private lemma sumIdx_expand_local (f : Idx → ℝ → ℝ → ℝ) :
+    ∀ r θ,
+      sumIdx (fun e => f e r θ)
+      = f Idx.t r θ + f Idx.r r θ + f Idx.θ r θ + f Idx.φ r θ := by
+    intro r θ
+    simp [sumIdx, add_comm, add_left_comm, add_assoc]
+
+  -- c-branch: split both families to 4+4 via the bridge; no global effects.
+  set_option maxHeartbeats 400000 in
+  lemma Hsplit_c_both :
+    dCoord c (fun r θ => ContractionC M r θ d a b) r θ
+    =
+    dCoord c (fun r θ =>
+       Γtot M r θ Idx.t d a * g M Idx.t b r θ
+     + Γtot M r θ Idx.r d a * g M Idx.r b r θ
+     + Γtot M r θ Idx.θ d a * g M Idx.θ b r θ
+     + Γtot M r θ Idx.φ d a * g M Idx.φ b r θ) r θ
+  +
+    dCoord c (fun r θ =>
+       Γtot M r θ Idx.t d b * g M a Idx.t r θ
+     + Γtot M r θ Idx.r d b * g M a Idx.r r θ
+     + Γtot M r θ Idx.θ d b * g M a Idx.θ r θ
+     + Γtot M r θ Idx.φ d b * g M a Idx.φ r θ) r θ := by
+    -- Expand ContractionC, distribute dCoord over sums, expand sumIdx
+    simp only [ContractionC, dCoord_sumIdx, sumIdx_expand, dCoord_add]
+    -- Normalize associativity/commutativity
+    ring
+
+  -- d-branch: same idea, roles of c/d swapped accordingly.
+  set_option maxHeartbeats 400000 in
+  lemma Hsplit_d_both :
+    dCoord d (fun r θ => ContractionC M r θ c a b) r θ
+    =
+    dCoord d (fun r θ =>
+       Γtot M r θ Idx.t c a * g M Idx.t b r θ
+     + Γtot M r θ Idx.r c a * g M Idx.r b r θ
+     + Γtot M r θ Idx.θ c a * g M Idx.θ b r θ
+     + Γtot M r θ Idx.φ c a * g M Idx.φ b r θ) r θ
+  +
+    dCoord d (fun r θ =>
+       Γtot M r θ Idx.t c b * g M a Idx.t r θ
+     + Γtot M r θ Idx.r c b * g M a Idx.r r θ
+     + Γtot M r θ Idx.θ c b * g M a Idx.θ r θ
+     + Γtot M r θ Idx.φ c b * g M a Idx.φ r θ) r θ := by
+    -- Expand ContractionC, distribute dCoord over sums, expand sumIdx
+    simp only [ContractionC, dCoord_sumIdx, sumIdx_expand, dCoord_add]
+    -- Normalize associativity/commutativity
+    ring
+
+end Stage1_LHS_Splits
+-/
+
+/-
+-- Stage-1 RHS splits (file-scope; safe to activate)
+section Stage1_RHS_Splits
+  variable (M r θ : ℝ) (a b c d : Idx)
+
+  -- Local μ-expander for RHS terms (μ summation in Riemann definition)
+  private lemma sumIdx_expand_local_rhs (f : Idx → ℝ → ℝ → ℝ) :
+    ∀ r θ, sumIdx (fun μ => f μ r θ)
+      = f Idx.t r θ + f Idx.r r θ + f Idx.θ r θ + f Idx.φ r θ := by
+    intro r θ
+    simp [sumIdx, add_comm, add_left_comm, add_assoc]
+
+  -- Split for first Riemann term: Riemann M r θ a b c d
+  lemma Hsplit_RHS₁ :
+    Riemann M r θ a b c d
+      = sumIdx (fun μ => g M a μ r θ * RiemannUp M r θ μ b c d) := by
+    -- This is just the definition
+    rfl
+
+  -- Expand the μ summation using the bridge lemma pattern
+  lemma Hsplit_RHS₁_expanded :
+    Riemann M r θ a b c d
+      = g M a Idx.t r θ * RiemannUp M r θ Idx.t b c d
+      + g M a Idx.r r θ * RiemannUp M r θ Idx.r b c d
+      + g M a Idx.θ r θ * RiemannUp M r θ Idx.θ b c d
+      + g M a Idx.φ r θ * RiemannUp M r θ Idx.φ b c d := by
+    rw [Hsplit_RHS₁]
+    exact sumIdx_expand_local_rhs (fun μ r θ => g M a μ r θ * RiemannUp M r θ μ b c d) r θ
+
+  -- Split for second Riemann term: Riemann M r θ b a c d
+  lemma Hsplit_RHS₂ :
+    Riemann M r θ b a c d
+      = sumIdx (fun μ => g M b μ r θ * RiemannUp M r θ μ a c d) := by
+    -- This is just the definition
+    rfl
+
+  -- Expand the μ summation for second term
+  lemma Hsplit_RHS₂_expanded :
+    Riemann M r θ b a c d
+      = g M b Idx.t r θ * RiemannUp M r θ Idx.t a c d
+      + g M b Idx.r r θ * RiemannUp M r θ Idx.r a c d
+      + g M b Idx.θ r θ * RiemannUp M r θ Idx.θ a c d
+      + g M b Idx.φ r θ * RiemannUp M r θ Idx.φ a c d := by
+    rw [Hsplit_RHS₂]
+    exact sumIdx_expand_local_rhs (fun μ r θ => g M b μ r θ * RiemannUp M r θ μ a c d) r θ
+
+  -- Combined RHS split: expand both Riemann terms
+  lemma Hsplit_RHS_combined :
+    Riemann M r θ a b c d + Riemann M r θ b a c d
+      = (g M a Idx.t r θ * RiemannUp M r θ Idx.t b c d
+        + g M a Idx.r r θ * RiemannUp M r θ Idx.r b c d
+        + g M a Idx.θ r θ * RiemannUp M r θ Idx.θ b c d
+        + g M a Idx.φ r θ * RiemannUp M r θ Idx.φ b c d)
+      + (g M b Idx.t r θ * RiemannUp M r θ Idx.t a c d
+        + g M b Idx.r r θ * RiemannUp M r θ Idx.r a c d
+        + g M b Idx.θ r θ * RiemannUp M r θ Idx.θ a c d
+        + g M b Idx.φ r θ * RiemannUp M r θ Idx.φ a c d) := by
+    rw [Hsplit_RHS₁_expanded, Hsplit_RHS₂_expanded]
+
+end Stage1_RHS_Splits
+-/
 
 -- File-scope helper for zero derivatives (not marked [simp])
 private lemma dCoord_zero_fun (μ : Idx) (r θ : ℝ) :

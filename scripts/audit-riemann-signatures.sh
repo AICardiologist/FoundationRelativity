@@ -3,13 +3,8 @@ set -euo pipefail
 
 FILE="Papers/P5_GeneralRelativity/GR/Riemann.lean"
 
-echo "▶ Audit: Stage-1 lemma signatures present"
+echo "▶ Audit: Essential infrastructure lemmas present"
 needles=(
-  "namespace Stage1LHS"
-  "lemma Hc_one"
-  "lemma Hd_one"
-  "lemma Hc2_one"
-  "lemma Hd2_one"
   "lemma dCoord_add4"
   "lemma dCoord_add4_flat"
   "lemma dCoord_sumIdx_via_funext"
@@ -21,7 +16,14 @@ for n in "${needles[@]}"; do
     exit 1
   fi
 done
-echo "  ✅ Stage-1 invariants found"
+echo "  ✅ Infrastructure lemmas found"
+
+echo "▶ Audit: Stage1LHS deleted per Phase 3.1"
+if rg -n --fixed-strings "namespace Stage1LHS" "$FILE" >/dev/null; then
+  echo "  ❌ Stage1LHS should be deleted (Phase 3.1 cleanup)"
+  exit 1
+fi
+echo "  ✅ Stage1LHS properly deleted"
 
 echo "▶ Audit: Activation marker present"
 if ! rg -n '^-- ACTIVATION_STATUS:' "$FILE" >/dev/null; then
