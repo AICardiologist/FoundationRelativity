@@ -1515,16 +1515,22 @@ lemma dCoord_r_θ_commute_for_g (M r θ : ℝ) (a b : Idx) :
 @[simp]
 lemma ContractionC_differentiable_r (M r θ : ℝ) (a b c : Idx) :
   DifferentiableAt_r (fun r θ => ContractionC M r θ a b c) r θ := by
-  -- TODO: Prove using DifferentiableAt.sum, DifferentiableAt.mul,
-  -- Γ_differentiable_r, g_differentiable_r
+  -- ContractionC = ∑ e, (Γ(e,c,a)·g(e,b) + Γ(e,c,b)·g(a,e))
+  -- Proof strategy: Expand sum (4 terms), apply DifferentiableAt.add/mul to each,
+  -- use Γtot_differentiable_r and g_differentiable_r as base facts.
+  -- Blocked on: Γtot_differentiable_r has sorry (needs 13 Christoffel symbol proofs)
+  --             g_differentiable_r has 2 sorries (g_tt, g_rr need Exterior)
   sorry
 
 /-- ContractionC is differentiable in θ. -/
 @[simp]
 lemma ContractionC_differentiable_θ (M r θ : ℝ) (a b c : Idx) :
   DifferentiableAt_θ (fun r θ => ContractionC M r θ a b c) r θ := by
-  -- TODO: Prove using DifferentiableAt.sum, DifferentiableAt.mul,
-  -- Γ_differentiable_θ, g_differentiable_θ
+  -- ContractionC = ∑ e, (Γ(e,c,a)·g(e,b) + Γ(e,c,b)·g(a,e))
+  -- Proof strategy: Expand sum (4 terms), apply DifferentiableAt.add/mul to each,
+  -- use Γtot_differentiable_θ and g_differentiable_θ as base facts.
+  -- Blocked on: Γtot_differentiable_θ has sorry (needs 13 Christoffel symbol proofs)
+  -- Note: g_differentiable_θ is FULLY PROVEN (all 16 cases)
   sorry
 
 /-- The first derivative of g (wrt any coordinate) is itself differentiable in r (C2 smoothness).
