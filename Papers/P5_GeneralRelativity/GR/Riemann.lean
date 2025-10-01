@@ -1538,8 +1538,13 @@ lemma ContractionC_differentiable_θ (M r θ : ℝ) (a b c : Idx) :
 @[simp]
 lemma dCoord_g_differentiable_r (M r θ : ℝ) (μ a b : Idx) :
   DifferentiableAt_r (dCoord μ (fun r θ => g M a b r θ)) r θ := by
-  -- TODO: Case analysis on μ, a, b; apply differentiation rules for concrete functions
-  -- (derivatives of 1-2M/r, r^2, sin^2θ)
+  -- Proof strategy: Case analysis on μ and (a,b) - most cases trivial
+  -- - μ=t or φ: dCoord gives 0 (constant, trivial)
+  -- - μ=θ: dCoord_θ g is constant in r (trivial)
+  -- - μ=r, off-diagonal: ∂_r(0) = 0 (trivial)
+  -- - μ=r, g_θθ: ∂_r(r²) = 2r, then ∂_r(2r) = 2 (constant, trivial)
+  -- - μ=r, g_φφ: ∂_r(r²sin²θ) = 2r·sin²θ, then ∂_r(...) constant in r (trivial)
+  -- Blocked: μ=r, g_tt/g_rr need C3 smoothness of f(r) = 1-2M/r
   sorry
 
 /-- The first derivative of g (wrt any coordinate) is itself differentiable in θ (C2 smoothness).
@@ -1547,7 +1552,12 @@ lemma dCoord_g_differentiable_r (M r θ : ℝ) (μ a b : Idx) :
 @[simp]
 lemma dCoord_g_differentiable_θ (M r θ : ℝ) (μ a b : Idx) :
   DifferentiableAt_θ (dCoord μ (fun r θ => g M a b r θ)) r θ := by
-  -- TODO: Case analysis on μ, a, b; apply differentiation rules for concrete functions
+  -- Proof strategy: Case analysis on μ and (a,b) - most cases trivial
+  -- - μ=t or φ: dCoord gives 0 (constant, trivial)
+  -- - μ=r: ∂_r g is constant in θ (trivial)
+  -- - μ=θ, non-φφ: All components constant in θ (trivial)
+  -- Blocked: μ=θ, g_φφ needs C3 smoothness lemma for sin²θ
+  --   g_φφ = r²sin²θ → ∂_θ(r²·2sinθcosθ) = r²·2(cos²θ-sin²θ) → ∂_θ(...) needs analysis
   sorry
 
 -- ========== C1 Smoothness Lemmas (Γtot Differentiability) ==========
