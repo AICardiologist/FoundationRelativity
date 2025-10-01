@@ -1952,7 +1952,8 @@ does not depend on completing this infrastructure.
     This structural lemma separates the calculus transformations from the algebraic
     manipulation required in the main alternation proof. (Phase 3.2b per professor's guidance)
 -/
-lemma dCoord_ContractionC_expanded (M r θ : ℝ) (μ c a b : Idx) :
+lemma dCoord_ContractionC_expanded (M r θ : ℝ) (μ c a b : Idx)
+    (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
   dCoord μ (fun r θ => ContractionC M r θ c a b) r θ =
   sumIdx (fun k =>
     -- First product: ∂_μ(Γ(k,c,a)) · g(k,b) + Γ(k,c,a) · ∂_μ(g(k,b))
@@ -1963,9 +1964,12 @@ lemma dCoord_ContractionC_expanded (M r θ : ℝ) (μ c a b : Idx) :
     (dCoord μ (fun r θ => Γtot M r θ k c b) r θ * g M a k r θ +
      Γtot M r θ k c b * dCoord μ (fun r θ => g M a k r θ) r θ)
   ) := by
-  -- TODO: Complete proof using Sequential Rewrite + Robust Discharge pattern
-  -- Infrastructure is in place (refined recursive discharge_diff), but fine-tuning
-  -- of the recursion strategy is needed. Defer to sorry per pragmatic approach.
+  -- Sequential Rewrite Strategy (Professor's guidance)
+  -- Proof structure: simp [ContractionC] → rw [dCoord_sumIdx] → congr → rw [dCoord_add_of_diff, dCoord_mul_of_diff]
+  -- Infrastructure ready: All C1 lemmas proven, ContractionC proven, hypotheses in scope
+  -- Blocker: discharge_diff tactic needs refinement to pass (hM, h_ext, h_sin_nz) to C1 lemmas
+  -- The simp strategy in discharge_diff (line 599-610) doesn't properly instantiate hypotheses
+  -- Tactical fix needed: Either enhance discharge_diff or manually discharge with `Or.inl` + assumption
   sorry
 
 /-- Alternation identity scaffold (baseline-neutral with optional micro-steps).
@@ -1974,7 +1978,8 @@ lemma dCoord_ContractionC_expanded (M r θ : ℝ) (μ c a b : Idx) :
 
     DEFERRED: This sorry is part of Category C (alternation identity infrastructure).
     See documentation block above. -/
-lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
+lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
+    (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
   ( dCoord c (fun r θ => ContractionC M r θ d a b) r θ
   - dCoord d (fun r θ => ContractionC M r θ c a b) r θ )
   = ( Riemann M r θ a b c d + Riemann M r θ b a c d ) := by
@@ -1982,8 +1987,9 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx) :
   -- Strategy: Expand LHS using dCoord_ContractionC_expanded, expand RHS (Riemann def),
   -- then normalize with Controlled Rewriting Sequence (abel_nf → simp only → ring_nf)
 
-  -- 1. Expand LHS using structural lemma
-  rw [dCoord_ContractionC_expanded, dCoord_ContractionC_expanded]
+  -- 1. Expand LHS using structural lemma (with hypotheses)
+  rw [dCoord_ContractionC_expanded M r θ c d a b hM h_ext h_sin_nz,
+      dCoord_ContractionC_expanded M r θ d c a b hM h_ext h_sin_nz]
 
   -- 2. Expand RHS (Riemann definitions)
   simp only [Riemann, RiemannUp]
@@ -3338,7 +3344,7 @@ lemma ricci_identity_on_g
   -- 1. Simplify LHS using derivative commutativity (Clairaut's theorem)
   rw [ricci_LHS M r θ a b c d hM h_ext h_sin_nz]
   -- 2. Relate the remaining terms to the Riemann tensor (core algebraic identity)
-  rw [alternation_dC_eq_Riem M r θ a b c d]
+  rw [alternation_dC_eq_Riem M r θ a b c d hM h_ext h_sin_nz]
   -- 3. Trivial algebraic rearrangement (goal already solved by rewrites)
   -- ring -- Not needed
 
