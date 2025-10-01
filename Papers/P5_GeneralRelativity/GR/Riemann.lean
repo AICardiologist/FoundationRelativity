@@ -1563,6 +1563,9 @@ lemma dCoord_g_differentiable_θ (M r θ : ℝ) (μ a b : Idx) :
 -- ========== C1 Smoothness Lemmas (Γtot Differentiability) ==========
 -- Required for alternation_dC_eq_Riem proof (Phase 3.2a per professor's guidance)
 
+-- Note: Individual Christoffel symbol differentiability lemmas exist in Schwarzschild.lean
+-- (differentiableAt_Γ_r_θθ_r, differentiableAt_Γ_θ_rθ_r, etc.)
+
 /-- Christoffel symbols are differentiable in r (sum of products of differentiable functions). -/
 @[simp]
 lemma Γtot_differentiable_r (M r θ : ℝ) (i j k : Idx) :
