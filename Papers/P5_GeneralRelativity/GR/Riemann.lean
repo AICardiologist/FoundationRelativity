@@ -1566,55 +1566,86 @@ lemma dCoord_g_differentiable_θ (M r θ : ℝ) (μ a b : Idx) :
 -- Note: Individual Christoffel symbol differentiability lemmas exist in Schwarzschild.lean
 -- (differentiableAt_Γ_r_θθ_r, differentiableAt_Γ_θ_rθ_r, etc.)
 
-/-- Christoffel symbols are differentiable in r (sum of products of differentiable functions). -/
+/-- Christoffel symbols are differentiable in r in the Exterior domain.
+Uses Definition Localization Pattern: case analysis FIRST, then expand Γtot locally in each case. -/
 @[simp]
-lemma Γtot_differentiable_r (M r θ : ℝ) (i j k : Idx) :
+lemma Γtot_differentiable_r (M r θ : ℝ) (i j k : Idx)
+    (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
   DifferentiableAt_r (fun r θ => Γtot M r θ i j k) r θ := by
-  -- Strategy: Case analysis on (i,j,k) - 13 nonzero cases from Γtot definition
-  -- Proof approach for each nonzero case:
-  -- - Γ_t_tr = M/(r²·f): Needs differentiability of 1/f (blocked on Exterior)
-  -- - Γ_r_tt = M·f/r²: Needs differentiability of f (blocked on Exterior)
-  -- - Γ_r_rr = -M/(r²·f): Similar to Γ_t_tr
-  -- - Γ_r_θθ = -(r-2M): Polynomial, trivially differentiable
-  -- - Γ_r_φφ = -(r-2M)·sin²θ: Differentiable in r (sin²θ constant wrt r)
-  -- - Γ_θ_rθ = 1/r: Rational function, differentiable for r≠0
-  -- - Γ_φ_rφ = 1/r: Same as Γ_θ_rθ
-  -- - Γ_θ_φφ = -sinθ·cosθ: Constant in r (only depends on θ)
-  -- - Γ_φ_θφ = cotθ: Constant in r (only depends on θ)
-  -- Zero cases: All other (i,j,k) combinations give 0 (trivially differentiable)
-  sorry
+  -- Definition Localization Pattern: case analysis FIRST (before expanding DifferentiableAt_r)
+  cases i <;> cases j <;> cases k
+  -- Handle all 64 cases explicitly (51 zero + 13 nonzero)
+  case t.t.r => simp only [DifferentiableAt_r, Γtot]; exact differentiableAt_Γ_t_tr_r M r hM h_ext
+  case t.r.t => simp only [DifferentiableAt_r, Γtot]; exact differentiableAt_Γ_t_tr_r M r hM h_ext
+  case r.t.t => simp only [DifferentiableAt_r, Γtot]; exact differentiableAt_Γ_r_tt_r M r hM h_ext
+  case r.r.r => simp only [DifferentiableAt_r, Γtot]; exact differentiableAt_Γ_r_rr_r M r hM h_ext
+  case r.θ.θ => simp only [DifferentiableAt_r, Γtot]; exact differentiableAt_Γ_r_θθ_r M r
+  case r.φ.φ => simp only [DifferentiableAt_r, Γtot]; exact differentiableAt_Γ_r_φφ_r M r θ
+  case θ.r.θ =>
+    simp only [DifferentiableAt_r, Γtot]
+    have hr0 : r ≠ 0 := r_ne_zero_of_exterior M r hM h_ext
+    exact differentiableAt_Γ_θ_rθ_r r hr0
+  case θ.θ.r =>
+    simp only [DifferentiableAt_r, Γtot]
+    have hr0 : r ≠ 0 := r_ne_zero_of_exterior M r hM h_ext
+    exact differentiableAt_Γ_θ_rθ_r r hr0
+  case θ.φ.φ => simp only [DifferentiableAt_r, Γtot]; exact differentiableAt_const _  -- Constant in r
+  case φ.r.φ =>
+    simp only [DifferentiableAt_r, Γtot]
+    have hr0 : r ≠ 0 := r_ne_zero_of_exterior M r hM h_ext
+    exact differentiableAt_Γ_φ_rφ_r r hr0
+  case φ.φ.r =>
+    simp only [DifferentiableAt_r, Γtot]
+    have hr0 : r ≠ 0 := r_ne_zero_of_exterior M r hM h_ext
+    exact differentiableAt_Γ_φ_rφ_r r hr0
+  case φ.θ.φ => simp only [DifferentiableAt_r, Γtot]; exact differentiableAt_const _  -- Constant in r
+  case φ.φ.θ => simp only [DifferentiableAt_r, Γtot]; exact differentiableAt_const _  -- Constant in r
+  -- All remaining 51 cases are zero (Γtot = 0), handle with differentiableAt_const
+  all_goals { simp only [DifferentiableAt_r, Γtot]; exact differentiableAt_const _ }
 
-/-- Christoffel symbols are differentiable in θ. -/
+/-- Christoffel symbols are differentiable in θ in the Exterior domain.
+Uses Definition Localization Pattern: case analysis FIRST, then expand Γtot locally in each case. -/
 @[simp]
-lemma Γtot_differentiable_θ (M r θ : ℝ) (i j k : Idx) :
+lemma Γtot_differentiable_θ (M r θ : ℝ) (i j k : Idx)
+    (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
   DifferentiableAt_θ (fun r θ => Γtot M r θ i j k) r θ := by
-  -- Strategy: Case analysis on (i,j,k) - 13 nonzero cases from Γtot definition
-  -- Proof approach for each nonzero case:
-  -- - Γ_t_tr, Γ_r_tt, Γ_r_rr, Γ_r_θθ: Constant in θ (only depend on r,M)
-  -- - Γ_θ_rθ, Γ_φ_rφ: Constant in θ (only depend on r)
-  -- - Γ_r_φφ = -(r-2M)·sin²θ: Differentiable (polynomial in sinθ)
-  -- - Γ_θ_φφ = -sinθ·cosθ: Differentiable (standard trig)
-  -- - Γ_φ_θφ = cotθ: Differentiable for θ ∉ {0,π} (standard trig)
-  -- Zero cases: All other combinations give 0 (trivially differentiable)
-  sorry
+  -- Definition Localization Pattern: case analysis FIRST (before expanding DifferentiableAt_θ)
+  cases i <;> cases j <;> cases k
+  -- Handle all 64 cases explicitly (51 zero + 13 nonzero)
+  case t.t.r => simp only [DifferentiableAt_θ, Γtot]; exact differentiableAt_const _  -- Constant in θ
+  case t.r.t => simp only [DifferentiableAt_θ, Γtot]; exact differentiableAt_const _  -- Constant in θ
+  case r.t.t => simp only [DifferentiableAt_θ, Γtot]; exact differentiableAt_const _  -- Constant in θ
+  case r.r.r => simp only [DifferentiableAt_θ, Γtot]; exact differentiableAt_const _  -- Constant in θ
+  case r.θ.θ => simp only [DifferentiableAt_θ, Γtot]; exact differentiableAt_const _  -- Constant in θ
+  case r.φ.φ => simp only [DifferentiableAt_θ, Γtot]; exact differentiableAt_Γ_r_φφ_θ M r θ
+  case θ.r.θ => simp only [DifferentiableAt_θ, Γtot]; exact differentiableAt_const _  -- Constant in θ
+  case θ.θ.r => simp only [DifferentiableAt_θ, Γtot]; exact differentiableAt_const _  -- Constant in θ
+  case θ.φ.φ => simp only [DifferentiableAt_θ, Γtot]; exact differentiableAt_Γ_θ_φφ_θ θ
+  case φ.r.φ => simp only [DifferentiableAt_θ, Γtot]; exact differentiableAt_const _  -- Constant in θ
+  case φ.φ.r => simp only [DifferentiableAt_θ, Γtot]; exact differentiableAt_const _  -- Constant in θ
+  case φ.θ.φ => simp only [DifferentiableAt_θ, Γtot]; exact differentiableAt_Γ_φ_θφ_θ θ h_sin_nz
+  case φ.φ.θ => simp only [DifferentiableAt_θ, Γtot]; exact differentiableAt_Γ_φ_θφ_θ θ h_sin_nz
+  -- All remaining 51 cases are zero (Γtot = 0), handle with differentiableAt_const
+  all_goals { simp only [DifferentiableAt_θ, Γtot]; exact differentiableAt_const _ }
 
-/-- Metric tensor components are differentiable in r (general lemma for abstract indices). -/
+/-- Metric tensor components are differentiable in r in the Exterior domain. -/
 @[simp]
-lemma g_differentiable_r (M r θ : ℝ) (i j : Idx) :
+lemma g_differentiable_r (M r θ : ℝ) (i j : Idx)
+    (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
   DifferentiableAt_r (fun r θ => g M i j r θ) r θ := by
   -- Case analysis on metric components (g is diagonal)
   cases i <;> cases j
   · -- g_tt: -f(r) requires Exterior for differentiability of f
-    simp only [DifferentiableAt_r, g]
-    sorry
+    have h : Exterior M r θ := ⟨hM, h_ext⟩
+    exact differentiableAt_g_tt_r M r θ h
   · -- Off-diagonal: 0 is trivially differentiable
     simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
   · simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
   · simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
   · simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
   · -- g_rr: 1/f(r) requires Exterior for differentiability of f
-    simp only [DifferentiableAt_r, g]
-    sorry
+    have h : Exterior M r θ := ⟨hM, h_ext⟩
+    exact differentiableAt_g_rr_r M r θ h
   · simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
   · simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
   · simp only [DifferentiableAt_r, g]; exact differentiableAt_const _
@@ -1628,9 +1659,10 @@ lemma g_differentiable_r (M r θ : ℝ) (i j : Idx) :
   · -- g_φφ: r²sin²θ is differentiable in r everywhere
     exact differentiableAt_g_φφ_r M r θ
 
-/-- Metric tensor components are differentiable in θ (general lemma for abstract indices). -/
+/-- Metric tensor components are differentiable in θ in the Exterior domain. -/
 @[simp]
-lemma g_differentiable_θ (M r θ : ℝ) (i j : Idx) :
+lemma g_differentiable_θ (M r θ : ℝ) (i j : Idx)
+    (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
   DifferentiableAt_θ (fun r θ => g M i j r θ) r θ := by
   -- Case analysis on metric components (g is diagonal)
   cases i <;> cases j
