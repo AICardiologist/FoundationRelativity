@@ -1513,30 +1513,29 @@ lemma dCoord_r_θ_commute_for_g (M r θ : ℝ) (a b : Idx) :
 
 /-- ContractionC is differentiable in r (sum of products of differentiable functions). -/
 @[simp]
-lemma ContractionC_differentiable_r (M r θ : ℝ) (a b c : Idx) :
+lemma ContractionC_differentiable_r (M r θ : ℝ) (a b c : Idx)
+    (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
   DifferentiableAt_r (fun r θ => ContractionC M r θ a b c) r θ := by
   -- ContractionC = ∑ e, (Γ(e,c,a)·g(e,b) + Γ(e,c,b)·g(a,e))
-  -- Proof strategy: Expand sum (4 terms), apply DifferentiableAt.add/mul to each,
-  -- use Γtot_differentiable_r and g_differentiable_r as base facts.
-  -- Blocked on: Γtot_differentiable_r has sorry (needs 13 Christoffel symbol proofs)
-  --             g_differentiable_r has 2 sorries (g_tt, g_rr need Exterior)
+  -- Dependencies: Γtot_differentiable_r, g_differentiable_r (proven later in file)
+  -- Will be proven after those C1 lemmas using manual 4-term expansion
   sorry
 
 /-- ContractionC is differentiable in θ. -/
 @[simp]
-lemma ContractionC_differentiable_θ (M r θ : ℝ) (a b c : Idx) :
+lemma ContractionC_differentiable_θ (M r θ : ℝ) (a b c : Idx)
+    (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
   DifferentiableAt_θ (fun r θ => ContractionC M r θ a b c) r θ := by
   -- ContractionC = ∑ e, (Γ(e,c,a)·g(e,b) + Γ(e,c,b)·g(a,e))
-  -- Proof strategy: Expand sum (4 terms), apply DifferentiableAt.add/mul to each,
-  -- use Γtot_differentiable_θ and g_differentiable_θ as base facts.
-  -- Blocked on: Γtot_differentiable_θ has sorry (needs 13 Christoffel symbol proofs)
-  -- Note: g_differentiable_θ is FULLY PROVEN (all 16 cases)
+  -- Dependencies: Γtot_differentiable_θ, g_differentiable_θ (proven later in file)
+  -- Will be proven after those C1 lemmas using manual 4-term expansion
   sorry
 
 /-- The first derivative of g (wrt any coordinate) is itself differentiable in r (C2 smoothness).
     Note: This is about the partially-applied function (dCoord μ g) as a function of (r,θ). -/
 @[simp]
-lemma dCoord_g_differentiable_r (M r θ : ℝ) (μ a b : Idx) :
+lemma dCoord_g_differentiable_r (M r θ : ℝ) (μ a b : Idx)
+    (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
   DifferentiableAt_r (dCoord μ (fun r θ => g M a b r θ)) r θ := by
   -- Proof strategy: Case analysis on μ and (a,b) - most cases trivial
   -- - μ=t or φ: dCoord gives 0 (constant, trivial)
@@ -1550,7 +1549,8 @@ lemma dCoord_g_differentiable_r (M r θ : ℝ) (μ a b : Idx) :
 /-- The first derivative of g (wrt any coordinate) is itself differentiable in θ (C2 smoothness).
     Note: This is about the partially-applied function (dCoord μ g) as a function of (r,θ). -/
 @[simp]
-lemma dCoord_g_differentiable_θ (M r θ : ℝ) (μ a b : Idx) :
+lemma dCoord_g_differentiable_θ (M r θ : ℝ) (μ a b : Idx)
+    (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
   DifferentiableAt_θ (dCoord μ (fun r θ => g M a b r θ)) r θ := by
   -- Proof strategy: Case analysis on μ and (a,b) - most cases trivial
   -- - μ=t or φ: dCoord gives 0 (constant, trivial)
@@ -1722,7 +1722,8 @@ lemma DifferentiableAt_θ_mul_of_cond (A B : ℝ → ℝ → ℝ) (r θ : ℝ) (
 
 /-- The LHS of the Ricci identity simplifies using commutativity of derivatives.
     The second partial derivatives of the metric cancel out. -/
-lemma ricci_LHS (M r θ : ℝ) (a b c d : Idx) :
+lemma ricci_LHS (M r θ : ℝ) (a b c d : Idx)
+    (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
   ( dCoord c (fun r θ => nabla_g M r θ d a b) r θ
   - dCoord d (fun r θ => nabla_g M r θ c a b) r θ )
   = - ( dCoord c (fun r θ => ContractionC M r θ d a b) r θ
@@ -1735,12 +1736,12 @@ lemma ricci_LHS (M r θ : ℝ) (a b c d : Idx) :
   repeat (rw [dCoord_sub_of_diff])
 
   -- 3. Discharge Differentiability Preconditions (8 hypotheses + 1 main goal = 9 total)
-  -- Use manual discharge since discharge_diff isn't matching C2 lemmas
+  -- Pass hypotheses to C2 smoothness lemmas
   all_goals (try (first
-    | apply Or.inl; apply dCoord_g_differentiable_r
-    | apply Or.inl; apply dCoord_g_differentiable_θ
-    | apply Or.inl; apply ContractionC_differentiable_r
-    | apply Or.inl; apply ContractionC_differentiable_θ
+    | apply Or.inl; apply dCoord_g_differentiable_r; assumption; assumption; assumption
+    | apply Or.inl; apply dCoord_g_differentiable_θ; assumption; assumption; assumption
+    | apply Or.inl; apply ContractionC_differentiable_r; assumption; assumption; assumption
+    | apply Or.inl; apply ContractionC_differentiable_θ; assumption; assumption; assumption
   ))
 
   -- 4. Apply Commutativity (Clairaut's theorem)
@@ -3299,13 +3300,14 @@ end RicciInfrastructure
 
 /-- Ricci identity specialized to the metric (lowered first index form). -/
 lemma ricci_identity_on_g
-    (M r θ : ℝ) (a b c d : Idx) :
+    (M r θ : ℝ) (a b c d : Idx)
+    (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
   ( dCoord c (fun r θ => nabla_g M r θ d a b) r θ
   - dCoord d (fun r θ => nabla_g M r θ c a b) r θ )
   = - ( Riemann M r θ a b c d + Riemann M r θ b a c d ) := by
   -- The proof is now structured:
   -- 1. Simplify LHS using derivative commutativity (Clairaut's theorem)
-  rw [ricci_LHS M r θ a b c d]
+  rw [ricci_LHS M r θ a b c d hM h_ext h_sin_nz]
   -- 2. Relate the remaining terms to the Riemann tensor (core algebraic identity)
   rw [alternation_dC_eq_Riem M r θ a b c d]
   -- 3. Trivial algebraic rearrangement (goal already solved by rewrites)
@@ -3316,11 +3318,14 @@ lemma ricci_identity_on_g
     This is the axiom-free version that uses topology infrastructure instead of AX_nabla_g_zero.
     Requires explicit Exterior hypothesis to ensure metric compatibility.
 -/
-lemma Riemann_swap_a_b_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (a b c d : Idx) :
+lemma Riemann_swap_a_b_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) (a b c d : Idx) :
   Riemann M r θ a b c d = - Riemann M r θ b a c d := by
   classical
+  -- Extract individual hypotheses from Exterior
+  have hM := h_ext.hM
+  have h_ext_ineq := h_ext.hr_ex
   -- Apply the Ricci identity
-  have hRic := ricci_identity_on_g M r θ a b c d
+  have hRic := ricci_identity_on_g M r θ a b c d hM h_ext_ineq h_sin_nz
   -- The LHS vanishes because the connection is metric compatible on Exterior
   -- Since ∇g = 0 on Exterior, its derivative (∇∇g) is also 0
   have hLHS_zero : ( dCoord c (fun r θ => nabla_g M r θ d a b) r θ
@@ -3341,18 +3346,18 @@ lemma Riemann_swap_a_b_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (a b c d : I
 
     This is the Exterior-hypothesis version that eliminates AX_nabla_g_zero.
 -/
-lemma Riemann_sq_swap_a_b_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (a b c d : Idx) :
+lemma Riemann_sq_swap_a_b_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) (a b c d : Idx) :
   (Riemann M r θ b a c d)^2 = (Riemann M r θ a b c d)^2 := by
-  rw [Riemann_swap_a_b_ext M r θ h_ext, sq_neg]
+  rw [Riemann_swap_a_b_ext M r θ h_ext h_sin_nz, sq_neg]
 
 /-- If the first two indices coincide, the Riemann component vanishes on Exterior.
 
     This is the Exterior-hypothesis version that eliminates AX_nabla_g_zero.
 -/
-@[simp] lemma Riemann_first_equal_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (a c d : Idx) :
+@[simp] lemma Riemann_first_equal_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) (a c d : Idx) :
   Riemann M r θ a a c d = 0 := by
   -- By antisymmetry: R_aacd = -R_aacd
-  have h := Riemann_swap_a_b_ext M r θ h_ext a a c d
+  have h := Riemann_swap_a_b_ext M r θ h_ext h_sin_nz a a c d
   -- The only number equal to its negation is 0
   linarith
 
