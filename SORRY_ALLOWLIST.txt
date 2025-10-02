@@ -434,20 +434,25 @@ Papers/P5_GeneralRelativity/GR/Riemann.lean:1659  # Stage2 preview - Future work
 Papers/P5_GeneralRelativity/GR/Riemann.lean:1716  # alternation_dC_eq_Riem - Category C per professor's mandate
 Papers/P5_GeneralRelativity/GR/Riemann.lean:2210  # alternation_dC_eq_Riem algebraic step - Category C infrastructure
 
-# Inactive Scaffolding (13 sorries - all in commented blocks, lines 2763-2900)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2781  # Stage-1 micro-pack Hc_one (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2796  # Stage-1 micro-pack Hd_one (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2811  # Stage-1 micro-pack HRc_one (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2826  # Stage-1 micro-pack HRd_one (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2844  # Stage-1 micro-pack Hc2_one (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2862  # Stage-1 micro-pack Hd2_one (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2869  # Stage-1 micro-pack HRc2_one (commented)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2876  # Stage-1 micro-pack HRd2_one (commented)
+# Inactive Scaffolding (18 sorries - all in commented blocks, lines 2354-3011)
 Papers/P5_GeneralRelativity/GR/Riemann.lean:2354  # Stage-1 micro-pack (commented)
 Papers/P5_GeneralRelativity/GR/Riemann.lean:2385  # Stage-1 micro-pack (commented)
 Papers/P5_GeneralRelativity/GR/Riemann.lean:2422  # Stage-1 micro-pack (commented)
 Papers/P5_GeneralRelativity/GR/Riemann.lean:2483  # Stage-1 micro-pack (commented)
 Papers/P5_GeneralRelativity/GR/Riemann.lean:2517  # Stage-1 micro-pack (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2781  # Stage-1 micro-pack Hc_one (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2796  # Stage-1 micro-pack Hd_one (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2811  # Stage-1 micro-pack HRc_one (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2826  # Stage-1 micro-pack HRd_one (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2844  # Stage-1 micro-pack Hc2_one (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2848  # Stage-1 LHS c-split scaffolding (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2862  # Stage-1 micro-pack Hd2_one (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2869  # Stage-1 micro-pack HRc2_one (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2876  # Stage-1 micro-pack HRd2_one (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2879  # Stage-1 LHS d-split scaffolding (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2916  # Stage-1 LHS c-both proof skeleton (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2977  # Stage-1 LHS d-both proof skeleton (commented)
+Papers/P5_GeneralRelativity/GR/Riemann.lean:3011  # Stage-1 RHS normalization scaffolding (commented)
 
 # Note: Schwarzschild.lean has 0 active sorries - vacuum solution R_μν = 0 fully verified
 # See Papers/P5_GeneralRelativity/GR/README_SORRY_ELIMINATION.md for complete documentation
