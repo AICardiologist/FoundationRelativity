@@ -449,25 +449,43 @@ Papers/P5_GeneralRelativity/GR/Riemann.lean:2422  # Stage-1 micro-pack (commente
 Papers/P5_GeneralRelativity/GR/Riemann.lean:2483  # Stage-1 micro-pack (commented)
 Papers/P5_GeneralRelativity/GR/Riemann.lean:2517  # Stage-1 micro-pack (commented)
 
-# Note: Schwarzschild.lean has 0 sorries - vacuum solution R_μν = 0 fully verified
+# Note: Schwarzschild.lean has 0 active sorries - vacuum solution R_μν = 0 fully verified
 # See Papers/P5_GeneralRelativity/GR/README_SORRY_ELIMINATION.md for complete documentation
+
+# Comment references in Schwarzschild.lean
+Papers/P5_GeneralRelativity/GR/Schwarzschild.lean:2043  # Comment: "-- sorry" in commented TODO
 
 # Additional Paper 5 files
 Papers/P5_GeneralRelativity/GR/Invariants.lean:111  # Ricci components - infrastructure pending
 
+# Diagonal Ricci cases (4 sorries) - Awaiting Junior Professor tactical guidance
+Papers/P5_GeneralRelativity/GR/Riemann.lean:4808  # R_tt diagonal case - needs derivative calculators
+Papers/P5_GeneralRelativity/GR/Riemann.lean:4809  # R_rr diagonal case - needs derivative calculators
+Papers/P5_GeneralRelativity/GR/Riemann.lean:4810  # R_θθ diagonal case - needs derivative calculators
+Papers/P5_GeneralRelativity/GR/Riemann.lean:4811  # R_φφ diagonal case - needs derivative calculators
+
 # Comment references in Riemann.lean (detected by grep but not actual sorry statements)
-Papers/P5_GeneralRelativity/GR/Riemann.lean:581   # Comment: "-- sorry" in commented-out code
-Papers/P5_GeneralRelativity/GR/Riemann.lean:586   # Comment: "-- sorry" in commented-out code
-Papers/P5_GeneralRelativity/GR/Riemann.lean:1242  # Comment: documentation mentions "no sorry"
-Papers/P5_GeneralRelativity/GR/Riemann.lean:1509  # Comment: "-- sorry" in commented-out code
-Papers/P5_GeneralRelativity/GR/Riemann.lean:1629  # Comment: documentation mentions "sorry"
-Papers/P5_GeneralRelativity/GR/Riemann.lean:1687  # Comment: documentation mentions "sorry"
-Papers/P5_GeneralRelativity/GR/Riemann.lean:1693  # Comment: documentation mentions "sorry"
-Papers/P5_GeneralRelativity/GR/Riemann.lean:1695  # Comment: documentation mentions "sorry"
-Papers/P5_GeneralRelativity/GR/Riemann.lean:1714  # Comment: "-- NOTE: Early sorry" documentation
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2303  # Comment: "-- sorry" in commented-out code
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2391  # Comment: inside /- -/ block, mentions "sorry"
-Papers/P5_GeneralRelativity/GR/Riemann.lean:2455  # Comment: inside /- -/ block, mentions "sorry"
+Papers/P5_GeneralRelativity/GR/Riemann.lean:259   # Comment: AUDIT note mentions line numbers
+Papers/P5_GeneralRelativity/GR/Riemann.lean:433   # Comment: NOTE about lemmas with sorry placeholders
+Papers/P5_GeneralRelativity/GR/Riemann.lean:790   # Comment: mentions unsound sorry usage
+Papers/P5_GeneralRelativity/GR/Riemann.lean:962   # Comment: "-- sorry" in commented-out code
+Papers/P5_GeneralRelativity/GR/Riemann.lean:967   # Comment: "-- sorry" in commented-out code
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2119  # Comment: "-- sorry" in commented-out code
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2147  # Comment: documentation mentions "sorry"
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2172  # Comment: mentions blocked sorry
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2179  # Comment: mentions algebraic sorry
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2181  # Comment: DEFERRED mentions Category C sorry
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2797  # Comment: "-- sorry" in commented scaffolding
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2885  # Comment: "-- sorry" in proof skeleton
+Papers/P5_GeneralRelativity/GR/Riemann.lean:2949  # Comment: "-- sorry" in commented scaffolding
+Papers/P5_GeneralRelativity/GR/Riemann.lean:3275  # Comment: "-- sorry" in commented scaffolding
+Papers/P5_GeneralRelativity/GR/Riemann.lean:3290  # Comment: "-- sorry" in commented scaffolding
+Papers/P5_GeneralRelativity/GR/Riemann.lean:3305  # Comment: "-- sorry" in commented scaffolding
+Papers/P5_GeneralRelativity/GR/Riemann.lean:3320  # Comment: "-- sorry" in commented scaffolding
+Papers/P5_GeneralRelativity/GR/Riemann.lean:3338  # Comment: "-- sorry" in commented scaffolding
+Papers/P5_GeneralRelativity/GR/Riemann.lean:3356  # Comment: "-- sorry" in commented scaffolding
+Papers/P5_GeneralRelativity/GR/Riemann.lean:3363  # Comment: "-- sorry" in commented scaffolding
+Papers/P5_GeneralRelativity/GR/Riemann.lean:3370  # Comment: "-- sorry" in commented scaffolding
 
 # Comment references in Invariants.lean
 Papers/P5_GeneralRelativity/GR/Invariants.lean:106  # Comment: mentions "sorry" in checklist
