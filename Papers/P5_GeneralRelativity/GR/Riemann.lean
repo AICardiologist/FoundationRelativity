@@ -979,7 +979,7 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
     have h1 : deriv (fun s => s^2) r = 2 * r := deriv_pow_two_at r
     have h2 : deriv (fun s => f M s) r = 2 * M / r^2 := by
       simpa using hf'.deriv
-    -- product rule for s^2 * f (use the result, not the lemma head)
+    -- product rule for s^2 * f: use named hypothesis, then rewrite
     have h_mul := deriv_mul (fun s => s^2) (fun s => f M s) r
     simpa [h1, h2, mul_comm, mul_left_comm, mul_assoc] using h_mul
   -- (H(r))⁻¹ derivative
@@ -988,11 +988,14 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
       deriv (fun s => (s^2 * f M s)⁻¹) r
         = - deriv (fun s => s^2 * f M s) r / ((r^2 * f M r)^2) := by
     simpa using deriv_inv_general (fun s => s^2 * f M s) r hden hHdiff
-  -- Γ^t_{tr}(s) = M * (H(s))^{-1}
+  -- Γ^t_{tr}(s) = M * (H s)^{-1}; rewrite as an equality of functions first,
+  -- then apply `deriv_const_mul` to avoid a type mismatch on this snapshot.
+  have hΓfun : (fun s => Γ_t_tr M s) = (fun s => M * ((s^2 * f M s)⁻¹)) := by
+    funext s; simp [Γ_t_tr, div_eq_mul_inv]
   have hΓ :
       deriv (fun s => Γ_t_tr M s) r
         = M * deriv (fun s => (s^2 * f M s)⁻¹) r := by
-    simpa [Γ_t_tr, div_eq_mul_inv, deriv_const_mul]
+    simpa [hΓfun] using (deriv_const_mul M (fun s => (s^2 * f M s)⁻¹) r)
   -- Assemble and clear denominators once
   have : deriv (fun s => Γ_t_tr M s) r
         = - M * ( (2 * r) * f M r + r^2 * (2 * M / r^2) ) / ((r^2 * f M r)^2) := by
@@ -1006,11 +1009,24 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
   deriv (fun s => Γ_r_rr M s) r
     = (2 * M) * (r * f M r + M) / (r^4 * (f M r)^2) := by
   classical
-  have hΓ : ∀ s, Γ_r_rr M s = - Γ_t_tr M s := by
-    intro s; simp [Γ_r_rr, Γ_t_tr]
-  -- Sign-flip via Γ_r_rr = -Γ_t_tr
-  have h := deriv_Γ_t_tr_at M r hr hf
-  simpa [hΓ, deriv_const_mul, mul_comm] using h
+  -- Γ^r_{rr} = - Γ^t_{tr} pointwise
+  have hΓfun : (fun s => Γ_r_rr M s) = (fun s => (-1) * Γ_t_tr M s) := by
+    funext s; simp [Γ_r_rr, Γ_t_tr, mul_comm]
+  -- Differentiate: deriv Γ_r_rr = (-1) * deriv Γ_t_tr
+  have hderiv :
+      deriv (fun s => Γ_r_rr M s) r
+        = (-1) * deriv (fun s => Γ_t_tr M s) r := by
+    simpa [hΓfun, mul_comm] using (deriv_const_mul (-1) (fun s => Γ_t_tr M s) r)
+  -- Multiply the known derivative of Γ_t_tr by (-1) and simplify
+  have ht := deriv_Γ_t_tr_at M r hr hf
+  have ht' :
+      (-1) * deriv (fun s => Γ_t_tr M s) r
+        = (-1) * ( - (2 * M) * (r * f M r + M) / (r^4 * (f M r)^2) ) := by
+    simpa using congrArg (fun x => (-1) * x) ht
+  have : deriv (fun s => Γ_r_rr M s) r
+        = (2 * M) * (r * f M r + M) / (r^4 * (f M r)^2) := by
+    simpa [hderiv, mul_comm, mul_left_comm, mul_assoc] using ht'
+  exact this
 
 /-- `d/dθ Γ^φ_{θφ}(θ) = - csc² θ` (i.e. `- 1/(sin θ)^2`). -/
 @[simp] lemma deriv_Γ_φ_θφ_at
