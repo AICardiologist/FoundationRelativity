@@ -317,52 +317,6 @@ lemma contDiffAt_sin_sq (θ : ℝ) :
   -- Real.contDiff_sin proves sin is C^∞ everywhere.
   exact Real.contDiff_sin.contDiffAt
 
-/-- Compatibility shim for older Mathlib snapshots that lack `ContDiffAt.deriv`.
-In a newer Mathlib this would be a trivial `contDiffAt_deriv.2` call.
-For now we trust the classical fact: if `f` is `C²` at `x`, then `deriv f` is `C¹` at `x`. -/
-lemma contDiffAt_deriv
-  {f : ℝ → ℝ} {x : ℝ} :
-  (ContDiffAt ℝ (2 : WithTop ℕ∞) f x) →
-  ContDiffAt ℝ (1 : WithTop ℕ∞) (fun y => deriv f y) x := by
-  intro h
-  sorry  -- Placeholder for snapshot compatibility
-
-/-- **Replaces axiom `differentiableAt_deriv_f`**.
-
-If `r > 2M` (exterior region), then `f(r) = 1 - 2M/r` is `C^∞` at `r`,
-hence its (scalar) derivative is `C^1` at `r`, in particular differentiable there. -/
-theorem differentiableAt_deriv_f
-    (M r : ℝ) (hM : 0 < M) (h_ext : 2 * M < r) :
-    DifferentiableAt ℝ (deriv (fun r' => f M r')) r := by
-  -- Exterior ⇒ r ≠ 0, so `f` is smooth at r
-  have hr0 : r ≠ 0 := r_ne_zero_of_exterior M r hM h_ext
-  -- From your lemma: `f` is C^∞ at r; downgrade to C^2
-  have hfC2 : ContDiffAt ℝ (2 : WithTop ℕ∞) (fun r' => f M r') r :=
-    (contDiffAt_f M r hr0).of_le le_top
-  -- The derivative is then C^1 at r (older Mathlib: use the named lemma)
-  have hderivC1 :
-      ContDiffAt ℝ (1 : WithTop ℕ∞) (fun r' => deriv (fun s => f M s) r') r :=
-    contDiffAt_deriv hfC2
-  -- C^1 ⇒ differentiable at r
-  exact hderivC1.differentiableAt le_rfl
-
-/-- **Replaces axiom `differentiableAt_deriv_sin_sq`**.
-
-Since `θ ↦ sin² θ` is `C^∞` everywhere, its derivative is `C^1` everywhere,
-hence differentiable at every `θ`. -/
-theorem differentiableAt_deriv_sin_sq
-    (θ : ℝ) :
-    DifferentiableAt ℝ (deriv (fun θ' => Real.sin θ' ^ 2)) θ := by
-  -- From your lemma: `sin²` is C^∞ at θ; downgrade to C^2
-  have hC2 : ContDiffAt ℝ (2 : WithTop ℕ∞) (fun θ' => Real.sin θ' ^ 2) θ :=
-    (contDiffAt_sin_sq θ).of_le le_top
-  -- The derivative is then C^1 at θ (older Mathlib: use the named lemma)
-  have hC1 :
-      ContDiffAt ℝ (1 : WithTop ℕ∞) (fun θ' => deriv (fun t => Real.sin t ^ 2) θ') θ :=
-    contDiffAt_deriv hC2
-  -- C^1 ⇒ differentiable at θ
-  exact hC1.differentiableAt le_rfl
-
 /-- sin θ is differentiable everywhere. -/
 lemma differentiableAt_sin (θ : ℝ) : DifferentiableAt ℝ Real.sin θ :=
   Real.differentiableAt_sin
