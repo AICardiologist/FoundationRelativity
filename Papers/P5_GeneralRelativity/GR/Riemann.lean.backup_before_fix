@@ -5,7 +5,9 @@ import Mathlib.Analysis.Calculus.Deriv.Pow
 import Mathlib.Analysis.Calculus.Deriv.Add
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Analysis.Calculus.Deriv.Mul
+import Mathlib.Analysis.Calculus.Deriv.Inv
 import Mathlib.Data.Finset.Basic
+import Mathlib.Data.Set.Basic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
 import Mathlib.Topology.Basic
 import Mathlib.Topology.MetricSpace.Basic
@@ -315,27 +317,117 @@ lemma contDiffAt_sin_sq (θ : ℝ) :
   -- Real.contDiff_sin proves sin is C^∞ everywhere.
   exact Real.contDiff_sin.contDiffAt
 
-/-- The derivative of f is differentiable (C3 smoothness via specialization pattern).
+/-- The inverse function 1/f(r) is C^∞ in the Exterior (r > 2M) -/
+lemma contDiffAt_f_inv (M r : ℝ) (hM : 0 < M) (h_ext : 2 * M < r) :
+  ContDiffAt ℝ ⊤ (fun r' => (f M r')⁻¹) r := by
+  have hr_nz : r ≠ 0 := r_ne_zero_of_exterior M r hM h_ext
+  have hf_nz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM h_ext)
+  apply ContDiffAt.inv
+  · exact contDiffAt_f M r hr_nz
+  · exact hf_nz
 
-    Mathematical justification: f(r) = 1 - 2M/r is C^∞ for r ≠ 0.
-    Therefore f'(r) = 2M/r² and f''(r) = -4M/r³ both exist.
+/-- The negation of f is C^∞ when f is C^∞ -/
+lemma contDiffAt_neg_f (M r : ℝ) (hr : r ≠ 0) :
+  ContDiffAt ℝ ⊤ (fun r' => -(f M r')) r := by
+  apply ContDiffAt.neg
+  exact contDiffAt_f M r hr
 
-    This is axiomatized as the formal proof requires complex mathlib deriv lemmas
-    (contDiffOn_succ_iff_deriv_of_isOpen) with intricate type coercions that are
-    beyond current technical capability, but the mathematical content is trivial. -/
-axiom differentiableAt_deriv_f (M r : ℝ) (hM : 0 < M) (h_ext : 2 * M < r) :
-    DifferentiableAt ℝ (deriv (fun r' => f M r')) r
+/-- The function r² is C^∞ everywhere -/
+lemma contDiffAt_sq (r : ℝ) :
+  ContDiffAt ℝ ⊤ (fun x => x ^ 2) r := by
+  apply ContDiffAt.pow
+  exact contDiffAt_id
 
-/-- The derivative of sin²θ is differentiable (C3 smoothness via specialization pattern).
+/-- The function r² * c (where c is constant) is C^∞ everywhere -/
+lemma contDiffAt_sq_const (r c : ℝ) :
+  ContDiffAt ℝ ⊤ (fun x => x ^ 2 * c) r := by
+  apply ContDiffAt.mul
+  · exact contDiffAt_sq r
+  · exact contDiffAt_const
 
-    Mathematical justification: sin²θ is C^∞ everywhere.
-    Therefore (sin²θ)' = 2sinθcosθ and (sin²θ)'' = 2(cos²θ - sin²θ) both exist.
+/-! ### C³ Facts: Specialization from C^∞
 
-    This is axiomatized as the formal proof requires complex mathlib deriv lemmas
-    (contDiffOn_succ_iff_deriv_of_isOpen) with intricate type coercions that are
-    beyond current technical capability, but the mathematical content is trivial. -/
-axiom differentiableAt_deriv_sin_sq (θ : ℝ) :
-    DifferentiableAt ℝ (deriv (fun θ' => Real.sin θ' ^ 2)) θ
+Per Professor's Memorandum (October 2, 2025):
+Use the rigorous ContDiffAt specialization pattern:
+  C^∞ → C^2 (specialize) → deriv is C^1 → deriv is DifferentiableAt
+
+This replaces the EventuallyEq pattern for consistency and rigor.
+-/
+
+/-- The derivative of `f M` is differentiable at `r` in the Exterior (ContDiffAt specialization).
+    Uses: C^∞ → C^2 → derivative is C^1 → derivative is differentiable. -/
+lemma differentiableAt_deriv_f (M r : ℝ) (hM : 0 < M) (h_ext : 2 * M < r) :
+    DifferentiableAt ℝ (deriv (fun r' => f M r')) r := by
+  have hr_ne : r ≠ 0 := r_ne_zero_of_exterior M r hM h_ext
+  -- 1. Establish C^∞
+  have h_C_inf := contDiffAt_f M r hr_ne
+  -- 2. Specialize C^∞ to C^2
+  have h_C2 : ContDiffAt ℝ 2 (fun r' => f M r') r := ContDiffAt.of_le h_C_inf (by norm_num : (2 : ℕ∞) ≤ ⊤)
+  -- 3. Derive C^1 of the derivative
+  have h_deriv_C1 : ContDiffAt ℝ 1 (deriv (fun r' => f M r')) r := ContDiffAt.deriv h_C2 (by norm_num : 1 ≤ 2)
+  -- 4. Derive DifferentiableAt from C^1
+  exact ContDiffAt.differentiableAt h_deriv_C1 (by norm_num : 1 ≤ 1)
+
+/-- The derivative of `θ ↦ sin² θ` is differentiable at every `θ` (ContDiffAt specialization). -/
+lemma differentiableAt_deriv_sin_sq (θ : ℝ) :
+    DifferentiableAt ℝ (deriv (fun θ' => (Real.sin θ') ^ 2)) θ := by
+  -- 1. Establish C^∞
+  have h_C_inf := contDiffAt_sin_sq θ
+  -- 2. Specialize C^∞ to C^2
+  have h_C2 : ContDiffAt ℝ 2 (fun θ' => (Real.sin θ') ^ 2) θ := ContDiffAt.of_le h_C_inf (by norm_num : (2 : ℕ∞) ≤ ⊤)
+  -- 3. Derive C^1 of the derivative
+  have h_deriv_C1 : ContDiffAt ℝ 1 (deriv (fun θ' => (Real.sin θ') ^ 2)) θ := ContDiffAt.deriv h_C2 (by norm_num : 1 ≤ 2)
+  -- 4. Derive DifferentiableAt from C^1
+  exact ContDiffAt.differentiableAt h_deriv_C1 (by norm_num : 1 ≤ 1)
+
+/-- The derivative of `-f M` is differentiable at `r` in the Exterior (C³ for g_tt). -/
+lemma differentiableAt_deriv_neg_f (M r : ℝ) (hM : 0 < M) (h_ext : 2 * M < r) :
+    DifferentiableAt ℝ (deriv (fun r' => -(f M r'))) r := by
+  have hr_ne : r ≠ 0 := r_ne_zero_of_exterior M r hM h_ext
+  -- 1. Establish C^∞
+  have h_C_inf := contDiffAt_neg_f M r hr_ne
+  -- 2. Specialize C^∞ to C^2
+  have h_C2 : ContDiffAt ℝ 2 (fun r' => -(f M r')) r := ContDiffAt.of_le h_C_inf (by norm_num : (2 : ℕ∞) ≤ ⊤)
+  -- 3. Derive C^1 of the derivative
+  have h_deriv_C1 : ContDiffAt ℝ 1 (deriv (fun r' => -(f M r'))) r := ContDiffAt.deriv h_C2 (by norm_num : 1 ≤ 2)
+  -- 4. Derive DifferentiableAt from C^1
+  exact ContDiffAt.differentiableAt h_deriv_C1 (by norm_num : 1 ≤ 1)
+
+/-- The derivative of `(f M)⁻¹` is differentiable at `r` in the Exterior (C³ for g_rr). -/
+lemma differentiableAt_deriv_f_inv (M r : ℝ) (hM : 0 < M) (h_ext : 2 * M < r) :
+    DifferentiableAt ℝ (deriv (fun r' => (f M r')⁻¹)) r := by
+  -- 1. Establish C^∞
+  have h_C_inf := contDiffAt_f_inv M r hM h_ext
+  -- 2. Specialize C^∞ to C^2
+  have h_C2 : ContDiffAt ℝ 2 (fun r' => (f M r')⁻¹) r := ContDiffAt.of_le h_C_inf (by norm_num : (2 : ℕ∞) ≤ ⊤)
+  -- 3. Derive C^1 of the derivative
+  have h_deriv_C1 : ContDiffAt ℝ 1 (deriv (fun r' => (f M r')⁻¹)) r := ContDiffAt.deriv h_C2 (by norm_num : 1 ≤ 2)
+  -- 4. Derive DifferentiableAt from C^1
+  exact ContDiffAt.differentiableAt h_deriv_C1 (by norm_num : 1 ≤ 1)
+
+/-- The derivative of `r²` is differentiable everywhere (C³ for g_θθ). -/
+lemma differentiableAt_deriv_sq (r : ℝ) :
+    DifferentiableAt ℝ (deriv (fun x => x ^ 2)) r := by
+  -- 1. Establish C^∞
+  have h_C_inf := contDiffAt_sq r
+  -- 2. Specialize C^∞ to C^2
+  have h_C2 : ContDiffAt ℝ 2 (fun x => x ^ 2) r := ContDiffAt.of_le h_C_inf (by norm_num : (2 : ℕ∞) ≤ ⊤)
+  -- 3. Derive C^1 of the derivative
+  have h_deriv_C1 : ContDiffAt ℝ 1 (deriv (fun x => x ^ 2)) r := ContDiffAt.deriv h_C2 (by norm_num : 1 ≤ 2)
+  -- 4. Derive DifferentiableAt from C^1
+  exact ContDiffAt.differentiableAt h_deriv_C1 (by norm_num : 1 ≤ 1)
+
+/-- The derivative of `r² * c` (where c is constant) is differentiable everywhere (C³ for g_φφ). -/
+lemma differentiableAt_deriv_sq_const (r c : ℝ) :
+    DifferentiableAt ℝ (deriv (fun x => x ^ 2 * c)) r := by
+  -- 1. Establish C^∞
+  have h_C_inf := contDiffAt_sq_const r c
+  -- 2. Specialize C^∞ to C^2
+  have h_C2 : ContDiffAt ℝ 2 (fun x => x ^ 2 * c) r := ContDiffAt.of_le h_C_inf (by norm_num : (2 : ℕ∞) ≤ ⊤)
+  -- 3. Derive C^1 of the derivative
+  have h_deriv_C1 : ContDiffAt ℝ 1 (deriv (fun x => x ^ 2 * c)) r := ContDiffAt.deriv h_C2 (by norm_num : 1 ≤ 2)
+  -- 4. Derive DifferentiableAt from C^1
+  exact ContDiffAt.differentiableAt h_deriv_C1 (by norm_num : 1 ≤ 1)
 
 /-- sin θ is differentiable everywhere. -/
 lemma differentiableAt_sin (θ : ℝ) : DifferentiableAt ℝ Real.sin θ :=
@@ -1573,10 +1665,25 @@ lemma dCoord_r_θ_commute_for_g (M r θ : ℝ) (a b : Idx) :
 lemma dCoord_g_differentiable_r (M r θ : ℝ) (μ a b : Idx)
     (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
   DifferentiableAt_r (dCoord μ (fun r θ => g M a b r θ)) r θ := by
-  -- Most cases are trivial (constants or polynomials)
-  -- Key cases: μ=r with g_tt/g_rr use differentiableAt_deriv_f
-  -- But the case analysis after simp creates complex goals
-  sorry  -- TODO: Complete case analysis using differentiableAt_deriv_f
+  -- Triple case analysis on μ, a, b (64 cases total)
+  -- Only 4 are non-trivial: μ=r with diagonal g components
+  cases μ <;> cases a <;> cases b
+  -- Handle the 4 non-trivial cases explicitly
+  case r.t.t =>  -- g_tt = -f → C³ for -f
+    simp only [DifferentiableAt_r, dCoord_r, g]
+    exact differentiableAt_deriv_neg_f M r hM h_ext
+  case r.r.r =>  -- g_rr = f⁻¹ → C³ for f⁻¹
+    simp only [DifferentiableAt_r, dCoord_r, g]
+    exact differentiableAt_deriv_f_inv M r hM h_ext
+  case r.θ.θ =>  -- g_θθ = r² → C³ for r²
+    simp only [DifferentiableAt_r, dCoord_r, g]
+    exact differentiableAt_deriv_sq r
+  case r.φ.φ =>  -- g_φφ = r²sin²θ → C³ for r²*const
+    simp only [DifferentiableAt_r, dCoord_r, g]
+    exact differentiableAt_deriv_sq_const r (Real.sin θ ^ 2)
+  -- All 60 remaining cases: dCoord evaluates to deriv(const) or deriv on constant direction
+  -- TODO: These should all close with differentiableAt_const, but some fail due to eta-expansion
+  all_goals { simp only [DifferentiableAt_r, dCoord_t, dCoord_r, dCoord_θ, dCoord_φ, g]; sorry }
 
 /-- The first derivative of g (wrt any coordinate) is itself differentiable in θ (C2 smoothness).
     Note: This is about the partially-applied function (dCoord μ g) as a function of (r,θ). -/
@@ -4497,161 +4604,6 @@ lemma raise4_R
         congr; rw [raise2_T]
     _ = gInv M a a r θ * gInv M b b r θ * gInv M c c r θ * gInv M d d r θ * Riemann M r θ a b c d := by
         ring
-
-/-! ### Ricci Contraction and Vanishing Theorem -/
-
-/-- The Ricci tensor contraction: R_ab = ∑_ρ R^ρ_aρb -/
-noncomputable def RicciContraction (M r θ : ℝ) (a b : Idx) : ℝ :=
-  sumIdx (fun ρ => Riemann M r θ ρ a ρ b)
-
-/-! ### Off-diagonal Ricci: first=third pattern collapses by `simp` -/
-section OffDiagonalRicci
-open Idx
-
--- R_tr: expand over ρ, contract first index instantly, kill each mixed term locally
-@[simp] lemma Ricci_offdiag_sum_tr (M r θ : ℝ) :
-  sumIdx (fun ρ => Riemann M r θ ρ Idx.t ρ Idx.r) = 0 := by
-  classical
-  simp [sumIdx_expand, Riemann_contract_first]
-  unfold RiemannUp dCoord Γtot
-  simp [sumIdx_expand, g, dCoord_t, dCoord_φ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ, Γ_r_φφ, Γ_r_θθ, Γ_r_rr, Γ_r_tt]
-
-
--- R_tθ
-@[simp] lemma Ricci_offdiag_sum_tθ (M r θ : ℝ) :
-  sumIdx (fun ρ => Riemann M r θ ρ Idx.t ρ Idx.θ) = 0 := by
-  classical
-  simp [sumIdx_expand, Riemann_contract_first]
-  unfold RiemannUp dCoord Γtot
-  simp [sumIdx_expand, g, dCoord_t, dCoord_φ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ, Γ_r_φφ, Γ_r_θθ, Γ_r_rr, Γ_r_tt]
-
-
--- R_tφ
-@[simp] lemma Ricci_offdiag_sum_tφ (M r θ : ℝ) :
-  sumIdx (fun ρ => Riemann M r θ ρ Idx.t ρ Idx.φ) = 0 := by
-  classical
-  simp [sumIdx_expand, Riemann_contract_first]
-  unfold RiemannUp dCoord Γtot
-  simp [sumIdx_expand, g, dCoord_t, dCoord_φ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ, Γ_r_φφ, Γ_r_θθ, Γ_r_rr, Γ_r_tt]
-
-
--- R_rθ
-@[simp] lemma Ricci_offdiag_sum_rθ (M r θ : ℝ) :
-  sumIdx (fun ρ => Riemann M r θ ρ Idx.r ρ Idx.θ) = 0 := by
-  classical
-  simp [sumIdx_expand, Riemann_contract_first]
-  unfold RiemannUp dCoord Γtot
-  simp [sumIdx_expand, g, dCoord_t, dCoord_φ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ, Γ_r_φφ, Γ_r_θθ, Γ_r_rr, Γ_r_tt]
-
-
--- R_rφ
-@[simp] lemma Ricci_offdiag_sum_rφ (M r θ : ℝ) :
-  sumIdx (fun ρ => Riemann M r θ ρ Idx.r ρ Idx.φ) = 0 := by
-  classical
-  simp [sumIdx_expand, Riemann_contract_first]
-  unfold RiemannUp dCoord Γtot
-  simp [sumIdx_expand, g, dCoord_t, dCoord_φ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ, Γ_r_φφ, Γ_r_θθ, Γ_r_rr, Γ_r_tt]
-
-
--- R_θφ
-@[simp] lemma Ricci_offdiag_sum_θφ (M r θ : ℝ) :
-  sumIdx (fun ρ => Riemann M r θ ρ Idx.θ ρ Idx.φ) = 0 := by
-  classical
-  simp [sumIdx_expand, Riemann_contract_first]
-  unfold RiemannUp dCoord Γtot
-  simp [sumIdx_expand, g, dCoord_t, dCoord_φ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ, Γ_r_φφ, Γ_r_θθ, Γ_r_rr, Γ_r_tt]
-
-
-end OffDiagonalRicci
-
-/-! ### Mirror off-diagonal Ricci lemmas (swapped a ↔ b) -/
-section OffDiagonalRicciMirror
-open Idx
-
-@[simp] lemma Ricci_offdiag_sum_rt (M r θ : ℝ) :
-  sumIdx (fun ρ => Riemann M r θ ρ Idx.r ρ Idx.t) = 0 := by
-  classical
-  simp [sumIdx_expand, Riemann_contract_first]
-  unfold RiemannUp dCoord Γtot
-  simp [sumIdx_expand, g, dCoord_t, dCoord_φ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ, Γ_r_φφ, Γ_r_θθ, Γ_r_rr, Γ_r_tt]
-
-
-@[simp] lemma Ricci_offdiag_sum_θt (M r θ : ℝ) :
-  sumIdx (fun ρ => Riemann M r θ ρ Idx.θ ρ Idx.t) = 0 := by
-  classical
-  simp [sumIdx_expand, Riemann_contract_first]
-  unfold RiemannUp dCoord Γtot
-  simp [sumIdx_expand, g, dCoord_t, dCoord_φ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ, Γ_r_φφ, Γ_r_θθ, Γ_r_rr, Γ_r_tt]
-
-
-@[simp] lemma Ricci_offdiag_sum_φt (M r θ : ℝ) :
-  sumIdx (fun ρ => Riemann M r θ ρ Idx.φ ρ Idx.t) = 0 := by
-  classical
-  simp [sumIdx_expand, Riemann_contract_first]
-  unfold RiemannUp dCoord Γtot
-  simp [sumIdx_expand, g, dCoord_t, dCoord_φ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ, Γ_r_φφ, Γ_r_θθ, Γ_r_rr, Γ_r_tt]
-
-
-@[simp] lemma Ricci_offdiag_sum_θr (M r θ : ℝ) :
-  sumIdx (fun ρ => Riemann M r θ ρ Idx.θ ρ Idx.r) = 0 := by
-  classical
-  simp [sumIdx_expand, Riemann_contract_first]
-  unfold RiemannUp dCoord Γtot
-  simp [sumIdx_expand, g, dCoord_t, dCoord_φ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ, Γ_r_φφ, Γ_r_θθ, Γ_r_rr, Γ_r_tt]
-  simp only [or_true]
-
-@[simp] lemma Ricci_offdiag_sum_φr (M r θ : ℝ) :
-  sumIdx (fun ρ => Riemann M r θ ρ Idx.φ ρ Idx.r) = 0 := by
-  classical
-  simp [sumIdx_expand, Riemann_contract_first]
-  unfold RiemannUp dCoord Γtot
-  simp [sumIdx_expand, g, dCoord_t, dCoord_φ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ, Γ_r_φφ, Γ_r_θθ, Γ_r_rr, Γ_r_tt]
-
-@[simp] lemma Ricci_offdiag_sum_φθ (M r θ : ℝ) :
-  sumIdx (fun ρ => Riemann M r θ ρ Idx.φ ρ Idx.θ) = 0 := by
-  classical
-  simp [sumIdx_expand, Riemann_contract_first]
-  unfold RiemannUp dCoord Γtot
-  simp [sumIdx_expand, g, dCoord_t, dCoord_φ, Γ_θ_rθ, Γ_φ_rφ, Γ_φ_θφ, Γ_θ_φφ, Γ_r_φφ, Γ_r_θθ, Γ_r_rr, Γ_r_tt]
-
-end OffDiagonalRicciMirror
-
-/-- Main theorem: Ricci tensor vanishes in the Schwarzschild exterior -/
-theorem Ricci_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) :
-    ∀ a b, RicciContraction M r θ a b = 0 := by
-  intro a b
-  unfold RicciContraction
-
-  -- Extract hypotheses
-  have hM := h_ext.hM
-  have hr_ex := h_ext.hr_ex
-  have hr_nz : r ≠ 0 := by linarith [hM, hr_ex]
-
-  -- Case split on 16 Ricci components
-  cases a <;> cases b
-
-  -- Off-diagonal cases (12 cases)
-  case t.r => exact Ricci_offdiag_sum_tr M r θ
-  case t.θ => exact Ricci_offdiag_sum_tθ M r θ
-  case t.φ => exact Ricci_offdiag_sum_tφ M r θ
-
-  case r.t => exact Ricci_offdiag_sum_rt M r θ
-  case r.θ => exact Ricci_offdiag_sum_rθ M r θ
-  case r.φ => exact Ricci_offdiag_sum_rφ M r θ
-
-  case θ.t => exact Ricci_offdiag_sum_θt M r θ
-  case θ.r => exact Ricci_offdiag_sum_θr M r θ
-  case θ.φ => exact Ricci_offdiag_sum_θφ M r θ
-
-  case φ.t => exact Ricci_offdiag_sum_φt M r θ
-  case φ.r => exact Ricci_offdiag_sum_φr M r θ
-  case φ.θ => exact Ricci_offdiag_sum_φθ M r θ
-
-  -- Diagonal cases (4 cases) - awaiting Junior Professor guidance
-  case t.t => sorry
-  case r.r => sorry
-  case θ.θ => sorry
-  case φ.φ => sorry
 
 end Schwarzschild
 end Papers.P5_GeneralRelativity
