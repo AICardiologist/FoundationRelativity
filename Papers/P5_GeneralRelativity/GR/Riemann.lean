@@ -1061,7 +1061,6 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
   Γ_θ_φφ θ * Γ_φ_θφ θ = - (Real.cos θ)^2 := by
   simp [Γ_θ_φφ, Γ_φ_θφ, pow_two, div_eq_mul_inv]
   field_simp [hθ]
-  ring
 
 -- Minimal SimpSetup after dCoord definitions
 section SimpSetup
@@ -2164,7 +2163,7 @@ lemma dCoord_ContractionC_expanded (M r θ : ℝ) (μ c a b : Idx)
   simpa [F] using
     (by
       have := hsum
-      simpa [F] at this
+      simp [F] at this
       refine this.trans ?_
       funext k
 
