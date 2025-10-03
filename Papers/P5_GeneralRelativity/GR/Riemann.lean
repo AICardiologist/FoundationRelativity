@@ -2278,29 +2278,31 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
   ( dCoord c (fun r θ => ContractionC M r θ d a b) r θ
   - dCoord d (fun r θ => ContractionC M r θ c a b) r θ )
   = ( Riemann M r θ a b c d + Riemann M r θ b a c d ) := by
-  -- Phase 3.2d: Clean implementation using structural lemma (per professor's guidance)
-  -- Strategy: Expand LHS using dCoord_ContractionC_expanded, expand RHS (Riemann def),
-  -- then normalize with Controlled Rewriting Sequence (abel_nf → simp only → ring_nf)
+  -- Following junior professor's 6-step mechanical plan
 
-  -- 1. Expand LHS using structural lemma (with hypotheses)
+  -- Step 1: Introduce Exterior struct
+  have hExt : Exterior M r θ := ⟨hM, h_ext⟩
+
+  -- Step 2: Expand both LHS derivatives using dCoord_ContractionC_expanded
   rw [dCoord_ContractionC_expanded M r θ c d a b hM h_ext h_sin_nz,
       dCoord_ContractionC_expanded M r θ d c a b hM h_ext h_sin_nz]
 
-  -- 2. Expand RHS (Riemann definitions)
+  -- Step 3: Rewrite dCoord of metric components using metric compatibility
+  -- After expansion, we have terms like: dCoord c (g M k b) and dCoord d (g M k b)
+  -- Use dCoord_g_via_compat_ext to replace ∂g with Γ*g terms
+  simp only [dCoord_g_via_compat_ext M r θ hExt]
+
+  -- Step 4: Expand RHS (Riemann definitions)
   simp only [Riemann, RiemannUp]
 
-  -- 3. Algebraic Normalization (Controlled Rewriting Sequence)
-  -- First: Normalize associativity/commutativity of addition
+  -- Step 5: Normalize with simp
+  simp only [sumIdx_add, sumIdx_sub, sub_eq_add_neg, mul_add, add_mul,
+             add_comm, add_left_comm, add_assoc, mul_comm, mul_left_comm, mul_assoc]
+
+  -- Step 6: Final normalization
   abel_nf
-
-  -- Second: Expand structural combinators
-  simp only [sumIdx_add, mul_add, add_mul, sub_eq_add_neg]
-
-  -- Third: Final algebraic normalization (may require increased heartbeats)
   set_option maxHeartbeats 2000000 in
   ring_nf
-
-  sorry
 
   /-
   -- Stage-1 splits (both families)
