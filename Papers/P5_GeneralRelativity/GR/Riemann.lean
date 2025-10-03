@@ -964,50 +964,47 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
   deriv (fun s => Γ_t_tr M s) r
     = - (2 * M) * (r * f M r + M) / (r^4 * (f M r)^2) := by
   classical
-  -- H(s) := s^2 * f(s)
-  -- Component differentiability for the product rule
+  -- Let H(s) = s² · f(s). We first compute H′(r).
   have hd1 : DifferentiableAt ℝ (fun s => s^2) r :=
     (differentiable_pow 2).differentiableAt
   have hd2 : DifferentiableAt ℝ (fun s => f M s) r :=
     (contDiffAt_f M r hr).differentiableAt le_top
   have hHdiff : DifferentiableAt ℝ (fun s => s^2 * f M s) r := hd1.mul hd2
-  -- H'(r) = (2r) f(r) + r^2 f'(r), and f'(r) = 2M / r^2
   have hf' := f_hasDerivAt M r hr
   have h_prod :
       deriv (fun s => s^2 * f M s) r
         = (2 * r) * f M r + r^2 * (2 * M / r^2) := by
     have h1 : deriv (fun s => s^2) r = 2 * r := deriv_pow_two_at r
-    have h2 : deriv (fun s => f M s) r = 2 * M / r^2 := by
-      simpa using hf'.deriv
-    -- product rule for s^2 * f: provide differentiability hypotheses explicitly
-    -- Note: deriv_mul gives deriv (g * h) = g r * deriv h r + deriv g r * h r
+    have h2 : deriv (fun s => f M s) r = 2 * M / r^2 := by simpa using hf'.deriv
     have h_mul := deriv_mul hd1 hd2
-    -- Convert goal to use Pi.mul form
-    show deriv ((fun s => s^2) * (fun s => f M s)) r = 2 * r * f M r + r^2 * (2 * M / r^2)
-    rw [h_mul, h1, h2]
-    ring
-  -- (H(r))⁻¹ derivative
+    -- `deriv (g*h) = deriv g * h + g * deriv h`
+    calc
+      deriv (fun s => s^2 * f M s) r
+          = deriv ((fun s => s^2) * (fun s => f M s)) r := by rfl
+      _   = deriv (fun s => s^2) r * f M r + (r^2) * deriv (fun s => f M s) r := by
+              simpa using h_mul
+      _   = (2 * r) * f M r + r^2 * (2 * M / r^2) := by simpa [h1, h2]
+  -- Derivative of H⁻¹ at r.
   have hden : r^2 * f M r ≠ 0 := mul_ne_zero (pow_ne_zero 2 hr) hf
   have h_inv :
       deriv (fun s => (s^2 * f M s)⁻¹) r
         = - deriv (fun s => s^2 * f M s) r / ((r^2 * f M r)^2) := by
     simpa using deriv_inv_general (fun s => s^2 * f M s) r hden hHdiff
-  -- Γ^t_{tr}(s) = M * (H s)^{-1}; rewrite as an equality of functions first,
-  -- then apply `deriv_const_mul` to avoid a type mismatch on this snapshot.
+  -- Rewrite Γ^t_{tr} and differentiate with `deriv_const_mul`.
   have hΓfun : (fun s => Γ_t_tr M s) = (fun s => M * ((s^2 * f M s)⁻¹)) := by
     funext s; simp [Γ_t_tr, div_eq_mul_inv]
-  have hd_inv : DifferentiableAt ℝ (fun s => (s^2 * f M s)⁻¹) r := hHdiff.inv hden
-  have hΓ :
-      deriv (fun s => Γ_t_tr M s) r
-        = M * deriv (fun s => (s^2 * f M s)⁻¹) r := by
-    rw [hΓfun]
-    exact deriv_const_mul M hd_inv
-  -- Assemble and clear denominators once
-  have : deriv (fun s => Γ_t_tr M s) r
-        = - M * ( (2 * r) * f M r + r^2 * (2 * M / r^2) ) / ((r^2 * f M r)^2) := by
-    simpa [hΓ, h_inv, h_prod, mul_comm, mul_left_comm, mul_assoc]
-  field_simp [pow_two, sq, hr, hf] at this
-  simpa [pow_two, sq, mul_comm, mul_left_comm, mul_assoc] using this
+  -- Final calc chain (one `field_simp` at the end).
+  calc
+    deriv (fun s => Γ_t_tr M s) r
+        = deriv (fun s => M * ((s^2 * f M s)⁻¹)) r := by rw [hΓfun]
+    _   = M * deriv (fun s => (s^2 * f M s)⁻¹) r := by
+            rw [deriv_const_mul M (fun s => (s^2 * f M s)⁻¹) r]
+    _   = M * ( - deriv (fun s => s^2 * f M s) r / ((r^2 * f M r)^2) ) := by
+            rw [h_inv]
+    _   = - M * ((2 * r) * f M r + r^2 * (2 * M / r^2)) / ((r^2 * f M r)^2) := by
+            rw [h_prod]; ring
+    _   = - (2 * M) * (r * f M r + M) / (r^4 * (f M r)^2) := by
+            field_simp [hr, hf]
 
 /-- `d/dr Γ^r_{rr}(r)` is the opposite sign of `d/dr Γ^t_{tr}(r)` since `Γ^r_{rr} = - Γ^t_{tr}`. -/
 @[simp] lemma deriv_Γ_r_rr_at
@@ -1015,42 +1012,25 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
   deriv (fun s => Γ_r_rr M s) r
     = (2 * M) * (r * f M r + M) / (r^4 * (f M r)^2) := by
   classical
-  -- Γ^r_{rr} = - Γ^t_{tr} pointwise
+  -- Pointwise identity: Γ^r_{rr} = - Γ^t_{tr}.
   have hΓfun : (fun s => Γ_r_rr M s) = (fun s => (-1) * Γ_t_tr M s) := by
-    funext s; simp [Γ_r_rr, Γ_t_tr, mul_comm]
-  -- Γ_t_tr is differentiable since Γ_t_tr = M / (r² f)
-  have hd1 : DifferentiableAt ℝ (fun s => s^2) r :=
-    (differentiable_pow 2).differentiableAt
-  have hd2 : DifferentiableAt ℝ (fun s => f M s) r :=
-    (contDiffAt_f M r hr).differentiableAt le_top
-  have hHdiff : DifferentiableAt ℝ (fun s => s^2 * f M s) r := hd1.mul hd2
-  have hden : r^2 * f M r ≠ 0 := mul_ne_zero (pow_ne_zero 2 hr) hf
-  have hd_inv : DifferentiableAt ℝ (fun s => (s^2 * f M s)⁻¹) r := hHdiff.inv hden
-  have hd_Γttr : DifferentiableAt ℝ (fun s => Γ_t_tr M s) r :=
-    DifferentiableAt.const_mul hd_inv M
-  -- Differentiate: deriv Γ_r_rr = (-1) * deriv Γ_t_tr
-  have hderiv :
-      deriv (fun s => Γ_r_rr M s) r
-        = (-1) * deriv (fun s => Γ_t_tr M s) r := by
-    rw [hΓfun]
-    exact deriv_const_mul (-1) hd_Γttr
-  -- Multiply the known derivative of Γ_t_tr by (-1) and simplify
-  have ht := deriv_Γ_t_tr_at M r hr hf
-  have ht' :
-      (-1) * deriv (fun s => Γ_t_tr M s) r
-        = (-1) * ( - (2 * M) * (r * f M r + M) / (r^4 * (f M r)^2) ) := by
-    simpa using congrArg (fun x => (-1) * x) ht
-  have : deriv (fun s => Γ_r_rr M s) r
-        = (2 * M) * (r * f M r + M) / (r^4 * (f M r)^2) := by
-    simpa [hderiv, mul_comm, mul_left_comm, mul_assoc] using ht'
-  exact this
+    funext s; simp [Γ_r_rr, Γ_t_tr]; ring
+  -- Reduce to the known derivative of Γ_t_tr.
+  calc
+    deriv (fun s => Γ_r_rr M s) r
+        = deriv (fun s => (-1) * Γ_t_tr M s) r := by rw [hΓfun]
+    _   = (-1) * deriv (fun s => Γ_t_tr M s) r := by
+            rw [deriv_const_mul (-1) (fun s => Γ_t_tr M s) r]
+    _   = (-1) * ( - (2 * M) * (r * f M r + M) / (r^4 * (f M r)^2) ) := by
+            rw [deriv_Γ_t_tr_at M r hr hf]
+    _   = (2 * M) * (r * f M r + M) / (r^4 * (f M r)^2) := by ring
 
 /-- `d/dθ Γ^φ_{θφ}(θ) = - csc² θ` (i.e. `- 1/(sin θ)^2`). -/
 @[simp] lemma deriv_Γ_φ_θφ_at
   (θ : ℝ) (hθ : Real.sin θ ≠ 0) :
   deriv (fun t => Γ_φ_θφ t) θ = - 1 / (Real.sin θ)^2 := by
   classical
-  -- derivative of csc via the reciprocal rule
+  -- csc′ via reciprocal rule
   have h_sin_diff : DifferentiableAt ℝ Real.sin θ := Real.differentiableAt_sin
   have h_inv :
       deriv (fun t => (Real.sin t)⁻¹) θ
@@ -1058,7 +1038,7 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
     simpa using deriv_inv_general Real.sin θ hθ h_sin_diff
   have hcos' : deriv (fun t => Real.cos t) θ = - Real.sin θ := by
     simpa using (Real.hasDerivAt_cos θ).deriv
-  -- product rule for cos * csc: need differentiability hypotheses
+  -- product rule for cos * csc
   have hd_cos : DifferentiableAt ℝ (fun t => Real.cos t) θ :=
     Real.differentiable_cos.differentiableAt
   have hd_csc : DifferentiableAt ℝ (fun t => (Real.sin t)⁻¹) θ :=
@@ -1069,7 +1049,7 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
           + Real.cos θ * ( - Real.cos θ / (Real.sin θ)^2 ) := by
     have hm := deriv_mul hd_cos hd_csc
     simpa [hcos', h_inv] using hm
-  -- algebraic cleanup: (-sin)*csc + cos*(-cos/sin^2) = - 1 / sin^2
+  -- cleanup: (-sin)*csc + cos*(-cos/sin^2) = - 1 / sin^2
   have h1 : (- Real.sin θ) * (Real.sin θ)⁻¹ = -1 := by
     field_simp [hθ]
   have h2 : Real.cos θ * ( - Real.cos θ / (Real.sin θ)^2 )
@@ -1084,11 +1064,11 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
     _   = (- Real.sin θ) * (Real.sin θ)⁻¹
           + Real.cos θ * ( - Real.cos θ / (Real.sin θ)^2 ) := h_mul
     _   = -1 - (Real.cos θ)^2 / (Real.sin θ)^2 := by
-            simpa [h1, h2, sub_eq_add_neg]
+            rw [h1, h2]; ring
     _   = - ((Real.sin θ)^2 + (Real.cos θ)^2) / (Real.sin θ)^2 := by
             field_simp [hθ, pow_two]; ring
     _   = - 1 / (Real.sin θ)^2 := by
-            simpa [trig, one_div]  -- sin^2 + cos^2 = 1
+            simpa [trig, one_div]
 
 /-- `d/dθ Γ^θ_{φφ}(θ) = sin² θ − cos² θ`. -/
 @[simp] lemma deriv_Γ_θ_φφ_at (θ : ℝ) :
@@ -1098,25 +1078,34 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
     simpa using (Real.hasDerivAt_sin θ).deriv
   have h2 : deriv (fun t => Real.cos t) θ = - Real.sin θ := by
     simpa using (Real.hasDerivAt_cos θ).deriv
-  -- Γ_θ_φφ = -(sin · cos): need differentiability hypotheses for product rule
+  -- Differentiability data for product rule
   have hd_sin : DifferentiableAt ℝ (fun t => Real.sin t) θ :=
     Real.differentiable_sin.differentiableAt
   have hd_cos : DifferentiableAt ℝ (fun t => Real.cos t) θ :=
     Real.differentiable_cos.differentiableAt
   have hprod := deriv_mul hd_sin hd_cos
-  -- derivative of -(sin*cos) = -(cos*cos + sin*(-sin))
-  have hneg : deriv (fun t => - (Real.sin t * Real.cos t)) θ
-         = - (Real.cos θ * Real.cos θ + Real.sin θ * (- Real.sin θ)) := by
-    have := congrArg (fun x => -x) hprod
-    simpa [h1, h2, mul_comm, mul_left_comm, mul_assoc] using this
-  -- now rewrite in the Γ_θ_φφ form
-  simpa [Γ_θ_φφ, mul_comm, mul_left_comm, mul_assoc, pow_two] using hneg
+  -- `deriv(sin·cos) = cos·cos + sin·(-sin)`
+  have hmul :
+      deriv (fun t => Real.sin t * Real.cos t) θ
+        = Real.cos θ * Real.cos θ + Real.sin θ * (- Real.sin θ) := by
+    simpa [h1, h2, mul_comm, mul_left_comm, mul_assoc] using hprod
+  -- Now use Γ_θ_φφ = -(sin·cos)
+  calc
+    deriv (fun t => Γ_θ_φφ t) θ
+        = deriv (fun t => - (Real.sin t * Real.cos t)) θ := by
+            simp [Γ_θ_φφ]
+    _   = - deriv (fun t => Real.sin t * Real.cos t) θ := by simp
+    _   = - (Real.cos θ * Real.cos θ + Real.sin θ * (- Real.sin θ)) := by
+            rw [hmul]
+    _   = (Real.sin θ)^2 - (Real.cos θ)^2 := by
+            ring
 
 /-- Convenience product: `Γ^θ_{φφ} · Γ^φ_{θφ} = -cos² θ`. Helpful for θ‑sector cancellations. -/
-@[simp] lemma Γ_θ_φφ_mul_Γ_φ_θφ (θ : ℝ) :
+@[simp] lemma Γ_θ_φφ_mul_Γ_φ_θφ (θ : ℝ) (hθ : Real.sin θ ≠ 0) :
   Γ_θ_φφ θ * Γ_φ_θφ θ = - (Real.cos θ)^2 := by
-  classical
-  simp [Γ_θ_φφ, Γ_φ_θφ, pow_two, mul_comm, mul_left_comm, mul_assoc]
+  simp [Γ_θ_φφ, Γ_φ_θφ, pow_two, div_eq_mul_inv]
+  field_simp [hθ]
+  ring
 
 -- Minimal SimpSetup after dCoord definitions
 section SimpSetup
