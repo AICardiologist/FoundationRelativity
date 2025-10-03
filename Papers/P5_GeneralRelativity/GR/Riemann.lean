@@ -738,17 +738,6 @@ The helper predicates `DifferentiableAt_r` and `DifferentiableAt_θ` are defined
     · exact hg_θ.resolve_right (by simp)
   case φ => simp [dCoord]
 
-/-- Minimal helper: dCoord distributes over sumIdx without C² assumptions.
-    Piggybacks on dCoord_add_of_diff to expand the 4-point enumeration. -/
-@[simp] lemma dCoord_sumIdx_min (μ : Idx)
-    (F : Idx → ℝ → ℝ → ℝ) (r θ : ℝ) :
-  dCoord μ (fun r θ => sumIdx (fun k => F k r θ)) r θ
-  = sumIdx (fun k => dCoord μ (fun r θ => F k r θ) r θ) := by
-  classical
-  -- Expand the 4-point enumeration and use add-linearity twice.
-  -- No higher smoothness is required: the `dCoord_*_of_diff` lemmas supply/discharge side-conditions casewise.
-  simp [sumIdx_expand, dCoord_add_of_diff]
-
 /-! #### Calculus infrastructure for dCoord -/
 
 /- Legacy lemmas dCoord_add/sub/mul DELETED per professor mandate (2025-10-01).
@@ -4977,7 +4966,8 @@ theorem Ricci_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real
     simp [ g
          , Γ_r_rr, Γ_t_tr
          , Γ_r_φφ, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ
-         , Γtot
+         , Γtot, Γtot_t_tr, Γtot_r_rr  -- Add Γtot projection lemmas
+         , dCoord_r, dCoord_θ  -- Add dCoord definitions
          , pow_two, sq
          , deriv_Γ_t_tr_at M r hr_nz hf_ne
          , deriv_Γ_r_rr_at M r hr_nz hf_ne
@@ -5014,7 +5004,8 @@ theorem Ricci_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real
     simp [ g
          , Γ_r_rr, Γ_t_tr
          , Γ_r_φφ, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ
-         , Γtot
+         , Γtot, Γtot_t_tr, Γtot_r_rr
+         , dCoord_r, dCoord_θ
          , pow_two, sq
          , deriv_Γ_t_tr_at M r hr_nz hf_ne
          , deriv_Γ_r_rr_at M r hr_nz hf_ne
@@ -5045,7 +5036,8 @@ theorem Ricci_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real
     simp [ g
          , Γ_r_rr, Γ_t_tr
          , Γ_r_φφ, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ
-         , Γtot
+         , Γtot, Γtot_t_tr, Γtot_r_rr
+         , dCoord_r, dCoord_θ
          , pow_two, sq
          , deriv_Γ_t_tr_at M r hr_nz hf_ne
          , deriv_Γ_r_rr_at M r hr_nz hf_ne
@@ -5068,7 +5060,8 @@ theorem Ricci_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real
     simp [ g
          , Γ_r_rr, Γ_t_tr
          , Γ_r_φφ, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ
-         , Γtot
+         , Γtot, Γtot_t_tr, Γtot_r_rr
+         , dCoord_r, dCoord_θ
          , pow_two, sq
          , deriv_Γ_t_tr_at M r hr_nz hf_ne
          , deriv_Γ_r_rr_at M r hr_nz hf_ne
