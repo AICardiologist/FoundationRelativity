@@ -1056,11 +1056,23 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
     _   = (Real.sin θ)^2 - (Real.cos θ)^2 := by
             ring
 
-/-- Convenience product: `Γ^θ_{φφ} · Γ^φ_{θφ} = -cos² θ`. Helpful for θ‑sector cancellations. -/
+/-- Off-axis product identity: `Γ^θ_{φφ}(θ) * Γ^φ_{θφ}(θ) = - (cos θ)^2`,
+    valid under the natural hypothesis `sin θ ≠ 0` (away from the axis). -/
 @[simp] lemma Γ_θ_φφ_mul_Γ_φ_θφ (θ : ℝ) (hθ : Real.sin θ ≠ 0) :
   Γ_θ_φφ θ * Γ_φ_θφ θ = - (Real.cos θ)^2 := by
-  simp [Γ_θ_φφ, Γ_φ_θφ, pow_two, div_eq_mul_inv]
+  classical
+  -- `Γ_θ_φφ = -(sin θ)*(cos θ)`, `Γ_φ_θφ = (cos θ)/(sin θ)`
+  -- Multiply and clear the denominator using `hθ : sin θ ≠ 0`.
+  simp only [Γ_θ_φφ, Γ_φ_θφ, pow_two]
   field_simp [hθ]
+
+/-- On the axis (`sin θ = 0`) the product is `0`.  Useful to split cases when needed. -/
+lemma Γ_θ_φφ_mul_Γ_φ_θφ_onAxis (θ : ℝ) (hθ0 : Real.sin θ = 0) :
+  Γ_θ_φφ θ * Γ_φ_θφ θ = 0 := by
+  classical
+  -- Here `Γ_θ_φφ θ = 0`, while `Γ_φ_θφ θ = cos θ / 0 = 0` in this snapshot (inv 0 = 0),
+  -- so the product is definitionally `0`.
+  simp [Γ_θ_φφ, Γ_φ_θφ, hθ0]
 
 -- Minimal SimpSetup after dCoord definitions
 section SimpSetup
