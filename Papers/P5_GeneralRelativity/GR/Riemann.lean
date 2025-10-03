@@ -1691,6 +1691,13 @@ lemma dCoord_r_θ_commute_for_g (M r θ : ℝ) (a b : Idx) :
 -- ========== C2 Smoothness Lemmas (Second-Order Differentiability) ==========
 -- These are now MOVED to after C1 lemmas (after line 1722) to satisfy dependencies
 
+/-
+DEFERRED: C² smoothness lemmas (not needed for Ricci vacuum proof)
+
+These lemmas establish second-order differentiability (∂(∂g)), which would be required
+for higher-order curvature computations but are not on the critical path for proving
+that the Schwarzschild spacetime is a vacuum solution (Ricci tensor = 0).
+
 /-- The first derivative of g (wrt any coordinate) is itself differentiable in r (C2 smoothness).
     Note: This is about the partially-applied function (dCoord μ g) as a function of (r,θ). -/
 @[simp]
@@ -1711,6 +1718,7 @@ lemma dCoord_g_differentiable_θ (M r θ : ℝ) (μ a b : Idx)
   -- Most cases are trivial (constants)
   -- Key case: μ=θ with g_φφ uses differentiableAt_deriv_sin_sq
   SCAFFOLD_TODO  -- TODO: Complete case analysis using differentiableAt_deriv_sin_sq
+-/
 
 -- ========== C1 Smoothness Lemmas (Γtot Differentiability) ==========
 -- Required for alternation_dC_eq_Riem proof (Phase 3.2a per professor's guidance)
