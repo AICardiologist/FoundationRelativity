@@ -738,6 +738,17 @@ The helper predicates `DifferentiableAt_r` and `DifferentiableAt_θ` are defined
     · exact hg_θ.resolve_right (by simp)
   case φ => simp [dCoord]
 
+/-- Minimal helper: dCoord distributes over sumIdx without C² assumptions.
+    Piggybacks on dCoord_add_of_diff to expand the 4-point enumeration. -/
+@[simp] lemma dCoord_sumIdx_min (μ : Idx)
+    (F : Idx → ℝ → ℝ → ℝ) (r θ : ℝ) :
+  dCoord μ (fun r θ => sumIdx (fun k => F k r θ)) r θ
+  = sumIdx (fun k => dCoord μ (fun r θ => F k r θ) r θ) := by
+  classical
+  -- Expand the 4-point enumeration and use add-linearity twice.
+  -- No higher smoothness is required: the `dCoord_*_of_diff` lemmas supply/discharge side-conditions casewise.
+  simp [sumIdx_expand, dCoord_add_of_diff]
+
 /-! #### Calculus infrastructure for dCoord -/
 
 /- Legacy lemmas dCoord_add/sub/mul DELETED per professor mandate (2025-10-01).
@@ -4925,11 +4936,147 @@ theorem Ricci_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real
   case φ.r => exact Ricci_offdiag_sum_φr M r θ
   case φ.θ => exact Ricci_offdiag_sum_φθ M r θ
 
-  -- Diagonal cases (4 cases) - awaiting Junior Professor guidance
-  case t.t => SCAFFOLD_TODO
-  case r.r => SCAFFOLD_TODO
-  case θ.θ => SCAFFOLD_TODO
-  case φ.φ => SCAFFOLD_TODO
+  -- Diagonal cases (4 cases) - using Patch M from Junior Professor
+  case t.t =>
+    classical
+    have hf_ne : f M r ≠ 0 := Exterior.f_ne_zero h_ext
+
+    -- Σ_ρ R_ρtρt, drop ρ=t term
+    simp only [sumIdx_expand]
+    simp only [Riemann_first_equal_zero_ext M r θ h_ext h_sin_nz]
+
+    -- reorder R_rtrt, R_θtθt, R_φtφt to match reduction lemmas
+    have h_rt : Riemann M r θ Idx.r Idx.t Idx.r Idx.t
+              = Riemann M r θ Idx.t Idx.r Idx.t Idx.r := by
+      simpa using
+        (by
+          have := Riemann_swap_a_b_ext M r θ h_ext h_sin_nz Idx.r Idx.t Idx.r Idx.t
+          have := Riemann_swap_c_d M r θ Idx.t Idx.r Idx.r Idx.t ▸ this
+          simpa)
+    have h_th : Riemann M r θ Idx.θ Idx.t Idx.θ Idx.t
+              = Riemann M r θ Idx.t Idx.θ Idx.t Idx.θ := by
+      simpa using
+        (by
+          have := Riemann_swap_a_b_ext M r θ h_ext h_sin_nz Idx.θ Idx.t Idx.θ Idx.t
+          have := Riemann_swap_c_d M r θ Idx.t Idx.θ Idx.θ Idx.t ▸ this
+          simpa)
+    have h_ph : Riemann M r θ Idx.φ Idx.t Idx.φ Idx.t
+              = Riemann M r θ Idx.t Idx.φ Idx.t Idx.φ := by
+      simpa using
+        (by
+          have := Riemann_swap_a_b_ext M r θ h_ext h_sin_nz Idx.φ Idx.t Idx.φ Idx.t
+          have := Riemann_swap_c_d M r θ Idx.t Idx.φ Idx.φ Idx.t ▸ this
+          simpa)
+
+    -- rewrite and reduce the three terms
+    rw [h_rt, h_th, h_ph,
+        Riemann_trtr_reduce, Riemann_tθtθ_reduce, Riemann_tφtφ_reduce]
+
+    -- normalize Christoffels + compute the few derivatives
+    have hθ : Real.sin θ ≠ 0 := h_sin_nz
+    simp [ g
+         , Γ_r_rr, Γ_t_tr
+         , Γ_r_φφ, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ
+         , Γtot
+         , pow_two, sq
+         , deriv_Γ_t_tr_at M r hr_nz hf_ne
+         , deriv_Γ_r_rr_at M r hr_nz hf_ne
+         , deriv_Γ_θ_φφ_at θ
+         , deriv_Γ_φ_θφ_at θ hθ
+         ]
+
+    field_simp [hr_nz, hf_ne, hθ, pow_two, sq]; ring
+  case r.r =>
+    classical
+    have hf_ne : f M r ≠ 0 := Exterior.f_ne_zero h_ext
+    simp only [sumIdx_expand]
+    simp only [Riemann_first_equal_zero_ext M r θ h_ext h_sin_nz]
+
+    -- reorder the two angular terms to rθrθ / rφrφ
+    have h_rθ : Riemann M r θ Idx.θ Idx.r Idx.θ Idx.r
+              = Riemann M r θ Idx.r Idx.θ Idx.r Idx.θ := by
+      simpa using
+        (by
+          have := Riemann_swap_a_b_ext M r θ h_ext h_sin_nz Idx.θ Idx.r Idx.θ Idx.r
+          have := Riemann_swap_c_d M r θ Idx.r Idx.θ Idx.θ Idx.r ▸ this
+          simpa)
+    have h_rφ : Riemann M r θ Idx.φ Idx.r Idx.φ Idx.r
+              = Riemann M r θ Idx.r Idx.φ Idx.r Idx.φ := by
+      simpa using
+        (by
+          have := Riemann_swap_a_b_ext M r θ h_ext h_sin_nz Idx.φ Idx.r Idx.φ Idx.r
+          have := Riemann_swap_c_d M r θ Idx.r Idx.φ Idx.φ Idx.r ▸ this
+          simpa)
+
+    rw [Riemann_trtr_reduce, h_rθ, h_rφ, Riemann_rθrθ_reduce, Riemann_rφrφ_reduce]
+
+    have hθ : Real.sin θ ≠ 0 := h_sin_nz
+    simp [ g
+         , Γ_r_rr, Γ_t_tr
+         , Γ_r_φφ, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ
+         , Γtot
+         , pow_two, sq
+         , deriv_Γ_t_tr_at M r hr_nz hf_ne
+         , deriv_Γ_r_rr_at M r hr_nz hf_ne
+         , deriv_Γ_θ_φφ_at θ
+         , deriv_Γ_φ_θφ_at θ hθ
+         ]
+
+    field_simp [hr_nz, hf_ne, hθ, pow_two, sq]; ring
+
+  case θ.θ =>
+    classical
+    have hf_ne : f M r ≠ 0 := Exterior.f_ne_zero h_ext
+    simp only [sumIdx_expand]
+    simp only [Riemann_first_equal_zero_ext M r θ h_ext h_sin_nz]
+
+    -- reorder φθφθ → θφθφ
+    have h_θφ : Riemann M r θ Idx.φ Idx.θ Idx.φ Idx.θ
+              = Riemann M r θ Idx.θ Idx.φ Idx.θ Idx.φ := by
+      simpa using
+        (by
+          have := Riemann_swap_a_b_ext M r θ h_ext h_sin_nz Idx.φ Idx.θ Idx.φ Idx.θ
+          have := Riemann_swap_c_d M r θ Idx.θ Idx.φ Idx.φ Idx.θ ▸ this
+          simpa)
+
+    rw [Riemann_tθtθ_reduce, Riemann_rθrθ_reduce, h_θφ, Riemann_θφθφ_reduce]
+
+    have hθ : Real.sin θ ≠ 0 := h_sin_nz
+    simp [ g
+         , Γ_r_rr, Γ_t_tr
+         , Γ_r_φφ, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ
+         , Γtot
+         , pow_two, sq
+         , deriv_Γ_t_tr_at M r hr_nz hf_ne
+         , deriv_Γ_r_rr_at M r hr_nz hf_ne
+         , deriv_Γ_θ_φφ_at θ
+         , deriv_Γ_φ_θφ_at θ hθ
+         ]
+
+    field_simp [hr_nz, hf_ne, hθ, pow_two, sq]; ring
+
+  case φ.φ =>
+    classical
+    have hf_ne : f M r ≠ 0 := Exterior.f_ne_zero h_ext
+    simp only [sumIdx_expand]
+    simp only [Riemann_first_equal_zero_ext M r θ h_ext h_sin_nz]
+
+    -- all three terms already in standard order
+    rw [Riemann_tφtφ_reduce, Riemann_rφrφ_reduce, Riemann_θφθφ_reduce]
+
+    have hθ : Real.sin θ ≠ 0 := h_sin_nz
+    simp [ g
+         , Γ_r_rr, Γ_t_tr
+         , Γ_r_φφ, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ
+         , Γtot
+         , pow_two, sq
+         , deriv_Γ_t_tr_at M r hr_nz hf_ne
+         , deriv_Γ_r_rr_at M r hr_nz hf_ne
+         , deriv_Γ_θ_φφ_at θ
+         , deriv_Γ_φ_θφ_at θ hθ
+         ]
+
+    field_simp [hr_nz, hf_ne, hθ, pow_two, sq]; ring
 
 end Schwarzschild
 end Papers.P5_GeneralRelativity
