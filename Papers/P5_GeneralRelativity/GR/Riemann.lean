@@ -2163,17 +2163,109 @@ lemma dCoord_ContractionC_expanded (M r θ : ℝ) (μ c a b : Idx)
     (dCoord μ (fun r θ => Γtot M r θ k c b) r θ * g M a k r θ +
      Γtot M r θ k c b * dCoord μ (fun r θ => g M a k r θ) r θ)
   ) := by
-  -- Strategy: Distribute dCoord through sum and products using linearity
+  classical
+  -- Unfold the definition once
   simp only [ContractionC]
-  rw [dCoord_sumIdx]
-  congr; ext k
-  rw [dCoord_add_of_diff, dCoord_mul_of_diff, dCoord_mul_of_diff]
-  · discharge_diff
-  · left; exact Γtot_differentiable_r M r θ k c b hM h_ext h_sin_nz
-  · left; exact g_differentiable_r M r θ k b
-  · discharge_diff
-  · left; exact Γtot_differentiable_r M r θ k c a hM h_ext h_sin_nz
-  · left; exact g_differentiable_r M r θ k b
+
+  -- Define the summand as a function for clarity
+  let F : Idx → ℝ → ℝ → ℝ := fun k r θ =>
+    Γtot M r θ k c a * g M k b r θ + Γtot M r θ k c b * g M a k r θ
+
+  -- Show F k is differentiable in r for all k (supply as Or.inl)
+  have hF_r : ∀ k, DifferentiableAt_r (F k) r θ ∨ μ ≠ Idx.r := by
+    intro k; left
+    unfold DifferentiableAt_r F
+    refine DifferentiableAt.add ?_ ?_
+    · refine DifferentiableAt.mul ?_ ?_
+      · simpa [DifferentiableAt_r] using (Γtot_differentiable_r M r θ k c a hM h_ext h_sin_nz)
+      · simpa [DifferentiableAt_r] using (g_differentiable_r M r θ k b hM h_ext h_sin_nz)
+    · refine DifferentiableAt.mul ?_ ?_
+      · simpa [DifferentiableAt_r] using (Γtot_differentiable_r M r θ k c b hM h_ext h_sin_nz)
+      · simpa [DifferentiableAt_r] using (g_differentiable_r M r θ a k hM h_ext h_sin_nz)
+
+  -- Show F k is differentiable in θ for all k (supply as Or.inl)
+  have hF_θ : ∀ k, DifferentiableAt_θ (F k) r θ ∨ μ ≠ Idx.θ := by
+    intro k; left
+    unfold DifferentiableAt_θ F
+    refine DifferentiableAt.add ?_ ?_
+    · refine DifferentiableAt.mul ?_ ?_
+      · simpa [DifferentiableAt_θ] using (Γtot_differentiable_θ M r θ k c a hM h_ext h_sin_nz)
+      · simpa [DifferentiableAt_θ] using (g_differentiable_θ M r θ k b hM h_ext h_sin_nz)
+    · refine DifferentiableAt.mul ?_ ?_
+      · simpa [DifferentiableAt_θ] using (Γtot_differentiable_θ M r θ k c b hM h_ext h_sin_nz)
+      · simpa [DifferentiableAt_θ] using (g_differentiable_θ M r θ a k hM h_ext h_sin_nz)
+
+  -- Push dCoord across the sum
+  have hsum := dCoord_sumIdx μ F r θ hF_r hF_θ
+
+  -- Expand each summand using product rules
+  simpa [F] using
+    (by
+      have := hsum
+      simpa [F] at this
+      refine this.trans ?_
+      funext k
+
+      -- Split the addition
+      have h_add :
+        dCoord μ (fun r θ => Γtot M r θ k c a * g M k b r θ + Γtot M r θ k c b * g M a k r θ) r θ =
+        dCoord μ (fun r θ => Γtot M r θ k c a * g M k b r θ) r θ +
+        dCoord μ (fun r θ => Γtot M r θ k c b * g M a k r θ) r θ := by
+        have h1 := dCoord_add_of_diff μ
+          (fun r θ => Γtot M r θ k c a * g M k b r θ)
+          (fun r θ => Γtot M r θ k c b * g M a k r θ) r θ
+          (Or.inl (by
+            unfold DifferentiableAt_r
+            exact (DifferentiableAt.mul
+              ((Γtot_differentiable_r M r θ k c a hM h_ext h_sin_nz) : _)
+              ((g_differentiable_r M r θ k b hM h_ext h_sin_nz) : _))))
+          (Or.inl (by
+            unfold DifferentiableAt_r
+            exact (DifferentiableAt.mul
+              ((Γtot_differentiable_r M r θ k c b hM h_ext h_sin_nz) : _)
+              ((g_differentiable_r M r θ a k hM h_ext h_sin_nz) : _))))
+          (Or.inl (by
+            unfold DifferentiableAt_θ
+            exact (DifferentiableAt.mul
+              ((Γtot_differentiable_θ M r θ k c a hM h_ext h_sin_nz) : _)
+              ((g_differentiable_θ M r θ k b hM h_ext h_sin_nz) : _))))
+          (Or.inl (by
+            unfold DifferentiableAt_θ
+            exact (DifferentiableAt.mul
+              ((Γtot_differentiable_θ M r θ k c b hM h_ext h_sin_nz) : _)
+              ((g_differentiable_θ M r θ a k hM h_ext h_sin_nz) : _))))
+        simpa using h1
+
+      -- Expand first product
+      have h_prod₁ :
+        dCoord μ (fun r θ => Γtot M r θ k c a * g M k b r θ) r θ =
+        dCoord μ (fun r θ => Γtot M r θ k c a) r θ * g M k b r θ +
+        Γtot M r θ k c a * dCoord μ (fun r θ => g M k b r θ) r θ := by
+        have h := dCoord_mul_of_diff μ
+          (fun r θ => Γtot M r θ k c a)
+          (fun r θ => g M k b r θ) r θ
+          (Or.inl (by simpa [DifferentiableAt_r] using (Γtot_differentiable_r M r θ k c a hM h_ext h_sin_nz)))
+          (Or.inl (by simpa [DifferentiableAt_r] using (g_differentiable_r M r θ k b hM h_ext h_sin_nz)))
+          (Or.inl (by simpa [DifferentiableAt_θ] using (Γtot_differentiable_θ M r θ k c a hM h_ext h_sin_nz)))
+          (Or.inl (by simpa [DifferentiableAt_θ] using (g_differentiable_θ M r θ k b hM h_ext h_sin_nz)))
+        simpa using h
+
+      -- Expand second product
+      have h_prod₂ :
+        dCoord μ (fun r θ => Γtot M r θ k c b * g M a k r θ) r θ =
+        dCoord μ (fun r θ => Γtot M r θ k c b) r θ * g M a k r θ +
+        Γtot M r θ k c b * dCoord μ (fun r θ => g M a k r θ) r θ := by
+        have h := dCoord_mul_of_diff μ
+          (fun r θ => Γtot M r θ k c b)
+          (fun r θ => g M a k r θ) r θ
+          (Or.inl (by simpa [DifferentiableAt_r] using (Γtot_differentiable_r M r θ k c b hM h_ext h_sin_nz)))
+          (Or.inl (by simpa [DifferentiableAt_r] using (g_differentiable_r M r θ a k hM h_ext h_sin_nz)))
+          (Or.inl (by simpa [DifferentiableAt_θ] using (Γtot_differentiable_θ M r θ k c b hM h_ext h_sin_nz)))
+          (Or.inl (by simpa [DifferentiableAt_θ] using (g_differentiable_θ M r θ a k hM h_ext h_sin_nz)))
+        simpa using h
+
+      simpa [h_prod₁, h_prod₂] using h_add
+    )
 
 /-- Alternation identity scaffold (baseline-neutral with optional micro-steps).
     We expand the contracted object and push `dCoord` through the finite sum,
