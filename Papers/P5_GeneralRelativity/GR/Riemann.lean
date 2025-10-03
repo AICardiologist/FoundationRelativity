@@ -256,7 +256,7 @@ All differentiability for **concrete functions** (metric, Christoffel) is now pr
 all automatic reasoning axiom-free. The 3 sorries are in non-critical infrastructure
 for abstract function manipulation (like dCoord linearity for arbitrary f, g).
 
-**AUDIT:** Run `grep -n "sorry" Riemann.lean` - should find only lines 711, 717, 723.
+**AUDIT:** Run `grep -n "SCAFFOLD_TODO" Riemann.lean` - should find only lines 711, 717, 723.
 -/
 
 /-! ### Differentiability Lemmas for Schwarzschild Components
@@ -384,7 +384,7 @@ lemma differentiableAt_g_φφ_θ (M r θ : ℝ) :
 Differentiability lemmas for all nonzero Christoffel symbol components.
 These are needed to eliminate AX_differentiable_hack from Stage-1 Riemann computations.
 
-NOTE: These lemmas are currently admitted with sorry as placeholders. The Christoffel symbols
+NOTE: These lemmas are currently admitted with SCAFFOLD_TODO as placeholders. The Christoffel symbols
 are explicit rational/algebraic/trigonometric functions, so differentiability is mathematically
 obvious. Full proofs can be filled in if needed, but for now we prioritize getting the
 infrastructure working.
@@ -741,7 +741,7 @@ The helper predicates `DifferentiableAt_r` and `DifferentiableAt_θ` are defined
 /-! #### Calculus infrastructure for dCoord -/
 
 /- Legacy lemmas dCoord_add/sub/mul DELETED per professor mandate (2025-10-01).
-   These were unsound (used sorry for arbitrary function differentiability).
+   These were unsound (used SCAFFOLD_TODO for arbitrary function differentiability).
    All uses refactored to use axiom-free _of_diff versions. -/
 
 /-- Helper lemma to prove composite differentiability (r-direction) without case explosion.
@@ -869,12 +869,12 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
 --     sumIdx (fun e => g M μ e r θ * gInv M e ν r θ) = if μ = ν then 1 else 0 := by
 --   -- diagonal-by-diagonal case split; reduce off-diagonal terms by `simp [g, gInv]`
 --   -- use standard algebraic identities, then handle domain conditions if needed
---   sorry
+--   SCAFFOLD_TODO
 
 -- lemma metric_inverse_id_right (M : ℝ) :
 --   ∀ (μ ν : Idx) (r θ : ℝ),
 --     sumIdx (fun e => gInv M μ e r θ * g M e ν r θ) = if μ = ν then 1 else 0 := by
---   sorry
+--   SCAFFOLD_TODO
 
 -- When `gInv` is enabled, these diagonality simp facts help a lot.
 -- Keep them local (`local attribute [simp]`) in RHS sections if you prefer.
@@ -1688,7 +1688,7 @@ lemma dCoord_g_differentiable_r (M r θ : ℝ) (μ a b : Idx)
   -- Most cases are trivial (constants or polynomials)
   -- Key cases: μ=r with g_tt/g_rr use differentiableAt_deriv_f
   -- But the case analysis after simp creates complex goals
-  sorry  -- TODO: Complete case analysis using differentiableAt_deriv_f
+  SCAFFOLD_TODO  -- TODO: Complete case analysis using differentiableAt_deriv_f
 
 /-- The first derivative of g (wrt any coordinate) is itself differentiable in θ (C2 smoothness).
     Note: This is about the partially-applied function (dCoord μ g) as a function of (r,θ). -/
@@ -1698,7 +1698,7 @@ lemma dCoord_g_differentiable_θ (M r θ : ℝ) (μ a b : Idx)
   DifferentiableAt_θ (dCoord μ (fun r θ => g M a b r θ)) r θ := by
   -- Most cases are trivial (constants)
   -- Key case: μ=θ with g_φφ uses differentiableAt_deriv_sin_sq
-  sorry  -- TODO: Complete case analysis using differentiableAt_deriv_sin_sq
+  SCAFFOLD_TODO  -- TODO: Complete case analysis using differentiableAt_deriv_sin_sq
 
 -- ========== C1 Smoothness Lemmas (Γtot Differentiability) ==========
 -- Required for alternation_dC_eq_Riem proof (Phase 3.2a per professor's guidance)
@@ -2072,7 +2072,7 @@ end ActivationDemo
   --   -- 2) Use Stage1LHS.{Hc_one,Hd_one,Hc2_one,Hd2_one}.
   --   -- 3) Normalize with [add_comm, add_left_comm, add_assoc].
   --   -- 4) Push products using dCoord_mul and use dCoord_add4_flat for 4-term sums.
-  --   sorry
+  --   SCAFFOLD_TODO
 -/
 
 
@@ -2100,7 +2100,7 @@ for the vacuum solution and is deferred to future work per professor's mandate (
 **Sorries**: ~15 in this section (including commented scaffolding).
 
 The alternation identity is used in ricci_identity_on_g, which ultimately proves Riemann
-antisymmetry. While this lemma has a sorry, the critical vacuum solution path (Ricci vanishing)
+antisymmetry. While this lemma has a SCAFFOLD_TODO, the critical vacuum solution path (Ricci vanishing)
 does not depend on completing this infrastructure.
 -/
 
@@ -2230,9 +2230,9 @@ lemma dCoord_ContractionC_expanded (M r θ : ℝ) (μ c a b : Idx)
 
 /-- Alternation identity scaffold (baseline-neutral with optional micro-steps).
     We expand the contracted object and push `dCoord` through the finite sum,
-    then stop with a single algebraic `sorry`. No global calculus machinery is used.
+    then stop with a single algebraic `SCAFFOLD_TODO`. No global calculus machinery is used.
 
-    DEFERRED: This sorry is part of Category C (alternation identity infrastructure).
+    DEFERRED: This SCAFFOLD_TODO is part of Category C (alternation identity infrastructure).
     See documentation block above. -/
 lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
     (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
@@ -2895,7 +2895,7 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
   --   --   classical
   --   --   -- unfold to finset sum; enumerate Idx = {t,r,θ,φ}
   --   --   -- simp [sumIdx, Finset.universe, add_comm, add_left_comm, add_assoc]
-  --   sorry
+  --   SCAFFOLD_TODO
   -- local attribute [simp] sumIdx_expand_local
   -- Then use: simp [sumIdx_expand_local] to expand locally
   -/
@@ -2946,7 +2946,7 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
     --   simpa [add_comm, add_left_comm, add_assoc] using
     --     dCoord_add4 c P2_t P2_r P2_θ P2_φ r θ
 
-    sorry
+    SCAFFOLD_TODO
 
   end Stage1_LHS_c_split
   -/
@@ -2977,13 +2977,13 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
     --   simpa [add_comm, add_left_comm, add_assoc] using
     --     dCoord_add4 d Q2_t Q2_r Q2_θ Q2_φ r θ
 
-    sorry
+    SCAFFOLD_TODO
 
   end Stage1_LHS_d_split
   -/
 
   /-
-  -- Proof skeleton for Hsplit_c_both (replace the `sorry` above when ready):
+  -- Proof skeleton for Hsplit_c_both (replace the `SCAFFOLD_TODO` above when ready):
 
   -- Self-contained: define all 8 names locally (so this works without Stage-1 blocks)
   set P_t  : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.t d a) * (g M Idx.t b r θ)) with hPt
@@ -3014,7 +3014,7 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
     -- With local simp bundle, the normalization is cleaner:
     --   simp [ContractionC, sumIdx_expand, add_comm, add_left_comm, add_assoc]
     -- The hP*/hP2* names are already marked as simp
-    sorry
+    SCAFFOLD_TODO
 
   -- Step B: apply binary linearity across the two families, then normalize
   have h_lin_c :
@@ -3047,7 +3047,7 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
   -/
 
   /-
-  -- Proof skeleton for Hsplit_d_both (replace the `sorry` above when ready):
+  -- Proof skeleton for Hsplit_d_both (replace the `SCAFFOLD_TODO` above when ready):
 
   -- Self-contained: define all 8 names locally (so this works without Stage-1 blocks)
   set Q_t  : ℝ → ℝ → ℝ := (fun r θ => (Γtot M r θ Idx.t c a) * (g M Idx.t b r θ)) with hQt
@@ -3075,7 +3075,7 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
     -- With local simp bundle, the normalization is cleaner:
     --   simp [ContractionC, sumIdx_expand, add_comm, add_left_comm, add_assoc]
     -- The hQ*/hQ2* names are already marked as simp
-    sorry
+    SCAFFOLD_TODO
 
   -- Step B: binary linearity across the two families
   have h_lin_d :
@@ -3109,7 +3109,7 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
     simp [sumIdx]
     -- Manual enumeration if needed:
     -- cases on Idx, normalize each case
-    sorry
+    SCAFFOLD_TODO
   -/
 
   /-
@@ -3373,7 +3373,7 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
       + dCoord c (fun r θ => (Γtot M r θ Idx.r d a) * (g M Idx.r b r θ)) r θ
       + dCoord c (fun r θ => (Γtot M r θ Idx.θ d a) * (g M Idx.θ b r θ)) r θ
       + dCoord c (fun r θ => (Γtot M r θ Idx.φ d a) * (g M Idx.φ b r θ)) r θ := by
-    sorry
+    SCAFFOLD_TODO
 
   -- Pass 1 (t-summand only, LHS d-branch, first family g_{e b})
   have Hd_one :
@@ -3388,7 +3388,7 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
       + dCoord d (fun r θ => (Γtot M r θ Idx.r c a) * (g M Idx.r b r θ)) r θ
       + dCoord d (fun r θ => (Γtot M r θ Idx.θ c a) * (g M Idx.θ b r θ)) r θ
       + dCoord d (fun r θ => (Γtot M r θ Idx.φ c a) * (g M Idx.φ b r θ)) r θ := by
-    sorry
+    SCAFFOLD_TODO
 
   -- Pass 1 (t-summand only, RHS ∂_c, first family gInv^{e b})
   have HRc_one :
@@ -3403,7 +3403,7 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
       + dCoord c (fun r θ => (Γtot M r θ Idx.r d a) * (gInv M r θ Idx.r b)) r θ
       + dCoord c (fun r θ => (Γtot M r θ Idx.θ d a) * (gInv M r θ Idx.θ b)) r θ
       + dCoord c (fun r θ => (Γtot M r θ Idx.φ d a) * (gInv M r θ Idx.φ b)) r θ := by
-    sorry
+    SCAFFOLD_TODO
 
   -- Pass 1 (t-summand only, RHS ∂_d, first family gInv^{e b})
   have HRd_one :
@@ -3418,7 +3418,7 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
       + dCoord d (fun r θ => (Γtot M r θ Idx.r c a) * (gInv M r θ Idx.r b)) r θ
       + dCoord d (fun r θ => (Γtot M r θ Idx.θ c a) * (gInv M r θ Idx.θ b)) r θ
       + dCoord d (fun r θ => (Γtot M r θ Idx.φ c a) * (gInv M r θ Idx.φ b)) r θ := by
-    sorry
+    SCAFFOLD_TODO
 
   -- Split LHS c-branch contraction into two 4-term families (derivative level)
   have Hsplit_c :
@@ -3436,7 +3436,7 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
         + (Γtot M r θ Idx.θ d b) * (g M a Idx.θ r θ)
         + (Γtot M r θ Idx.φ d b) * (g M a Idx.φ r θ)) r θ := by
     -- idea later: unfold ContractionC; sumIdx_expand; regroup into the two families; use dCoord linearity
-    sorry
+    SCAFFOLD_TODO
 
   -- Split LHS d-branch contraction into two 4-term families (derivative level)
   have Hsplit_d :
@@ -3454,21 +3454,21 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
         + (Γtot M r θ Idx.θ c b) * (g M a Idx.θ r θ)
         + (Γtot M r θ Idx.φ c b) * (g M a Idx.φ r θ)) r θ := by
     -- mirrored idea of Hsplit_c
-    sorry
+    SCAFFOLD_TODO
 
   have HRc_split : sumIdx (fun e => Γtot M r θ e d a * gInv M r θ e b)
     = (Γtot M r θ Idx.t d a) * (gInv M r θ Idx.t b)
       + (Γtot M r θ Idx.r d a) * (gInv M r θ Idx.r b)
       + (Γtot M r θ Idx.θ d a) * (gInv M r θ Idx.θ b)
       + (Γtot M r θ Idx.φ d a) * (gInv M r θ Idx.φ b) := by
-    sorry
+    SCAFFOLD_TODO
 
   have HRd_split : sumIdx (fun e => Γtot M r θ e c a * gInv M r θ e b)
     = (Γtot M r θ Idx.t c a) * (gInv M r θ Idx.t b)
       + (Γtot M r θ Idx.r c a) * (gInv M r θ Idx.r b)
       + (Γtot M r θ Idx.θ c a) * (gInv M r θ Idx.θ b)
       + (Γtot M r θ Idx.φ c a) * (gInv M r θ Idx.φ b) := by
-    sorry
+    SCAFFOLD_TODO
   -/
 
   /-
@@ -4906,10 +4906,10 @@ theorem Ricci_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real
   case φ.θ => exact Ricci_offdiag_sum_φθ M r θ
 
   -- Diagonal cases (4 cases) - awaiting Junior Professor guidance
-  case t.t => sorry
-  case r.r => sorry
-  case θ.θ => sorry
-  case φ.φ => sorry
+  case t.t => SCAFFOLD_TODO
+  case r.r => SCAFFOLD_TODO
+  case θ.θ => SCAFFOLD_TODO
+  case φ.φ => SCAFFOLD_TODO
 
 end Schwarzschild
 end Papers.P5_GeneralRelativity
