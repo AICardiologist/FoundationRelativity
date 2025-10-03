@@ -1238,6 +1238,23 @@ noncomputable def nabla_g (M r θ : ℝ) (c a b : Idx) : ℝ :=
   cases a <;>
     simp [sumIdx_expand, g, Γtot, mul_comm, mul_left_comm, mul_assoc]
 
+/-- Collapse a metric-weighted right contraction over the index `k`:
+    `∑_k F k · g_{k b} = F b · g_{b b}` (diagonal metric). -/
+@[simp] lemma sumIdx_mul_g_right
+    (M : ℝ) (r θ : ℝ) (b : Idx) (F : Idx → ℝ) :
+  sumIdx (fun k => F k * g M k b r θ) = F b * g M b b r θ := by
+  classical
+  cases b <;>
+    simp [sumIdx_expand, g, mul_comm, mul_left_comm, mul_assoc]
+
+/-- Collapse a metric-weighted left contraction over the index `k`:
+    `∑_k g_{a k} · F k = g_{a a} · F a` (diagonal metric). -/
+@[simp] lemma sumIdx_mul_g_left
+    (M : ℝ) (r θ : ℝ) (a : Idx) (F : Idx → ℝ) :
+  sumIdx (fun k => g M a k r θ * F k) = g M a a r θ * F a := by
+  classical
+  cases a <;>
+    simp [sumIdx_expand, g, mul_comm, mul_left_comm, mul_assoc]
 
 /-- With the two collapses, `nabla_g` has a tiny normal form. -/
 @[simp] lemma nabla_g_shape (M r θ : ℝ) (x a b : Idx) :
@@ -2287,19 +2304,62 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
   rw [dCoord_ContractionC_expanded M r θ c d a b hM h_ext h_sin_nz,
       dCoord_ContractionC_expanded M r θ d c a b hM h_ext h_sin_nz]
 
-  -- Step 3: Rewrite dCoord of metric components using metric compatibility
-  -- After expansion, we have terms like: dCoord c (g M k b) and dCoord d (g M k b)
-  -- Use dCoord_g_via_compat_ext to replace ∂g with Γ*g terms
-  simp only [dCoord_g_via_compat_ext M r θ hExt]
+  -- Step 3: Distribute outer sum and subtraction first
+  simp only [sumIdx_add, sumIdx_sub, sub_eq_add_neg]
 
-  -- Step 4: Expand RHS (Riemann definitions)
-  simp only [Riemann, RiemannUp]
+  -- Step 4: Collapse metric-weighted derivative terms using diagonal metric
+  -- These remove all occurrences of sumIdx (... * g ...)
+  have hc₁ :
+      sumIdx (fun k => dCoord c (fun r θ => Γtot M r θ k d a) r θ * g M k b r θ)
+      = dCoord c (fun r θ => Γtot M r θ b d a) r θ * g M b b r θ := by
+    classical; simpa using sumIdx_mul_g_right M r θ b (fun k => dCoord c (fun r θ => Γtot M r θ k d a) r θ)
 
-  -- Step 5: Normalize with simp
-  simp only [sumIdx_add, sumIdx_sub, sub_eq_add_neg, mul_add, add_mul,
-             add_comm, add_left_comm, add_assoc, mul_comm, mul_left_comm, mul_assoc]
+  have hc₂ :
+      sumIdx (fun k => dCoord c (fun r θ => Γtot M r θ k d b) r θ * g M a k r θ)
+      = g M a a r θ * dCoord c (fun r θ => Γtot M r θ a d b) r θ := by
+    classical; simpa [mul_comm] using sumIdx_mul_g_left M r θ a (fun k => dCoord c (fun r θ => Γtot M r θ k d b) r θ)
 
-  -- Step 6: Final normalization
+  have hd₁ :
+      sumIdx (fun k => dCoord d (fun r θ => Γtot M r θ k c a) r θ * g M k b r θ)
+      = dCoord d (fun r θ => Γtot M r θ b c a) r θ * g M b b r θ := by
+    classical; simpa using sumIdx_mul_g_right M r θ b (fun k => dCoord d (fun r θ => Γtot M r θ k c a) r θ)
+
+  have hd₂ :
+      sumIdx (fun k => dCoord d (fun r θ => Γtot M r θ k c b) r θ * g M a k r θ)
+      = g M a a r θ * dCoord d (fun r θ => Γtot M r θ a c b) r θ := by
+    classical; simpa [mul_comm] using sumIdx_mul_g_left M r θ a (fun k => dCoord d (fun r θ => Γtot M r θ k c b) r θ)
+
+  simp [hc₁, hc₂, hd₁, hd₂]
+
+  -- Step 5: Rewrite Γ · dCoord g using metric compatibility, then collapse inner sums
+  have hcompat_c_kb : ∀ k, dCoord c (fun r θ => g M k b r θ) r θ =
+      sumIdx (fun m => Γtot M r θ m c k * g M m b r θ) +
+      sumIdx (fun m => Γtot M r θ m c b * g M k m r θ) := by
+    intro k; simpa using dCoord_g_via_compat_ext M r θ hExt c k b
+
+  have hcompat_c_ak : ∀ k, dCoord c (fun r θ => g M a k r θ) r θ =
+      sumIdx (fun m => Γtot M r θ m c a * g M m k r θ) +
+      sumIdx (fun m => Γtot M r θ m c k * g M a m r θ) := by
+    intro k; simpa using dCoord_g_via_compat_ext M r θ hExt c a k
+
+  have hcompat_d_kb : ∀ k, dCoord d (fun r θ => g M k b r θ) r θ =
+      sumIdx (fun m => Γtot M r θ m d k * g M m b r θ) +
+      sumIdx (fun m => Γtot M r θ m d b * g M k m r θ) := by
+    intro k; simpa using dCoord_g_via_compat_ext M r θ hExt d k b
+
+  have hcompat_d_ak : ∀ k, dCoord d (fun r θ => g M a k r θ) r θ =
+      sumIdx (fun m => Γtot M r θ m d a * g M m k r θ) +
+      sumIdx (fun m => Γtot M r θ m d k * g M a m r θ) := by
+    intro k; simpa using dCoord_g_via_compat_ext M r θ hExt d a k
+
+  set_option maxHeartbeats 800000 in
+  simp only [hcompat_c_kb, hcompat_c_ak, hcompat_d_kb, hcompat_d_ak, sumIdx_add, mul_add, add_mul]
+  simp only [sumIdx_Γ_g_left, sumIdx_Γ_g_right]
+
+  -- Step 6: Expand RHS and match contracted form
+  simp only [Riemann_contract_first, RiemannUp]
+
+  -- Final normalization
   abel_nf
   set_option maxHeartbeats 2000000 in
   ring_nf
