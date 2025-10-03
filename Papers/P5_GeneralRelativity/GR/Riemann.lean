@@ -965,12 +965,12 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
     = - (2 * M) * (r * f M r + M) / (r^4 * (f M r)^2) := by
   classical
   -- H(s) := s^2 * f(s)
-  have hHdiff : DifferentiableAt ℝ (fun s => s^2 * f M s) r := by
-    have h1 : DifferentiableAt ℝ (fun s => s^2) r :=
-      (differentiable_pow 2).differentiableAt
-    have h2 : DifferentiableAt ℝ (fun s => f M s) r :=
-      (contDiffAt_f M r hr).differentiableAt le_top
-    exact h1.mul h2
+  -- Component differentiability for the product rule
+  have hd1 : DifferentiableAt ℝ (fun s => s^2) r :=
+    (differentiable_pow 2).differentiableAt
+  have hd2 : DifferentiableAt ℝ (fun s => f M s) r :=
+    (contDiffAt_f M r hr).differentiableAt le_top
+  have hHdiff : DifferentiableAt ℝ (fun s => s^2 * f M s) r := hd1.mul hd2
   -- H'(r) = (2r) f(r) + r^2 f'(r), and f'(r) = 2M / r^2
   have hf' := f_hasDerivAt M r hr
   have h_prod :
@@ -979,9 +979,13 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
     have h1 : deriv (fun s => s^2) r = 2 * r := deriv_pow_two_at r
     have h2 : deriv (fun s => f M s) r = 2 * M / r^2 := by
       simpa using hf'.deriv
-    -- product rule for s^2 * f: use named hypothesis, then rewrite
-    have h_mul := deriv_mul (fun s => s^2) (fun s => f M s) r
-    simpa [h1, h2, mul_comm, mul_left_comm, mul_assoc] using h_mul
+    -- product rule for s^2 * f: provide differentiability hypotheses explicitly
+    -- Note: deriv_mul gives deriv (g * h) = g r * deriv h r + deriv g r * h r
+    have h_mul := deriv_mul hd1 hd2
+    -- Convert goal to use Pi.mul form
+    show deriv ((fun s => s^2) * (fun s => f M s)) r = 2 * r * f M r + r^2 * (2 * M / r^2)
+    rw [h_mul, h1, h2]
+    ring
   -- (H(r))⁻¹ derivative
   have hden : r^2 * f M r ≠ 0 := mul_ne_zero (pow_ne_zero 2 hr) hf
   have h_inv :
@@ -992,10 +996,12 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
   -- then apply `deriv_const_mul` to avoid a type mismatch on this snapshot.
   have hΓfun : (fun s => Γ_t_tr M s) = (fun s => M * ((s^2 * f M s)⁻¹)) := by
     funext s; simp [Γ_t_tr, div_eq_mul_inv]
+  have hd_inv : DifferentiableAt ℝ (fun s => (s^2 * f M s)⁻¹) r := hHdiff.inv hden
   have hΓ :
       deriv (fun s => Γ_t_tr M s) r
         = M * deriv (fun s => (s^2 * f M s)⁻¹) r := by
-    simpa [hΓfun] using (deriv_const_mul M (fun s => (s^2 * f M s)⁻¹) r)
+    rw [hΓfun]
+    exact deriv_const_mul M hd_inv
   -- Assemble and clear denominators once
   have : deriv (fun s => Γ_t_tr M s) r
         = - M * ( (2 * r) * f M r + r^2 * (2 * M / r^2) ) / ((r^2 * f M r)^2) := by
@@ -1012,11 +1018,22 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
   -- Γ^r_{rr} = - Γ^t_{tr} pointwise
   have hΓfun : (fun s => Γ_r_rr M s) = (fun s => (-1) * Γ_t_tr M s) := by
     funext s; simp [Γ_r_rr, Γ_t_tr, mul_comm]
+  -- Γ_t_tr is differentiable since Γ_t_tr = M / (r² f)
+  have hd1 : DifferentiableAt ℝ (fun s => s^2) r :=
+    (differentiable_pow 2).differentiableAt
+  have hd2 : DifferentiableAt ℝ (fun s => f M s) r :=
+    (contDiffAt_f M r hr).differentiableAt le_top
+  have hHdiff : DifferentiableAt ℝ (fun s => s^2 * f M s) r := hd1.mul hd2
+  have hden : r^2 * f M r ≠ 0 := mul_ne_zero (pow_ne_zero 2 hr) hf
+  have hd_inv : DifferentiableAt ℝ (fun s => (s^2 * f M s)⁻¹) r := hHdiff.inv hden
+  have hd_Γttr : DifferentiableAt ℝ (fun s => Γ_t_tr M s) r :=
+    DifferentiableAt.const_mul hd_inv M
   -- Differentiate: deriv Γ_r_rr = (-1) * deriv Γ_t_tr
   have hderiv :
       deriv (fun s => Γ_r_rr M s) r
         = (-1) * deriv (fun s => Γ_t_tr M s) r := by
-    simpa [hΓfun, mul_comm] using (deriv_const_mul (-1) (fun s => Γ_t_tr M s) r)
+    rw [hΓfun]
+    exact deriv_const_mul (-1) hd_Γttr
   -- Multiply the known derivative of Γ_t_tr by (-1) and simplify
   have ht := deriv_Γ_t_tr_at M r hr hf
   have ht' :
@@ -1041,12 +1058,16 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
     simpa using deriv_inv_general Real.sin θ hθ h_sin_diff
   have hcos' : deriv (fun t => Real.cos t) θ = - Real.sin θ := by
     simpa using (Real.hasDerivAt_cos θ).deriv
-  -- product rule for cos * csc
+  -- product rule for cos * csc: need differentiability hypotheses
+  have hd_cos : DifferentiableAt ℝ (fun t => Real.cos t) θ :=
+    Real.differentiable_cos.differentiableAt
+  have hd_csc : DifferentiableAt ℝ (fun t => (Real.sin t)⁻¹) θ :=
+    (Real.differentiable_sin.differentiableAt).inv hθ
   have h_mul :
       deriv (fun t => Real.cos t * (Real.sin t)⁻¹) θ
         = (- Real.sin θ) * (Real.sin θ)⁻¹
           + Real.cos θ * ( - Real.cos θ / (Real.sin θ)^2 ) := by
-    have hm := deriv_mul (fun t => Real.cos t) (fun t => (Real.sin t)⁻¹) θ
+    have hm := deriv_mul hd_cos hd_csc
     simpa [hcos', h_inv] using hm
   -- algebraic cleanup: (-sin)*csc + cos*(-cos/sin^2) = - 1 / sin^2
   have h1 : (- Real.sin θ) * (Real.sin θ)⁻¹ = -1 := by
@@ -1077,8 +1098,12 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
     simpa using (Real.hasDerivAt_sin θ).deriv
   have h2 : deriv (fun t => Real.cos t) θ = - Real.sin θ := by
     simpa using (Real.hasDerivAt_cos θ).deriv
-  -- Γ_θ_φφ = -(sin · cos)
-  have hprod := deriv_mul (fun t => Real.sin t) (fun t => Real.cos t) θ
+  -- Γ_θ_φφ = -(sin · cos): need differentiability hypotheses for product rule
+  have hd_sin : DifferentiableAt ℝ (fun t => Real.sin t) θ :=
+    Real.differentiable_sin.differentiableAt
+  have hd_cos : DifferentiableAt ℝ (fun t => Real.cos t) θ :=
+    Real.differentiable_cos.differentiableAt
+  have hprod := deriv_mul hd_sin hd_cos
   -- derivative of -(sin*cos) = -(cos*cos + sin*(-sin))
   have hneg : deriv (fun t => - (Real.sin t * Real.cos t)) θ
          = - (Real.cos θ * Real.cos θ + Real.sin θ * (- Real.sin θ)) := by
@@ -2138,11 +2163,17 @@ lemma dCoord_ContractionC_expanded (M r θ : ℝ) (μ c a b : Idx)
     (dCoord μ (fun r θ => Γtot M r θ k c b) r θ * g M a k r θ +
      Γtot M r θ k c b * dCoord μ (fun r θ => g M a k r θ) r θ)
   ) := by
-  -- Strategy: Distribute dCoord through sum and products
-  -- Blocked: Requires dCoord_g_differentiable_r/θ to be fully proven (currently sorry)
-  -- Those lemmas need differentiableAt_deriv_f and differentiableAt_deriv_sin_sq
-  -- which in turn need the correct mathlib lemmas for ContDiffAt → differentiability of derivatives
-  sorry  -- TODO: Complete after C3 lemmas are proven
+  -- Strategy: Distribute dCoord through sum and products using linearity
+  simp only [ContractionC]
+  rw [dCoord_sumIdx]
+  congr; ext k
+  rw [dCoord_add_of_diff, dCoord_mul_of_diff, dCoord_mul_of_diff]
+  · discharge_diff
+  · left; exact Γtot_differentiable_r M r θ k c b hM h_ext h_sin_nz
+  · left; exact g_differentiable_r M r θ k b
+  · discharge_diff
+  · left; exact Γtot_differentiable_r M r θ k c a hM h_ext h_sin_nz
+  · left; exact g_differentiable_r M r θ k b
 
 /-- Alternation identity scaffold (baseline-neutral with optional micro-steps).
     We expand the contracted object and push `dCoord` through the finite sum,
