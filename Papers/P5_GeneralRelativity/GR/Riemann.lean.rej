@@ -1,0 +1,18 @@
+--- Papers/P5_GeneralRelativity/GR/Riemann.lean
++++ Papers/P5_GeneralRelativity/GR/Riemann.lean
+@@ -2057,11 +2057,11 @@
+   simp [add_comm, mul_comm]
+   -- Discharge differentiability obligations for the second product
+   · left; exact Γtot_differentiable_r M r θ k c b hM h_ext h_sin_nz
+-  · left; simp [dCoord_g_differentiable_r M r θ μ a k hM h_ext h_sin_nz]
++  · left; exact dCoord_g_differentiable_r M r θ μ a k hM h_ext h_sin_nz
+   · left; exact Γtot_differentiable_θ M r θ k c b hM h_ext h_sin_nz
+-  · left; simp [dCoord_g_differentiable_θ M r θ μ a k hM h_ext h_sin_nz]
++  · left; exact dCoord_g_differentiable_θ M r θ μ a k hM h_ext h_sin_nz
+   -- Discharge differentiability obligations for the first product
+   · left; exact Γtot_differentiable_r M r θ k c a hM h_ext h_sin_nz
+-  · left; simp [dCoord_g_differentiable_r M r θ μ k b hM h_ext h_sin_nz]
++  · left; exact dCoord_g_differentiable_r M r θ μ k b hM h_ext h_sin_nz
+   · left; exact Γtot_differentiable_θ M r θ k c a hM h_ext h_sin_nz
+-  · left; simp [dCoord_g_differentiable_θ M r θ μ k b hM h_ext h_sin_nz]
++  · left; exact dCoord_g_differentiable_θ M r θ μ k b hM h_ext h_sin_nz

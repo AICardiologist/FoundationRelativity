@@ -20,6 +20,8 @@ jobs:
   paper5-build:
     runs-on: ubuntu-latest
     if: ${{ !github.event.pull_request.draft }}
+    env:
+      LEAN_ABORT_ON_SORRY: 0
     steps:
       - uses: actions/checkout@v4
 

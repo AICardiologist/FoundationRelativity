@@ -1465,6 +1465,54 @@ section TotalChristoffel
 Collects all nonzero Christoffel symbols into a single function for Ricci computation.
 -/
 
+/-! ### Dependent Type Infrastructure for Christoffel Symbols
+
+For Level 3 de-axiomatization, we need to track which Christoffel symbol combinations
+are nonzero at the type level. This allows us to prove differentiability only for
+the nonzero cases, avoiding the need to prove differentiability for arbitrary index
+combinations (which would require the axiom we're trying to eliminate).
+-/
+
+/-- Predicate identifying the 13 nonzero Christoffel symbol combinations in Schwarzschild spacetime. -/
+inductive NonzeroChristoffel : Idx → Idx → Idx → Prop where
+  | t_tr : NonzeroChristoffel Idx.t Idx.t Idx.r
+  | t_rt : NonzeroChristoffel Idx.t Idx.r Idx.t
+  | r_tt : NonzeroChristoffel Idx.r Idx.t Idx.t
+  | r_rr : NonzeroChristoffel Idx.r Idx.r Idx.r
+  | r_θθ : NonzeroChristoffel Idx.r Idx.θ Idx.θ
+  | r_φφ : NonzeroChristoffel Idx.r Idx.φ Idx.φ
+  | θ_rθ : NonzeroChristoffel Idx.θ Idx.r Idx.θ
+  | θ_θr : NonzeroChristoffel Idx.θ Idx.θ Idx.r
+  | θ_φφ : NonzeroChristoffel Idx.θ Idx.φ Idx.φ
+  | φ_rφ : NonzeroChristoffel Idx.φ Idx.r Idx.φ
+  | φ_φr : NonzeroChristoffel Idx.φ Idx.φ Idx.r
+  | φ_θφ : NonzeroChristoffel Idx.φ Idx.θ Idx.φ
+  | φ_φθ : NonzeroChristoffel Idx.φ Idx.φ Idx.θ
+
+/-- Decidable instance for NonzeroChristoffel - allows case analysis. -/
+instance : DecidablePred (fun (p : Idx × Idx × Idx) => NonzeroChristoffel p.1 p.2.1 p.2.2) := by
+  intro ⟨μ, ν, ρ⟩
+  cases μ <;> cases ν <;> cases ρ <;>
+    (first | apply isTrue; constructor | apply isFalse; intro h; cases h)
+
+/-- Christoffel symbol value for nonzero combinations (requires proof of nonzero). -/
+noncomputable def Γtot_nonzero (M r θ : ℝ) (μ ν ρ : Idx) (_h : NonzeroChristoffel μ ν ρ) : ℝ :=
+  match μ, ν, ρ with
+  | Idx.t, Idx.t, Idx.r => Γ_t_tr M r
+  | Idx.t, Idx.r, Idx.t => Γ_t_tr M r
+  | Idx.r, Idx.t, Idx.t => Γ_r_tt M r
+  | Idx.r, Idx.r, Idx.r => Γ_r_rr M r
+  | Idx.r, Idx.θ, Idx.θ => Γ_r_θθ M r
+  | Idx.r, Idx.φ, Idx.φ => Γ_r_φφ M r θ
+  | Idx.θ, Idx.r, Idx.θ => Γ_θ_rθ r
+  | Idx.θ, Idx.θ, Idx.r => Γ_θ_rθ r
+  | Idx.θ, Idx.φ, Idx.φ => Γ_θ_φφ θ
+  | Idx.φ, Idx.r, Idx.φ => Γ_φ_rφ r
+  | Idx.φ, Idx.φ, Idx.r => Γ_φ_rφ r
+  | Idx.φ, Idx.θ, Idx.φ => Γ_φ_θφ θ
+  | Idx.φ, Idx.φ, Idx.θ => Γ_φ_θφ θ
+  | _, _, _ => 0  -- Unreachable due to proof h, but needed for totality
+
 /-- Total Christoffel as a function, backed by proven cases -/
 noncomputable def Γtot (M r θ : ℝ) : Idx → Idx → Idx → ℝ
 | Idx.t, Idx.t, Idx.r => Γ_t_tr M r
@@ -1481,6 +1529,11 @@ noncomputable def Γtot (M r θ : ℝ) : Idx → Idx → Idx → ℝ
 | Idx.φ, Idx.θ, Idx.φ => Γ_φ_θφ θ
 | Idx.φ, Idx.φ, Idx.θ => Γ_φ_θφ θ       -- symmetry Γ^φ_{θφ} = Γ^φ_{φθ}
 | _, _, _ => 0
+
+/-- Lemma: Γtot_nonzero agrees with Γtot for nonzero cases. -/
+lemma Γtot_nonzero_eq_Γtot (M r θ : ℝ) (μ ν ρ : Idx) (h : NonzeroChristoffel μ ν ρ) :
+    Γtot_nonzero M r θ μ ν ρ h = Γtot M r θ μ ν ρ := by
+  cases μ <;> cases ν <;> cases ρ <;> cases h <;> rfl
 
 -- Lemmas relating Γtot to the individual Christoffel symbols
 @[simp] lemma Γtot_t_tr (M r θ : ℝ) : Γtot M r θ Idx.t Idx.t Idx.r = Γ_t_tr M r := rfl
