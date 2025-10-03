@@ -816,50 +816,6 @@ lemma dCoord_add4_flat (μ : Idx) (A B C D : ℝ → ℝ → ℝ) (r θ : ℝ)
   simpa [add_comm, add_left_comm, add_assoc] using
     dCoord_add4 μ A B C D r θ hA_r hB_r hC_r hD_r hA_θ hB_θ hC_θ hD_θ
 
-/-- Push `dCoord` across `sumIdx` using a function-level expansion of `sumIdx`.
-    This is designed to pair with a local `sumIdx_expand_local` proved by `funext`. -/
-lemma dCoord_sumIdx_via_funext
-  (μ : Idx) (F : Idx → ℝ → ℝ → ℝ) (r θ : ℝ)
-  (hexp_fun :
-    (fun r θ => sumIdx (fun i => F i r θ))
-    =
-    (fun r θ =>
-      F Idx.t r θ + F Idx.r r θ + F Idx.θ r θ + F Idx.φ r θ)) :
-  dCoord μ (fun r θ => sumIdx (fun i => F i r θ)) r θ
-  =
-    dCoord μ (F Idx.t) r θ
-  + dCoord μ (F Idx.r) r θ
-  + dCoord μ (F Idx.θ) r θ
-  + dCoord μ (F Idx.φ) r θ := by
-  -- Rewrite using the function expansion
-  have h := congrArg (fun H => dCoord μ H r θ) hexp_fun
-  simp only at h
-  rw [h]
-  -- Now we need to apply dCoord_add_of_diff repeatedly
-  -- This is essentially dCoord_add4 but we can't use it without diff hypotheses
-  -- For now, use the axiom-free lemma directly with trivial discharge
-  sorry  -- TODO: Need differentiability hypotheses to proceed
-
-/-- Same as `dCoord_sumIdx_via_funext` but takes the *pointwise* local expansion
-    and builds the function-level equality internally via `funext`. -/
-lemma dCoord_sumIdx_via_local_expand
-  (μ : Idx) (F : Idx → ℝ → ℝ → ℝ) (r θ : ℝ)
-  (hexp_pointwise :
-    ∀ r θ, sumIdx (fun i => F i r θ)
-            = F Idx.t r θ + F Idx.r r θ + F Idx.θ r θ + F Idx.φ r θ) :
-  dCoord μ (fun r θ => sumIdx (fun i => F i r θ)) r θ
-  =
-    dCoord μ (F Idx.t) r θ
-  + dCoord μ (F Idx.r) r θ
-  + dCoord μ (F Idx.θ) r θ
-  + dCoord μ (F Idx.φ) r θ := by
-  have hexp_fun :
-      (fun r θ => sumIdx (fun i => F i r θ))
-      =
-      (fun r θ =>
-        F Idx.t r θ + F Idx.r r θ + F Idx.θ r θ + F Idx.φ r θ) := by
-    funext r θ; simpa using hexp_pointwise r θ
-  exact dCoord_sumIdx_via_funext μ F r θ hexp_fun
 
 /-- Distribution of `dCoord` over the abstract finite sum `sumIdx` (refactored). -/
 @[simp] lemma dCoord_sumIdx (μ : Idx) (F : Idx → ℝ → ℝ → ℝ) (r θ : ℝ)
