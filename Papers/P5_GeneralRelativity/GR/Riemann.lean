@@ -2312,22 +2312,26 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
   have hc₁ :
       sumIdx (fun k => dCoord c (fun r θ => Γtot M r θ k d a) r θ * g M k b r θ)
       = dCoord c (fun r θ => Γtot M r θ b d a) r θ * g M b b r θ := by
-    classical; simpa using sumIdx_mul_g_right M r θ b (fun k => dCoord c (fun r θ => Γtot M r θ k d a) r θ)
+    classical
+    simpa using sumIdx_mul_g_right M r θ b (fun k => dCoord c (fun r θ => Γtot M r θ k d a) r θ)
 
   have hc₂ :
       sumIdx (fun k => dCoord c (fun r θ => Γtot M r θ k d b) r θ * g M a k r θ)
       = g M a a r θ * dCoord c (fun r θ => Γtot M r θ a d b) r θ := by
-    classical; simpa [mul_comm] using sumIdx_mul_g_left M r θ a (fun k => dCoord c (fun r θ => Γtot M r θ k d b) r θ)
+    classical
+    simpa [mul_comm] using sumIdx_mul_g_left M r θ a (fun k => dCoord c (fun r θ => Γtot M r θ k d b) r θ)
 
   have hd₁ :
       sumIdx (fun k => dCoord d (fun r θ => Γtot M r θ k c a) r θ * g M k b r θ)
       = dCoord d (fun r θ => Γtot M r θ b c a) r θ * g M b b r θ := by
-    classical; simpa using sumIdx_mul_g_right M r θ b (fun k => dCoord d (fun r θ => Γtot M r θ k c a) r θ)
+    classical
+    simpa using sumIdx_mul_g_right M r θ b (fun k => dCoord d (fun r θ => Γtot M r θ k c a) r θ)
 
   have hd₂ :
       sumIdx (fun k => dCoord d (fun r θ => Γtot M r θ k c b) r θ * g M a k r θ)
       = g M a a r θ * dCoord d (fun r θ => Γtot M r θ a c b) r θ := by
-    classical; simpa [mul_comm] using sumIdx_mul_g_left M r θ a (fun k => dCoord d (fun r θ => Γtot M r θ k c b) r θ)
+    classical
+    simpa [mul_comm] using sumIdx_mul_g_left M r θ a (fun k => dCoord d (fun r θ => Γtot M r θ k c b) r θ)
 
   simp [hc₁, hc₂, hd₁, hd₂]
 
@@ -2352,7 +2356,6 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
       sumIdx (fun m => Γtot M r θ m d k * g M a m r θ) := by
     intro k; simpa using dCoord_g_via_compat_ext M r θ hExt d a k
 
-  set_option maxHeartbeats 800000 in
   simp only [hcompat_c_kb, hcompat_c_ak, hcompat_d_kb, hcompat_d_ak, sumIdx_add, mul_add, add_mul]
   simp only [sumIdx_Γ_g_left, sumIdx_Γ_g_right]
 
@@ -2361,7 +2364,6 @@ lemma alternation_dC_eq_Riem (M r θ : ℝ) (a b c d : Idx)
 
   -- Final normalization
   abel_nf
-  set_option maxHeartbeats 2000000 in
   ring_nf
 
   /-
