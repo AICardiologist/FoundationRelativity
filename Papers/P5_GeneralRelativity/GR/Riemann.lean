@@ -4894,6 +4894,222 @@ open Idx
 
 end OffDiagonalRicciMirror
 
+/-! ### Phase 1: Helper lemmas for component proofs -/
+
+lemma r_mul_f (M r : ℝ) (hr_nz : r ≠ 0) : r * f M r = r - 2 * M := by
+  unfold f
+  field_simp [hr_nz]
+
+lemma one_minus_f (M r : ℝ) : 1 - f M r = 2 * M / r := by
+  unfold f
+  ring
+
+lemma sub_twoM_ne_zero_of_exterior (M r : ℝ) (hr_ex : 2 * M < r) : r - M * 2 ≠ 0 := by
+  linarith
+
+/-! ### Phase 2: Schwarzschild Riemann component lemmas -/
+
+/-- Component: R_trtr = -2M/r³ -/
+lemma Riemann_trtr_eq (M r θ : ℝ) (hM : 0 < M) (hr_ex : 2 * M < r) :
+    Riemann M r θ Idx.t Idx.r Idx.t Idx.r = -2 * M / r ^ 3 := by
+  classical
+  have hr_nz : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
+  have hf_nz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
+  have hsub_nz : r - 2 * M ≠ 0 := by
+    have : 0 < r - 2 * M := sub_pos.mpr hr_ex
+    exact ne_of_gt this
+
+  -- Contract first index and expand (only case needing derivative calculators)
+  rw [Riemann_contract_first M r θ Idx.t Idx.r Idx.t Idx.r]
+  unfold RiemannUp
+  simp [g, dCoord_t, dCoord_r, sumIdx_expand, Γtot]
+
+  -- Apply derivative calculators
+  have hder_tr := deriv_Γ_t_tr_at M r hr_nz hf_nz
+  have hder_rr := deriv_Γ_r_rr_at M r hr_nz hf_nz
+  simp [hder_tr, hder_rr]
+
+  -- Expand the Γ symbols (keep f unexpanded)
+  simp [Γ_t_tr, Γ_r_rr, g]
+
+  -- Simplify directly with field_simp - the hsub_nz hypothesis lets it clear (r-2M)⁻¹ terms
+  field_simp [hr_nz, hsub_nz]
+  ring
+
+/-- Component: R_tθtθ = M·f(r)/r -/
+lemma Riemann_tθtθ_eq (M r θ : ℝ) (hM : 0 < M) (hr_ex : 2 * M < r) :
+    Riemann M r θ Idx.t Idx.θ Idx.t Idx.θ = M * f M r / r := by
+  classical
+  have hr_nz : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
+  have hf_nz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
+
+  -- Step 1: Structural Expansion
+  rw [Riemann_contract_first M r θ Idx.t Idx.θ Idx.t Idx.θ]
+  unfold RiemannUp
+  simp only [dCoord_t, dCoord_θ, sumIdx_expand, Γtot, g]
+
+  -- Step 2: Handle derivatives
+  simp only [deriv_const']
+
+  -- Step 3: Expand Γ symbols
+  simp only [Γ_t_tr, Γ_r_θθ]
+
+  -- Step 4: Algebraic closure using Junior Prof's 3-step pattern (Plan D)
+  -- Nonzero of r - 2M in the exterior
+  have hsub_nz : r - 2 * M ≠ 0 := by
+    have : 0 < r - 2 * M := sub_pos.mpr hr_ex
+    exact ne_of_gt this
+
+  -- Step D1: Factor one denominator
+  have hfactor :
+    -(r * M ^ 2 * (r - 2 * M)⁻¹ * 4)
+    + r ^ 2 * M * (r - 2 * M)⁻¹
+    + M ^ 3 * (r - 2 * M)⁻¹ * 4
+    =
+    (r - 2 * M)⁻¹ * (r ^ 2 * M - 4 * r * M ^ 2 + 4 * M ^ 3) := by
+    ring
+
+  -- Step D2: Numerator factorization
+  have hpoly :
+    r ^ 2 * M - 4 * r * M ^ 2 + 4 * M ^ 3
+      = (r * M - 2 * M ^ 2) * (r - 2 * M) := by
+    ring
+
+  -- Step D3: Cancel (r - 2M) with its inverse
+  have hcancel :
+    (r - 2 * M)⁻¹ * ((r * M - 2 * M ^ 2) * (r - 2 * M))
+      = (r * M - 2 * M ^ 2) := by
+    field_simp [hsub_nz]
+
+  -- Combine and close
+  have :
+    -(r * M ^ 2 * (r - 2 * M)⁻¹ * 4)
+    + r ^ 2 * M * (r - 2 * M)⁻¹
+    + M ^ 3 * (r - 2 * M)⁻¹ * 4
+    = r * M - 2 * M ^ 2 := by
+    calc
+      -(r * M ^ 2 * (r - 2 * M)⁻¹ * 4)
+        + r ^ 2 * M * (r - 2 * M)⁻¹
+        + M ^ 3 * (r - 2 * M)⁻¹ * 4
+          = (r - 2 * M)⁻¹ * (r ^ 2 * M - 4 * r * M ^ 2 + 4 * M ^ 3) := hfactor
+      _   = (r - 2 * M)⁻¹ * ((r * M - 2 * M ^ 2) * (r - 2 * M)) := by
+              rw [hpoly]
+      _   = (r * M - 2 * M ^ 2) := hcancel
+
+  -- Final cleanup to match RHS form (M * f M r / r)
+  simp only [f, div_eq_mul_inv]
+  field_simp [hr_nz]
+  simpa using this
+
+/-- Component: R_tφtφ = M·f(r)·sin²θ/r -/
+lemma Riemann_tφtφ_eq (M r θ : ℝ) (hM : 0 < M) (hr_ex : 2 * M < r) :
+    Riemann M r θ Idx.t Idx.φ Idx.t Idx.φ = M * f M r * Real.sin θ ^ 2 / r := by
+  classical
+  have hr_nz : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
+  have hf_nz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
+
+  -- Contract and expand (no derivatives)
+  rw [Riemann_contract_first M r θ Idx.t Idx.φ Idx.t Idx.φ]
+  unfold RiemannUp
+  simp [g, dCoord_t, dCoord_φ, sumIdx_expand, Γtot]
+
+  -- Expand Γ symbols (keep f unexpanded)
+  simp [Γ_t_tr, Γ_r_φφ, Γ_r_rr, g]
+
+  -- Clear denominators directly - hsub_nz lets field_simp handle (r-2M)⁻¹ terms
+  have hsub_nz : r - 2 * M ≠ 0 := by
+    have : 0 < r - 2 * M := sub_pos.mpr hr_ex
+    exact ne_of_gt this
+  field_simp [hr_nz, hsub_nz]
+  simp only [f]
+  field_simp [hr_nz]
+  ring
+
+/-- Component: R_rθrθ = -M/(r·f(r)) -/
+lemma Riemann_rθrθ_eq (M r θ : ℝ) (hM : 0 < M) (hr_ex : 2 * M < r) :
+    Riemann M r θ Idx.r Idx.θ Idx.r Idx.θ = -M / (r * f M r) := by
+  classical
+  have hr_nz : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
+  have hf_nz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
+  have hsub_nz := sub_twoM_ne_zero_of_exterior M r hr_ex
+
+  -- Contract and expand (∂ᵣΓʳ_θθ is just -1, no calculator needed)
+  rw [Riemann_contract_first M r θ Idx.r Idx.θ Idx.r Idx.θ]
+  unfold RiemannUp
+  simp [g, dCoord_r, dCoord_θ, sumIdx_expand, Γtot]
+
+  -- Expand Γ symbols (keep f unexpanded)
+  simp [Γ_r_θθ, Γ_r_rr, Γ_θ_rθ, g]
+
+  -- Clear denominators directly
+  have hsub_nz : r - 2 * M ≠ 0 := by
+    have : 0 < r - 2 * M := sub_pos.mpr hr_ex
+    exact ne_of_gt this
+  field_simp [hr_nz, hsub_nz]
+  simp only [f]
+  field_simp [hr_nz]
+  ring
+
+/-- Component: R_rφrφ = -M·sin²θ/(r·f(r)) -/
+lemma Riemann_rφrφ_eq (M r θ : ℝ) (hM : 0 < M) (hr_ex : 2 * M < r) :
+    Riemann M r θ Idx.r Idx.φ Idx.r Idx.φ = -M * Real.sin θ ^ 2 / (r * f M r) := by
+  classical
+  have hr_nz : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
+  have hf_nz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
+  have hsub_nz := sub_twoM_ne_zero_of_exterior M r hr_ex
+
+  -- Contract and expand (∂ᵣΓʳ_φφ is just -sin²θ, no calculator needed)
+  rw [Riemann_contract_first M r θ Idx.r Idx.φ Idx.r Idx.φ]
+  unfold RiemannUp
+  simp [g, dCoord_r, dCoord_φ, sumIdx_expand, Γtot]
+
+  -- Expand Γ symbols (keep f unexpanded)
+  simp [Γ_r_φφ, Γ_r_rr, Γ_φ_rφ, g]
+
+  -- Clear denominators directly
+  have hsub_nz : r - 2 * M ≠ 0 := by
+    have : 0 < r - 2 * M := sub_pos.mpr hr_ex
+    exact ne_of_gt this
+  field_simp [hr_nz, hsub_nz]
+  simp only [f]
+  field_simp [hr_nz]
+  ring
+
+/-- Component: R_θφθφ = 2Mr·sin²θ -/
+lemma Riemann_θφθφ_eq (M r θ : ℝ) (hM : 0 < M) (hr_ex : 2 * M < r) :
+    Riemann M r θ Idx.θ Idx.φ Idx.θ Idx.φ = 2 * M * r * Real.sin θ ^ 2 := by
+  classical
+  have hr_nz : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
+  have hf_nz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
+  have hsub_nz := sub_twoM_ne_zero_of_exterior M r hr_ex
+
+  -- Contract and expand
+  rw [Riemann_contract_first M r θ Idx.θ Idx.φ Idx.θ Idx.φ]
+  unfold RiemannUp
+  simp [g, dCoord_θ, dCoord_φ, sumIdx_expand, Γtot]
+
+  -- Handle the Γ_θ_φφ · Γ_φ_θφ product term
+  by_cases hsin : Real.sin θ = 0
+  · -- On-axis case: sin²θ = 0 so RHS = 0
+    simp only [hsin, pow_two, mul_zero, zero_mul]
+    simp [Γ_θ_rθ, Γ_r_φφ, Γ_θ_φφ, Γ_φ_θφ]
+    ring
+  · -- Off-axis case: use product lemma
+    have hprod : Γ_θ_φφ θ * Γ_φ_θφ θ = -(Real.cos θ) ^ 2 := by
+      simp [Γ_θ_φφ, Γ_φ_θφ, div_mul_eq_mul_div]
+      field_simp [hsin]
+      ring
+    simp [Γ_θ_rθ, Γ_r_φφ, hprod, g]
+
+    -- Clear denominators directly
+    have hsub_nz : r - 2 * M ≠ 0 := by
+      have : 0 < r - 2 * M := sub_pos.mpr hr_ex
+      exact ne_of_gt this
+    field_simp [hr_nz, hsub_nz, hsin]
+    simp only [f]
+    field_simp [hr_nz]
+    ring
+
 /-- Main theorem: Ricci tensor vanishes in the Schwarzschild exterior -/
 theorem Ricci_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) :
     ∀ a b, RicciContraction M r θ a b = 0 := by
