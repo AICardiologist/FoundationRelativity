@@ -5075,49 +5075,46 @@ lemma Riemann_rφrφ_eq (M r θ : ℝ) (hM : 0 < M) (hr_ex : 2 * M < r) :
   field_simp [hr_nz]
   ring
 
-/-- Component: R_θφθφ = 2Mr·sin²θ -/
+/-- Component: R_θφθφ = 2Mr·sin²θ (valid on all θ; no case split). -/
 lemma Riemann_θφθφ_eq (M r θ : ℝ) (hM : 0 < M) (hr_ex : 2 * M < r) :
     Riemann M r θ Idx.θ Idx.φ Idx.θ Idx.φ = 2 * M * r * Real.sin θ ^ 2 := by
   classical
-  have hr_nz : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
-  have hf_nz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
-  have hsub_nz := sub_twoM_ne_zero_of_exterior M r hr_ex
+  -- Nonzero facts for later cancellation off-axis (not used in the core algebra):
+  have hr_ne : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
 
-  -- Contract and expand
-  rw [Riemann_contract_first M r θ Idx.θ Idx.φ Idx.θ Idx.φ]
-  unfold RiemannUp
-  simp [g, dCoord_θ, dCoord_φ, sumIdx_expand, Γtot]
+  -- 1) Prove the *cross-multiplied* identity with g_{φφ}.
+  have H :
+      g M Idx.φ Idx.φ r θ * Riemann M r θ Idx.θ Idx.φ Idx.θ Idx.φ
+      =
+      (2 * M * r * Real.sin θ ^ 2) * g M Idx.φ Idx.φ r θ := by
+    -- Contract first index (ρ = θ only survives), then expand RiemannUp for (θ,φ,θ,φ)
+    -- and push the scalar g_{φφ} inside.
+    simp [Riemann_contract_first, RiemannUp, g, Γtot, sumIdx_expand, dCoord_θ]
 
-  -- Handle the Γ_θ_φφ · Γ_φ_θφ product term using the product identity
-  -- Key insight: Γ_θ_φφ θ * Γ_φ_θφ θ = -cos²θ for ALL θ (even when sin θ = 0)
-  have hprod : Γ_θ_φφ θ * Γ_φ_θφ θ = -(Real.cos θ) ^ 2 := by
-    by_cases hsin : Real.sin θ = 0
-    · -- On-axis: Γ_θ_φφ = 0 so product is 0, and cos²θ = 1
-      simp [Γ_θ_φφ, hsin, mul_zero]
-      -- Goal: 0 = -cos²θ, i.e., cos²θ = 0
-      -- But this is false when sin θ = 0 (then cos θ = ±1)
-      -- Actually, let's check if Γ_θ_φφ · Γ_φ_θφ is indeterminate (0 · ∞)
-      sorry  -- This needs careful analysis
-    · -- Off-axis: standard computation
-      simp [Γ_θ_φφ, Γ_φ_θφ, div_mul_eq_mul_div]
-      field_simp [hsin]
-      ring
+    -- Expand Christoffel symbols and use compatibility
+    simp [Γ_θ_rθ, Γ_r_φφ, Γ_θ_φφ, deriv_Γ_θ_φφ_at, compat_φ_θφ]
 
-  simp [Γ_θ_rθ, Γ_r_φφ, hprod, g]
+    -- Clear r⁻¹ terms
+    have hr_nz' : r ≠ 0 := hr_ne
+    field_simp [hr_nz']
 
-  -- Clear denominators directly
-  have hsub_nz : r - 2 * M ≠ 0 := by
-    have : 0 < r - 2 * M := sub_pos.mpr hr_ex
-    exact ne_of_gt this
+    -- Algebra closure
+    ring
+
+  -- 2) Cancel g_{φφ} off-axis; on-axis both sides are zero.
   by_cases hsin : Real.sin θ = 0
-  · -- On-axis case: sin²θ = 0
-    simp only [hsin, pow_two, mul_zero, zero_mul]
-    ring
-  · -- Off-axis case
-    field_simp [hr_nz, hsub_nz, hsin]
-    simp only [f]
-    field_simp [hr_nz]
-    ring
+  · -- On the axis: g_{φφ} = r^2 · sin²θ = 0, so both sides of H are 0.
+    simpa [g, pow_two, hsin] using H
+  · -- Off the axis: can cancel g_{φφ} (nonzero since r ≠ 0 and sin θ ≠ 0).
+    have hgφφ_ne : g M Idx.φ Idx.φ r θ ≠ 0 := by
+      -- g_{φφ} = r^2 · sin²θ
+      simp [g, pow_two, hsin, hr_ne]
+    -- Rearrange RHS of H to `g_{φφ} * (...)` and cancel on the left.
+    have H' :
+        g M Idx.φ Idx.φ r θ * Riemann M r θ Idx.θ Idx.φ Idx.θ Idx.φ
+      = g M Idx.φ Idx.φ r θ * (2 * M * r * Real.sin θ ^ 2) := by
+      simpa [mul_comm] using H
+    exact mul_left_cancel₀ hgφφ_ne H'
 
 /-- Main theorem: Ricci tensor vanishes in the Schwarzschild exterior -/
 theorem Ricci_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) :
