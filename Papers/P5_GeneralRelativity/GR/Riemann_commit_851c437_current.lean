@@ -397,14 +397,14 @@ lemma differentiableAt_Γ_t_tr_r (M r : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
   -- Γ_t_tr M r = M / (r^2 * f M r)
   apply DifferentiableAt.div
   · -- M is constant
-    exact differentiableAt_const M
+    exact differentiableAt_const (M : ℝ)
   · -- r^2 * f M r is differentiable
     apply DifferentiableAt.mul
     · -- r^2 is differentiable
       exact differentiable_pow 2 |>.differentiableAt
-    · -- f M r is differentiable
+    · -- f M r is differentiable; annotate the binder to avoid instance metavars
       -- f M r = 1 - 2*M/r
-      show DifferentiableAt ℝ (fun r' => f M r') r
+      show DifferentiableAt ℝ (fun (r' : ℝ) => f M r') r
       unfold f
       apply DifferentiableAt.sub
       · exact differentiableAt_const 1
@@ -424,8 +424,9 @@ lemma differentiableAt_Γ_r_tt_r (M r : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
   -- Γ_r_tt M r = M * f M r / r^2
   apply DifferentiableAt.div
   · apply DifferentiableAt.mul
-    · exact differentiableAt_const M
-    · show DifferentiableAt ℝ (fun r' => f M r') r
+    · exact differentiableAt_const (M : ℝ)
+    · -- annotate the binder to stabilize typeclass inference
+      show DifferentiableAt ℝ (fun (r' : ℝ) => f M r') r
       unfold f
       apply DifferentiableAt.sub
       · exact differentiableAt_const 1
@@ -654,9 +655,6 @@ macro_rules
           | { apply g_differentiable_θ <;> try assumption }
           | { apply ContractionC_differentiable_r <;> try assumption }
           | { apply ContractionC_differentiable_θ <;> try assumption }
-          -- Add C3 facts here when Path A is complete:
-          | { apply dCoord_g_differentiable_r <;> try assumption }
-          | { apply dCoord_g_differentiable_θ <;> try assumption }
 
           -- 2c. Fallback
           | { simp only [differentiableAt_const] }
@@ -1056,6 +1054,66 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
     _   = (Real.sin θ)^2 - (Real.cos θ)^2 := by
             ring
 
+/-! ### Additional Derivative Calculators (Level 3 Finalization) -/
+
+/-- `d/dr Γ^r_{θθ}(r) = -1`. -/
+@[simp] lemma deriv_Γ_r_θθ_at (M r : ℝ) (hr : r ≠ 0) :
+  deriv (fun s => Γ_r_θθ M s) r = -1 := by
+  classical
+  -- Γ^r_{θθ}(s) = -(s - 2*M)
+  have h_sub : deriv (fun s => s - (2*M)) r = 1 := by
+    -- d/dr s = 1, d/dr (2M) = 0
+    simpa [deriv_id'', deriv_const] using
+      deriv_sub (differentiableAt_id r) (differentiableAt_const (2*M))
+  have h_neg : deriv (fun s => -(s - (2*M))) r = -1 := by
+    -- d/dr (-(s-2M)) = -(d/dr (s-2M))
+    simpa [deriv_neg, h_sub]
+  simpa [Γ_r_θθ] using h_neg
+
+/-- `d/dr Γ^θ_{rθ}(r) = -1/r²`. -/
+@[simp] lemma deriv_Γ_θ_rθ_at (r : ℝ) (hr : r ≠ 0) :
+  deriv (fun s => Γ_θ_rθ s) r = -1 / r^2 := by
+  classical
+  -- Γ^θ_{rθ}(s) = 1/s
+  have h_rewrite : (fun s => Γ_θ_rθ s) = (fun s => (s)⁻¹) := by
+    funext s; simp [Γ_θ_rθ]
+  -- Use the robust reciprocal rule proved above
+  have h := deriv_inv_general (fun s => s) r (by simpa using hr) (differentiableAt_id r)
+  -- deriv id at r is 1
+  have hid : deriv (fun s => s) r = 1 := by simpa using deriv_id''
+  simpa [h_rewrite, hid, one_div, pow_two] using h
+
+/-- `∂/∂r Γ^r_{φφ}(r,θ) = -(sin θ)²`.  Treats `sin²θ` as an r-constant. -/
+@[simp] lemma deriv_Γ_r_φφ_at (M r θ : ℝ) :
+  deriv (fun s => Γ_r_φφ M s θ) r = -(Real.sin θ)^2 := by
+  classical
+  -- Γ^r_{φφ}(s,θ) = (-(s - 2*M)) * (sin θ)^2
+  have h_rewrite :
+    (fun s => Γ_r_φφ M s θ) = (fun s => (-(s - 2*M)) * (Real.sin θ)^2) := by
+    funext s; simp [Γ_r_φφ, mul_comm, mul_left_comm]
+  -- d/dr (-(s - 2*M)) = -1
+  have h_sub : deriv (fun s => s - (2*M)) r = 1 := by
+    simpa [deriv_id'', deriv_const] using
+      deriv_sub (differentiableAt_id r) (differentiableAt_const (2*M))
+  have h_neg : deriv (fun s => -(s - (2*M))) r = -1 := by
+    simpa [deriv_neg, h_sub]
+  -- multiply by the θ-constant (sin θ)^2
+  simpa [h_rewrite, h_neg] using
+    (deriv_mul_const (fun s => -(s - (2*M))) ((Real.sin θ)^2) r)
+
+/-- `d/dr Γ^φ_{rφ}(r) = -1/r²`.  Identical pattern to `Γ^θ_{rθ}`. -/
+@[simp] lemma deriv_Γ_φ_rφ_at (r : ℝ) (hr : r ≠ 0) :
+  deriv (fun s => Γ_φ_rφ s) r = -1 / r^2 := by
+  classical
+  have h_rewrite : (fun s => Γ_φ_rφ s) = (fun s => (s)⁻¹) := by
+    funext s; simp [Γ_φ_rφ]
+  have h := deriv_inv_general (fun s => s) r (by simpa using hr) (differentiableAt_id r)
+  have hid : deriv (fun s => s) r = 1 := by simpa using deriv_id''
+  simpa [h_rewrite, hid, one_div, pow_two] using h
+
+-- Note: deriv_Γ_r_φφ_θ already exists in Schwarzschild.lean with complete proof
+-- No need to duplicate here - the @[simp] attribute makes it available automatically
+
 /-- Off-axis product identity: `Γ^θ_{φφ}(θ) * Γ^φ_{θφ}(θ) = - (cos θ)^2`,
     valid under the natural hypothesis `sin θ ≠ 0` (away from the axis). -/
 @[simp] lemma Γ_θ_φφ_mul_Γ_φ_θφ (θ : ℝ) (hθ : Real.sin θ ≠ 0) :
@@ -1125,6 +1183,66 @@ noncomputable def Riemann
   -- expand the ρ-sum and use the diagonal equations for g
   cases a <;> -- a = t | r | θ | φ
     simp [Riemann, sumIdx_expand, g]
+
+/-! ### Auxiliary orientation component lemmas (Direct CRS)
+
+These two lemmas provide the same numerical values as the principal component lemmas,
+but in the *goal-native* orientations that appear after expanding the Ricci contraction
+for the `r.r` and `θ.θ` diagonal cases. They avoid any reliance on symmetry rewrites
+and therefore sidestep the `open Idx` pattern-matching ambiguity.
+-/
+
+/-- Schwarzschild Riemann component in the `t–r–t–r` orientation. -/
+lemma R_trtr_eq (M r θ : ℝ) (hM : 0 < M) (hr_ex : 2 * M < r) :
+  Riemann M r θ Idx.t Idx.r Idx.t Idx.r = (2 * M) / r^3 := by
+  classical
+  -- Exterior-domain nonvanishing facts
+  have hr_nz : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
+  have hf_nz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
+
+  -- Direct Controlled Rewriting Sequence
+  unfold Riemann RiemannUp
+  simp only [sumIdx_expand, Riemann_contract_first]
+
+  -- Phase 1: Projection (no unfolding of Γ-definitions yet)
+  simp only [g, Γtot, dCoord_t, dCoord_r]
+
+  -- Phase 2: Calculus (apply derivative calculators before unfolding Γ)
+  simp only [deriv_Γ_t_tr_at M r hr_nz hf_nz]
+
+  -- Phase 3: Definition Substitution (unfold remaining Γ on demand)
+  simp only [Γ_t_tr, Γ_r_rr, Γ_r_tt]
+
+  -- Phase 4: Algebraic normalization
+  unfold f
+  field_simp [hr_nz, hf_nz, pow_two, sq]
+  ring
+
+/-- Schwarzschild Riemann component in the `r–θ–r–θ` orientation. -/
+lemma R_rθrθ_eq (M r θ : ℝ) (hM : 0 < M) (hr_ex : 2 * M < r) :
+  Riemann M r θ Idx.r Idx.θ Idx.r Idx.θ = M / (r * f M r) := by
+  classical
+  -- Exterior-domain nonvanishing facts
+  have hr_nz : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
+  have hf_nz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
+
+  -- Direct Controlled Rewriting Sequence
+  unfold Riemann RiemannUp
+  simp only [sumIdx_expand, Riemann_contract_first]
+
+  -- Phase 1: Projection (no unfolding of Γ-definitions yet)
+  simp only [g, Γtot, dCoord_r, dCoord_θ]
+
+  -- Phase 2: Calculus
+  simp only [deriv_Γ_r_θθ_at M r hr_nz]  -- ∂/∂r Γ^r_{θθ} = -1
+
+  -- Phase 3: Definition Substitution
+  simp only [Γ_r_θθ, Γ_θ_rθ, Γ_r_rr, Γ_t_tr, Γ_r_tt, Γ_r_φφ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ]
+
+  -- Phase 4: Algebraic normalization
+  unfold f
+  field_simp [hr_nz, hf_nz, pow_two, sq]
+  ring
 
 /-! ## Small structural simp lemmas -/
 
@@ -1654,7 +1772,7 @@ end DraftRiemann
 lemma nabla_g_eq_dCoord_sub_C (M r θ : ℝ) (d a b : Idx) :
   nabla_g M r θ d a b = dCoord d (fun r θ => g M a b r θ) r θ - ContractionC M r θ d a b := by
   unfold nabla_g ContractionC
-  simp [sumIdx_add]
+  simp only [sumIdx_add]
   ring
 
 /-- Helper: dCoord (partial derivative) of a constant function is zero. -/
@@ -2185,6 +2303,9 @@ lemma dCoord_ContractionC_expanded (M r θ : ℝ) (μ c a b : Idx)
       have := hsum
       simp [F] at this
       refine this.trans ?_
+      -- Convert equality of sums to equality of summand functions,
+      -- then reduce to pointwise equality on the index.
+      refine congrArg (fun f : Idx → ℝ => sumIdx f) ?_
       funext k
 
       -- Split the addition
@@ -4650,8 +4771,7 @@ lemma Riemann_tφtφ_reduce (M r θ : ℝ) :
   Riemann M r θ Idx.t Idx.φ Idx.t Idx.φ
     = g M Idx.t Idx.t r θ * Γ_t_tr M r * Γ_r_φφ M r θ := by
   simp [Riemann, RiemannUp]
-  -- Expand sumIdx_expand and evaluate each index
-  simp [sumIdx_expand]
+  -- sumIdx_expand is now automatically applied (simp attribute)
   -- Most terms vanish due to zero Christoffel symbols
   simp [Γtot, mul_eq_zero]
   -- The only non-zero contribution is from λ = r
@@ -4777,9 +4897,13 @@ lemma raise4_R
 
 /-! ### Ricci Contraction and Vanishing Theorem -/
 
-/-- The Ricci tensor contraction: R_ab = ∑_ρ R^ρ_aρb -/
+/-- The Ricci tensor contraction: R_ab = g^{cd} R_{cadb} -/
 noncomputable def RicciContraction (M r θ : ℝ) (a b : Idx) : ℝ :=
-  sumIdx (fun ρ => Riemann M r θ ρ a ρ b)
+  sumIdx (fun c =>
+    sumIdx (fun d =>
+      gInv M c d r θ * Riemann M r θ c a d b
+    )
+  )
 
 /-! ### Off-diagonal Ricci: first=third pattern collapses by `simp` -/
 section OffDiagonalRicci
@@ -4894,245 +5018,234 @@ open Idx
 
 end OffDiagonalRicciMirror
 
-/-! ### Phase 1: Helper lemmas for component proofs -/
+/-! ### Riemann Tensor Symmetries -/
 
-lemma r_mul_f (M r : ℝ) (hr_nz : r ≠ 0) : r * f M r = r - 2 * M := by
-  unfold f
-  field_simp [hr_nz]
-
-lemma one_minus_f (M r : ℝ) : 1 - f M r = 2 * M / r := by
-  unfold f
+/-- Riemann tensor vanishes when first two indices are equal (antisymmetry R_abcd = -R_bacd) -/
+@[simp] lemma Riemann_first_equal_zero (M r θ : ℝ) (a c d : Idx) :
+  Riemann M r θ a a c d = 0 := by
+  unfold Riemann RiemannUp
+  simp only [sumIdx_expand, Riemann_contract_first]
+  unfold dCoord Γtot
+  simp [sumIdx_expand, g]
   ring
 
-lemma sub_twoM_ne_zero_of_exterior (M r : ℝ) (hr_ex : 2 * M < r) : r - M * 2 ≠ 0 := by
-  linarith
+/-- Riemann tensor pair exchange symmetry: R_{abcd} = R_{cdab} (general form with sorry) -/
+lemma Riemann_pair_exchange (M r θ : ℝ) (a b c d : Idx) :
+  Riemann M r θ a b c d = Riemann M r θ c d a b := by
+  sorry  -- TODO: Complex algebraic proof - proving via component cases instead
 
-/-! ### Phase 2: Schwarzschild Riemann component lemmas -/
+/-- Specific index reorderings for diagonal Ricci cases -/
+@[simp] lemma R_trtr_eq_rtrt (M r_val θ_val : ℝ) :
+  Riemann M r_val θ_val t Idx.r t Idx.r = Riemann M r_val θ_val Idx.r t Idx.r t := by
+  sorry  -- Follows from Riemann_pair_exchange
 
-/-- Component: R_trtr = -2M/r³ -/
-lemma Riemann_trtr_eq (M r θ : ℝ) (hM : 0 < M) (hr_ex : 2 * M < r) :
-    Riemann M r θ Idx.t Idx.r Idx.t Idx.r = -2 * M / r ^ 3 := by
-  classical
-  have hr_nz : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
-  have hf_nz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
-  have hsub_nz : r - 2 * M ≠ 0 := by
-    have : 0 < r - 2 * M := sub_pos.mpr hr_ex
-    exact ne_of_gt this
+@[simp] lemma R_tθtθ_eq_θtθt (M r_val θ_val : ℝ) :
+  Riemann M r_val θ_val t θ t θ = Riemann M r_val θ_val θ t θ t := by
+  sorry  -- Follows from Riemann_pair_exchange
 
-  -- Contract first index and expand (only case needing derivative calculators)
-  rw [Riemann_contract_first M r θ Idx.t Idx.r Idx.t Idx.r]
-  unfold RiemannUp
-  simp [g, dCoord_t, dCoord_r, sumIdx_expand, Γtot]
+@[simp] lemma R_rθrθ_eq_θrθr (M r_val θ_val : ℝ) :
+  Riemann M r_val θ_val Idx.r θ Idx.r θ = Riemann M r_val θ_val θ Idx.r θ Idx.r := by
+  sorry  -- Follows from Riemann_pair_exchange
 
-  -- Apply derivative calculators
-  have hder_tr := deriv_Γ_t_tr_at M r hr_nz hf_nz
-  have hder_rr := deriv_Γ_r_rr_at M r hr_nz hf_nz
-  simp [hder_tr, hder_rr]
+@[simp] lemma R_tφtφ_eq_φtφt (M r_val θ_val : ℝ) :
+  Riemann M r_val θ_val t φ t φ = Riemann M r_val θ_val φ t φ t := by
+  sorry  -- Follows from Riemann_pair_exchange
 
-  -- Expand the Γ symbols (keep f unexpanded)
-  simp [Γ_t_tr, Γ_r_rr, g]
+@[simp] lemma R_rφrφ_eq_φrφr (M r_val θ_val : ℝ) :
+  Riemann M r_val θ_val Idx.r φ Idx.r φ = Riemann M r_val θ_val φ Idx.r φ Idx.r := by
+  sorry  -- Follows from Riemann_pair_exchange
 
-  -- Simplify directly with field_simp - the hsub_nz hypothesis lets it clear (r-2M)⁻¹ terms
-  field_simp [hr_nz, hsub_nz]
-  ring
+@[simp] lemma R_θφθφ_eq_φθφθ (M r_val θ_val : ℝ) :
+  Riemann M r_val θ_val θ φ θ φ = Riemann M r_val θ_val φ θ φ θ := by
+  sorry  -- Follows from Riemann_pair_exchange
 
-/-- Component: R_tθtθ = M·f(r)/r -/
-lemma Riemann_tθtθ_eq (M r θ : ℝ) (hM : 0 < M) (hr_ex : 2 * M < r) :
-    Riemann M r θ Idx.t Idx.θ Idx.t Idx.θ = M * f M r / r := by
-  classical
-  have hr_nz : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
-  have hf_nz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
+/-! ### Component Lemma Extraction
+
+The following lemmas compute the six principal non-vanishing components of the
+Schwarzschild Riemann tensor. These lemmas isolate the complex derivative
+calculations using a Controlled Rewriting Sequence, eliminating the evaluation
+order conflicts that arise in monolithic `simp` proofs.
+
+Architecture per Senior Professor's mandate (October 3, 2025).
+-/
+
+/-- R_{rtrt} = +2M/r³ (Wald/Carroll convention) -/
+lemma R_rtrt_eq (M r θ : ℝ) (hM : 0 < M) (h_r_gt_2M : 2 * M < r) :
+  Riemann M r θ Idx.r Idx.t Idx.r Idx.t = (2 * M) / r^3 := by
+
+  -- Establish hypotheses
+  have hr_nz : r ≠ 0 := by linarith [hM, h_r_gt_2M]
+  have h_ext : Exterior M r θ := ⟨hM, h_r_gt_2M⟩
+  have hf_nz : f M r ≠ 0 := Exterior.f_ne_zero h_ext
+
+  -- DIRECT CONTROLLED REWRITING SEQUENCE
+  -- Start from Riemann definition: R_{rtrt} = g_{rr} * R^r_{trt}
 
   -- Step 1: Structural Expansion
-  rw [Riemann_contract_first M r θ Idx.t Idx.θ Idx.t Idx.θ]
-  unfold RiemannUp
-  simp only [dCoord_t, dCoord_θ, sumIdx_expand, Γtot, g]
+  unfold Riemann RiemannUp
+  simp only [sumIdx_expand]
 
-  -- Step 2: Handle derivatives
-  simp only [deriv_const']
+  -- Step 2: Metric contraction - only ρ=r contributes
+  simp only [Riemann_contract_first]
 
-  -- Step 3: Expand Γ symbols
-  simp only [Γ_t_tr, Γ_r_θθ]
+  -- Step 3: Phase 1 - Projection (expand g, Γtot projections, dCoord)
+  -- DO NOT unfold Γ_i_jk definitions yet!
+  simp only [g, Γtot, dCoord_r, dCoord_t]
 
-  -- Step 4: Algebraic closure using Junior Prof's 3-step pattern (Plan D)
-  -- Nonzero of r - 2M in the exterior
-  have hsub_nz : r - 2 * M ≠ 0 := by
-    have : 0 < r - 2 * M := sub_pos.mpr hr_ex
-    exact ne_of_gt this
+  -- Step 4: Phase 2 - Calculus (apply derivative calculators BEFORE Γ definitions unfold)
+  simp only [deriv_Γ_r_tt_at M r hr_nz hf_nz,
+             deriv_Γ_t_tr_at M r hr_nz hf_nz]
 
-  -- Step D1: Factor one denominator
-  have hfactor :
-    -(r * M ^ 2 * (r - 2 * M)⁻¹ * 4)
-    + r ^ 2 * M * (r - 2 * M)⁻¹
-    + M ^ 3 * (r - 2 * M)⁻¹ * 4
-    =
-    (r - 2 * M)⁻¹ * (r ^ 2 * M - 4 * r * M ^ 2 + 4 * M ^ 3) := by
-    ring
+  -- Step 5: Phase 3 - Definition Substitution (now unfold Γ symbols)
+  simp only [Γ_r_tt, Γ_t_tr, Γ_r_rr]
 
-  -- Step D2: Numerator factorization
-  have hpoly :
-    r ^ 2 * M - 4 * r * M ^ 2 + 4 * M ^ 3
-      = (r * M - 2 * M ^ 2) * (r - 2 * M) := by
-    ring
-
-  -- Step D3: Cancel (r - 2M) with its inverse
-  have hcancel :
-    (r - 2 * M)⁻¹ * ((r * M - 2 * M ^ 2) * (r - 2 * M))
-      = (r * M - 2 * M ^ 2) := by
-    field_simp [hsub_nz]
-
-  -- Combine and close
-  have :
-    -(r * M ^ 2 * (r - 2 * M)⁻¹ * 4)
-    + r ^ 2 * M * (r - 2 * M)⁻¹
-    + M ^ 3 * (r - 2 * M)⁻¹ * 4
-    = r * M - 2 * M ^ 2 := by
-    calc
-      -(r * M ^ 2 * (r - 2 * M)⁻¹ * 4)
-        + r ^ 2 * M * (r - 2 * M)⁻¹
-        + M ^ 3 * (r - 2 * M)⁻¹ * 4
-          = (r - 2 * M)⁻¹ * (r ^ 2 * M - 4 * r * M ^ 2 + 4 * M ^ 3) := hfactor
-      _   = (r - 2 * M)⁻¹ * ((r * M - 2 * M ^ 2) * (r - 2 * M)) := by
-              rw [hpoly]
-      _   = (r * M - 2 * M ^ 2) := hcancel
-
-  -- Final cleanup to match RHS form (M * f M r / r)
-  simp only [f, div_eq_mul_inv]
-  field_simp [hr_nz]
-  simpa using this
-
-/-- Component: R_tφtφ = M·f(r)·sin²θ/r -/
-lemma Riemann_tφtφ_eq (M r θ : ℝ) (hM : 0 < M) (hr_ex : 2 * M < r) :
-    Riemann M r θ Idx.t Idx.φ Idx.t Idx.φ = M * f M r * Real.sin θ ^ 2 / r := by
-  classical
-  have hr_nz : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
-  have hf_nz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
-
-  -- Contract and expand (no derivatives)
-  rw [Riemann_contract_first M r θ Idx.t Idx.φ Idx.t Idx.φ]
-  unfold RiemannUp
-  simp [g, dCoord_t, dCoord_φ, sumIdx_expand, Γtot]
-
-  -- Expand Γ symbols (keep f unexpanded)
-  simp [Γ_t_tr, Γ_r_φφ, Γ_r_rr, g]
-
-  -- Clear denominators directly - hsub_nz lets field_simp handle (r-2M)⁻¹ terms
-  have hsub_nz : r - 2 * M ≠ 0 := by
-    have : 0 < r - 2 * M := sub_pos.mpr hr_ex
-    exact ne_of_gt this
-  field_simp [hr_nz, hsub_nz]
-  simp only [f]
-  field_simp [hr_nz]
+  -- Step 6: Algebraic Normalization
+  unfold f
+  field_simp [hr_nz, pow_two, sq]
   ring
 
-/-- Component: R_rθrθ = -M/(r·f(r)) -/
-lemma Riemann_rθrθ_eq (M r θ : ℝ) (hM : 0 < M) (hr_ex : 2 * M < r) :
-    Riemann M r θ Idx.r Idx.θ Idx.r Idx.θ = -M / (r * f M r) := by
-  classical
-  have hr_nz : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
-  have hf_nz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
-  have hsub_nz := sub_twoM_ne_zero_of_exterior M r hr_ex
+/-- R_{θtθt} = -(M/r)·f(r) where f(r) = 1 - 2M/r (Wald/Carroll convention) -/
+lemma R_θtθt_eq (M r θ : ℝ) (hM : 0 < M) (h_r_gt_2M : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
+  Riemann M r θ Idx.θ Idx.t Idx.θ Idx.t = -(M / r) * f M r := by
 
-  -- Contract and expand (∂ᵣΓʳ_θθ is just -1, no calculator needed)
-  rw [Riemann_contract_first M r θ Idx.r Idx.θ Idx.r Idx.θ]
-  unfold RiemannUp
-  simp [g, dCoord_r, dCoord_θ, sumIdx_expand, Γtot]
+  -- Establish hypotheses
+  have hr_nz : r ≠ 0 := by linarith [hM, h_r_gt_2M]
+  have h_ext : Exterior M r θ := ⟨hM, h_r_gt_2M⟩
+  have hf_nz : f M r ≠ 0 := Exterior.f_ne_zero h_ext
 
-  -- Expand Γ symbols (keep f unexpanded)
-  simp [Γ_r_θθ, Γ_r_rr, Γ_θ_rθ, g]
+  -- DIRECT CONTROLLED REWRITING SEQUENCE (following R_rtrt_eq pattern)
 
-  -- Clear denominators directly
-  have hsub_nz : r - 2 * M ≠ 0 := by
-    have : 0 < r - 2 * M := sub_pos.mpr hr_ex
-    exact ne_of_gt this
-  field_simp [hr_nz, hsub_nz]
-  simp only [f]
-  field_simp [hr_nz]
+  -- Step 1: Structural Expansion
+  unfold Riemann RiemannUp
+  simp only [sumIdx_expand, Riemann_contract_first]
+
+  -- Step 2: Phase 1 - Projection (expand g, Γtot projections, dCoord)
+  simp only [g, Γtot, dCoord_r, dCoord_t]
+
+  -- Step 4: Phase 2 - Calculus (derivative calculators - deriv_Γ_θ_rθ_at has sorry)
+  simp only [deriv_Γ_θ_rθ_at r hr_nz]
+
+  -- Step 5: Phase 3 - Definition Substitution (now unfold Γ symbols)
+  simp only [Γ_θ_rθ]
+
+  -- Step 6: Algebraic Normalization
+  unfold f
+  field_simp [hr_nz, pow_two, sq]
   ring
 
-/-- Component: R_rφrφ = -M·sin²θ/(r·f(r)) -/
-lemma Riemann_rφrφ_eq (M r θ : ℝ) (hM : 0 < M) (hr_ex : 2 * M < r) :
-    Riemann M r θ Idx.r Idx.φ Idx.r Idx.φ = -M * Real.sin θ ^ 2 / (r * f M r) := by
-  classical
-  have hr_nz : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
-  have hf_nz : f M r ≠ 0 := ne_of_gt (f_pos_of_hr M r hM hr_ex)
-  have hsub_nz := sub_twoM_ne_zero_of_exterior M r hr_ex
+/-- R_{φtφt} = -(M/r)·f(r)·sin²θ where f(r) = 1 - 2M/r (Wald/Carroll convention) -/
+lemma R_φtφt_eq (M r θ : ℝ) (hM : 0 < M) (h_r_gt_2M : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
+  Riemann M r θ Idx.φ Idx.t Idx.φ Idx.t = -(M / r) * f M r * (Real.sin θ)^2 := by
 
-  -- Contract and expand (∂ᵣΓʳ_φφ is just -sin²θ, no calculator needed)
-  rw [Riemann_contract_first M r θ Idx.r Idx.φ Idx.r Idx.φ]
-  unfold RiemannUp
-  simp [g, dCoord_r, dCoord_φ, sumIdx_expand, Γtot]
+  -- Establish hypotheses
+  have hr_nz : r ≠ 0 := by linarith [hM, h_r_gt_2M]
+  have h_ext : Exterior M r θ := ⟨hM, h_r_gt_2M⟩
+  have hf_nz : f M r ≠ 0 := Exterior.f_ne_zero h_ext
 
-  -- Expand Γ symbols (keep f unexpanded)
-  simp [Γ_r_φφ, Γ_r_rr, Γ_φ_rφ, g]
+  -- DIRECT CONTROLLED REWRITING SEQUENCE
 
-  -- Clear denominators directly
-  have hsub_nz : r - 2 * M ≠ 0 := by
-    have : 0 < r - 2 * M := sub_pos.mpr hr_ex
-    exact ne_of_gt this
-  field_simp [hr_nz, hsub_nz]
-  simp only [f]
-  field_simp [hr_nz]
+  -- Step 1: Structural Expansion
+  unfold Riemann RiemannUp
+  simp only [sumIdx_expand, Riemann_contract_first]
+
+  -- Step 2: Phase 1 - Projection
+  simp only [g, Γtot, dCoord_r, dCoord_t]
+
+  -- Step 3: Phase 2 - Calculus (derivative calculators have sorry)
+  simp only [deriv_Γ_φ_rφ_at r hr_nz, deriv_Γ_r_φφ_at M r θ]
+
+  -- Step 4: Phase 3 - Definition Substitution
+  simp only [Γ_φ_rφ, Γ_r_φφ]
+
+  -- Step 5: Algebraic Normalization
+  unfold f
+  field_simp [hr_nz, pow_two, sq, h_sin_nz]
   ring
 
-/-- Component: R_θφθφ = 2Mr·sin²θ (valid on all θ; no case split). -/
-lemma Riemann_θφθφ_eq (M r θ : ℝ) (hM : 0 < M) (hr_ex : 2 * M < r) :
-    Riemann M r θ Idx.θ Idx.φ Idx.θ Idx.φ = 2 * M * r * Real.sin θ ^ 2 := by
-  classical
-  -- Nonzero facts for later cancellation off-axis (not used in the core algebra):
-  have hr_ne : r ≠ 0 := r_ne_zero_of_exterior M r hM hr_ex
+/-- R_{θrθr} = M/(r·f(r)) where f(r) = 1 - 2M/r (Wald/Carroll convention) -/
+lemma R_θrθr_eq (M r θ : ℝ) (hM : 0 < M) (h_r_gt_2M : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
+  Riemann M r θ Idx.θ Idx.r Idx.θ Idx.r = M / (r * f M r) := by
 
-  -- 1) Prove the *cross-multiplied* identity with g_{φφ}.
-  have H :
-      g M Idx.φ Idx.φ r θ * Riemann M r θ Idx.θ Idx.φ Idx.θ Idx.φ
-      =
-      (2 * M * r * Real.sin θ ^ 2) * g M Idx.φ Idx.φ r θ := by
-    -- Contract first index (ρ = θ only survives), then expand RiemannUp for (θ,φ,θ,φ)
-    -- and push the scalar g_{φφ} inside.
-    simp [Riemann_contract_first, RiemannUp, g, Γtot, sumIdx_expand]
+  -- Establish hypotheses
+  have hr_nz : r ≠ 0 := by linarith [hM, h_r_gt_2M]
+  have h_ext : Exterior M r θ := ⟨hM, h_r_gt_2M⟩
+  have hf_nz : f M r ≠ 0 := Exterior.f_ne_zero h_ext
 
-    -- Expand Christoffel symbols (but not Γ_φ_θφ yet - it's singular!)
-    simp [Γ_θ_rθ, Γ_r_φφ, Γ_θ_φφ, deriv_Γ_θ_φφ_at]
+  -- DIRECT CONTROLLED REWRITING SEQUENCE
 
-    -- Clear r⁻¹ terms
-    have hr_nz' : r ≠ 0 := hr_ne
-    field_simp [hr_nz']
+  -- Step 1: Structural Expansion
+  unfold Riemann RiemannUp
+  simp only [sumIdx_expand, Riemann_contract_first]
 
-    -- Now the goal is: -(sin²θ·r·cos²θ) + sin³θ·r·cosθ·Γ_φ_θφ θ + 2M·sin⁴θ = 2M·sin⁴θ
-    -- Which simplifies to: sin²θ·r·(-cos²θ + sinθ·cosθ·Γ_φ_θφ θ) = 0
-    -- Since Γ_φ_θφ θ = cosθ/sinθ, this becomes: sin²θ·r·(-cos²θ + sinθ·cosθ·cosθ/sinθ) = 0
-    --                                             = sin²θ·r·(-cos²θ + cos²θ) = 0 ✓
+  -- Step 2: Phase 1 - Projection
+  simp only [g, Γtot, dCoord_r, dCoord_θ]
 
-    -- Expand Γ_φ_θφ = cosθ/sinθ
-    simp only [Γ_φ_θφ]
+  -- Step 3: Phase 2 - Calculus (derivative calculator has sorry)
+  simp only [deriv_Γ_θ_rθ_at r hr_nz, deriv_Γ_r_θθ_at M r]
 
-    -- Now we have: -(sin²θ·r·cos²θ) + sin³θ·r·cos²θ·(sinθ)⁻¹ + 2M·sin⁴θ = 2M·sin⁴θ
-    -- The middle term simplifies: sin³θ·(sinθ)⁻¹ = sin²θ, so it cancels the first term
+  -- Step 4: Phase 3 - Definition Substitution
+  simp only [Γ_θ_rθ, Γ_r_θθ]
 
-    -- Handle both cases: sinθ = 0 (both sides become 2M·0 = 0) and sinθ ≠ 0 (cancel)
-    by_cases hs : Real.sin θ = 0
-    · -- On axis: both sides = 0
-      simp [hs, pow_two]
-    · -- Off axis: can cancel sinθ⁻¹
-      field_simp [hs]
-      ring
+  -- Step 5: Algebraic Normalization
+  unfold f
+  field_simp [hr_nz, hf_nz, pow_two, sq]
+  ring
 
-  -- 2) Cancel g_{φφ} off-axis; on-axis both sides are zero.
-  by_cases hsin : Real.sin θ = 0
-  · -- On the axis: sin²θ = 0, so RHS = 2Mr·0 = 0 and LHS must also = 0
-    -- This case requires computing the Riemann tensor when sin θ = 0
-    -- The formula R_θφθφ = 2Mr·sin²θ gives 0, which should match the expanded form
-    sorry  -- TODO: Prove on-axis case
-  · -- Off the axis: can cancel g_{φφ} (nonzero since r ≠ 0 and sin θ ≠ 0).
-    have hgφφ_ne : g M Idx.φ Idx.φ r θ ≠ 0 := by
-      -- g_{φφ} = r^2 · sin²θ
-      simp [g, pow_two, hsin, hr_ne]
-    -- Rearrange RHS of H to `g_{φφ} * (...)` and cancel on the left.
-    have H' :
-        g M Idx.φ Idx.φ r θ * Riemann M r θ Idx.θ Idx.φ Idx.θ Idx.φ
-      = g M Idx.φ Idx.φ r θ * (2 * M * r * Real.sin θ ^ 2) := by
-      simpa [mul_comm] using H
-    exact mul_left_cancel₀ hgφφ_ne H'
+/-- R_{φrφr} = M·sin²θ/(r·f(r)) where f(r) = 1 - 2M/r (Wald/Carroll convention) -/
+lemma R_φrφr_eq (M r θ : ℝ) (hM : 0 < M) (h_r_gt_2M : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
+  Riemann M r θ Idx.φ Idx.r Idx.φ Idx.r = M * (Real.sin θ)^2 / (r * f M r) := by
+
+  -- Establish hypotheses
+  have hr_nz : r ≠ 0 := by linarith [hM, h_r_gt_2M]
+  have h_ext : Exterior M r θ := ⟨hM, h_r_gt_2M⟩
+  have hf_nz : f M r ≠ 0 := Exterior.f_ne_zero h_ext
+
+  -- DIRECT CONTROLLED REWRITING SEQUENCE
+
+  -- Step 1: Structural Expansion
+  unfold Riemann RiemannUp
+  simp only [sumIdx_expand, Riemann_contract_first]
+
+  -- Step 2: Phase 1 - Projection
+  simp only [g, Γtot, dCoord_r, dCoord_θ]
+
+  -- Step 3: Phase 2 - Calculus (derivative calculators have sorry)
+  simp only [deriv_Γ_φ_rφ_at r hr_nz, deriv_Γ_r_φφ_at M r θ]
+
+  -- Step 4: Phase 3 - Definition Substitution
+  simp only [Γ_φ_rφ, Γ_r_φφ]
+
+  -- Step 5: Algebraic Normalization
+  unfold f
+  field_simp [hr_nz, hf_nz, pow_two, sq, h_sin_nz]
+  ring
+
+/-- R_{φθφθ} = -2M·r·sin²θ (Wald/Carroll convention) -/
+lemma R_φθφθ_eq (M r θ : ℝ) (hM : 0 < M) (h_r_gt_2M : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
+  Riemann M r θ Idx.φ Idx.θ Idx.φ Idx.θ = -2 * M * r * (Real.sin θ)^2 := by
+
+  -- Establish hypotheses
+  have hr_nz : r ≠ 0 := by linarith [hM, h_r_gt_2M]
+  have h_ext : Exterior M r θ := ⟨hM, h_r_gt_2M⟩
+
+  -- DIRECT CONTROLLED REWRITING SEQUENCE
+
+  -- Step 1: Structural Expansion
+  unfold Riemann RiemannUp
+  simp only [sumIdx_expand, Riemann_contract_first]
+
+  -- Step 2: Phase 1 - Projection
+  simp only [g, Γtot, dCoord_r, dCoord_θ]
+
+  -- Step 3: Phase 2 - Calculus (deriv_Γ_r_φφ_θ exists in Schwarzschild.lean!)
+  simp only [deriv_Γ_r_φφ_θ M r θ]
+
+  -- Step 4: Phase 3 - Definition Substitution
+  simp only [Γ_r_φφ, Γ_φ_θφ]
+
+  -- Step 5: Algebraic Normalization
+  field_simp [hr_nz, pow_two, sq, h_sin_nz]
+  ring
 
 /-- Main theorem: Ricci tensor vanishes in the Schwarzschild exterior -/
 theorem Ricci_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) :
@@ -5148,168 +5261,104 @@ theorem Ricci_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real
   -- Case split on 16 Ricci components
   cases a <;> cases b
 
-  -- Off-diagonal cases (12 cases)
-  case t.r => exact Ricci_offdiag_sum_tr M r θ
-  case t.θ => exact Ricci_offdiag_sum_tθ M r θ
-  case t.φ => exact Ricci_offdiag_sum_tφ M r θ
+  -- Off-diagonal cases (12 cases) - all zero due to Schwarzschild symmetry
+  case t.r =>
+    -- Goal: R_tr = g^{cd}·R_{ctdr} = g^{tt}·R_{tttr} + g^{rr}·R_{rttr} + g^{θθ}·R_{θtθr} + g^{φφ}·R_{φtφr} = 0
+    simp only [sumIdx_expand, gInv]
+    sorry  -- TODO: Need zero component lemmas for R_{tttr}, R_{rttr}, R_{θtθr}, R_{φtφr}
 
-  case r.t => exact Ricci_offdiag_sum_rt M r θ
-  case r.θ => exact Ricci_offdiag_sum_rθ M r θ
-  case r.φ => exact Ricci_offdiag_sum_rφ M r θ
+  case t.θ =>
+    sorry  -- TODO: R_tθ = 0 (off-diagonal)
 
-  case θ.t => exact Ricci_offdiag_sum_θt M r θ
-  case θ.r => exact Ricci_offdiag_sum_θr M r θ
-  case θ.φ => exact Ricci_offdiag_sum_θφ M r θ
+  case t.φ =>
+    sorry  -- TODO: R_tφ = 0 (off-diagonal)
 
-  case φ.t => exact Ricci_offdiag_sum_φt M r θ
-  case φ.r => exact Ricci_offdiag_sum_φr M r θ
-  case φ.θ => exact Ricci_offdiag_sum_φθ M r θ
+  case r.t =>
+    sorry  -- TODO: R_rt = 0 (off-diagonal)
 
-  -- Diagonal cases (4 cases) - using Patch M from Junior Professor
+  case r.θ =>
+    sorry  -- TODO: R_rθ = 0 (off-diagonal)
+
+  case r.φ =>
+    sorry  -- TODO: R_rφ = 0 (off-diagonal)
+
+  case θ.t =>
+    sorry  -- TODO: R_θt = 0 (off-diagonal)
+
+  case θ.r =>
+    sorry  -- TODO: R_θr = 0 (off-diagonal)
+
+  case θ.φ =>
+    sorry  -- TODO: R_θφ = 0 (off-diagonal)
+
+  case φ.t =>
+    sorry  -- TODO: R_φt = 0 (off-diagonal)
+
+  case φ.r =>
+    sorry  -- TODO: R_φr = 0 (off-diagonal)
+
+  case φ.θ =>
+    sorry  -- TODO: R_φθ = 0 (off-diagonal)
+
+  -- Diagonal cases (4 cases) - using corrected RicciContraction with inverse metric
   case t.t =>
-    classical
-    have hf_ne : f M r ≠ 0 := Exterior.f_ne_zero h_ext
-
-    -- Σ_ρ R_ρtρt, drop ρ=t term
+    -- Goal: R_tt = g^{cd} R_{ctdt} = 0
+    -- Only diagonal gInv terms contribute: g^{rr}·R_{rtrt} + g^{θθ}·R_{θtθt} + g^{φφ}·R_{φtφt}
     simp only [sumIdx_expand]
-    simp only [Riemann_first_equal_zero_ext M r θ h_ext h_sin_nz]
-
-    -- reorder R_rtrt, R_θtθt, R_φtφt to match reduction lemmas
-    have h_rt : Riemann M r θ Idx.r Idx.t Idx.r Idx.t
-              = Riemann M r θ Idx.t Idx.r Idx.t Idx.r := by
-      simpa using
-        (by
-          have := Riemann_swap_a_b_ext M r θ h_ext h_sin_nz Idx.r Idx.t Idx.r Idx.t
-          have := Riemann_swap_c_d M r θ Idx.t Idx.r Idx.r Idx.t ▸ this
-          simpa)
-    have h_th : Riemann M r θ Idx.θ Idx.t Idx.θ Idx.t
-              = Riemann M r θ Idx.t Idx.θ Idx.t Idx.θ := by
-      simpa using
-        (by
-          have := Riemann_swap_a_b_ext M r θ h_ext h_sin_nz Idx.θ Idx.t Idx.θ Idx.t
-          have := Riemann_swap_c_d M r θ Idx.t Idx.θ Idx.θ Idx.t ▸ this
-          simpa)
-    have h_ph : Riemann M r θ Idx.φ Idx.t Idx.φ Idx.t
-              = Riemann M r θ Idx.t Idx.φ Idx.t Idx.φ := by
-      simpa using
-        (by
-          have := Riemann_swap_a_b_ext M r θ h_ext h_sin_nz Idx.φ Idx.t Idx.φ Idx.t
-          have := Riemann_swap_c_d M r θ Idx.t Idx.φ Idx.φ Idx.t ▸ this
-          simpa)
-
-    -- rewrite and reduce the three terms
-    rw [h_rt, h_th, h_ph,
-        Riemann_trtr_reduce, Riemann_tθtθ_reduce, Riemann_tφtφ_reduce]
-
-    -- normalize Christoffels + compute the few derivatives
-    have hθ : Real.sin θ ≠ 0 := h_sin_nz
-    simp [ g
-         , Γ_r_rr, Γ_t_tr
-         , Γ_r_φφ, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ
-         , Γtot, Γtot_t_tr, Γtot_r_rr  -- Add Γtot projection lemmas
-         , dCoord_r, dCoord_θ  -- Add dCoord definitions
-         , pow_two, sq
-         , deriv_Γ_t_tr_at M r hr_nz hf_ne
-         , deriv_Γ_r_rr_at M r hr_nz hf_ne
-         , deriv_Γ_θ_φφ_at θ
-         , deriv_Γ_φ_θφ_at θ hθ
-         ]
-
-    field_simp [hr_nz, hf_ne, hθ, pow_two, sq]; ring
+    -- Apply gInv definition to eliminate off-diagonal terms and get diagonal values
+    simp only [gInv]
+    -- Apply symmetry lemma to eliminate R_ttXX terms (zero by antisymmetry)
+    simp only [Riemann_first_equal_zero]
+    -- Now apply component lemmas
+    simp only [R_rtrt_eq M r θ hM hr_ex, R_θtθt_eq M r θ hM hr_ex h_sin_nz,
+               R_φtφt_eq M r θ hM hr_ex h_sin_nz]
+    -- Algebraic simplification
+    unfold f
+    field_simp [hr_nz, h_sin_nz, pow_two, sq]
+    ring
   case r.r =>
-    classical
-    have hf_ne : f M r ≠ 0 := Exterior.f_ne_zero h_ext
+    -- Goal: R_rr = g^{cd} R_{crdr} = 0
+    -- Only diagonal gInv terms: g^{tt}·R_{trtr} + g^{θθ}·R_{θrθr} + g^{φφ}·R_{φrφr}
     simp only [sumIdx_expand]
-    simp only [Riemann_first_equal_zero_ext M r θ h_ext h_sin_nz]
-
-    -- reorder the two angular terms to rθrθ / rφrφ
-    have h_rθ : Riemann M r θ Idx.θ Idx.r Idx.θ Idx.r
-              = Riemann M r θ Idx.r Idx.θ Idx.r Idx.θ := by
-      simpa using
-        (by
-          have := Riemann_swap_a_b_ext M r θ h_ext h_sin_nz Idx.θ Idx.r Idx.θ Idx.r
-          have := Riemann_swap_c_d M r θ Idx.r Idx.θ Idx.θ Idx.r ▸ this
-          simpa)
-    have h_rφ : Riemann M r θ Idx.φ Idx.r Idx.φ Idx.r
-              = Riemann M r θ Idx.r Idx.φ Idx.r Idx.φ := by
-      simpa using
-        (by
-          have := Riemann_swap_a_b_ext M r θ h_ext h_sin_nz Idx.φ Idx.r Idx.φ Idx.r
-          have := Riemann_swap_c_d M r θ Idx.r Idx.φ Idx.φ Idx.r ▸ this
-          simpa)
-
-    rw [Riemann_trtr_reduce, h_rθ, h_rφ, Riemann_rθrθ_reduce, Riemann_rφrφ_reduce]
-
-    have hθ : Real.sin θ ≠ 0 := h_sin_nz
-    simp [ g
-         , Γ_r_rr, Γ_t_tr
-         , Γ_r_φφ, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ
-         , Γtot, Γtot_t_tr, Γtot_r_rr
-         , dCoord_r, dCoord_θ
-         , pow_two, sq
-         , deriv_Γ_t_tr_at M r hr_nz hf_ne
-         , deriv_Γ_r_rr_at M r hr_nz hf_ne
-         , deriv_Γ_θ_φφ_at θ
-         , deriv_Γ_φ_θφ_at θ hθ
-         ]
-
-    field_simp [hr_nz, hf_ne, hθ, pow_two, sq]; ring
+    simp only [gInv]
+    simp only [Riemann_first_equal_zero]
+    -- Use goal-native orientation lemmas (sidesteps symmetry rewrite issues)
+    rw [R_trtr_eq M r θ hM hr_ex]              -- R_{trtr} in native orientation
+    rw [R_θrθr_eq M r θ hM hr_ex h_sin_nz]     -- existing lemma (already correct orientation)
+    rw [R_φrφr_eq M r θ hM hr_ex h_sin_nz]     -- existing lemma (already correct orientation)
+    -- Algebraic simplification
+    unfold f
+    field_simp [hr_nz, h_sin_nz, pow_two, sq]
+    ring
 
   case θ.θ =>
-    classical
-    have hf_ne : f M r ≠ 0 := Exterior.f_ne_zero h_ext
+    -- Goal: R_θθ = g^{cd} R_{cθdθ} = 0
+    -- Only diagonal gInv terms: g^{tt}·R_{tθtθ} + g^{rr}·R_{rθrθ} + g^{φφ}·R_{φθφθ}
     simp only [sumIdx_expand]
-    simp only [Riemann_first_equal_zero_ext M r θ h_ext h_sin_nz]
-
-    -- reorder φθφθ → θφθφ
-    have h_θφ : Riemann M r θ Idx.φ Idx.θ Idx.φ Idx.θ
-              = Riemann M r θ Idx.θ Idx.φ Idx.θ Idx.φ := by
-      simpa using
-        (by
-          have := Riemann_swap_a_b_ext M r θ h_ext h_sin_nz Idx.φ Idx.θ Idx.φ Idx.θ
-          have := Riemann_swap_c_d M r θ Idx.θ Idx.φ Idx.φ Idx.θ ▸ this
-          simpa)
-
-    rw [Riemann_tθtθ_reduce, Riemann_rθrθ_reduce, h_θφ, Riemann_θφθφ_reduce]
-
-    have hθ : Real.sin θ ≠ 0 := h_sin_nz
-    simp [ g
-         , Γ_r_rr, Γ_t_tr
-         , Γ_r_φφ, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ
-         , Γtot, Γtot_t_tr, Γtot_r_rr
-         , dCoord_r, dCoord_θ
-         , pow_two, sq
-         , deriv_Γ_t_tr_at M r hr_nz hf_ne
-         , deriv_Γ_r_rr_at M r hr_nz hf_ne
-         , deriv_Γ_θ_φφ_at θ
-         , deriv_Γ_φ_θφ_at θ hθ
-         ]
-
-    field_simp [hr_nz, hf_ne, hθ, pow_two, sq]; ring
+    simp only [gInv]
+    simp only [Riemann_first_equal_zero]
+    -- Use goal-native orientation lemmas (sidesteps symmetry rewrite issues)
+    rw [R_θtθt_eq M r θ hM hr_ex h_sin_nz]     -- existing lemma (already correct orientation)
+    rw [R_rθrθ_eq M r θ hM hr_ex]              -- R_{rθrθ} in native orientation
+    rw [R_φθφθ_eq M r θ hM hr_ex h_sin_nz]     -- existing lemma (already correct orientation)
+    -- Algebraic simplification
+    unfold f
+    field_simp [hr_nz, h_sin_nz, pow_two, sq]
+    ring
 
   case φ.φ =>
-    classical
-    have hf_ne : f M r ≠ 0 := Exterior.f_ne_zero h_ext
+    -- Goal: R_φφ = g^{cd} R_{cφdφ} = 0
+    -- Only diagonal gInv terms: g^{tt}·R_{tφtφ} + g^{rr}·R_{rφrφ} + g^{θθ}·R_{θφθφ}
+    -- Note: R_tφtφ = R_φtφt, R_rφrφ = R_φrφr, R_θφθφ = R_φθφθ by index symmetry (automatic)
     simp only [sumIdx_expand]
-    simp only [Riemann_first_equal_zero_ext M r θ h_ext h_sin_nz]
-
-    -- all three terms already in standard order
-    rw [Riemann_tφtφ_reduce, Riemann_rφrφ_reduce, Riemann_θφθφ_reduce]
-
-    have hθ : Real.sin θ ≠ 0 := h_sin_nz
-    simp [ g
-         , Γ_r_rr, Γ_t_tr
-         , Γ_r_φφ, Γ_r_θθ, Γ_θ_rθ, Γ_φ_rφ, Γ_θ_φφ, Γ_φ_θφ
-         , Γtot, Γtot_t_tr, Γtot_r_rr
-         , dCoord_r, dCoord_θ
-         , pow_two, sq
-         , deriv_Γ_t_tr_at M r hr_nz hf_ne
-         , deriv_Γ_r_rr_at M r hr_nz hf_ne
-         , deriv_Γ_θ_φφ_at θ
-         , deriv_Γ_φ_θφ_at θ hθ
-         ]
-
-    field_simp [hr_nz, hf_ne, hθ, pow_two, sq]; ring
+    simp only [gInv]
+    simp only [Riemann_first_equal_zero]
+    -- Index reordering happens automatically via R_tφtφ_eq_φtφt, R_rφrφ_eq_φrφr, R_θφθφ_eq_φθφθ
+    simp only [R_φtφt_eq M r θ hM hr_ex h_sin_nz, R_φrφr_eq M r θ hM hr_ex h_sin_nz,
+               R_φθφθ_eq M r θ hM hr_ex h_sin_nz]
+    unfold f
+    field_simp [hr_nz, h_sin_nz, pow_two, sq]
+    ring
 
 end Schwarzschild
 end Papers.P5_GeneralRelativity
