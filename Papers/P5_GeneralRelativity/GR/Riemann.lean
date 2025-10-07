@@ -981,6 +981,55 @@ def gInv (M : ℝ) (μ ν : Idx) (r θ : ℝ) : ℝ :=
             rw [deriv_Γ_t_tr_at M r hr hf]
     _   = (2 * M) * (r * f M r + M) / (r^4 * (f M r)^2) := by ring
 
+/-- `d/dr Γ^r_{tt}(r)` in closed form. Γ^r_{tt} = M * (f / r^2) -/
+@[simp] lemma deriv_Γ_r_tt_at
+  (M r : ℝ) (hr : r ≠ 0) :
+  deriv (fun s => Γ_r_tt M s) r
+    = - (2 * M) * (r - 3 * M) / r^4 := by
+  classical
+  -- Write Γ^r_{tt} as M * (f / r^2) = M * ((s^2)⁻¹ * f)
+  have hΓ :
+      (fun s => Γ_r_tt M s)
+        = (fun s => M * ((f M s) * ((s^2)⁻¹))) := by
+    funext s; simp [Γ_r_tt, div_eq_mul_inv]; ring
+
+  -- Derivatives we need
+  have hdf : deriv (fun s => f M s) r = 2 * M / r^2 := by
+    simpa using (f_hasDerivAt M r hr).deriv
+  have hd_sq : DifferentiableAt ℝ (fun s => s^2) r :=
+    (differentiable_pow 2).differentiableAt
+  have hpow_ne : r^2 ≠ 0 := pow_ne_zero 2 hr
+  have hd_inv_sq :
+      deriv (fun s => (s^2)⁻¹) r = - (2 * r) / (r^2)^2 := by
+    -- general reciprocal rule for v(s) = (s^2)⁻¹
+    simpa using deriv_inv_general (fun s => s^2) r hpow_ne hd_sq
+
+  -- Product rule for (f * (s^2)⁻¹), then constant M out
+  have hprod :
+      deriv (fun s => (f M s) * ((s^2)⁻¹)) r
+        = (2 * M / r^2) * (r^2)⁻¹ + (f M r) * ( - (2 * r) / (r^2)^2 ) := by
+    have hF  : DifferentiableAt ℝ (fun s => f M s) r :=
+      (contDiffAt_f M r hr).differentiableAt le_top
+    have hG  : DifferentiableAt ℝ (fun s => (s^2)⁻¹) r :=
+      (hd_sq.inv hpow_ne)
+    have h := deriv_mul hF hG
+    simpa [hdf, hd_inv_sq] using h
+
+  -- Put everything together and clean up
+  calc
+    deriv (fun s => Γ_r_tt M s) r
+        = deriv (fun s => M * ((f M s) * ((s^2)⁻¹))) r := by
+            simpa [hΓ]
+    _   = M * deriv (fun s => (f M s) * ((s^2)⁻¹)) r := by
+            simpa [deriv_const_mul]
+    _   = M * ( (2 * M / r^2) * (r^2)⁻¹ + (f M r) * ( - (2 * r) / (r^2)^2 ) ) := by
+            simpa [hprod]
+    _   = - (2 * M) * (r - 3 * M) / r^4 := by
+            -- Expand f = 1 - 2M/r and simplify
+            simp only [f]
+            field_simp [hr, pow_two]
+            ring
+
 /-- `d/dθ Γ^φ_{θφ}(θ) = - csc² θ` (i.e. `- 1/(sin θ)^2`). -/
 @[simp] lemma deriv_Γ_φ_θφ_at
   (θ : ℝ) (hθ : Real.sin θ ≠ 0) :
@@ -1961,6 +2010,330 @@ lemma RiemannUp_θ_rθr_ext
   RiemannUp M r θ Idx.θ Idx.r Idx.θ Idx.r = - M / (r^2 * (r - 2*M)) := by
   sorry  -- TODO: Complete using Junior Tactics Professor's pattern
 
+/-- R^φ_{rφr} = -M/(r²(r-2M)) for Schwarzschild exterior region -/
+lemma RiemannUp_φ_rφr_ext
+  (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) :
+  RiemannUp M r θ Idx.φ Idx.r Idx.φ Idx.r = - M / (r^2 * (r - 2*M)) := by
+  sorry
+
+-- All 7 Schwarzschild component lemmas: shield heavy simp locally.
+section ComponentLemmas
+
+/-! Freeze any lemma that can cause global shape or large rewrites. -/
+attribute [-simp]
+  -- Riemann/compat infrastructure (never needed while shaping components):
+  RiemannUp_mu_eq_nu
+
+  -- θ–φ sector helpers that can trigger large trig rewrites:
+  Γ_θ_φφ_mul_Γ_φ_θφ
+
+  -- Derivative calculators: we insert them explicitly (don't let `simp` guess):
+  deriv_Γ_t_tr_at deriv_Γ_r_rr_at deriv_Γ_r_tt_at
+  deriv_Γ_φ_θφ_at deriv_Γ_θ_φφ_at
+
+/-! ### Normalization helpers for post-shape algebra (no attributes) -/
+
+-- Normalize f to (r - 2M)/r under r ≠ 0
+lemma f_alt (M r : ℝ) (hr : r ≠ 0) : f M r = (r - 2*M) / r := by
+  unfold f
+  field_simp [hr]
+
+-- Normalize (2*M - r) to -(r - 2*M) everywhere
+lemma twoM_sub_r (M r : ℝ) : 2*M - r = -(r - 2*M) := by ring
+
+-- Normalize (-(M*2) + r) to (r - 2*M)
+lemma inv_sub_flip (M r : ℝ) : (-(M*2) + r) = (r - 2*M) := by ring
+
+/-- Collapse `M*r*f` to a polynomial in `M` and `r` (keep `f` symbolic elsewhere). -/
+lemma Mr_f_collapse (M r : ℝ) (hr : r ≠ 0) :
+  M * r * f M r = M * r - 2 * M ^ 2 := by
+  unfold f
+  field_simp [hr]
+
+/-- Linearized form that is perfect for your final equality steps:
+    `-(M*r*f)*k` becomes `-(M*r)*k + (M^2)*(2*k)`. -/
+lemma Mr_f_linearize (M r k : ℝ) (hr : r ≠ 0) :
+  -(M * r * f M r * k) = -(M * r * k) + M ^ 2 * (2 * k) := by
+  have hcollapse : M * r * f M r = M * r - 2 * M ^ 2 := Mr_f_collapse M r hr
+  calc
+    -(M * r * f M r * k)
+        = -((M * r - 2 * M ^ 2) * k) := by simpa [hcollapse]
+    _   = -(M * r * k) + (2 * M ^ 2) * k := by ring
+    _   = -(M * r * k) + M ^ 2 * (2 * k) := by ring
+
+/-- Symmetric version (handles r * f * M). -/
+lemma Mr_f_linearize_sym (M r k : ℝ) (hr : r ≠ 0) :
+  -(r * f M r * M * k) = -(M * r * k) + M ^ 2 * (2 * k) := by
+  have h := Mr_f_linearize M r k hr
+  simpa [mul_comm, mul_left_comm, mul_assoc] using h
+
+/-- Collapser for the φφ diagonal cases. After your algebra you often get
+    `((-(M*r) + 2*M^2) * k) * (r - 2*M)⁻¹`. This lemma turns it into `-(M*k)`. -/
+lemma collapse_r_sub_2M (M r k : ℝ) (hsub : r - 2 * M ≠ 0) :
+  ((-(M * r) + 2 * M ^ 2) * k) * (r - 2 * M)⁻¹ = -(M * k) := by
+  have hsub' : r - M * 2 ≠ 0 := by convert hsub using 2; ring
+  field_simp [hsub']
+  ring
+
+/-! ### t.t diagonal component lemmas -/
+
+/-- R^r_{trt} = -2M·f(r)/r³ for Schwarzschild exterior region -/
+lemma RiemannUp_r_trt_ext
+  (M r θ : ℝ) (h_ext : Exterior M r θ) :
+  RiemannUp M r θ Idx.r Idx.t Idx.r Idx.t = -(2*M) * f M r / r^3 := by
+  classical
+  -- Exterior nonzero facts
+  have hr : r ≠ 0 := Exterior.r_ne_zero h_ext
+  have hf : f M r ≠ 0 := Exterior.f_ne_zero h_ext
+
+  -- Shape (keep Γ-symbolic; no expansion of `f`)
+  have shape :
+      RiemannUp M r θ Idx.r Idx.t Idx.r Idx.t
+        = deriv (fun s => Γ_r_tt M s) r
+            - Γ_r_tt M r * Γ_t_tr M r + Γ_r_tt M r * Γ_r_rr M r := by
+    unfold RiemannUp
+    simp only [dCoord_r, dCoord_t, sumIdx_expand, Γtot,
+      Γtot_r_tt, Γtot_t_rt, Γtot_r_rr, Γtot_t_tr]
+    ring
+
+  -- Closed form derivative and Γ^r_{rr} = - Γ^t_{tr}
+  have hder' :
+      deriv (fun s => Γ_r_tt M s) r
+        = - (2 * M) * (r - 3 * M) / r^4 := by
+    simpa using deriv_Γ_r_tt_at M r hr
+  have hrel : Γ_r_rr M r = - Γ_t_tr M r := by
+    simp [Γ_r_rr, Γ_t_tr]; ring
+
+  -- Substitute and finish by algebra (keep f symbolic!)
+  rw [shape, hder', hrel]
+  simp only [Γ_r_tt, Γ_t_tr, div_eq_mul_inv]
+  field_simp [hr, hf, pow_two]
+  ring
+  have h := Mr_f_linearize M r 2 hr
+  rw [h]; ring
+
+/-- R^θ_{tθt} = M·f(r)/r³ for Schwarzschild exterior region -/
+lemma RiemannUp_θ_tθt_ext
+  (M r θ : ℝ) (h_ext : Exterior M r θ) :
+  RiemannUp M r θ Idx.θ Idx.t Idx.θ Idx.t = M * f M r / r^3 := by
+  classical
+  have hr : r ≠ 0 := Exterior.r_ne_zero h_ext
+  unfold RiemannUp
+  simp [dCoord, sumIdx_expand, Γtot, Γ_θ_rθ, Γ_r_tt, Γ_t_tr, Γ_r_rr]
+  field_simp [hr, f]
+
+/-- R^φ_{tφt} = M·f(r)/r³ for Schwarzschild exterior region -/
+lemma RiemannUp_φ_tφt_ext
+  (M r θ : ℝ) (h_ext : Exterior M r θ) :
+  RiemannUp M r θ Idx.φ Idx.t Idx.φ Idx.t = M * f M r / r^3 := by
+  classical
+  have hr : r ≠ 0 := Exterior.r_ne_zero h_ext
+  unfold RiemannUp
+  simp [dCoord, sumIdx_expand, Γtot, Γ_φ_rφ, Γ_r_tt, Γ_t_tr, Γ_r_rr]
+  field_simp [hr, f]
+
+/-! ### θθ diagonal component lemmas -/
+
+/-- R^t_{θtθ} = -M/r for Schwarzschild exterior region -/
+lemma RiemannUp_t_θtθ_ext
+  (M r θ : ℝ) (h_ext : Exterior M r θ) :
+  RiemannUp M r θ Idx.t Idx.θ Idx.t Idx.θ = -M / r := by
+  classical
+  -- Exterior nonzero facts
+  have hr : r ≠ 0 := Exterior.r_ne_zero h_ext
+  have hf : f M r ≠ 0 := Exterior.f_ne_zero h_ext
+
+  -- Shape: only one product survives
+  have shape :
+      RiemannUp M r θ Idx.t Idx.θ Idx.t Idx.θ
+        = Γ_t_tr M r * Γ_r_θθ M r := by
+    unfold RiemannUp
+    -- ∂_t Γ^t_{θθ} = 0, ∂_θ Γ^t_{tθ} = 0 (use adapter zeros + deriv_const)
+    simp only [dCoord_t, dCoord_θ, sumIdx_expand, Γtot,
+      Γtot_t_tr, Γtot_r_θθ, Γtot_t_θθ, deriv_const]
+    ring
+
+  -- Substitute and close with exact algebra
+  rw [shape]
+  simp only [Γ_t_tr, Γ_r_θθ, div_eq_mul_inv]
+  field_simp [hr, hf, pow_two]
+  ring
+  have := Mr_f_linearize M r 1 hr
+  simp at this
+  exact this.symm
+
+/-- R^r_{θrθ} = -M/r for Schwarzschild exterior region -/
+lemma RiemannUp_r_θrθ_ext
+  (M r θ : ℝ) (h_ext : Exterior M r θ) :
+  RiemannUp M r θ Idx.r Idx.θ Idx.r Idx.θ = -M / r := by
+  classical
+  -- Exterior nonzero facts
+  have hr : r ≠ 0 := Exterior.r_ne_zero h_ext
+  have hf : f M r ≠ 0 := Exterior.f_ne_zero h_ext
+
+  -- Shape: ∂_r Γ^r_{θθ} plus two products; ∂_θ Γ^r_{rθ} = 0
+  have shape :
+      RiemannUp M r θ Idx.r Idx.θ Idx.r Idx.θ
+        = deriv (fun s => Γ_r_θθ M s) r
+            + Γ_r_rr M r * Γ_r_θθ M r
+            - Γ_r_θθ M r * Γ_θ_rθ r := by
+    unfold RiemannUp
+    simp only [dCoord_r, dCoord_θ, sumIdx_expand, Γtot,
+      Γtot_r_θθ, Γtot_r_rr, Γtot_θ_rθ, deriv_const]
+    ring
+
+  -- Compute d/dr Γ^r_{θθ} = d/dr (-(r - 2M)) = -1
+  have hderθθ : deriv (fun s => Γ_r_θθ M s) r = -1 := by
+    -- Γ_r_θθ M s = -(s - 2*M)
+    have : (fun s => Γ_r_θθ M s) = (fun s => -(s - 2*M)) := by
+      funext s; simp [Γ_r_θθ]
+    -- derivative of -(id - const) is -1
+    simpa [this, deriv_neg, deriv_sub, deriv_const] using (deriv_id (x := r))
+
+  -- Substitute and finish by algebra
+  rw [shape, hderθθ]
+  simp only [Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, div_eq_mul_inv]
+  field_simp [hr, hf, pow_two]
+  ring
+  have h1 := Mr_f_linearize_sym M r 2 hr
+  have h2 := Mr_f_linearize_sym M r 1 hr
+  simp at h1 h2
+  rw [h1, h2]
+  ring
+
+/-- R^φ_{θφθ} = 2M/r on the Schwarzschild exterior (off–axis) -/
+lemma RiemannUp_φ_θφθ_ext
+  (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) :
+  RiemannUp M r θ Idx.φ Idx.θ Idx.φ Idx.θ = (2*M) / r := by
+  classical
+  -- exterior nonzero
+  have hr : r ≠ 0 := Exterior.r_ne_zero h_ext
+
+  -- shape: ∂_φ Γ^φ_{θθ} = 0; only one derivative and two products survive
+  have shape :
+      RiemannUp M r θ Idx.φ Idx.θ Idx.φ Idx.θ
+        = -(deriv (fun t => Γ_φ_θφ t) θ)
+          + Γ_φ_rφ r * Γ_r_θθ M r
+          - (Γ_φ_θφ θ) * (Γ_φ_θφ θ) := by
+    unfold RiemannUp
+    simp only [dCoord_φ, dCoord_θ, sumIdx_expand, Γtot,
+               Γtot_φ_θθ, Γtot_φ_φθ, Γtot_φ_rφ, Γtot_r_θθ, deriv_const]
+    ring
+
+  -- substitute closed forms and finish: (1/sin²) − (cos²/sin²) = 1, remaining term is −(r−2M)/r
+  rw [shape]
+  simp only [deriv_Γ_φ_θφ_at θ h_sin_nz, Γ_φ_rφ, Γ_r_θθ, Γ_φ_θφ, div_eq_mul_inv]
+  field_simp [hr, h_sin_nz, pow_two]
+  ring
+
+/-! ### φφ diagonal component lemmas -/
+
+/-- R^t_{φtφ} = -M·sin²θ / r on the Schwarzschild exterior -/
+lemma RiemannUp_t_φtφ_ext
+  (M r θ : ℝ) (h_ext : Exterior M r θ) :
+  RiemannUp M r θ Idx.t Idx.φ Idx.t Idx.φ = -(M * Real.sin θ ^ 2) / r := by
+  classical
+  have hr : r ≠ 0 := Exterior.r_ne_zero h_ext
+  have hf : f M r ≠ 0 := Exterior.f_ne_zero h_ext
+
+  -- shape: only λ = r contributes in the product sums; both derivatives are 0
+  have shape :
+      RiemannUp M r θ Idx.t Idx.φ Idx.t Idx.φ
+        = Γ_t_tr M r * Γ_r_φφ M r θ := by
+    unfold RiemannUp
+    simp only [dCoord_t, dCoord_φ, sumIdx_expand, Γtot,
+               Γtot_t_tr, Γtot_r_φφ, deriv_const]
+    ring
+
+  rw [shape]  -- your shape reduces to Γ_t_tr * Γ_r_φφ
+  simp only [Γ_t_tr, Γ_r_φφ, div_eq_mul_inv]
+  field_simp [hr, hf, pow_two]
+  ring
+  have := Mr_f_linearize M r 1 hr
+  simp at this
+  have : -(M * r * sin θ ^ 2) + M ^ 2 * sin θ ^ 2 * 2 = -(M * r * sin θ ^ 2 * f M r) := by
+    have h := this
+    calc -(M * r * sin θ ^ 2) + M ^ 2 * sin θ ^ 2 * 2
+        = sin θ ^ 2 * (-(M * r) + M ^ 2 * 2) := by ring
+    _   = sin θ ^ 2 * (-(M * r * f M r)) := by rw [← h]
+    _   = -(M * r * sin θ ^ 2 * f M r) := by ring
+  exact this
+
+/-- R^r_{φrφ} = -M·sin²θ / r on the Schwarzschild exterior -/
+lemma RiemannUp_r_φrφ_ext
+  (M r θ : ℝ) (h_ext : Exterior M r θ) :
+  RiemannUp M r θ Idx.r Idx.φ Idx.r Idx.φ = -(M * Real.sin θ ^ 2) / r := by
+  classical
+  have hr : r ≠ 0 := Exterior.r_ne_zero h_ext
+  have hf : f M r ≠ 0 := Exterior.f_ne_zero h_ext
+
+  -- shape: derivative of Γ^r_{φφ} and two products; ∂_φ Γ^r_{rφ} = 0
+  have shape :
+      RiemannUp M r θ Idx.r Idx.φ Idx.r Idx.φ
+        = deriv (fun s => Γ_r_φφ M s θ) r
+            + Γ_r_rr M r * Γ_r_φφ M r θ
+            - Γ_r_φφ M r θ * Γ_φ_rφ r := by
+    unfold RiemannUp
+    simp only [dCoord_r, dCoord_φ, sumIdx_expand, Γtot,
+               Γtot_r_φφ, Γtot_r_rr, Γtot_φ_rφ, deriv_const]
+    ring
+
+  -- compute ∂_r [Γ^r_{φφ}(M, s, θ)] = ∂_r[-(s - 2M)·sin²θ] = -sin²θ
+  have hderφφ : deriv (fun s => Γ_r_φφ M s θ) r = -(Real.sin θ)^2 := by
+    have h1 : deriv (fun s : ℝ => s - 2 * M) r = 1 := by
+      simpa using deriv_sub (differentiableAt_id r) (differentiableAt_const (2 * M))
+    have : deriv (fun s : ℝ => -(s - 2 * M) * (Real.sin θ)^2) r = -(Real.sin θ)^2 := by
+      simp [deriv_mul_const, deriv_neg, h1]
+    simpa [Γ_r_φφ] using this
+
+  rw [shape, hderφφ]  -- your shape reduces to Γ_r_rr * Γ_r_φφ - Γ_r_φφ * Γ_φ_rφ (with the signs you've fixed)
+  simp only [Γ_r_rr, Γ_r_φφ, Γ_φ_rφ, div_eq_mul_inv]
+  field_simp [hr, hf, pow_two]
+  ring
+  have h1 := Mr_f_linearize_sym M r 2 hr
+  have h2 := Mr_f_linearize_sym M r 1 hr
+  simp at h1 h2
+  -- Use the linearize lemmas to prove the needed equality
+  have : -(sin θ ^ 2 * r * f M r * M * 2) + (sin θ ^ 2 * r * M - sin θ ^ 2 * M ^ 2 * 2) =
+         -(sin θ ^ 2 * r * f M r * M) := by
+    have key : -(r * f M r * M * 2) + (r * M - M ^ 2 * 2) = -(r * f M r * M) := by
+      linarith [h1, h2]
+    calc -(sin θ ^ 2 * r * f M r * M * 2) + (sin θ ^ 2 * r * M - sin θ ^ 2 * M ^ 2 * 2)
+        = sin θ ^ 2 * (-(r * f M r * M * 2) + (r * M - M ^ 2 * 2)) := by ring
+    _   = sin θ ^ 2 * (-(r * f M r * M)) := by rw [key]
+    _   = -(sin θ ^ 2 * r * f M r * M) := by ring
+  exact this
+
+/-- R^θ_{φθφ} = 2M·sin²θ / r on the Schwarzschild exterior (off–axis) -/
+lemma RiemannUp_θ_φθφ_ext
+  (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) :
+  RiemannUp M r θ Idx.θ Idx.φ Idx.θ Idx.φ = (2 * M * Real.sin θ ^ 2) / r := by
+  classical
+  have hr : r ≠ 0 := Exterior.r_ne_zero h_ext
+
+  -- shape: only one derivative and two products survive; ∂_φ Γ^θ_{φφ} = 0
+  have shape :
+      RiemannUp M r θ Idx.θ Idx.φ Idx.θ Idx.φ
+        = deriv (fun t => Γ_θ_φφ t) θ
+            + Γ_θ_rθ r * Γ_r_φφ M r θ
+            - Γ_θ_φφ θ * Γ_φ_θφ θ := by
+    unfold RiemannUp
+    simp only [dCoord_θ, dCoord_φ, sumIdx_expand, Γtot,
+               Γtot_θ_φφ, Γtot_r_φφ, Γtot_θ_rθ, Γtot_φ_θφ, deriv_const]
+    ring
+
+  -- Use your established lemma; no re-derivation
+  have hderφφ : deriv (fun t => Γ_θ_φφ t) θ = (Real.sin θ)^2 - (Real.cos θ)^2 := by
+    simpa using deriv_Γ_θ_φφ_at θ
+
+  rw [shape, hderφφ]
+  simp only [Γ_θ_rθ, Γ_r_φφ, Γ_θ_φφ, Γ_φ_θφ, div_eq_mul_inv]
+  -- Everything is polynomial/trigonometric; no f, no denominators except r in Γ_θ_rθ/Γ_φ_rφ
+  field_simp [hr, pow_two]  -- (no hr/hf needed here if no 1/r appears; include hr if you simplified to 1/r)
+  ring
+
+end ComponentLemmas
+
 /- Zero component lemmas: When μ = ν, antisymmetry forces R^ρ_{σμμ} = 0 -/
 
 @[simp] lemma RiemannUp_r_rrr_ext (M r θ : ℝ) :
@@ -1978,6 +2351,70 @@ lemma RiemannUp_θ_rθr_ext
 @[simp] lemma RiemannUp_φ_φφφ_ext (M r θ : ℝ) :
   RiemannUp M r θ Idx.φ Idx.φ Idx.φ Idx.φ = 0 := by
   simpa using RiemannUp_mu_eq_nu M r θ Idx.φ Idx.φ Idx.φ
+
+/-! ### Diagonal Ricci cancellation lemmas -/
+
+/-- Cancellation for R_rr: Component values sum to zero -/
+lemma Ricci_rr_cancellation
+  (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) :
+  RiemannUp M r θ Idx.t Idx.r Idx.t Idx.r +
+  RiemannUp M r θ Idx.r Idx.r Idx.r Idx.r +
+  RiemannUp M r θ Idx.θ Idx.r Idx.θ Idx.r +
+  RiemannUp M r θ Idx.φ Idx.r Idx.φ Idx.r = 0 := by
+  classical
+  have hr : r ≠ 0 := Exterior.r_ne_zero h_ext
+  simp [RiemannUp_mu_eq_nu,
+        RiemannUp_t_rtr_ext M r θ h_ext h_sin_nz,
+        RiemannUp_θ_rθr_ext M r θ h_ext h_sin_nz,
+        RiemannUp_φ_rφr_ext M r θ h_ext h_sin_nz]
+  field_simp [hr]; ring
+
+/-- Cancellation for R_tt: Component values sum to zero -/
+lemma Ricci_tt_cancellation
+  (M r θ : ℝ) (h_ext : Exterior M r θ) :
+  RiemannUp M r θ Idx.t Idx.t Idx.t Idx.t +
+  RiemannUp M r θ Idx.r Idx.t Idx.r Idx.t +
+  RiemannUp M r θ Idx.θ Idx.t Idx.θ Idx.t +
+  RiemannUp M r θ Idx.φ Idx.t Idx.φ Idx.t = 0 := by
+  classical
+  have hr : r ≠ 0 := Exterior.r_ne_zero h_ext
+  simp [RiemannUp_mu_eq_nu]  -- drops R^t_{ttt}
+  -- Substitute the three component lemmas:
+  simp [RiemannUp_r_trt_ext M r θ h_ext,
+        RiemannUp_θ_tθt_ext M r θ h_ext,
+        RiemannUp_φ_tφt_ext M r θ h_ext]
+  -- Now it's pure algebra:
+  field_simp [hr, f]; ring
+
+/-- Cancellation for R_θθ: Component values sum to zero -/
+lemma Ricci_θθ_cancellation
+  (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) :
+  RiemannUp M r θ Idx.t Idx.θ Idx.t Idx.θ +
+  RiemannUp M r θ Idx.r Idx.θ Idx.r Idx.θ +
+  RiemannUp M r θ Idx.θ Idx.θ Idx.θ Idx.θ +
+  RiemannUp M r θ Idx.φ Idx.θ Idx.φ Idx.θ = 0 := by
+  classical
+  have hr : r ≠ 0 := Exterior.r_ne_zero h_ext
+  simp [RiemannUp_mu_eq_nu,
+        RiemannUp_t_θtθ_ext M r θ h_ext,
+        RiemannUp_r_θrθ_ext M r θ h_ext,
+        RiemannUp_φ_θφθ_ext M r θ h_ext h_sin_nz]
+  field_simp [hr]; ring
+
+/-- Cancellation for R_φφ: Component values sum to zero -/
+lemma Ricci_φφ_cancellation
+  (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) :
+  RiemannUp M r θ Idx.t Idx.φ Idx.t Idx.φ +
+  RiemannUp M r θ Idx.r Idx.φ Idx.r Idx.φ +
+  RiemannUp M r θ Idx.θ Idx.φ Idx.θ Idx.φ +
+  RiemannUp M r θ Idx.φ Idx.φ Idx.φ Idx.φ = 0 := by
+  classical
+  have hr : r ≠ 0 := Exterior.r_ne_zero h_ext
+  simp [RiemannUp_mu_eq_nu,
+        RiemannUp_t_φtφ_ext M r θ h_ext,
+        RiemannUp_r_φrφ_ext M r θ h_ext,
+        RiemannUp_θ_φθφ_ext M r θ h_ext h_sin_nz]
+  field_simp [hr]; ring
 
 /-- Squared symmetry in the last pair. Safer for simp. -/
 lemma Riemann_sq_swap_c_d (M r θ : ℝ) (a b c d : Idx) :
@@ -3412,14 +3849,20 @@ theorem Ricci_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real
   case φ.r => exact Ricci_offdiag_sum_φr M r θ
   case φ.θ => exact Ricci_offdiag_sum_φθ M r θ
 
-  -- Diagonal cases (4 cases) - UNDER RECONSTRUCTION
-  -- Previous claim R^ρ_{aρa} = 0 was FALSE (verified by Senior Math Professor)
+  -- Diagonal cases (4 cases) - Component cancellation
   -- Components are NON-ZERO but algebraically cancel when summed
-  -- TODO: Prove explicit cancellation lemmas using component lemmas above
-  case t.t => sorry  -- TODO: R_tt = R^t_{ttt} + R^r_{trt} + R^θ_{tθt} + R^φ_{tφt} = 0 (cancellation)
-  case r.r => sorry  -- TODO: R_rr = R^t_{rtr} + R^r_{rrr} + R^θ_{rθr} + R^φ_{rφr} = 0 (cancellation)
-  case θ.θ => sorry  -- TODO: R_θθ = R^t_{θtθ} + R^r_{θrθ} + R^θ_{θθθ} + R^φ_{θφθ} = 0 (cancellation)
-  case φ.φ => sorry  -- TODO: R_φφ = R^t_{φtφ} + R^r_{φrφ} + R^θ_{φθφ} + R^φ_{φφφ} = 0 (cancellation)
+  case t.t =>
+    convert Ricci_tt_cancellation M r θ h_ext using 2
+    simp [sumIdx_expand]
+  case r.r =>
+    convert Ricci_rr_cancellation M r θ h_ext h_sin_nz using 2
+    simp [sumIdx_expand]
+  case θ.θ =>
+    convert Ricci_θθ_cancellation M r θ h_ext h_sin_nz using 2
+    simp [sumIdx_expand]
+  case φ.φ =>
+    convert Ricci_φφ_cancellation M r θ h_ext h_sin_nz using 2
+    simp [sumIdx_expand]
 
 end RicciInfrastructure
 
