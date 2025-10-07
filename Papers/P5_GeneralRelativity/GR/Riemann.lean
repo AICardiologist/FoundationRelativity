@@ -1929,20 +1929,55 @@ lemma ContractionC_differentiable_θ (M r θ : ℝ) (a b c : Idx)
       · apply g_differentiable_θ; assumption; assumption; assumption
   }
 
-/-- RiemannUp version: if first and third indices coincide, the component vanishes on Exterior.
+/- =====================================================================
+   COMPONENT LEMMAS: Explicit Riemann tensor components for Schwarzschild
 
-    This follows from antisymmetry in (a,c): R^a_{cad} = -R^c_{aad} and using Riemann_first_equal_zero for the covariant version.
--/
-@[simp] lemma RiemannUp_first_equal_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) (a c d : Idx) :
-  RiemannUp M r θ a c a d = 0 := by
-  classical
-  -- Expand RiemannUp definition
-  unfold RiemannUp
-  -- Use antisymmetry and coordinate/Christoffel structure to show this vanishes
-  -- The proof uses staticity (∂_t = 0), axisymmetry, and the Christoffel symbol sparsity pattern
-  simp only [dCoord, Γtot, sumIdx_expand]
-  -- All terms cancel due to index antisymmetry when first=third
-  sorry  -- TODO: Complete proof using coordinate expansions and antisymmetry
+   The following lemmas prove the explicit non-zero values of RiemannUp M r θ ρ σ μ ν
+   for the Schwarzschild metric in the exterior region (r > 2M).
+
+   Mathematical Note:
+   - The claim R^a_{cad} = 0 (when first and third indices equal) is FALSE
+   - Components are NON-ZERO but algebraically cancel when summed in Ricci tensor
+   - Example: R^t_{rtr} = 2M/(r²(r-2M)) ≠ 0
+   - Verified by Senior Mathematics Professor (Oct 6, 2025)
+
+   Proof strategy (from Junior Tactics Professor):
+   1. unfold RiemannUp
+   2. simp [dCoord, sumIdx_expand, Γtot]  -- Does most of the work!
+   3. Apply small identity lemmas (e.g., Γ_r_rr = -Γ_t_tr)
+   4. Use existing derivative lemmas (e.g., deriv_Γ_t_tr_at)
+   5. field_simp + ring to finish
+   ===================================================================== -/
+
+/-- R^t_{rtr} = 2M/(r²(r-2M)) for Schwarzschild exterior region -/
+lemma RiemannUp_t_rtr_ext
+  (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) :
+  RiemannUp M r θ Idx.t Idx.r Idx.t Idx.r = 2 * M / (r^2 * (r - 2*M)) := by
+  sorry  -- TODO: Complete using Junior Tactics Professor's pattern
+
+/-- R^θ_{rθr} = -M/(r²(r-2M)) for Schwarzschild exterior region -/
+lemma RiemannUp_θ_rθr_ext
+  (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) :
+  RiemannUp M r θ Idx.θ Idx.r Idx.θ Idx.r = - M / (r^2 * (r - 2*M)) := by
+  sorry  -- TODO: Complete using Junior Tactics Professor's pattern
+
+/- Zero component lemmas: When μ = ν, antisymmetry forces R^ρ_{σμμ} = 0 -/
+
+@[simp] lemma RiemannUp_r_rrr_ext (M r θ : ℝ) :
+  RiemannUp M r θ Idx.r Idx.r Idx.r Idx.r = 0 := by
+  simpa using RiemannUp_mu_eq_nu M r θ Idx.r Idx.r Idx.r
+
+@[simp] lemma RiemannUp_t_ttt_ext (M r θ : ℝ) :
+  RiemannUp M r θ Idx.t Idx.t Idx.t Idx.t = 0 := by
+  simpa using RiemannUp_mu_eq_nu M r θ Idx.t Idx.t Idx.t
+
+@[simp] lemma RiemannUp_θ_θθθ_ext (M r θ : ℝ) :
+  RiemannUp M r θ Idx.θ Idx.θ Idx.θ Idx.θ = 0 := by
+  simpa using RiemannUp_mu_eq_nu M r θ Idx.θ Idx.θ Idx.θ
+
+@[simp] lemma RiemannUp_φ_φφφ_ext (M r θ : ℝ) :
+  RiemannUp M r θ Idx.φ Idx.φ Idx.φ Idx.φ = 0 := by
+  simpa using RiemannUp_mu_eq_nu M r θ Idx.φ Idx.φ Idx.φ
 
 /-- Squared symmetry in the last pair. Safer for simp. -/
 lemma Riemann_sq_swap_c_d (M r θ : ℝ) (a b c d : Idx) :
@@ -3377,11 +3412,14 @@ theorem Ricci_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real
   case φ.r => exact Ricci_offdiag_sum_φr M r θ
   case φ.θ => exact Ricci_offdiag_sum_φθ M r θ
 
-  -- Diagonal cases (4 cases) - trivial because RiemannUp^ρ_aρa = 0 (first=third index)
-  case t.t => simp only [sumIdx_expand, RiemannUp_first_equal_zero_ext M r θ h_ext h_sin_nz]; norm_num
-  case r.r => simp only [sumIdx_expand, RiemannUp_first_equal_zero_ext M r θ h_ext h_sin_nz]; norm_num
-  case θ.θ => simp only [sumIdx_expand, RiemannUp_first_equal_zero_ext M r θ h_ext h_sin_nz]; norm_num
-  case φ.φ => simp only [sumIdx_expand, RiemannUp_first_equal_zero_ext M r θ h_ext h_sin_nz]; norm_num
+  -- Diagonal cases (4 cases) - UNDER RECONSTRUCTION
+  -- Previous claim R^ρ_{aρa} = 0 was FALSE (verified by Senior Math Professor)
+  -- Components are NON-ZERO but algebraically cancel when summed
+  -- TODO: Prove explicit cancellation lemmas using component lemmas above
+  case t.t => sorry  -- TODO: R_tt = R^t_{ttt} + R^r_{trt} + R^θ_{tθt} + R^φ_{tφt} = 0 (cancellation)
+  case r.r => sorry  -- TODO: R_rr = R^t_{rtr} + R^r_{rrr} + R^θ_{rθr} + R^φ_{rφr} = 0 (cancellation)
+  case θ.θ => sorry  -- TODO: R_θθ = R^t_{θtθ} + R^r_{θrθ} + R^θ_{θθθ} + R^φ_{θφθ} = 0 (cancellation)
+  case φ.φ => sorry  -- TODO: R_φφ = R^t_{φtφ} + R^r_{φrφ} + R^θ_{φθφ} + R^φ_{φφφ} = 0 (cancellation)
 
 end RicciInfrastructure
 
