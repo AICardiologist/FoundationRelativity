@@ -1753,10 +1753,76 @@ that the Schwarzschild spacetime is a vacuum solution (Ricci tensor = 0).
 lemma dCoord_g_differentiable_r (M r θ : ℝ) (μ a b : Idx)
     (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
   DifferentiableAt_r (dCoord μ (fun r θ => g M a b r θ)) r θ := by
-  -- Most cases are trivial (constants or polynomials)
-  -- Key cases: μ=r with g_tt/g_rr use differentiableAt_deriv_f
-  -- But the case analysis after simp creates complex goals
-  SCAFFOLD_TODO  -- TODO: Complete case analysis using differentiableAt_deriv_f
+  -- Hybrid Strategy: Case analysis FIRST, then apply appropriate strategy per case
+  cases μ <;> cases a <;> cases b
+  all_goals {
+    -- Strategy dispatch based on case type:
+    -- 1. Trivial cases (staticity, axisymmetry, off-diagonal): simp → constant derivative
+    -- 2. Matching direction (e.g., ∂²_r g): Use C^k framework abstraction
+    -- 3. Mismatching direction (e.g., ∂_r∂_θ g): Explicit calculation via separation of variables
+    try {
+      simp only [DifferentiableAt_r, dCoord_r, dCoord_t, dCoord_θ, dCoord_φ, g, deriv_const]
+      exact differentiableAt_const 0
+    }
+  }
+
+  -- Non-trivial cases require specific handling
+
+  -- === μ=r cases (matching direction - use C^k abstraction) ===
+
+  case r.t.t =>
+    -- g_tt = -f(r), ∂_r g_tt = -f'(r)
+    -- Goal: DifferentiableAt_r (deriv (fun s => -f M s))
+    simp only [DifferentiableAt_r, dCoord_r, g]
+    have h_neg_f_Cinf := contDiff_f.contDiffAt.neg
+    exact h_neg_f_Cinf.differentiable_deriv_of_ge_two (by norm_num)
+
+  case r.r.r =>
+    -- g_rr = 1/f(r), ∂_r g_rr involves f'
+    -- Goal: DifferentiableAt_r (deriv (fun s => (f M s)⁻¹))
+    simp only [DifferentiableAt_r, dCoord_r, g]
+    -- f is C^∞ on Exterior, f ≠ 0 on Exterior
+    have hf_pos : 0 < f M r := f_pos M r hM h_ext
+    have hf_nz : f M r ≠ 0 := ne_of_gt hf_pos
+    have h_inv_f_Cinf := contDiff_f.contDiffAt.inv hf_nz
+    exact h_inv_f_Cinf.differentiable_deriv_of_ge_two (by norm_num)
+
+  case r.θ.θ =>
+    -- g_θθ = r² (CORRECTED: matching direction)
+    simp only [DifferentiableAt_r, dCoord_r, g]
+    -- Use C^k framework: r² is C^∞
+    have h_pow_Cinf := contDiffAt_pow 2
+    exact h_pow_Cinf.differentiable_deriv_of_ge_two (by norm_num)
+
+  case r.φ.φ =>
+    -- g_φφ = r² sin²θ (CORRECTED)
+    simp only [DifferentiableAt_r, dCoord_r, g]
+    -- Use Ck framework (Matching direction).
+    have h_pow_Cinf := contDiffAt_pow 2
+    -- r² * const is C^∞.
+    have h_gpp_Cinf := h_pow_Cinf.mul_const ((Real.sin θ)^2)
+    exact h_gpp_Cinf.differentiable_deriv_of_ge_two (by norm_num)
+
+  -- === μ=θ cases (mismatching direction for non-constant g - use explicit calculation) ===
+
+  case θ.t.t | θ.r.r =>
+    -- g_tt = -f(r), g_rr = 1/f(r) are constant in θ
+    -- ∂_θ g = 0 → ∂_r (∂_θ g) = ∂_r 0 = 0 (differentiable)
+    simp only [DifferentiableAt_r, dCoord_θ, g, deriv_const]
+    exact differentiableAt_const 0
+
+  case θ.θ.θ =>
+    -- g_θθ = r² is constant in θ
+    -- ∂_θ g_θθ = 0 → ∂_r (∂_θ g_θθ) = ∂_r 0 = 0 (differentiable)
+    simp only [DifferentiableAt_r, dCoord_θ, g, deriv_const]
+    exact differentiableAt_const 0
+
+  case θ.φ.φ =>
+    -- g_φφ = r² sin²θ separates: ∂_θ g_φφ = r² (2 sin θ cos θ)
+    -- Goal: DifferentiableAt_r (r² · 2 sin θ cos θ) = differentiability of r² as function of r
+    simp only [DifferentiableAt_r, dCoord_θ, g, deriv_const_mul, deriv_sin_sq_at]
+    -- r² is differentiable in r
+    exact DifferentiableAt.mul_const (differentiableAt_pow 2 r) (2 * Real.sin θ * Real.cos θ)
 
 /-- The first derivative of g (wrt any coordinate) is itself differentiable in θ (C2 smoothness).
     Note: This is about the partially-applied function (dCoord μ g) as a function of (r,θ). -/
@@ -1764,9 +1830,46 @@ lemma dCoord_g_differentiable_r (M r θ : ℝ) (μ a b : Idx)
 lemma dCoord_g_differentiable_θ (M r θ : ℝ) (μ a b : Idx)
     (hM : 0 < M) (h_ext : 2 * M < r) (h_sin_nz : Real.sin θ ≠ 0) :
   DifferentiableAt_θ (dCoord μ (fun r θ => g M a b r θ)) r θ := by
-  -- Most cases are trivial (constants)
-  -- Key case: μ=θ with g_φφ uses differentiableAt_deriv_sin_sq
-  SCAFFOLD_TODO  -- TODO: Complete case analysis using differentiableAt_deriv_sin_sq
+  -- Hybrid Strategy: Case analysis FIRST, then apply appropriate strategy per case
+  cases μ <;> cases a <;> cases b
+  all_goals {
+    -- Strategy dispatch based on case type:
+    -- 1. Trivial cases (staticity, axisymmetry, off-diagonal): simp → constant derivative
+    -- 2. Matching direction (e.g., ∂²_θ g): Use C^k framework abstraction
+    -- 3. Mismatching direction (e.g., ∂_θ∂_r g): Explicit calculation via separation of variables
+    try {
+      simp only [DifferentiableAt_θ, dCoord_r, dCoord_t, dCoord_θ, dCoord_φ, g, deriv_const]
+      exact differentiableAt_const 0
+    }
+  }
+
+  -- Non-trivial cases require specific handling
+
+  -- === μ=θ cases (matching direction - use C^k abstraction) ===
+
+  case θ.φ.φ =>
+    -- g_φφ = r² sin²θ (CORRECTED)
+    -- Use Ck framework (Matching direction). Remove explicit derivative lemmas from simp.
+    simp only [DifferentiableAt_θ, dCoord_θ, g]
+    have h_sin_sq_Cinf := contDiffAt_sin_sq θ
+    -- const * sin²θ is C^∞.
+    have h_gpp_Cinf := h_sin_sq_Cinf.const_mul (r^2)
+    exact h_gpp_Cinf.differentiable_deriv_of_ge_two (by norm_num)
+
+  -- === μ=r cases (mismatching direction for non-constant g - use explicit calculation) ===
+
+  case r.θ.θ =>
+    -- g_θθ = r² separates: ∂_r g_θθ = 2r
+    -- Goal: DifferentiableAt_θ (2r) = differentiability of constant in θ
+    simp only [DifferentiableAt_θ, dCoord_r, g, deriv_pow_two_at]
+    exact differentiableAt_const (2 * r)
+
+  case r.φ.φ =>
+    -- g_φφ = r² sin²θ separates: ∂_r g_φφ = 2r sin²θ
+    -- Goal: DifferentiableAt_θ (2r sin²θ) = differentiability of sin²θ as function of θ
+    simp only [DifferentiableAt_θ, dCoord_r, g, deriv_mul_const, deriv_pow_two_at]
+    -- sin²θ is differentiable in θ
+    exact DifferentiableAt.const_mul (differentiableAt_sin_sq θ) (2 * r)
 -/
 
 -- ========== C1 Smoothness Lemmas (Γtot Differentiability) ==========
