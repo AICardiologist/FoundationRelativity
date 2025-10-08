@@ -2222,9 +2222,58 @@ lemma RiemannUp_φ_θφθ_ext
 
   -- substitute closed forms and finish: (1/sin²) − (cos²/sin²) = 1, remaining term is −(r−2M)/r
   rw [shape]
-  simp only [deriv_Γ_φ_θφ_at θ h_sin_nz, Γ_φ_rφ, Γ_r_θθ, Γ_φ_θφ, div_eq_mul_inv]
+  -- Expand Γ-terms, but do NOT rewrite the derivative yet
+  simp only [Γ_φ_rφ, Γ_r_θθ, Γ_φ_θφ, div_eq_mul_inv]
+
+  -- Clear the (r) and (sin θ)^2 denominators first; this produces the "r·sin²θ" factors you saw
   field_simp [hr, h_sin_nz, pow_two]
-  ring
+
+  -- Now replace the derivative of cot with the closed form  - 1/(sin θ)^2.
+  have hdcot :
+    deriv (fun t => Real.cos t / Real.sin t) θ
+      = - 1 / (Real.sin θ)^2 := by
+    -- This is just `deriv_Γ_φ_θφ_at` with `Γ_φ_θφ = cos/sin`.
+    simpa [Γ_φ_θφ] using deriv_Γ_φ_θφ_at θ h_sin_nz
+  rw [hdcot]
+
+  -- Work with the factored shape produced by the earlier `field_simp`.
+  -- Goal (after the previous steps):
+  --   (-(- 1 / (Real.sin θ)^2 * r) + -(r - 2*M)) * (Real.sin θ)^2 - r * (Real.cos θ)^2
+  --   = 2 * M * (Real.sin θ)^2
+
+  -- 1) Distribute the product so the csc²·sin² cancellation is an atomic step.
+  have hsplit :
+      (-(- 1 / (Real.sin θ)^2 * r) + -(r - 2*M)) * (Real.sin θ)^2 - r * (Real.cos θ)^2
+        = (-(- 1 / (Real.sin θ)^2 * r) * (Real.sin θ)^2)
+          + (-(r - 2*M) * (Real.sin θ)^2) - r * (Real.cos θ)^2 := by
+    ring
+
+  -- 2) Cancel csc²·sin² -> 1 in the first product. Needs sin θ ≠ 0.
+  have hA : -(- 1 / (Real.sin θ)^2 * r) * (Real.sin θ)^2 = r := by
+    field_simp [h_sin_nz, pow_two]
+
+  -- 3) Pythagorean identity in the polynomial form we need.
+  have trig : (Real.sin θ)^2 + (Real.cos θ)^2 = 1 := by
+    simpa [pow_two] using Real.sin_sq_add_cos_sq θ
+
+  -- 4) Finish with a short calc (no global rewriting; only ring and trig).
+  have hfinish :
+      (-(- 1 / (Real.sin θ)^2 * r) + -(r - 2*M)) * (Real.sin θ)^2 - r * (Real.cos θ)^2
+        = 2 * M * (Real.sin θ)^2 := by
+    calc
+      (-(- 1 / (Real.sin θ)^2 * r) + -(r - 2*M)) * (Real.sin θ)^2 - r * (Real.cos θ)^2
+          = r + (-(r - 2*M) * (Real.sin θ)^2) - r * (Real.cos θ)^2 := by
+            rw [hsplit, hA]
+      _   = r - r * ((Real.sin θ)^2 + (Real.cos θ)^2) + 2 * M * (Real.sin θ)^2 := by
+            ring
+      _   = r - r * 1 + 2 * M * (Real.sin θ)^2 := by
+            rw [trig]
+      _   = 2 * M * (Real.sin θ)^2 := by
+            ring
+
+  -- 5) `simpa` takes care of harmless associativity/commutativity differences
+  --     (e.g. `M * sin² * 2` vs `2 * M * sin²`).
+  simpa [mul_comm, mul_left_comm, mul_assoc] using hfinish
 
 /-! ### φφ diagonal component lemmas -/
 
