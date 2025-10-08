@@ -2105,19 +2105,55 @@ lemma ContractionC_differentiable_θ (M r θ : ℝ) (a b c : Idx)
 lemma RiemannUp_t_rtr_ext
   (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) :
   RiemannUp M r θ Idx.t Idx.r Idx.t Idx.r = 2 * M / (r^2 * (r - 2*M)) := by
-  sorry  -- TODO: Complete using Junior Tactics Professor's pattern
+  classical
+  have hr : r ≠ 0 := Exterior.r_ne_zero h_ext
+  have hf : f M r ≠ 0 := Exterior.f_ne_zero h_ext
+  have hsub : r - 2 * M ≠ 0 := by
+    have : 0 < r - 2 * M := sub_pos.mpr h_ext.hr_ex
+    exact ne_of_gt this
+
+  -- Shape: expand RiemannUp
+  -- R^t_{rtr} = ∂_t Γ^t_{rr} - ∂_r Γ^t_{tr} + Γ^t_{tλ}Γ^λ_{rr} - Γ^t_{rλ}Γ^λ_{tr}
+  have shape :
+      RiemannUp M r θ Idx.t Idx.r Idx.t Idx.r
+        = - deriv (fun s => Γ_t_tr M s) r
+            + Γ_t_tr M r * Γ_r_rr M r - Γ_t_tr M r * Γ_t_tr M r := by
+    unfold RiemannUp
+    simp only [dCoord_r, dCoord_t, sumIdx_expand, Γtot,
+      Γtot_t_tr, Γtot_r_rr, Γtot_t_rr, deriv_const]
+    ring
+
+  -- Compute derivative: deriv(Γ_t_tr) = deriv(M/(r²f))
+  have hder : deriv (fun s => Γ_t_tr M s) r = -(2*M*(r - M)) / (r^2 * (r - 2*M)^2) := by
+    exact deriv_Γ_t_tr M r hr hf hsub
+
+  -- Substitute and finish
+  rw [shape, hder]
+  simp only [Γ_t_tr, Γ_r_rr, f, div_eq_mul_inv]
+  field_simp [hr, hsub, pow_two]
+  ring
 
 /-- R^θ_{rθr} = -M/(r²(r-2M)) for Schwarzschild exterior region -/
 lemma RiemannUp_θ_rθr_ext
   (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) :
   RiemannUp M r θ Idx.θ Idx.r Idx.θ Idx.r = - M / (r^2 * (r - 2*M)) := by
-  sorry  -- TODO: Complete using Junior Tactics Professor's pattern
+  classical
+  have hr : r ≠ 0 := Exterior.r_ne_zero h_ext
+  unfold RiemannUp
+  simp [dCoord, sumIdx_expand, Γtot, Γ_θ_rθ, Γ_r_θθ, Γ_r_rr, f]
+  field_simp [hr]
+  ring
 
 /-- R^φ_{rφr} = -M/(r²(r-2M)) for Schwarzschild exterior region -/
 lemma RiemannUp_φ_rφr_ext
   (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real.sin θ ≠ 0) :
   RiemannUp M r θ Idx.φ Idx.r Idx.φ Idx.r = - M / (r^2 * (r - 2*M)) := by
-  sorry
+  classical
+  have hr : r ≠ 0 := Exterior.r_ne_zero h_ext
+  unfold RiemannUp
+  simp [dCoord, sumIdx_expand, Γtot, Γ_φ_rφ, Γ_r_φφ, Γ_r_rr, f]
+  field_simp [hr]
+  ring
 
 -- All 7 Schwarzschild component lemmas: shield heavy simp locally.
 section ComponentLemmas
