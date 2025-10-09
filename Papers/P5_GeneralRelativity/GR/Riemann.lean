@@ -77,17 +77,13 @@ lemma deriv_zero_of_locally_zero {f : ℝ → ℝ} {x : ℝ} {U : Set ℝ}
     deriv f x = 0 := by
   -- Step 1: U is a neighborhood of x
   have h_nhds : U ∈ 𝓝 x := hU_open.mem_nhds hx
-
   -- Step 2: f is eventually equal to the zero function near x
-  have h_eventually_eq_zero : f =ᶠ[𝓝 x] (fun _ => 0) := by
-    apply eventually_of_mem h_nhds
+  have h0 : f =ᶠ[𝓝 x] (fun _ => 0) := by
+    apply Filter.eventually_of_mem h_nhds
     intro y hy
     simp [hf_zero y hy]
-
   -- Step 3: The derivative of f equals the derivative of the zero function
-  -- Use Filter.EventuallyEq.deriv_eq
-  rw [h_eventually_eq_zero.deriv_eq]
-
+  rw [h0.deriv_eq]
   -- Step 4: The derivative of a constant is zero
   simp [deriv_const]
 
@@ -558,6 +554,36 @@ lemma differentiableAt_Γtot_φ_rφ_r (M r θ : ℝ) (hM : 0 < M) (hr : 2 * M < 
   simp only [DifferentiableAt_r, Γtot_φ_rφ]
   have hr0 : r ≠ 0 := r_ne_zero_of_exterior M r hM hr
   exact differentiableAt_Γ_φ_rφ_r r hr0
+
+/-- r-direction differentiability of Γ^θ_{θ r} via lower-index symmetry:
+    Γ^θ_{θ r} = Γ^θ_{r θ}. Valid on the Exterior domain. -/
+lemma differentiableAt_Γtot_θ_θr_r
+    (M r θ : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
+  DifferentiableAt_r (fun r θ => Γtot M r θ Idx.θ Idx.θ Idx.r) r θ := by
+  -- Pointwise symmetry of the *lower* indices:
+  have hsym :
+    (fun r θ => Γtot M r θ Idx.θ Idx.θ Idx.r)
+      =
+    (fun r θ => Γtot M r θ Idx.θ Idx.r Idx.θ) := by
+    funext r' θ'
+    simpa using (Γtot_symmetry M r' θ' Idx.θ Idx.θ Idx.r)
+  -- Reuse the existing differentiability of Γ^θ_{r θ}
+  simpa [hsym, DifferentiableAt_r] using
+    differentiableAt_Γtot_θ_rθ_r M r θ hM hr
+
+/-- r-direction differentiability of Γ^φ_{φ r} via lower-index symmetry:
+    Γ^φ_{φ r} = Γ^φ_{r φ}. Valid on the Exterior domain. -/
+lemma differentiableAt_Γtot_φ_φr_r
+    (M r θ : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
+  DifferentiableAt_r (fun r θ => Γtot M r θ Idx.φ Idx.φ Idx.r) r θ := by
+  have hsym :
+    (fun r θ => Γtot M r θ Idx.φ Idx.φ Idx.r)
+      =
+    (fun r θ => Γtot M r θ Idx.φ Idx.r Idx.φ) := by
+    funext r' θ'
+    simpa using (Γtot_symmetry M r' θ' Idx.φ Idx.φ Idx.r)
+  simpa [hsym, DifferentiableAt_r] using
+    differentiableAt_Γtot_φ_rφ_r M r θ hM hr
 
 lemma differentiableAt_Γtot_φ_θφ_θ (M r θ : ℝ) (hθ : Real.sin θ ≠ 0) :
     DifferentiableAt_θ (fun r θ => Γtot M r θ Idx.φ Idx.θ Idx.φ) r θ := by
@@ -1219,6 +1245,14 @@ lemma Riemann_swap_c_d
 
 /-! ### Covariant derivative framework for first-pair antisymmetry -/
 
+/-- Covariant derivative of a (0,2) tensor field T.
+    ∇_c T_{ab} = ∂_c T_{ab} - Γ^d_{ca} T_{db} - Γ^d_{cb} T_{ad} -/
+noncomputable def nabla (T : ℝ → ℝ → ℝ → Idx → Idx → ℝ)
+    (M r θ : ℝ) (c a b : Idx) : ℝ :=
+  dCoord c (fun r θ => T M r θ a b) r θ
+  - sumIdx (fun d => Γtot M r θ d a c * T M r θ d b)
+  - sumIdx (fun d => Γtot M r θ d b c * T M r θ a d)
+
 /-- Covariant derivative of the metric: components `(∇_c g)_{ab}` in coordinates. -/
 noncomputable def nabla_g (M r θ : ℝ) (c a b : Idx) : ℝ :=
   dCoord c (fun r θ => g M a b r θ) r θ
@@ -1589,17 +1623,11 @@ lemma dCoord_nabla_g_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ)
     simp only [dCoord_r]
     -- Goal: deriv (fun r' => nabla_g M r' θ c a b) r = 0
 
-    -- Define the open set U = {r' : ℝ | 2 * M < r'}
-    let U := {r' : ℝ | 2 * M < r'}
-
-    -- U is open (it's the open interval (2M, ∞))
-    have hU_open : IsOpen U := isOpen_Ioi
-
-    -- (r, θ) ∈ Exterior means r ∈ U
-    have hx : r ∈ U := h_ext.hr_ex
+    -- openness gives a neighborhood of r inside {s | 2M < s}
+    have : {s : ℝ | 2 * M < s} ∈ 𝓝 r := isOpen_Ioi.mem_nhds h_ext.hr_ex
 
     -- Apply the general lemma
-    apply Exterior.deriv_zero_of_locally_zero hU_open hx
+    apply Exterior.deriv_zero_of_locally_zero isOpen_Ioi h_ext.hr_ex
 
     -- Prove that nabla_g is zero on U
     intro r' hr'_ex
@@ -1633,6 +1661,37 @@ lemma dCoord_nabla_g_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ)
     -- because Exterior only depends on r > 2M and M > 0, not on θ
     have h_ext' : Exterior M r θ' := { hM := h_ext.hM, hr_ex := h_ext.hr_ex }
     exact nabla_g_zero_ext M r θ' h_ext' c a b
+
+/-- On Exterior, the second covariant derivative of the metric vanishes. -/
+lemma nabla_nabla_g_zero_ext
+    (M r θ : ℝ) (h_ext : Exterior M r θ)
+    (c d a b : Idx) :
+  nabla (fun M' r' θ' a' b' => nabla_g M' r' θ' d a' b') M r θ c a b = 0 := by
+  classical
+  -- Pointwise zeros we will use:
+  have H0 : dCoord c (fun r θ => nabla_g M r θ d a b) r θ = 0 :=
+    dCoord_nabla_g_zero_ext M r θ h_ext c d a b
+  have H1 : ∀ e, nabla_g M r θ d e b = 0 :=
+    fun e => nabla_g_zero_ext M r θ h_ext d e b
+  have H2 : ∀ e, nabla_g M r θ d a e = 0 :=
+    fun e => nabla_g_zero_ext M r θ h_ext d a e
+
+  -- Expand ∇ exactly once:
+  unfold nabla
+
+  -- Kill both Γ·(∇g) sums BEFORE any other simplification.
+  have S1 : sumIdx (fun e => Γtot M r θ e a c * nabla_g M r θ d e b) = 0 := by
+    -- rewrite the integrand to Γ * 0
+    simp only [H1]
+    simp
+  have S2 : sumIdx (fun e => Γtot M r θ e b c * nabla_g M r θ d a e) = 0 := by
+    simp only [H2]
+    simp
+
+  -- Now the goal is: dCoord c (...) - 0 - 0 = 0
+  -- Rewrite with S1/S2 and close with H0.
+  simp only [S1, S2, sub_zero]
+  exact H0
 
 /-! #### Legacy Compatibility Lemmas (θ-φ sector only)
 
@@ -1736,6 +1795,718 @@ lemma dCoord_r_θ_commute_for_g (M r θ : ℝ) (a b : Idx) :
     -- 3. Algebraic Closure
     try { ring }
   }
+
+/-- Mixed coordinate derivatives commute for `g` in *all* index directions.
+    The only nontrivial case is `(r, θ)`, covered by `dCoord_r_θ_commute_for_g`. -/
+lemma dCoord_commute_for_g_all
+    (M r θ : ℝ) (a b c d : Idx) :
+  dCoord c (fun r θ => dCoord d (fun r θ => g M a b r θ) r θ) r θ
+  =
+  dCoord d (fun r θ => dCoord c (fun r θ => g M a b r θ) r θ) r θ := by
+  cases c <;> cases d
+  all_goals
+    first
+    | -- (r, θ): nontrivial
+      exact dCoord_r_θ_commute_for_g M r θ a b
+    | -- (θ, r): nontrivial, use symmetry
+      exact (dCoord_r_θ_commute_for_g M r θ a b).symm
+    | -- identical directions or directions with a trivial derivative (t, φ):
+      simp [g, dCoord_r, dCoord_θ, dCoord_t, dCoord_φ, deriv_const]
+
+/-- Distribute `∂_r` across `∑ₑ Γ^e_{θ a} · g_{e b}` on the Exterior domain. -/
+lemma dCoord_r_sumIdx_Γθ_g_left_ext
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (a b : Idx) :
+  dCoord Idx.r (fun r θ => sumIdx (fun e => Γtot M r θ e Idx.θ a * g M e b r θ)) r θ
+    =
+  sumIdx (fun e =>
+    dCoord Idx.r (fun r θ => Γtot M r θ e Idx.θ a) r θ * g M e b r θ
+  + Γtot M r θ e Idx.θ a * dCoord Idx.r (fun r θ => g M e b r θ) r θ) := by
+  classical
+  -- Step 1: push ∂r through the finite sum, with r/θ obligations.
+  have hsum :
+    dCoord Idx.r (fun r θ => sumIdx (fun e => Γtot M r θ e Idx.θ a * g M e b r θ)) r θ
+      =
+    sumIdx (fun e =>
+      dCoord Idx.r (fun r θ => Γtot M r θ e Idx.θ a * g M e b r θ) r θ) := by
+    refine dCoord_sumIdx Idx.r
+      (fun e r θ => Γtot M r θ e Idx.θ a * g M e b r θ) r θ
+      ?hr ?hθ
+    · intro e
+      -- (r-side) DifferentiableAt_r of Γ·g: prove for each factor then mul.
+      left
+      have hΓ :
+        DifferentiableAt_r (fun r θ => Γtot M r θ e Idx.θ a) r θ := by
+        -- r-sensitive exactly in (e=θ,a=r) and (e=r,a=θ); others are r-constant/0.
+        cases e <;> cases a <;>
+          first
+          | exact differentiableAt_Γtot_θ_θr_r M r θ h_ext.hM h_ext.hr_ex  -- e=θ, a=r
+          | exact differentiableAt_Γtot_r_θθ_r M r θ                        -- e=r, a=θ
+          | simp [DifferentiableAt_r, Γtot]
+      have hg :
+        DifferentiableAt_r (fun r θ => g M e b r θ) r θ := by
+        cases e <;> cases b <;>
+          first
+          | exact differentiableAt_g_tt_r M r θ h_ext
+          | exact differentiableAt_g_rr_r M r θ h_ext
+          | exact differentiableAt_g_θθ_r M r θ
+          | exact differentiableAt_g_φφ_r M r θ
+          | simp [DifferentiableAt_r, g]
+      exact hΓ.mul hg
+    · intro _e; right; simp        -- (θ-side) we're doing ∂r so discharge with μ ≠ θ
+
+  -- Step 2: product rule in each summand, with explicit obligations.
+  have hprod :
+    (fun e =>
+      dCoord Idx.r (fun r θ => Γtot M r θ e Idx.θ a * g M e b r θ) r θ)
+      =
+    (fun e =>
+      dCoord Idx.r (fun r θ => Γtot M r θ e Idx.θ a) r θ * g M e b r θ
+    + Γtot M r θ e Idx.θ a * dCoord Idx.r (fun r θ => g M e b r θ) r θ) := by
+    funext e
+    refine dCoord_mul_of_diff Idx.r
+      (fun r θ => Γtot M r θ e Idx.θ a)
+      (fun r θ => g M e b r θ) r θ ?hf_r ?hg_r ?hf_θ ?hg_θ
+    · -- hf_r : r-diff of Γ
+      left
+      cases e <;> cases a <;>
+        first
+        | exact differentiableAt_Γtot_θ_θr_r M r θ h_ext.hM h_ext.hr_ex
+        | exact differentiableAt_Γtot_r_θθ_r M r θ
+        | simp [DifferentiableAt_r, Γtot]
+    · -- hg_r : r-diff of g
+      left
+      cases e <;> cases b <;>
+        first
+        | exact differentiableAt_g_tt_r M r θ h_ext
+        | exact differentiableAt_g_rr_r M r θ h_ext
+        | exact differentiableAt_g_θθ_r M r θ
+        | exact differentiableAt_g_φφ_r M r θ
+        | simp [DifferentiableAt_r, g]
+    · -- hf_θ : discharge via μ ≠ θ
+      right; simp
+    · -- hg_θ : discharge via μ ≠ θ
+      right; simp
+
+  -- Combine.
+  rw [hsum, hprod]
+
+/-- Distribute `∂_r` across `∑ₑ Γ^e_{θ b} · g_{a e}` on the Exterior domain. -/
+lemma dCoord_r_sumIdx_Γθ_g_right_ext
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (a b : Idx) :
+  dCoord Idx.r (fun r θ => sumIdx (fun e => Γtot M r θ e Idx.θ b * g M a e r θ)) r θ
+    =
+  sumIdx (fun e =>
+    dCoord Idx.r (fun r θ => Γtot M r θ e Idx.θ b) r θ * g M a e r θ
+  + Γtot M r θ e Idx.θ b * dCoord Idx.r (fun r θ => g M a e r θ) r θ) := by
+  classical
+  -- Step 1: push ∂r through the finite sum, with r/θ obligations.
+  have hsum :
+    dCoord Idx.r (fun r θ => sumIdx (fun e => Γtot M r θ e Idx.θ b * g M a e r θ)) r θ
+      =
+    sumIdx (fun e =>
+      dCoord Idx.r (fun r θ => Γtot M r θ e Idx.θ b * g M a e r θ) r θ) := by
+    refine dCoord_sumIdx Idx.r
+      (fun e r θ => Γtot M r θ e Idx.θ b * g M a e r θ) r θ
+      ?hr ?hθ
+    · intro e
+      left
+      have hΓ :
+        DifferentiableAt_r (fun r θ => Γtot M r θ e Idx.θ b) r θ := by
+        cases e <;> cases b <;>
+          first
+          | exact differentiableAt_Γtot_θ_θr_r M r θ h_ext.hM h_ext.hr_ex  -- e=θ, b=r
+          | exact differentiableAt_Γtot_r_θθ_r M r θ                        -- e=r, b=θ
+          | simp [DifferentiableAt_r, Γtot]
+      have hg :
+        DifferentiableAt_r (fun r θ => g M a e r θ) r θ := by
+        cases a <;> cases e <;>
+          first
+          | exact differentiableAt_g_tt_r M r θ h_ext
+          | exact differentiableAt_g_rr_r M r θ h_ext
+          | exact differentiableAt_g_θθ_r M r θ
+          | exact differentiableAt_g_φφ_r M r θ
+          | simp [DifferentiableAt_r, g]
+      exact hΓ.mul hg
+    · intro _e; right; simp
+
+  -- Step 2: product rule in each summand.
+  have hprod :
+    (fun e =>
+      dCoord Idx.r (fun r θ => Γtot M r θ e Idx.θ b * g M a e r θ) r θ)
+      =
+    (fun e =>
+      dCoord Idx.r (fun r θ => Γtot M r θ e Idx.θ b) r θ * g M a e r θ
+    + Γtot M r θ e Idx.θ b * dCoord Idx.r (fun r θ => g M a e r θ) r θ) := by
+    funext e
+    refine dCoord_mul_of_diff Idx.r
+      (fun r θ => Γtot M r θ e Idx.θ b)
+      (fun r θ => g M a e r θ) r θ ?hf_r ?hg_r ?hf_θ ?hg_θ
+    · -- hf_r : r-diff of Γ
+      left
+      cases e <;> cases b <;>
+        first
+        | exact differentiableAt_Γtot_θ_θr_r M r θ h_ext.hM h_ext.hr_ex
+        | exact differentiableAt_Γtot_r_θθ_r M r θ
+        | simp [DifferentiableAt_r, Γtot]
+    · -- hg_r : r-diff of g
+      left
+      cases a <;> cases e <;>
+        first
+        | exact differentiableAt_g_tt_r M r θ h_ext
+        | exact differentiableAt_g_rr_r M r θ h_ext
+        | exact differentiableAt_g_θθ_r M r θ
+        | exact differentiableAt_g_φφ_r M r θ
+        | simp [DifferentiableAt_r, g]
+    · -- hf_θ
+      right; simp
+    · -- hg_θ
+      right; simp
+
+  -- Combine.
+  rw [hsum, hprod]
+
+/-- Distribute `∂_θ` across `∑ₑ Γ^e_{r a} · g_{e b}` (no Exterior hypothesis needed). -/
+lemma dCoord_θ_sumIdx_Γr_g_left
+    (M r θ : ℝ) (a b : Idx) :
+  dCoord Idx.θ (fun r θ => sumIdx (fun e => Γtot M r θ e Idx.r a * g M e b r θ)) r θ
+    =
+  sumIdx (fun e =>
+    dCoord Idx.θ (fun r θ => Γtot M r θ e Idx.r a) r θ * g M e b r θ
+  + Γtot M r θ e Idx.r a * dCoord Idx.θ (fun r θ => g M e b r θ) r θ) := by
+  classical
+  -- ∂θ through sum: r-obligations are trivial since μ=θ; θ-obligations are easy:
+  have hsum :
+    dCoord Idx.θ (fun r θ => sumIdx (fun e => Γtot M r θ e Idx.r a * g M e b r θ)) r θ
+      =
+    sumIdx (fun e =>
+      dCoord Idx.θ (fun r θ => Γtot M r θ e Idx.r a * g M e b r θ) r θ) := by
+    refine dCoord_sumIdx Idx.θ
+      (fun e r θ => Γtot M r θ e Idx.r a * g M e b r θ) r θ ?hr ?hθ
+    · intro _e; right; simp   -- r-side disjunction: μ ≠ r
+    · intro e
+      left
+      -- Γ_{ra}^e is θ-constant in this metric (depends only on r) ⇒ θ-differentiable
+      have hΓ :
+        DifferentiableAt_θ (fun r θ => Γtot M r θ e Idx.r a) r θ := by
+        cases e <;> cases a <;> simp [DifferentiableAt_θ, Γtot]
+      -- g_{eb} has θ-derivative only in φφ; others constant
+      have hg :
+        DifferentiableAt_θ (fun r θ => g M e b r θ) r θ := by
+        cases e <;> cases b <;>
+          first
+          | exact differentiableAt_g_φφ_θ M r θ
+          | all_goals simp [DifferentiableAt_θ, g]
+      exact (DifferentiableAt.mul hΓ hg)
+  -- Product rule per term; θ-obligations on Γ/g as above; r-side discharged by μ≠r
+  have hprod :
+    (fun e =>
+      dCoord Idx.θ (fun r θ => Γtot M r θ e Idx.r a * g M e b r θ) r θ)
+      =
+    (fun e =>
+      dCoord Idx.θ (fun r θ => Γtot M r θ e Idx.r a) r θ * g M e b r θ
+    + Γtot M r θ e Idx.r a * dCoord Idx.θ (fun r θ => g M e b r θ) r θ) := by
+    funext e
+    refine dCoord_mul_of_diff Idx.θ
+      (fun r θ => Γtot M r θ e Idx.r a)
+      (fun r θ => g M e b r θ) r θ ?hf_r ?hg_r ?hf_θ ?hg_θ
+    · right; simp  -- r side
+    · right; simp
+    · left;  cases e <;> cases a <;> simp [DifferentiableAt_θ, Γtot]
+    · left;  cases e <;> cases b <;>
+               first
+               | exact differentiableAt_g_φφ_θ M r θ
+               | all_goals simp [DifferentiableAt_θ, g]
+  rw [hsum, hprod]
+
+/-- Distribute `∂_θ` across `∑ₑ Γ^e_{r b} · g_{a e}` (no Exterior hypothesis needed). -/
+lemma dCoord_θ_sumIdx_Γr_g_right
+    (M r θ : ℝ) (a b : Idx) :
+  dCoord Idx.θ (fun r θ => sumIdx (fun e => Γtot M r θ e Idx.r b * g M a e r θ)) r θ
+    =
+  sumIdx (fun e =>
+    dCoord Idx.θ (fun r θ => Γtot M r θ e Idx.r b) r θ * g M a e r θ
+  + Γtot M r θ e Idx.r b * dCoord Idx.θ (fun r θ => g M a e r θ) r θ) := by
+  classical
+  have hsum :
+    dCoord Idx.θ (fun r θ => sumIdx (fun e => Γtot M r θ e Idx.r b * g M a e r θ)) r θ
+      =
+    sumIdx (fun e =>
+      dCoord Idx.θ (fun r θ => Γtot M r θ e Idx.r b * g M a e r θ) r θ) := by
+    refine dCoord_sumIdx Idx.θ
+      (fun e r θ => Γtot M r θ e Idx.r b * g M a e r θ) r θ ?hr ?hθ
+    · intro _e; right; simp
+    · intro e
+      left
+      have hΓ :
+        DifferentiableAt_θ (fun r θ => Γtot M r θ e Idx.r b) r θ := by
+        cases e <;> cases b <;> simp [DifferentiableAt_θ, Γtot]
+      have hg :
+        DifferentiableAt_θ (fun r θ => g M a e r θ) r θ := by
+        cases a <;> cases e <;>
+          first
+          | exact differentiableAt_g_φφ_θ M r θ
+          | all_goals simp [DifferentiableAt_θ, g]
+      exact (DifferentiableAt.mul hΓ hg)
+  have hprod :
+    (fun e =>
+      dCoord Idx.θ (fun r θ => Γtot M r θ e Idx.r b * g M a e r θ) r θ)
+      =
+    (fun e =>
+      dCoord Idx.θ (fun r θ => Γtot M r θ e Idx.r b) r θ * g M a e r θ
+    + Γtot M r θ e Idx.r b * dCoord Idx.θ (fun r θ => g M a e r θ) r θ) := by
+    funext e
+    refine dCoord_mul_of_diff Idx.θ
+      (fun r θ => Γtot M r θ e Idx.r b)
+      (fun r θ => g M a e r θ) r θ ?hf_r ?hg_r ?hf_θ ?hg_θ
+    · right; simp
+    · right; simp
+    · left;  cases e <;> cases b <;> simp [DifferentiableAt_θ, Γtot]
+    · left;  cases a <;> cases e <;>
+               first
+               | exact differentiableAt_g_φφ_θ M r θ
+               | all_goals simp [DifferentiableAt_θ, g]
+  rw [hsum, hprod]
+
+------------------------------------------------------------------------------------
+-- Helper lemmas for ricci_identity_on_g_rθ_ext differentiability side-conditions
+------------------------------------------------------------------------------------
+
+/-- If every summand is r-differentiable at (r,θ), then the `sumIdx` is too. -/
+private lemma sumIdx_differentiableAt_r
+    (F : Idx → ℝ → ℝ → ℝ) (r θ : ℝ)
+    (hF : ∀ e, DifferentiableAt_r (F e) r θ) :
+  DifferentiableAt_r (fun r θ => sumIdx (fun e => F e r θ)) r θ := by
+  classical
+  unfold DifferentiableAt_r at hF ⊢
+  -- `sumIdx_expand` → 4-term sum; chain `DifferentiableAt.add`
+  simpa [sumIdx_expand] using
+    (((hF Idx.t).add (hF Idx.r)).add (hF Idx.θ)).add (hF Idx.φ)
+
+/-- If every summand is θ-differentiable at (r,θ), then the `sumIdx` is too. -/
+private lemma sumIdx_differentiableAt_θ
+    (F : Idx → ℝ → ℝ → ℝ) (r θ : ℝ)
+    (hF : ∀ e, DifferentiableAt_θ (F e) r θ) :
+  DifferentiableAt_θ (fun r θ => sumIdx (fun e => F e r θ)) r θ := by
+  classical
+  unfold DifferentiableAt_θ at hF ⊢
+  simpa [sumIdx_expand] using
+    (((hF Idx.t).add (hF Idx.r)).add (hF Idx.θ)).add (hF Idx.φ)
+
+/-- For any indices `a b`, the θ–derivative of `g_{ab}` is r–differentiable. -/
+private lemma diff_r_dCoord_θ_g (M r θ : ℝ) (a b : Idx) :
+  DifferentiableAt_r (fun r θ => dCoord Idx.θ (fun r θ => g M a b r θ) r θ) r θ := by
+  classical
+  -- All cases other than (φ,φ): `g` is θ-constant ⇒ θ-derivative is 0 ⇒ r-differentiable.
+  -- For (φ,φ): dθ g_{φφ} = r² * (d/dθ sin²) = r² * (2 sin θ cos θ).
+  cases a <;> cases b <;>
+    first
+    | -- (φ,φ)
+      -- Compute the closed form then finish with `r^2` differentiability.
+      have : (fun r' => dCoord Idx.θ (fun r θ => g M Idx.φ Idx.φ r θ) r' θ)
+             = (fun r' => r'^2 * (2 * Real.sin θ * Real.cos θ)) := by
+        funext r'; simp [dCoord_θ, g, deriv_const_mul, deriv_sin_sq_at]
+      -- Now just: r ↦ r^2 * const(θ) is differentiable.
+      simpa [DifferentiableAt_r, this] using
+        (DifferentiableAt.mul (differentiable_pow 2 |>.differentiableAt)
+                              (differentiableAt_const _))
+    | -- all other (a,b)
+      simp [DifferentiableAt_r, dCoord_θ, g, deriv_const]
+
+/-- For any indices `a b`, the r–derivative of `g_{ab}` is θ–differentiable. -/
+private lemma diff_θ_dCoord_r_g (M r θ : ℝ) (a b : Idx) :
+  DifferentiableAt_θ (fun r θ => dCoord Idx.r (fun r θ => g M a b r θ) r θ) r θ := by
+  classical
+  -- All cases other than (φ,φ): d_r g_{ab} depends only on r ⇒ θ-constant ⇒ θ-differentiable.
+  -- For (φ,φ): d_r g_{φφ} = 2r * sin² θ.
+  cases a <;> cases b <;>
+    first
+    | -- (φ,φ)
+      have : (fun θ' => dCoord Idx.r (fun r θ => g M Idx.φ Idx.φ r θ) r θ')
+             = (fun θ' => (2 * r) * (Real.sin θ')^2) := by
+        funext θ'; simp [dCoord_r, g, deriv_mul_const, deriv_pow_two_at]
+      -- θ ↦ const(r) * sin² θ is θ–differentiable.
+      simpa [DifferentiableAt_θ, this] using
+        (DifferentiableAt.mul (differentiableAt_const _) (differentiableAt_sin_sq θ))
+    | -- all other (a,b)
+      simp [DifferentiableAt_θ, dCoord_r, g, deriv_const, deriv_pow_two_at]
+
+/-- r–differentiability of the left `Γ_{θa}·g` sum. -/
+private lemma diff_r_sum_Γθ_g_left
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (a b : Idx) :
+  DifferentiableAt_r
+    (fun r θ => sumIdx (fun e => Γtot M r θ e Idx.θ a * g M e b r θ)) r θ := by
+  classical
+  refine sumIdx_differentiableAt_r (fun e r θ => Γtot M r θ e Idx.θ a * g M e b r θ) r θ ?_
+  intro e
+  -- As in your distributor: only (e=θ,a=r) or (e=r,a=θ) are r-sensitive; others are constant/0.
+  have hΓ :
+      DifferentiableAt_r (fun r θ => Γtot M r θ e Idx.θ a) r θ := by
+    cases e <;> cases a <;>
+      first
+      | exact differentiableAt_Γtot_θ_θr_r M r θ h_ext.hM h_ext.hr_ex
+      | exact differentiableAt_Γtot_r_θθ_r M r θ
+      | simp [DifferentiableAt_r, Γtot]
+  have hg :
+      DifferentiableAt_r (fun r θ => g M e b r θ) r θ := by
+    cases e <;> cases b <;>
+      first
+      | exact differentiableAt_g_tt_r M r θ h_ext
+      | exact differentiableAt_g_rr_r M r θ h_ext
+      | exact differentiableAt_g_θθ_r M r θ
+      | exact differentiableAt_g_φφ_r M r θ
+      | simp [DifferentiableAt_r, g]
+  exact hΓ.mul hg
+
+/-- r–differentiability of the right `Γ_{θb}·g` sum. -/
+private lemma diff_r_sum_Γθ_g_right
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (a b : Idx) :
+  DifferentiableAt_r
+    (fun r θ => sumIdx (fun e => Γtot M r θ e Idx.θ b * g M a e r θ)) r θ := by
+  classical
+  refine sumIdx_differentiableAt_r (fun e r θ => Γtot M r θ e Idx.θ b * g M a e r θ) r θ ?_
+  intro e
+  have hΓ :
+      DifferentiableAt_r (fun r θ => Γtot M r θ e Idx.θ b) r θ := by
+    cases e <;> cases b <;>
+      first
+      | exact differentiableAt_Γtot_θ_θr_r M r θ h_ext.hM h_ext.hr_ex
+      | exact differentiableAt_Γtot_r_θθ_r M r θ
+      | simp [DifferentiableAt_r, Γtot]
+  have hg :
+      DifferentiableAt_r (fun r θ => g M a e r θ) r θ := by
+    cases a <;> cases e <;>
+      first
+      | exact differentiableAt_g_tt_r M r θ h_ext
+      | exact differentiableAt_g_rr_r M r θ h_ext
+      | exact differentiableAt_g_θθ_r M r θ
+      | exact differentiableAt_g_φφ_r M r θ
+      | simp [DifferentiableAt_r, g]
+  exact hΓ.mul hg
+
+/-- θ–differentiability of the left `Γ_{ra}·g` sum.  For `x=r` the Γ's are θ-constant. -/
+private lemma diff_θ_sum_Γr_g_left
+    (M r θ : ℝ) (a b : Idx) :
+  DifferentiableAt_θ
+    (fun r θ => sumIdx (fun e => Γtot M r θ e Idx.r a * g M e b r θ)) r θ := by
+  classical
+  refine sumIdx_differentiableAt_θ (fun e r θ => Γtot M r θ e Idx.r a * g M e b r θ) r θ ?_
+  intro e
+  have hΓ :
+      DifferentiableAt_θ (fun r θ => Γtot M r θ e Idx.r a) r θ := by
+    -- For c = r, all nonzero Γ's are θ-constant; the rest are 0.
+    cases e <;> cases a <;> simp [DifferentiableAt_θ, Γtot]
+  have hg :
+      DifferentiableAt_θ (fun r θ => g M e b r θ) r θ := by
+    cases e <;> cases b <;>
+      first
+      | simp [DifferentiableAt_θ, g]  -- θ-constant diagonal entries tt, rr, θθ
+      | exact differentiableAt_g_φφ_θ M r θ
+      | all_goals simp [DifferentiableAt_θ, g]
+  exact hΓ.mul hg
+
+/-- θ–differentiability of the right `Γ_{rb}·g` sum. -/
+private lemma diff_θ_sum_Γr_g_right
+    (M r θ : ℝ) (a b : Idx) :
+  DifferentiableAt_θ
+    (fun r θ => sumIdx (fun e => Γtot M r θ e Idx.r b * g M a e r θ)) r θ := by
+  classical
+  refine sumIdx_differentiableAt_θ (fun e r θ => Γtot M r θ e Idx.r b * g M a e r θ) r θ ?_
+  intro e
+  have hΓ :
+      DifferentiableAt_θ (fun r θ => Γtot M r θ e Idx.r b) r θ := by
+    cases e <;> cases b <;> simp [DifferentiableAt_θ, Γtot]
+  have hg :
+      DifferentiableAt_θ (fun r θ => g M a e r θ) r θ := by
+    cases a <;> cases e <;>
+      first
+      | simp [DifferentiableAt_θ, g]
+      | exact differentiableAt_g_φφ_θ M r θ
+      | all_goals simp [DifferentiableAt_θ, g]
+  exact hΓ.mul hg
+
+/-- Pack the `k`–sum against the **right** metric slot into `g_{bb} · RiemannUp^{b}{}_{a r θ}`.
+    (Junior Professor, Oct 9 2025 - correct replacement for broken Ha lemma) -/
+lemma pack_right_RiemannUp
+    (M r θ : ℝ) (a b : Idx) :
+  sumIdx (fun k =>
+    g M k b r θ *
+      ( dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
+      - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ
+      + sumIdx (fun lam =>
+          Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a
+        - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a) ) )
+  =
+  g M b b r θ * RiemannUp M r θ b a Idx.r Idx.θ := by
+  classical
+  -- Rewrite the inner block to the *definition* of RiemannUp
+  have : sumIdx (fun k =>
+          g M k b r θ *
+            ( dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
+            - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ
+            + sumIdx (fun lam =>
+                Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a
+              - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a) ) )
+        =
+        sumIdx (fun k => g M k b r θ * RiemannUp M r θ k a Idx.r Idx.θ) := by
+    simp [RiemannUp, sub_eq_add_neg, add_comm, add_left_comm, add_assoc,
+          mul_comm, mul_left_comm, mul_assoc]
+  -- Commute the factors (ℝ is commutative) to apply the right contraction.
+  calc
+    sumIdx (fun k =>
+      g M k b r θ *
+        (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
+        - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ
+        + sumIdx (fun lam =>
+            Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a
+          - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))) = _ := this
+    _ = sumIdx (fun k => RiemannUp M r θ k a Idx.r Idx.θ * g M k b r θ) := by
+          simp [mul_comm]
+    _ = RiemannUp M r θ b a Idx.r Idx.θ * g M b b r θ := by
+          simpa using
+            (sumIdx_mul_g_right M r θ b
+              (fun k => RiemannUp M r θ k a Idx.r Idx.θ))
+    _ = g M b b r θ * RiemannUp M r θ b a Idx.r Idx.θ := by
+          simp [mul_comm]
+
+/-- Pack the `k`–sum against the **left** metric slot into `g_{aa} · RiemannUp^{a}{}_{b r θ}`.
+    (Junior Professor, Oct 9 2025 - correct replacement for broken Hb lemma) -/
+lemma pack_left_RiemannUp
+    (M r θ : ℝ) (a b : Idx) :
+  sumIdx (fun k =>
+    g M a k r θ *
+      ( dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b) r θ
+      - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b) r θ
+      + sumIdx (fun lam =>
+          Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ b
+        - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r b) ) )
+  =
+  g M a a r θ * RiemannUp M r θ a b Idx.r Idx.θ := by
+  classical
+  -- Definition of RiemannUp inside the sum:
+  have : sumIdx (fun k =>
+          g M a k r θ *
+            ( dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b) r θ
+            - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b) r θ
+            + sumIdx (fun lam =>
+                Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ b
+              - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r b) ) )
+        =
+        sumIdx (fun k => g M a k r θ * RiemannUp M r θ k b Idx.r Idx.θ) := by
+    simp [RiemannUp, sub_eq_add_neg, add_comm, add_left_comm, add_assoc,
+          mul_comm, mul_left_comm, mul_assoc]
+  -- Collapse with the **left** contraction lemma.
+  calc
+    sumIdx (fun k =>
+      g M a k r θ *
+        (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b) r θ
+        - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b) r θ
+        + sumIdx (fun lam =>
+            Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ b
+          - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r b))) = _ := this
+    _ = g M a a r θ * RiemannUp M r θ a b Idx.r Idx.θ := by
+          simpa using
+            (sumIdx_mul_g_left M r θ a
+              (fun k => RiemannUp M r θ k b Idx.r Idx.θ))
+
+/-- Direction inequality facts for dCoord_sub_of_diff disjuncts (Junior Professor, Oct 9 2025) -/
+@[simp] private lemma r_ne_θ : (Idx.r : Idx) ≠ Idx.θ := by decide
+@[simp] private lemma θ_ne_r : (Idx.θ : Idx) ≠ Idx.r := by decide
+
+/-- Ricci identity specialized to the metric in the (r,θ) plane, on the Exterior domain.
+
+    This is a pure definition chase with controlled distribution:
+    we only differentiate θ-constant `Γ_{r·}` in the θ-branch, and
+    only r-regular quantities in the r-branch (valid on Exterior). -/
+lemma ricci_identity_on_g_rθ_ext
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (a b : Idx) :
+  nabla (fun M r θ a b => nabla_g M r θ Idx.θ a b) M r θ Idx.r a b
+  - nabla (fun M r θ a b => nabla_g M r θ Idx.r a b) M r θ Idx.θ a b
+  =
+  - Riemann M r θ b a Idx.r Idx.θ - Riemann M r θ a b Idx.r Idx.θ := by
+  classical
+  -- Step 1: Unfold covariant derivative
+  simp only [nabla]
+
+  -- Step 2: Unfold nabla_g
+  simp_rw [nabla_g]
+
+  -- Step 3: Expand derivatives through sums (using dCoord linearity)
+  -- Define intermediate functions for clarity (Junior Professor, Oct 9 2025)
+  let X_rθ := fun r θ => dCoord Idx.θ (fun r θ => g M a b r θ) r θ
+  let Y_rθ := fun r θ => sumIdx (fun k => Γtot M r θ k Idx.θ a * g M k b r θ)
+  let Z_rθ := fun r θ => sumIdx (fun k => Γtot M r θ k Idx.θ b * g M a k r θ)
+
+  -- EXP_rθ : push ∂_r across (X_rθ - Y_rθ - Z_rθ)
+  have EXP_rθ :
+    dCoord Idx.r (fun r θ => X_rθ r θ - Y_rθ r θ - Z_rθ r θ) r θ
+      =
+    (dCoord Idx.r X_rθ r θ - dCoord Idx.r Y_rθ r θ) - dCoord Idx.r Z_rθ r θ := by
+    -- Differentiability facts
+    have hX : DifferentiableAt_r X_rθ r θ := diff_r_dCoord_θ_g M r θ a b
+    have hY : DifferentiableAt_r Y_rθ r θ := diff_r_sum_Γθ_g_left M r θ h_ext a b
+    have hZ : DifferentiableAt_r Z_rθ r θ := diff_r_sum_Γθ_g_right M r θ h_ext a b
+
+    -- Reassociate ((X - Y) - Z) so a single `dCoord_sub_of_diff` applies.
+    have Hshape :
+      (fun r θ => X_rθ r θ - Y_rθ r θ - Z_rθ r θ)
+        =
+      (fun r θ => (X_rθ r θ - Y_rθ r θ) - Z_rθ r θ) := by
+      funext r' θ'; simp [sub_eq_add_neg, add_comm, add_left_comm, add_assoc]
+
+    -- r-differentiability of X-Y from hX hY
+    have hXYr : DifferentiableAt_r (fun r θ => X_rθ r θ - Y_rθ r θ) r θ := by
+      -- unfold and use DifferentiableAt.sub on ℝ → ℝ
+      simpa [DifferentiableAt_r] using (hX.sub hY)
+
+    -- First push across the *outer* subtraction
+    have step₂ :
+      dCoord Idx.r (fun r θ => (X_rθ r θ - Y_rθ r θ) - Z_rθ r θ) r θ
+        =
+      dCoord Idx.r (fun r θ => X_rθ r θ - Y_rθ r θ) r θ
+        - dCoord Idx.r Z_rθ r θ := by
+      refine dCoord_sub_of_diff Idx.r
+        (fun r θ => X_rθ r θ - Y_rθ r θ) Z_rθ r θ
+        (Or.inl hXYr)     -- r‑diff of (X−Y)
+        (Or.inl hZ)       -- r‑diff of Z
+        (Or.inr r_ne_θ)   -- μ = r, so take θ‑mismatch on both
+        (Or.inr r_ne_θ)
+
+    -- Then expand ∂_r(X−Y)
+    have step₁ :
+      dCoord Idx.r (fun r θ => X_rθ r θ - Y_rθ r θ) r θ
+        =
+      dCoord Idx.r X_rθ r θ - dCoord Idx.r Y_rθ r θ := by
+      refine dCoord_sub_of_diff Idx.r
+        X_rθ Y_rθ r θ
+        (Or.inl hX)       -- r‑diff of X
+        (Or.inl hY)       -- r‑diff of Y
+        (Or.inr r_ne_θ)   -- θ‑mismatch again
+        (Or.inr r_ne_θ)
+
+    -- Assemble
+    simp only [Hshape, step₁, step₂]
+
+  -- Define intermediate functions for θ-direction (Junior Professor, Oct 9 2025)
+  let X_θr := fun r θ => dCoord Idx.r (fun r θ => g M a b r θ) r θ
+  let Y_θr := fun r θ => sumIdx (fun k => Γtot M r θ k Idx.r a * g M k b r θ)
+  let Z_θr := fun r θ => sumIdx (fun k => Γtot M r θ k Idx.r b * g M a k r θ)
+
+  -- EXP_θr : push ∂_θ across (X_θr - Y_θr - Z_θr)
+  have EXP_θr :
+    dCoord Idx.θ (fun r θ => X_θr r θ - Y_θr r θ - Z_θr r θ) r θ
+      =
+    (dCoord Idx.θ X_θr r θ - dCoord Idx.θ Y_θr r θ) - dCoord Idx.θ Z_θr r θ := by
+    -- Differentiability facts
+    have hXθ : DifferentiableAt_θ X_θr r θ := diff_θ_dCoord_r_g M r θ a b
+    have hYθ : DifferentiableAt_θ Y_θr r θ := diff_θ_sum_Γr_g_left M r θ a b
+    have hZθ : DifferentiableAt_θ Z_θr r θ := diff_θ_sum_Γr_g_right M r θ a b
+
+    -- Reassociate ((X - Y) - Z)
+    have Hshape :
+      (fun r θ => X_θr r θ - Y_θr r θ - Z_θr r θ)
+        =
+      (fun r θ => (X_θr r θ - Y_θr r θ) - Z_θr r θ) := by
+      funext r' θ'; simp [sub_eq_add_neg, add_comm, add_left_comm, add_assoc]
+
+    -- θ‑differentiability of X−Y from θ‑side lemmas
+    have hXYθ : DifferentiableAt_θ (fun r θ => X_θr r θ - Y_θr r θ) r θ := by
+      simpa [DifferentiableAt_θ] using (hXθ.sub hYθ)
+
+    -- Push across the outer subtraction with μ = θ:
+    have step₂ :
+      dCoord Idx.θ (fun r θ => (X_θr r θ - Y_θr r θ) - Z_θr r θ) r θ
+        =
+      dCoord Idx.θ (fun r θ => X_θr r θ - Y_θr r θ) r θ
+        - dCoord Idx.θ Z_θr r θ := by
+      refine dCoord_sub_of_diff Idx.θ
+        (fun r θ => X_θr r θ - Y_θr r θ) Z_θr r θ
+        (Or.inr θ_ne_r)   -- μ = θ ⇒ use r‑mismatch
+        (Or.inr θ_ne_r)
+        (Or.inl hXYθ)     -- θ‑diff of (X−Y)
+        (Or.inl hZθ)      -- θ‑diff of Z
+
+    -- Expand ∂_θ(X−Y)
+    have step₁ :
+      dCoord Idx.θ (fun r θ => X_θr r θ - Y_θr r θ) r θ
+        =
+      dCoord Idx.θ X_θr r θ - dCoord Idx.θ Y_θr r θ := by
+      refine dCoord_sub_of_diff Idx.θ
+        X_θr Y_θr r θ
+        (Or.inr θ_ne_r)   -- r‑mismatch
+        (Or.inr θ_ne_r)
+        (Or.inl hXθ)      -- θ‑diff of X
+        (Or.inl hYθ)      -- θ‑diff of Y
+
+    -- Assemble
+    simp only [Hshape, step₁, step₂]
+
+  rw [EXP_rθ, EXP_θr]
+
+  -- Step 3.5: Partial derivatives commute
+  have Hcomm_eq : dCoord Idx.r (dCoord Idx.θ (fun r θ => g M a b r θ)) r θ
+                = dCoord Idx.θ (dCoord Idx.r (fun r θ => g M a b r θ)) r θ := by
+    exact dCoord_commute_for_g_all M r θ a b Idx.r Idx.θ
+  rw [Hcomm_eq]
+
+  -- Step 4: Apply four distributor lemmas
+  rw [dCoord_r_sumIdx_Γθ_g_left_ext M r θ h_ext a b]
+  rw [dCoord_r_sumIdx_Γθ_g_right_ext M r θ h_ext a b]
+  rw [dCoord_θ_sumIdx_Γr_g_left M r θ a b]
+  rw [dCoord_θ_sumIdx_Γr_g_right M r θ a b]
+
+  -- Steps 5-9: Metric compatibility, packaging, and final closure
+  -- (Junior Professor, Oct 9 2025)
+
+  -- === Step 5: expose the lets so the compatibility lemma matches ===
+  -- This turns every occurrence of X_rθ, Y_rθ, Z_rθ, X_θr, Y_θr, Z_θr
+  -- back into the raw forms built from dCoord and sumIdx.
+  simp only [X_rθ, Y_rθ, Z_rθ, X_θr, Y_θr, Z_θr]
+
+  -- Steps 5a-9: Final closure (compatibility rewrites, packaging, lowering, AC normalization)
+  -- TODO: Pattern matching issue - dCoord_g_via_compat_ext doesn't match goal structure
+  -- See ADDENDUM_VERIFICATION_OCT9.md for full analysis
+  sorry
+
+/-- Ricci identity specialized to the metric, by *definition-chasing only*.
+    No domain hypothesis needed.
+
+    STATUS: This lemma times out even with 800k heartbeats during the normalization steps.
+    The mathematical strategy is sound but requires a different tactical approach.
+    Currently attempting case-by-case proof (see ricci_identity_on_g_r_θ test). -/
+lemma ricci_identity_on_g
+    (M r θ : ℝ) (a b c d : Idx) :
+  nabla (fun M r θ a b => nabla_g M r θ d a b) M r θ c a b
+  - nabla (fun M r θ a b => nabla_g M r θ c a b) M r θ d a b
+  =
+  - Riemann M r θ b a c d - Riemann M r θ a b c d := by
+  sorry
+
+/-- First-pair antisymmetry on the Exterior domain. -/
+lemma Riemann_swap_a_b_ext
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (a b c d : Idx) :
+  Riemann M r θ b a c d = - Riemann M r θ a b c d := by
+  -- TODO: Depends on ricci_identity_on_g_rθ_ext which has 1 sorry remaining
+  sorry
+
+/-- First-pair antisymmetry for the (all-lowered) Riemann tensor of the Levi–Civita connection.
+    It follows from metric compatibility (`∇g = 0`) and the Ricci identity on `g`:
+    0 = [∇_c, ∇_d] g_{ab} = -R_{aecd} g_{eb} - R_{becd} g_{ae} = -R_{abcd} - R_{bacd}
+    Hence R_{bacd} = -R_{abcd}.
+
+    TODO: Full proof requires completing ricci_identity_on_g and nabla_nabla_g_zero_ext.
+    The mathematical strategy is sound (see user's drop-in code) but needs tactical refinement.
+    Standard textbook result: MTW Box 8.5, Wald Appendix B. -/
+lemma Riemann_swap_a_b (M r θ : ℝ) (a b c d : Idx) :
+  Riemann M r θ b a c d = - Riemann M r θ a b c d := by
+  sorry
+  /-
+  TODO: Complete using Riemann_swap_a_b_ext once upstream lemmas are proven:
+  by_cases hM : 0 < M
+  · by_cases hr : 2 * M < r
+    · exact Riemann_swap_a_b_ext M r θ ⟨hM, hr⟩ a b c d
+    · sorry -- r ≤ 2M case
+  · sorry -- M ≤ 0 case
+  -/
 
 -- ========== C2 Smoothness Lemmas (Second-Order Differentiability) ==========
 -- These are now MOVED to after C1 lemmas (after line 1722) to satisfy dependencies
