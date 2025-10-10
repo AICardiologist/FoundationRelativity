@@ -2944,53 +2944,81 @@ lemma regroup_right_sum_to_RiemannUp
             g M k b r θ *
               sumIdx (fun lam => Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a)) ) := by
         simp only [sumIdx_add, sumIdx_sub, mul_sub]
-      -- (b) funext+mul_add to combine inside the integrand
-      -- A(k) := (dCoord_r Γ - dCoord_θ Γ)
-      let A : Idx → ℝ :=
-        fun k => dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
-               - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ
 
-      -- H(k) := (Σ ΓΓ) - (Σ ΓΓ)
-      let H : Idx → ℝ :=
-        fun k =>
-          sumIdx (fun lam => Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a)
-        - sumIdx (fun lam => Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a)
-
-      -- ① Pointwise factor: g*A + g*H = g*(A + H)
-      have fold_pt :
-        (fun k => g M k b r θ * A k + g M k b r θ * H k)
-        =
-        (fun k => g M k b r θ * (A k + H k)) := by
+      -- (b) Bridge from lin.symm to goal via add_sub_assoc normalization
+      -- Step 1: fold g*A + g*(H1 - H2) -> g*(A + (H1 - H2)) pointwise, then lift.
+      have fold₁ :
+          sumIdx (fun k =>
+            g M k b r θ *
+              ( dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
+              - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ)
+            + g M k b r θ *
+              ( sumIdx (fun lam => Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a)
+              - sumIdx (fun lam => Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a)))
+            =
+          sumIdx (fun k =>
+            g M k b r θ *
+              (( dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
+               - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ)
+              + ( sumIdx (fun lam => Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a)
+                - sumIdx (fun lam => Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a)))) := by
         classical
+        refine sumIdx_congr_then_fold ?_
         funext k
-        -- Use the direction that avoids unification issues.
+        -- g*A + g*(H1 - H2) = g*(A + (H1 - H2))
         rw [← mul_add]
 
-      -- ② Lift the pointwise fold to sum-level
-      have fold_congr :
-        sumIdx (fun k => g M k b r θ * A k + g M k b r θ * H k)
-        = sumIdx (fun k => g M k b r θ * (A k + H k)) :=
-        sumIdx_congr_then_fold fold_pt
+      -- Step 2: reassociate A + (H1 - H2) -> (A + H1) - H2 under the same g, pointwise, then lift.
+      have fold₂ :
+          sumIdx (fun k =>
+            g M k b r θ *
+              (( dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
+               - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ)
+              + ( sumIdx (fun lam => Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a)
+                - sumIdx (fun lam => Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))))
+            =
+          sumIdx (fun k =>
+            g M k b r θ *
+              (( dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
+               - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ
+               + sumIdx (fun lam => Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a))
+              - sumIdx (fun lam => Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))) := by
+        classical
+        refine sumIdx_congr_then_fold ?_
+        funext k
+        -- A + (H1 - H2) = (A + H1) - H2
+        rw [← add_sub_assoc]
 
-      -- ③ Replace the RHS by the "sum of two sums" shape the goal expects
-      have fold_linear :
-        sumIdx (fun k => g M k b r θ * (A k + H k))
-        = (sumIdx (fun k => g M k b r θ * A k)
-           + sumIdx (fun k => g M k b r θ * H k)) :=
-        (sumIdx_mul_add (fun k => g M k b r θ) A H)
+      -- Chain: (split sums) = (single sum with +) = (single sum with (⋯) - Z)
+      exact lin.symm.trans (fold₁.trans fold₂)
 
-      -- ④ Compose them: this gives the exact two-sums shape
-      have fold_sum :
-        sumIdx (fun k => g M k b r θ * A k + g M k b r θ * H k)
-        = sumIdx (fun k => g M k b r θ * A k)
-          + sumIdx (fun k => g M k b r θ * H k) :=
-        fold_congr.trans fold_linear
+    -- Normalize the "separated sums" so the weight g sits on the left of each factor.
+    -- This bridges hlin's output (using X, Y, Z) to the form that `this` expects.
+    have commute_sep :
+      sumIdx X + (sumIdx Y - sumIdx Z)
+      =
+      (sumIdx (fun k =>
+          g M k b r θ *
+            ( dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
+            - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ))
+       +
+       (sumIdx (fun k =>
+          g M k b r θ *
+            (sumIdx (fun lam => Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a)))
+        -
+        sumIdx (fun k =>
+          g M k b r θ *
+            (sumIdx (fun lam => Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))))) := by
+      -- Expand X, Y, Z and commute the scalar weight through each summand
+      simp only [X, Y, Z, sumIdx_commute_weight_right M r θ b, H₁, H₂]
 
-      -- ⑤ Chain everything: LHS_goal → ∑(g*(A+H)) via lin.symm and fold_congr
-      exact lin.symm.trans fold_congr
-
-    -- Put it all together
-    exact (hlin.trans <| (congr (congrArg HAdd.hAdd hder) hH).trans this)
+    -- Final chain:
+    --  expanded → X+Y+...(pointwise) → X+Y+...(separated) → g*...(separated) → g*...(pointwise)
+    exact
+      hsplit.trans <|
+        hlin.trans <|
+          commute_sep.trans <|
+            this
 
   /- ③d. Hand the (now perfectly packed) expression to the core packer. -/
   -- TODO: Once regroup8 and apply_H are proven, this should close
