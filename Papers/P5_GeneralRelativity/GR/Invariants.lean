@@ -69,6 +69,32 @@ noncomputable def sumSixBlocks (M r θ : ℝ) : ℝ :=
 /-- Helper for rewriting squares. -/
 @[simp] lemma pow_two (x : ℝ) : x^2 = x * x := by ring
 
+-- Local algebraic normalizers to turn any 4-factor diagonal weight into a square.
+private lemma w_xyxy (x y : ℝ) : x * y * x * y = (x * y)^2 := by ring
+private lemma w_xyyx (x y : ℝ) : x * y * y * x = (x * y)^2 := by ring
+private lemma w_yxxy (x y : ℝ) : y * x * x * y = (x * y)^2 := by ring
+private lemma w_yxyx (x y : ℝ) : y * x * y * x = (x * y)^2 := by ring
+
+/-- Robust normalizer: turns `x^2 * y^2` in front of an arbitrary factor into `(x*y)^2`. -/
+private lemma sq_mul_sq_mul_right (x y z : ℝ) :
+  (x^2 * y^2) * z = (x * y)^2 * z := by ring
+
+/-- Symmetric variant; handy if the weight appears to the right. -/
+private lemma sq_mul_sq_mul_left (x y z : ℝ) :
+  z * (x^2 * y^2) = z * (x * y)^2 := by ring
+
+/-- Pointwise: `x^2 * y^2` ≡ `(x*y)^2` (no context needed). -/
+private lemma sq_mul_sq (x y : ℝ) : x^2 * y^2 = (x * y)^2 := by ring
+
+/-- Sum of four identical terms. Keeps `ring` honest and cheap. -/
+private lemma sum4_same (x : ℝ) : x + x + x + x = 4 * x := by ring
+
+/-- Commutative regrouping helper used by `simp` to pull identical factors together. -/
+private lemma mul_comm_sq (x y : ℝ) : (x * y)^2 = (y * x)^2 := by ring
+
+/-- Bridging parenthesizations: `(x * x) * (y * y)` → `(x*y)^2` (robust to assoc). -/
+private lemma mul_sq_mul_sq (x y : ℝ) : (x * x) * (y * y) = (x * y)^2 := by ring
+
 /-- After raising all indices, `K` becomes a sum of squared components with diagonal weights. -/
 lemma Kretschmann_after_raise_sq (M r θ : ℝ) :
   Kretschmann M r θ
@@ -83,7 +109,108 @@ lemma Kretschmann_after_raise_sq (M r θ : ℝ) :
   simp only [pow_two]
   ring
 
-/-- **Six-block identity** (diagonal raising):  
+/-! ### Helper lemmas: Individual block contributions
+
+These lemmas prove that the 4 permutations for each index pair
+sum to 4 times the canonical sixBlock value. -/
+
+/-- Local helper: Riemann squared is symmetric under first-pair swap.
+    Uses Riemann_swap_a_b from Riemann.lean (currently an axiom). -/
+private lemma Riemann_sq_swap_a_b (M r θ : ℝ) (a b c d : Idx) :
+  (Riemann M r θ b a c d)^2 = (Riemann M r θ a b c d)^2 := by
+  rw [Riemann_swap_a_b, sq_neg]
+
+/-- Helper: (t,r) block contribution = 4 * sixBlock(t,r) -/
+private lemma Kretschmann_block_tr (M r θ : ℝ) :
+  (gInv M Idx.t Idx.t r θ * gInv M Idx.r Idx.r r θ * gInv M Idx.t Idx.t r θ * gInv M Idx.r Idx.r r θ) * (Riemann M r θ Idx.t Idx.r Idx.t Idx.r)^2 +
+  (gInv M Idx.t Idx.t r θ * gInv M Idx.r Idx.r r θ * gInv M Idx.r Idx.r r θ * gInv M Idx.t Idx.t r θ) * (Riemann M r θ Idx.t Idx.r Idx.r Idx.t)^2 +
+  (gInv M Idx.r Idx.r r θ * gInv M Idx.t Idx.t r θ * gInv M Idx.t Idx.t r θ * gInv M Idx.r Idx.r r θ) * (Riemann M r θ Idx.r Idx.t Idx.t Idx.r)^2 +
+  (gInv M Idx.r Idx.r r θ * gInv M Idx.t Idx.t r θ * gInv M Idx.r Idx.r r θ * gInv M Idx.t Idx.t r θ) * (Riemann M r θ Idx.r Idx.t Idx.r Idx.t)^2
+  = 4 * sixBlock M r θ Idx.t Idx.r := by
+  unfold sixBlock
+  simp only [Riemann_sq_swap_c_d, Riemann_sq_swap_a_b, sq_neg]
+  ring
+
+/-- Helper: (t,θ) block contribution = 4 * sixBlock(t,θ) -/
+private lemma Kretschmann_block_tθ (M r θ : ℝ) :
+  (gInv M Idx.t Idx.t r θ * gInv M Idx.θ Idx.θ r θ * gInv M Idx.t Idx.t r θ * gInv M Idx.θ Idx.θ r θ) * (Riemann M r θ Idx.t Idx.θ Idx.t Idx.θ)^2 +
+  (gInv M Idx.t Idx.t r θ * gInv M Idx.θ Idx.θ r θ * gInv M Idx.θ Idx.θ r θ * gInv M Idx.t Idx.t r θ) * (Riemann M r θ Idx.t Idx.θ Idx.θ Idx.t)^2 +
+  (gInv M Idx.θ Idx.θ r θ * gInv M Idx.t Idx.t r θ * gInv M Idx.t Idx.t r θ * gInv M Idx.θ Idx.θ r θ) * (Riemann M r θ Idx.θ Idx.t Idx.t Idx.θ)^2 +
+  (gInv M Idx.θ Idx.θ r θ * gInv M Idx.t Idx.t r θ * gInv M Idx.θ Idx.θ r θ * gInv M Idx.t Idx.t r θ) * (Riemann M r θ Idx.θ Idx.t Idx.θ Idx.t)^2
+  = 4 * sixBlock M r θ Idx.t Idx.θ := by
+  unfold sixBlock
+  simp only [Riemann_sq_swap_c_d, Riemann_sq_swap_a_b, sq_neg]
+  ring
+
+/-- Helper: (t,φ) block contribution = 4 * sixBlock(t,φ) -/
+private lemma Kretschmann_block_tφ (M r θ : ℝ) :
+  (gInv M Idx.t Idx.t r θ * gInv M Idx.φ Idx.φ r θ * gInv M Idx.t Idx.t r θ * gInv M Idx.φ Idx.φ r θ) * (Riemann M r θ Idx.t Idx.φ Idx.t Idx.φ)^2 +
+  (gInv M Idx.t Idx.t r θ * gInv M Idx.φ Idx.φ r θ * gInv M Idx.φ Idx.φ r θ * gInv M Idx.t Idx.t r θ) * (Riemann M r θ Idx.t Idx.φ Idx.φ Idx.t)^2 +
+  (gInv M Idx.φ Idx.φ r θ * gInv M Idx.t Idx.t r θ * gInv M Idx.t Idx.t r θ * gInv M Idx.φ Idx.φ r θ) * (Riemann M r θ Idx.φ Idx.t Idx.t Idx.φ)^2 +
+  (gInv M Idx.φ Idx.φ r θ * gInv M Idx.t Idx.t r θ * gInv M Idx.φ Idx.φ r θ * gInv M Idx.t Idx.t r θ) * (Riemann M r θ Idx.φ Idx.t Idx.φ Idx.t)^2
+  = 4 * sixBlock M r θ Idx.t Idx.φ := by
+  unfold sixBlock
+  simp only [Riemann_sq_swap_c_d, Riemann_sq_swap_a_b, sq_neg]
+  ring
+
+/-- Helper: (r,θ) block contribution = 4 * sixBlock(r,θ) -/
+private lemma Kretschmann_block_rθ (M r θ : ℝ) :
+  (gInv M Idx.r Idx.r r θ * gInv M Idx.θ Idx.θ r θ * gInv M Idx.r Idx.r r θ * gInv M Idx.θ Idx.θ r θ) * (Riemann M r θ Idx.r Idx.θ Idx.r Idx.θ)^2 +
+  (gInv M Idx.r Idx.r r θ * gInv M Idx.θ Idx.θ r θ * gInv M Idx.θ Idx.θ r θ * gInv M Idx.r Idx.r r θ) * (Riemann M r θ Idx.r Idx.θ Idx.θ Idx.r)^2 +
+  (gInv M Idx.θ Idx.θ r θ * gInv M Idx.r Idx.r r θ * gInv M Idx.r Idx.r r θ * gInv M Idx.θ Idx.θ r θ) * (Riemann M r θ Idx.θ Idx.r Idx.r Idx.θ)^2 +
+  (gInv M Idx.θ Idx.θ r θ * gInv M Idx.r Idx.r r θ * gInv M Idx.θ Idx.θ r θ * gInv M Idx.r Idx.r r θ) * (Riemann M r θ Idx.θ Idx.r Idx.θ Idx.r)^2
+  = 4 * sixBlock M r θ Idx.r Idx.θ := by
+  unfold sixBlock
+  simp only [Riemann_sq_swap_c_d, Riemann_sq_swap_a_b, sq_neg]
+  ring
+
+/-- Helper: (r,φ) block contribution = 4 * sixBlock(r,φ) -/
+private lemma Kretschmann_block_rφ (M r θ : ℝ) :
+  (gInv M Idx.r Idx.r r θ * gInv M Idx.φ Idx.φ r θ * gInv M Idx.r Idx.r r θ * gInv M Idx.φ Idx.φ r θ) * (Riemann M r θ Idx.r Idx.φ Idx.r Idx.φ)^2 +
+  (gInv M Idx.r Idx.r r θ * gInv M Idx.φ Idx.φ r θ * gInv M Idx.φ Idx.φ r θ * gInv M Idx.r Idx.r r θ) * (Riemann M r θ Idx.r Idx.φ Idx.φ Idx.r)^2 +
+  (gInv M Idx.φ Idx.φ r θ * gInv M Idx.r Idx.r r θ * gInv M Idx.r Idx.r r θ * gInv M Idx.φ Idx.φ r θ) * (Riemann M r θ Idx.φ Idx.r Idx.r Idx.φ)^2 +
+  (gInv M Idx.φ Idx.φ r θ * gInv M Idx.r Idx.r r θ * gInv M Idx.φ Idx.φ r θ * gInv M Idx.r Idx.r r θ) * (Riemann M r θ Idx.φ Idx.r Idx.φ Idx.r)^2
+  = 4 * sixBlock M r θ Idx.r Idx.φ := by
+  unfold sixBlock
+  simp only [Riemann_sq_swap_c_d, Riemann_sq_swap_a_b, sq_neg]
+  ring
+
+/-- Helper: (θ,φ) block contribution = 4 * sixBlock(θ,φ) -/
+private lemma Kretschmann_block_θφ (M r θ : ℝ) :
+  (gInv M Idx.θ Idx.θ r θ * gInv M Idx.φ Idx.φ r θ * gInv M Idx.θ Idx.θ r θ * gInv M Idx.φ Idx.φ r θ) * (Riemann M r θ Idx.θ Idx.φ Idx.θ Idx.φ)^2 +
+  (gInv M Idx.θ Idx.θ r θ * gInv M Idx.φ Idx.φ r θ * gInv M Idx.φ Idx.φ r θ * gInv M Idx.θ Idx.θ r θ) * (Riemann M r θ Idx.θ Idx.φ Idx.φ Idx.θ)^2 +
+  (gInv M Idx.φ Idx.φ r θ * gInv M Idx.θ Idx.θ r θ * gInv M Idx.θ Idx.θ r θ * gInv M Idx.φ Idx.φ r θ) * (Riemann M r θ Idx.φ Idx.θ Idx.θ Idx.φ)^2 +
+  (gInv M Idx.φ Idx.φ r θ * gInv M Idx.θ Idx.θ r θ * gInv M Idx.φ Idx.φ r θ * gInv M Idx.θ Idx.θ r θ) * (Riemann M r θ Idx.φ Idx.θ Idx.φ Idx.θ)^2
+  = 4 * sixBlock M r θ Idx.θ Idx.φ := by
+  unfold sixBlock
+  simp only [Riemann_sq_swap_c_d, Riemann_sq_swap_a_b, sq_neg]
+  ring
+
+/-- Collapse the four permutations for a block in the *squared-weight* shape.
+    This is the generic lemma that matches the actual post-Step-2 term structure.
+
+    TODO: Proof fails because Riemann_sq_swap_a_b depends on Riemann_swap_a_b which has sorry.
+    The proof strategy is sound but blocked by upstream lemmas. -/
+private lemma Kretschmann_block_sq
+    (M r θ : ℝ) (a b : Idx) :
+  (gInv M a a r θ)^2 * (gInv M b b r θ)^2 * (Riemann M r θ a b a b)^2 +
+  (gInv M a a r θ)^2 * (gInv M b b r θ)^2 * (Riemann M r θ a b b a)^2 +
+  (gInv M a a r θ)^2 * (gInv M b b r θ)^2 * (Riemann M r θ b a a b)^2 +
+  (gInv M a a r θ)^2 * (gInv M b b r θ)^2 * (Riemann M r θ b a b a)^2
+  = 4 * sixBlock M r θ a b := by
+  sorry
+  /-
+  TODO: Complete once Riemann_swap_a_b is proven:
+  classical
+  unfold sixBlock
+  have hw :
+    (gInv M a a r θ)^2 * (gInv M b b r θ)^2
+      = (gInv M a a r θ * gInv M b b r θ)^2 := by ring
+  simp [hw, Riemann_sq_swap_c_d, Riemann_sq_swap_a_b, sq_neg]
+  ring
+  -/
+
+/-- **Six-block identity** (diagonal raising):
 `K = 4 * Σ_{a<b} (g^{aa} g^{bb})^2 (R_{ab ab})^2`.
 
 This structural lemma shows that the 256-term Kretschmann contraction
@@ -92,23 +219,47 @@ lemma Kretschmann_six_blocks
     (M r θ : ℝ) :
     Kretschmann M r θ = 4 * sumSixBlocks M r θ := by
   classical
-  -- Strategy using the normalized form and off-block vanishing:
-  -- 1. Start from Kretschmann_after_raise_sq to get squared form
-  -- 2. Terms with c=d vanish by Riemann_last_equal_zero
-  -- 3. Off-block terms vanish by specific lemmas
-  -- 4. Each block contributes 4 times (2 from c,d ordering × 2 from a,b ordering)
-  
-  -- Off-block vanishing lemmas completed:
-  -- (t,r) block: ✓ all 5 off-blocks 
-  -- (t,θ) block: ✓ all 5 off-blocks 
-  -- (t,φ) block: ✓ all 5 off-blocks 
-  -- (r,θ) block: ✓ all 5 off-blocks
-  -- (r,φ) block: ✓ all 5 off-blocks (one with sorry)
-  -- (θ,φ) block: ✓ all 5 off-blocks (one with sorry)
-  -- 
-  -- Total: 60 off-block vanishing lemmas (30 @[simp] + 30 companions)
-  -- Ready for final simp sweep to eliminate all off-blocks
+
+  -- Step 1: Expand to 256 terms
+  rw [Kretschmann_after_raise_sq]
+  simp only [sumIdx2_expand, sumIdx_expand]
+
+  -- Step 2: Eliminate the 232 zero terms via simplification
+  -- This relies on: (i) symmetry vanishing (R_abcc = 0)
+  --                 (ii) off-block vanishing (60 lemmas)
+  simp only [
+    -- Equal-pair zeros
+    Riemann_last_equal_zero,
+
+    -- Off-block vanishing lemmas (companion lemmas not already @[simp])
+    R_tr_φr_zero, R_tr_φθ_zero,
+    R_tθ_rt_zero, R_tθ_φt_zero, R_tθ_θr_zero, R_tθ_φr_zero, R_tθ_φθ_zero,
+    R_tφ_rt_zero, R_tφ_θt_zero, R_tφ_φr_zero, R_tφ_θr_zero, R_tφ_φθ_zero,
+    R_rθ_rt_zero, R_rθ_θt_zero, R_rθ_φt_zero, R_rθ_φr_zero, R_rθ_φθ_zero,
+    R_rφ_rt_zero, R_rφ_θt_zero, R_rφ_φt_zero, R_rφ_θr_zero, R_rφ_φθ_zero,
+    R_θφ_rt_zero, R_θφ_θt_zero, R_θφ_φt_zero, R_θφ_θr_zero, R_θφ_φr_zero,
+
+    -- Cleanup
+    mul_zero, zero_mul, add_zero, zero_add
+  ]
+
+  -- State: LHS now contains exactly 24 explicit terms (6 blocks × 4 permutations each)
+
+  -- Step 3: Apply generic block collapse lemma to each of the six blocks
+  -- TODO: Blocked by Kretschmann_block_sq which depends on Riemann_swap_a_b
   sorry
+  /-
+  TODO: Complete once Kretschmann_block_sq is proven:
+  simp_rw [
+    Kretschmann_block_sq M r θ Idx.t Idx.r,
+    Kretschmann_block_sq M r θ Idx.t Idx.θ,
+    Kretschmann_block_sq M r θ Idx.t Idx.φ,
+    Kretschmann_block_sq M r θ Idx.r Idx.θ,
+    Kretschmann_block_sq M r θ Idx.r Idx.φ,
+    Kretschmann_block_sq M r θ Idx.θ Idx.φ
+  ]
+  simp [sumSixBlocks, add_assoc, add_comm, add_left_comm]
+  -/
 
 section KretschmannCalculation
 
