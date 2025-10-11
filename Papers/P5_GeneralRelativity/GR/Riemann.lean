@@ -2992,33 +2992,11 @@ lemma regroup_right_sum_to_RiemannUp
       -- Chain: (split sums) = (single sum with +) = (single sum with (⋯) - Z)
       exact lin.symm.trans (fold₁.trans fold₂)
 
-    -- Normalize the "separated sums" so the weight g sits on the left of each factor.
-    -- This bridges hlin's output (using X, Y, Z) to the form that `this` expects.
-    have commute_sep :
-      sumIdx X + (sumIdx Y - sumIdx Z)
-      =
-      (sumIdx (fun k =>
-          g M k b r θ *
-            ( dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
-            - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ))
-       +
-       (sumIdx (fun k =>
-          g M k b r θ *
-            (sumIdx (fun lam => Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a)))
-        -
-        sumIdx (fun k =>
-          g M k b r θ *
-            (sumIdx (fun lam => Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))))) := by
-      -- Expand X, Y, Z and commute the scalar weight through each summand
-      simp only [X, Y, Z, sumIdx_commute_weight_right M r θ b, H₁, H₂]
-
-    -- Final chain:
-    --  expanded → X+Y+...(pointwise) → X+Y+...(separated) → g*...(separated) → g*...(pointwise)
-    exact
-      hsplit.trans <|
-        hlin.trans <|
-          commute_sep.trans <|
-            this
+    -- Chain: hsplit gets us to pointwise X+Y-Z, hlin linearizes to separated sums,
+    --        h₃ commutes weights, this folds with E3.
+    exact hsplit.trans (hlin.trans (by
+      simp only [X, Y, Z, H₁, H₂, sumIdx_commute_weight_right M r θ b]
+      exact this))
 
   /- ③d. Hand the (now perfectly packed) expression to the core packer. -/
   -- TODO: Once regroup8 and apply_H are proven, this should close
