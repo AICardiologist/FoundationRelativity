@@ -36,6 +36,29 @@ lemma r_ne_zero {M r θ : ℝ} (h : Exterior M r θ) : r ≠ 0 :=
 lemma f_ne_zero {M r θ : ℝ} (h : Exterior M r θ) : f M r ≠ 0 :=
   ne_of_gt (f_pos_of_hr M r h.hM h.hr_ex)
 
+/-! ### Denominator form shims (for field_simp pattern matching) -/
+
+/-- Convert r - 2*M ≠ 0 to the commuted form r - M*2 ≠ 0 for field_simp.
+
+    field_simp pattern-matches syntactically, not semantically. When the goal
+    contains `(r - M * 2)⁻¹`, provide this exact form rather than normalizing. -/
+lemma denom_form_of_comm {M r : ℝ} (hD₀ : r - 2 * M ≠ 0) : r - M * 2 ≠ 0 := by
+  simpa [mul_comm] using hD₀
+
+/-- Derive r - M*2 ≠ 0 directly from Exterior (exact form for field_simp). -/
+lemma denom_form_of_exterior {M r θ : ℝ} (h_ext : Exterior M r θ) : r - M * 2 ≠ 0 := by
+  have : r - 2 * M ≠ 0 := by linarith [h_ext.hr_ex]
+  simpa [mul_comm] using this
+
+/-! ### Nonzero bundling -/
+
+/-- Package all common nonzero hypotheses from Exterior for field_simp. -/
+lemma nonzeros_of_exterior {M r θ : ℝ} (h_ext : Exterior M r θ) :
+  r ≠ 0 ∧ f M r ≠ 0 ∧ r - M * 2 ≠ 0 := by
+  refine ⟨r_ne_zero h_ext, f_ne_zero h_ext, ?_⟩
+  have : r - 2 * M ≠ 0 := by linarith [h_ext.hr_ex]
+  simpa [mul_comm] using this
+
 /-- The Exterior domain (for fixed M > 0) forms an open set in ℝ × ℝ.
 
     TOPOLOGICAL INFRASTRUCTURE (Level 3 De-Axiomatization):
@@ -88,6 +111,16 @@ lemma deriv_zero_of_locally_zero {f : ℝ → ℝ} {x : ℝ} {U : Set ℝ}
   simp [deriv_const]
 
 end Exterior
+
+/-! ### Fold helpers (avoid invoking ring in binder contexts) -/
+
+/-- Fold subtraction on right: a * c - b * c = (a - b) * c -/
+@[simp] lemma fold_sub_right {a b c : ℝ} : a * c - b * c = (a - b) * c := by
+  simpa using (sub_mul a b c).symm
+
+/-- Fold addition on left: a * b + a * c = a * (b + c) -/
+@[simp] lemma fold_add_left {a b c : ℝ} : a * b + a * c = a * (b + c) := by
+  simpa using (mul_add a b c).symm
 
 -- -------------- BEGIN: adapter + simp setup for Riemann.lean --------------
 
@@ -1749,6 +1782,42 @@ lemma compat_refold_θ_kb
   have H := dCoord_g_via_compat_ext M r θ h_ext Idx.θ k b
   have := congrArg (fun x =>
     x - sumIdx (fun lam => Γtot M r θ lam Idx.θ k * g M lam b r θ)) H
+  simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using this.symm
+
+/-! ### Right-slot compat refolds (mirrors of left-slot) -/
+
+/-- For fixed `(a, k)`, isolate the right-slot sum in the `r`-branch.
+
+    Mirror of compat_refold_r_kb. Same pure-rewrite discipline:
+    use dCoord_g_via_compat_ext with indices ordered for right-slot,
+    then subtract to isolate the desired sum. -/
+lemma compat_refold_r_ak
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (a k : Idx) :
+  sumIdx (fun lam => Γtot M r θ lam Idx.r k * g M a lam r θ)
+    =
+  dCoord Idx.r (fun r θ => g M a k r θ) r θ
+  - sumIdx (fun lam => Γtot M r θ lam Idx.r a * g M lam k r θ) := by
+  classical
+  -- ∂_r g_{a k} = Σλ Γ^λ_{r a} g_{λ k} + Σλ Γ^λ_{r k} g_{a λ}
+  have H := dCoord_g_via_compat_ext M r θ h_ext Idx.r a k
+  -- Move Σλ Γ^λ_{r a} g_{λ k} to the RHS; keep Σλ Γ^λ_{r k} g_{a λ} on LHS
+  have := congrArg (fun x =>
+    x - sumIdx (fun lam => Γtot M r θ lam Idx.r a * g M lam k r θ)) H
+  simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using this.symm
+
+/-- For fixed `(a, k)`, isolate the right-slot sum in the `θ`-branch.
+
+    Mirror of compat_refold_θ_kb. -/
+lemma compat_refold_θ_ak
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (a k : Idx) :
+  sumIdx (fun lam => Γtot M r θ lam Idx.θ k * g M a lam r θ)
+    =
+  dCoord Idx.θ (fun r θ => g M a k r θ) r θ
+  - sumIdx (fun lam => Γtot M r θ lam Idx.θ a * g M lam k r θ) := by
+  classical
+  have H := dCoord_g_via_compat_ext M r θ h_ext Idx.θ a k
+  have := congrArg (fun x =>
+    x - sumIdx (fun lam => Γtot M r θ lam Idx.θ a * g M lam k r θ)) H
   simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using this.symm
 
 /-- **PRIORITY 1.2-1.4: Derivative of nabla_g is zero on Exterior**
