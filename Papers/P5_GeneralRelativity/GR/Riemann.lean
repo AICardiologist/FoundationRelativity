@@ -5603,6 +5603,27 @@ theorem Ricci_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real
     convert Ricci_φφ_cancellation M r θ h_ext h_sin_nz using 2
     simp [sumIdx_expand]
 
+/-! ### NEW Section C Implementations (Option B: Fresh then Swap)
+
+    Streamlined regroup lemmas using Section B infrastructure.
+    Once tested, these will replace the existing partial implementations.
+-/
+
+/-! #### Micro helper: pack 4-term integrand as difference of products -/
+
+lemma pack_right_slot_prod
+    (M r θ : ℝ) (a b k : Idx) :
+  (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ) * g M k b r θ
+- (dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ) * g M k b r θ
++ Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ
+- Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ
+=
+  dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a * g M k b r θ) r θ
+- dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a * g M k b r θ) r θ := by
+  -- Product rule: ∂(Γ·g) = (∂Γ)·g + Γ·(∂g)
+  -- TODO: Complete with deriv_mul + reassociation
+  sorry
+
 end RicciInfrastructure
 
 end Schwarzschild
