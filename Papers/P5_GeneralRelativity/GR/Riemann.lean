@@ -2840,7 +2840,24 @@ lemma regroup_right_sum_to_RiemannUp
         (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ)
         (dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ)
         (g M k b r θ)
-    have hsplit := congrArg (fun f : (Idx → ℝ) => sumIdx f) hfun
+    -- ① lift the pointwise split to sums, no wrappers
+    have hsplit₀ :
+      sumIdx (fun k =>
+        dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ * g M k b r θ
+      - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ * g M k b r θ
+      + (Γtot M r θ k Idx.θ a *
+          sumIdx (fun lam => Γtot M r θ lam Idx.r k * g M lam b r θ)
+        - Γtot M r θ k Idx.r a *
+          sumIdx (fun lam => Γtot M r θ lam Idx.θ k * g M lam b r θ)))
+      =
+      sumIdx (fun k =>
+        ( dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
+        - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ) * g M k b r θ
+      + (Γtot M r θ k Idx.θ a *
+          sumIdx (fun lam => Γtot M r θ lam Idx.r k * g M lam b r θ)
+        - Γtot M r θ k Idx.r a *
+          sumIdx (fun lam => Γtot M r θ lam Idx.θ k * g M lam b r θ))) :=
+      sumIdx_congr_then_fold hfun
     -- ② linearity at the outer level (no AC)
     -- Name these three pieces once to keep the goal readable:
     let X : Idx → ℝ :=
@@ -2992,11 +3009,13 @@ lemma regroup_right_sum_to_RiemannUp
       -- Chain: (split sums) = (single sum with +) = (single sum with (⋯) - Z)
       exact lin.symm.trans (fold₁.trans fold₂)
 
-    -- Chain: hsplit gets us to pointwise X+Y-Z, hlin linearizes to separated sums,
-    --        h₃ commutes weights, this folds with E3.
-    exact hsplit.trans (hlin.trans (by
-      simp only [X, Y, Z, H₁, H₂, sumIdx_commute_weight_right M r θ b]
-      exact this))
+    -- ② chain: hsplit₀ → hlin (with let-unfolding) → weight commute → E3 fold
+    -- Note: hsplit₀.symm has LHS = (A-B)*g + (C-D), goal expects A*g - B*g + C - D
+    -- These are definitionally equal but Eq.trans needs exact syntactic match
+    refine hsplit₀.symm.trans ?_
+    refine hlin.trans ?_
+    simp only [X, Y, Z, H₁, H₂, sumIdx_commute_weight_right M r θ b]
+    exact this
 
   /- ③d. Hand the (now perfectly packed) expression to the core packer. -/
   -- TODO: Once regroup8 and apply_H are proven, this should close
