@@ -3009,10 +3009,26 @@ lemma regroup_right_sum_to_RiemannUp
       -- Chain: (split sums) = (single sum with +) = (single sum with (⋯) - Z)
       exact lin.symm.trans (fold₁.trans fold₂)
 
-    -- ② chain: hsplit₀ → hlin (with let-unfolding) → weight commute → E3 fold
-    -- Note: hsplit₀.symm has LHS = (A-B)*g + (C-D), goal expects A*g - B*g + C - D
-    -- These are definitionally equal but Eq.trans needs exact syntactic match
-    refine hsplit₀.symm.trans ?_
+    -- ② normalize hsplit₀.symm LHS: (A-B)*g → A*g - B*g via sub_mul distributivity
+    have hsplit_norm :
+      sumIdx (fun k =>
+        dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ * g M k b r θ
+      - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ * g M k b r θ
+      + (Γtot M r θ k Idx.θ a *
+          sumIdx (fun lam => Γtot M r θ lam Idx.r k * g M lam b r θ)
+        - Γtot M r θ k Idx.r a *
+          sumIdx (fun lam => Γtot M r θ lam Idx.θ k * g M lam b r θ)))
+      =
+      sumIdx (fun k =>
+        (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ) *
+          g M k b r θ +
+        ((Γtot M r θ k Idx.θ a * sumIdx (fun lam => Γtot M r θ lam Idx.r k * g M lam b r θ)) -
+          Γtot M r θ k Idx.r a * sumIdx (fun lam => Γtot M r θ lam Idx.θ k * g M lam b r θ))) := by
+      refine sumIdx_congr_then_fold ?_
+      funext k
+      rw [sub_mul]
+    -- Chain: hsplit_norm → hsplit₀ → hlin → weight commute → E3 fold
+    refine hsplit_norm.trans (hsplit₀.symm.trans ?_)
     refine hlin.trans ?_
     simp only [X, Y, Z, H₁, H₂, sumIdx_commute_weight_right M r θ b]
     exact this
