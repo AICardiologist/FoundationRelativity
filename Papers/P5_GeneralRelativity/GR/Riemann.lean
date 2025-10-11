@@ -706,7 +706,13 @@ macro_rules
           | { apply DifferentiableAt.mul <;> discharge_diff }
           | { apply DifferentiableAt.sub <;> discharge_diff }
 
-          -- 2b. Base Facts (Explicit Application with hypothesis discharge)
+          -- 2b. Base Facts - Exterior-based (for contexts with h_ext : Exterior M r θ)
+          | { apply g_differentiable_r_ext; assumption }
+          | { apply g_differentiable_θ_ext; assumption }
+          | { apply Γtot_differentiable_r_ext; assumption }
+          | { apply Γtot_differentiable_θ_ext; assumption }
+
+          -- 2c. Base Facts - Expanded hypotheses (for contexts with separate hM, h_ext, h_sin_nz)
           | { apply Γtot_differentiable_r <;> try assumption }
           | { apply Γtot_differentiable_θ <;> try assumption }
           | { apply g_differentiable_r <;> try assumption }
@@ -717,7 +723,7 @@ macro_rules
           | { apply dCoord_g_differentiable_r <;> try assumption }
           | { apply dCoord_g_differentiable_θ <;> try assumption }
 
-          -- 2c. Fallback
+          -- 2d. Fallback
           | { simp only [differentiableAt_const] }
           | assumption
         }
@@ -5603,16 +5609,77 @@ theorem Ricci_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (h_sin_nz : Real
     convert Ricci_φφ_cancellation M r θ h_ext h_sin_nz using 2
     simp [sumIdx_expand]
 
+
 /-! ### NEW Section C Implementations (Option B: Fresh then Swap)
 
     Streamlined regroup lemmas using Section B infrastructure.
     Once tested, these will replace the existing partial implementations.
 -/
 
-/-! #### Micro helper: pack 4-term integrand as difference of products -/
+/-! #### Exterior-based wrappers for pack helpers (no on-axis assumptions needed) -/
+
+/-- Metric: r-direction differentiability on Exterior (all components). -/
+lemma g_differentiable_r_ext
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (i j : Idx) :
+  DifferentiableAt_r (fun r θ => g M i j r θ) r θ := by
+  classical
+  -- diagonal cases use the prepared lemmas; off-diagonals are 0
+  cases i <;> cases j <;>
+    first
+    | simpa [DifferentiableAt_r] using differentiableAt_g_tt_r M r θ h_ext
+    | simpa [DifferentiableAt_r] using differentiableAt_g_rr_r M r θ h_ext
+    | simpa [DifferentiableAt_r] using differentiableAt_g_θθ_r M r θ
+    | simpa [DifferentiableAt_r] using differentiableAt_g_φφ_r M r θ
+    | simp [DifferentiableAt_r, g]
+
+/-- Metric: θ-direction differentiability (all components). -/
+lemma g_differentiable_θ_ext
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (i j : Idx) :
+  DifferentiableAt_θ (fun r θ => g M i j r θ) r θ := by
+  classical
+  -- only g_φφ depends on θ (via sin²); the rest are constants in θ
+  cases i <;> cases j <;>
+    first
+    | simp [DifferentiableAt_θ, g]
+    | simp [DifferentiableAt_θ, g]
+    | simp [DifferentiableAt_θ, g]
+    | simpa [DifferentiableAt_θ] using differentiableAt_g_φφ_θ M r θ
+    | simp [DifferentiableAt_θ, g]
+
+/-- Γ with lower θ: r-direction differentiability (used in `Hr`). -/
+lemma Γtot_differentiable_r_ext_μθ
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (k a : Idx) :
+  DifferentiableAt_r (fun r θ => Γtot M r θ k Idx.θ a) r θ := by
+  classical
+  -- nonzero θ-row entries: Γ^r_{θθ}=-r, Γ^θ_{rθ}=1/r differentiable; others are constants in r or zero
+  cases k <;> cases a
+  -- r.θ case: Γ^r_{θθ} = -r (linear, always differentiable)
+  case r.θ => simp only [DifferentiableAt_r, Γtot, Γ_r_θθ]; fun_prop
+  -- θ.r case: Γ^θ_{rθ} = 1/r (differentiable when r ≠ 0, guaranteed by Exterior)
+  case θ.r =>
+    simp only [DifferentiableAt_r, Γtot, Γ_θ_rθ]
+    exact DifferentiableAt.div (differentiableAt_const 1) (differentiableAt_id r) (Exterior.r_ne_zero h_ext)
+  -- All other cases: either 0 or constant in r
+  all_goals { simp [DifferentiableAt_r, Γtot, Γ_θ_φφ, Γ_φ_θφ] }
+
+/-- Γ with lower r: θ-direction differentiability (used in `Hθ`). -/
+lemma Γtot_differentiable_θ_ext_μr
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (k a : Idx) :
+  DifferentiableAt_θ (fun r θ => Γtot M r θ k Idx.r a) r θ := by
+  classical
+  -- nonzero r-row entries: Γ^r_{φφ} depends on θ (smooth), others are θ-constants
+  cases k <;> cases a <;>
+    first
+    | simp [DifferentiableAt_θ, Γtot, Γ_r_tt, Γ_r_rr, Γ_r_θθ]
+    | simp [DifferentiableAt_θ, Γtot, Γ_r_tt, Γ_r_rr, Γ_r_θθ]
+    | simp [DifferentiableAt_θ, Γtot, Γ_r_tt, Γ_r_rr, Γ_r_θθ]
+    | simpa [DifferentiableAt_θ, Γtot] using differentiableAt_Γ_r_φφ_θ M r θ
+    | simp [DifferentiableAt_θ, Γtot]
+
+/-! #### Micro helper: pack 4-term integrand as difference of products (right slot) -/
 
 lemma pack_right_slot_prod
-    (M r θ : ℝ) (a b k : Idx) :
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (a b k : Idx) :
   (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ) * g M k b r θ
 - (dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ) * g M k b r θ
 + Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ
@@ -5620,9 +5687,97 @@ lemma pack_right_slot_prod
 =
   dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a * g M k b r θ) r θ
 - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a * g M k b r θ) r θ := by
-  -- Product rule: ∂(Γ·g) = (∂Γ)·g + Γ·(∂g)
-  -- TODO: Complete with deriv_mul + reassociation
-  sorry
+  classical
+  -- r-branch product rule
+  have Hr :
+      dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a * g M k b r θ) r θ
+        =
+      dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ * g M k b r θ
+      + Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ := by
+    -- choose Or branches explicitly:
+    simpa using
+      (dCoord_mul_of_diff Idx.r
+        (fun r θ => Γtot M r θ k Idx.θ a)
+        (fun r θ => g M k b r θ) r θ
+        (Or.inl (Γtot_differentiable_r_ext_μθ M r θ h_ext k a))
+        (Or.inl (g_differentiable_r_ext          M r θ h_ext k b))
+        (Or.inr (by decide : Idx.r ≠ Idx.θ))
+        (Or.inr (by decide : Idx.r ≠ Idx.θ)))
+  -- θ-branch product rule
+  have Hθ :
+      dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a * g M k b r θ) r θ
+        =
+      dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ * g M k b r θ
+      + Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ := by
+    simpa using
+      (dCoord_mul_of_diff Idx.θ
+        (fun r θ => Γtot M r θ k Idx.r a)
+        (fun r θ => g M k b r θ) r θ
+        (Or.inr (by decide : Idx.θ ≠ Idx.r))
+        (Or.inr (by decide : Idx.θ ≠ Idx.r))
+        (Or.inl (Γtot_differentiable_θ_ext_μr M r θ h_ext k a))
+        (Or.inl (g_differentiable_θ_ext        M r θ h_ext k b)))
+  -- assemble
+  have step1 : (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ) * g M k b r θ
+             - (dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ) * g M k b r θ
+             + Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ
+             - Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ
+             = (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ * g M k b r θ
+                + Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ)
+             - (dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ * g M k b r θ
+                + Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ) := by ring
+  rw [step1, Hr, Hθ]
+
+/-! #### Micro helper: pack 4-term integrand as difference of products (left slot) -/
+
+lemma pack_left_slot_prod
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (a b k : Idx) :
+  (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b) r θ) * g M a k r θ
+- (dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b) r θ) * g M a k r θ
++ Γtot M r θ k Idx.θ b * dCoord Idx.r (fun r θ => g M a k r θ) r θ
+- Γtot M r θ k Idx.r b * dCoord Idx.θ (fun r θ => g M a k r θ) r θ
+=
+  dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b * g M a k r θ) r θ
+- dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b * g M a k r θ) r θ := by
+  classical
+  -- r-branch product rule
+  have Hr :
+      dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b * g M a k r θ) r θ
+        =
+      dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b) r θ * g M a k r θ
+      + Γtot M r θ k Idx.θ b * dCoord Idx.r (fun r θ => g M a k r θ) r θ := by
+    simpa using
+      (dCoord_mul_of_diff Idx.r
+        (fun r θ => Γtot M r θ k Idx.θ b)
+        (fun r θ => g M a k r θ) r θ
+        (Or.inl (Γtot_differentiable_r_ext_μθ M r θ h_ext k b))
+        (Or.inl (g_differentiable_r_ext          M r θ h_ext a k))
+        (Or.inr (by decide : Idx.r ≠ Idx.θ))
+        (Or.inr (by decide : Idx.r ≠ Idx.θ)))
+  -- θ-branch product rule
+  have Hθ :
+      dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b * g M a k r θ) r θ
+        =
+      dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b) r θ * g M a k r θ
+      + Γtot M r θ k Idx.r b * dCoord Idx.θ (fun r θ => g M a k r θ) r θ := by
+    simpa using
+      (dCoord_mul_of_diff Idx.θ
+        (fun r θ => Γtot M r θ k Idx.r b)
+        (fun r θ => g M a k r θ) r θ
+        (Or.inr (by decide : Idx.θ ≠ Idx.r))
+        (Or.inr (by decide : Idx.θ ≠ Idx.r))
+        (Or.inl (Γtot_differentiable_θ_ext_μr M r θ h_ext k b))
+        (Or.inl (g_differentiable_θ_ext        M r θ h_ext a k)))
+  -- assemble
+  have step1 : (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b) r θ) * g M a k r θ
+             - (dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b) r θ) * g M a k r θ
+             + Γtot M r θ k Idx.θ b * dCoord Idx.r (fun r θ => g M a k r θ) r θ
+             - Γtot M r θ k Idx.r b * dCoord Idx.θ (fun r θ => g M a k r θ) r θ
+             = (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b) r θ * g M a k r θ
+                + Γtot M r θ k Idx.θ b * dCoord Idx.r (fun r θ => g M a k r θ) r θ)
+             - (dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b) r θ * g M a k r θ
+                + Γtot M r θ k Idx.r b * dCoord Idx.θ (fun r θ => g M a k r θ) r θ) := by ring
+  rw [step1, Hr, Hθ]
 
 end RicciInfrastructure
 
