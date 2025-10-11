@@ -3810,8 +3810,13 @@ lemma RiemannUp_r_θrθ_ext
 
   -- Substitute and finish by algebra
   rw [shape, hderθθ]
-  simp only [Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, div_eq_mul_inv, f, pow_two]
-  field_simp [hr]
+  simp only [Γ_r_rr, Γ_r_θθ, Γ_θ_rθ, div_eq_mul_inv]
+  field_simp [hr, hf, pow_two]
+  ring
+  have h1 := Mr_f_linearize_sym M r 2 hr
+  have h2 := Mr_f_linearize_sym M r 1 hr
+  simp [mul_comm, mul_left_comm, mul_assoc] at h1 h2
+  rw [h1, h2]
   ring
 
 /-- R^φ_{θφθ} = 2M/r on the Schwarzschild exterior (off–axis) -/
