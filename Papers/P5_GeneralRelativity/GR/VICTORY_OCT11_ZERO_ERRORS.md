@@ -141,11 +141,15 @@ When field_simp needs to prove denominators are nonzero, it may create side cond
 - Use pure-rewrite discipline (refine/funext/rw)
 
 ### Section C: Address 6 Sorrys (After Section B)
-1. RiemannUp_t_trt_ext (line 3755)
-2. RiemannUp_t_θtθ_ext (line 3765)
-3. RiemannUp_t_φtφ_ext (line 3775)
-4. regroup_left_sum_to_RiemannUp (line 3135)
-5. Two sorrys in Ricci_off_diag_tθ_ext (lines 5291, 5295)
+
+**Current Sorries (line numbers updated after Section B additions):**
+
+1. **Line 2635:** `regroup_right_sum_to_RiemannUp` - Right-slot mirror
+2. **Line 3142:** `regroup_left_sum_to_RiemannUp` - Left-slot regrouping
+3. **Line 3215:** `ricci_identity_on_g_rθ_ext` - Ricci off-diagonal identity
+4. **Line 3252:** `ricci_identity_on_g` - General Ricci identity
+5. **Line 3261:** `Riemann_swap_a_b_ext` - Riemann symmetry on Exterior
+6. **Line 3276:** `Riemann_swap_a_b` - General Riemann symmetry
 
 **Strategy:** Work in order, using pure-rewrite discipline.
 
