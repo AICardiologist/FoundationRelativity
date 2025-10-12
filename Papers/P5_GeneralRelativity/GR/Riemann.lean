@@ -1400,6 +1400,43 @@ noncomputable def nabla_g (M r θ : ℝ) (c a b : Idx) : ℝ :=
   simp only [sumIdx_add, sumIdx_sub]
   ring
 
+/-- `sumIdx` β-reduction under a binder. Useful to discharge `(fun k => (fun k => F k) k)`. -/
+@[simp] lemma sumIdx_beta (F : Idx → ℝ) :
+  sumIdx (fun k => (fun k => F k) k) = sumIdx F := rfl
+
+/-- Trivial η for `sumIdx` (kept for symmetry with `sumIdx_beta`). -/
+@[simp] lemma sumIdx_eta (F : Idx → ℝ) :
+  sumIdx (fun k => F k) = sumIdx F := rfl
+
+/-- Sum of a difference equals difference of sums (for JP's drop-in solution). -/
+@[simp] lemma sumIdx_map_sub (A B : Idx → ℝ) :
+  sumIdx (fun k => A k - B k) = sumIdx A - sumIdx B := by
+  classical
+  simpa [sumIdx, Finset.sum_sub_distrib]
+
+/-! ### Metric symmetry helpers for refold lemmas -/
+
+/-- Schwarzschild metric is symmetric in its two index slots. -/
+lemma g_swap_slots (M r θ : ℝ) (i j : Idx) :
+  g M i j r θ = g M j i r θ := by
+  cases i <;> cases j <;> simp [g]
+
+/-- Pointwise along the inner index for the right-slot contraction -/
+lemma g_swap_lam_b (M r θ : ℝ) (b : Idx) :
+  ∀ lam, g M b lam r θ = g M lam b r θ :=
+by intro lam; simpa using g_swap_slots M r θ b lam
+
+lemma g_swap_lam_a (M r θ : ℝ) (a : Idx) :
+  ∀ lam, g M lam a r θ = g M a lam r θ :=
+by intro lam; simpa using g_swap_slots M r θ lam a
+
+/-- Function equality for the dCoord argument -/
+lemma g_swap_fun (M : ℝ) (a b : Idx) :
+  (fun r θ => g M b a r θ) = (fun r θ => g M a b r θ) :=
+by
+  funext r' θ'
+  simpa using g_swap_slots M r' θ' b a
+
 @[simp] lemma sumIdx_mul_sub (A B C : Idx → ℝ) :
   sumIdx (fun k => A k * (B k - C k))
   = sumIdx (fun k => A k * B k) - sumIdx (fun k => A k * C k) := by
@@ -5676,34 +5713,47 @@ lemma Γtot_differentiable_θ_ext_μr
     | simpa [DifferentiableAt_θ, Γtot] using differentiableAt_Γ_r_φφ_θ M r θ
     | simp [DifferentiableAt_θ, Γtot]
 
+/-- Symmetry helper: Γ^t_{rt} = Γ^t_{tr} for r-differentiability. -/
+lemma differentiableAt_Γtot_t_rt_r
+    (M r θ : ℝ) (hM : 0 < M) (hr : 2 * M < r) :
+  DifferentiableAt_r (fun r θ => Γtot M r θ Idx.t Idx.r Idx.t) r θ := by
+  have hsym :
+    (fun r θ => Γtot M r θ Idx.t Idx.r Idx.t)
+      = (fun r θ => Γtot M r θ Idx.t Idx.t Idx.r) := by
+    funext r' θ'
+    simpa using Γtot_symmetry M r' θ' Idx.t Idx.r Idx.t
+  simpa [hsym, DifferentiableAt_r] using
+    differentiableAt_Γtot_t_tr_r M r θ hM hr
+
 /-- Γ with lower r: r-direction differentiability. -/
 lemma Γtot_differentiable_r_ext_μr
     (M r θ : ℝ) (h_ext : Exterior M r θ) (k a : Idx) :
   DifferentiableAt_r (fun r θ => Γtot M r θ k Idx.r a) r θ := by
   classical
-  -- Γ with lower r depends on r (e.g., Γ^r_{rr}, Γ^θ_{rθ} = 1/r)
+  have hM := h_ext.hM
+  have hr := h_ext.hr_ex
   cases k <;> cases a
-  -- θ.r case: Γ^θ_{rθ} = 1/r
-  case θ.r =>
-    simp only [DifferentiableAt_r, Γtot, Γ_θ_rθ]
-    exact DifferentiableAt.div (differentiableAt_const 1) (differentiableAt_id r) (Exterior.r_ne_zero h_ext)
-  -- r.r case: Γ^r_{rr} = -M/(r²f(r)) - needs proof
-  case r.r => sorry  -- TODO: prove Γ^r_{rr} differentiability
-  -- All other cases: constant or zero in r
-  all_goals { simp [DifferentiableAt_r, Γtot] }
+  · simpa [DifferentiableAt_r] using differentiableAt_Γtot_t_rt_r M r θ hM hr
+  all_goals first
+    | simpa [DifferentiableAt_r, Γtot] using differentiableAt_const (0 : ℝ)
+    | skip
+  case r.r =>
+    simpa [DifferentiableAt_r] using differentiableAt_Γtot_r_rr_r M r θ hM hr
+  case θ.θ =>
+    simpa [DifferentiableAt_r] using differentiableAt_Γtot_θ_rθ_r M r θ hM hr
+  case φ.φ =>
+    simpa [DifferentiableAt_r] using differentiableAt_Γtot_φ_rφ_r M r θ hM hr
 
 /-- Γ with lower θ: θ-direction differentiability. -/
 lemma Γtot_differentiable_θ_ext_μθ
-    (M r θ : ℝ) (h_ext : Exterior M r θ) (k a : Idx) :
+    (M r θ : ℝ) (hθ : Real.sin θ ≠ 0) (k a : Idx) :
   DifferentiableAt_θ (fun r θ => Γtot M r θ k Idx.θ a) r θ := by
   classical
-  -- Γ with lower θ: most are θ-constants, a few have θ-dependence
   cases k <;> cases a
-  -- Cases with θ-dependence (φ row)
-  case φ.φ => sorry  -- TODO: Γ^φ_{θφ} = cot θ
-  case θ.φ => sorry  -- TODO: Γ^θ_{φφ} = -sin θ cos θ
-  -- All other cases: θ-constants
-  all_goals { simp [DifferentiableAt_θ, Γtot] }
+  case φ.φ =>
+    simpa [DifferentiableAt_θ] using differentiableAt_Γtot_φ_θφ_θ M r θ hθ
+  all_goals
+    simp [DifferentiableAt_θ, Γtot]
 
 /-! #### Micro helper: pack 4-term integrand as difference of products (right slot) -/
 
@@ -5815,7 +5865,7 @@ lemma pack_left_slot_prod
     pieces via right-slot compat lemmas. This is the right-hand version
     that pairs with `pack_right_slot_prod`. -/
 lemma regroup_right_sum_to_RiemannUp_NEW
-    (M r θ : ℝ) (h_ext : Exterior M r θ) (a b : Idx) :
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (hθ : Real.sin θ ≠ 0) (a b : Idx) :
   sumIdx (fun k =>
     dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a * g M k b r θ) r θ
   - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a * g M k b r θ) r θ)
@@ -5831,98 +5881,200 @@ lemma regroup_right_sum_to_RiemannUp_NEW
   let G : Idx → ℝ := fun k => g     M k b r θ
 
   -- 1) Pointwise "pack" then lift under the k-sum
-  have h_pt :
-    (fun k =>
-      (dCoord Idx.r (fun r θ => A k) r θ) * G k
-    - (dCoord Idx.θ (fun r θ => B k) r θ) * G k
-    +  A k * dCoord Idx.r (fun r θ => g M k b r θ) r θ
-    -  B k * dCoord Idx.θ (fun r θ => g M k b r θ) r θ)
-    =
-    (fun k =>
-      dCoord Idx.r (fun r θ => A k * g M k b r θ) r θ
-    - dCoord Idx.θ (fun r θ => B k * g M k b r θ) r θ) := by
+  have h_pt : (fun k =>
+      ((dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ) * g M k b r θ
+       + Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ)
+    - ((dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ) * g M k b r θ
+       + Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ))
+    = (fun k =>
+      dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a * g M k b r θ) r θ
+    - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a * g M k b r θ) r θ) := by
     funext k
-    -- Your finished pack helper drops in verbatim:
-    simpa [A, B] using pack_right_slot_prod M r θ h_ext a b k
+    have := pack_right_slot_prod M r θ h_ext a b k
+    simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using this
 
-  -- Sum-level linearization: use h_pt to rewrite the sum
-  have h_sum_linearized :
+  -- lift the difference-of-functions to difference-of-sums with the precise parentheses:
+  have h_sum_linearized :=
+    sumIdx_of_pointwise_sub
+      (A := fun k =>
+        (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ) * g M k b r θ
+        + Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ)
+      (B := fun k =>
+        (dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ) * g M k b r θ
+        + Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ)
+      (C := fun k => dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a * g M k b r θ) r θ)
+      (D := fun k => dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a * g M k b r θ) r θ)
+      h_pt
+
+  -- 2) Expand ∂g and fold to RiemannUp (JP's fiberwise approach Oct 12)
+  --    Key insight: Work fiberwise (small terms), then lift with congrArg (avoids timeout)
+
+  -- (A) Expand ∂g pointwise
+  have H_r_pt : (fun k =>
+    Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ)
+    =
+    (fun k =>
+      Γtot M r θ k Idx.θ a *
+        (sumIdx (fun lam => Γtot M r θ lam Idx.r k * g M lam b r θ)
+       + sumIdx (fun lam => Γtot M r θ lam Idx.r b * g M k lam r θ))) := by
+    funext k
+    simp only [dCoord_g_via_compat_ext M r θ h_ext Idx.r k b]
+
+  have H_θ_pt : (fun k =>
+    Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ)
+    =
+    (fun k =>
+      Γtot M r θ k Idx.r a *
+        (sumIdx (fun lam => Γtot M r θ lam Idx.θ k * g M lam b r θ)
+       + sumIdx (fun lam => Γtot M r θ lam Idx.θ b * g M k lam r θ))) := by
+    funext k
+    simp only [dCoord_g_via_compat_ext M r θ h_ext Idx.θ k b]
+
+  -- (B) Fiberwise fold (JP's solution Oct 12: fiberize H_r_pt/H_θ_pt with congrArg)
+  have h_fold_fiber :
+    (fun k =>
+       (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a * g M k b r θ) r θ)
+     - (dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a * g M k b r θ) r θ))
+    =
+    (fun k =>
+      (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
+     - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ
+     + sumIdx (fun lam =>
+         Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a
+       - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))
+      * g M k b r θ) := by
+    funext k
+    -- 1) Open the product on both dCoord's (use the pack lemma, oriented left→right)
+    have h_pack_k :
+        dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a * g M k b r θ) r θ
+      - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a * g M k b r θ) r θ
+      =
+        (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ) * g M k b r θ
+      - (dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ) * g M k b r θ
+      + Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ
+      - Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ := by
+      simpa [sub_eq_add_neg] using (pack_right_slot_prod M r θ h_ext a b k).symm
+
+    -- 2) Fiberize the ∂g expansions from Step (A)
+    have Hr_k :
+        Γtot M r θ k Idx.θ a
+          * dCoord Idx.r (fun r θ => g M k b r θ) r θ
+      =
+        Γtot M r θ k Idx.θ a
+          * ( sumIdx (fun lam => Γtot M r θ lam Idx.r k * g M lam b r θ)
+            + sumIdx (fun lam => Γtot M r θ lam Idx.r b * g M k lam r θ) ) := by
+      have := congrArg (fun F : Idx → ℝ => F k) H_r_pt
+      simpa using this
+
+    have Hθ_k :
+        Γtot M r θ k Idx.r a
+          * dCoord Idx.θ (fun r θ => g M k b r θ) r θ
+      =
+        Γtot M r θ k Idx.r a
+          * ( sumIdx (fun lam => Γtot M r θ lam Idx.θ k * g M lam b r θ)
+            + sumIdx (fun lam => Γtot M r θ lam Idx.θ b * g M k lam r θ) ) := by
+      have := congrArg (fun F : Idx → ℝ => F k) H_θ_pt
+      simpa using this
+
+    -- 3) Eliminate g(k,·)-sums with refolds, then fold (JP's Oct 12 solution)
+    -- Key: Rewrite Γ * (∑ Γ_{rb} g_{kλ}) using compat_refold BEFORE explosion
+    have Rr' :
+        Γtot M r θ k Idx.θ a
+          * sumIdx (fun lam => Γtot M r θ lam Idx.r b * g M k lam r θ)
+      =
+        Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ
+      - Γtot M r θ k Idx.θ a
+          * sumIdx (fun lam => Γtot M r θ lam Idx.r k * g M lam b r θ) := by
+      have := congrArg (fun x => Γtot M r θ k Idx.θ a * x)
+        (compat_refold_r_kb M r θ h_ext k b)
+      simpa [mul_sub, sumIdx_pull_const_left] using this
+
+    have Rθ' :
+        Γtot M r θ k Idx.r a
+          * sumIdx (fun lam => Γtot M r θ lam Idx.θ b * g M k lam r θ)
+      =
+        Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ
+      - Γtot M r θ k Idx.r a
+          * sumIdx (fun lam => Γtot M r θ lam Idx.θ k * g M lam b r θ) := by
+      have := congrArg (fun x => Γtot M r θ k Idx.r a * x)
+        (compat_refold_θ_kb M r θ h_ext k b)
+      simpa [mul_sub, sumIdx_pull_const_left] using this
+
+    -- Now the main fold: substitute refolds, cancel, factor g_kb
+    calc
+      dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a * g M k b r θ) r θ
+    - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a * g M k b r θ) r θ
+        = (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ) * g M k b r θ
+        - (dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ) * g M k b r θ
+        + Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ
+        - Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ := h_pack_k
+    _ = (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
+       - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ
+       + sumIdx (fun lam =>
+           Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a
+         - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))
+        * g M k b r θ := by
+      rw [Hr_k, Hθ_k]
+      -- TODO: Complete algebraic folding with Rr', Rθ' substitution
+      sorry
+
+  -- (C) Recognize RiemannUp fiberwise
+  have h_R_fiber :
+    (fun k =>
+      (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
+     - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ
+     + sumIdx (fun lam =>
+         Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a
+       - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a)))
+    =
+    (fun k => RiemannUp M r θ k a Idx.r Idx.θ) := by
+    funext k
+    simp [RiemannUp, sub_eq_add_neg,
+          sumIdx, Finset.sum_sub_distrib,
+          add_comm, add_left_comm, add_assoc,
+          mul_comm, mul_left_comm, mul_assoc]
+
+  -- (D) Lift fiberwise equalities back to outer sum
+  have h_fold_sum :
     sumIdx (fun k =>
-      (dCoord Idx.r (fun r θ => A k) r θ) * G k
-    - (dCoord Idx.θ (fun r θ => B k) r θ) * G k
-    +  A k * dCoord Idx.r (fun r θ => g M k b r θ) r θ
-    -  B k * dCoord Idx.θ (fun r θ => g M k b r θ) r θ)
+       dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a * g M k b r θ) r θ
+     - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a * g M k b r θ) r θ)
     =
     sumIdx (fun k =>
-      dCoord Idx.r (fun r θ => A k * g M k b r θ) r θ
-    - dCoord Idx.θ (fun r θ => B k * g M k b r θ) r θ) := by
-    -- h_pt gives us pointwise equality, lift to sum
-    have := congrArg sumIdx h_pt
-    exact this
+      (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
+     - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ
+     + sumIdx (fun lam =>
+         Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a
+       - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))
+      * g M k b r θ) := by
+    exact congrArg (fun F : Idx → ℝ => sumIdx F) h_fold_fiber
 
-  -- 2) Commute `dCoord` across the outer k-sum (twice) with `dCoord_sumIdx`
-  have hF_r : ∀ k, DifferentiableAt_r (fun r θ => A k * g M k b r θ) r θ ∨ Idx.r ≠ Idx.r := by
-    intro k; left
-    unfold DifferentiableAt_r
-    exact (Γtot_differentiable_r_ext_μθ M r θ h_ext k a).mul
-          (g_differentiable_r_ext           M r θ h_ext k b)
-  have hF_θ : ∀ k, DifferentiableAt_θ (fun r θ => A k * g M k b r θ) r θ ∨ Idx.r ≠ Idx.θ := by
-    intro _; right; simp
-
-  have hG_r : ∀ k, DifferentiableAt_r (fun r θ => B k * g M k b r θ) r θ ∨ Idx.θ ≠ Idx.r := by
-    intro k; left
-    unfold DifferentiableAt_r
-    exact (Γtot_differentiable_r_ext_μr M r θ h_ext k a).mul
-          (g_differentiable_r_ext        M r θ h_ext k b)
-  have hG_θ : ∀ k, DifferentiableAt_θ (fun r θ => B k * g M k b r θ) r θ ∨ Idx.θ ≠ Idx.θ := by
-    intro k; left
-    unfold DifferentiableAt_θ
-    exact (Γtot_differentiable_θ_ext_μr M r θ h_ext k a).mul
-          (g_differentiable_θ_ext        M r θ h_ext k b)
-
-  have h_pull :
-    (sumIdx (fun k => dCoord Idx.r (fun r θ => A k * g M k b r θ) r θ)
-     - sumIdx (fun k => dCoord Idx.θ (fun r θ => B k * g M k b r θ) r θ))
+  have h_finish :
+    sumIdx (fun k =>
+      (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
+     - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ
+     + sumIdx (fun lam =>
+         Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a
+       - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))
+      * g M k b r θ)
     =
-    (dCoord Idx.r (fun r θ => sumIdx (fun k => A k * g M k b r θ)) r θ
-     - dCoord Idx.θ (fun r θ => sumIdx (fun k => B k * g M k b r θ)) r θ) := by
-    have Hr := dCoord_sumIdx Idx.r (fun k r θ => A k * g M k b r θ) r θ hF_r hF_θ
-    have Hθ := dCoord_sumIdx Idx.θ (fun k r θ => B k * g M k b r θ) r θ hG_r hG_θ
-    simpa [Hr, Hθ]
+    sumIdx (fun k => RiemannUp M r θ k a Idx.r Idx.θ * g M k b r θ) := by
+    have := congrArg
+      (fun F : Idx → ℝ => sumIdx (fun k => F k * g M k b r θ)) h_R_fiber
+    simpa using this
 
-  -- 3) Refold the two outer "sum over k (Γ·g)" via your right-slot compat lemmas
-  have Hr_refold : sumIdx (fun k => Γtot M r θ k Idx.θ a * g M k b r θ)
-                      = dCoord Idx.θ (fun r θ => g M a b r θ) r θ
-                      - sumIdx (fun lam => Γtot M r θ lam Idx.θ b * g M a lam r θ) :=
-    compat_refold_θ_ak M r θ h_ext a b
-  have Hθ_refold : sumIdx (fun k => Γtot M r θ k Idx.r a * g M k b r θ)
-                      = dCoord Idx.r (fun r θ => g M a b r θ) r θ
-                      - sumIdx (fun lam => Γtot M r θ lam Idx.r b * g M a lam r θ) :=
-    compat_refold_r_ak M r θ h_ext a b
-
-  -- 4) Assemble → recognize `RiemannUp` pointwise under the k-sum
+  -- Chain: steps (0)-(1) from h_sum_linearized, then fiberwise fold
   calc
-    _ = _ := h_sum_linearized
-    _ = _ := h_pull
-    -- Expand both dCoord's of the k-sums using Hr_refold / Hθ_refold
-    _ = sumIdx (fun k =>
-          ((dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ)
-         - (dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ))
-         * g M k b r θ
-        + (sumIdx (fun lam =>
-              Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a)
-         - sumIdx (fun lam =>
-              Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a))
-         * g M k b r θ) := by
-      sorry  -- TODO: pure algebra cleanup
-    _ = sumIdx (fun k =>
-          RiemannUp M r θ k a Idx.r Idx.θ * g M k b r θ) := by
-      sorry  -- TODO: recognize RiemannUp definition
+    sumIdx (fun k =>
+      dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a * g M k b r θ) r θ
+    - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a * g M k b r θ) r θ)
+        = _ := h_fold_sum
+    _   = sumIdx (fun k => RiemannUp M r θ k a Idx.r Idx.θ * g M k b r θ) := h_finish
 
 /-- Left-slot analogue of the regroup lemma: use `pack_left_slot_prod` and
     the left-slot compat refolds `compat_refold_*_kb`. -/
 lemma regroup_left_sum_to_RiemannUp_NEW
-    (M r θ : ℝ) (h_ext : Exterior M r θ) (a b : Idx) :
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (hθ : Real.sin θ ≠ 0) (a b : Idx) :
   sumIdx (fun k =>
     dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b * g M a k r θ) r θ
   - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b * g M a k r θ) r θ)
@@ -5937,70 +6089,195 @@ lemma regroup_left_sum_to_RiemannUp_NEW
   let B : Idx → ℝ := fun k => Γtot M r θ k Idx.r  b
 
   -- 1) Pointwise pack (left-slot version) then lift under the k-sum
-  have h_pt :
-    (fun k =>
-      (dCoord Idx.r (fun r θ => A k) r θ) * g M a k r θ
-    - (dCoord Idx.θ (fun r θ => B k) r θ) * g M a k r θ
-    +  A k * dCoord Idx.r (fun r θ => g M a k r θ) r θ
-    -  B k * dCoord Idx.θ (fun r θ => g M a k r θ) r θ)
-    =
-    (fun k =>
-      dCoord Idx.r (fun r θ => A k * g M a k r θ) r θ
-    - dCoord Idx.θ (fun r θ => B k * g M a k r θ) r θ) := by
+  have h_pt : (fun k =>
+      ((dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b) r θ) * g M a k r θ
+       + Γtot M r θ k Idx.θ b * dCoord Idx.r (fun r θ => g M a k r θ) r θ)
+    - ((dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b) r θ) * g M a k r θ
+       + Γtot M r θ k Idx.r b * dCoord Idx.θ (fun r θ => g M a k r θ) r θ))
+    = (fun k =>
+      dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b * g M a k r θ) r θ
+    - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b * g M a k r θ) r θ) := by
     funext k
-    simpa [A, B] using pack_left_slot_prod M r θ h_ext a b k
+    have := pack_left_slot_prod M r θ h_ext a b k
+    simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using this
 
-  have h_sum_linearized :
+  -- lift the difference-of-functions to difference-of-sums with the precise parentheses:
+  have h_sum_linearized :=
+    sumIdx_of_pointwise_sub
+      (A := fun k =>
+        (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b) r θ) * g M a k r θ
+        + Γtot M r θ k Idx.θ b * dCoord Idx.r (fun r θ => g M a k r θ) r θ)
+      (B := fun k =>
+        (dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b) r θ) * g M a k r θ
+        + Γtot M r θ k Idx.r b * dCoord Idx.θ (fun r θ => g M a k r θ) r θ)
+      (C := fun k => dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b * g M a k r θ) r θ)
+      (D := fun k => dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b * g M a k r θ) r θ)
+      h_pt
+
+  -- 2) Expand ∂g and fold to RiemannUp (JP's fiberwise approach Oct 12)
+  --    Key insight: Work fiberwise (small terms), then lift with congrArg (avoids timeout)
+
+  -- (A) Expand ∂g pointwise (LEFT-SLOT VERSION: g_{a k} not g_{k b})
+  have H_r_pt : (fun k =>
+    Γtot M r θ k Idx.θ b * dCoord Idx.r (fun r θ => g M a k r θ) r θ)
+    =
+    (fun k =>
+      Γtot M r θ k Idx.θ b *
+        (sumIdx (fun lam => Γtot M r θ lam Idx.r a * g M lam k r θ)
+       + sumIdx (fun lam => Γtot M r θ lam Idx.r k * g M a lam r θ))) := by
+    funext k
+    simp only [dCoord_g_via_compat_ext M r θ h_ext Idx.r a k]
+
+  have H_θ_pt : (fun k =>
+    Γtot M r θ k Idx.r b * dCoord Idx.θ (fun r θ => g M a k r θ) r θ)
+    =
+    (fun k =>
+      Γtot M r θ k Idx.r b *
+        (sumIdx (fun lam => Γtot M r θ lam Idx.θ a * g M lam k r θ)
+       + sumIdx (fun lam => Γtot M r θ lam Idx.θ k * g M a lam r θ))) := by
+    funext k
+    simp only [dCoord_g_via_compat_ext M r θ h_ext Idx.θ a k]
+
+  -- (B) Fiberwise fold (JP's solution Oct 12: fiberize H_r_pt/H_θ_pt with congrArg)
+  have h_fold_fiber :
+    (fun k =>
+       (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b * g M a k r θ) r θ)
+     - (dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b * g M a k r θ) r θ))
+    =
+    (fun k =>
+      (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b) r θ
+     - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b) r θ
+     + sumIdx (fun lam =>
+         Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ b
+       - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r b))
+      * g M a k r θ) := by
+    funext k
+    -- 1) Open the product on both dCoord's (LEFT-SLOT VERSION: g_{a k})
+    have h_pack_k :
+        dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b * g M a k r θ) r θ
+      - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b * g M a k r θ) r θ
+      =
+        (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b) r θ) * g M a k r θ
+      - (dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b) r θ) * g M a k r θ
+      + Γtot M r θ k Idx.θ b * dCoord Idx.r (fun r θ => g M a k r θ) r θ
+      - Γtot M r θ k Idx.r b * dCoord Idx.θ (fun r θ => g M a k r θ) r θ := by
+      simpa [sub_eq_add_neg] using (pack_left_slot_prod M r θ h_ext a b k).symm
+
+    -- 2) Fiberize the ∂g expansions from Step (A)
+    have Hr_k :
+        Γtot M r θ k Idx.θ b
+          * dCoord Idx.r (fun r θ => g M a k r θ) r θ
+      =
+        Γtot M r θ k Idx.θ b
+          * ( sumIdx (fun lam => Γtot M r θ lam Idx.r a * g M lam k r θ)
+            + sumIdx (fun lam => Γtot M r θ lam Idx.r k * g M a lam r θ) ) := by
+      have := congrArg (fun F : Idx → ℝ => F k) H_r_pt
+      simpa using this
+
+    have Hθ_k :
+        Γtot M r θ k Idx.r b
+          * dCoord Idx.θ (fun r θ => g M a k r θ) r θ
+      =
+        Γtot M r θ k Idx.r b
+          * ( sumIdx (fun lam => Γtot M r θ lam Idx.θ a * g M lam k r θ)
+            + sumIdx (fun lam => Γtot M r θ lam Idx.θ k * g M a lam r θ) ) := by
+      have := congrArg (fun F : Idx → ℝ => F k) H_θ_pt
+      simpa using this
+
+    -- 3) Eliminate g(k,·)-sums with refolds, then fold (JP's Oct 12 solution, LEFT variant)
+    -- For left-slot (g_{a k}), we use compat_refold_r_ak / compat_refold_θ_ak
+    have Rr' :
+        Γtot M r θ k Idx.θ b
+          * sumIdx (fun lam => Γtot M r θ lam Idx.r k * g M a lam r θ)
+      =
+        Γtot M r θ k Idx.θ b * dCoord Idx.r (fun r θ => g M a k r θ) r θ
+      - Γtot M r θ k Idx.θ b
+          * sumIdx (fun lam => Γtot M r θ lam Idx.r a * g M lam k r θ) := by
+      have := congrArg (fun x => Γtot M r θ k Idx.θ b * x)
+        (compat_refold_r_ak M r θ h_ext a k)
+      simpa [mul_sub, sumIdx_pull_const_left] using this
+
+    have Rθ' :
+        Γtot M r θ k Idx.r b
+          * sumIdx (fun lam => Γtot M r θ lam Idx.θ k * g M a lam r θ)
+      =
+        Γtot M r θ k Idx.r b * dCoord Idx.θ (fun r θ => g M a k r θ) r θ
+      - Γtot M r θ k Idx.r b
+          * sumIdx (fun lam => Γtot M r θ lam Idx.θ a * g M lam k r θ) := by
+      have := congrArg (fun x => Γtot M r θ k Idx.r b * x)
+        (compat_refold_θ_ak M r θ h_ext a k)
+      simpa [mul_sub, sumIdx_pull_const_left] using this
+
+    -- Now the main fold: substitute refolds, cancel, factor g_ak
+    calc
+      dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b * g M a k r θ) r θ
+    - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b * g M a k r θ) r θ
+        = (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b) r θ) * g M a k r θ
+        - (dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b) r θ) * g M a k r θ
+        + Γtot M r θ k Idx.θ b * dCoord Idx.r (fun r θ => g M a k r θ) r θ
+        - Γtot M r θ k Idx.r b * dCoord Idx.θ (fun r θ => g M a k r θ) r θ := h_pack_k
+    _ = (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b) r θ
+       - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b) r θ
+       + sumIdx (fun lam =>
+           Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ b
+         - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r b))
+        * g M a k r θ := by
+      rw [Hr_k, Hθ_k]
+      -- TODO: Complete algebraic folding with Rr', Rθ' substitution
+      sorry
+
+  -- (C) Recognize RiemannUp fiberwise
+  have h_R_fiber :
+    (fun k =>
+      (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b) r θ
+     - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b) r θ
+     + sumIdx (fun lam =>
+         Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ b
+       - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r b)))
+    =
+    (fun k => RiemannUp M r θ k b Idx.r Idx.θ) := by
+    funext k
+    simp [RiemannUp, sub_eq_add_neg,
+          sumIdx, Finset.sum_sub_distrib,
+          add_comm, add_left_comm, add_assoc,
+          mul_comm, mul_left_comm, mul_assoc]
+
+  -- (D) Lift fiberwise equalities back to outer sum
+  have h_fold_sum :
     sumIdx (fun k =>
-      (dCoord Idx.r (fun r θ => A k) r θ) * g M a k r θ
-    - (dCoord Idx.θ (fun r θ => B k) r θ) * g M a k r θ
-    +  A k * dCoord Idx.r (fun r θ => g M a k r θ) r θ
-    -  B k * dCoord Idx.θ (fun r θ => g M a k r θ) r θ)
+       dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b * g M a k r θ) r θ
+     - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b * g M a k r θ) r θ)
     =
     sumIdx (fun k =>
-      dCoord Idx.r (fun r θ => A k * g M a k r θ) r θ
-    - dCoord Idx.θ (fun r θ => B k * g M a k r θ) r θ) := by
-    have := congrArg sumIdx h_pt
-    exact this
+      (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b) r θ
+     - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b) r θ
+     + sumIdx (fun lam =>
+         Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ b
+       - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r b))
+      * g M a k r θ) := by
+    exact congrArg (fun F : Idx → ℝ => sumIdx F) h_fold_fiber
 
-  -- 2) Commute dCoord across the k-sum (twice)
-  have hF_r : ∀ k, DifferentiableAt_r (fun r θ => A k * g M a k r θ) r θ ∨ Idx.r ≠ Idx.r := by
-    intro k; left
-    unfold DifferentiableAt_r
-    exact (Γtot_differentiable_r_ext_μθ M r θ h_ext k b).mul
-          (g_differentiable_r_ext           M r θ h_ext a k)
-  have hF_θ : ∀ k, DifferentiableAt_θ (fun r θ => A k * g M a k r θ) r θ ∨ Idx.r ≠ Idx.θ := by
-    intro _; right; simp
-
-  have hG_r : ∀ k, DifferentiableAt_r (fun r θ => B k * g M a k r θ) r θ ∨ Idx.θ ≠ Idx.r := by
-    intro k; left
-    unfold DifferentiableAt_r
-    exact (Γtot_differentiable_θ_ext_μr M r θ h_ext k b).mul
-          (g_differentiable_r_ext          M r θ h_ext a k)
-  have hG_θ : ∀ k, DifferentiableAt_θ (fun r θ => B k * g M a k r θ) r θ ∨ Idx.θ ≠ Idx.θ := by
-    intro _; right; simp
-
-  have h_pull :
-    (sumIdx (fun k => dCoord Idx.r (fun r θ => A k * g M a k r θ) r θ)
-     - sumIdx (fun k => dCoord Idx.θ (fun r θ => B k * g M a k r θ) r θ))
+  have h_finish :
+    sumIdx (fun k =>
+      (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b) r θ
+     - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b) r θ
+     + sumIdx (fun lam =>
+         Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ b
+       - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r b))
+      * g M a k r θ)
     =
-    (dCoord Idx.r (fun r θ => sumIdx (fun k => A k * g M a k r θ)) r θ
-     - dCoord Idx.θ (fun r θ => sumIdx (fun k => B k * g M a k r θ)) r θ) := by
-    have Hr := dCoord_sumIdx Idx.r (fun k r θ => A k * g M a k r θ) r θ hF_r hF_θ
-    have Hθ := dCoord_sumIdx Idx.θ (fun k r θ => B k * g M a k r θ) r θ hG_r hG_θ
-    simpa [Hr, Hθ]
+    sumIdx (fun k => RiemannUp M r θ k b Idx.r Idx.θ * g M a k r θ) := by
+    have := congrArg
+      (fun F : Idx → ℝ => sumIdx (fun k => F k * g M a k r θ)) h_R_fiber
+    simpa using this
 
-  -- 3) Refold via the *left-slot* refolds
-  have Hr_refold := compat_refold_r_kb M r θ h_ext a b
-  have Hθ_refold := compat_refold_θ_kb M r θ h_ext a b
-
-  -- 4) Collect and recognize `RiemannUp` at ρ=k, σ=b
+  -- Chain: steps (0)-(1) from h_sum_linearized, then fiberwise fold
   calc
-    _ = _ := h_sum_linearized
-    _ = _ := h_pull
-    _ = sumIdx (fun k =>
-          RiemannUp M r θ k b Idx.r Idx.θ * g M a k r θ) := by
-      sorry  -- TODO: identical algebraic cleanup as right-slot
+    sumIdx (fun k =>
+      dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ b * g M a k r θ) r θ
+    - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r b * g M a k r θ) r θ)
+        = _ := h_fold_sum
+    _   = sumIdx (fun k => RiemannUp M r θ k b Idx.r Idx.θ * g M a k r θ) := h_finish
 
 end RicciInfrastructure
 
