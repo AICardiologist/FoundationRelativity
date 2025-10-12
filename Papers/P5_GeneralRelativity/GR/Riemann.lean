@@ -5676,6 +5676,35 @@ lemma Γtot_differentiable_θ_ext_μr
     | simpa [DifferentiableAt_θ, Γtot] using differentiableAt_Γ_r_φφ_θ M r θ
     | simp [DifferentiableAt_θ, Γtot]
 
+/-- Γ with lower r: r-direction differentiability. -/
+lemma Γtot_differentiable_r_ext_μr
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (k a : Idx) :
+  DifferentiableAt_r (fun r θ => Γtot M r θ k Idx.r a) r θ := by
+  classical
+  -- Γ with lower r depends on r (e.g., Γ^r_{rr}, Γ^θ_{rθ} = 1/r)
+  cases k <;> cases a
+  -- θ.r case: Γ^θ_{rθ} = 1/r
+  case θ.r =>
+    simp only [DifferentiableAt_r, Γtot, Γ_θ_rθ]
+    exact DifferentiableAt.div (differentiableAt_const 1) (differentiableAt_id r) (Exterior.r_ne_zero h_ext)
+  -- r.r case: Γ^r_{rr} = -M/(r²f(r)) - needs proof
+  case r.r => sorry  -- TODO: prove Γ^r_{rr} differentiability
+  -- All other cases: constant or zero in r
+  all_goals { simp [DifferentiableAt_r, Γtot] }
+
+/-- Γ with lower θ: θ-direction differentiability. -/
+lemma Γtot_differentiable_θ_ext_μθ
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (k a : Idx) :
+  DifferentiableAt_θ (fun r θ => Γtot M r θ k Idx.θ a) r θ := by
+  classical
+  -- Γ with lower θ: most are θ-constants, a few have θ-dependence
+  cases k <;> cases a
+  -- Cases with θ-dependence (φ row)
+  case φ.φ => sorry  -- TODO: Γ^φ_{θφ} = cot θ
+  case θ.φ => sorry  -- TODO: Γ^θ_{φφ} = -sin θ cos θ
+  -- All other cases: θ-constants
+  all_goals { simp [DifferentiableAt_θ, Γtot] }
+
 /-! #### Micro helper: pack 4-term integrand as difference of products (right slot) -/
 
 lemma pack_right_slot_prod
@@ -5834,19 +5863,22 @@ lemma regroup_right_sum_to_RiemannUp_NEW
   -- 2) Commute `dCoord` across the outer k-sum (twice) with `dCoord_sumIdx`
   have hF_r : ∀ k, DifferentiableAt_r (fun r θ => A k * g M k b r θ) r θ ∨ Idx.r ≠ Idx.r := by
     intro k; left
-    exact
-      (Γtot_differentiable_r_ext_μθ M r θ h_ext k a).mul
-      (g_differentiable_r_ext           M r θ h_ext k b)
+    unfold DifferentiableAt_r
+    exact (Γtot_differentiable_r_ext_μθ M r θ h_ext k a).mul
+          (g_differentiable_r_ext           M r θ h_ext k b)
   have hF_θ : ∀ k, DifferentiableAt_θ (fun r θ => A k * g M k b r θ) r θ ∨ Idx.r ≠ Idx.θ := by
     intro _; right; simp
 
   have hG_r : ∀ k, DifferentiableAt_r (fun r θ => B k * g M k b r θ) r θ ∨ Idx.θ ≠ Idx.r := by
     intro k; left
-    exact
-      (Γtot_differentiable_θ_ext_μr M r θ h_ext k a).mul
-      (g_differentiable_r_ext          M r θ h_ext k b)
+    unfold DifferentiableAt_r
+    exact (Γtot_differentiable_r_ext_μr M r θ h_ext k a).mul
+          (g_differentiable_r_ext        M r θ h_ext k b)
   have hG_θ : ∀ k, DifferentiableAt_θ (fun r θ => B k * g M k b r θ) r θ ∨ Idx.θ ≠ Idx.θ := by
-    intro _; right; simp
+    intro k; left
+    unfold DifferentiableAt_θ
+    exact (Γtot_differentiable_θ_ext_μr M r θ h_ext k a).mul
+          (g_differentiable_θ_ext        M r θ h_ext k b)
 
   have h_pull :
     (sumIdx (fun k => dCoord Idx.r (fun r θ => A k * g M k b r θ) r θ)
@@ -5934,17 +5966,17 @@ lemma regroup_left_sum_to_RiemannUp_NEW
   -- 2) Commute dCoord across the k-sum (twice)
   have hF_r : ∀ k, DifferentiableAt_r (fun r θ => A k * g M a k r θ) r θ ∨ Idx.r ≠ Idx.r := by
     intro k; left
-    exact
-      (Γtot_differentiable_r_ext_μθ M r θ h_ext k b).mul
-      (g_differentiable_r_ext           M r θ h_ext a k)
+    unfold DifferentiableAt_r
+    exact (Γtot_differentiable_r_ext_μθ M r θ h_ext k b).mul
+          (g_differentiable_r_ext           M r θ h_ext a k)
   have hF_θ : ∀ k, DifferentiableAt_θ (fun r θ => A k * g M a k r θ) r θ ∨ Idx.r ≠ Idx.θ := by
     intro _; right; simp
 
   have hG_r : ∀ k, DifferentiableAt_r (fun r θ => B k * g M a k r θ) r θ ∨ Idx.θ ≠ Idx.r := by
     intro k; left
-    exact
-      (Γtot_differentiable_θ_ext_μr M r θ h_ext k b).mul
-      (g_differentiable_r_ext          M r θ h_ext a k)
+    unfold DifferentiableAt_r
+    exact (Γtot_differentiable_θ_ext_μr M r θ h_ext k b).mul
+          (g_differentiable_r_ext          M r θ h_ext a k)
   have hG_θ : ∀ k, DifferentiableAt_θ (fun r θ => B k * g M a k r θ) r θ ∨ Idx.θ ≠ Idx.θ := by
     intro _; right; simp
 
