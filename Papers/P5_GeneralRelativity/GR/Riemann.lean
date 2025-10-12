@@ -6014,9 +6014,11 @@ lemma regroup_right_sum_to_RiemannUp_NEW
            Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a
          - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))
         * g M k b r θ := by
+      -- Expand ∂g using compat and then apply algebra
       rw [Hr_k, Hθ_k]
-      -- TODO: Complete algebraic folding with Rr', Rθ' substitution
-      sorry
+      simp only [mul_add, add_mul]
+      -- Try directly using ring without refolds first to see if it works
+      sorry  -- TODO: Need to apply Rr'/Rθ' but pattern matching is failing
 
   -- (C) Recognize RiemannUp fiberwise
   have h_R_fiber :
@@ -6222,9 +6224,11 @@ lemma regroup_left_sum_to_RiemannUp_NEW
            Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ b
          - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r b))
         * g M a k r θ := by
+      -- Expand ∂g using compat and then apply algebra
       rw [Hr_k, Hθ_k]
-      -- TODO: Complete algebraic folding with Rr', Rθ' substitution
-      sorry
+      simp only [mul_add, add_mul]
+      -- Try directly using ring without refolds first to see if it works
+      sorry  -- TODO: Need to apply Rr'/Rθ' but pattern matching is failing
 
   -- (C) Recognize RiemannUp fiberwise
   have h_R_fiber :
