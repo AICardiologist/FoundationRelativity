@@ -6112,14 +6112,24 @@ lemma regroup_right_sum_to_RiemannUp_NEW
   -- simp_rw [g_swap_lam_b M r θ] at h_weighted
   -- simp_rw [g_swap_lam_a M r θ] at h_weighted
 
-  -- (4) Collapse the inner λ-sums (direct matches now)
-  simp_rw [sumIdx_Γ_g_left M r θ, sumIdx_Γ_g_right M r θ] at h_weighted
-
-  -- (5) Fold algebra to the bracket·g normal form and recognize RiemannUp
-  -- TODO: JP's funext→fold→lift→recognize pattern has type mismatches
-  -- Error 1 (line 6134): funext simp has unsolved goals
-  -- Error 2 (line 6158): h_weighted and h_bracket_sum don't match
-  -- Need to inspect actual state of h_weighted after Step 4 to write correct fold
+  -- (4) & (5) BLOCKED: JP's drop-in code doesn't match our h_weighted form
+  --
+  -- Investigation findings:
+  -- - Step 4 collapse (sumIdx_Γ_g_left/right) contracts inner sums to single terms
+  --   This eliminates the sumIdx that JP's fold expects to see
+  -- - Without collapse, h_weighted after Step 3 (compat expansion) still doesn't match
+  --   JP's h_bracket_fiber LHS - different syntactic form
+  -- - JP's funext simp leaves unsolved goals (line 6137)
+  -- - h_weighted.trans h_bracket_sum has type mismatch (line 6144)
+  --
+  -- Root cause: JP's code was written generically without seeing our actual expressions.
+  -- The compat expansions and subsequent transformations produce a form that doesn't
+  -- syntactically match JP's expected LHS.
+  --
+  -- Need to either:
+  -- A) Inspect h_weighted at this point and write custom fold that matches its actual form
+  -- B) Use OLD working approach (lines 2678-2850) which has proven tactics
+  -- C) Ask JP for help debugging the expression mismatch
   sorry
 
 /-- Left-slot analogue of the regroup lemma: use `pack_left_slot_prod` and
