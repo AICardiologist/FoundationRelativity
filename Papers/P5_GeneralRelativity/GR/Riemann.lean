@@ -6061,8 +6061,29 @@ lemma regroup_right_sum_to_RiemannUp_NEW
           - (Γtot M r θ k Idx.r a * (Sθb + Sθk))
             = - (Γtot M r θ k Idx.r a
                   * dCoord Idx.θ (fun r θ => g M k b r θ) r θ) := by
-          -- TODO: JP's approach with neg_add - pattern matching issues
-          sorry
+          -- JP's negate→fold→re-negate pattern (Oct 12, 2025)
+          -- First remove the leading negation to get a positive-sum statement
+          have pair_θ_unneg :
+            Γtot M r θ k Idx.r a * Sθk
+          + Γtot M r θ k Idx.r a * Sθb
+            =
+            Γtot M r θ k Idx.r a
+              * dCoord Idx.θ (fun r θ => g M k b r θ) r θ := by
+            -- negate both sides of pair_θ and clean up
+            have := congrArg (fun x : ℝ => -x) pair_θ
+            simp only [neg_add, neg_mul, sub_eq_add_neg, neg_neg] at this
+            exact this
+
+          -- Fold to Γ*(Sθk+Sθb), then re-introduce the outer minus and commute
+          have pos :
+            Γtot M r θ k Idx.r a * (Sθk + Sθb)
+              =
+            Γtot M r θ k Idx.r a
+              * dCoord Idx.θ (fun r θ => g M k b r θ) r θ := by
+            simpa [add_mul_left] using pair_θ_unneg
+          -- add the outer minus, then commute the inner sum to (Sθb + Sθk)
+          have := congrArg (fun x : ℝ => -x) pos
+          simpa [add_comm] using this
 
         -- Close the fiber step without ring
         simp [pair_r_fold_comm, pair_θ_fold_comm,
@@ -6095,11 +6116,11 @@ lemma regroup_right_sum_to_RiemannUp_NEW
   simp_rw [sumIdx_Γ_g_left M r θ, sumIdx_Γ_g_right M r θ] at h_weighted
 
   -- (5) Fold algebra to the bracket·g normal form and recognize RiemannUp
-  -- TODO: This simp still times out - need smaller lemma set or different approach
+  -- TODO: JP's funext→fold→lift→recognize pattern has type mismatches
+  -- Error 1 (line 6134): funext simp has unsolved goals
+  -- Error 2 (line 6158): h_weighted and h_bracket_sum don't match
+  -- Need to inspect actual state of h_weighted after Step 4 to write correct fold
   sorry
-  -- simp [fold_add_left, fold_sub_right, add_comm, add_left_comm, add_assoc] at h_weighted
-  -- simp [RiemannUp] at h_weighted
-  -- exact h_weighted
 
 /-- Left-slot analogue of the regroup lemma: use `pack_left_slot_prod` and
     the left-slot compat refolds `compat_refold_*_kb`. -/
