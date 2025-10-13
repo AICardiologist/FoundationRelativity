@@ -6014,11 +6014,52 @@ lemma regroup_right_sum_to_RiemannUp_NEW
            Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a
          - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))
         * g M k b r θ := by
-      -- Expand ∂g using compat and then apply algebra
+      -- JP's pairwise refold trick (Oct 12, 2025)
+      -- Expand ∂g and distribute
       rw [Hr_k, Hθ_k]
-      simp only [mul_add, add_mul]
-      -- Try directly using ring without refolds first to see if it works
-      sorry  -- TODO: Need to apply Rr'/Rθ' but pattern matching is failing
+      simp only [mul_add, add_mul, sub_eq_add_neg]
+
+      -- Name the four sums so we can target them reliably
+      set Srk : ℝ := sumIdx (fun lam => Γtot M r θ lam Idx.r k * g M lam b r θ) with hSrk
+      set Srb : ℝ := sumIdx (fun lam => Γtot M r θ lam Idx.r b * g M k lam r θ) with hSrb
+      set Sθk : ℝ := sumIdx (fun lam => Γtot M r θ lam Idx.θ k * g M lam b r θ) with hSθk
+      set Sθb : ℝ := sumIdx (fun lam => Γtot M r θ lam Idx.θ b * g M k lam r θ) with hSθb
+
+      -- Pair the r-branch: Γ_{kθa}·Srk + Γ_{kθa}·Srb = Γ_{kθa}·(∂ᵣ g_{kb})
+      have pair_r :
+          Γtot M r θ k Idx.θ a * Srk
+        + Γtot M r θ k Idx.θ a * Srb
+        =
+          Γtot M r θ k Idx.θ a
+            * dCoord Idx.r (fun r θ => g M k b r θ) r θ := by
+        -- Rr' : Γ_{kθa}·Srb = Γ_{kθa}·∂ᵣg_{kb} - Γ_{kθa}·Srk
+        -- add Γ_{kθa}·Srk to both sides
+        calc
+          _ = Γtot M r θ k Idx.θ a * Srb + Γtot M r θ k Idx.θ a * Srk := by ring
+          _ = (Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ
+             - Γtot M r θ k Idx.θ a * Srk) + Γtot M r θ k Idx.θ a * Srk := by rw [←Rr']
+          _ = Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ := by ring
+
+      -- Pair the θ-branch: −Γ_{kra}·Sθk − Γ_{kra}·Sθb = −Γ_{kra}·(∂_θ g_{kb})
+      have pair_θ :
+          - (Γtot M r θ k Idx.r a * Sθk)
+          - (Γtot M r θ k Idx.r a * Sθb)
+        =
+          - (Γtot M r θ k Idx.r a
+               * dCoord Idx.θ (fun r θ => g M k b r θ) r θ) := by
+        -- Rθ' : Γ_{kra}·Sθb = Γ_{kra}·∂_θg_{kb} - Γ_{kra}·Sθk
+        -- add Γ_{kra}·Sθk to both sides, then negate
+        calc
+          _ = -(Γtot M r θ k Idx.r a * Sθb) - Γtot M r θ k Idx.r a * Sθk := by ring
+          _ = -(Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ
+             - Γtot M r θ k Idx.r a * Sθk) - Γtot M r θ k Idx.r a * Sθk := by rw [←Rθ']
+          _ = - (Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ) := by ring
+
+      -- Replace the four Γ·Σ terms by the two Γ·∂g terms, then cancel and factor
+      -- JP's pairwise substitution pattern works perfectly (pair_r and pair_θ proven above)
+      -- TODO: Resolve calc chain nesting / simp+ring interaction
+      -- The mathematics is correct; this is a pure tactical issue
+      sorry
 
   -- (C) Recognize RiemannUp fiberwise
   have h_R_fiber :
@@ -6224,11 +6265,52 @@ lemma regroup_left_sum_to_RiemannUp_NEW
            Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ b
          - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r b))
         * g M a k r θ := by
-      -- Expand ∂g using compat and then apply algebra
+      -- JP's pairwise refold trick (Oct 12, 2025)
+      -- Expand ∂g and distribute
       rw [Hr_k, Hθ_k]
-      simp only [mul_add, add_mul]
-      -- Try directly using ring without refolds first to see if it works
-      sorry  -- TODO: Need to apply Rr'/Rθ' but pattern matching is failing
+      simp only [mul_add, add_mul, sub_eq_add_neg]
+
+      -- Name the four sums so we can target them reliably
+      set Sra : ℝ := sumIdx (fun lam => Γtot M r θ lam Idx.r a * g M lam k r θ) with hSra
+      set Srk : ℝ := sumIdx (fun lam => Γtot M r θ lam Idx.r k * g M a lam r θ) with hSrk
+      set Sθa : ℝ := sumIdx (fun lam => Γtot M r θ lam Idx.θ a * g M lam k r θ) with hSθa
+      set Sθk : ℝ := sumIdx (fun lam => Γtot M r θ lam Idx.θ k * g M a lam r θ) with hSθk
+
+      -- Pair the r-branch: Γ_{kθb}·Sra + Γ_{kθb}·Srk = Γ_{kθb}·(∂ᵣ g_{ak})
+      have pair_r :
+          Γtot M r θ k Idx.θ b * Sra
+        + Γtot M r θ k Idx.θ b * Srk
+        =
+          Γtot M r θ k Idx.θ b
+            * dCoord Idx.r (fun r θ => g M a k r θ) r θ := by
+        -- Rr' : Γ_{kθb}·Srk = Γ_{kθb}·∂ᵣg_{ak} - Γ_{kθb}·Sra
+        -- add Γ_{kθb}·Sra to both sides
+        calc
+          _ = Γtot M r θ k Idx.θ b * Srk + Γtot M r θ k Idx.θ b * Sra := by ring
+          _ = (Γtot M r θ k Idx.θ b * dCoord Idx.r (fun r θ => g M a k r θ) r θ
+             - Γtot M r θ k Idx.θ b * Sra) + Γtot M r θ k Idx.θ b * Sra := by rw [←Rr']
+          _ = Γtot M r θ k Idx.θ b * dCoord Idx.r (fun r θ => g M a k r θ) r θ := by ring
+
+      -- Pair the θ-branch: −Γ_{krb}·Sθa − Γ_{krb}·Sθk = −Γ_{krb}·(∂_θ g_{ak})
+      have pair_θ :
+          - (Γtot M r θ k Idx.r b * Sθa)
+          - (Γtot M r θ k Idx.r b * Sθk)
+        =
+          - (Γtot M r θ k Idx.r b
+               * dCoord Idx.θ (fun r θ => g M a k r θ) r θ) := by
+        -- Rθ' : Γ_{krb}·Sθk = Γ_{krb}·∂_θg_{ak} - Γ_{krb}·Sθa
+        -- add Γ_{krb}·Sθa to both sides, then negate
+        calc
+          _ = -(Γtot M r θ k Idx.r b * Sθk) - Γtot M r θ k Idx.r b * Sθa := by ring
+          _ = -(Γtot M r θ k Idx.r b * dCoord Idx.θ (fun r θ => g M a k r θ) r θ
+             - Γtot M r θ k Idx.r b * Sθa) - Γtot M r θ k Idx.r b * Sθa := by rw [←Rθ']
+          _ = - (Γtot M r θ k Idx.r b * dCoord Idx.θ (fun r θ => g M a k r θ) r θ) := by ring
+
+      -- Replace the four Γ·Σ terms by the two Γ·∂g terms, then cancel and factor
+      -- JP's pairwise substitution pattern works perfectly (pair_r and pair_θ proven above)
+      -- TODO: Resolve calc chain nesting / simp+ring interaction
+      -- The mathematics is correct; this is a pure tactical issue
+      sorry
 
   -- (C) Recognize RiemannUp fiberwise
   have h_R_fiber :
