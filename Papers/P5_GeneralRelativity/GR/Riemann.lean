@@ -5931,6 +5931,8 @@ lemma regroup_right_sum_to_RiemannUp_NEW
     simp only [dCoord_g_via_compat_ext M r θ h_ext Idx.θ k b]
 
   -- (B) Fiberwise fold (JP's solution Oct 12: fiberize H_r_pt/H_θ_pt with congrArg)
+  -- JP's weighted-first restructure (Oct 12): Don't close to bracket in fiber!
+  -- Instead, stop at the form with Γ*∂g terms, then lift+weight
   have h_fold_fiber :
     (fun k =>
        (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a * g M k b r θ) r θ)
@@ -5938,11 +5940,9 @@ lemma regroup_right_sum_to_RiemannUp_NEW
     =
     (fun k =>
       (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
-     - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ
-     + sumIdx (fun lam =>
-         Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a
-       - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))
-      * g M k b r θ) := by
+     - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ) * g M k b r θ
+    + (Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ
+     - Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ)) := by
     funext k
     -- 1) Open the product on both dCoord's (use the pack lemma, oriented left→right)
     have h_pack_k :
@@ -6000,7 +6000,7 @@ lemma regroup_right_sum_to_RiemannUp_NEW
         (compat_refold_θ_kb M r θ h_ext k b)
       simpa [mul_sub, sumIdx_pull_const_left] using this
 
-    -- JP's pairwise refold trick (Oct 12, 2025): flat calc with pair_sum
+    -- JP's pairwise refold trick (Oct 12, 2025): Close fiber with Γ*∂g form
     calc
       dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a * g M k b r θ) r θ
     - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a * g M k b r θ) r θ
@@ -6009,11 +6009,9 @@ lemma regroup_right_sum_to_RiemannUp_NEW
         + Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ
         - Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ := h_pack_k
       _ = (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
-         - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ
-         + sumIdx (fun lam =>
-             Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a
-           - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))
-          * g M k b r θ := by
+           - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ) * g M k b r θ
+        + (Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ
+           - Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ) := by
         -- Expand ∂g, distribute, name sums, pair them, substitute
         rw [Hr_k, Hθ_k]
         simp only [mul_add, add_mul, sub_eq_add_neg]
@@ -6050,71 +6048,58 @@ lemma regroup_right_sum_to_RiemannUp_NEW
                - Γtot M r θ k Idx.r a * Sθk) - Γtot M r θ k Idx.r a * Sθk := by rw [←Rθ']
             _ = - (Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ) := by ring
 
-        -- Bundle & substitute in one shot (JP's key insight!)
-        have pair_sum :
-            (Γtot M r θ k Idx.θ a * Srk + Γtot M r θ k Idx.θ a * Srb)
-          + (-(Γtot M r θ k Idx.r a * Sθk) - (Γtot M r θ k Idx.r a * Sθb))
-          =
-            Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ
-          - Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ := by
-          simpa [pair_r, pair_θ, add_comm, add_left_comm, add_assoc, sub_eq_add_neg]
+        -- JP's weighted-first: Stop at Γ*∂g form (Oct 12, 2025)
+        -- AC-robust folded forms that match the post-simp shapes
+        have pair_r_fold_comm :
+          Γtot M r θ k Idx.θ a * (Srb + Srk)
+            = Γtot M r θ k Idx.θ a
+                * dCoord Idx.r (fun r θ => g M k b r θ) r θ := by
+          -- from Γ*Srk + Γ*Srb = Γ*∂ᵣg, fold to Γ*(Srk+Srb), then commute to (Srb+Srk)
+          simpa [add_comm, add_mul_left] using pair_r
 
-        -- Now apply: pair_sum → fold → forward refold
-        simp only [pair_sum, fold_sub_right, add_comm, add_left_comm, add_assoc, sub_eq_add_neg]
-        sorry  -- TODO: Forward refold using compat
+        have pair_θ_fold_comm :
+          - (Γtot M r θ k Idx.r a * (Sθb + Sθk))
+            = - (Γtot M r θ k Idx.r a
+                  * dCoord Idx.θ (fun r θ => g M k b r θ) r θ) := by
+          -- TODO: JP's approach with neg_add - pattern matching issues
+          sorry
 
-  -- (C) Recognize RiemannUp fiberwise
-  have h_R_fiber :
-    (fun k =>
-      (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
-     - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ
-     + sumIdx (fun lam =>
-         Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a
-       - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a)))
-    =
-    (fun k => RiemannUp M r θ k a Idx.r Idx.θ) := by
-    funext k
-    simp [RiemannUp, sub_eq_add_neg,
-          sumIdx, Finset.sum_sub_distrib,
-          add_comm, add_left_comm, add_assoc,
-          mul_comm, mul_left_comm, mul_assoc]
+        -- Close the fiber step without ring
+        simp [pair_r_fold_comm, pair_θ_fold_comm,
+              fold_sub_right, fold_add_left,  -- ring-free factoring lemmas
+              add_comm, add_left_comm, add_assoc]
 
-  -- (D) Lift fiberwise equalities back to outer sum
-  have h_fold_sum :
-    sumIdx (fun k =>
-       dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a * g M k b r θ) r θ
-     - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a * g M k b r θ) r θ)
-    =
-    sumIdx (fun k =>
-      (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
-     - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ
-     + sumIdx (fun lam =>
-         Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a
-       - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))
-      * g M k b r θ) := by
-    exact congrArg (fun F : Idx → ℝ => sumIdx F) h_fold_fiber
+  -- JP's weighted-first approach (Oct 12, 2025):
+  -- (Step 2) Lift the fiber equality and weight by g immediately
+  have h_weighted := congrArg (fun F : Idx → ℝ => sumIdx F) h_fold_fiber
+  -- Now: ∑_k[(∂ᵣΓ - ∂_θΓ)*g + (Γ*∂ᵣg - Γ*∂_θg)] = ∑_k[RHS with Γ*∂g terms]
 
-  have h_finish :
-    sumIdx (fun k =>
-      (dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
-     - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ
-     + sumIdx (fun lam =>
-         Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a
-       - Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))
-      * g M k b r θ)
-    =
-    sumIdx (fun k => RiemannUp M r θ k a Idx.r Idx.θ * g M k b r θ) := by
-    have := congrArg
-      (fun F : Idx → ℝ => sumIdx (fun k => F k * g M k b r θ)) h_R_fiber
-    simpa using this
+  -- (Step 3) Open the ∂g terms with compat UNDER THE OUTER SUM
+  simp_rw [dCoord_g_via_compat_ext M r θ h_ext] at h_weighted
 
-  -- Chain: steps (0)-(1) from h_sum_linearized, then fiberwise fold
-  calc
-    sumIdx (fun k =>
-      dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a * g M k b r θ) r θ
-    - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a * g M k b r θ) r θ)
-        = _ := h_fold_sum
-    _   = sumIdx (fun k => RiemannUp M r θ k a Idx.r Idx.θ * g M k b r θ) := h_finish
+  -- JP's 5-step weighted-first sequence (Oct 12, 2025):
+  -- (1) Distribute Γ over the inner sums gently
+  simp_rw [mul_add, sub_eq_add_neg] at h_weighted
+  simp_rw [add_mul] at h_weighted
+
+  -- (2) Push/pull the Γ factor across the inner λ-sums
+  -- TODO: sumIdx_pull_const_right application - may not be needed if collapse works directly
+  -- simp_rw [sumIdx_pull_const_right] at h_weighted
+
+  -- (3) Normalize metric slot order so the collapse lemmas match syntactically
+  -- TODO: These may not be needed if collapse lemmas already match
+  -- simp_rw [g_swap_lam_b M r θ] at h_weighted
+  -- simp_rw [g_swap_lam_a M r θ] at h_weighted
+
+  -- (4) Collapse the inner λ-sums (direct matches now)
+  simp_rw [sumIdx_Γ_g_left M r θ, sumIdx_Γ_g_right M r θ] at h_weighted
+
+  -- (5) Fold algebra to the bracket·g normal form and recognize RiemannUp
+  -- TODO: This simp still times out - need smaller lemma set or different approach
+  sorry
+  -- simp [fold_add_left, fold_sub_right, add_comm, add_left_comm, add_assoc] at h_weighted
+  -- simp [RiemannUp] at h_weighted
+  -- exact h_weighted
 
 /-- Left-slot analogue of the regroup lemma: use `pack_left_slot_prod` and
     the left-slot compat refolds `compat_refold_*_kb`. -/
