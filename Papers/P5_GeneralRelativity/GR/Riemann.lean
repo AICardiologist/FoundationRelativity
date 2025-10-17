@@ -1369,6 +1369,20 @@ lemma sumIdx_mul_distrib (f : Idx → ℝ) (c : ℝ) :
   (sumIdx f) * c = sumIdx (fun k => f k * c) := by
   unfold sumIdx; rw [Finset.sum_mul]
 
+/-- Generalized Fubini with multiplication distribution.
+    Σρ (G ρ * Σλ (F ρ λ)) = Σλ (Σρ (G ρ * F ρ λ))
+    Combines mul_sumIdx_distrib and sumIdx_swap.
+    Proved using non-recursive tactics (congr/ext + rw) to avoid infinite loops.
+    Critical helper for Steps 4-7 in Riemann_via_Γ₁ proof. -/
+lemma sumIdx_mul_sumIdx_swap (G : Idx → ℝ) (F : Idx → Idx → ℝ) :
+  sumIdx (fun ρ => G ρ * sumIdx (fun lam => F ρ lam))
+  = sumIdx (fun lam => sumIdx (fun ρ => G ρ * F ρ lam)) := by
+  -- 1. Distribution: Move 'G' inside the inner sum (Σλ).
+  simp only [mul_sumIdx_distrib]
+  -- State is now: sumIdx (fun ρ => sumIdx (fun lam => G ρ * F ρ lam))
+  -- 2. Fubini: Swap the sums.
+  rw [sumIdx_swap]
+
 /-! ## Symmetry Lemmas
 
 Basic symmetry properties of the metric and Christoffel symbols.
@@ -1626,23 +1640,20 @@ lemma Riemann_via_Γ₁
       ring
 
     -- Steps 4-7: Algebraic rearrangement
-    -- SP's guidance (Oct 17): Use calc with have statements for Fubini
-    -- Tactical challenge: simp_rw [mul_sumIdx_distrib] causes infinite loop
-    -- Need alternative approach or specialized lemma
+    -- Split sums over addition/subtraction, distribute multiplication,
+    -- and apply Fubini theorem (swap sum order) using specialized helper lemma
     _ = sumIdx (fun ρ => g M β ρ r θ * dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ a) r θ)
       - sumIdx (fun ρ => g M β ρ r θ * dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r a) r θ)
       + sumIdx (fun lam => sumIdx (fun ρ =>
             g M β ρ r θ * (Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ a)))
       - sumIdx (fun lam => sumIdx (fun ρ =>
             g M β ρ r θ * (Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r a))) := by
-      -- Required operations (all mathematically valid):
-      -- 1. Expand: g·Σ(X-Y) = g·ΣX - g·ΣY using sumIdx_map_sub
-      -- 2. Split: Σ(A-B+C-D) = ΣA - ΣB + ΣC - ΣD
-      -- 3. Fubini: Σρ (g·Σλ(...)) = Σλ (Σρ (g·(...))) using sumIdx_swap
-      --
-      -- Issue: simp_rw [mul_sumIdx_distrib] creates infinite loop
-      -- Need: Either non-looping tactic sequence or specialized helper lemma
-      sorry
+      -- 1. Basic distribution lemmas (sumIdx over +/-)
+      simp only [sumIdx_map_sub, mul_sub, sumIdx_add_distrib]
+      -- 2. Apply Fubini theorem with distribution (using specialized helper to avoid infinite loop)
+      simp_rw [sumIdx_mul_sumIdx_swap]
+      -- 3. Normalize associativity for final form
+      abel
 
     -- Step 8: The Algebraic Miracle (M - D = -T2)
     -- After Steps 4-7, we have: ∂Γ terms + M terms (separated and swapped)
@@ -1654,17 +1665,16 @@ lemma Riemann_via_Γ₁
           Γ₁ M r θ lam a Idx.r * Γtot M r θ lam β Idx.θ
         - Γ₁ M r θ lam a Idx.θ * Γtot M r θ lam β Idx.r)
         := by
-          -- Step 8: Apply product rule backwards and use 4 proven auxiliary lemmas
-          -- Mathematical operations required:
-          -- 1. Apply prod_rule_backwards_sum to recognize ∂Γ₁ terms
-          -- 2. Rearrange to separate: ∂Γ₁ terms + (M - D) terms
-          -- 3. Apply Riemann_via_Γ₁_Cancel_r/θ: M_r = D_r2, M_θ = D_θ2
-          -- 4. Apply Riemann_via_Γ₁_Identify_r/θ: D_r1 = T2_r, D_θ1 = T2_θ
-          -- 5. Conclude: (M - D) = M - (D1+D2) = -D1 = -T2
-          -- 6. Final normalization with ring_nf
+          -- Mathematical strategy (all components proven):
+          -- 1. Apply prod_rule_backwards_sum to ∂Γ terms: Σ g(∂Γ) = ∂(Σ gΓ) - Σ (∂g)Γ
+          -- 2. Recognize Γ₁ = Σρ g_{βρ} Γ^ρ_{aν} in the ∂(...) terms
+          -- 3. The M terms (quadratic Christoffel) cancel with D2 terms from ∂g (via Cancel lemmas)
+          -- 4. The remaining D1 terms equal -T2 (via Identify lemmas)
+          -- 5. Result: ∂Γ₁ - ∂Γ₁ - T2
           --
-          -- All 4 auxiliary lemmas are fully proven (no sorries).
-          -- Tactical assembly pending - pattern matching after Steps 4-7 swap.
+          -- Tactical blocker: Pattern matching for prod_rule_backwards_sum with variable names
+          -- The lemma uses (r', θ') but goal has (r, θ), requiring conv navigation
+          -- All mathematical content is verified in auxiliary lemmas (lines 1450-1550)
           sorry
 
 /-! ## Small structural simp lemmas -/
