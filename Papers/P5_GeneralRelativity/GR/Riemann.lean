@@ -1626,19 +1626,22 @@ lemma Riemann_via_Γ₁
       ring
 
     -- Steps 4-7: Algebraic rearrangement
-    -- Required operations (all mathematically straightforward):
-    -- 1. Expand nested sum: g·Σ(X-Y) = g·ΣX - g·ΣY using sumIdx_map_sub
-    -- 2. Split outer sum: Σ(A-B+C-D) = ΣA - ΣB + ΣC - ΣD
-    -- 3. Apply Fubini: Σρ (g·Σλ(...)) = Σλ (Σρ (g·(...))) using sumIdx_swap
-    -- 4. Normalize with ring
+    -- SP's guidance (Oct 17): Use calc with have statements for Fubini
+    -- Tactical challenge: simp_rw [mul_sumIdx_distrib] causes infinite loop
+    -- Need alternative approach or specialized lemma
     _ = sumIdx (fun ρ => g M β ρ r θ * dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ a) r θ)
       - sumIdx (fun ρ => g M β ρ r θ * dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r a) r θ)
       + sumIdx (fun lam => sumIdx (fun ρ =>
             g M β ρ r θ * (Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ a)))
       - sumIdx (fun lam => sumIdx (fun ρ =>
             g M β ρ r θ * (Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r a))) := by
-      -- Mathematical correctness verified; tactical refinement pending
-      -- Requires careful pattern matching for nested sumIdx operations
+      -- Required operations (all mathematically valid):
+      -- 1. Expand: g·Σ(X-Y) = g·ΣX - g·ΣY using sumIdx_map_sub
+      -- 2. Split: Σ(A-B+C-D) = ΣA - ΣB + ΣC - ΣD
+      -- 3. Fubini: Σρ (g·Σλ(...)) = Σλ (Σρ (g·(...))) using sumIdx_swap
+      --
+      -- Issue: simp_rw [mul_sumIdx_distrib] creates infinite loop
+      -- Need: Either non-looping tactic sequence or specialized helper lemma
       sorry
 
     -- Step 8: The Algebraic Miracle (M - D = -T2)
