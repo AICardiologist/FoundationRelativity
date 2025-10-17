@@ -1573,6 +1573,35 @@ lemma Γtot_nonzero_eq_Γtot (M r θ : ℝ) (μ ν ρ : Idx) (h : NonzeroChristo
 @[simp] lemma deriv_Γtot_r_θr (M r θ : ℝ) :
   deriv (fun t => Γtot M r t Idx.r Idx.θ Idx.r) θ = 0 := by simp
 
+/-!  JP's commutator-collapse helpers for h_fiber diagonal case (Oct 14, 2025)  -/
+
+-- One-shot diagonal/off-diagonal fact for the Schwarzschild metric.
+-- Avoids 16 subgoals each time we just need "g_{kb} = 0 when k ≠ b".
+@[simp] lemma g_offdiag (M r θ : ℝ) {i j : Idx} (hij : i ≠ j) :
+  g M i j r θ = 0 := by
+  cases i <;> cases j <;> (first | exfalso; exact hij rfl | simp [g])
+
+/-- In Schwarzschild, for the `r`-branch commutator
+    ∑_λ Γ^k_{rλ} Γ^λ_{θa} collapses to the single λ = k term. -/
+@[simp] lemma comm_r_sum_collapse (M r θ : ℝ) (k a : Idx) :
+  sumIdx (fun lam =>
+    Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a)
+  =
+  Γtot M r θ k Idx.r k * Γtot M r θ k Idx.θ a := by
+  classical
+  cases k <;> cases a <;> simp [sumIdx_expand, Γtot, mul_zero, zero_mul, add_zero, zero_add]
+
+/-- **Correct θ-branch collapse.**
+    In Schwarzschild, for the `θ`-branch commutator
+    ∑_λ Γ^k_{θλ} Γ^λ_{ra} collapses to the single λ = a term (not λ = k). -/
+@[simp] lemma comm_θ_sum_collapse (M r θ : ℝ) (k a : Idx) :
+  sumIdx (fun lam =>
+    Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a)
+  =
+  Γtot M r θ k Idx.θ a * Γtot M r θ a Idx.r a := by
+  classical
+  cases k <;> cases a <;> simp [sumIdx_expand, Γtot, mul_zero, zero_mul, add_zero, zero_add]
+
 end TotalChristoffel
 
 /-! CI-stable derivative helpers for the linear/trig shapes that actually occur. -/
