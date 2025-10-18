@@ -463,6 +463,62 @@ lemma differentiableAt_g_φφ_θ (M r θ : ℝ) :
   · exact differentiableAt_const _
   · exact differentiableAt_sin_sq θ
 
+/-- g_tt doesn't depend on θ, hence differentiable (with derivative 0). -/
+lemma differentiableAt_g_tt_θ (M r θ : ℝ) :
+    DifferentiableAt_θ (fun r θ => g M Idx.t Idx.t r θ) r θ := by
+  simp only [DifferentiableAt_θ, g]
+  exact differentiableAt_const _
+
+/-- g_rr doesn't depend on θ, hence differentiable (with derivative 0). -/
+lemma differentiableAt_g_rr_θ (M r θ : ℝ) :
+    DifferentiableAt_θ (fun r θ => g M Idx.r Idx.r r θ) r θ := by
+  simp only [DifferentiableAt_θ, g]
+  exact differentiableAt_const _
+
+/-- g_θθ = r² doesn't depend on θ, hence differentiable (with derivative 0). -/
+lemma differentiableAt_g_θθ_θ (M r θ : ℝ) :
+    DifferentiableAt_θ (fun r θ => g M Idx.θ Idx.θ r θ) r θ := by
+  simp only [DifferentiableAt_θ, g]
+  exact differentiableAt_const _
+
+/-! ### Master Lemmas: Comprehensive Differentiability
+
+These master lemmas handle all index combinations efficiently, avoiding exponential blowup.
+They use optimized case analysis with minimal unfolding to prevent timeouts.
+-/
+
+/-- Master Lemma: g_{βρ} is differentiable wrt r for all indices.
+    Handles all 16 index combinations efficiently using case analysis. -/
+lemma differentiableAt_g_all_r (M r θ : ℝ) (h_ext : Exterior M r θ) (β ρ : Idx) :
+  DifferentiableAt_r (fun r θ => g M β ρ r θ) r θ := by
+  cases β <;> cases ρ
+  all_goals {
+    first
+      -- Try specific lemmas for diagonal components.
+      | apply differentiableAt_g_tt_r M r θ h_ext
+      | apply differentiableAt_g_rr_r M r θ h_ext
+      | apply differentiableAt_g_θθ_r M r θ
+      | apply differentiableAt_g_φφ_r M r θ
+      -- Fallback for off-diagonal (zero) components.
+      | (simp only [g]; apply differentiableAt_const)
+  }
+
+/-- Master Lemma: g_{βρ} is differentiable wrt θ for all indices.
+    Handles all 16 index combinations efficiently using case analysis. -/
+lemma differentiableAt_g_all_θ (M r θ : ℝ) (β ρ : Idx) :
+  DifferentiableAt_θ (fun r θ => g M β ρ r θ) r θ := by
+  cases β <;> cases ρ
+  all_goals {
+    first
+      -- Try specific lemmas for diagonal components.
+      | apply differentiableAt_g_tt_θ M r θ
+      | apply differentiableAt_g_rr_θ M r θ
+      | apply differentiableAt_g_θθ_θ M r θ
+      | apply differentiableAt_g_φφ_θ M r θ
+      -- Fallback for off-diagonal (zero) components.
+      | (simp only [g]; apply differentiableAt_const)
+  }
+
 /-! ### Christoffel Symbol Differentiability
 
 Differentiability lemmas for all nonzero Christoffel symbol components.
@@ -721,6 +777,113 @@ lemma differentiableAt_Γtot_nonzero_θ (M r θ : ℝ) (μ ν ρ : Idx) (h : Non
   case φ_φr => exact differentiableAt_const (Γ_φ_rφ r)
   case φ_θφ => exact differentiableAt_Γ_φ_θφ_θ θ hθ
   case φ_φθ => exact differentiableAt_Γ_φ_θφ_θ θ hθ
+
+/-! ### Zero Lemma for Γtot
+
+Proves that Γtot returns 0 for index combinations not in the NonzeroChristoffel set.
+This is required for the Master Lemma strategy.
+-/
+
+/-- Prerequisite: Γtot is zero for all index combinations not in NonzeroChristoffel.
+    This follows directly from the definition of Γtot which has a catch-all case `| _, _, _ => 0`. -/
+lemma Γtot_eq_zero_of_not_nonzero (M r θ : ℝ) (μ ν ρ : Idx) (h : ¬ NonzeroChristoffel μ ν ρ) :
+  Γtot M r θ μ ν ρ = 0 := by
+  -- Exhaustive case analysis on all 64 combinations
+  cases μ <;> cases ν <;> cases ρ <;>
+    -- For each case, either derive a contradiction (if it's in NonzeroChristoffel)
+    -- or prove it's 0 by unfolding Γtot
+    (first
+      | (exfalso; apply h; constructor)  -- Case is in NonzeroChristoffel - contradiction
+      | (simp only [Γtot]))               -- Case returns 0 by definition
+
+/-! ### Master Lemmas for Γtot
+
+These master lemmas handle all 64 index combinations efficiently using the NonzeroChristoffel predicate.
+This avoids exponential blowup from explicit case analysis.
+-/
+
+/-- Master Lemma: Γ^μ_{νρ} is differentiable wrt r for all indices.
+    Uses NonzeroChristoffel predicate to efficiently handle 64 cases. -/
+lemma differentiableAt_Γtot_all_r (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν ρ : Idx) :
+  DifferentiableAt_r (fun r θ => Γtot M r θ μ ν ρ) r θ := by
+  by_cases h_nz : NonzeroChristoffel μ ν ρ
+
+  -- Case 1: Non-zero combination - use existing lemma
+  case pos =>
+    -- Convert to the form expected by differentiableAt_Γtot_nonzero_r
+    have h_convert : DifferentiableAt ℝ (fun r' => Γtot_nonzero M r' θ μ ν ρ h_nz) r :=
+      differentiableAt_Γtot_nonzero_r M r θ μ ν ρ h_nz h_ext.hM h_ext.hr_ex
+    -- Show that Γtot agrees with Γtot_nonzero for this case
+    have h_eq : (fun r' θ' => Γtot M r' θ' μ ν ρ) = (fun r' θ' => Γtot_nonzero M r' θ' μ ν ρ h_nz) := by
+      ext r' θ'
+      exact (Γtot_nonzero_eq_Γtot M r' θ' μ ν ρ h_nz).symm
+    rw [h_eq, DifferentiableAt_r]
+    exact h_convert
+
+  -- Case 2: Zero combination - constant function
+  case neg =>
+    -- Show the function is identically zero
+    have h_zero_fun : (fun r' θ' => Γtot M r' θ' μ ν ρ) = (fun _ _ => 0) := by
+      ext r' θ'
+      exact Γtot_eq_zero_of_not_nonzero M r' θ' μ ν ρ h_nz
+    rw [h_zero_fun, DifferentiableAt_r]
+    exact differentiableAt_const 0
+
+/-- Master Lemma: Γ^μ_{νρ} is differentiable wrt θ for all indices.
+    Requires sin θ ≠ 0 for certain components.
+    Uses NonzeroChristoffel predicate to efficiently handle 64 cases. -/
+lemma differentiableAt_Γtot_all_θ (M r θ : ℝ) (μ ν ρ : Idx) (h_θ : Real.sin θ ≠ 0) :
+  DifferentiableAt_θ (fun r θ => Γtot M r θ μ ν ρ) r θ := by
+  by_cases h_nz : NonzeroChristoffel μ ν ρ
+
+  -- Case 1: Non-zero combination - use existing lemma with h_θ constraint
+  case pos =>
+    have h_convert : DifferentiableAt ℝ (fun θ' => Γtot_nonzero M r θ' μ ν ρ h_nz) θ :=
+      differentiableAt_Γtot_nonzero_θ M r θ μ ν ρ h_nz h_θ
+    have h_eq : (fun r' θ' => Γtot M r' θ' μ ν ρ) = (fun r' θ' => Γtot_nonzero M r' θ' μ ν ρ h_nz) := by
+      ext r' θ'
+      exact (Γtot_nonzero_eq_Γtot M r' θ' μ ν ρ h_nz).symm
+    rw [h_eq, DifferentiableAt_θ]
+    exact h_convert
+
+  -- Case 2: Zero combination - constant function
+  case neg =>
+    have h_zero_fun : (fun r' θ' => Γtot M r' θ' μ ν ρ) = (fun _ _ => 0) := by
+      ext r' θ'
+      exact Γtot_eq_zero_of_not_nonzero M r' θ' μ ν ρ h_nz
+    rw [h_zero_fun, DifferentiableAt_θ]
+    exact differentiableAt_const 0
+
+-- ========== Helper Lemmas for Product Differentiability (Phase 2A) ==========
+
+/-- Helper lemma for product differentiability using Condition Localization (r-direction).
+    Proves that if A and B are differentiable (or μ ≠ r), then A*B is differentiable (or μ ≠ r). -/
+lemma DifferentiableAt_r_mul_of_cond (A B : ℝ → ℝ → ℝ) (r θ : ℝ) (μ : Idx)
+    (hA : DifferentiableAt_r A r θ ∨ μ ≠ Idx.r)
+    (hB : DifferentiableAt_r B r θ ∨ μ ≠ Idx.r) :
+    DifferentiableAt_r (fun r θ => A r θ * B r θ) r θ ∨ μ ≠ Idx.r := by
+  by_cases h_coord : μ = Idx.r  -- Condition Localization
+  · left   -- Case 1: μ = Idx.r, prove differentiability
+    have hA_diff := hA.resolve_right (by simp [h_coord])
+    have hB_diff := hB.resolve_right (by simp [h_coord])
+    unfold DifferentiableAt_r at *
+    exact DifferentiableAt.mul hA_diff hB_diff
+  · right  -- Case 2: μ ≠ Idx.r, trivially true
+    exact h_coord
+
+/-- Helper lemma for product differentiability (θ-direction). -/
+lemma DifferentiableAt_θ_mul_of_cond (A B : ℝ → ℝ → ℝ) (r θ : ℝ) (μ : Idx)
+    (hA : DifferentiableAt_θ A r θ ∨ μ ≠ Idx.θ)
+    (hB : DifferentiableAt_θ B r θ ∨ μ ≠ Idx.θ) :
+    DifferentiableAt_θ (fun r θ => A r θ * B r θ) r θ ∨ μ ≠ Idx.θ := by
+  by_cases h_coord : μ = Idx.θ  -- Condition Localization
+  · left   -- Case 1: μ = Idx.θ, prove differentiability
+    have hA_diff := hA.resolve_right (by simp [h_coord])
+    have hB_diff := hB.resolve_right (by simp [h_coord])
+    unfold DifferentiableAt_θ at *
+    exact DifferentiableAt.mul hA_diff hB_diff
+  · right  -- Case 2: μ ≠ Idx.θ, trivially true
+    exact h_coord
 
 /-! ### Automated Tactic for Differentiability Hypothesis Discharge
 
@@ -1554,7 +1717,7 @@ lemma Riemann_via_Γ₁_Identify_θ (M r θ : ℝ) (β a : Idx) :
 /-- Helper Lemma: Product Rule Backwards for summed terms.
     Σ_ρ g_{βρ} (∂_μ Γ^ρ_{aν}) = ∂_μ(Σ_ρ g_{βρ} Γ^ρ_{aν}) - Σ_ρ (∂_μ g_{βρ}) Γ^ρ_{aν}.
 -/
-lemma prod_rule_backwards_sum (M r θ : ℝ) (h_ext : Exterior M r θ) (β a μ ν : Idx) :
+lemma prod_rule_backwards_sum (M r θ : ℝ) (h_ext : Exterior M r θ) (h_θ : Real.sin θ ≠ 0) (β a μ ν : Idx) :
   sumIdx (fun ρ => g M β ρ r θ * dCoord μ (fun r' θ' => Γtot M r' θ' ρ a ν) r θ)
   = (dCoord μ (fun r' θ' => sumIdx (fun ρ => g M β ρ r' θ' * Γtot M r' θ' ρ a ν)) r θ
    - sumIdx (fun ρ => dCoord μ (fun r' θ' => g M β ρ r' θ') r θ * Γtot M r θ ρ a ν)) := by
@@ -1569,8 +1732,12 @@ lemma prod_rule_backwards_sum (M r θ : ℝ) (h_ext : Exterior M r θ) (β a μ 
     have h_prod := dCoord_mul_of_diff μ
       (fun r' θ' => g M β ρ r' θ')
       (fun r' θ' => Γtot M r' θ' ρ a ν) r θ
-      -- Differentiability conditions (TODO: Discharge using h_ext and Phase 2A infrastructure)
-      (sorry) (sorry) (sorry) (sorry)
+      -- Differentiability conditions (Discharged using Master Lemmas)
+      -- Wrap in Or.inl since the signature expects `P ∨ μ ≠ direction`
+      (Or.inl (differentiableAt_g_all_r M r θ h_ext β ρ))
+      (Or.inl (differentiableAt_Γtot_all_r M r θ h_ext ρ a ν))
+      (Or.inl (differentiableAt_g_all_θ M r θ β ρ))
+      (Or.inl (differentiableAt_Γtot_all_θ M r θ ρ a ν h_θ))
     rw [h_prod]
     ring
 
@@ -1580,18 +1747,30 @@ lemma prod_rule_backwards_sum (M r θ : ℝ) (h_ext : Exterior M r θ) (β a μ 
 
   -- 3. Interchange ∂ and Σ in the first term using Phase 2A lemma dCoord_sumIdx.
   rw [dCoord_sumIdx μ (fun ρ r' θ' => g M β ρ r' θ' * Γtot M r' θ' ρ a ν) r θ
-    (by intro i; sorry)  -- Differentiability for r
-    (by intro i; sorry)] -- Differentiability for θ
+    -- Differentiability for r (using DifferentiableAt_r_mul_of_cond)
+    (by
+      intro i
+      apply DifferentiableAt_r_mul_of_cond
+      exact Or.inl (differentiableAt_g_all_r M r θ h_ext β i)
+      exact Or.inl (differentiableAt_Γtot_all_r M r θ h_ext i a ν)
+    )
+    -- Differentiability for θ (using DifferentiableAt_θ_mul_of_cond, passing h_θ)
+    (by
+      intro i
+      apply DifferentiableAt_θ_mul_of_cond
+      exact Or.inl (differentiableAt_g_all_θ M r θ β i)
+      exact Or.inl (differentiableAt_Γtot_all_θ M r θ i a ν h_θ)
+    )]
 
 /-- Helper Lemma: Product Rule Backwards - Direct Variant (matches goal pattern).
     This version uses (r, θ) variables directly instead of (r', θ') to match goal patterns.
     It's just an alias that invokes the original lemma - they're alpha-equivalent.
 -/
-lemma prod_rule_backwards_sum_direct (M r θ : ℝ) (h_ext : Exterior M r θ) (β a μ ν : Idx) :
+lemma prod_rule_backwards_sum_direct (M r θ : ℝ) (h_ext : Exterior M r θ) (h_θ : Real.sin θ ≠ 0) (β a μ ν : Idx) :
   sumIdx (fun ρ => g M β ρ r θ * dCoord μ (fun r θ => Γtot M r θ ρ a ν) r θ)
   = (dCoord μ (fun r θ => sumIdx (fun ρ => g M β ρ r θ * Γtot M r θ ρ a ν)) r θ
    - sumIdx (fun ρ => dCoord μ (fun r θ => g M β ρ r θ) r θ * Γtot M r θ ρ a ν)) :=
-  prod_rule_backwards_sum M r θ h_ext β a μ ν
+  prod_rule_backwards_sum M r θ h_ext h_θ β a μ ν
 
 /-! ## Metric Compatibility (Forward Declaration for Step 8) -/
 
@@ -1619,7 +1798,7 @@ axiom dCoord_g_via_compat_ext_temp (M r θ : ℝ) (h_ext : Exterior M r θ) (x a
     The RHS sum represents -T2, which equals:
     +Σ_λ (Γ_{λar} Γ^λ_{βθ} - Γ_{λaθ} Γ^λ_{βr}) = -(T2_r - T2_θ) = -T2 -/
 lemma Riemann_via_Γ₁
-    (M r θ : ℝ) (h_ext : Exterior M r θ) (β a : Idx) :
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (h_θ : Real.sin θ ≠ 0) (β a : Idx) :
   Riemann M r θ β a Idx.r Idx.θ  -- ✅ CORRECTED: R_{βarθ}
   = dCoord Idx.r (fun r θ => Γ₁ M r θ β a Idx.θ) r θ
   - dCoord Idx.θ (fun r θ => Γ₁ M r θ β a Idx.r) r θ
@@ -1690,8 +1869,8 @@ lemma Riemann_via_Γ₁
           -- Key fixes: (1) ring_nf instead of abel_nf, (2) simp only for Identify (forward direction)
 
           -- 1. Apply Product Rule (Using specialized variant and corrected argument order)
-          rw [prod_rule_backwards_sum_direct M r θ h_ext β Idx.θ Idx.r a]
-          rw [prod_rule_backwards_sum_direct M r θ h_ext β Idx.r Idx.θ a]
+          rw [prod_rule_backwards_sum_direct M r θ h_ext h_θ β Idx.θ Idx.r a]
+          rw [prod_rule_backwards_sum_direct M r θ h_ext h_θ β Idx.r Idx.θ a]
 
           -- 2. Recognize Γ₁ definition
           simp only [Γ₁]
@@ -4154,38 +4333,6 @@ lemma g_differentiable_θ (M r θ : ℝ) (i j : Idx)
   · simp only [DifferentiableAt_θ, g]; exact differentiableAt_const _
   · -- g_φφ: r²sin²θ is differentiable in θ everywhere
     exact differentiableAt_g_φφ_θ M r θ
-
--- ========== Product Condition Localization (Phase 3.2a) ==========
--- Multiplicative analogue of additive Condition Localization from Priority 2
-
-/-- Helper lemma for product differentiability using Condition Localization (r-direction).
-    Proves that if A and B are differentiable (or μ ≠ r), then A*B is differentiable (or μ ≠ r). -/
-lemma DifferentiableAt_r_mul_of_cond (A B : ℝ → ℝ → ℝ) (r θ : ℝ) (μ : Idx)
-    (hA : DifferentiableAt_r A r θ ∨ μ ≠ Idx.r)
-    (hB : DifferentiableAt_r B r θ ∨ μ ≠ Idx.r) :
-    DifferentiableAt_r (fun r θ => A r θ * B r θ) r θ ∨ μ ≠ Idx.r := by
-  by_cases h_coord : μ = Idx.r  -- Condition Localization
-  · left   -- Case 1: μ = Idx.r, prove differentiability
-    have hA_diff := hA.resolve_right (by simp [h_coord])
-    have hB_diff := hB.resolve_right (by simp [h_coord])
-    unfold DifferentiableAt_r at *
-    exact DifferentiableAt.mul hA_diff hB_diff
-  · right  -- Case 2: μ ≠ Idx.r, trivially true
-    exact h_coord
-
-/-- Helper lemma for product differentiability (θ-direction). -/
-lemma DifferentiableAt_θ_mul_of_cond (A B : ℝ → ℝ → ℝ) (r θ : ℝ) (μ : Idx)
-    (hA : DifferentiableAt_θ A r θ ∨ μ ≠ Idx.θ)
-    (hB : DifferentiableAt_θ B r θ ∨ μ ≠ Idx.θ) :
-    DifferentiableAt_θ (fun r θ => A r θ * B r θ) r θ ∨ μ ≠ Idx.θ := by
-  by_cases h_coord : μ = Idx.θ  -- Condition Localization
-  · left   -- Case 1: μ = Idx.θ, prove differentiability
-    have hA_diff := hA.resolve_right (by simp [h_coord])
-    have hB_diff := hB.resolve_right (by simp [h_coord])
-    unfold DifferentiableAt_θ at *
-    exact DifferentiableAt.mul hA_diff hB_diff
-  · right  -- Case 2: μ ≠ Idx.θ, trivially true
-    exact h_coord
 
 -- ========== C2 Smoothness: ContractionC Differentiability ==========
 -- NOW PROVEN using manual 4-term expansion (Professor's guidance)
