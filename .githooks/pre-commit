@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
+# =================================================================
+# Pre-commit Hook for FoundationRelativity (Post-Phase 2B)
+# Phases 2A, 2B, 3 complete - Now working on Phases 4-6
+# Updated: October 18, 2025
+# =================================================================
 set -euo pipefail
 
-# Guard: keep sumIdx_expand local-only (never global [simp])
+#-----------------------------------------------------------------
+# GUARD 1: Keep sumIdx_expand local-only (never global [simp])
+#-----------------------------------------------------------------
 # Ignore commented additions (+ -- or + /-) and only flag *global* 'attribute [simp]' (not 'local attribute')
 if git diff --cached -U0 \
   | grep -E '^\+' \
@@ -11,87 +18,45 @@ if git diff --cached -U0 \
   exit 1
 fi
 
-# Guard: don't enable RHS sections unless gInv is defined in the staged Riemann.lean
-if git diff --cached -U0 -- Papers/P5_GeneralRelativity/GR/Riemann.lean \
-  | grep -E '^\+\s*section\s+Stage1_RHS' >/dev/null; then
-  # Read the staged file contents (not the working tree)
-  if ! git show :Papers/P5_GeneralRelativity/GR/Riemann.lean | grep -E '^\s*def\s+gInv\s*\(' >/dev/null; then
-    echo "❌ Refusing commit: RHS sections require 'def gInv' to be enabled first." >&2
-    exit 1
-  fi
-fi
-
-# Guard: LHS sections require a non-baseline ACTIVATION_STATUS
-if git diff --cached -U0 -- Papers/P5_GeneralRelativity/GR/Riemann.lean \
-  | grep -E '^\+\s*section\s+Stage1_LHS' >/dev/null; then
-  MODE="$(git show :Papers/P5_GeneralRelativity/GR/Riemann.lean | \
-          sed -n 's/^-- ACTIVATION_STATUS:\s*\(.*\)$/\1/p' | head -1)"
-  if [ -z "${MODE:-}" ] || [ "$MODE" = "baseline" ]; then
-    echo "❌ Refusing commit: LHS Stage-1 sections are uncommented but ACTIVATION_STATUS is 'baseline'." >&2
-    exit 1
-  fi
-  # Optional: tighten coupling for first/both modes
-  if [ "$MODE" = "stage1-lhs-first" ]; then
-    if git diff --cached -U0 -- Papers/P5_GeneralRelativity/GR/Riemann.lean \
-      | grep -E '^\+\s*section\s+Stage1_LHS_.*_second' >/dev/null; then
-      echo "❌ Refusing commit: second-family LHS sections present but mode is 'stage1-lhs-first'." >&2
-      exit 1
-    fi
-  fi
-fi
-
+#-----------------------------------------------------------------
+# GUARD 2: Build Verification (CRITICAL)
+#-----------------------------------------------------------------
 # Only run for GR changes to keep commits snappy
 if git diff --cached --name-only | grep -qE '^Papers/P5_GeneralRelativity/GR/'; then
-  echo "▶ Running Riemann quality gates…"
+  echo "▶ Building Riemann.lean (incremental)..."
 
-  # Mode from STAGED file (robust trim, CR-safe)
-  MODE="$(
-    git show :Papers/P5_GeneralRelativity/GR/Riemann.lean 2>/dev/null \
-    | sed -n 's/^[[:space:]]*--[[:space:]]*ACTIVATION_STATUS:[[:space:]]*\(.*\)$/\1/p' \
-    | head -1 | tr -d '\r' | xargs
-  )"
+  # Run baseline check (0 errors required)
+  ./scripts/check-baseline.sh || exit 1
 
-  # Fallback to working tree if not staged (e.g., partial commits)
-  if [ -z "${MODE:-}" ]; then
-    MODE="$(
-      sed -n 's/^[[:space:]]*--[[:space:]]*ACTIVATION_STATUS:[[:space:]]*\(.*\)$/\1/p' \
-      Papers/P5_GeneralRelativity/GR/Riemann.lean | head -1 | tr -d '\r' | xargs
-    )"
-  fi
-
-  : "${MODE:=baseline}"
-  echo "  • activation mode (staged/WT): '${MODE}'"
-
-  ./scripts/check.sh "$MODE"
+  # Show sorry/axiom progress
+  echo "▶ Analyzing progress..."
+  ./scripts/check-progress.sh
 fi
 
-# If Markdown changed, audit docs links
+#-----------------------------------------------------------------
+# GUARD 3: Documentation Integrity
+#-----------------------------------------------------------------
 if git diff --cached --name-only | grep -qE '\.md$'; then
+  # Check for dependencies (Python scripts need certain packages)
   ./scripts/check-deps.sh >/dev/null 2>&1 || {
     echo "❌ Missing dependencies. Run ./scripts/check-deps.sh for details." >&2
     exit 1
   }
-  echo "▶ Auditing documentation links…"
+
+  echo "▶ Auditing documentation links..."
   ./scripts/audit-doc-links.sh || {
     echo "❌ Docs link audit failed. Fix broken links or update references." >&2
     exit 1
   }
-  echo "▶ Auditing documentation anchors…"
+
+  echo "▶ Auditing documentation anchors..."
   ./scripts/audit-doc-anchors.sh || {
     echo "❌ Docs anchor audit failed. Fix headings or fragments." >&2
     exit 1
   }
 fi
 
-# If Riemann.lean changed, audit signatures
-if git diff --cached --name-only | grep -q "Papers/P5_GeneralRelativity/GR/Riemann.lean"; then
-  ./scripts/check-deps.sh >/dev/null 2>&1 || {
-    echo "❌ Missing dependencies. Run ./scripts/check-deps.sh for details." >&2
-    exit 1
-  }
-  echo "▶ Auditing Riemann signatures…"
-  ./scripts/audit-riemann-signatures.sh || {
-    echo "❌ Riemann signatures audit failed. Check Stage-1 invariants." >&2
-    exit 1
-  }
-fi
+#-----------------------------------------------------------------
+# SUCCESS
+#-----------------------------------------------------------------
+echo "✅ All checks passed!"
