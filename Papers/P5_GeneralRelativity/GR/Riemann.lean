@@ -1730,8 +1730,8 @@ lemma Riemann_via_Γ₁
           -- 8. Final Assembly
           ring_nf
 
-          -- Remaining: Check goal state
-          sorry
+          -- Try to close the goal with increasingly powerful tactics
+          sorry  -- TODO: Find the right tactic sequence
 
 /-! ## Small structural simp lemmas -/
 
