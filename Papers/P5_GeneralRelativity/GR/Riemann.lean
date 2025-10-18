@@ -1583,6 +1583,27 @@ lemma prod_rule_backwards_sum (M r θ : ℝ) (h_ext : Exterior M r θ) (β a μ 
     (by intro i; sorry)  -- Differentiability for r
     (by intro i; sorry)] -- Differentiability for θ
 
+/-- Helper Lemma: Product Rule Backwards - Direct Variant (matches goal pattern).
+    This version uses (r, θ) variables directly instead of (r', θ') to match goal patterns.
+    It's just an alias that invokes the original lemma - they're alpha-equivalent.
+-/
+lemma prod_rule_backwards_sum_direct (M r θ : ℝ) (h_ext : Exterior M r θ) (β a μ ν : Idx) :
+  sumIdx (fun ρ => g M β ρ r θ * dCoord μ (fun r θ => Γtot M r θ ρ a ν) r θ)
+  = (dCoord μ (fun r θ => sumIdx (fun ρ => g M β ρ r θ * Γtot M r θ ρ a ν)) r θ
+   - sumIdx (fun ρ => dCoord μ (fun r θ => g M β ρ r θ) r θ * Γtot M r θ ρ a ν)) :=
+  prod_rule_backwards_sum M r θ h_ext β a μ ν
+
+/-! ## Metric Compatibility (Forward Declaration for Step 8) -/
+
+/-- TEMPORARY: Forward declaration of metric compatibility for Step 8 testing.
+    The actual proof is at line 2221. This axiom allows testing Step 8 roadmap.
+    TODO: Reorganize file to move dCoord_g_via_compat_ext earlier or restructure proof.
+-/
+axiom dCoord_g_via_compat_ext_temp (M r θ : ℝ) (h_ext : Exterior M r θ) (x a b : Idx) :
+  dCoord x (fun r θ => g M a b r θ) r θ =
+    sumIdx (fun k => Γtot M r θ k x a * g M k b r θ) +
+    sumIdx (fun k => Γtot M r θ k x b * g M a k r θ)
+
 /-! ## Main Riemann Identity via Γ₁ -/
 
 /-- Core identity: Riemann tensor (fully covariant) expressed via Γ₁.
@@ -1656,25 +1677,60 @@ lemma Riemann_via_Γ₁
       abel
 
     -- Step 8: The Algebraic Miracle (M - D = -T2)
-    -- After Steps 4-7, we have: ∂Γ terms + M terms (separated and swapped)
-    -- Now: (1) Apply product rule backwards to recognize Γ₁
-    --      (2) Apply the 4 proven auxiliary lemmas
+    -- Following SP's complete roadmap (Oct 18, 2025)
+    -- Critical insights: (1) Use erw for alpha-equivalence, (2) Apply metric compatibility,
+    --                    (3) Reverse sum order before Cancel lemmas
     _  = dCoord Idx.r (fun r θ => Γ₁ M r θ β a Idx.θ) r θ
       - dCoord Idx.θ (fun r θ => Γ₁ M r θ β a Idx.r) r θ
       + sumIdx (fun lam =>
           Γ₁ M r θ lam a Idx.r * Γtot M r θ lam β Idx.θ
         - Γ₁ M r θ lam a Idx.θ * Γtot M r θ lam β Idx.r)
         := by
-          -- Mathematical strategy (all components proven):
-          -- 1. Apply prod_rule_backwards_sum to ∂Γ terms: Σ g(∂Γ) = ∂(Σ gΓ) - Σ (∂g)Γ
-          -- 2. Recognize Γ₁ = Σρ g_{βρ} Γ^ρ_{aν} in the ∂(...) terms
-          -- 3. The M terms (quadratic Christoffel) cancel with D2 terms from ∂g (via Cancel lemmas)
-          -- 4. The remaining D1 terms equal -T2 (via Identify lemmas)
-          -- 5. Result: ∂Γ₁ - ∂Γ₁ - T2
-          --
-          -- Tactical blocker: Pattern matching for prod_rule_backwards_sum with variable names
-          -- The lemma uses (r', θ') but goal has (r, θ), requiring conv navigation
-          -- All mathematical content is verified in auxiliary lemmas (lines 1450-1550)
+          -- SP's Complete Revised Roadmap (Oct 18, 2025)
+          -- Key fixes: (1) ring_nf instead of abel_nf, (2) simp only for Identify (forward direction)
+
+          -- 1. Apply Product Rule (Using specialized variant and corrected argument order)
+          rw [prod_rule_backwards_sum_direct M r θ h_ext β Idx.θ Idx.r a]
+          rw [prod_rule_backwards_sum_direct M r θ h_ext β Idx.r Idx.θ a]
+
+          -- 2. Recognize Γ₁ definition
+          simp only [Γ₁]
+
+          -- 3. Rearrange terms (Keep abel_nf - it works here)
+          abel_nf
+
+          -- 4. Apply Metric Compatibility (Using temporary axiom)
+          simp_rw [dCoord_g_via_compat_ext_temp M r θ h_ext]
+
+          -- 5. Expand algebraic structure (Keep abel_nf - swap needs this structure)
+          simp_rw [add_mul]
+          simp_rw [sumIdx_add_distrib]
+          abel_nf
+
+          -- 6. Fix summation order (Swap M terms back for Cancel lemmas)
+          simp_rw [← sumIdx_mul_sumIdx_swap]
+
+          -- 7. Apply Auxiliary Lemmas (The Algebraic Miracle)
+
+          -- 7a. Apply Cancellation (M=D2)
+          rw [Riemann_via_Γ₁_Cancel_r M r θ β a]
+          rw [Riemann_via_Γ₁_Cancel_θ M r θ β a]
+
+          -- 7b. Normalize (Revised: Use ring_nf)
+          ring_nf
+          -- Conceptual State: (∂Γ₁_r - ∂Γ₁_θ) + (D1_θ - D1_r). Cleanly normalized.
+
+          -- 7c. Apply Identification (D1=T2) (Revised: Use simp only, forward direction)
+          simp only [
+            Riemann_via_Γ₁_Identify_r M r θ β a,
+            Riemann_via_Γ₁_Identify_θ M r θ β a
+          ]
+          -- Conceptual State: (∂Γ₁_r - ∂Γ₁_θ) + (T2_θ - T2_r)
+
+          -- 8. Final Assembly
+          ring_nf
+
+          -- Remaining: Check goal state
           sorry
 
 /-! ## Small structural simp lemmas -/
