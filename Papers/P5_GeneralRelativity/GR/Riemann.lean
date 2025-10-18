@@ -1727,11 +1727,61 @@ lemma Riemann_via_Γ₁
           ]
           -- Conceptual State: (∂Γ₁_r - ∂Γ₁_θ) + (T2_θ - T2_r)
 
-          -- 8. Final Assembly
+          -- 8. Final Assembly (Revised and Complete - SP's guidance, Oct 18, 2025)
+
+          -- Initial normalization (from Step 7c)
+          ring_nf
+          simp only [neg_smul, one_smul]
+
+          -- Apply Γtot symmetry
+          simp_rw [Γtot_symm]
+
+          -- CRITICAL: Normalize again AFTER symmetry to cancel the M-term remnants
+          -- Use abel_nf for aggressive cancellation in deeply nested additive structure
+          abel_nf
+          try ring_nf  -- Polish if needed
+
+          -- The LHS should now be clean: (∂Γ₁_r - ∂Γ₁_θ) + (T2_A - T2_B)
+
+          -- Strategy A: Structural Rewrite (Direct combination of sums)
+          try {
+            -- Normalize subtraction representation (e.g., A + -B -> A - B)
+            simp only [add_neg_eq_sub, sub_eq_add_neg]
+
+            -- Combine the T2 sums: sumIdx A - sumIdx B -> sumIdx (A - B)
+            rw [← sumIdx_map_sub]
+
+            -- Final normalization to match associativity exactly
+            ring_nf
+          }
+
+          -- Strategy B: Robust Closure (The Nuclear Option)
+          -- If Strategy A fails due to subtle syntactic variance or definition folding artifacts
+          try {
+            -- Match the structure outside the sums (the ∂Γ₁ terms)
+            congr 1
+
+            -- Goal is now: sumIdx F = sumIdx G
+            -- Use sumIdx_congr for robust proof of summation equality
+            apply sumIdx_congr
+
+            -- Goal is now: ∀ lam, F lam = G lam
+            -- Handles alpha-equivalence (lam vs i) and definitional equality (Γ₁ folding)
+            intro lam
+            -- Prove component-wise algebraic equality
+            ring
+          }
+
+          -- Final cleanup: Unfold Γ₁ on LHS to match RHS structure
+          simp only [Γ₁]
+
+          -- One more normalization after unfolding
           ring_nf
 
-          -- Try to close the goal with increasingly powerful tactics
-          sorry  -- TODO: Find the right tactic sequence
+          -- Attempt 2: Unfold sumIdx to Finset.sum, use Finset lemmas
+          simp only [sumIdx]
+          simp only [← Finset.smul_sum]
+          abel
 
 /-! ## Small structural simp lemmas -/
 
