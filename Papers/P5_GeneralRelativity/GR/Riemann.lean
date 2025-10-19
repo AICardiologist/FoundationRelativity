@@ -411,17 +411,19 @@ Provided by JP/SP memo Oct 16, 2025.
 lemma differentiableAt_slice_r {F : ℝ → ℝ → ℝ} {r θ : ℝ}
     (h_prod : DifferentiableAt ℝ (fun p : ℝ × ℝ => F p.1 p.2) (r, θ)) :
     DifferentiableAt ℝ (fun r' => F r' θ) r := by
-  -- TODO: The JP/SP pattern uses h_prod.comp but requires correct type alignment
-  -- This is straightforward mathlib infrastructure but needs exact lemma application
-  sorry
+  -- (r', θ) is differentiable at r, then compose
+  have h_pair : DifferentiableAt ℝ (fun s => (s, θ)) r :=
+    (differentiableAt_id r).prodMk (differentiableAt_const θ)
+  exact h_prod.comp r h_pair
 
 /-- Convert product-form differentiability to θ-slice differentiability.
     Uses chain rule: F ∘ G where G(θ') = (r, θ'). -/
 lemma differentiableAt_slice_θ {F : ℝ → ℝ → ℝ} {r θ : ℝ}
     (h_prod : DifferentiableAt ℝ (fun p : ℝ × ℝ => F p.1 p.2) (r, θ)) :
     DifferentiableAt ℝ (fun θ' => F r θ') θ := by
-  -- TODO: Similar to differentiableAt_slice_r
-  sorry
+  have h_pair : DifferentiableAt ℝ (fun t => (r, t)) θ :=
+    (differentiableAt_const r).prodMk (differentiableAt_id θ)
+  exact h_prod.comp θ h_pair
 
 /-! ### Metric Component Differentiability -/
 
@@ -1513,6 +1515,112 @@ lemma sumIdx_congr {f g : Idx → ℝ} (h : ∀ i, f i = g i) :
   congr 1
   ext i
   exact h i
+
+/-! ## JP's Collection Helpers for Step 2 (Oct 18, 2025)
+
+These lemmas provide deterministic collection and splitting of multiple sums,
+designed specifically to handle the Step 2 transformation in regroup_right_sum_to_RiemannUp.
+-/
+
+/-- JP's helper: Combine four sums in one step.
+    Foundational building block for sumIdx_collect8. -/
+lemma sumIdx_collect4 (f₁ f₂ f₃ f₄ : Idx → ℝ) :
+  (sumIdx f₁ - sumIdx f₂) + (sumIdx f₃ - sumIdx f₄)
+  = sumIdx (fun k => f₁ k - f₂ k + f₃ k - f₄ k) := by
+  rw [← sumIdx_map_sub, ← sumIdx_map_sub]
+  rw [← sumIdx_add_distrib]
+  apply sumIdx_congr
+  intro k
+  ring
+
+/-- JP: collector matching the unbalanced Step‑2 shape. -/
+lemma sumIdx_collect8_unbalanced
+    (f₁ f₂ f₃ f₄ f₅ f₆ f₇ f₈ : Idx → ℝ) :
+  ( ((sumIdx f₁ - sumIdx f₂) + sumIdx f₃) - sumIdx f₄ )
++ ( ((sumIdx f₅ - sumIdx f₆) - sumIdx f₈) + sumIdx f₇ )
+  =
+  sumIdx (fun k =>
+    (f₁ k - f₂ k + f₃ k - f₄ k)
+  + (f₅ k - f₆ k + f₇ k - f₈ k)) := by
+  -- Turn the unbalanced LHS into the balanced one and reuse sumIdx_collect4.
+  have h_balanced :
+    ((sumIdx f₁ - sumIdx f₂) + (sumIdx f₃ - sumIdx f₄))
+  + ((sumIdx f₅ - sumIdx f₆) + (sumIdx f₇ - sumIdx f₈))
+    = sumIdx (fun k =>
+        (f₁ k - f₂ k + f₃ k - f₄ k)
+      + (f₅ k - f₆ k + f₇ k - f₈ k)) := by
+    rw [sumIdx_collect4, sumIdx_collect4, ← sumIdx_add_distrib]
+  -- Reshape unbalanced to balanced
+  have h_reshape :
+    ( ((sumIdx f₁ - sumIdx f₂) + sumIdx f₃) - sumIdx f₄ )
+  + ( ((sumIdx f₅ - sumIdx f₆) - sumIdx f₈) + sumIdx f₇ )
+    =
+    ((sumIdx f₁ - sumIdx f₂) + (sumIdx f₃ - sumIdx f₄))
+  + ((sumIdx f₅ - sumIdx f₆) + (sumIdx f₇ - sumIdx f₈)) := by ring
+  rw [h_reshape, h_balanced]
+
+/-- Split a *single* `sumIdx` core of four terms back into ((sumIdx f₁ - sumIdx f₂) + sumIdx f₃) - sumIdx f₄. -/
+lemma sumIdx_split_core4 (f₁ f₂ f₃ f₄ : Idx → ℝ) :
+  sumIdx (fun k => f₁ k - f₂ k + f₃ k - f₄ k)
+  = ((sumIdx f₁ - sumIdx f₂) + sumIdx f₃) - sumIdx f₄ := by
+  classical
+  -- reshape pointwise: (f₁ - f₂ + f₃ - f₄) = (f₁ - f₂) + (f₃ - f₄)
+  have hfun :
+    (fun k => f₁ k - f₂ k + f₃ k - f₄ k)
+      = (fun k => (f₁ k - f₂ k) + (f₃ k - f₄ k)) := by
+    funext k; ring
+  -- sum(A + B) = sum A + sum B
+  have hsum :
+    sumIdx (fun k => (f₁ k - f₂ k) + (f₃ k - f₄ k))
+    = sumIdx (fun k => f₁ k - f₂ k) + sumIdx (fun k => f₃ k - f₄ k) := by
+    exact sumIdx_add_distrib (fun k => f₁ k - f₂ k) (fun k => f₃ k - f₄ k)
+  -- sum(fi - fj) = sum fi - sum fj
+  have h12 : sumIdx (fun k => f₁ k - f₂ k) = sumIdx f₁ - sumIdx f₂ := by
+    exact sumIdx_map_sub f₁ f₂
+  have h34 : sumIdx (fun k => f₃ k - f₄ k) = sumIdx f₃ - sumIdx f₄ := by
+    exact sumIdx_map_sub f₃ f₄
+  -- assemble
+  rw [hfun, hsum, h12, h34]
+  ring
+
+/-- Mixed collector: first block already in one sumIdx (core4), second block unbalanced.
+    Use this when after_cancel has already collapsed the first four terms. -/
+lemma sumIdx_collect8_mixed_left
+    (f₁ f₂ f₃ f₄ f₅ f₆ f₇ f₈ : Idx → ℝ) :
+  ( sumIdx (fun k => f₁ k - f₂ k + f₃ k - f₄ k) )
+  + ( ((sumIdx f₅ - sumIdx f₆) - sumIdx f₈) + sumIdx f₇ )
+  =
+  sumIdx (fun k =>
+    (f₁ k - f₂ k + f₃ k - f₄ k)
+  + (f₅ k - f₆ k + f₇ k - f₈ k)) := by
+  -- Re-express the collected first block back to the 4-sum shape,
+  -- then reuse the unbalanced collector.
+  have :
+    ( sumIdx (fun k => f₁ k - f₂ k + f₃ k - f₄ k) )
+  = ((sumIdx f₁ - sumIdx f₂) + sumIdx f₃) - sumIdx f₄ := by
+    exact sumIdx_split_core4 f₁ f₂ f₃ f₄
+  -- Now it matches the LHS of `sumIdx_collect8_unbalanced`.
+  simpa [this] using
+    (sumIdx_collect8_unbalanced f₁ f₂ f₃ f₄ f₅ f₆ f₇ f₈)
+
+/-- Mixed collector: first block unbalanced, second block already in one sumIdx (core4).
+    Mirror variant of sumIdx_collect8_mixed_left. -/
+lemma sumIdx_collect8_mixed_right
+    (f₁ f₂ f₃ f₄ f₅ f₆ f₇ f₈ : Idx → ℝ) :
+  ( ((sumIdx f₁ - sumIdx f₂) + sumIdx f₃) - sumIdx f₄ )
+  + ( sumIdx (fun k => f₅ k - f₆ k + f₇ k - f₈ k) )
+  =
+  sumIdx (fun k =>
+    (f₁ k - f₂ k + f₃ k - f₄ k)
+  + (f₅ k - f₆ k + f₇ k - f₈ k)) := by
+  -- Push the second block to the 4-sum outer shape, then reuse the unbalanced collector.
+  have :
+    ( sumIdx (fun k => f₅ k - f₆ k + f₇ k - f₈ k) )
+  = ((sumIdx f₅ - sumIdx f₆) + sumIdx f₇) - sumIdx f₈ := by
+    exact sumIdx_split_core4 f₅ f₆ f₇ f₈
+  -- Now it matches the LHS of `sumIdx_collect8_unbalanced`.
+  simpa [this] using
+    (sumIdx_collect8_unbalanced f₁ f₂ f₃ f₄ f₅ f₆ f₇ f₈)
 
 /-! ## Standardized Distribution Lemmas
 
