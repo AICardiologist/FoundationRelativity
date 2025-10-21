@@ -4323,17 +4323,36 @@ lemma pack_left_RiemannUp_core
     - sumIdx (fun lam => Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a) )
   =
   RiemannUp M r θ k a Idx.r Idx.θ * g M k b r θ := by
-  -- no algebraic search needed; unfold and use AC-reflexivity
-  unfold RiemannUp
-  -- turns both sides into the same AC-normal form
-  ring
+  classical
+  -- Abbreviate the four bodies so `ring` treats them as scalars.
+  set X :=
+    dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ
+  set Y :=
+    dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ
+  set U :=
+    sumIdx (fun lam => Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a)
+  set V :=
+    sumIdx (fun lam => Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a)
+
+  -- Goal is `g*(X - Y + U - V) = (X - Y + U - V)*g`.
+  -- Put g on the right using your stable folds, then commute by `ring`.
+  calc
+    g M k b r θ * (X - Y + U - V)
+        = ((X - Y) * g M k b r θ) + ((U - V) * g M k b r θ) := by ring
+    _   = (X * g M k b r θ - Y * g M k b r θ)
+          + (U * g M k b r θ - V * g M k b r θ) := by ring
+    _   = (X - Y + U - V) * g M k b r θ := by ring
+    _   = RiemannUp M r θ k a Idx.r Idx.θ * g M k b r θ := by
+            -- expand the shorthand back, RiemannUp is exactly X - Y + U - V
+            simp only [RiemannUp, X, Y, U, V]
 
 /-- Sum-level regrouping for the **right slot** (CORRECTED):
-    S_Right = g_{bb}·R^b_{a r θ} + (ExtraRight_r − ExtraRight_θ).
-    The extra terms come from the second branch of metric compatibility. -/
-/-- Sum-level regrouping for the **right slot** (formerly false, now CORRECTED):
-    Correctly implements the metric-compatibility expansion by including the
-    unavoidable extra terms from the second branch (Γ^λ_{μb} g_{kλ}).
+
+    `S_right = g_{bb} · R^b_{a r θ} + (ExtraRight_r − ExtraRight_θ)`.
+
+    The extra terms come from the second branch of metric compatibility
+    (`Γ^λ_{μ b} · g_{k λ}`). This version correctly includes those terms,
+    so the regrouping matches the expanded `Cancel_right_*_expanded` lemmas.
 
     The CORRECTED statement adds (ExtraRight_r - ExtraRight_θ) to the RHS,
     where ExtraRight_r = Σ_λ Γ^λ_{r b} · Γ_{λ a θ} (and similarly for θ).
@@ -4349,118 +4368,100 @@ lemma regroup_right_sum_to_RiemannUp
   g M b b r θ * RiemannUp M r θ b a Idx.r Idx.θ
   + (ExtraRight_r M r θ a b - ExtraRight_θ M r θ a b) := by
   classical
-  -- Step 1 (SΓ): Expand ∂g using metric compatibility (both branches)
-  have SΓ :
-    sumIdx (fun k =>
-        dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ * g M k b r θ
-      - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ * g M k b r θ
-      + Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ
-      - Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ)
-    =
-    sumIdx (fun k =>
-        dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ * g M k b r θ
-      - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ * g M k b r θ)
-    + sumIdx (fun k =>
-        g M k b r θ *
-          sumIdx (fun lam => Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a))
-    - sumIdx (fun k =>
-        g M k b r θ *
-          sumIdx (fun lam => Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))
-    + ExtraRight_r M r θ a b
-    - ExtraRight_θ M r θ a b := by
-    rw [Cancel_right_r_expanded M r θ h_ext a b,
-        Cancel_right_θ_expanded M r θ h_ext a b]
-    ring
+  -- Names for the four per-k addends (purely for readability)
+  set A := fun k => dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ * g M k b r θ
+  set B := fun k => dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ * g M k b r θ
+  set C := fun k => Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ
+  set D := fun k => Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ
 
-  -- Step 2 (Sg): Contract the metric to get g_{bb}
-  have Sg :
-    sumIdx (fun k =>
-        dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ * g M k b r θ
-      - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ * g M k b r θ)
-    + sumIdx (fun k =>
-        g M k b r θ *
-          sumIdx (fun lam => Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a))
-    - sumIdx (fun k =>
-        g M k b r θ *
-          sumIdx (fun lam => Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))
-    =
-    g M b b r θ *
-      ( dCoord Idx.r (fun r θ => Γtot M r θ b Idx.θ a) r θ
-      - dCoord Idx.θ (fun r θ => Γtot M r θ b Idx.r a) r θ
-      + sumIdx (fun lam => Γtot M r θ b Idx.r lam * Γtot M r θ lam Idx.θ a)
-      - sumIdx (fun lam => Γtot M r θ b Idx.θ lam * Γtot M r θ lam Idx.r a)) := by
-    classical
-    -- Contract each of the three sums with g_{kb} using sumIdx_mul_g_right
-    have H1 :
-      sumIdx (fun k =>
-        dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ * g M k b r θ
-      - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ * g M k b r θ)
-      =
-      g M b b r θ *
-        ( dCoord Idx.r (fun r θ => Γtot M r θ b Idx.θ a) r θ
-        - dCoord Idx.θ (fun r θ => Γtot M r θ b Idx.r a) r θ) := by
-      simp only [sumIdx_sub]
-      rw [sumIdx_mul_g_right, sumIdx_mul_g_right]
-      ring
-    have H2 :
-      sumIdx (fun k =>
-        g M k b r θ *
-          sumIdx (fun lam => Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a))
-      =
-      g M b b r θ *
-        sumIdx (fun lam => Γtot M r θ b Idx.r lam * Γtot M r θ lam Idx.θ a) := by
-      rw [sumIdx_mul_g_left]; ring
-    have H3 :
-      sumIdx (fun k =>
-        g M k b r θ *
-          sumIdx (fun lam => Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))
-      =
-      g M b b r θ *
-        sumIdx (fun lam => Γtot M r θ b Idx.θ lam * Γtot M r θ lam Idx.r a) := by
-      rw [sumIdx_mul_g_left]; ring
-    rw [H1, H2, H3]
-    ring
+  -- 1) Split Σ(A - B + C - D) into ((ΣA - ΣB) + ΣC) - ΣD
+  have hsplit :
+    sumIdx (fun k => A k - B k + C k - D k)
+    = ((sumIdx A - sumIdx B) + sumIdx C) - sumIdx D := by
+      have := sumIdx_split_core4 A B C D
+      simp only [A, B, C, D] at this ⊢
+      exact this
 
-  -- Step 3 (E3): Fold RiemannBody into RiemannUp using helper lemma
-  have E3 :
-    g M b b r θ *
-      ( dCoord Idx.r (fun r θ => Γtot M r θ b Idx.θ a) r θ
-      - dCoord Idx.θ (fun r θ => Γtot M r θ b Idx.r a) r θ
-      + sumIdx (fun lam => Γtot M r θ b Idx.r lam * Γtot M r θ lam Idx.θ a)
-      - sumIdx (fun lam => Γtot M r θ b Idx.θ lam * Γtot M r θ lam Idx.r a))
-    =
-    g M b b r θ * RiemannUp M r θ b a Idx.r Idx.θ := by
-    rw [g_times_RiemannBody_comm]
-    ring
+  -- 2) Apply the cancel lemmas to ΣC and ΣD
+  have Hr :
+    sumIdx (fun k => Γtot M r θ k Idx.θ a *
+                      dCoord Idx.r (fun r θ => g M k b r θ) r θ)
+      =
+    sumIdx (fun ρ =>
+      g M ρ b r θ *
+        sumIdx (fun lam => Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ a))
+    + ExtraRight_r M r θ a b :=
+    Cancel_right_r_expanded M r θ h_ext a b
 
-  -- Chain all steps together
-  calc sumIdx (fun k =>
-        dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ * g M k b r θ
-      - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ * g M k b r θ
-      + Γtot M r θ k Idx.θ a * dCoord Idx.r (fun r θ => g M k b r θ) r θ
-      - Γtot M r θ k Idx.r a * dCoord Idx.θ (fun r θ => g M k b r θ) r θ)
-    _ = sumIdx (fun k =>
-          dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ * g M k b r θ
-        - dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ * g M k b r θ)
-      + sumIdx (fun k =>
-          g M k b r θ *
-            sumIdx (fun lam => Γtot M r θ k Idx.r lam * Γtot M r θ lam Idx.θ a))
-      - sumIdx (fun k =>
-          g M k b r θ *
-            sumIdx (fun lam => Γtot M r θ k Idx.θ lam * Γtot M r θ lam Idx.r a))
-      + ExtraRight_r M r θ a b
-      - ExtraRight_θ M r θ a b := SΓ
-    _ = g M b b r θ *
-          ( dCoord Idx.r (fun r θ => Γtot M r θ b Idx.θ a) r θ
-          - dCoord Idx.θ (fun r θ => Γtot M r θ b Idx.r a) r θ
-          + sumIdx (fun lam => Γtot M r θ b Idx.r lam * Γtot M r θ lam Idx.θ a)
-          - sumIdx (fun lam => Γtot M r θ b Idx.θ lam * Γtot M r θ lam Idx.r a))
-      + ExtraRight_r M r θ a b
-      - ExtraRight_θ M r θ a b := by rw [Sg]
-    _ = g M b b r θ * RiemannUp M r θ b a Idx.r Idx.θ
-      + (ExtraRight_r M r θ a b - ExtraRight_θ M r θ a b) := by
-        rw [E3]
-        ring
+  have Hθ :
+    sumIdx (fun k => Γtot M r θ k Idx.r a *
+                      dCoord Idx.θ (fun r θ => g M k b r θ) r θ)
+      =
+    sumIdx (fun ρ =>
+      g M ρ b r θ *
+        sumIdx (fun lam => Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r a))
+    + ExtraRight_θ M r θ a b :=
+    Cancel_right_θ_expanded M r θ h_ext a b
+
+  -- 3) Commute g in the first two sums (ΣA, ΣB) so they match the ρ-shaped sums
+  have hA :
+    sumIdx (fun k => A k)
+      = sumIdx (fun ρ =>
+          g M ρ b r θ *
+          dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ a) r θ) := by
+    apply sumIdx_congr; intro ρ; simp only [A, mul_comm, mul_left_comm, mul_assoc]
+
+  have hB :
+    sumIdx (fun k => B k)
+      = sumIdx (fun ρ =>
+          g M ρ b r θ *
+          dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r a) r θ) := by
+    apply sumIdx_congr; intro ρ; simp only [B, mul_comm, mul_left_comm, mul_assoc]
+
+  -- 4) Assemble: collect the four ρ-sums into one Σρ g_{ρb}·(…RiemannUp-body…)
+  --    and then collapse the diagonal metric sum to g_{bb}·(ρ=b term)
+  calc
+    sumIdx (fun k => A k - B k + C k - D k)
+        = ((sumIdx A - sumIdx B) + sumIdx C) - sumIdx D := hsplit
+    _   = ((sumIdx (fun ρ => g M ρ b r θ *
+                      dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ a) r θ))
+           - (sumIdx (fun ρ => g M ρ b r θ *
+                      dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r a) r θ)))
+          + (sumIdx (fun ρ =>
+                g M ρ b r θ *
+                  sumIdx (fun lam =>
+                    Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ a))
+              + ExtraRight_r M r θ a b)
+          - (sumIdx (fun ρ =>
+                g M ρ b r θ *
+                  sumIdx (fun lam =>
+                    Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r a))
+              + ExtraRight_θ M r θ a b) := by
+            simp only [hA, hB, Hr, Hθ, C, D]
+    _   =
+          -- group the ρ-sums (four of them) into one Σρ g_{ρb} * (RiemannUp-body ρ)
+          (sumIdx (fun ρ =>
+              g M ρ b r θ *
+                ( dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ a) r θ
+                - dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r a) r θ
+                + sumIdx (fun lam => Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ a)
+                - sumIdx (fun lam => Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r a) )))
+          + (ExtraRight_r M r θ a b - ExtraRight_θ M r θ a b) := by
+            rw [sumIdx_map_sub, sumIdx_map_sub, sumIdx_add_distrib]
+            apply sumIdx_congr
+            intro ρ
+            ring
+    _   =
+          -- swap g · (body) to (RiemannUp ρ) · g and then eliminate the ρ-sum by diagonality
+          (sumIdx (fun ρ =>
+              RiemannUp M r θ ρ a Idx.r Idx.θ * g M ρ b r θ))
+          + (ExtraRight_r M r θ a b - ExtraRight_θ M r θ a b) := by
+            apply sumIdx_congr; intro ρ
+            rw [g_times_RiemannBody_comm]
+    _   = g M b b r θ * RiemannUp M r θ b a Idx.r Idx.θ
+          + (ExtraRight_r M r θ a b - ExtraRight_θ M r θ a b) := by
+            -- Diagonal metric collapses the ρ-sum: only ρ = b survives
+            cases b <;> simp only [sumIdx_expand, g]
 
 
 set_option maxHeartbeats 800000 in
