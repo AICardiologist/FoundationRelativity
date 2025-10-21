@@ -1516,6 +1516,32 @@ lemma sumIdx_congr {f g : Idx → ℝ} (h : ∀ i, f i = g i) :
   ext i
   exact h i
 
+/-- Difference of two sums that share the same right factor. -/
+lemma sumIdx_sub_same_right (A B C : Idx → ℝ) :
+  (sumIdx (fun k => A k * C k) - sumIdx (fun k => B k * C k))
+  = sumIdx (fun k => (A k - B k) * C k) := by
+  classical
+  calc
+    sumIdx (fun k => A k * C k) - sumIdx (fun k => B k * C k)
+        = sumIdx (fun k => A k * C k - B k * C k) := by
+            simpa using
+              (sumIdx_map_sub (fun k => A k * C k) (fun k => B k * C k)).symm
+    _   = sumIdx (fun k => (A k - B k) * C k) := by
+            apply sumIdx_congr; intro k; simp [fold_sub_right]
+
+/-- Sum of two sums that share the same left factor. -/
+lemma sumIdx_add_same_left (C X Y : Idx → ℝ) :
+  sumIdx (fun k => C k * X k) + sumIdx (fun k => C k * Y k)
+  = sumIdx (fun k => C k * (X k + Y k)) := by
+  classical
+  calc
+    sumIdx (fun k => C k * X k) + sumIdx (fun k => C k * Y k)
+        = sumIdx (fun k => C k * X k + C k * Y k) := by
+            simpa using
+              (sumIdx_add_distrib (fun k => C k * X k) (fun k => C k * Y k)).symm
+    _   = sumIdx (fun k => C k * (X k + Y k)) := by
+            apply sumIdx_congr; intro k; simp [fold_add_left]
+
 /-! ## JP's Collection Helpers for Step 2 (Oct 18, 2025)
 
 These lemmas provide deterministic collection and splitting of multiple sums,
@@ -1672,6 +1698,25 @@ Basic symmetry properties of the metric and Christoffel symbols.
 lemma g_symm (M r θ : ℝ) (α β : Idx) :
   g M α β r θ = g M β α r θ := by
   cases α <;> cases β <;> simp [g]
+
+/-- Collapse `∑ρ RiemannUp ρ a r θ · g_{ρb}` using diagonality of `g`. -/
+lemma sumIdx_RiemannUp_mul_g_collapse
+  (M r θ : ℝ) (a b : Idx) :
+  sumIdx (fun ρ => RiemannUp M r θ ρ a Idx.r Idx.θ * g M ρ b r θ)
+    = g M b b r θ * RiemannUp M r θ b a Idx.r Idx.θ := by
+  classical
+  -- commute to match the `Riemann` definition and flip g via symmetry
+  have : sumIdx (fun ρ => g M b ρ r θ * RiemannUp M r θ ρ a Idx.r Idx.θ)
+      = Riemann M r θ b a Idx.r Idx.θ := rfl
+  calc
+    sumIdx (fun ρ => RiemannUp M r θ ρ a Idx.r Idx.θ * g M ρ b r θ)
+        = sumIdx (fun ρ => g M b ρ r θ * RiemannUp M r θ ρ a Idx.r Idx.θ) := by
+            apply sumIdx_congr; intro ρ
+            rw [g_symm M r θ ρ b]
+            ring
+    _   = Riemann M r θ b a Idx.r Idx.θ := this
+    _   = g M b b r θ * RiemannUp M r θ b a Idx.r Idx.θ := by
+            simpa using Riemann_contract_first M r θ b a Idx.r Idx.θ
 
 /-- The Christoffel symbols are symmetric in their lower indices (torsion-free).
     Simplified version for early access. -/
@@ -4469,18 +4514,82 @@ lemma regroup_right_sum_to_RiemannUp
                 - sumIdx (fun lam =>
                     Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r a) )))
           + (ExtraRight_r M r θ a b - ExtraRight_θ M r θ a b) := by
+            -- Combine (Σ T1 - Σ T2) into a single ρ-sum, then add to the existing ρ-sum.
+            -- expose T1, T2 and use the "same right factor" lemma
             simp only [T1, T2]
-            rw [sumIdx_map_sub, sumIdx_add_distrib]
-            apply sumIdx_congr
-            intro ρ
+            -- 1) (Σ A*g) - (Σ B*g)  →  Σ ((A-B)*g)
+            have h₁ :
+              (sumIdx (fun k =>
+                  dCoord Idx.r (fun r θ => Γtot M r θ k Idx.θ a) r θ * g M k b r θ)
+              - sumIdx (fun k =>
+                  dCoord Idx.θ (fun r θ => Γtot M r θ k Idx.r a) r θ * g M k b r θ))
+              =
+              sumIdx (fun ρ =>
+                ( dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ a) r θ
+                - dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r a) r θ)
+                * g M ρ b r θ) := by
+              classical
+              simpa using
+                (sumIdx_sub_same_right
+                  (A := fun ρ => dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ a) r θ)
+                  (B := fun ρ => dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r a) r θ)
+                  (C := fun ρ => g M ρ b r θ))
+            -- 2) commute the first integrand so it looks like g * (A-B)
+            have h₂ :
+              sumIdx (fun ρ =>
+                ( dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ a) r θ
+                - dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r a) r θ)
+                * g M ρ b r θ)
+              =
+              sumIdx (fun ρ =>
+                g M ρ b r θ *
+                  ( dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ a) r θ
+                  - dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r a) r θ)) := by
+              classical
+              apply sumIdx_congr; intro ρ; ring
+            -- 3) now add the two ρ–sums with the same left factor g M ρ b r θ
+            have h₃ :
+              sumIdx (fun ρ =>
+                g M ρ b r θ *
+                  ( dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ a) r θ
+                  - dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r a) r θ))
+              +
+              sumIdx (fun ρ =>
+                g M ρ b r θ *
+                  ( sumIdx (fun lam => Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ a)
+                  - sumIdx (fun lam => Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r a)))
+              =
+              sumIdx (fun ρ =>
+                g M ρ b r θ *
+                  ( ( dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ a) r θ
+                    - dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r a) r θ)
+                  + ( sumIdx (fun lam => Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ a)
+                    - sumIdx (fun lam => Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r a)))) := by
+              classical
+              -- use the "same left factor" lemma
+              simpa using
+                (sumIdx_add_same_left
+                  (C := fun ρ => g M ρ b r θ)
+                  (X := fun ρ =>
+                    dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ a) r θ
+                  - dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r a) r θ)
+                  (Y := fun ρ =>
+                    sumIdx (fun lam => Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ a)
+                  - sumIdx (fun lam => Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r a)))
+            -- assemble
+            rw [h₁, h₂, h₃]
             ring
-    _   = (sumIdx (fun ρ =>
-              RiemannUp M r θ ρ a Idx.r Idx.θ * g M ρ b r θ))
+    -- turn g·(body) into RiemannUp·g under the ρ–sum
+    _   = sumIdx (fun ρ =>
+            RiemannUp M r θ ρ a Idx.r Idx.θ * g M ρ b r θ)
           + (ExtraRight_r M r θ a b - ExtraRight_θ M r θ a b) := by
-            rw [hR]
+            classical
+            congr 1
     _   = g M b b r θ * RiemannUp M r θ b a Idx.r Idx.θ
           + (ExtraRight_r M r θ a b - ExtraRight_θ M r θ a b) := by
-            cases b <;> simp only [sumIdx_expand, g, RiemannUp]; ring
+            classical
+            congr 1
+            simpa using sumIdx_RiemannUp_mul_g_collapse M r θ a b
 
 
 set_option maxHeartbeats 800000 in
@@ -5286,7 +5395,7 @@ lemma ricci_identity_on_g_rθ_ext
   have HθR := dCoord_θ_sumIdx_Γr_g_right M r θ a b
 
   -- === Steps 5–7 in one shot (no AC gymnastics):
-  have packR := regroup_right_sum_to_RiemannUp  M r θ h_ext a b
+  have packR := regroup_right_sum_to_RiemannUp  M r θ h_ext h_θ a b
   have packL := regroup_left_sum_to_RiemannUp   M r θ h_ext h_θ a b
 
   -- TODO: Complete closure once helper lemmas are finished
