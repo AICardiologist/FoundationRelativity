@@ -5789,6 +5789,160 @@ lemma ricci_identity_on_g_rθ_ext
   sorry  -- TEMPORARY: Test if recursion fixes allow file to compile
   -- TODO JP: Need interactive Lean to fix "case G" created by refine ?_main
 
+  -- ═══════════════════════════════════════════════════════════════════════════
+  -- Step 6: Apply Two-Branch Collector (JP's Surgical Fix - Oct 22, 2025)
+  -- ═══════════════════════════════════════════════════════════════════════════
+  --
+  -- After Step 5, we have product-rule expanded terms: (∂Γ)·g + Γ·(∂g)
+  -- This step collects them using the two-branch collector, following
+  -- Senior Professor's verified strategy (see memo Oct 22, 2025):
+  --   1. Cancel mixed partials (X - Y = 0)
+  --   2. Collect (∂Γ)·g commutator terms and Γ·(∂g) payload terms
+  --   3. Convert payloads using expanded metric compatibility
+  --   4. Combine to form complete Riemann tensor
+  --
+  -- ═══════════════════════════════════════════════════════════════════════════
+
+  -- Step 6.A: Cancel mixed partials (robust pattern - no shape assumptions)
+  -- Mixed partials should have canceled in Steps 1-5
+  -- Verify with: dCoord Idx.r ∘ dCoord Idx.θ = dCoord Idx.θ ∘ dCoord Idx.r
+  have hmixed : dCoord Idx.r (fun r θ => dCoord Idx.θ (fun r θ => g M a b r θ) r θ) r θ
+              = dCoord Idx.θ (fun r θ => dCoord Idx.r (fun r θ => g M a b r θ) r θ) r θ :=
+    dCoord_commute_for_g_all M r θ a b Idx.r Idx.θ
+  -- If needed, apply: simp [sub_eq_zero.mpr hmixed]
+
+  -- Step 6.B: Define branch terms for the collector
+  let Gᵇ : Idx → ℝ := fun ρ => g M ρ b r θ
+
+  let Aᵣ : Idx → ℝ := fun ρ => dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ a) r θ
+  let Bᵣ : Idx → ℝ := fun ρ => dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r a) r θ
+  let Cᵣ : Idx → ℝ := fun ρ => sumIdx (fun lam => Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ a)
+  let Dᵣ : Idx → ℝ := fun ρ => sumIdx (fun lam => Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r a)
+
+  let Pᵣ : Idx → ℝ := fun ρ =>
+    Γtot M r θ ρ Idx.r a * dCoord Idx.θ (fun r θ => g M ρ b r θ) r θ
+  let Qᵣ : Idx → ℝ := fun ρ =>
+    Γtot M r θ ρ Idx.r b * dCoord Idx.θ (fun r θ => g M a ρ r θ) r θ
+
+  let Aθ : Idx → ℝ := fun ρ => dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r a) r θ
+  let Bθ : Idx → ℝ := fun ρ => dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ a) r θ
+  let Cθ : Idx → ℝ := fun ρ => sumIdx (fun lam => Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r a)
+  let Dθ : Idx → ℝ := fun ρ => sumIdx (fun lam => Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ a)
+
+  let Pθ : Idx → ℝ := fun ρ =>
+    Γtot M r θ ρ Idx.θ a * dCoord Idx.r (fun r θ => g M ρ b r θ) r θ
+  let Qθ : Idx → ℝ := fun ρ =>
+    Γtot M r θ ρ Idx.θ b * dCoord Idx.r (fun r θ => g M a ρ r θ) r θ
+
+  -- Step 6.C: Apply the two-branch collector
+  have h2 := sumIdx_collect_two_branches Gᵇ Aᵣ Bᵣ Cᵣ Dᵣ Pᵣ Qᵣ Aθ Bθ Cθ Dθ Pθ Qθ
+  -- Expand let-bindings in the GOAL (not in h2) so rw matches deterministically
+  simp_rw [Gᵇ, Aᵣ, Bᵣ, Cᵣ, Dᵣ, Pᵣ, Qᵣ, Aθ, Bθ, Cθ, Dθ, Pθ, Qθ]
+  -- Now the goal's LHS should match h2's LHS exactly
+  rw [h2]
+
+  -- Step 6.D: Convert payloads Γ·(∂g) into ΓΓ·g
+  -- (Using dCoord_g_expand: ∂g = Σ Γ·g + Σ Γ·g)
+  have payload_r :
+    sumIdx (fun ρ => Γtot M r θ ρ Idx.r a * dCoord Idx.θ (fun r θ => g M ρ b r θ) r θ
+                     - Γtot M r θ ρ Idx.r b * dCoord Idx.θ (fun r θ => g M a ρ r θ) r θ)
+    = sumIdx (fun ρ => Γtot M r θ ρ Idx.r a
+                        * sumIdx (fun lam => Γtot M r θ lam Idx.θ ρ * g M lam b r θ))
+    - sumIdx (fun ρ => Γtot M r θ ρ Idx.r b
+                        * sumIdx (fun lam => Γtot M r θ lam Idx.θ a * g M ρ lam r θ))
+    := by
+    apply sumIdx_congr; intro ρ
+    simp [dCoord_g_expand M r θ h_ext Idx.θ]
+    ring
+    sorry -- TODO: finish pointwise algebra
+
+  have payload_r_flat :
+    sumIdx (fun ρ => Γtot M r θ ρ Idx.r a
+                      * sumIdx (fun lam => Γtot M r θ lam Idx.θ ρ * g M lam b r θ))
+    = sumIdx (fun lam => g M lam b r θ
+                     * sumIdx (fun ρ => Γtot M r θ ρ Idx.r a * Γtot M r θ lam Idx.θ ρ))
+    := by
+    classical
+    simp [sumIdx_swap, mul_sumIdx_comm, sumIdx_mul_comm, mul_comm, mul_left_comm, mul_assoc]
+    sorry -- TODO: finish Fubini swap
+
+  have payload_r_second :
+    sumIdx (fun ρ => Γtot M r θ ρ Idx.r b
+                      * sumIdx (fun lam => Γtot M r θ lam Idx.θ a * g M ρ lam r θ))
+    = sumIdx (fun lam => g M lam a r θ
+                     * sumIdx (fun ρ => Γtot M r θ ρ Idx.r b * Γtot M r θ lam Idx.θ ρ))
+    := by
+    classical
+    simp [sumIdx_swap, mul_sumIdx_comm, sumIdx_mul_comm, g_symm_JP, mul_comm, mul_left_comm, mul_assoc]
+    sorry -- TODO: finish Fubini + g symmetry
+
+  have payload_θ :
+    sumIdx (fun ρ => Γtot M r θ ρ Idx.θ a * dCoord Idx.r (fun r θ => g M ρ b r θ) r θ
+                     - Γtot M r θ ρ Idx.θ b * dCoord Idx.r (fun r θ => g M a ρ r θ) r θ)
+    = sumIdx (fun ρ => Γtot M r θ ρ Idx.θ a
+                        * sumIdx (fun lam => Γtot M r θ lam Idx.r ρ * g M lam b r θ))
+    - sumIdx (fun ρ => Γtot M r θ ρ Idx.θ b
+                        * sumIdx (fun lam => Γtot M r θ lam Idx.r a * g M ρ lam r θ))
+    := by sorry -- TODO: mirror of payload_r
+
+  have payload_θ_flat :
+    sumIdx (fun ρ => Γtot M r θ ρ Idx.θ a
+                      * sumIdx (fun lam => Γtot M r θ lam Idx.r ρ * g M lam b r θ))
+    = sumIdx (fun lam => g M lam b r θ
+                     * sumIdx (fun ρ => Γtot M r θ ρ Idx.θ a * Γtot M r θ lam Idx.r ρ))
+    := by sorry -- TODO: mirror of payload_r_flat
+
+  have payload_θ_second :
+    sumIdx (fun ρ => Γtot M r θ ρ Idx.θ b
+                      * sumIdx (fun lam => Γtot M r θ lam Idx.r a * g M ρ lam r θ))
+    = sumIdx (fun lam => g M lam a r θ
+                     * sumIdx (fun ρ => Γtot M r θ ρ Idx.θ b * Γtot M r θ lam Idx.r ρ))
+    := by sorry -- TODO: mirror of payload_r_second
+
+  -- Step 6.E: Combine payload ΓΓ with commutator C,D to form RiemannUp
+  have combine_r :
+    sumIdx (fun ρ => g M ρ b r θ
+             * ((dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ a) r θ
+                 - dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r a) r θ)
+               + (sumIdx (fun lam => Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ a)
+                 - sumIdx (fun lam => Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r a))))
+    + (sumIdx (fun lam => g M lam b r θ * sumIdx (fun ρ => Γtot M r θ ρ Idx.r a * Γtot M r θ lam Idx.θ ρ))
+      - sumIdx (fun lam => g M lam a r θ * sumIdx (fun ρ => Γtot M r θ ρ Idx.r b * Γtot M r θ lam Idx.θ ρ)))
+    = sumIdx (fun ρ => g M ρ b r θ * RiemannUp M r θ ρ a Idx.r Idx.θ b)
+    := by
+    apply sumIdx_congr; intro ρ
+    simp only [RiemannUp]
+    ring
+
+  have combine_θ :
+    sumIdx (fun ρ => g M ρ b r θ
+             * ((dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r a) r θ
+                 - dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ a) r θ)
+               + (sumIdx (fun lam => Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r a)
+                 - sumIdx (fun lam => Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ a))))
+    + (sumIdx (fun lam => g M lam b r θ * sumIdx (fun ρ => Γtot M r θ ρ Idx.θ a * Γtot M r θ lam Idx.r ρ))
+      - sumIdx (fun lam => g M lam a r θ * sumIdx (fun ρ => Γtot M r θ ρ Idx.θ b * Γtot M r θ lam Idx.r ρ)))
+    = sumIdx (fun ρ => g M ρ b r θ * RiemannUp M r θ ρ a Idx.θ Idx.r b)
+    := by
+    apply sumIdx_congr; intro ρ
+    simp only [RiemannUp]
+    ring
+
+  -- Assemble all transformations
+  rw [payload_r, payload_r_flat, payload_r_second,
+      payload_θ, payload_θ_flat, payload_θ_second,
+      combine_r, combine_θ]
+
+  -- Final steps: contract and simplify to Riemann
+  -- TODO: Complete final contraction to -Riemann... form after filling payload sorries
+
+  -- Temporary stopper: closes the ?_step6 containment block
+  -- Remove this `admit` once all payload conversions are filled
+  admit
+
+  -- Close the ?_main containment block
+  admit
+
 end RicciProof
 /-- Ricci identity specialized to the metric, by *definition-chasing only*.
     No domain hypothesis needed.
