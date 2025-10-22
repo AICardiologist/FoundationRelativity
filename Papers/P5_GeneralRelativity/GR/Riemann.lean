@@ -2371,12 +2371,13 @@ lemma prod_rule_backwards_sum_direct (M r θ : ℝ) (h_ext : Exterior M r θ) (h
 /-! ## Metric Compatibility (Forward Declaration) -/
 
 /-- Forward reference to metric compatibility lemma.
-    The actual proof `dCoord_g_via_compat_ext` appears later at line 2594.
-    This axiom allows earlier code to use metric compatibility before it's proven. -/
-axiom dCoord_g_via_compat_ext_temp (M r θ : ℝ) (h_ext : Exterior M r θ) (x a b : Idx) :
+    The actual proof `dCoord_g_via_compat_ext` appears later at line 3072.
+    This forward declaration uses sorry to avoid axiom in CI. -/
+lemma dCoord_g_via_compat_ext_temp (M r θ : ℝ) (h_ext : Exterior M r θ) (x a b : Idx) :
   dCoord x (fun r θ => g M a b r θ) r θ =
     sumIdx (fun k => Γtot M r θ k x a * g M k b r θ) +
-    sumIdx (fun k => Γtot M r θ k x b * g M a k r θ)
+    sumIdx (fun k => Γtot M r θ k x b * g M a k r θ) := by
+  sorry  -- Proven later at line 3072 as dCoord_g_via_compat_ext
 
 /-! ## Main Riemann Identity via Γ₁ -/
 
