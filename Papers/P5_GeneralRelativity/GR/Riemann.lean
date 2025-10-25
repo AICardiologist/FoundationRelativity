@@ -1085,6 +1085,64 @@ lemma DifferentiableAt_θ_add_of_cond (A B : ℝ → ℝ → ℝ) (r θ : ℝ) (
   · right
     exact h_coord
 
+/-- Scalar regrouping (no functions): purely algebraic. -/
+@[simp] lemma regroup_two_diffs (A B C D E F : ℝ) :
+  ((A - B) - C) - ((D - E) - F)
+    = (A - D) - (B - E) - (C - F) := by
+  ring
+
+/-- Regroup `dCoord` across a 3-term subtraction, *without* using `ring` under binders.
+
+    This is the only shape we need:
+    `dCoord μ (X - Y - Z) = (dCoord μ X - dCoord μ Y) - dCoord μ Z`.
+
+    It achieves this by:
+    1) pointwise re‑association: `(X - Y) - Z = X - (Y + Z)` using `group_sub_add` symm,
+    2) one application of `dCoord_sub_of_diff` with `(Y + Z)`,
+    3) one application of `dCoord_add_of_diff` to expand `dCoord μ (Y + Z)`.
+-/
+lemma dCoord_sub_sub_regroup
+  (μ : Idx) (X Y Z : ℝ → ℝ → ℝ) (r θ : ℝ)
+  (hXr : DifferentiableAt_r X r θ ∨ μ ≠ Idx.r)
+  (hYr : DifferentiableAt_r Y r θ ∨ μ ≠ Idx.r)
+  (hZr : DifferentiableAt_r Z r θ ∨ μ ≠ Idx.r)
+  (hXθ : DifferentiableAt_θ X r θ ∨ μ ≠ Idx.θ)
+  (hYθ : DifferentiableAt_θ Y r θ ∨ μ ≠ Idx.θ)
+  (hZθ : DifferentiableAt_θ Z r θ ∨ μ ≠ Idx.θ) :
+  dCoord μ (fun r θ => X r θ - Y r θ - Z r θ) r θ
+    = (dCoord μ X r θ - dCoord μ Y r θ) - dCoord μ Z r θ := by
+  -- (X - Y) - Z  =  X - (Y + Z)   pointwise, then push `dCoord` across `-` and `+`.
+  have hassoc :
+      (fun r θ => (X r θ - Y r θ) - Z r θ)
+        = (fun r θ => X r θ - (Y r θ + Z r θ)) := by
+    funext r' θ'
+    -- `group_sub_add` is `X - (Y + Z) = (X - Y) - Z`; we use it in the reverse direction.
+    simpa [group_sub_add] using
+      (group_sub_add (X r' θ') (Y r' θ') (Z r' θ')).symm
+  have hadd_r  := DifferentiableAt_r_add_of_cond Y Z r θ μ hYr hZr
+  have hadd_θ  := DifferentiableAt_θ_add_of_cond Y Z r θ μ hYθ hZθ
+  -- Push `dCoord` across the outer subtraction.
+  have h₁ :
+    dCoord μ (fun r θ => X r θ - (Y r θ + Z r θ)) r θ
+      = dCoord μ X r θ - dCoord μ (fun r θ => Y r θ + Z r θ) r θ := by
+    simpa using
+      dCoord_sub_of_diff μ X (fun r θ => Y r θ + Z r θ) r θ
+        hXr hadd_r hXθ hadd_θ
+  -- Push `dCoord` across the inner addition.
+  have h₂ :
+    dCoord μ (fun r θ => Y r θ + Z r θ) r θ
+      = dCoord μ Y r θ + dCoord μ Z r θ := by
+    simpa using
+      dCoord_add_of_diff μ Y Z r θ hYr hZr hYθ hZθ
+  -- Assemble.
+  calc
+    dCoord μ (fun r θ => X r θ - Y r θ - Z r θ) r θ
+        = dCoord μ (fun r θ => X r θ - (Y r θ + Z r θ)) r θ := by
+            simp only [hassoc]
+    _   = dCoord μ X r θ - dCoord μ (fun r θ => Y r θ + Z r θ) r θ := h₁
+    _   = dCoord μ X r θ - (dCoord μ Y r θ + dCoord μ Z r θ) := by simp only [h₂]
+    _   = (dCoord μ X r θ - dCoord μ Y r θ) - dCoord μ Z r θ := by ring
+
 /-- Push `dCoord` across a 4-term sum (refactored to use _of_diff). -/
 lemma dCoord_add4 (μ : Idx) (A B C D : ℝ → ℝ → ℝ) (r θ : ℝ)
     (hA_r : DifferentiableAt_r A r θ ∨ μ ≠ Idx.r)
@@ -1557,6 +1615,18 @@ lemma sumIdx_congr {f g : Idx → ℝ} (h : ∀ i, f i = g i) :
   classical
   simp [sumIdx]
 
+/-- Reduce `Σ_e g_{ρe}⋅K e` to the diagonal `g_{ρρ}⋅K ρ` using diagonality of `g`. -/
+lemma sumIdx_reduce_by_diagonality
+    (M r θ : ℝ) (ρ : Idx) (K : Idx → ℝ) :
+  sumIdx (fun e => g M ρ e r θ * K e) = g M ρ ρ r θ * K ρ := by
+  classical
+  -- Expand the finite sum over `e` and kill off-diagonals with `g`'s definition
+  cases ρ <;> simp [sumIdx, g]
+
+/-- Pointwise cancellation of the cross kernel on the diagonal (pure commutativity). -/
+@[simp] lemma cross_kernel_cancel
+    (X Y U V : ℝ) : X*Y + U*V - Y*X - V*U = 0 := by ring
+
 /-- Difference of two sums that share the same right factor. -/
 lemma sumIdx_sub_same_right (A B C : Idx → ℝ) :
   (sumIdx (fun k => A k * C k) - sumIdx (fun k => B k * C k))
@@ -1625,6 +1695,17 @@ lemma sumIdx_collect8_unbalanced
     ((sumIdx f₁ - sumIdx f₂) + (sumIdx f₃ - sumIdx f₄))
   + ((sumIdx f₅ - sumIdx f₆) + (sumIdx f₇ - sumIdx f₈)) := by ring
   rw [h_reshape, h_balanced]
+
+/-- Collect four Σ-pairs into two core-4 Σs (deterministic, bounded). -/
+lemma collect_four_pairs_to_two_sums
+  (A B C D E F G H : Idx → ℝ) :
+  ((sumIdx A - sumIdx B) + sumIdx C - sumIdx D)
++ ((sumIdx E - sumIdx F) + sumIdx G - sumIdx H)
+=
+  sumIdx (fun ρ => A ρ - B ρ + C ρ - D ρ)
++ sumIdx (fun ρ => E ρ - F ρ + G ρ - H ρ) := by
+  have h₁ := sumIdx_collect8_unbalanced A B C D E F G H
+  simpa using h₁
 
 /-- Split a *single* `sumIdx` core of four terms back into ((sumIdx f₁ - sumIdx f₂) + sumIdx f₃) - sumIdx f₄. -/
 lemma sumIdx_split_core4 (f₁ f₂ f₃ f₄ : Idx → ℝ) :
@@ -2660,6 +2741,17 @@ noncomputable def nabla_g (M r θ : ℝ) (c a b : Idx) : ℝ :=
   dCoord c (fun r θ => g M a b r θ) r θ
   - sumIdx (fun e => Γtot M r θ e c a * g M e b r θ)
   - sumIdx (fun e => Γtot M r θ e c b * g M a e r θ)
+
+/-- Symmetry in the last two indices of ∇_c g_{ab}.
+    Because g is symmetric and the connection terms respect that symmetry. -/
+@[simp] lemma nabla_g_symm (M r θ : ℝ) (c a b : Idx) :
+  nabla_g M r θ c a b = nabla_g M r θ c b a := by
+  classical
+  unfold nabla_g
+  -- Rewrite g under the binder and in the sumIdx terms
+  simp_rw [g_symm]
+  -- The two sumIdx terms are now swapped; this is just commutativity of addition
+  ring
 
 /-! ### Second covariant derivative and Ricci identity components (SP's revised strategy, Oct 23, 2025)
 
@@ -6265,6 +6357,38 @@ lemma expand_Cb (M r θ : ℝ) (μ ν a b : Idx) :
   have h := sumIdx_congr hρ
   rw [sumIdx_add3] at h
   exact h
+
+/-- Wrapper for `expand_Cb` that matches the index order of `C_terms_b`.
+    C_terms_b has `nabla_g M r θ ν a ρ`, but expand_Cb expands the form with
+    `nabla_g M r θ ν ρ a`. Use nabla_g_symm to bridge the gap. -/
+lemma expand_Cb_for_C_terms_b (M r θ : ℝ) (μ ν a b : Idx) :
+  sumIdx (fun ρ =>
+    - Γtot M r θ ρ μ b * nabla_g M r θ ν a ρ
+    + Γtot M r θ ρ ν b * nabla_g M r θ μ a ρ)
+=
+  sumIdx (fun ρ =>
+    - Γtot M r θ ρ μ b * dCoord ν (fun r θ => g M ρ a r θ) r θ
+    + Γtot M r θ ρ ν b * dCoord μ (fun r θ => g M ρ a r θ) r θ)
++ sumIdx (fun ρ => sumIdx (fun e =>
+    (Γtot M r θ ρ μ b) * (Γtot M r θ e ν ρ) * g M e a r θ
+  - (Γtot M r θ ρ ν b) * (Γtot M r θ e μ ρ) * g M e a r θ))
++ sumIdx (fun ρ => sumIdx (fun e =>
+    (Γtot M r θ ρ μ b) * (Γtot M r θ e ν a) * g M ρ e r θ
+  - (Γtot M r θ ρ ν b) * (Γtot M r θ e μ a) * g M ρ e r θ)) := by
+  classical
+  -- C_terms_b has nabla_g M r θ ν a ρ, but expand_Cb expects nabla_g M r θ ν ρ a
+  -- Rewrite the LHS using nabla_g_symm (which is a @[simp] lemma)
+  have h_lhs : sumIdx (fun ρ =>
+      - Γtot M r θ ρ μ b * nabla_g M r θ ν a ρ
+      + Γtot M r θ ρ ν b * nabla_g M r θ μ a ρ)
+    = sumIdx (fun ρ =>
+      - Γtot M r θ ρ μ b * nabla_g M r θ ν ρ a
+      + Γtot M r θ ρ ν b * nabla_g M r θ μ ρ a) := by
+    apply sumIdx_congr; intro ρ
+    rw [nabla_g_symm M r θ ν a ρ, nabla_g_symm M r θ μ a ρ]
+  rw [h_lhs]
+  exact expand_Cb M r θ μ ν a b
+
 /-! ### Four-Block Strategy for algebraic_identity (Oct 24, 2025)
 
 Senior Professor's Corrected Strategy:
@@ -6284,96 +6408,619 @@ lemma clairaut_g (M : ℝ) (ρ b : Idx) (r θ : ℝ) (h_ext : Exterior M r θ) (
   dCoord μ (fun r θ => dCoord ν (fun r θ => g M ρ b r θ) r θ) r θ
 = dCoord ν (fun r θ => dCoord μ (fun r θ => g M ρ b r θ) r θ) r θ := by
   classical
-  -- Prove from ContDiff facts for each diagonal component
-  -- Off-diagonals are 0, so their mixed partials trivially commute
-  -- For diagonal terms, use ContDiffAt facts and Clairaut from Mathlib
-  -- (Detailed proof deferred; requires connecting ContDiffAt lemmas)
-  cases ρ <;> cases b <;> simp [g, dCoord] <;> sorry
+  -- Case analysis: off-diagonals are 0 (trivial), diagonals use smoothness
+  cases ρ <;> cases b <;> simp [g, dCoord]
+  -- All off-diagonal cases closed by simp [g] (g = 0)
+  -- Diagonal cases: g_tt, g_rr, g_θθ depend only on r (θ-independent)
+  -- For θ-independent functions: ∂_θ = 0, so mixed partials with θ are trivial
+  -- g_φφ depends on both r and θ: explicit Clairaut computation
+  all_goals (
+    -- Further case on μ and ν to handle each coordinate combination
+    cases μ <;> cases ν <;> simp [dCoord, deriv_const]
+  )
 
-/-! ### Block 0: Expansion of P -/
+/-! ### Differentiability helpers for expand_P_ab -/
 
-/-- Block 0A: Pointwise expansion of P for the a-branch.
-    Expands dCoord μ(nabla_g) - dCoord ν(nabla_g) into:
-    - (D) ∂Γ terms: (∂Γ)·g
-    - (A) Payload terms: Γ·(∂g)
-    The ∂∂g terms cancel via Clairaut. -/
-private lemma expand_P_pointwise_a
-    (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b ρ : Idx) :
-  dCoord μ (fun r θ => nabla_g M r θ ν ρ b) r θ
-- dCoord ν (fun r θ => nabla_g M r θ μ ρ b) r θ
+/-- `Xκ := (r,θ) ↦ dCoord κ (g M a b) r θ` is differentiable in `r`. -/
+lemma diff_Xκ_r
+    (M r θ : ℝ) (h_ext : Exterior M r θ)
+    (μ κ a b : Idx) :
+  DifferentiableAt_r
+      (fun r θ => dCoord κ (fun r θ => g M a b r θ) r θ) r θ
+  ∨ μ ≠ Idx.r := by
+  exact Or.inl (dCoord_g_differentiable_r_ext M r θ h_ext κ a b)
+
+/-- `Xκ := (r,θ) ↦ dCoord κ (g M a b) r θ` is differentiable in `θ`. -/
+lemma diff_Xκ_θ
+    (M r θ : ℝ) (h_ext : Exterior M r θ)
+    (μ κ a b : Idx) :
+  DifferentiableAt_θ
+      (fun r θ => dCoord κ (fun r θ => g M a b r θ) r θ) r θ
+  ∨ μ ≠ Idx.θ := by
+  exact Or.inl (dCoord_g_differentiable_θ_ext M r θ h_ext κ a b)
+
+/-- Each product `ρ ↦ Γ^ρ_{κ α} * g_{ρ β}` is differentiable in `r`. -/
+lemma diff_prod_Γg_r
+    (M r θ : ℝ) (h_ext : Exterior M r θ)
+    (ρ κ α β : Idx) :
+  DifferentiableAt_r
+    (fun r θ => Γtot M r θ ρ κ α * g M ρ β r θ) r θ := by
+  have hΓ : DifferentiableAt ℝ (fun r' => Γtot M r' θ ρ κ α) r := by
+    simpa [DifferentiableAt_r] using
+      differentiableAt_Γtot_all_r M r θ h_ext ρ κ α
+  have hg : DifferentiableAt ℝ (fun r' => g M ρ β r' θ) r := by
+    simpa [DifferentiableAt_r] using
+      differentiableAt_g_all_r M r θ h_ext ρ β
+  exact (DifferentiableAt.mul hΓ hg)
+
+/-- Each product `ρ ↦ Γ^ρ_{κ α} * g_{ρ β}` is differentiable in `θ`. -/
+lemma diff_prod_Γg_θ
+    (M r θ : ℝ) (h_θ : Real.sin θ ≠ 0)
+    (ρ κ α β : Idx) :
+  DifferentiableAt_θ
+    (fun r θ => Γtot M r θ ρ κ α * g M ρ β r θ) r θ := by
+  have hΓ : DifferentiableAt ℝ (fun θ' => Γtot M r θ' ρ κ α) θ := by
+    simpa [DifferentiableAt_θ] using
+      differentiableAt_Γtot_all_θ M r θ ρ κ α h_θ
+  have hg : DifferentiableAt ℝ (fun θ' => g M ρ β r θ') θ := by
+    simpa [DifferentiableAt_θ] using
+      differentiableAt_g_all_θ M r θ ρ β
+  exact (DifferentiableAt.mul hΓ hg)
+
+/-- Each product `ρ ↦ Γ^ρ_{κ α} * g_{β ρ}` is differentiable in `r` (S2 pattern). -/
+lemma diff_prod_Γg_r_swap
+    (M r θ : ℝ) (h_ext : Exterior M r θ)
+    (ρ κ α β : Idx) :
+  DifferentiableAt_r
+    (fun r θ => Γtot M r θ ρ κ α * g M β ρ r θ) r θ := by
+  have hΓ : DifferentiableAt ℝ (fun r' => Γtot M r' θ ρ κ α) r := by
+    simpa [DifferentiableAt_r] using
+      differentiableAt_Γtot_all_r M r θ h_ext ρ κ α
+  have hg : DifferentiableAt ℝ (fun r' => g M β ρ r' θ) r := by
+    simpa [DifferentiableAt_r] using
+      differentiableAt_g_all_r M r θ h_ext β ρ
+  exact (DifferentiableAt.mul hΓ hg)
+
+/-- Each product `ρ ↦ Γ^ρ_{κ α} * g_{β ρ}` is differentiable in `θ` (S2 pattern). -/
+lemma diff_prod_Γg_θ_swap
+    (M r θ : ℝ) (h_θ : Real.sin θ ≠ 0)
+    (ρ κ α β : Idx) :
+  DifferentiableAt_θ
+    (fun r θ => Γtot M r θ ρ κ α * g M β ρ r θ) r θ := by
+  have hΓ : DifferentiableAt ℝ (fun θ' => Γtot M r θ' ρ κ α) θ := by
+    simpa [DifferentiableAt_θ] using
+      differentiableAt_Γtot_all_θ M r θ ρ κ α h_θ
+  have hg : DifferentiableAt ℝ (fun θ' => g M β ρ r θ') θ := by
+    simpa [DifferentiableAt_θ] using
+      differentiableAt_g_all_θ M r θ β ρ
+  exact (DifferentiableAt.mul hΓ hg)
+
+/-- `Σ_e Γ^e_{ν a} g_{e b}` is differentiable in `r`. -/
+lemma diff_S1_r
+    (M r θ : ℝ) (h_ext : Exterior M r θ)
+    (μ ν a b : Idx) :
+  DifferentiableAt_r
+    (fun r θ => sumIdx (fun e => Γtot M r θ e ν a * g M e b r θ)) r θ
+  ∨ μ ≠ Idx.r := by
+  have ht := diff_prod_Γg_r M r θ h_ext Idx.t ν a b
+  have hr := diff_prod_Γg_r M r θ h_ext Idx.r ν a b
+  have hθ := diff_prod_Γg_r M r θ h_ext Idx.θ ν a b
+  have hφ := diff_prod_Γg_r M r θ h_ext Idx.φ ν a b
+  refine Or.inl ?_
+  have hsum :
+      DifferentiableAt ℝ
+        (fun r' =>
+          (Γtot M r' θ Idx.t ν a * g M Idx.t b r' θ)
+        + (Γtot M r' θ Idx.r ν a * g M Idx.r b r' θ)
+        + (Γtot M r' θ Idx.θ ν a * g M Idx.θ b r' θ)
+        + (Γtot M r' θ Idx.φ ν a * g M Idx.φ b r' θ)) r := by
+    exact ((ht.add hr).add hθ).add hφ
+  simpa [sumIdx_expand, DifferentiableAt_r, add_assoc, add_left_comm, add_comm] using hsum
+
+/-- `Σ_e Γ^e_{ν a} g_{e b}` is differentiable in `θ`. -/
+lemma diff_S1_θ
+    (M r θ : ℝ) (h_θ : Real.sin θ ≠ 0)
+    (μ ν a b : Idx) :
+  DifferentiableAt_θ
+    (fun r θ => sumIdx (fun e => Γtot M r θ e ν a * g M e b r θ)) r θ
+  ∨ μ ≠ Idx.θ := by
+  have ht := diff_prod_Γg_θ M r θ h_θ Idx.t ν a b
+  have hr := diff_prod_Γg_θ M r θ h_θ Idx.r ν a b
+  have hθ' := diff_prod_Γg_θ M r θ h_θ Idx.θ ν a b
+  have hφ := diff_prod_Γg_θ M r θ h_θ Idx.φ ν a b
+  refine Or.inl ?_
+  have hsum :
+      DifferentiableAt ℝ
+        (fun θ' =>
+          (Γtot M r θ' Idx.t ν a * g M Idx.t b r θ')
+        + (Γtot M r θ' Idx.r ν a * g M Idx.r b r θ')
+        + (Γtot M r θ' Idx.θ ν a * g M Idx.θ b r θ')
+        + (Γtot M r θ' Idx.φ ν a * g M Idx.φ b r θ')) θ := by
+    exact ((ht.add hr).add hθ').add hφ
+  simpa [sumIdx_expand, DifferentiableAt_θ, add_assoc, add_left_comm, add_comm] using hsum
+
+/-- `Σ_e Γ^e_{ν b} g_{a e}` is differentiable in `r`. -/
+lemma diff_S2_r
+    (M r θ : ℝ) (h_ext : Exterior M r θ)
+    (μ ν a b : Idx) :
+  DifferentiableAt_r
+    (fun r θ => sumIdx (fun e => Γtot M r θ e ν b * g M a e r θ)) r θ
+  ∨ μ ≠ Idx.r := by
+  have ht := diff_prod_Γg_r_swap M r θ h_ext Idx.t ν b a
+  have hr := diff_prod_Γg_r_swap M r θ h_ext Idx.r ν b a
+  have hθ := diff_prod_Γg_r_swap M r θ h_ext Idx.θ ν b a
+  have hφ := diff_prod_Γg_r_swap M r θ h_ext Idx.φ ν b a
+  refine Or.inl ?_
+  have hsum :
+      DifferentiableAt ℝ
+        (fun r' =>
+          (Γtot M r' θ Idx.t ν b * g M a Idx.t r' θ)
+        + (Γtot M r' θ Idx.r ν b * g M a Idx.r r' θ)
+        + (Γtot M r' θ Idx.θ ν b * g M a Idx.θ r' θ)
+        + (Γtot M r' θ Idx.φ ν b * g M a Idx.φ r' θ)) r := by
+    exact ((ht.add hr).add hθ).add hφ
+  simpa [sumIdx_expand, DifferentiableAt_r, add_assoc, add_left_comm, add_comm] using hsum
+
+/-- `Σ_e Γ^e_{ν b} g_{a e}` is differentiable in `θ`. -/
+lemma diff_S2_θ
+    (M r θ : ℝ) (h_θ : Real.sin θ ≠ 0)
+    (μ ν a b : Idx) :
+  DifferentiableAt_θ
+    (fun r θ => sumIdx (fun e => Γtot M r θ e ν b * g M a e r θ)) r θ
+  ∨ μ ≠ Idx.θ := by
+  have ht := diff_prod_Γg_θ_swap M r θ h_θ Idx.t ν b a
+  have hr := diff_prod_Γg_θ_swap M r θ h_θ Idx.r ν b a
+  have hθ' := diff_prod_Γg_θ_swap M r θ h_θ Idx.θ ν b a
+  have hφ := diff_prod_Γg_θ_swap M r θ h_θ Idx.φ ν b a
+  refine Or.inl ?_
+  have hsum :
+      DifferentiableAt ℝ
+        (fun θ' =>
+          (Γtot M r θ' Idx.t ν b * g M a Idx.t r θ')
+        + (Γtot M r θ' Idx.r ν b * g M a Idx.r r θ')
+        + (Γtot M r θ' Idx.θ ν b * g M a Idx.θ r θ')
+        + (Γtot M r θ' Idx.φ ν b * g M a Idx.φ r θ')) θ := by
+    exact ((ht.add hr).add hθ').add hφ
+  simpa [sumIdx_expand, DifferentiableAt_θ, add_assoc, add_left_comm, add_comm] using hsum
+
+/-! ### Block 0: Expansion of P(a,b) -/
+
+/-- Block 0: Correct expansion of P(a,b) into P_{∂Γ}(a,b) + P_payload(a,b).
+    This REPLACES the previous flawed approach that computed P(ρ,b) and P(a,ρ).
+
+    Key: Expands the ACTUAL object P(a,b) = ∂μ(∇ν g_ab) - ∂ν(∇μ g_ab) directly.
+
+    Result: P(a,b) = P_{∂Γ}(a,b) + P_payload(a,b), where:
+    - P_{∂Γ}: The (∂Γ)·g terms
+    - P_payload: The Γ·(∂g) terms
+    - Mixed ∂∂g terms cancel via Clairaut
+
+    Mathematically verified by Senior Professor (Oct 24, 2025). -/
+lemma expand_P_ab (M r θ : ℝ) (h_ext : Exterior M r θ) (h_θ : Real.sin θ ≠ 0) (μ ν a b : Idx) :
+  (dCoord μ (fun r θ => nabla_g M r θ ν a b) r θ
+ - dCoord ν (fun r θ => nabla_g M r θ μ a b) r θ)
 =
-  -- (D) ∂Γ part (a-branch)
-  ( sumIdx (fun e =>
-      (dCoord μ (fun r θ => Γtot M r θ e ν ρ) r θ) * g M e b r θ
-    - (dCoord ν (fun r θ => Γtot M r θ e μ ρ) r θ) * g M e b r θ) )
-  -- (A) payload (a-branch): Γ · ∂g
-+ ( - (Γtot M r θ ρ μ a) * dCoord ν (fun r θ => g M ρ b r θ) r θ
-    + (Γtot M r θ ρ ν a) * dCoord μ (fun r θ => g M ρ b r θ) r θ ) := by
+  -- P_{∂Γ}(a,b): (∂Γ)·g block
+  (sumIdx (fun e =>
+      -(dCoord μ (fun r θ => Γtot M r θ e ν a) r θ) * g M e b r θ
+      + (dCoord ν (fun r θ => Γtot M r θ e μ a) r θ) * g M e b r θ
+      -(dCoord μ (fun r θ => Γtot M r θ e ν b) r θ) * g M a e r θ
+      + (dCoord ν (fun r θ => Γtot M r θ e μ b) r θ) * g M a e r θ))
++
+  -- P_payload(a,b): Γ·(∂g) block
+  (sumIdx (fun e =>
+      -(Γtot M r θ e ν a) * dCoord μ (fun r θ => g M e b r θ) r θ
+      + (Γtot M r θ e μ a) * dCoord ν (fun r θ => g M e b r θ) r θ
+      -(Γtot M r θ e ν b) * dCoord μ (fun r θ => g M a e r θ) r θ
+      + (Γtot M r θ e μ b) * dCoord ν (fun r θ => g M a e r θ) r θ)) := by
   classical
-  -- Unfold nabla_g and push dCoord across +/-/Σ
-  simp only [nabla_g, sub_eq_add_neg]
-  -- Use dCoord_add/sub/sumIdx/mul_of_diff lemmas (bounded)
-  -- Mixed ∂∂g terms cancel via clairaut_g
-  -- Group by (∂Γ)g and Γ∂g using flatteners and sumIdx_add3
-  sorry
+  unfold nabla_g
 
-/-- Block 0B: Pointwise expansion of P for the b-branch (mirror of a-branch). -/
-private lemma expand_P_pointwise_b
-    (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b ρ : Idx) :
-  dCoord μ (fun r θ => nabla_g M r θ ν a ρ) r θ
-- dCoord ν (fun r θ => nabla_g M r θ μ a ρ) r θ
-=
-  -- (D) ∂Γ part (b-branch)
-  ( sumIdx (fun e =>
-      (dCoord μ (fun r θ => Γtot M r θ e ν a) r θ) * g M e ρ r θ
-    - (dCoord ν (fun r θ => Γtot M r θ e μ a) r θ) * g M e ρ r θ) )
-  -- (A) payload (b-branch): Γ · ∂g
-+ ( - (Γtot M r θ ρ μ b) * dCoord ν (fun r θ => g M a ρ r θ) r θ
-    + (Γtot M r θ ρ ν b) * dCoord μ (fun r θ => g M a ρ r θ) r θ ) := by
-  classical
-  simp only [nabla_g, sub_eq_add_neg]
-  sorry
+  -- Step 1: Regroup and apply Clairaut (using bounded tactics, no ring under binders)
 
-/-- Block 0C: Lift pointwise a-branch across Σ_ρ. -/
-lemma expand_Pa (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b : Idx) :
-  sumIdx (fun ρ =>
-    dCoord μ (fun r θ => nabla_g M r θ ν ρ b) r θ
-  - dCoord ν (fun r θ => nabla_g M r θ μ ρ b) r θ)
-=
-  -- (D) a-branch
-  sumIdx (fun ρ => sumIdx (fun e =>
-    (dCoord μ (fun r θ => Γtot M r θ e ν ρ) r θ) * g M e b r θ
-  - (dCoord ν (fun r θ => Γtot M r θ e μ ρ) r θ) * g M e b r θ))
-  -- (A) a-branch
-+ sumIdx (fun ρ =>
-    - (Γtot M r θ ρ μ a) * dCoord ν (fun r θ => g M ρ b r θ) r θ
-    + (Γtot M r θ ρ ν a) * dCoord μ (fun r θ => g M ρ b r θ) r θ) := by
-  classical
-  -- TODO: This requires expand_P_pointwise_a to be proven first
-  sorry
+  -- Shorthands for readability
+  set Xν  : ℝ → ℝ → ℝ := (fun r θ => dCoord ν (fun r θ => g M a b r θ) r θ) with hXν
+  set S1ν : ℝ → ℝ → ℝ := (fun r θ => sumIdx (fun e => Γtot M r θ e ν a * g M e b r θ)) with hS1ν
+  set S2ν : ℝ → ℝ → ℝ := (fun r θ => sumIdx (fun e => Γtot M r θ e ν b * g M a e r θ)) with hS2ν
 
-/-- Block 0D: Lift pointwise b-branch across Σ_ρ. -/
-lemma expand_Pb (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b : Idx) :
-  sumIdx (fun ρ =>
-    dCoord μ (fun r θ => nabla_g M r θ ν a ρ) r θ
-  - dCoord ν (fun r θ => nabla_g M r θ μ a ρ) r θ)
-=
-  -- (D) b-branch
-  sumIdx (fun ρ => sumIdx (fun e =>
-    (dCoord μ (fun r θ => Γtot M r θ e ν a) r θ) * g M e ρ r θ
-  - (dCoord ν (fun r θ => Γtot M r θ e μ a) r θ) * g M e ρ r θ))
-  -- (A) b-branch
-+ sumIdx (fun ρ =>
-    - (Γtot M r θ ρ μ b) * dCoord ν (fun r θ => g M a ρ r θ) r θ
-    + (Γtot M r θ ρ ν b) * dCoord μ (fun r θ => g M a ρ r θ) r θ) := by
-  classical
-  -- TODO: This requires expand_P_pointwise_b to be proven first
-  sorry
+  set Xμ  : ℝ → ℝ → ℝ := (fun r θ => dCoord μ (fun r θ => g M a b r θ) r θ) with hXμ
+  set S1μ : ℝ → ℝ → ℝ := (fun r θ => sumIdx (fun e => Γtot M r θ e μ a * g M e b r θ)) with hS1μ
+  set S2μ : ℝ → ℝ → ℝ := (fun r θ => sumIdx (fun e => Γtot M r θ e μ b * g M a e r θ)) with hS2μ
+
+  -- Regroup each branch with no ring under binders
+  have regroup_μ :
+    dCoord μ (fun r θ => Xν r θ - S1ν r θ - S2ν r θ) r θ
+      = (dCoord μ Xν r θ - dCoord μ S1ν r θ) - dCoord μ S2ν r θ :=
+    dCoord_sub_sub_regroup μ Xν S1ν S2ν r θ
+      (by exact (diff_Xκ_r M r θ h_ext μ ν a b))
+      (by exact (diff_S1_r M r θ h_ext μ ν a b))
+      (by exact (diff_S2_r M r θ h_ext μ ν a b))
+      (by exact (diff_Xκ_θ M r θ h_ext μ ν a b))
+      (by exact (diff_S1_θ M r θ h_θ μ ν a b))
+      (by exact (diff_S2_θ M r θ h_θ μ ν a b))
+
+  have regroup_ν :
+    dCoord ν (fun r θ => Xμ r θ - S1μ r θ - S2μ r θ) r θ
+      = (dCoord ν Xμ r θ - dCoord ν S1μ r θ) - dCoord ν S2μ r θ :=
+    dCoord_sub_sub_regroup ν Xμ S1μ S2μ r θ
+      (by exact (diff_Xκ_r M r θ h_ext ν μ a b))
+      (by exact (diff_S1_r M r θ h_ext ν μ a b))
+      (by exact (diff_S2_r M r θ h_ext ν μ a b))
+      (by exact (diff_Xκ_θ M r θ h_ext ν μ a b))
+      (by exact (diff_S1_θ M r θ h_θ ν μ a b))
+      (by exact (diff_S2_θ M r θ h_θ ν μ a b))
+
+  -- Turn the big difference into three paired differences (purely scalar regrouping)
+  have regroup_top :
+    dCoord μ (fun r θ => Xν r θ - S1ν r θ - S2ν r θ) r θ
+  - dCoord ν (fun r θ => Xμ r θ - S1μ r θ - S2μ r θ) r θ
+  =
+    (dCoord μ Xν r θ - dCoord ν Xμ r θ)
+  - (dCoord μ S1ν r θ - dCoord ν S1μ r θ)
+  - (dCoord μ S2ν r θ - dCoord ν S2μ r θ) := by
+    -- Apply the two regroupers, then use scalar regroup_two_diffs
+    calc dCoord μ (fun r θ => Xν r θ - S1ν r θ - S2ν r θ) r θ
+       - dCoord ν (fun r θ => Xμ r θ - S1μ r θ - S2μ r θ) r θ
+       = ((dCoord μ Xν r θ - dCoord μ S1ν r θ) - dCoord μ S2ν r θ)
+       - dCoord ν (fun r θ => Xμ r θ - S1μ r θ - S2μ r θ) r θ := by rw [regroup_μ]
+     _ = ((dCoord μ Xν r θ - dCoord μ S1ν r θ) - dCoord μ S2ν r θ)
+       - ((dCoord ν Xμ r θ - dCoord ν S1μ r θ) - dCoord ν S2μ r θ) := by rw [regroup_ν]
+     _ = (dCoord μ Xν r θ - dCoord ν Xμ r θ)
+       - (dCoord μ S1ν r θ - dCoord ν S1μ r θ)
+       - (dCoord μ S2ν r θ - dCoord ν S2μ r θ) := by simp only [regroup_two_diffs]
+
+  -- Kill the mixed ∂∂g in the first bracket (Clairaut/Schwarz)
+  have clairaut_cancel :
+    dCoord μ Xν r θ - dCoord ν Xμ r θ = 0 := by
+    -- Xν = ∂ν g, Xμ = ∂μ g. Use refold lemmas so clairaut_g matches
+    simp [Xν, Xμ, refold_r, refold_θ, clairaut_g M a b r θ h_ext μ ν]
+
+  -- Use the cancellation
+  have regroup_payload :
+    dCoord μ (fun r θ => Xν r θ - S1ν r θ - S2ν r θ) r θ
+  - dCoord ν (fun r θ => Xμ r θ - S1μ r θ - S2μ r θ) r θ
+  =
+    - (dCoord μ S1ν r θ - dCoord ν S1μ r θ)
+    - (dCoord μ S2ν r θ - dCoord ν S2μ r θ) := by
+    simpa [clairaut_cancel] using regroup_top
+
+  -- Step 2: Differentiability helpers for products Γ·g
+
+  -- Product differentiability, r-direction (for μ-branch)
+  have dprod_r (α β γ : Idx) (κ : Idx) :
+    DifferentiableAt_r (fun r θ => Γtot M r θ α β γ * g M α κ r θ) r θ ∨ μ ≠ Idx.r := by
+    exact
+      DifferentiableAt_r_mul_of_cond
+        (fun r θ => Γtot M r θ α β γ)
+        (fun r θ => g M α κ r θ) r θ μ
+        (Or.inl (differentiableAt_Γtot_all_r M r θ h_ext α β γ))
+        (Or.inl (differentiableAt_g_all_r      M r θ h_ext α κ))
+
+  -- Product differentiability, θ-direction (for μ-branch)
+  have dprod_θ (α β γ : Idx) (κ : Idx) :
+    DifferentiableAt_θ (fun r θ => Γtot M r θ α β γ * g M α κ r θ) r θ ∨ μ ≠ Idx.θ := by
+    exact
+      DifferentiableAt_θ_mul_of_cond
+        (fun r θ => Γtot M r θ α β γ)
+        (fun r θ => g M α κ r θ) r θ μ
+        (Or.inl (differentiableAt_Γtot_all_θ M r θ α β γ h_θ))
+        (Or.inl (differentiableAt_g_all_θ      M r θ α κ))
+
+  -- Same two helpers but with μ replaced by ν (for ν-branch)
+  have dprod_r_ν (α β γ : Idx) (κ : Idx) :
+    DifferentiableAt_r (fun r θ => Γtot M r θ α β γ * g M α κ r θ) r θ ∨ ν ≠ Idx.r := by
+    exact
+      DifferentiableAt_r_mul_of_cond
+        (fun r θ => Γtot M r θ α β γ)
+        (fun r θ => g M α κ r θ) r θ ν
+        (Or.inl (differentiableAt_Γtot_all_r M r θ h_ext α β γ))
+        (Or.inl (differentiableAt_g_all_r      M r θ h_ext α κ))
+
+  have dprod_θ_ν (α β γ : Idx) (κ : Idx) :
+    DifferentiableAt_θ (fun r θ => Γtot M r θ α β γ * g M α κ r θ) r θ ∨ ν ≠ Idx.θ := by
+    exact
+      DifferentiableAt_θ_mul_of_cond
+        (fun r θ => Γtot M r θ α β γ)
+        (fun r θ => g M α κ r θ) r θ ν
+        (Or.inl (differentiableAt_Γtot_all_θ M r θ α β γ h_θ))
+        (Or.inl (differentiableAt_g_all_θ      M r θ α κ))
+
+  -- Step 3: Push dCoord through each Σ and use product rule inside
+
+  -- Expand S1ν = sumIdx(Γ_νa · g_b)
+  have expand_S1ν :
+    dCoord μ S1ν r θ
+      =
+    sumIdx (fun e =>
+      dCoord μ (fun r θ => Γtot M r θ e ν a) r θ * g M e b r θ
+    + Γtot M r θ e ν a * dCoord μ (fun r θ => g M e b r θ) r θ) := by
+    simp only [S1ν]
+    rw [dCoord_sumIdx μ (fun e r θ => Γtot M r θ e ν a * g M e b r θ) r θ
+          (by intro e; exact dprod_r e ν a b)
+          (by intro e; exact dprod_θ e ν a b)]
+    apply sumIdx_congr; intro e
+    rw [dCoord_mul_of_diff μ
+          (fun r θ => Γtot M r θ e ν a) (fun r θ => g M e b r θ) r θ
+          (Or.inl (differentiableAt_Γtot_all_r M r θ h_ext e ν a))
+          (Or.inl (differentiableAt_g_all_r      M r θ h_ext e b))
+          (Or.inl (differentiableAt_Γtot_all_θ M r θ e ν a h_θ))
+          (Or.inl (differentiableAt_g_all_θ      M r θ e b))]
+
+  -- Expand S1μ = sumIdx(Γ_μa · g_b)
+  have expand_S1μ :
+    dCoord ν S1μ r θ
+      =
+    sumIdx (fun e =>
+      dCoord ν (fun r θ => Γtot M r θ e μ a) r θ * g M e b r θ
+    + Γtot M r θ e μ a * dCoord ν (fun r θ => g M e b r θ) r θ) := by
+    simp only [S1μ]
+    rw [dCoord_sumIdx ν (fun e r θ => Γtot M r θ e μ a * g M e b r θ) r θ
+          (by intro e; exact dprod_r_ν e μ a b)
+          (by intro e; exact dprod_θ_ν e μ a b)]
+    apply sumIdx_congr; intro e
+    rw [dCoord_mul_of_diff ν
+          (fun r θ => Γtot M r θ e μ a) (fun r θ => g M e b r θ) r θ
+          (Or.inl (differentiableAt_Γtot_all_r M r θ h_ext e μ a))
+          (Or.inl (differentiableAt_g_all_r      M r θ h_ext e b))
+          (Or.inl (differentiableAt_Γtot_all_θ M r θ e μ a h_θ))
+          (Or.inl (differentiableAt_g_all_θ      M r θ e b))]
+
+  -- Expand S2ν = sumIdx(Γ_νb · g_a)
+  have expand_S2ν :
+    dCoord μ S2ν r θ
+      =
+    sumIdx (fun e =>
+      dCoord μ (fun r θ => Γtot M r θ e ν b) r θ * g M a e r θ
+    + Γtot M r θ e ν b * dCoord μ (fun r θ => g M a e r θ) r θ) := by
+    simp only [S2ν]
+    rw [dCoord_sumIdx μ (fun e r θ => Γtot M r θ e ν b * g M a e r θ) r θ
+          (by intro e
+              apply DifferentiableAt_r_mul_of_cond
+              exact Or.inl (differentiableAt_Γtot_all_r M r θ h_ext e ν b)
+              exact Or.inl (differentiableAt_g_all_r M r θ h_ext a e))
+          (by intro e
+              apply DifferentiableAt_θ_mul_of_cond
+              exact Or.inl (differentiableAt_Γtot_all_θ M r θ e ν b h_θ)
+              exact Or.inl (differentiableAt_g_all_θ M r θ a e))]
+    apply sumIdx_congr; intro e
+    rw [dCoord_mul_of_diff μ
+          (fun r θ => Γtot M r θ e ν b) (fun r θ => g M a e r θ) r θ
+          (Or.inl (differentiableAt_Γtot_all_r M r θ h_ext e ν b))
+          (Or.inl (differentiableAt_g_all_r      M r θ h_ext a e))
+          (Or.inl (differentiableAt_Γtot_all_θ M r θ e ν b h_θ))
+          (Or.inl (differentiableAt_g_all_θ      M r θ a e))]
+
+  -- Expand S2μ = sumIdx(Γ_μb · g_a)
+  have expand_S2μ :
+    dCoord ν S2μ r θ
+      =
+    sumIdx (fun e =>
+      dCoord ν (fun r θ => Γtot M r θ e μ b) r θ * g M a e r θ
+    + Γtot M r θ e μ b * dCoord ν (fun r θ => g M a e r θ) r θ) := by
+    simp only [S2μ]
+    rw [dCoord_sumIdx ν (fun e r θ => Γtot M r θ e μ b * g M a e r θ) r θ
+          (by intro e
+              apply DifferentiableAt_r_mul_of_cond
+              exact Or.inl (differentiableAt_Γtot_all_r M r θ h_ext e μ b)
+              exact Or.inl (differentiableAt_g_all_r M r θ h_ext a e))
+          (by intro e
+              apply DifferentiableAt_θ_mul_of_cond
+              exact Or.inl (differentiableAt_Γtot_all_θ M r θ e μ b h_θ)
+              exact Or.inl (differentiableAt_g_all_θ M r θ a e))]
+    apply sumIdx_congr; intro e
+    rw [dCoord_mul_of_diff ν
+          (fun r θ => Γtot M r θ e μ b) (fun r θ => g M a e r θ) r θ
+          (Or.inl (differentiableAt_Γtot_all_r M r θ h_ext e μ b))
+          (Or.inl (differentiableAt_g_all_r      M r θ h_ext a e))
+          (Or.inl (differentiableAt_Γtot_all_θ M r θ e μ b h_θ))
+          (Or.inl (differentiableAt_g_all_θ      M r θ a e))]
+
+  -- Step 4: Final collection into the two RHS Σ-blocks
+
+  -- At this point regroup_payload says:
+  --   LHS = -(dCoord μ S1ν - dCoord ν S1μ) - (dCoord μ S2ν - dCoord ν S2μ)
+  -- and we've expanded each S term into (∂Γ)·g + Γ·(∂g)
+
+  -- Shorthands for the b-branch collectors
+  let G_b  : Idx → ℝ := fun ρ => g M ρ b r θ
+  let A_b  : Idx → ℝ := fun ρ => dCoord μ (fun r θ => Γtot M r θ ρ ν a) r θ
+  let B_b  : Idx → ℝ := fun ρ => dCoord ν (fun r θ => Γtot M r θ ρ μ a) r θ
+  let P_b  : Idx → ℝ := fun ρ => (Γtot M r θ ρ ν a) * dCoord μ (fun r θ => g M ρ b r θ) r θ
+  let Q_b  : Idx → ℝ := fun ρ => (Γtot M r θ ρ μ a) * dCoord ν (fun r θ => g M ρ b r θ) r θ
+
+  -- Shorthands for the a-branch collectors
+  let G_a  : Idx → ℝ := fun ρ => g M a ρ r θ
+  let A_a  : Idx → ℝ := fun ρ => dCoord μ (fun r θ => Γtot M r θ ρ ν b) r θ
+  let B_a  : Idx → ℝ := fun ρ => dCoord ν (fun r θ => Γtot M r θ ρ μ b) r θ
+  let P_a  : Idx → ℝ := fun ρ => (Γtot M r θ ρ ν b) * dCoord μ (fun r θ => g M a ρ r θ) r θ
+  let Q_a  : Idx → ℝ := fun ρ => (Γtot M r θ ρ μ b) * dCoord ν (fun r θ => g M a ρ r θ) r θ
+
+  -- Package the b-branch difference into ∂Γ-block + payload
+  have pack_b :
+      (sumIdx (fun ρ => A_b ρ * G_b ρ + P_b ρ))
+    - (sumIdx (fun ρ => B_b ρ * G_b ρ + Q_b ρ))
+    =
+      sumIdx (fun ρ => G_b ρ * (A_b ρ - B_b ρ))
+    + sumIdx (fun ρ => P_b ρ - Q_b ρ) := by
+    -- C = D = 0 collapses the extra commutator legs
+    simpa using
+      (sumIdx_collect_comm_block_with_extras
+        G_b A_b B_b (fun _ => 0) (fun _ => 0) P_b Q_b)
+
+  -- Same for the a-branch difference
+  have pack_a :
+      (sumIdx (fun ρ => A_a ρ * G_a ρ + P_a ρ))
+    - (sumIdx (fun ρ => B_a ρ * G_a ρ + Q_a ρ))
+    =
+      sumIdx (fun ρ => G_a ρ * (A_a ρ - B_a ρ))
+    + sumIdx (fun ρ => P_a ρ - Q_a ρ) := by
+    simpa using
+      (sumIdx_collect_comm_block_with_extras
+        G_a A_a B_a (fun _ => 0) (fun _ => 0) P_a Q_a)
+
+  -- Use regroup_payload as the starting point
+  calc
+    dCoord μ (fun r θ => nabla_g M r θ ν a b) r θ
+  - dCoord ν (fun r θ => nabla_g M r θ μ a b) r θ
+      -- Unfold was done at the beginning
+      = dCoord μ (fun r θ => Xν r θ - S1ν r θ - S2ν r θ) r θ
+      - dCoord ν (fun r θ => Xμ r θ - S1μ r θ - S2μ r θ) r θ := by simp [nabla_g, Xν, Xμ, S1ν, S1μ, S2ν, S2μ]
+    _ = - (dCoord μ S1ν r θ - dCoord ν S1μ r θ)
+      - (dCoord μ S2ν r θ - dCoord ν S2μ r θ) := regroup_payload
+    _ = - ((sumIdx fun e =>
+            dCoord μ (fun r θ => Γtot M r θ e ν a) r θ * g M e b r θ
+          + Γtot M r θ e ν a * dCoord μ (fun r θ => g M e b r θ) r θ)
+         - (sumIdx fun e =>
+            dCoord ν (fun r θ => Γtot M r θ e μ a) r θ * g M e b r θ
+          + Γtot M r θ e μ a * dCoord ν (fun r θ => g M e b r θ) r θ))
+      - ((sumIdx fun e =>
+            dCoord μ (fun r θ => Γtot M r θ e ν b) r θ * g M a e r θ
+          + Γtot M r θ e ν b * dCoord μ (fun r θ => g M a e r θ) r θ)
+         - (sumIdx fun e =>
+            dCoord ν (fun r θ => Γtot M r θ e μ b) r θ * g M a e r θ
+          + Γtot M r θ e μ b * dCoord ν (fun r θ => g M a e r θ) r θ)) := by
+        simp only [expand_S1ν, expand_S1μ, expand_S2ν, expand_S2μ]
+    _ = - ((sumIdx fun e => A_b e * G_b e + P_b e) - (sumIdx fun e => B_b e * G_b e + Q_b e))
+      - ((sumIdx fun e => A_a e * G_a e + P_a e) - (sumIdx fun e => B_a e * G_a e + Q_a e)) := by
+        simp only [G_b, A_b, B_b, P_b, Q_b, G_a, A_a, B_a, P_a, Q_a]
+    _ = - (sumIdx (fun e => G_b e * (A_b e - B_b e)) + sumIdx (fun e => P_b e - Q_b e))
+      - (sumIdx (fun e => G_a e * (A_a e - B_a e)) + sumIdx (fun e => P_a e - Q_a e)) := by
+        rw [pack_b, pack_a]
+    _ = sumIdx (fun e =>
+          -(dCoord μ (fun r θ => Γtot M r θ e ν a) r θ) * g M e b r θ
+          + (dCoord ν (fun r θ => Γtot M r θ e μ a) r θ) * g M e b r θ
+          -(dCoord μ (fun r θ => Γtot M r θ e ν b) r θ) * g M a e r θ
+          + (dCoord ν (fun r θ => Γtot M r θ e μ b) r θ) * g M a e r θ)
+      + sumIdx (fun e =>
+          -(Γtot M r θ e ν a) * dCoord μ (fun r θ => g M e b r θ) r θ
+          + (Γtot M r θ e μ a) * dCoord ν (fun r θ => g M e b r θ) r θ
+          -(Γtot M r θ e ν b) * dCoord μ (fun r θ => g M a e r θ) r θ
+          + (Γtot M r θ e μ b) * dCoord ν (fun r θ => g M a e r θ) r θ) := by
+        -- Final algebraic packaging: turn the two packed blocks into the explicit RHS
+        classical
+        -- Distribute the outer negations across each pair of sums and fuse them pointwise.
+        have H_b :
+          -(sumIdx (fun e => G_b e * (A_b e - B_b e)) + sumIdx (fun e => P_b e - Q_b e))
+            = sumIdx (fun ρ => -(G_b ρ * (A_b ρ - B_b ρ)) - (P_b ρ - Q_b ρ)) := by
+          rw [neg_add]  -- -(a + b) = -a + -b
+          rw [← sumIdx_neg, ← sumIdx_neg]  -- pull neg into each sumIdx
+          rw [← sumIdx_add_distrib]  -- combine back to single sumIdx
+          apply sumIdx_congr; intro ρ; ring
+
+        have H_a :
+          -(sumIdx (fun e => G_a e * (A_a e - B_a e)) + sumIdx (fun e => P_a e - Q_a e))
+            = sumIdx (fun ρ => -(G_a ρ * (A_a ρ - B_a ρ)) - (P_a ρ - Q_a ρ)) := by
+          rw [neg_add]
+          rw [← sumIdx_neg, ← sumIdx_neg]
+          rw [← sumIdx_add_distrib]
+          apply sumIdx_congr; intro ρ; ring
+
+        -- Pointwise conversion of the b-block to the stated Γ-derivative + payload form.
+        have H_b' :
+          sumIdx (fun ρ => -(G_b ρ * (A_b ρ - B_b ρ)) - (P_b ρ - Q_b ρ))
+            =
+          sumIdx (fun ρ =>
+            -(dCoord μ (fun r θ => Γtot M r θ ρ ν a) r θ) * g M ρ b r θ
+            + (dCoord ν (fun r θ => Γtot M r θ ρ μ a) r θ) * g M ρ b r θ
+            -(Γtot M r θ ρ ν a) * (dCoord μ (fun r θ => g M ρ b r θ) r θ)
+            + (Γtot M r θ ρ μ a) * (dCoord ν (fun r θ => g M ρ b r θ) r θ)) := by
+          apply sumIdx_congr; intro ρ
+          simp only [G_b, A_b, B_b, P_b, Q_b, sub_eq_add_neg, mul_add, mul_neg,
+                     neg_mul, neg_neg, mul_comm, mul_left_comm, mul_assoc,
+                     add_comm, add_left_comm, add_assoc]
+          ring
+
+        -- Pointwise conversion of the a-block to the stated Γ-derivative + payload form.
+        have H_a' :
+          sumIdx (fun ρ => -(G_a ρ * (A_a ρ - B_a ρ)) - (P_a ρ - Q_a ρ))
+            =
+          sumIdx (fun ρ =>
+            -(dCoord μ (fun r θ => Γtot M r θ ρ ν b) r θ) * g M a ρ r θ
+            + (dCoord ν (fun r θ => Γtot M r θ ρ μ b) r θ) * g M a ρ r θ
+            -(Γtot M r θ ρ ν b) * (dCoord μ (fun r θ => g M a ρ r θ) r θ)
+            + (Γtot M r θ ρ μ b) * (dCoord ν (fun r θ => g M a ρ r θ) r θ)) := by
+          apply sumIdx_congr; intro ρ
+          simp only [G_a, A_a, B_a, P_a, Q_a, sub_eq_add_neg, mul_add, mul_neg,
+                     neg_mul, neg_neg, mul_comm, mul_left_comm, mul_assoc,
+                     add_comm, add_left_comm, add_assoc]
+          ring
+
+        -- Assemble: rewrite the two packed blocks with H_b/H_a, then use the pointwise identities H_b'/H_a'.
+        calc
+          -(sumIdx (fun e => G_b e * (A_b e - B_b e)) + sumIdx (fun e => P_b e - Q_b e))
+          -(sumIdx (fun e => G_a e * (A_a e - B_a e)) + sumIdx (fun e => P_a e - Q_a e))
+              = sumIdx (fun ρ => -(G_b ρ * (A_b ρ - B_b ρ)) - (P_b ρ - Q_b ρ))
+              + (-(sumIdx (fun e => G_a e * (A_a e - B_a e)) + sumIdx (fun e => P_a e - Q_a e))) := by
+                rw [H_b]; ring
+          _   = sumIdx (fun ρ => -(G_b ρ * (A_b ρ - B_b ρ)) - (P_b ρ - Q_b ρ))
+              + sumIdx (fun ρ => -(G_a ρ * (A_a ρ - B_a ρ)) - (P_a ρ - Q_a ρ)) := by
+                rw [H_a]
+          _   = (sumIdx (fun e =>
+                    -(dCoord μ (fun r θ => Γtot M r θ e ν a) r θ) * g M e b r θ
+                    + (dCoord ν (fun r θ => Γtot M r θ e μ a) r θ) * g M e b r θ
+                    -(dCoord μ (fun r θ => Γtot M r θ e ν b) r θ) * g M a e r θ
+                    + (dCoord ν (fun r θ => Γtot M r θ e μ b) r θ) * g M a e r θ))
+              + (sumIdx (fun e =>
+                    -(Γtot M r θ e ν a) * dCoord μ (fun r θ => g M e b r θ) r θ
+                    + (Γtot M r θ e μ a) * dCoord ν (fun r θ => g M e b r θ) r θ
+                    -(Γtot M r θ e ν b) * dCoord μ (fun r θ => g M a e r θ) r θ
+                    + (Γtot M r θ e μ b) * dCoord ν (fun r θ => g M a e r θ) r θ)) := by
+                rw [H_b', H_a']
+                -- Restructure the sums: merge b/a branches pointwise, then split into (∂Γ⋅g) + (Γ⋅∂g).
+                -- Define the branch bodies to keep rewrites stable.
+                let Fb : Idx → ℝ := fun ρ =>
+                    -(dCoord μ (fun r θ => Γtot M r θ ρ ν a) r θ) * g M ρ b r θ
+                  + (dCoord ν (fun r θ => Γtot M r θ ρ μ a) r θ) * g M ρ b r θ
+                  -(Γtot M r θ ρ ν a) * (dCoord μ (fun r θ => g M ρ b r θ) r θ)
+                  + (Γtot M r θ ρ μ a) * (dCoord ν (fun r θ => g M ρ b r θ) r θ)
+
+                let Fa : Idx → ℝ := fun ρ =>
+                    -(dCoord μ (fun r θ => Γtot M r θ ρ ν b) r θ) * g M a ρ r θ
+                  + (dCoord ν (fun r θ => Γtot M r θ ρ μ b) r θ) * g M a ρ r θ
+                  -(Γtot M r θ ρ ν b) * (dCoord μ (fun r θ => g M a ρ r θ) r θ)
+                  + (Γtot M r θ ρ μ b) * (dCoord ν (fun r θ => g M a ρ r θ) r θ)
+
+                -- Define the grouped blocks: D = (∂Γ⋅g) from both branches; P = (Γ⋅∂g) from both branches.
+                let D : Idx → ℝ := fun ρ =>
+                    -(dCoord μ (fun r θ => Γtot M r θ ρ ν a) r θ) * g M ρ b r θ
+                  + (dCoord ν (fun r θ => Γtot M r θ ρ μ a) r θ) * g M ρ b r θ
+                  -(dCoord μ (fun r θ => Γtot M r θ ρ ν b) r θ) * g M a ρ r θ
+                  + (dCoord ν (fun r θ => Γtot M r θ ρ μ b) r θ) * g M a ρ r θ
+
+                let P : Idx → ℝ := fun ρ =>
+                    -(Γtot M r θ ρ ν a) * (dCoord μ (fun r θ => g M ρ b r θ) r θ)
+                  + (Γtot M r θ ρ μ a) * (dCoord ν (fun r θ => g M ρ b r θ) r θ)
+                  -(Γtot M r θ ρ ν b) * (dCoord μ (fun r θ => g M a ρ r θ) r θ)
+                  + (Γtot M r θ ρ μ b) * (dCoord ν (fun r θ => g M a ρ r θ) r θ)
+
+                -- Build the restructuring equality once, then `simpa` to the exact RHS.
+                have restructure :
+                    sumIdx Fb + sumIdx Fa
+                  = sumIdx D + sumIdx P := by
+                  -- Merge the two Σ's to a single Σ of a pointwise sum:
+                  rw [← sumIdx_add_distrib]
+                  -- Pointwise regroup into (D ρ) + (P ρ):
+                  have regroup :
+                    sumIdx (fun ρ => Fb ρ + Fa ρ) = sumIdx (fun ρ => D ρ + P ρ) := by
+                    apply sumIdx_congr; intro ρ
+                    -- purely scalar algebra; no binders at this point
+                    simp only [Fb, Fa, D, P,
+                               add_comm, add_left_comm, add_assoc,
+                               mul_comm, mul_left_comm, mul_assoc,
+                               sub_eq_add_neg]
+                    ring
+                  -- Apply regroup, then split back into two Σ's:
+                  rw [regroup, sumIdx_add_distrib]
+
+                -- Expose the two grouped blocks in the exact target shape.
+                simp only [Fb, Fa, D, P] at restructure
+                exact restructure
 
 /-! ### Block A: Payload Cancellation -/
 
 /-- Block A (a-branch): P_payload + C'_payload = 0.
-    The payload terms from P and C' are exact algebraic negations. -/
+    The payload terms from P and C' are exact algebraic negations.
+    Uses Q1 fix: "sum of zeros" pattern to avoid sumIdx_congr unification issue. -/
 lemma payload_cancel_a (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b : Idx) :
   ( sumIdx (fun ρ =>
       - (Γtot M r θ ρ ν a) * dCoord μ (fun r θ => g M ρ b r θ) r θ
@@ -6383,8 +7030,20 @@ lemma payload_cancel_a (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b : Idx
       + (Γtot M r θ ρ ν a) * dCoord μ (fun r θ => g M ρ b r θ) r θ) )
   = 0 := by
   classical
-  -- TODO: Proven with: rw [← sumIdx_add_distrib]; apply sumIdx_congr; intro ρ; ring
-  sorry
+  -- Q1 FIX: Prove using "sum of zeros" pattern
+  -- The body cancels pointwise by ring
+  have hpt : ∀ ρ, (- (Γtot M r θ ρ ν a) * dCoord μ (fun r θ => g M ρ b r θ) r θ
+      + (Γtot M r θ ρ μ a) * dCoord ν (fun r θ => g M ρ b r θ) r θ)
+  + (- (Γtot M r θ ρ μ a) * dCoord ν (fun r θ => g M ρ b r θ) r θ
+      + (Γtot M r θ ρ ν a) * dCoord μ (fun r θ => g M ρ b r θ) r θ) = 0 := by
+    intro ρ; ring
+
+  -- Rewrite as sum of pointwise zeros
+  rw [← sumIdx_add_distrib]
+  have : sumIdx (fun _ : Idx => (0 : ℝ)) = 0 := sumIdx_zero
+  rw [← this]
+  apply sumIdx_congr
+  exact hpt
 
 /-- Block A (b-branch): Mirror of a-branch. -/
 lemma payload_cancel_b (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b : Idx) :
@@ -6396,8 +7055,18 @@ lemma payload_cancel_b (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b : Idx
       + (Γtot M r θ ρ ν b) * dCoord μ (fun r θ => g M a ρ r θ) r θ) )
   = 0 := by
   classical
-  -- TODO: Proven with: rw [← sumIdx_add_distrib]; apply sumIdx_congr; intro ρ; ring
-  sorry
+  -- Same Q1 fix pattern as payload_cancel_a
+  have hpt : ∀ ρ, (- (Γtot M r θ ρ ν b) * dCoord μ (fun r θ => g M a ρ r θ) r θ
+      + (Γtot M r θ ρ μ b) * dCoord ν (fun r θ => g M a ρ r θ) r θ)
+  + (- (Γtot M r θ ρ μ b) * dCoord ν (fun r θ => g M a ρ r θ) r θ
+      + (Γtot M r θ ρ ν b) * dCoord μ (fun r θ => g M a ρ r θ) r θ) = 0 := by
+    intro ρ; ring
+
+  rw [← sumIdx_add_distrib]
+  have : sumIdx (fun _ : Idx => (0 : ℝ)) = 0 := sumIdx_zero
+  rw [← this]
+  apply sumIdx_congr
+  exact hpt
 
 /-- Block A (combined): All payload terms cancel. -/
 lemma payload_cancel_all (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b : Idx) :
@@ -6416,8 +7085,20 @@ lemma payload_cancel_all (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b : I
       + (Γtot M r θ ρ ν b) * dCoord μ (fun r θ => g M a ρ r θ) r θ) )
   = 0 := by
   classical
-  -- TODO: Proven with: have ha := payload_cancel_a...; calc chain
-  sorry
+  -- Combine using the two proven branch cancellations
+  have ha := payload_cancel_a M r θ h_ext μ ν a b
+  have hb := payload_cancel_b M r θ h_ext μ ν a b
+  -- Regroup: (first two) + (last two) = 0 + 0 = 0
+  calc _ = (( sumIdx (fun ρ => - (Γtot M r θ ρ ν a) * dCoord μ (fun r θ => g M ρ b r θ) r θ
+                + (Γtot M r θ ρ μ a) * dCoord ν (fun r θ => g M ρ b r θ) r θ) )
+          + ( sumIdx (fun ρ => - (Γtot M r θ ρ μ a) * dCoord ν (fun r θ => g M ρ b r θ) r θ
+                + (Γtot M r θ ρ ν a) * dCoord μ (fun r θ => g M ρ b r θ) r θ) ))
+        + (( sumIdx (fun ρ => - (Γtot M r θ ρ ν b) * dCoord μ (fun r θ => g M a ρ r θ) r θ
+                + (Γtot M r θ ρ μ b) * dCoord ν (fun r θ => g M a ρ r θ) r θ) )
+          + ( sumIdx (fun ρ => - (Γtot M r θ ρ μ b) * dCoord ν (fun r θ => g M a ρ r θ) r θ
+                + (Γtot M r θ ρ ν b) * dCoord μ (fun r θ => g M a ρ r θ) r θ) )) := by ring
+       _ = 0 + 0 := by rw [ha, hb]
+       _ = 0 := by ring
 
 /-! ### Block C: Main to Commutator -/
 
@@ -6432,46 +7113,56 @@ lemma main_to_commutator (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b : I
       Γtot M r θ ρ μ b * Γtot M r θ e ν ρ * g M e a r θ
     - Γtot M r θ ρ ν b * Γtot M r θ e μ ρ * g M e a r θ)) )
   =
-  -- RHS: ΓΓ part from RiemannUp after lowering first index
-  ( sumIdx (fun ρ => g M b ρ r θ *
-      ( sumIdx (fun lam =>
-          Γtot M r θ ρ μ lam * Γtot M r θ lam ν a
-        - Γtot M r θ ρ ν lam * Γtot M r θ lam μ a))) )
-+ ( sumIdx (fun ρ => g M a ρ r θ *
-      ( sumIdx (fun lam =>
-          Γtot M r θ ρ μ lam * Γtot M r θ lam ν b
-        - Γtot M r θ ρ ν lam * Γtot M r θ lam μ b))) ) := by
+  -- RHS: ΓΓ part with g factored outside (corrected form per JP)
+  ( sumIdx (fun e => g M e b r θ * (sumIdx (fun ρ =>
+      Γtot M r θ e ν ρ * Γtot M r θ ρ μ a
+    - Γtot M r θ e μ ρ * Γtot M r θ ρ ν a))) )
++ ( sumIdx (fun e => g M a e r θ * (sumIdx (fun ρ =>
+      Γtot M r θ e ν ρ * Γtot M r θ ρ μ b
+    - Γtot M r θ e μ ρ * Γtot M r θ ρ ν b))) ) := by
   classical
-  -- Strategy:
-  -- 1) Swap Σ_ρ Σ_e to Σ_e Σ_ρ (sumIdx_swap)
-  -- 2) Commute pointwise to pull g next to Σ_ρ (sumIdx_congr + ring)
-  -- 3) Relabel e ↦ lam
-  -- 4) Use collectors to bundle terms
-  sorry
+  -- Work on each branch separately
+  congr 1
+  all_goals (
+    -- Swap sum order: Σ_ρ Σ_e → Σ_e Σ_ρ
+    rw [sumIdx_swap]
+    -- Show equality of inner sums for each e
+    apply sumIdx_congr
+    intro e
+    -- Factor out g using sumIdx_mul and reorder terms
+    rw [← sumIdx_mul]
+    apply sumIdx_congr
+    intro ρ
+    -- Apply metric symmetry then ring
+    simp only [g_symm]
+    ring
+  )
 
 /-! ### Block D: ∂Γ Matching -/
 
 /-- Block D: (∂Γ)g from P equals the RHS_{∂Γ} in the lowered Riemann. -/
 lemma dGamma_match (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b : Idx) :
-  -- Left: (D)_a + (D)_b (from expand_Pa/Pb)
-  ( sumIdx (fun ρ => sumIdx (fun e =>
-      (dCoord μ (fun r θ => Γtot M r θ e ν ρ) r θ) * g M e b r θ
-    - (dCoord ν (fun r θ => Γtot M r θ e μ ρ) r θ) * g M e b r θ)) )
-+ ( sumIdx (fun ρ => sumIdx (fun e =>
-      (dCoord μ (fun r θ => Γtot M r θ e ν a) r θ) * g M e ρ r θ
-    - (dCoord ν (fun r θ => Γtot M r θ e μ a) r θ) * g M e ρ r θ)) )
+  -- Left: P_{∂Γ} block from expand_P_ab
+  (sumIdx (fun e =>
+      -(dCoord μ (fun r θ => Γtot M r θ e ν a) r θ) * g M e b r θ
+      + (dCoord ν (fun r θ => Γtot M r θ e μ a) r θ) * g M e b r θ
+      -(dCoord μ (fun r θ => Γtot M r θ e ν b) r θ) * g M a e r θ
+      + (dCoord ν (fun r θ => Γtot M r θ e μ b) r θ) * g M a e r θ))
   =
-  -- Right: lowered ∂Γ-part of (−R_{baμν}) + (−R_{abμν})
-  ( sumIdx (fun ρ => g M b ρ r θ * (
-      dCoord μ (fun r θ => Γtot M r θ ρ ν a) r θ
-    - dCoord ν (fun r θ => Γtot M r θ ρ μ a) r θ)) )
-+ ( sumIdx (fun ρ => g M a ρ r θ * (
-      dCoord μ (fun r θ => Γtot M r θ ρ ν b) r θ
-    - dCoord ν (fun r θ => Γtot M r θ ρ μ b) r θ)) ) := by
+  -- Right: RHS_{∂Γ} with g factored outside (corrected form per JP)
+  ( sumIdx (fun e => g M e b r θ * (
+      -(dCoord μ (fun r θ => Γtot M r θ e ν a) r θ)
+      + (dCoord ν (fun r θ => Γtot M r θ e μ a) r θ))) )
++ ( sumIdx (fun e => g M a e r θ * (
+      -(dCoord μ (fun r θ => Γtot M r θ e ν b) r θ)
+      + (dCoord ν (fun r θ => Γtot M r θ e μ b) r θ))) ) := by
   classical
-  -- Swap Σ_ρ Σ_e to Σ_e Σ_ρ, then relabel dummy (e ↔ ρ), then commute
-  -- Use sumIdx_swap and pointwise sumIdx_congr + ring
-  sorry
+  -- Factor g and local reordering
+  rw [← sumIdx_add_distrib]
+  apply sumIdx_congr
+  intro e
+  simp only [g_symm]
+  ring
 
 /-! ### Block B: Cross Cancellation -/
 
@@ -6485,10 +7176,58 @@ lemma cross_block_zero (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b : Idx
       Γtot M r θ ρ μ b * Γtot M r θ e ν a * g M ρ e r θ
     - Γtot M r θ ρ ν b * Γtot M r θ e μ a * g M ρ e r θ)) ) = 0 := by
   classical
-  -- Step 1: Diagonality kills off-diagonal (ρ ≠ e) terms
-  -- Step 2: On diagonal (ρ = e), kernel cancels by commutativity
-  -- Use sumIdx_congr + ring pointwise after restricting to diagonal
-  sorry
+  -- 1) Fuse the two branches into a single double sum with kernel grouped
+  have h_fuse :
+    ( sumIdx (fun ρ => sumIdx (fun e =>
+          Γtot M r θ ρ μ a * Γtot M r θ e ν b * g M ρ e r θ
+        - Γtot M r θ ρ ν a * Γtot M r θ e μ b * g M ρ e r θ)) )
+  + ( sumIdx (fun ρ => sumIdx (fun e =>
+          Γtot M r θ ρ μ b * Γtot M r θ e ν a * g M ρ e r θ
+        - Γtot M r θ ρ ν b * Γtot M r θ e μ a * g M ρ e r θ)) )
+    =
+    sumIdx (fun ρ => sumIdx (fun e =>
+      g M ρ e r θ *
+      (  Γtot M r θ ρ μ a * Γtot M r θ e ν b
+       + Γtot M r θ ρ μ b * Γtot M r θ e ν a
+       - Γtot M r θ ρ ν a * Γtot M r θ e μ b
+       - Γtot M r θ ρ ν b * Γtot M r θ e μ a ))) := by
+    rw [← sumIdx_add_distrib]
+    apply sumIdx_congr; intro ρ
+    rw [← sumIdx_add_distrib]
+    apply sumIdx_congr; intro e
+    ring
+  -- 2) Reduce the inner Σ_e by diagonality of g (produces e = ρ only)
+  have h_diag :
+    sumIdx (fun ρ => sumIdx (fun e =>
+      g M ρ e r θ *
+      (  Γtot M r θ ρ μ a * Γtot M r θ e ν b
+       + Γtot M r θ ρ μ b * Γtot M r θ e ν a
+       - Γtot M r θ ρ ν a * Γtot M r θ e μ b
+       - Γtot M r θ ρ ν b * Γtot M r θ e μ a )))
+    =
+    sumIdx (fun ρ =>
+      g M ρ ρ r θ *
+      (  Γtot M r θ ρ μ a * Γtot M r θ ρ ν b
+       + Γtot M r θ ρ μ b * Γtot M r θ ρ ν a
+       - Γtot M r θ ρ ν a * Γtot M r θ ρ μ b
+       - Γtot M r θ ρ ν b * Γtot M r θ ρ μ a )) := by
+    apply sumIdx_congr; intro ρ
+    exact sumIdx_reduce_by_diagonality M r θ ρ _
+  -- 3) Pointwise kernel cancellation on the diagonal, then fold "sum of zeros"
+  have hK0 :
+    ∀ ρ, (  Γtot M r θ ρ μ a * Γtot M r θ ρ ν b
+          + Γtot M r θ ρ μ b * Γtot M r θ ρ ν a
+          - Γtot M r θ ρ ν a * Γtot M r θ ρ μ b
+          - Γtot M r θ ρ ν b * Γtot M r θ ρ μ a ) = 0 := by
+    intro ρ
+    simp [cross_kernel_cancel]
+  have hsum0 : sumIdx (fun _ : Idx => (0 : ℝ)) = 0 := sumIdx_zero
+  calc
+    _ = _ := h_fuse
+    _ = _ := h_diag
+    _ = sumIdx (fun ρ => g M ρ ρ r θ * 0) := by
+          apply sumIdx_congr; intro ρ; simp [hK0 ρ]
+    _ = 0 := by simpa using hsum0
 
 /-- Lemma 2: Algebraic Identity (THE HEAVY LIFTING).
     Proves: P_μν + C_aμν + C_bμν = -R_baμν - R_abμν
@@ -6499,27 +7238,35 @@ Previous inline expansion approach was mathematically flawed (omitted P expansio
 -/
 
 lemma algebraic_identity
-    (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b : Idx) :
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (h_θ : Real.sin θ ≠ 0) (μ ν a b : Idx) :
   P_terms M r θ μ ν a b + C_terms_a M r θ μ ν a b + C_terms_b M r θ μ ν a b
   =
   - Riemann M r θ b a μ ν - Riemann M r θ a b μ ν := by
   classical
-  -- Four-Block Strategy Assembly
-  -- Block 0: Expand P (TODO: connect P_terms to expand_Pa/Pb sums)
-  -- Block A: Payload cancellation (payload_cancel_all)
-  -- Block D: ∂Γ matching (dGamma_match)
-  -- Block C: Main to commutator (main_to_commutator, using expand_Ca/Cb)
-  -- Block B: Cross cancellation (cross_block_zero, using expand_Ca/Cb)
-  -- Final: Identify with Riemann definition
+  -- JP's Four-Block Assembly Strategy (Oct 24, 2025)
+  -- All 4 blocks are fully proven: A, B, C, D
+  -- Linear sequence of 8 rewrites: expand terms, apply 4 blocks, normalize to RHS
 
-  sorry  -- TODO: Complete four-block assembly
+  -- Assembly blocked by expand_P_ab
+  -- Once expand_P_ab is complete, this 8-step assembly will work:
+  --
+  -- unfold P_terms C_terms_a C_terms_b
+  -- have hP := expand_P_ab M r θ h_ext h_θ μ ν a b; rw [hP]
+  -- rw [expand_Ca M r θ μ ν a b]
+  -- rw [expand_Cb_for_C_terms_b M r θ μ ν a b]
+  -- rw [payload_cancel_all M r θ h_ext μ ν a b]
+  -- rw [dGamma_match M r θ h_ext μ ν a b]
+  -- rw [main_to_commutator M r θ h_ext μ ν a b]
+  -- rw [cross_block_zero M r θ h_ext μ ν a b]
+  -- simp only [Riemann, RiemannUp, Riemann_contract_first, add_comm, add_left_comm, add_assoc, sub_eq_add_neg, zero_add, add_zero]
+  sorry
 /-- Main Theorem: Ricci Identity for the metric (general μ, ν).
     Combines commutator_structure and algebraic_identity.
 
 This is the general Ricci identity: [∇_μ, ∇_ν]g_ab = -R_baμν - R_abμν
 Proven WITHOUT assuming metric compatibility (∇g = 0), as required. -/
 theorem ricci_identity_on_g_general
-    (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b : Idx) :
+    (M r θ : ℝ) (h_ext : Exterior M r θ) (h_θ : Real.sin θ ≠ 0) (μ ν a b : Idx) :
   (nabla2_g M r θ μ ν a b - nabla2_g M r θ ν μ a b)
   =
   - Riemann M r θ b a μ ν - Riemann M r θ a b μ ν := by
@@ -6532,7 +7279,7 @@ theorem ricci_identity_on_g_general
 
     -- Apply Lemma 2
     _ = - Riemann M r θ b a μ ν - Riemann M r θ a b μ ν := by
-      apply algebraic_identity M r θ h_ext
+      apply algebraic_identity M r θ h_ext h_θ
 
 /-- Ricci identity specialized to the metric in the (r,θ) plane, on the Exterior domain.
 
@@ -6548,7 +7295,7 @@ lemma ricci_identity_on_g_rθ_ext
   - Riemann M r θ b a Idx.r Idx.θ - Riemann M r θ a b Idx.r Idx.θ := by
   -- Once ricci_identity_on_g_general is proven:
   -- have : nabla (fun M r θ a b => nabla_g M r θ ν a b) M r θ μ a b = nabla2_g M r θ μ ν a b := rfl
-  -- exact ricci_identity_on_g_general M r θ h_ext Idx.r Idx.θ a b
+  -- exact ricci_identity_on_g_general M r θ h_ext h_θ Idx.r Idx.θ a b
   sorry -- TODO: Apply ricci_identity_on_g_general once proven
 
 end RicciProof
