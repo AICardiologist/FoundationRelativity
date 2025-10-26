@@ -4324,6 +4324,28 @@ def Riemann (M r θ : ℝ) (a b c d : Idx) : ℝ :=
 end DraftRiemann
 -/
 
+/-- Σρ RiemannUp(ρ,a,μ,ν) · g_{ρb}  =  Riemann(b,a,μ,ν). -/
+lemma sum_RUp_g_to_Riemann_ba
+    (M r θ : ℝ) (a b μ ν : Idx) :
+  sumIdx (fun ρ => RiemannUp M r θ ρ a μ ν * g M ρ b r θ)
+    = Riemann M r θ b a μ ν := by
+  classical
+  unfold Riemann
+  apply sumIdx_congr
+  intro ρ
+  rw [mul_comm, g_symm_JP]
+
+/-- Σρ RiemannUp(ρ,b,μ,ν) · g_{aρ}  =  Riemann(a,b,μ,ν). -/
+lemma sum_RUp_g_to_Riemann_ab
+    (M r θ : ℝ) (a b μ ν : Idx) :
+  sumIdx (fun ρ => RiemannUp M r θ ρ b μ ν * g M a ρ r θ)
+    = Riemann M r θ a b μ ν := by
+  classical
+  unfold Riemann
+  apply sumIdx_congr
+  intro ρ
+  rw [mul_comm]
+
 /-- Lemma relating nabla_g and ContractionC. By definition: ∇_d g_ab = ∂_d g_ab - C_dab. -/
 lemma nabla_g_eq_dCoord_sub_C (M r θ : ℝ) (d a b : Idx) :
   nabla_g M r θ d a b = dCoord d (fun r θ => g M a b r θ) r θ - ContractionC M r θ d a b := by
@@ -8190,10 +8212,70 @@ lemma ricci_identity_on_g_rθ_ext
   - nabla (fun M r θ a b => nabla_g M r θ Idx.r a b) M r θ Idx.θ a b
   =
   - Riemann M r θ b a Idx.r Idx.θ - Riemann M r θ a b Idx.r Idx.θ := by
-  -- Once ricci_identity_on_g_general is proven:
-  -- have : nabla (fun M r θ a b => nabla_g M r θ ν a b) M r θ μ a b = nabla2_g M r θ μ ν a b := rfl
-  -- exact ricci_identity_on_g_general M r θ h_ext h_θ Idx.r Idx.θ a b
-  sorry -- TODO: Apply ricci_identity_on_g_general once proven
+  classical
+  -- General Ricci identity at (μ,ν) = (r,θ)
+  have H := ricci_identity_on_g_general M r θ h_ext h_θ Idx.r Idx.θ a b
+
+  -- Kill the commutator LHS by metric compatibility (∇g = 0)
+  have h_r : nabla_g M r θ Idx.r a b = 0 := nabla_g_zero_ext M r θ h_ext Idx.r a b
+  have h_θ' : nabla_g M r θ Idx.θ a b = 0 := nabla_g_zero_ext M r θ h_ext Idx.θ a b
+  have LHS0 :
+    dCoord Idx.r (fun r θ => nabla_g M r θ Idx.θ a b) r θ
+  - dCoord Idx.θ (fun r θ => nabla_g M r θ Idx.r a b) r θ = 0 := by
+    -- both dCoord terms are derivatives of the constant 0
+    simp [h_r, h_θ', dCoord]
+    ring
+
+  -- Convert both Σ(RUp⋅g) terms to lowered Riemann
+  have S₁ :
+    sumIdx (fun ρ => RiemannUp M r θ ρ a Idx.r Idx.θ * g M ρ b r θ)
+      = Riemann M r θ b a Idx.r Idx.θ :=
+    sum_RUp_g_to_Riemann_ba M r θ a b Idx.r Idx.θ
+  have S₂ :
+    sumIdx (fun ρ => RiemannUp M r θ ρ b Idx.r Idx.θ * g M a ρ r θ)
+      = Riemann M r θ a b Idx.r Idx.θ :=
+    sum_RUp_g_to_Riemann_ab M r θ a b Idx.r Idx.θ
+
+  -- Kill Gamma terms by metric compatibility
+  have hμν :
+    Gamma_mu_nabla_nu M r θ Idx.r Idx.θ a b = 0 := by
+    have hza1 := nabla_g_zero_ext M r θ h_ext Idx.θ a b
+    have hza2 := nabla_g_zero_ext M r θ h_ext Idx.θ b a
+    unfold Gamma_mu_nabla_nu
+    simp only [hza1, hza2]
+    ring
+
+  have hνμ :
+    Gamma_nu_nabla_mu M r θ Idx.r Idx.θ a b = 0 := by
+    have hzb1 := nabla_g_zero_ext M r θ h_ext Idx.r a b
+    have hzb2 := nabla_g_zero_ext M r θ h_ext Idx.r b a
+    unfold Gamma_nu_nabla_mu
+    simp only [hzb1, hzb2]
+    ring
+
+  -- From H and LHS0, get 0 = -(R_ba) - (R_ab) ⇒ R_ab + R_ba = 0
+  have : (0 : ℝ) - 0
+      = - Riemann M r θ b a Idx.r Idx.θ
+        - Riemann M r θ a b Idx.r Idx.θ := by
+    simp only [LHS0, S₁, S₂, hμν, hνμ, add_zero, zero_add, zero_sub, sub_zero] at H
+    simpa using H
+  -- Rearrange: 0 = -(X + Y) ⇒ X + Y = 0
+  have : Riemann M r θ b a Idx.r Idx.θ
+       + Riemann M r θ a b Idx.r Idx.θ = 0 := by
+    have : (0:ℝ) = - (Riemann M r θ b a Idx.r Idx.θ
+                 + Riemann M r θ a b Idx.r Idx.θ) := by
+      have := this
+      linarith
+    linarith
+
+  -- nabla definition and symmetry
+  have def_rθ : nabla (fun M r θ a b => nabla_g M r θ Idx.θ a b) M r θ Idx.r a b
+              = dCoord Idx.r (fun r θ => nabla_g M r θ Idx.θ a b) r θ := rfl
+  have def_θr : nabla (fun M r θ a b => nabla_g M r θ Idx.r a b) M r θ Idx.θ a b
+              = dCoord Idx.θ (fun r θ => nabla_g M r θ Idx.r a b) r θ := rfl
+
+  rw [def_rθ, def_θr, LHS0]
+  linarith
 
 end RicciProof
 /-- Ricci identity specialized to the metric, by *definition-chasing only*.
@@ -8210,50 +8292,59 @@ lemma ricci_identity_on_g
   - Riemann M r θ b a c d - Riemann M r θ a b c d := by
   sorry
 
-/-- First-pair antisymmetry for the r-θ case: R_{ba,rθ} = -R_{ab,rθ}.
+/-- First-pair antisymmetry on Exterior: R_{ba,μν} = -R_{ab,μν} for all μ,ν.
 
     Proven using ricci_identity_on_g_general + metric compatibility (∇g = 0).
     This is the standard textbook derivation.
 -/
 lemma Riemann_swap_a_b_ext
   (M r θ : ℝ) (h_ext : Exterior M r θ) (hθ : Real.sin θ ≠ 0)
-  (a b : Idx) :
-  Riemann M r θ b a Idx.r Idx.θ = - Riemann M r θ a b Idx.r Idx.θ := by
+  (a b μ ν : Idx) :
+  Riemann M r θ a b μ ν = - Riemann M r θ b a μ ν := by
   classical
-  have H := ricci_identity_on_g_general M r θ h_ext hθ Idx.r Idx.θ a b
+  have H := ricci_identity_on_g_general M r θ h_ext hθ μ ν a b
+  -- ∇g = 0 on Exterior
+  have hμ : nabla_g M r θ μ a b = 0 := nabla_g_zero_ext M r θ h_ext μ a b
+  have hν : nabla_g M r θ ν a b = 0 := nabla_g_zero_ext M r θ h_ext ν a b
+  have LHS0 :
+    dCoord μ (fun r θ => nabla_g M r θ ν a b) r θ
+  - dCoord ν (fun r θ => nabla_g M r θ μ a b) r θ = 0 := by
+    simp [hμ, hν, dCoord]
+    ring
 
-  -- Use your compiled compatibility lemmas here.
-  -- Adjust names if they differ slightly in your file:
-  --  * nabla_g_zero_ext : nabla_g M r θ μ a b = 0
-  --  * dCoord_nabla_g_zero_ext : dCoord μ (fun r θ => nabla_g …) r θ = 0
-  have h₁ :
-    dCoord Idx.r (fun r θ => nabla_g M r θ Idx.θ a b) r θ = 0 :=
-    dCoord_nabla_g_zero_ext M r θ h_ext Idx.r Idx.θ a b
-  have h₂ :
-    dCoord Idx.θ (fun r θ => nabla_g M r θ Idx.r a b) r θ = 0 :=
-    dCoord_nabla_g_zero_ext M r θ h_ext Idx.θ Idx.r a b
+  -- Convert the two Σ(RUp⋅g) to Riemann
+  have S₁ := sum_RUp_g_to_Riemann_ba M r θ a b μ ν
+  have S₂ := sum_RUp_g_to_Riemann_ab M r θ a b μ ν
 
+  -- Kill Gamma terms by metric compatibility
   have hμν :
-    Gamma_mu_nabla_nu M r θ Idx.r Idx.θ a b = 0 := by
-    -- both summands use nabla_g … = 0
-    have hza1 := nabla_g_zero_ext M r θ h_ext Idx.θ a b
-    have hza2 := nabla_g_zero_ext M r θ h_ext Idx.θ b a
-    simp [Gamma_mu_nabla_nu, hza1, hza2]
+    Gamma_mu_nabla_nu M r θ μ ν a b = 0 := by
+    have hza1 := nabla_g_zero_ext M r θ h_ext ν a b
+    have hza2 := nabla_g_zero_ext M r θ h_ext ν b a
+    unfold Gamma_mu_nabla_nu
+    simp only [hza1, hza2]
+    ring
 
   have hνμ :
-    Gamma_nu_nabla_mu M r θ Idx.r Idx.θ a b = 0 := by
-    -- both summands use nabla_g … = 0
-    have hzb1 := nabla_g_zero_ext M r θ h_ext Idx.r a b
-    have hzb2 := nabla_g_zero_ext M r θ h_ext Idx.r b a
-    simp [Gamma_nu_nabla_mu, hzb1, hzb2]
+    Gamma_nu_nabla_mu M r θ μ ν a b = 0 := by
+    have hzb1 := nabla_g_zero_ext M r θ h_ext μ a b
+    have hzb2 := nabla_g_zero_ext M r θ h_ext μ b a
+    unfold Gamma_nu_nabla_mu
+    simp only [hzb1, hzb2]
+    ring
 
-  -- LHS is 0; conclude antisymmetry in the first pair.
-  have comm_zero :
-    ((dCoord Idx.r (fun r θ => nabla_g M r θ Idx.θ a b) r θ - Gamma_mu_nabla_nu M r θ Idx.r Idx.θ a b)
-     - (dCoord Idx.θ (fun r θ => nabla_g M r θ Idx.r a b) r θ - Gamma_nu_nabla_mu M r θ Idx.r Idx.θ a b)) = 0 := by
-    simp [h₁, h₂, hμν, hνμ]
+  -- 0 = -(R_ba) - (R_ab)
+  have hsum0 :
+    Riemann M r θ a b μ ν + Riemann M r θ b a μ ν = 0 := by
+    have : (0:ℝ) - 0
+        = - Riemann M r θ b a μ ν
+          - Riemann M r θ a b μ ν := by
+      simp only [LHS0, S₁, S₂, hμν, hνμ, add_zero, zero_add, zero_sub, sub_zero] at H
+      simpa using H
+    linarith
 
-  simpa [comm_zero] using H
+  -- X + Y = 0  ↔  X = -Y
+  linarith
 
 /-- First-pair antisymmetry for the (all-lowered) Riemann tensor of the Levi–Civita connection.
     It follows from metric compatibility (`∇g = 0`) and the Ricci identity on `g`:
