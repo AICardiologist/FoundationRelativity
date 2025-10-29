@@ -112,6 +112,49 @@ lemma deriv_zero_of_locally_zero {f : ℝ → ℝ} {x : ℝ} {U : Set ℝ}
 
 end Exterior
 
+/-- On the Schwarzschild exterior and off the axis (`sin θ ≠ 0`),
+    every diagonal metric entry is nonzero. -/
+lemma g_diag_ne_zero_of_exterior_offaxis
+  (M r θ : ℝ) (h_ext : Exterior M r θ) (h_off : Real.sin θ ≠ 0) :
+  ∀ β : Idx, g M β β r θ ≠ 0 := by
+  have hr0 : r ≠ 0 := Exterior.r_ne_zero h_ext
+  have hf0 : f M r ≠ 0 := Exterior.f_ne_zero h_ext
+  intro β
+  cases β with
+  | t =>  -- g_tt = - f
+    simpa [g] using (neg_ne_zero.mpr hf0)
+  | r =>  -- g_rr = 1 / f
+    simpa [g] using (inv_ne_zero hf0)
+  | θ =>  -- g_θθ = r^2
+    simpa [g, pow_two] using (pow_ne_zero 2 hr0)
+  | φ =>  -- g_φφ = r^2 * (sin θ)^2
+    have h1 : (r^2) ≠ 0 := pow_ne_zero 2 hr0
+    have h2 : (Real.sin θ)^2 ≠ 0 := by
+      simpa [pow_two] using pow_ne_zero 2 h_off
+    have hprod : r^2 * (Real.sin θ)^2 ≠ 0 := mul_ne_zero h1 h2
+    simpa [g, pow_two] using hprod
+
+/-- A point θ is off the coordinate axis if sin θ ≠ 0.
+    This excludes the north and south poles (θ = 0, π). -/
+structure OffAxis (θ : ℝ) : Prop := (hθ : Real.sin θ ≠ 0)
+
+/-- The standard domain for Schwarzschild coordinate calculations:
+    the exterior region (r > 2M) away from the coordinate axis (sin θ ≠ 0). -/
+structure ChartDomain (M r θ : ℝ) : Prop :=
+  (ext : Exterior M r θ)
+  (off : OffAxis θ)
+
+namespace ChartDomain
+  variable {M r θ : ℝ}
+
+  lemma r_ne_zero  (h : ChartDomain M r θ) : r ≠ 0 := Exterior.r_ne_zero h.ext
+  lemma f_ne_zero  (h : ChartDomain M r θ) : f M r ≠ 0 := Exterior.f_ne_zero h.ext
+  lemma sin_ne_zero (h : ChartDomain M r θ) : Real.sin θ ≠ 0 := h.off.hθ
+  lemma g_diag_ne_zero (h : ChartDomain M r θ) :
+    ∀ β : Idx, g M β β r θ ≠ 0 :=
+  g_diag_ne_zero_of_exterior_offaxis M r θ h.ext h.off.hθ
+end ChartDomain
+
 /-! ### Fold helpers (avoid invoking ring in binder contexts) -/
 
 /-- Fold subtraction on right: a * c - b * c = (a - b) * c -/
@@ -121,6 +164,17 @@ end Exterior
 /-- Fold addition on left: a * b + a * c = a * (b + c) -/
 @[simp] lemma fold_add_left {a b c : ℝ} : a * b + a * c = a * (b + c) := by
   simpa using (mul_add a b c).symm
+
+/-- Scalar packaging for 4-term sum: canonical form after scalar_finish fixes -/
+@[simp] lemma scalar_pack4 (A B C D g : ℝ) :
+  (-(A) * g + B * g) + g * (C - D)
+    = ((-A + B) + (C - D)) * g := by
+  ring
+
+/-- Alternative scalar packaging: bridge to minus-of-difference form if needed -/
+@[simp] lemma scalar_pack4_alt (A B C D g : ℝ) :
+  ((-A + B) + (C - D)) * g = - ((A - B) - (C - D)) * g := by
+  ring
 
 /-- Group as `(X + Y) - Z = (X - Z) + Y`. No AC, stable shape. -/
 @[simp] lemma group_add_sub (X Y Z : ℝ) : X + Y - Z = (X - Z) + Y := by ring
@@ -1565,11 +1619,34 @@ lemma mul_sumIdx (c : ℝ) (f : Idx → ℝ) :
   -- both sides expand to the same 16-term sum
   simp [sumIdx_expand, add_comm, add_left_comm, add_assoc]
 
+/-- Swap the two dummy indices inside a double `sumIdx`. Purely algebraic.
+    NOTE: Not marked @[simp] to avoid bidirectional rewriting loops. Use explicitly. -/
+lemma sumIdx_swap_args (F : Idx → Idx → ℝ) :
+  sumIdx (fun ρ => sumIdx (fun e => F ρ e))
+    = sumIdx (fun ρ => sumIdx (fun e => F e ρ)) := by
+  classical
+  -- Both sides expand to the same 16-term sum in a different order.
+  simp [sumIdx_expand, add_comm, add_left_comm, add_assoc]
+
 /-- Distribute sum inside a multiplication: Σ(c·f) = c·Σf (used for pulling constants out). -/
 lemma sumIdx_mul (c : ℝ) (f : Idx → ℝ) :
   sumIdx (fun k => c * f k) = c * sumIdx f := by
   classical
   simp [sumIdx, Finset.mul_sum]
+
+/-! ### Right-hand constant helpers (for when constant is on the right of product) -/
+
+/-- Distribute sum with constant on right: Σ(f·c) = Σf·c. -/
+lemma sumIdx_mul_right (f : Idx → ℝ) (c : ℝ) :
+  sumIdx (fun e => f e * c) = sumIdx f * c := by
+  classical
+  simpa [mul_comm] using sumIdx_mul c (fun e => f e)
+
+/-- Reverse direction: Σf·c = Σ(f·c). -/
+lemma mul_sumIdx_right (f : Idx → ℝ) (c : ℝ) :
+  sumIdx f * c = sumIdx (fun e => f e * c) := by
+  classical
+  simpa [mul_comm] using (mul_sumIdx c f)
 
 /-- Sum distributes over addition: Σ(f + g) = Σf + Σg. -/
 lemma sumIdx_add_distrib (f g : Idx → ℝ) :
@@ -1768,12 +1845,21 @@ lemma sumIdx_collect8_mixed_right
 
 /-- Collect 6 sums into linearized form.
     Used for left regrouping where we have 2 ∂Γ terms + 4 Γ·Γ terms. -/
-lemma sumIdx_collect6 (f₁ f₂ f₃ f₄ f₅ f₆ : Idx → ℝ) :
+lemma sumIdx_collect6_left_regroup (f₁ f₂ f₃ f₄ f₅ f₆ : Idx → ℝ) :
   sumIdx (fun k => f₁ k - f₂ k + (f₃ k + f₄ k) - (f₅ k + f₆ k))
   = (sumIdx f₁ - sumIdx f₂) + (sumIdx f₃ + sumIdx f₄) - (sumIdx f₅ + sumIdx f₆) := by
   classical
-  -- Use distributivity in forward direction, then rearrange
   simp only [sumIdx_add_distrib, sumIdx_map_sub]
+
+/-- Collect six sums into a single Σ with the canonical `+-` footprint.
+    Deterministic; avoids AC search and `ring_nf` under binders. -/
+lemma sumIdx_collect6 (f₁ f₂ f₃ f₄ f₅ f₆ : Idx → ℝ) :
+  ((sumIdx f₁ - sumIdx f₂) + sumIdx f₃)
++ ((sumIdx f₄ - sumIdx f₅) + sumIdx f₆)
+  = sumIdx (fun k => f₁ k - f₂ k + f₃ k + f₄ k - f₅ k + f₆ k) := by
+  classical
+  simp only [sumIdx_add_distrib, sumIdx_map_sub]
+  ring
 
 /-- Deterministic collector for the commutator block.
     It packages:  (Σ A·G − Σ B·G) + (Σ G·C − Σ G·D)
@@ -1989,14 +2075,25 @@ lemma sumIdx_contract_g_left
   classical
   cases e <;> simp [sumIdx_expand, g]
 
-/-- Collapse a sum over the *right* metric slot using symmetry + diagonality:
-    Σ_e g_{e b} · K e = g_{b b} · K b. -/
+/-- Right-position diagonality: collapse Σ_e g_{eρ}·K e. -/
 lemma sumIdx_reduce_by_diagonality_right
-    (M r θ : ℝ) (b : Idx) (K : Idx → ℝ) :
-  sumIdx (fun e => g M e b r θ * K e) = g M b b r θ * K b := by
-  -- g_{e b} = g_{b e}, then apply the standard diagonality on the first slot
-  simpa [g_symm_JP] using
-    (sumIdx_reduce_by_diagonality M r θ b (fun e => K e))
+    (M r θ : ℝ) (ρ : Idx) (K : Idx → ℝ) :
+  sumIdx (fun e => g M e ρ r θ * K e) = g M ρ ρ r θ * K ρ := by
+  classical
+  cases ρ <;> simp [sumIdx, g]
+
+/-- Commuted product variant: collapse Σ_e K e · g_{eρ}. -/
+lemma sumIdx_reduce_by_diagonality_right_comm
+    (M r θ : ℝ) (ρ : Idx) (K : Idx → ℝ) :
+  sumIdx (fun e => K e * g M e ρ r θ) = K ρ * g M ρ ρ r θ := by
+  classical
+  calc
+    sumIdx (fun e => K e * g M e ρ r θ)
+        = sumIdx (fun e => g M e ρ r θ * K e) := by
+            apply sumIdx_congr; intro e; ring
+    _   = g M ρ ρ r θ * K ρ :=
+            sumIdx_reduce_by_diagonality_right M r θ ρ K
+    _   = K ρ * g M ρ ρ r θ := by ring
 
 /-- Collapse a sum over the *left* metric slot (explicit name; same as your standard lemma). -/
 lemma sumIdx_reduce_by_diagonality_left
@@ -2004,6 +2101,50 @@ lemma sumIdx_reduce_by_diagonality_left
   sumIdx (fun ρ => g M b ρ r θ * K ρ) = g M b b r θ * K b := by
   simpa using
     (sumIdx_reduce_by_diagonality M r θ b (fun ρ => K ρ))
+
+/-- Pick a single index out of a finite index sum (right-delta form).
+    `f k = Σᵢ f i · δᵢₖ`, where `δᵢₖ = if i = k then 1 else 0`. -/
+lemma sumIdx_pick_one {f : Idx → ℝ} (k : Idx) :
+  f k = sumIdx (fun i => f i * (if i = k then 1 else 0)) := by
+  classical
+  -- `sumIdx_expand` unfolds the 4-term sum over `Idx`; the `ite` collapses it.
+  simp only [sumIdx_expand]
+  cases k <;> simp [mul_one, mul_zero, add_comm, add_left_comm, add_assoc]
+
+/-- Same selection lemma with the delta on the left.
+    Useful when your term is `(if i = k then 1 else 0) * f i`. -/
+lemma sumIdx_pick_one_left {f : Idx → ℝ} (k : Idx) :
+  f k = sumIdx (fun i => (if i = k then 1 else 0) * f i) := by
+  classical
+  -- re-use the right-delta form and commute the multiplication pointwise
+  simpa [mul_comm] using (sumIdx_pick_one (f := f) k)
+
+/-- Convenience simp-forms (sum over a delta collapses). -/
+@[simp] lemma sumIdx_delta_right (f : Idx → ℝ) (k : Idx) :
+  sumIdx (fun i => f i * (if i = k then 1 else 0)) = f k :=
+  (sumIdx_pick_one (f := f) k).symm
+
+@[simp] lemma sumIdx_delta_left (f : Idx → ℝ) (k : Idx) :
+  sumIdx (fun i => (if i = k then 1 else 0) * f i) = f k :=
+  (sumIdx_pick_one_left (f := f) k).symm
+
+/-- Swap the order of factors inside a `sumIdx` body (keep out of simp). -/
+lemma sumIdx_swap_factors (A B : Idx → ℝ) :
+  sumIdx (fun ρ => A ρ * B ρ) = sumIdx (fun ρ => B ρ * A ρ) := by
+  classical
+  apply sumIdx_congr; intro ρ; ring
+
+/-- Move a difference to the outside once (bounded distributor).
+    `Σ (X - Y)·C = Σ X·C - Σ Y·C`. Already derivable, but having a name helps. -/
+lemma sumIdx_pull_sub_right (X Y C : Idx → ℝ) :
+  sumIdx (fun ρ => (X ρ - Y ρ) * C ρ)
+    = sumIdx (fun ρ => X ρ * C ρ) - sumIdx (fun ρ => Y ρ * C ρ) := by
+  classical
+  calc
+    sumIdx (fun ρ => (X ρ - Y ρ) * C ρ)
+        = sumIdx (fun ρ => X ρ * C ρ - Y ρ * C ρ) := by
+            apply sumIdx_congr; intro ρ; simp [fold_sub_right]
+    _   = _ := (sumIdx_map_sub (fun ρ => X ρ * C ρ) (fun ρ => Y ρ * C ρ))
 
 /-- Pointwise cancellation of the cross kernel on the diagonal (pure commutativity). -/
 @[simp] lemma cross_kernel_cancel
@@ -5326,7 +5467,7 @@ lemma regroup_left_sum_to_RiemannUp
   have split6 :
     sumIdx (fun k => f1 k - f2 k + (f3 k + f4 k) - (f5 k + f6 k))
     = (sumIdx f1 - sumIdx f2) + (sumIdx f3 + sumIdx f4) - (sumIdx f5 + sumIdx f6) := by
-    exact sumIdx_collect6 f1 f2 f3 f4 f5 f6
+    exact sumIdx_collect6_left_regroup f1 f2 f3 f4 f5 f6
 
   rw [split6]
 
@@ -7094,269 +7235,246 @@ lemma ΓΓ_quartet_split_b
         * (   Γtot M r θ ρ μ a * Γtot M r θ ρ ν b
             - Γtot M r θ ρ ν a * Γtot M r θ ρ μ b )) ) := by
   classical
-  /- FIRST BLOCK (no H₁/H₂; no recursive simp) -/
+  /- FIRST BLOCK (deterministic; no reduce_plus/minus; no recursive simp) -/
   have first_block :
     sumIdx (fun ρ => sumIdx (fun e =>
       ((Γtot M r θ ρ μ a * Γtot M r θ e ν ρ)
      - (Γtot M r θ ρ ν a * Γtot M r θ e μ ρ)) * g M e b r θ))
     =
-    g M b b r θ *
-      ( sumIdx (fun ρ => Γtot M r θ ρ μ a * Γtot M r θ b ν ρ)
-      - sumIdx (fun ρ => Γtot M r θ ρ ν a * Γtot M r θ b μ ρ) ) := by
-    -- distribute the inner subtraction per ρ, then lift Σ across it once
-    have step₁ :
-      ∀ ρ,
-        sumIdx (fun e =>
-          ((Γtot M r θ ρ μ a * Γtot M r θ e ν ρ)
-         - (Γtot M r θ ρ ν a * Γtot M r θ e μ ρ)) * g M e b r θ)
-        =
-        (sumIdx (fun e => (Γtot M r θ ρ μ a * Γtot M r θ e ν ρ) * g M e b r θ))
-        - (sumIdx (fun e => (Γtot M r θ ρ ν a * Γtot M r θ e μ ρ) * g M e b r θ)) := by
-      intro ρ
-      have : (fun e =>
+    sumIdx (fun ρ =>
+      g M b b r θ * (Γtot M r θ ρ μ a * Γtot M r θ b ν ρ)
+    - g M b b r θ * (Γtot M r θ ρ ν a * Γtot M r θ b μ ρ)) := by
+    classical
+    -- Work per ρ, then reassemble with sumIdx_congr
+    apply sumIdx_congr; intro ρ
+    calc
+      sumIdx (fun e =>
         ((Γtot M r θ ρ μ a * Γtot M r θ e ν ρ)
        - (Γtot M r θ ρ ν a * Γtot M r θ e μ ρ)) * g M e b r θ)
-           = (fun e =>
-               (Γtot M r θ ρ μ a * Γtot M r θ e ν ρ) * g M e b r θ
-             - (Γtot M r θ ρ ν a * Γtot M r θ e μ ρ) * g M e b r θ) := by
-        funext e; ring
-      simpa [this, sumIdx_map_sub]
+          = sumIdx (fun e =>
+              (Γtot M r θ ρ μ a * Γtot M r θ e ν ρ) * g M e b r θ
+            - (Γtot M r θ ρ ν a * Γtot M r θ e μ ρ) * g M e b r θ) := by
+                apply sumIdx_congr; intro e; ring
+      _   = sumIdx (fun e => (Γtot M r θ ρ μ a * Γtot M r θ e ν ρ) * g M e b r θ)
+          - sumIdx (fun e => (Γtot M r θ ρ ν a * Γtot M r θ e μ ρ) * g M e b r θ) :=
+              sumIdx_map_sub _ _
+      -- Now collapse each sum using sumIdx_reduce_by_diagonality_right
+      _   = (Γtot M r θ ρ μ a * (g M b b r θ * Γtot M r θ b ν ρ))
+          - (Γtot M r θ ρ ν a * (g M b b r θ * Γtot M r θ b μ ρ)) := by
+                congr 1
+                · calc
+                    sumIdx (fun e => (Γtot M r θ ρ μ a * Γtot M r θ e ν ρ) * g M e b r θ)
+                        = sumIdx (fun e => Γtot M r θ ρ μ a * (Γtot M r θ e ν ρ * g M e b r θ)) := by
+                            apply sumIdx_congr; intro e; ring
+                    _   = Γtot M r θ ρ μ a * sumIdx (fun e => Γtot M r θ e ν ρ * g M e b r θ) :=
+                            sumIdx_mul _ _
+                    _   = Γtot M r θ ρ μ a * sumIdx (fun e => g M e b r θ * Γtot M r θ e ν ρ) := by
+                            congr 1; apply sumIdx_congr; intro e; ring
+                    _   = Γtot M r θ ρ μ a * (g M b b r θ * Γtot M r θ b ν ρ) := by
+                            rw [sumIdx_reduce_by_diagonality_right]
+                · calc
+                    sumIdx (fun e => (Γtot M r θ ρ ν a * Γtot M r θ e μ ρ) * g M e b r θ)
+                        = sumIdx (fun e => Γtot M r θ ρ ν a * (Γtot M r θ e μ ρ * g M e b r θ)) := by
+                            apply sumIdx_congr; intro e; ring
+                    _   = Γtot M r θ ρ ν a * sumIdx (fun e => Γtot M r θ e μ ρ * g M e b r θ) :=
+                            sumIdx_mul _ _
+                    _   = Γtot M r θ ρ ν a * sumIdx (fun e => g M e b r θ * Γtot M r θ e μ ρ) := by
+                            congr 1; apply sumIdx_congr; intro e; ring
+                    _   = Γtot M r θ ρ ν a * (g M b b r θ * Γtot M r θ b μ ρ) := by
+                            rw [sumIdx_reduce_by_diagonality_right]
+      _   = g M b b r θ * (Γtot M r θ ρ μ a * Γtot M r θ b ν ρ)
+          - g M b b r θ * (Γtot M r θ ρ ν a * Γtot M r θ b μ ρ) := by
+                ring
 
-    have step₁' :
-      sumIdx (fun ρ => sumIdx (fun e =>
-        ((Γtot M r θ ρ μ a * Γtot M r θ e ν ρ)
-       - (Γtot M r θ ρ ν a * Γtot M r θ e μ ρ)) * g M e b r θ))
-      =
-      sumIdx (fun ρ =>
-        (sumIdx (fun e => (Γtot M r θ ρ μ a * Γtot M r θ e ν ρ) * g M e b r θ))
-        - (sumIdx (fun e => (Γtot M r θ ρ ν a * Γtot M r θ e μ ρ) * g M e b r θ))) := by
-      apply sumIdx_congr; intro ρ; simpa using step₁ ρ
-
-    -- collapse each e‑sum by diagonality after swapping g's indices, then factor g_{bb}
-    have reduce₊ :
-      sumIdx (fun ρ => sumIdx (fun e =>
-        (Γtot M r θ ρ μ a * Γtot M r θ e ν ρ) * g M e b r θ))
-      =
-      g M b b r θ * sumIdx (fun ρ => Γtot M r θ ρ μ a * Γtot M r θ b ν ρ) := by
-      have inner :
-        ∀ ρ,
-          sumIdx (fun e =>
-            (Γtot M r θ ρ μ a * Γtot M r θ e ν ρ) * g M e b r θ)
-          =
-          Γtot M r θ ρ μ a *
-            sumIdx (fun e => g M b e r θ * Γtot M r θ e ν ρ) := by
-        intro ρ
-        calc
-          sumIdx (fun e =>
-            (Γtot M r θ ρ μ a * Γtot M r θ e ν ρ) * g M e b r θ)
-              = sumIdx (fun e =>
-                  Γtot M r θ ρ μ a * (g M b e r θ * Γtot M r θ e ν ρ)) := by
-                apply sumIdx_congr; intro e
-                have := g_symm_JP M r θ e b
-                simp [this, mul_comm, mul_left_comm, mul_assoc]
-              _ = Γtot M r θ ρ μ a *
-                    sumIdx (fun e => g M b e r θ * Γtot M r θ e ν ρ) := by
-                simpa using
-                  (sumIdx_mul (Γtot M r θ ρ μ a)
-                    (fun e => g M b e r θ * Γtot M r θ e ν ρ))
-      calc
-        sumIdx (fun ρ => sumIdx (fun e =>
-          (Γtot M r θ ρ μ a * Γtot M r θ e ν ρ) * g M e b r θ))
-            = sumIdx (fun ρ =>
-                Γtot M r θ ρ μ a *
-                  sumIdx (fun e => g M b e r θ * Γtot M r θ e ν ρ)) := by
-              apply sumIdx_congr; intro ρ; simpa using inner ρ
-        _   = sumIdx (fun ρ =>
-                Γtot M r θ ρ μ a * (g M b b r θ * Γtot M r θ b ν ρ)) := by
-              apply sumIdx_congr; intro ρ
-              simpa using
-                (sumIdx_reduce_by_diagonality M r θ b
-                  (fun e => Γtot M r θ e ν ρ))
-        _   = g M b b r θ *
-                sumIdx (fun ρ => Γtot M r θ ρ μ a * Γtot M r θ b ν ρ) := by
-              simpa [sumIdx_mul, mul_comm, mul_left_comm, mul_assoc]
-
-    have reduce₋ :
-      sumIdx (fun ρ => sumIdx (fun e =>
-        (Γtot M r θ ρ ν a * Γtot M r θ e μ ρ) * g M e b r θ))
-      =
-      g M b b r θ * sumIdx (fun ρ => Γtot M r θ ρ ν a * Γtot M r θ b μ ρ) := by
-      have inner :
-        ∀ ρ,
-          sumIdx (fun e =>
-            (Γtot M r θ ρ ν a * Γtot M r θ e μ ρ) * g M e b r θ)
-          =
-          Γtot M r θ ρ ν a *
-            sumIdx (fun e => g M b e r θ * Γtot M r θ e μ ρ) := by
-        intro ρ
-        calc
-          sumIdx (fun e =>
-            (Γtot M r θ ρ ν a * Γtot M r θ e μ ρ) * g M e b r θ)
-              = sumIdx (fun e =>
-                  Γtot M r θ ρ ν a * (g M b e r θ * Γtot M r θ e μ ρ)) := by
-                apply sumIdx_congr; intro e
-                have := g_symm_JP M r θ e b
-                simp [this, mul_comm, mul_left_comm, mul_assoc]
-              _ = Γtot M r θ ρ ν a *
-                    sumIdx (fun e => g M b e r θ * Γtot M r θ e μ ρ) := by
-                simpa using
-                  (sumIdx_mul (Γtot M r θ ρ ν a)
-                    (fun e => g M b e r θ * Γtot M r θ e μ ρ))
-      calc
-        sumIdx (fun ρ => sumIdx (fun e =>
-          (Γtot M r θ ρ ν a * Γtot M r θ e μ ρ) * g M e b r θ))
-            = sumIdx (fun ρ =>
-                Γtot M r θ ρ ν a *
-                  sumIdx (fun e => g M b e r θ * Γtot M r θ e μ ρ)) := by
-              apply sumIdx_congr; intro ρ; simpa using inner ρ
-        _   = sumIdx (fun ρ =>
-                Γtot M r θ ρ ν a * (g M b b r θ * Γtot M r θ b μ ρ)) := by
-              apply sumIdx_congr; intro ρ
-              simpa using
-                (sumIdx_reduce_by_diagonality M r θ b
-                  (fun e => Γtot M r θ e μ ρ))
-        _   = g M b b r θ *
-                sumIdx (fun ρ => Γtot M r θ ρ ν a * Γtot M r θ b μ ρ) := by
-              simpa [sumIdx_mul, mul_comm, mul_left_comm, mul_assoc]
-
-    -- assemble
+  -- Package the constant g_{bb} from unpacked form to packed form (LHS = RHS of first_block)
+  have first_block_packed :
+    g M b b r θ *
+      ( sumIdx (fun ρ => Γtot M r θ ρ μ a * Γtot M r θ b ν ρ)
+      - sumIdx (fun ρ => Γtot M r θ ρ ν a * Γtot M r θ b μ ρ) )
+    =
+    sumIdx (fun ρ =>
+      g M b b r θ * (Γtot M r θ ρ μ a * Γtot M r θ b ν ρ)
+    - g M b b r θ * (Γtot M r θ ρ ν a * Γtot M r θ b μ ρ)) := by
     calc
-      sumIdx (fun ρ => sumIdx (fun e =>
-        ((Γtot M r θ ρ μ a * Γtot M r θ e ν ρ)
-       - (Γtot M r θ ρ ν a * Γtot M r θ e μ ρ)) * g M e b r θ))
-          = _ := step₁'
-      _ = (g M b b r θ * sumIdx (fun ρ => Γtot M r θ ρ μ a * Γtot M r θ b ν ρ))
-          - (g M b b r θ * sumIdx (fun ρ => Γtot M r θ ρ ν a * Γtot M r θ b μ ρ)) := by
-        rw [reduce₊, reduce₋]
+      g M b b r θ *
+        ( sumIdx (fun ρ => Γtot M r θ ρ μ a * Γtot M r θ b ν ρ)
+        - sumIdx (fun ρ => Γtot M r θ ρ ν a * Γtot M r θ b μ ρ) )
+          = g M b b r θ * sumIdx (fun ρ => Γtot M r θ ρ μ a * Γtot M r θ b ν ρ)
+          - g M b b r θ * sumIdx (fun ρ => Γtot M r θ ρ ν a * Γtot M r θ b μ ρ) := by
+              ring
+      _   = sumIdx (fun ρ => g M b b r θ * (Γtot M r θ ρ μ a * Γtot M r θ b ν ρ))
+          - sumIdx (fun ρ => g M b b r θ * (Γtot M r θ ρ ν a * Γtot M r θ b μ ρ)) := by
+              rw [sumIdx_mul, sumIdx_mul]
+      _   = sumIdx (fun ρ =>
+              g M b b r θ * (Γtot M r θ ρ μ a * Γtot M r θ b ν ρ)
+            - g M b b r θ * (Γtot M r θ ρ ν a * Γtot M r θ b μ ρ)) :=
+              (sumIdx_map_sub _ _).symm
+
+  -- After first_block: align Σ_ρ terms with whatever the calling context expects
+  -- (often the reverse product order for bb_core compatibility)
+  have swap₁ :
+    sumIdx (fun ρ => Γtot M r θ ρ μ a * Γtot M r θ b ν ρ)
+      = sumIdx (fun ρ => Γtot M r θ b ν ρ * Γtot M r θ ρ μ a) :=
+    sumIdx_swap_factors (A := fun ρ => Γtot M r θ ρ μ a)
+                        (B := fun ρ => Γtot M r θ b ν ρ)
+  have swap₂ :
+    sumIdx (fun ρ => Γtot M r θ ρ ν a * Γtot M r θ b μ ρ)
+      = sumIdx (fun ρ => Γtot M r θ b μ ρ * Γtot M r θ ρ ν a) :=
+    sumIdx_swap_factors (A := fun ρ => Γtot M r θ ρ ν a)
+                        (B := fun ρ => Γtot M r θ b μ ρ)
+  -- Now combine: first_block (unpacked) + first_block_packed (repack) + swaps
+  have first_block_aligned := by
+    calc
+      _ = sumIdx (fun ρ =>
+            g M b b r θ * (Γtot M r θ ρ μ a * Γtot M r θ b ν ρ)
+          - g M b b r θ * (Γtot M r θ ρ ν a * Γtot M r θ b μ ρ)) := first_block
       _ = g M b b r θ *
             ( sumIdx (fun ρ => Γtot M r θ ρ μ a * Γtot M r θ b ν ρ)
-            - sumIdx (fun ρ => Γtot M r θ ρ ν a * Γtot M r θ b μ ρ) ) := by
-        ring
+            - sumIdx (fun ρ => Γtot M r θ ρ ν a * Γtot M r θ b μ ρ) ) := first_block_packed.symm
+      _ = g M b b r θ *
+            ( sumIdx (fun ρ => Γtot M r θ b ν ρ * Γtot M r θ ρ μ a)
+            - sumIdx (fun ρ => Γtot M r θ b μ ρ * Γtot M r θ ρ ν a) ) := by
+              rw [swap₁, swap₂]
 
-  /- SECOND BLOCK (no h_plus/h_minus; no recursive simp) -/
-  -- define the two ρ-bodies once (ASCII names; no Unicode)
-  let U : Idx → ℝ :=
-    fun ρ => sumIdx (fun e => Γtot M r θ ρ μ a * Γtot M r θ e ν b)
-  let V : Idx → ℝ :=
-    fun ρ => sumIdx (fun e => Γtot M r θ ρ ν a * Γtot M r θ e μ b)
-
+  /- SECOND BLOCK (deterministic; no h_plus/h_minus; no simp under binders) -/
   have second_block :
     sumIdx (fun ρ =>
       sumIdx (fun e =>
         ((Γtot M r θ ρ μ a * Γtot M r θ e ν b)
        - (Γtot M r θ ρ ν a * Γtot M r θ e μ b)) * g M ρ e r θ))
     =
-    sumIdx (fun ρ => g M ρ b r θ * (U ρ - V ρ)) := by
-    -- pointwise reshaping of the inner subtraction; one `sumIdx_map_sub`
+    sumIdx (fun ρ =>
+      g M ρ ρ r θ *
+        ( Γtot M r θ ρ μ a * Γtot M r θ ρ ν b
+        - Γtot M r θ ρ ν a * Γtot M r θ ρ μ b )) := by
+    classical
+    -- Work per ρ, then re-assemble with one sumIdx_congr.
     apply sumIdx_congr; intro ρ
-    have : (fun e =>
-      ((Γtot M r θ ρ μ a * Γtot M r θ e ν b)
-     - (Γtot M r θ ρ ν a * Γtot M r θ e μ b)) * g M ρ e r θ)
-         = (fun e =>
-             (Γtot M r θ ρ μ a * Γtot M r θ e ν b) * g M ρ e r θ
-           - (Γtot M r θ ρ ν a * Γtot M r θ e μ b) * g M ρ e r θ) := by
-      funext e; ring
-    simp [this, sumIdx_map_sub, U, V, fold_sub_right, mul_comm, mul_left_comm, mul_assoc]
 
-  -- collapse the outer ρ-sum by diagonality (after one symmetry flip)
-  have U_collapse :
-    sumIdx (fun ρ => g M ρ b r θ * U ρ) = g M b b r θ * U b := by
-    have : sumIdx (fun ρ => g M ρ b r θ * U ρ)
-         = sumIdx (fun ρ => g M b ρ r θ * U ρ) := by
-      apply sumIdx_congr; intro ρ; simpa [g_symm_JP M r θ ρ b]
-    simpa [this] using
-      (sumIdx_reduce_by_diagonality M r θ b (fun ρ => U ρ))
+    -- Linearize the inner e-sum over the subtraction exactly once.
+    have lin :
+      sumIdx (fun e =>
+        ((Γtot M r θ ρ μ a * Γtot M r θ e ν b)
+       - (Γtot M r θ ρ ν a * Γtot M r θ e μ b)) * g M ρ e r θ)
+      =
+      sumIdx (fun e => (Γtot M r θ ρ μ a * Γtot M r θ e ν b) * g M ρ e r θ)
+      - sumIdx (fun e => (Γtot M r θ ρ ν a * Γtot M r θ e μ b) * g M ρ e r θ) := by
+      have t :
+        (fun e =>
+          ((Γtot M r θ ρ μ a * Γtot M r θ e ν b)
+         - (Γtot M r θ ρ ν a * Γtot M r θ e μ b)) * g M ρ e r θ)
+        =
+        (fun e =>
+          (Γtot M r θ ρ μ a * Γtot M r θ e ν b) * g M ρ e r θ
+        - (Γtot M r θ ρ ν a * Γtot M r θ e μ b) * g M ρ e r θ) := by
+        funext e; ring
+      simp only [t, sumIdx_map_sub]
 
-  have V_collapse :
-    sumIdx (fun ρ => g M ρ b r θ * V ρ) = g M b b r θ * V b := by
-    have : sumIdx (fun ρ => g M ρ b r θ * V ρ)
-         = sumIdx (fun ρ => g M b ρ r θ * V ρ) := by
-      apply sumIdx_congr; intro ρ; simpa [g_symm_JP M r θ ρ b]
-    simpa [this] using
-      (sumIdx_reduce_by_diagonality M r θ b (fun ρ => V ρ))
+    -- Collapse the U-part by diagonality on the left slot (after commuting g to the left).
+    have cU :
+      sumIdx (fun e => (Γtot M r θ ρ μ a * Γtot M r θ e ν b) * g M ρ e r θ)
+        = g M ρ ρ r θ * (Γtot M r θ ρ μ a * Γtot M r θ ρ ν b) := by
+      have t :
+        (fun e =>
+          (Γtot M r θ ρ μ a * Γtot M r θ e ν b) * g M ρ e r θ)
+        =
+        (fun e =>
+          g M ρ e r θ * (Γtot M r θ ρ μ a * Γtot M r θ e ν b)) := by
+        funext e; ring
+      rw [t]
+      exact
+        sumIdx_reduce_by_diagonality M r θ ρ
+          (fun e => Γtot M r θ ρ μ a * Γtot M r θ e ν b)
 
-  -- final algebra
-  have split_outer :
-    sumIdx (fun ρ => g M ρ b r θ * (U ρ - V ρ))
-      = sumIdx (fun ρ => g M ρ b r θ * U ρ)
-      - sumIdx (fun ρ => g M ρ b r θ * V ρ) := by
-    have : (fun ρ => g M ρ b r θ * (U ρ - V ρ))
-         = (fun ρ => g M ρ b r θ * U ρ - g M ρ b r θ * V ρ) := by
-      funext ρ; simp [fold_sub_right, mul_comm, mul_left_comm, mul_assoc]
-    simpa [this, sumIdx_map_sub]
+    -- Collapse the V-part similarly.
+    have cV :
+      sumIdx (fun e => (Γtot M r θ ρ ν a * Γtot M r θ e μ b) * g M ρ e r θ)
+        = g M ρ ρ r θ * (Γtot M r θ ρ ν a * Γtot M r θ ρ μ b) := by
+      have t :
+        (fun e =>
+          (Γtot M r θ ρ ν a * Γtot M r θ e μ b) * g M ρ e r θ)
+        =
+        (fun e =>
+          g M ρ e r θ * (Γtot M r θ ρ ν a * Γtot M r θ e μ b)) := by
+        funext e; ring
+      rw [t]
+      exact
+        sumIdx_reduce_by_diagonality M r θ ρ
+          (fun e => Γtot M r θ ρ ν a * Γtot M r θ e μ b)
 
-  have second_block_closed :
-    sumIdx (fun ρ => g M ρ b r θ * (U ρ - V ρ))
-    =
-    g M b b r θ *
-      ( U b - V b ) := by
+    -- Assemble the ρ-summand and factor g_{ρρ}.
     calc
-      sumIdx (fun ρ => g M ρ b r θ * (U ρ - V ρ))
-          = sumIdx (fun ρ => g M ρ b r θ * U ρ)
-            - sumIdx (fun ρ => g M ρ b r θ * V ρ) := split_outer
-      _   = g M b b r θ * U b - g M b b r θ * V b := by
-              rw [U_collapse, V_collapse]
-      _   = g M b b r θ * (U b - V b) := by ring
+      sumIdx (fun e =>
+        ((Γtot M r θ ρ μ a * Γtot M r θ e ν b)
+       - (Γtot M r θ ρ ν a * Γtot M r θ e μ b)) * g M ρ e r θ)
+          = (g M ρ ρ r θ * (Γtot M r θ ρ μ a * Γtot M r θ ρ ν b))
+          - (g M ρ ρ r θ * (Γtot M r θ ρ ν a * Γtot M r θ ρ μ b)) := by
+            simp only [lin, cU, cV]
+      _   = g M ρ ρ r θ *
+            ( Γtot M r θ ρ μ a * Γtot M r θ ρ ν b
+            - Γtot M r θ ρ ν a * Γtot M r θ ρ μ b ) := by
+            ring
 
-  -- rewrite the bodies at ρ = b
-  have second_block_final :
-    g M b b r θ * (U b - V b)
+  -- Optional: a "packed" variant if the caller expects the subtraction *outside* the Σ.
+  have second_block_packed :
+    sumIdx (fun ρ =>
+      g M ρ ρ r θ *
+        ( Γtot M r θ ρ μ a * Γtot M r θ ρ ν b
+        - Γtot M r θ ρ ν a * Γtot M r θ ρ μ b ))
     =
-    g M b b r θ *
-      ( sumIdx (fun e => Γtot M r θ b μ a * Γtot M r θ e ν b)
-      - sumIdx (fun e => Γtot M r θ b ν a * Γtot M r θ e μ b) ) := by
-    simp [U, V]
-
-  -- conclude the second block in the original shape
-  have second_block :
-    sumIdx (fun ρ => sumIdx (fun e =>
-      ((Γtot M r θ ρ μ a * Γtot M r θ e ν b)
-     - (Γtot M r θ ρ ν a * Γtot M r θ e μ b)) * g M ρ e r θ))
-    =
-    g M b b r θ *
-      ( sumIdx (fun e => Γtot M r θ b μ a * Γtot M r θ e ν b)
-      - sumIdx (fun e => Γtot M r θ b ν a * Γtot M r θ e μ b) ) := by
-    -- plug the chain above
-    have := second_block
-    -- (name shadowing avoided by using second_block_closed/final above)
-    exact
-      (by
-        -- first identify with the "g ρb * (U−V)" form
-        have := (by exact (second_block : _))
-        -- then collapse and unfold U/V at ρ = b
-        simpa using
-          (second_block_closed.trans second_block_final))
+    sumIdx (fun ρ => g M ρ ρ r θ * (Γtot M r θ ρ μ a * Γtot M r θ ρ ν b))
+    - sumIdx (fun ρ => g M ρ ρ r θ * (Γtot M r θ ρ ν a * Γtot M r θ ρ μ b)) := by
+    classical
+    -- pointwise: c*(X - Y) = c*X - c*Y, then Σ distributes once
+    have : ∀ ρ,
+        g M ρ ρ r θ *
+          ( Γtot M r θ ρ μ a * Γtot M r θ ρ ν b
+          - Γtot M r θ ρ ν a * Γtot M r θ ρ μ b )
+      =
+        (g M ρ ρ r θ * (Γtot M r θ ρ μ a * Γtot M r θ ρ ν b))
+      - (g M ρ ρ r θ * (Γtot M r θ ρ ν a * Γtot M r θ ρ μ b)) := by
+      intro ρ; ring
+    calc
+      _ = sumIdx (fun ρ =>
+            (g M ρ ρ r θ * (Γtot M r θ ρ μ a * Γtot M r θ ρ ν b))
+          - (g M ρ ρ r θ * (Γtot M r θ ρ ν a * Γtot M r θ ρ μ b))) := by
+            apply sumIdx_congr; intro ρ; simp only [this ρ]
+      _ = _ := by
+            simp only [sumIdx_map_sub]
 
   -- Put both blocks together:
-  -- optional prettification: rename ρ↦e in the bb-core to match (b,·,e)
+  -- Align the bb-core with the "(b,·,e)" convention by swapping factors and renaming the binder.
+  /- Deterministic reindexing; no simp, no assumption. -/
   have bb_core_reindexed :
-    ( sumIdx (fun ρ => Γtot M r θ ρ μ a * Γtot M r θ b ν ρ)
-    - sumIdx (fun ρ => Γtot M r θ ρ ν a * Γtot M r θ b μ ρ) )
+      ( sumIdx (fun ρ => Γtot M r θ ρ μ a * Γtot M r θ b ν ρ)
+      - sumIdx (fun ρ => Γtot M r θ ρ ν a * Γtot M r θ b μ ρ) )
     =
-    ( sumIdx (fun e => Γtot M r θ e μ a * Γtot M r θ b ν e)
-    - sumIdx (fun e => Γtot M r θ e ν a * Γtot M r θ b μ e) ) := by
-    -- finite index rename
-    simpa using rfl
-
-  -- Final algebraic reshuffle in the bb-core (commute scalar products inside the Σ):
-  have bb_core_final :
-    g M b b r θ *
-      ( sumIdx (fun e => Γtot M r θ e μ a * Γtot M r θ b ν e)
-      - sumIdx (fun e => Γtot M r θ e ν a * Γtot M r θ b μ e) )
-    =
-    g M b b r θ *
-      ( sumIdx (fun e => Γtot M r θ b μ e * Γtot M r θ e ν a)
-      - sumIdx (fun e => Γtot M r θ b ν e * Γtot M r θ e μ a) ) := by
-    -- pointwise `ring` on each e to swap factors (deterministic, no simp loops)
-    have h₁ :
-      sumIdx (fun e => Γtot M r θ e μ a * Γtot M r θ b ν e)
-        = sumIdx (fun e => Γtot M r θ b ν e * Γtot M r θ e μ a) := by
-      apply sumIdx_congr; intro e; ring
-    have h₂ :
-      sumIdx (fun e => Γtot M r θ e ν a * Γtot M r θ b μ e)
-        = sumIdx (fun e => Γtot M r θ b μ e * Γtot M r θ e ν a) := by
-      apply sumIdx_congr; intro e; ring
-    rw [h₁, h₂]
+      ( sumIdx (fun e => Γtot M r θ b ν e * Γtot M r θ e μ a)
+      - sumIdx (fun e => Γtot M r θ b μ e * Γtot M r θ e ν a) ) := by
+    classical
+    -- swap factors in both sums once
+    have s₁ :
+      sumIdx (fun ρ => Γtot M r θ ρ μ a * Γtot M r θ b ν ρ)
+        = sumIdx (fun ρ => Γtot M r θ b ν ρ * Γtot M r θ ρ μ a) :=
+      sumIdx_swap_factors
+        (A := fun ρ => Γtot M r θ ρ μ a)
+        (B := fun ρ => Γtot M r θ b ν ρ)
+    have s₂ :
+      sumIdx (fun ρ => Γtot M r θ ρ ν a * Γtot M r θ b μ ρ)
+        = sumIdx (fun ρ => Γtot M r θ b μ ρ * Γtot M r θ ρ ν a) :=
+      sumIdx_swap_factors
+        (A := fun ρ => Γtot M r θ ρ ν a)
+        (B := fun ρ => Γtot M r θ b μ ρ)
+    -- now just rename the bound variable ρ ↦ e (definitional equality)
+    calc
+      sumIdx (fun ρ => Γtot M r θ ρ μ a * Γtot M r θ b ν ρ)
+        - sumIdx (fun ρ => Γtot M r θ ρ ν a * Γtot M r θ b μ ρ)
+          = sumIdx (fun ρ => Γtot M r θ b ν ρ * Γtot M r θ ρ μ a)
+            - sumIdx (fun ρ => Γtot M r θ b μ ρ * Γtot M r θ ρ ν a) := by
+              rw [s₁, s₂]
+      _   = sumIdx (fun e => Γtot M r θ b ν e * Γtot M r θ e μ a)
+            - sumIdx (fun e => Γtot M r θ b μ e * Γtot M r θ e ν a) := by
+              rfl
 
   -- Assemble everything:
   calc
@@ -7375,21 +7493,13 @@ lemma ΓΓ_quartet_split_b
                 - Γtot M r θ ρ ν a * Γtot M r θ ρ μ b )) := by
           simp [first_block, second_block]
     _ = ( g M b b r θ *
-            ( sumIdx (fun e => Γtot M r θ e μ a * Γtot M r θ b ν e)
-            - sumIdx (fun e => Γtot M r θ e ν a * Γtot M r θ b μ e) ) )
+            ( sumIdx (fun e => Γtot M r θ b ν e * Γtot M r θ e μ a)
+            - sumIdx (fun e => Γtot M r θ b μ e * Γtot M r θ e ν a) ) )
           + sumIdx (fun ρ =>
               g M ρ ρ r θ *
                 ( Γtot M r θ ρ μ a * Γtot M r θ ρ ν b
                 - Γtot M r θ ρ ν a * Γtot M r θ ρ μ b )) := by
-          simpa [bb_core_reindexed]
-    _ = ( g M b b r θ *
-            ( sumIdx (fun e => Γtot M r θ b μ e * Γtot M r θ e ν a)
-            - sumIdx (fun e => Γtot M r θ b ν e * Γtot M r θ e μ a) ) )
-          + sumIdx (fun ρ =>
-              g M ρ ρ r θ *
-                ( Γtot M r θ ρ μ a * Γtot M r θ ρ ν b
-                - Γtot M r θ ρ ν a * Γtot M r θ ρ μ b )) := by
-          simpa [bb_core_final]
+          simp only [bb_core_reindexed]
 
 /-- **ha ΓΓ splitter (a-branch):** mirror of `ΓΓ_quartet_split_b`. -/
 lemma ΓΓ_quartet_split_a
@@ -7411,265 +7521,208 @@ lemma ΓΓ_quartet_split_a
             - Γtot M r θ ρ ν b * Γtot M r θ ρ μ a )) ) := by
   classical
   -- Identical proof to ΓΓ_quartet_split_b, with `a` and `b` swapped
-  /- FIRST BLOCK (no H₁/H₂; no recursive simp) -/
+  /- FIRST BLOCK (deterministic; no reduce_plus/minus; no recursive simp) -/
   have first_block :
     sumIdx (fun ρ => sumIdx (fun e =>
       ((Γtot M r θ ρ μ b * Γtot M r θ e ν ρ)
      - (Γtot M r θ ρ ν b * Γtot M r θ e μ ρ)) * g M e a r θ))
     =
-    g M a a r θ *
-      ( sumIdx (fun ρ => Γtot M r θ ρ μ b * Γtot M r θ a ν ρ)
-      - sumIdx (fun ρ => Γtot M r θ ρ ν b * Γtot M r θ a μ ρ) ) := by
-    -- distribute the inner subtraction per ρ, then lift Σ across it once
-    have step₁ :
-      ∀ ρ,
-        sumIdx (fun e =>
-          ((Γtot M r θ ρ μ b * Γtot M r θ e ν ρ)
-         - (Γtot M r θ ρ ν b * Γtot M r θ e μ ρ)) * g M e a r θ)
-        =
-        (sumIdx (fun e => (Γtot M r θ ρ μ b * Γtot M r θ e ν ρ) * g M e a r θ))
-        - (sumIdx (fun e => (Γtot M r θ ρ ν b * Γtot M r θ e μ ρ) * g M e a r θ)) := by
-      intro ρ
-      have : (fun e =>
+    sumIdx (fun ρ =>
+      g M a a r θ * (Γtot M r θ ρ μ b * Γtot M r θ a ν ρ)
+    - g M a a r θ * (Γtot M r θ ρ ν b * Γtot M r θ a μ ρ)) := by
+    classical
+    -- Work per ρ, then reassemble with sumIdx_congr
+    apply sumIdx_congr; intro ρ
+    calc
+      sumIdx (fun e =>
         ((Γtot M r θ ρ μ b * Γtot M r θ e ν ρ)
        - (Γtot M r θ ρ ν b * Γtot M r θ e μ ρ)) * g M e a r θ)
-           = (fun e =>
-               (Γtot M r θ ρ μ b * Γtot M r θ e ν ρ) * g M e a r θ
-             - (Γtot M r θ ρ ν b * Γtot M r θ e μ ρ) * g M e a r θ) := by
-        funext e; ring
-      simpa [this, sumIdx_map_sub]
+          = sumIdx (fun e =>
+              (Γtot M r θ ρ μ b * Γtot M r θ e ν ρ) * g M e a r θ
+            - (Γtot M r θ ρ ν b * Γtot M r θ e μ ρ) * g M e a r θ) := by
+                apply sumIdx_congr; intro e; ring
+      _   = sumIdx (fun e => (Γtot M r θ ρ μ b * Γtot M r θ e ν ρ) * g M e a r θ)
+          - sumIdx (fun e => (Γtot M r θ ρ ν b * Γtot M r θ e μ ρ) * g M e a r θ) :=
+              sumIdx_map_sub _ _
+      -- Now collapse each sum using sumIdx_reduce_by_diagonality_right
+      _   = (Γtot M r θ ρ μ b * (g M a a r θ * Γtot M r θ a ν ρ))
+          - (Γtot M r θ ρ ν b * (g M a a r θ * Γtot M r θ a μ ρ)) := by
+                congr 1
+                · calc
+                    sumIdx (fun e => (Γtot M r θ ρ μ b * Γtot M r θ e ν ρ) * g M e a r θ)
+                        = sumIdx (fun e => Γtot M r θ ρ μ b * (Γtot M r θ e ν ρ * g M e a r θ)) := by
+                            apply sumIdx_congr; intro e; ring
+                    _   = Γtot M r θ ρ μ b * sumIdx (fun e => Γtot M r θ e ν ρ * g M e a r θ) :=
+                            sumIdx_mul _ _
+                    _   = Γtot M r θ ρ μ b * sumIdx (fun e => g M e a r θ * Γtot M r θ e ν ρ) := by
+                            congr 1; apply sumIdx_congr; intro e; ring
+                    _   = Γtot M r θ ρ μ b * (g M a a r θ * Γtot M r θ a ν ρ) := by
+                            rw [sumIdx_reduce_by_diagonality_right]
+                · calc
+                    sumIdx (fun e => (Γtot M r θ ρ ν b * Γtot M r θ e μ ρ) * g M e a r θ)
+                        = sumIdx (fun e => Γtot M r θ ρ ν b * (Γtot M r θ e μ ρ * g M e a r θ)) := by
+                            apply sumIdx_congr; intro e; ring
+                    _   = Γtot M r θ ρ ν b * sumIdx (fun e => Γtot M r θ e μ ρ * g M e a r θ) :=
+                            sumIdx_mul _ _
+                    _   = Γtot M r θ ρ ν b * sumIdx (fun e => g M e a r θ * Γtot M r θ e μ ρ) := by
+                            congr 1; apply sumIdx_congr; intro e; ring
+                    _   = Γtot M r θ ρ ν b * (g M a a r θ * Γtot M r θ a μ ρ) := by
+                            rw [sumIdx_reduce_by_diagonality_right]
+      _   = g M a a r θ * (Γtot M r θ ρ μ b * Γtot M r θ a ν ρ)
+          - g M a a r θ * (Γtot M r θ ρ ν b * Γtot M r θ a μ ρ) := by
+                ring
 
-    have step₁' :
-      sumIdx (fun ρ => sumIdx (fun e =>
-        ((Γtot M r θ ρ μ b * Γtot M r θ e ν ρ)
-       - (Γtot M r θ ρ ν b * Γtot M r θ e μ ρ)) * g M e a r θ))
-      =
-      sumIdx (fun ρ =>
-        (sumIdx (fun e => (Γtot M r θ ρ μ b * Γtot M r θ e ν ρ) * g M e a r θ))
-        - (sumIdx (fun e => (Γtot M r θ ρ ν b * Γtot M r θ e μ ρ) * g M e a r θ))) := by
-      apply sumIdx_congr; intro ρ; simpa using step₁ ρ
-
-    -- collapse each e‑sum by diagonality after swapping g's indices, then factor g_{bb}
-    have reduce₊ :
-      sumIdx (fun ρ => sumIdx (fun e =>
-        (Γtot M r θ ρ μ b * Γtot M r θ e ν ρ) * g M e a r θ))
-      =
-      g M a a r θ * sumIdx (fun ρ => Γtot M r θ ρ μ b * Γtot M r θ a ν ρ) := by
-      have inner :
-        ∀ ρ,
-          sumIdx (fun e =>
-            (Γtot M r θ ρ μ b * Γtot M r θ e ν ρ) * g M e a r θ)
-          =
-          Γtot M r θ ρ μ b *
-            sumIdx (fun e => g M a e r θ * Γtot M r θ e ν ρ) := by
-        intro ρ
-        calc
-          sumIdx (fun e =>
-            (Γtot M r θ ρ μ b * Γtot M r θ e ν ρ) * g M e a r θ)
-              = sumIdx (fun e =>
-                  Γtot M r θ ρ μ b * (g M a e r θ * Γtot M r θ e ν ρ)) := by
-                apply sumIdx_congr; intro e
-                have := g_symm_JP M r θ e a
-                simp [this, mul_comm, mul_left_comm, mul_assoc]
-              _ = Γtot M r θ ρ μ b *
-                    sumIdx (fun e => g M a e r θ * Γtot M r θ e ν ρ) := by
-                simpa using
-                  (sumIdx_mul (Γtot M r θ ρ μ b)
-                    (fun e => g M a e r θ * Γtot M r θ e ν ρ))
-      calc
-        sumIdx (fun ρ => sumIdx (fun e =>
-          (Γtot M r θ ρ μ b * Γtot M r θ e ν ρ) * g M e a r θ))
-            = sumIdx (fun ρ =>
-                Γtot M r θ ρ μ b *
-                  sumIdx (fun e => g M a e r θ * Γtot M r θ e ν ρ)) := by
-              apply sumIdx_congr; intro ρ; simpa using inner ρ
-        _   = sumIdx (fun ρ =>
-                Γtot M r θ ρ μ b * (g M a a r θ * Γtot M r θ a ν ρ)) := by
-              apply sumIdx_congr; intro ρ
-              simpa using
-                (sumIdx_reduce_by_diagonality M r θ a
-                  (fun e => Γtot M r θ e ν ρ))
-        _   = g M a a r θ *
-                sumIdx (fun ρ => Γtot M r θ ρ μ b * Γtot M r θ a ν ρ) := by
-              simpa [sumIdx_mul, mul_comm, mul_left_comm, mul_assoc]
-
-    have reduce₋ :
-      sumIdx (fun ρ => sumIdx (fun e =>
-        (Γtot M r θ ρ ν b * Γtot M r θ e μ ρ) * g M e a r θ))
-      =
-      g M a a r θ * sumIdx (fun ρ => Γtot M r θ ρ ν b * Γtot M r θ a μ ρ) := by
-      have inner :
-        ∀ ρ,
-          sumIdx (fun e =>
-            (Γtot M r θ ρ ν b * Γtot M r θ e μ ρ) * g M e a r θ)
-          =
-          Γtot M r θ ρ ν b *
-            sumIdx (fun e => g M a e r θ * Γtot M r θ e μ ρ) := by
-        intro ρ
-        calc
-          sumIdx (fun e =>
-            (Γtot M r θ ρ ν b * Γtot M r θ e μ ρ) * g M e a r θ)
-              = sumIdx (fun e =>
-                  Γtot M r θ ρ ν b * (g M a e r θ * Γtot M r θ e μ ρ)) := by
-                apply sumIdx_congr; intro e
-                have := g_symm_JP M r θ e a
-                simp [this, mul_comm, mul_left_comm, mul_assoc]
-              _ = Γtot M r θ ρ ν b *
-                    sumIdx (fun e => g M a e r θ * Γtot M r θ e μ ρ) := by
-                simpa using
-                  (sumIdx_mul (Γtot M r θ ρ ν b)
-                    (fun e => g M a e r θ * Γtot M r θ e μ ρ))
-      calc
-        sumIdx (fun ρ => sumIdx (fun e =>
-          (Γtot M r θ ρ ν b * Γtot M r θ e μ ρ) * g M e a r θ))
-            = sumIdx (fun ρ =>
-                Γtot M r θ ρ ν b *
-                  sumIdx (fun e => g M a e r θ * Γtot M r θ e μ ρ)) := by
-              apply sumIdx_congr; intro ρ; simpa using inner ρ
-        _   = sumIdx (fun ρ =>
-                Γtot M r θ ρ ν b * (g M a a r θ * Γtot M r θ a μ ρ)) := by
-              apply sumIdx_congr; intro ρ
-              simpa using
-                (sumIdx_reduce_by_diagonality M r θ a
-                  (fun e => Γtot M r θ e μ ρ))
-        _   = g M a a r θ *
-                sumIdx (fun ρ => Γtot M r θ ρ ν b * Γtot M r θ a μ ρ) := by
-              simpa [sumIdx_mul, mul_comm, mul_left_comm, mul_assoc]
-
-    -- assemble
+  -- Package the constant g_{aa} from unpacked form to packed form (LHS = RHS of first_block)
+  have first_block_packed :
+    g M a a r θ *
+      ( sumIdx (fun ρ => Γtot M r θ ρ μ b * Γtot M r θ a ν ρ)
+      - sumIdx (fun ρ => Γtot M r θ ρ ν b * Γtot M r θ a μ ρ) )
+    =
+    sumIdx (fun ρ =>
+      g M a a r θ * (Γtot M r θ ρ μ b * Γtot M r θ a ν ρ)
+    - g M a a r θ * (Γtot M r θ ρ ν b * Γtot M r θ a μ ρ)) := by
     calc
-      sumIdx (fun ρ => sumIdx (fun e =>
-        ((Γtot M r θ ρ μ b * Γtot M r θ e ν ρ)
-       - (Γtot M r θ ρ ν b * Γtot M r θ e μ ρ)) * g M e a r θ))
-          = _ := step₁'
-      _ = (g M a a r θ * sumIdx (fun ρ => Γtot M r θ ρ μ b * Γtot M r θ a ν ρ))
-          - (g M a a r θ * sumIdx (fun ρ => Γtot M r θ ρ ν b * Γtot M r θ a μ ρ)) := by
-        rw [reduce₊, reduce₋]
+      g M a a r θ *
+        ( sumIdx (fun ρ => Γtot M r θ ρ μ b * Γtot M r θ a ν ρ)
+        - sumIdx (fun ρ => Γtot M r θ ρ ν b * Γtot M r θ a μ ρ) )
+          = g M a a r θ * sumIdx (fun ρ => Γtot M r θ ρ μ b * Γtot M r θ a ν ρ)
+          - g M a a r θ * sumIdx (fun ρ => Γtot M r θ ρ ν b * Γtot M r θ a μ ρ) := by
+              ring
+      _   = sumIdx (fun ρ => g M a a r θ * (Γtot M r θ ρ μ b * Γtot M r θ a ν ρ))
+          - sumIdx (fun ρ => g M a a r θ * (Γtot M r θ ρ ν b * Γtot M r θ a μ ρ)) := by
+              rw [sumIdx_mul, sumIdx_mul]
+      _   = sumIdx (fun ρ =>
+              g M a a r θ * (Γtot M r θ ρ μ b * Γtot M r θ a ν ρ)
+            - g M a a r θ * (Γtot M r θ ρ ν b * Γtot M r θ a μ ρ)) :=
+              (sumIdx_map_sub _ _).symm
+
+  -- After first_block: align Σ_ρ terms (mirror of split_b, with a↔b swapped)
+  have swap₁ :
+    sumIdx (fun ρ => Γtot M r θ ρ μ b * Γtot M r θ a ν ρ)
+      = sumIdx (fun ρ => Γtot M r θ a ν ρ * Γtot M r θ ρ μ b) :=
+    sumIdx_swap_factors (A := fun ρ => Γtot M r θ ρ μ b)
+                        (B := fun ρ => Γtot M r θ a ν ρ)
+  have swap₂ :
+    sumIdx (fun ρ => Γtot M r θ ρ ν b * Γtot M r θ a μ ρ)
+      = sumIdx (fun ρ => Γtot M r θ a μ ρ * Γtot M r θ ρ ν b) :=
+    sumIdx_swap_factors (A := fun ρ => Γtot M r θ ρ ν b)
+                        (B := fun ρ => Γtot M r θ a μ ρ)
+  -- Now combine: first_block (unpacked) + first_block_packed (repack) + swaps
+  have first_block_aligned := by
+    calc
+      _ = sumIdx (fun ρ =>
+            g M a a r θ * (Γtot M r θ ρ μ b * Γtot M r θ a ν ρ)
+          - g M a a r θ * (Γtot M r θ ρ ν b * Γtot M r θ a μ ρ)) := first_block
       _ = g M a a r θ *
             ( sumIdx (fun ρ => Γtot M r θ ρ μ b * Γtot M r θ a ν ρ)
-            - sumIdx (fun ρ => Γtot M r θ ρ ν b * Γtot M r θ a μ ρ) ) := by
-        ring
+            - sumIdx (fun ρ => Γtot M r θ ρ ν b * Γtot M r θ a μ ρ) ) := first_block_packed.symm
+      _ = g M a a r θ *
+            ( sumIdx (fun ρ => Γtot M r θ a ν ρ * Γtot M r θ ρ μ b)
+            - sumIdx (fun ρ => Γtot M r θ a μ ρ * Γtot M r θ ρ ν b) ) := by
+              rw [swap₁, swap₂]
 
-
-  /- SECOND BLOCK (no h_plus/h_minus; no recursive simp) -/
-  -- define the two ρ-bodies once (ASCII names; no Unicode)
-  let U : Idx → ℝ :=
-    fun ρ => sumIdx (fun e => Γtot M r θ ρ μ b * Γtot M r θ e ν a)
-  let V : Idx → ℝ :=
-    fun ρ => sumIdx (fun e => Γtot M r θ ρ ν b * Γtot M r θ e μ a)
-
+  /- SECOND BLOCK (deterministic; mirror of split_b) -/
   have second_block :
     sumIdx (fun ρ =>
       sumIdx (fun e =>
         ((Γtot M r θ ρ μ b * Γtot M r θ e ν a)
        - (Γtot M r θ ρ ν b * Γtot M r θ e μ a)) * g M ρ e r θ))
     =
-    sumIdx (fun ρ => g M ρ a r θ * (U ρ - V ρ)) := by
-    -- pointwise reshaping of the inner subtraction; one `sumIdx_map_sub`
+    sumIdx (fun ρ =>
+      g M ρ ρ r θ *
+        ( Γtot M r θ ρ μ b * Γtot M r θ ρ ν a
+        - Γtot M r θ ρ ν b * Γtot M r θ ρ μ a )) := by
+    classical
     apply sumIdx_congr; intro ρ
-    have : (fun e =>
-      ((Γtot M r θ ρ μ b * Γtot M r θ e ν a)
-     - (Γtot M r θ ρ ν b * Γtot M r θ e μ a)) * g M ρ e r θ)
-         = (fun e =>
-             (Γtot M r θ ρ μ b * Γtot M r θ e ν a) * g M ρ e r θ
-           - (Γtot M r θ ρ ν b * Γtot M r θ e μ a) * g M ρ e r θ) := by
-      funext e; ring
-    simp [this, sumIdx_map_sub, U, V, fold_sub_right, mul_comm, mul_left_comm, mul_assoc]
-
-  -- collapse the outer ρ-sum by diagonality (after one symmetry flip)
-  have U_collapse :
-    sumIdx (fun ρ => g M ρ a r θ * U ρ) = g M a a r θ * U a := by
-    have : sumIdx (fun ρ => g M ρ a r θ * U ρ)
-         = sumIdx (fun ρ => g M a ρ r θ * U ρ) := by
-      apply sumIdx_congr; intro ρ; simpa [g_symm_JP M r θ ρ a]
-    simpa [this] using
-      (sumIdx_reduce_by_diagonality M r θ a (fun ρ => U ρ))
-
-  have V_collapse :
-    sumIdx (fun ρ => g M ρ a r θ * V ρ) = g M a a r θ * V a := by
-    have : sumIdx (fun ρ => g M ρ a r θ * V ρ)
-         = sumIdx (fun ρ => g M a ρ r θ * V ρ) := by
-      apply sumIdx_congr; intro ρ; simpa [g_symm_JP M r θ ρ a]
-    simpa [this] using
-      (sumIdx_reduce_by_diagonality M r θ a (fun ρ => V ρ))
-
-  -- final algebra
-  have split_outer :
-    sumIdx (fun ρ => g M ρ a r θ * (U ρ - V ρ))
-      = sumIdx (fun ρ => g M ρ a r θ * U ρ)
-      - sumIdx (fun ρ => g M ρ a r θ * V ρ) := by
-    have : (fun ρ => g M ρ a r θ * (U ρ - V ρ))
-         = (fun ρ => g M ρ a r θ * U ρ - g M ρ a r θ * V ρ) := by
-      funext ρ; simp [fold_sub_right, mul_comm, mul_left_comm, mul_assoc]
-    simpa [this, sumIdx_map_sub]
-
-  have second_block_closed :
-    sumIdx (fun ρ => g M ρ a r θ * (U ρ - V ρ))
-    =
-    g M a a r θ *
-      ( U a - V a ) := by
+    have lin :
+      sumIdx (fun e =>
+        ((Γtot M r θ ρ μ b * Γtot M r θ e ν a)
+       - (Γtot M r θ ρ ν b * Γtot M r θ e μ a)) * g M ρ e r θ)
+      =
+      sumIdx (fun e => (Γtot M r θ ρ μ b * Γtot M r θ e ν a) * g M ρ e r θ)
+      - sumIdx (fun e => (Γtot M r θ ρ ν b * Γtot M r θ e μ a) * g M ρ e r θ) := by
+      have t :
+        (fun e =>
+          ((Γtot M r θ ρ μ b * Γtot M r θ e ν a)
+         - (Γtot M r θ ρ ν b * Γtot M r θ e μ a)) * g M ρ e r θ)
+        =
+        (fun e =>
+          (Γtot M r θ ρ μ b * Γtot M r θ e ν a) * g M ρ e r θ
+        - (Γtot M r θ ρ ν b * Γtot M r θ e μ a) * g M ρ e r θ) := by
+        funext e; ring
+      simp only [t, sumIdx_map_sub]
+    have cU :
+      sumIdx (fun e => (Γtot M r θ ρ μ b * Γtot M r θ e ν a) * g M ρ e r θ)
+        = g M ρ ρ r θ * (Γtot M r θ ρ μ b * Γtot M r θ ρ ν a) := by
+      have t :
+        (fun e =>
+          (Γtot M r θ ρ μ b * Γtot M r θ e ν a) * g M ρ e r θ)
+        =
+        (fun e =>
+          g M ρ e r θ * (Γtot M r θ ρ μ b * Γtot M r θ e ν a)) := by
+        funext e; ring
+      rw [t]
+      exact
+        sumIdx_reduce_by_diagonality M r θ ρ
+          (fun e => Γtot M r θ ρ μ b * Γtot M r θ e ν a)
+    have cV :
+      sumIdx (fun e => (Γtot M r θ ρ ν b * Γtot M r θ e μ a) * g M ρ e r θ)
+        = g M ρ ρ r θ * (Γtot M r θ ρ ν b * Γtot M r θ ρ μ a) := by
+      have t :
+        (fun e =>
+          (Γtot M r θ ρ ν b * Γtot M r θ e μ a) * g M ρ e r θ)
+        =
+        (fun e =>
+          g M ρ e r θ * (Γtot M r θ ρ ν b * Γtot M r θ e μ a)) := by
+        funext e; ring
+      rw [t]
+      exact
+        sumIdx_reduce_by_diagonality M r θ ρ
+          (fun e => Γtot M r θ ρ ν b * Γtot M r θ e μ a)
     calc
-      sumIdx (fun ρ => g M ρ a r θ * (U ρ - V ρ))
-          = sumIdx (fun ρ => g M ρ a r θ * U ρ)
-            - sumIdx (fun ρ => g M ρ a r θ * V ρ) := split_outer
-      _   = g M a a r θ * U a - g M a a r θ * V a := by
-              rw [U_collapse, V_collapse]
-      _   = g M a a r θ * (U a - V a) := by ring
-
-  -- rewrite the bodies at ρ = a
-  have second_block_final :
-    g M a a r θ * (U a - V a)
-    =
-    g M a a r θ *
-      ( sumIdx (fun e => Γtot M r θ a μ b * Γtot M r θ e ν a)
-      - sumIdx (fun e => Γtot M r θ a ν b * Γtot M r θ e μ a) ) := by
-    simp [U, V]
-
-  -- conclude the second block in the original shape
-  have second_block :
-    sumIdx (fun ρ => sumIdx (fun e =>
-      ((Γtot M r θ ρ μ b * Γtot M r θ e ν a)
-     - (Γtot M r θ ρ ν b * Γtot M r θ e μ a)) * g M ρ e r θ))
-    =
-    g M a a r θ *
-      ( sumIdx (fun e => Γtot M r θ a μ b * Γtot M r θ e ν a)
-      - sumIdx (fun e => Γtot M r θ a ν b * Γtot M r θ e μ a) ) := by
-    -- plug the chain above
-    have := second_block
-    -- (name shadowing avoided by using second_block_closed/final above)
-    exact
-      (by
-        -- first identify with the "g ρb * (U−V)" form
-        have := (by exact (second_block : _))
-        -- then collapse and unfold U/V at ρ = a
-        simpa using
-          (second_block_closed.trans second_block_final))
+      sumIdx (fun e =>
+        ((Γtot M r θ ρ μ b * Γtot M r θ e ν a)
+       - (Γtot M r θ ρ ν b * Γtot M r θ e μ a)) * g M ρ e r θ)
+          = (g M ρ ρ r θ * (Γtot M r θ ρ μ b * Γtot M r θ ρ ν a))
+          - (g M ρ ρ r θ * (Γtot M r θ ρ ν b * Γtot M r θ ρ μ a)) := by
+            simp only [lin, cU, cV]
+      _   = g M ρ ρ r θ *
+            ( Γtot M r θ ρ μ b * Γtot M r θ ρ ν a
+            - Γtot M r θ ρ ν b * Γtot M r θ ρ μ a ) := by
+            ring
 
 
+  /- Deterministic reindexing; no simp, no assumption. -/
   have aa_core_reindexed :
     ( sumIdx (fun ρ => Γtot M r θ ρ μ b * Γtot M r θ a ν ρ)
     - sumIdx (fun ρ => Γtot M r θ ρ ν b * Γtot M r θ a μ ρ) )
     =
-    ( sumIdx (fun e => Γtot M r θ e μ b * Γtot M r θ a ν e)
-    - sumIdx (fun e => Γtot M r θ e ν b * Γtot M r θ a μ e) ) := by
-    simpa using rfl
-
-  have aa_core_final :
-    g M a a r θ *
-      ( sumIdx (fun e => Γtot M r θ e μ b * Γtot M r θ a ν e)
-      - sumIdx (fun e => Γtot M r θ e ν b * Γtot M r θ a μ e) )
-    =
-    g M a a r θ *
-      ( sumIdx (fun e => Γtot M r θ a μ e * Γtot M r θ e ν b)
-      - sumIdx (fun e => Γtot M r θ a ν e * Γtot M r θ e μ b) ) := by
-    have swap :
-      ∀ e, (Γtot M r θ e μ b * Γtot M r θ a ν e)
-          =  (Γtot M r θ a ν e * Γtot M r θ e μ b) := by intro e; ring
-    have swap' :
-      ∀ e, (Γtot M r θ e ν b * Γtot M r θ a μ e)
-          =  (Γtot M r θ a μ e * Γtot M r θ e ν b) := by intro e; ring
-    simp only [sumIdx_congr swap, sumIdx_congr swap']
-    ring
+    ( sumIdx (fun e => Γtot M r θ a ν e * Γtot M r θ e μ b)
+    - sumIdx (fun e => Γtot M r θ a μ e * Γtot M r θ e ν b) ) := by
+    classical
+    -- swap factors in both sums once
+    have s₁ :
+      sumIdx (fun ρ => Γtot M r θ ρ μ b * Γtot M r θ a ν ρ)
+        = sumIdx (fun ρ => Γtot M r θ a ν ρ * Γtot M r θ ρ μ b) :=
+      sumIdx_swap_factors
+        (A := fun ρ => Γtot M r θ ρ μ b)
+        (B := fun ρ => Γtot M r θ a ν ρ)
+    have s₂ :
+      sumIdx (fun ρ => Γtot M r θ ρ ν b * Γtot M r θ a μ ρ)
+        = sumIdx (fun ρ => Γtot M r θ a μ ρ * Γtot M r θ ρ ν b) :=
+      sumIdx_swap_factors
+        (A := fun ρ => Γtot M r θ ρ ν b)
+        (B := fun ρ => Γtot M r θ a μ ρ)
+    -- now just rename the bound variable ρ ↦ e (definitional equality)
+    calc
+      sumIdx (fun ρ => Γtot M r θ ρ μ b * Γtot M r θ a ν ρ)
+        - sumIdx (fun ρ => Γtot M r θ ρ ν b * Γtot M r θ a μ ρ)
+          = sumIdx (fun ρ => Γtot M r θ a ν ρ * Γtot M r θ ρ μ b)
+            - sumIdx (fun ρ => Γtot M r θ a μ ρ * Γtot M r θ ρ ν b) := by
+              rw [s₁, s₂]
+      _   = sumIdx (fun e => Γtot M r θ a ν e * Γtot M r θ e μ b)
+            - sumIdx (fun e => Γtot M r θ a μ e * Γtot M r θ e ν b) := by
+              rfl
 
   calc
     ( sumIdx (fun ρ => sumIdx (fun e =>
@@ -7687,21 +7740,13 @@ lemma ΓΓ_quartet_split_a
                 - Γtot M r θ ρ ν b * Γtot M r θ ρ μ a )) := by
           simp [first_block, second_block]
     _ = ( g M a a r θ *
-            ( sumIdx (fun e => Γtot M r θ e μ b * Γtot M r θ a ν e)
-            - sumIdx (fun e => Γtot M r θ e ν b * Γtot M r θ a μ e) ) )
+            ( sumIdx (fun e => Γtot M r θ a ν e * Γtot M r θ e μ b)
+            - sumIdx (fun e => Γtot M r θ a μ e * Γtot M r θ e ν b) ) )
           + sumIdx (fun ρ =>
               g M ρ ρ r θ *
                 ( Γtot M r θ ρ μ b * Γtot M r θ ρ ν a
                 - Γtot M r θ ρ ν b * Γtot M r θ ρ μ a )) := by
-          simpa [aa_core_reindexed]
-    _ = ( g M a a r θ *
-            ( sumIdx (fun e => Γtot M r θ a μ e * Γtot M r θ e ν b)
-            - sumIdx (fun e => Γtot M r θ a ν e * Γtot M r θ e μ b) ) )
-          + sumIdx (fun ρ =>
-              g M ρ ρ r θ *
-                ( Γtot M r θ ρ μ b * Γtot M r θ ρ ν a
-                - Γtot M r θ ρ ν b * Γtot M r θ ρ μ a )) := by
-          simpa [aa_core_final]
+          simp only [aa_core_reindexed]
 
 /-- Algebraic identity: the covariant commutator cancels the payload terms
     and exposes precisely the RiemannUp·g blocks.
@@ -7723,6 +7768,28 @@ lemma algebraic_identity
   - sumIdx (fun ρ => RiemannUp M r θ ρ a μ ν * g M ρ b r θ)
   - sumIdx (fun ρ => RiemannUp M r θ ρ b μ ν * g M a ρ r θ) := by
   classical
+
+  -- Define all core objects at algebraic_identity scope (needed by multiple sub-proofs)
+  set bb_core :=
+    sumIdx (fun ρ =>
+      g M ρ b r θ *
+        ( sumIdx (fun e => Γtot M r θ ρ ν e * Γtot M r θ e μ a)
+         -sumIdx (fun e => Γtot M r θ ρ μ e * Γtot M r θ e ν a) )) with h_bb_core
+  set rho_core_b :=
+    sumIdx (fun ρ =>
+      g M ρ ρ r θ *
+        ( Γtot M r θ ρ μ a * Γtot M r θ ρ ν b
+         -Γtot M r θ ρ ν a * Γtot M r θ ρ μ b )) with h_rho_core_b
+  set aa_core :=
+    sumIdx (fun ρ =>
+      g M ρ a r θ *
+        ( sumIdx (fun e => Γtot M r θ ρ ν e * Γtot M r θ e μ b)
+         -sumIdx (fun e => Γtot M r θ ρ μ e * Γtot M r θ e ν b) )) with h_aa_core
+  set rho_core_a :=
+    sumIdx (fun ρ =>
+      g M ρ ρ r θ *
+        ( Γtot M r θ ρ μ b * Γtot M r θ ρ ν a
+         -Γtot M r θ ρ ν b * Γtot M r θ ρ μ a )) with h_rho_core_a
 
   -- 1) Reshape the outer subtraction so expand_P_ab drops in cleanly.
   have reshape :
@@ -7830,29 +7897,374 @@ lemma algebraic_identity
   set Cνa : ℝ := sumIdx (fun ρ => (Γtot M r θ ρ ν a) * (nabla_g M r θ μ ρ b)) with hCνa
   set Cνb : ℝ := sumIdx (fun ρ => (Γtot M r θ ρ ν b) * (nabla_g M r θ μ a ρ)) with hCνb
 
-  -- b-branch core and diagonal residue
-  set bb_core :
-    ℝ := g M b b r θ *
-          (  sumIdx (fun e => Γtot M r θ b μ e * Γtot M r θ e ν a)
-           - sumIdx (fun e => Γtot M r θ b ν e * Γtot M r θ e μ a) ) with h_bb_core
+  -- ### Reindexing lemmas for ΓΓ blocks (algebraic approach, no false identities)
 
-  set rho_core_b :
-    ℝ := sumIdx (fun ρ =>
-           g M ρ ρ r θ *
-             (  Γtot M r θ ρ μ a * Γtot M r θ ρ ν b
-              - Γtot M r θ ρ ν a * Γtot M r θ ρ μ b )) with h_rho_core_b
+  -- Reindex + Fubini for the `g_{e b}` part (μ on the left). No diagonality.
+  have ΓΓ_main_reindex_b_μ :
+    sumIdx (fun ρ =>
+      (Γtot M r θ ρ μ a) * sumIdx (fun e => Γtot M r θ e ν ρ * g M e b r θ))
+    =
+    sumIdx (fun ρ =>
+      g M ρ b r θ * sumIdx (fun e => Γtot M r θ ρ ν e * Γtot M r θ e μ a)) := by
+    classical
+    -- push outer factor through inner Σ
+    have hpush :
+      sumIdx (fun ρ =>
+        (Γtot M r θ ρ μ a) * sumIdx (fun e => Γtot M r θ e ν ρ * g M e b r θ))
+      =
+      sumIdx (fun ρ =>
+        sumIdx (fun e =>
+          Γtot M r θ ρ μ a * (Γtot M r θ e ν ρ * g M e b r θ))) := by
+      apply sumIdx_congr; intro ρ
+      change
+        (Γtot M r θ ρ μ a) * sumIdx (fun e => Γtot M r θ e ν ρ * g M e b r θ)
+          =
+        sumIdx (fun e =>
+          Γtot M r θ ρ μ a * (Γtot M r θ e ν ρ * g M e b r θ))
+      exact
+        mul_sumIdx (Γtot M r θ ρ μ a)
+          (fun e => Γtot M r θ e ν ρ * g M e b r θ)
+    -- swap the two dummy indices (ρ, e)
+    have hswap :
+      sumIdx (fun ρ =>
+        sumIdx (fun e =>
+          Γtot M r θ ρ μ a * (Γtot M r θ e ν ρ * g M e b r θ)))
+      =
+      sumIdx (fun ρ =>
+        sumIdx (fun e =>
+          Γtot M r θ e μ a * (Γtot M r θ ρ ν e * g M ρ b r θ))) := by
+      change
+        sumIdx (fun ρ =>
+          sumIdx (fun e =>
+            Γtot M r θ ρ μ a * (Γtot M r θ e ν ρ * g M e b r θ)))
+          =
+        sumIdx (fun ρ =>
+          sumIdx (fun e =>
+            Γtot M r θ e μ a * (Γtot M r θ ρ ν e * g M ρ b r θ)))
+      exact
+        sumIdx_swap_args
+          (fun ρ e => Γtot M r θ ρ μ a * (Γtot M r θ e ν ρ * g M e b r θ))
+    -- commute inside and factor `g ρ b` out of inner Σ
+    have hpull :
+      sumIdx (fun ρ =>
+        sumIdx (fun e =>
+          Γtot M r θ e μ a * (Γtot M r θ ρ ν e * g M ρ b r θ)))
+      =
+      sumIdx (fun ρ =>
+        g M ρ b r θ * sumIdx (fun e =>
+          Γtot M r θ ρ ν e * Γtot M r θ e μ a)) := by
+      apply sumIdx_congr; intro ρ
+      -- Commute the inner product pointwise, then pull out the constant with sumIdx_mul.
+      have hcomm :
+        sumIdx (fun e =>
+          Γtot M r θ e μ a * (Γtot M r θ ρ ν e * g M ρ b r θ))
+        =
+        sumIdx (fun e =>
+          g M ρ b r θ * (Γtot M r θ ρ ν e * Γtot M r θ e μ a)) := by
+        apply sumIdx_congr; intro e; ring
+      calc
+        sumIdx (fun e =>
+          Γtot M r θ e μ a * (Γtot M r θ ρ ν e * g M ρ b r θ))
+            = sumIdx (fun e =>
+                g M ρ b r θ * (Γtot M r θ ρ ν e * Γtot M r θ e μ a)) := hcomm
+        _   = g M ρ b r θ *
+                sumIdx (fun e => Γtot M r θ ρ ν e * Γtot M r θ e μ a) :=
+              sumIdx_mul (g M ρ b r θ)
+                (fun e => Γtot M r θ ρ ν e * Γtot M r θ e μ a)
+    calc
+      _ = _ := hpush
+      _ = _ := hswap
+      _ = _ := hpull
 
-  -- a-branch core and diagonal residue
-  set aa_core :
-    ℝ := g M a a r θ *
-          (  sumIdx (fun e => Γtot M r θ a μ e * Γtot M r θ e ν b)
-           - sumIdx (fun e => Γtot M r θ a ν e * Γtot M r θ e μ b) ) with h_aa_core
+  -- Reindex + Fubini for the `g_{e b}` part (ν on the left). No diagonality.
+  have ΓΓ_main_reindex_b_ν :
+    sumIdx (fun ρ =>
+      (Γtot M r θ ρ ν a) * sumIdx (fun e => Γtot M r θ e μ ρ * g M e b r θ))
+    =
+    sumIdx (fun ρ =>
+      g M ρ b r θ * sumIdx (fun e => Γtot M r θ ρ μ e * Γtot M r θ e ν a)) := by
+    classical
+    -- identical to the previous lemma with μ↔ν swapped
+    have hpush :
+      sumIdx (fun ρ =>
+        (Γtot M r θ ρ ν a) * sumIdx (fun e => Γtot M r θ e μ ρ * g M e b r θ))
+      =
+      sumIdx (fun ρ =>
+        sumIdx (fun e =>
+          Γtot M r θ ρ ν a * (Γtot M r θ e μ ρ * g M e b r θ))) := by
+      apply sumIdx_congr; intro ρ
+      change
+        (Γtot M r θ ρ ν a) * sumIdx (fun e => Γtot M r θ e μ ρ * g M e b r θ)
+          =
+        sumIdx (fun e =>
+          Γtot M r θ ρ ν a * (Γtot M r θ e μ ρ * g M e b r θ))
+      exact
+        mul_sumIdx (Γtot M r θ ρ ν a)
+          (fun e => Γtot M r θ e μ ρ * g M e b r θ)
+    have hswap :
+      sumIdx (fun ρ =>
+        sumIdx (fun e =>
+          Γtot M r θ ρ ν a * (Γtot M r θ e μ ρ * g M e b r θ)))
+      =
+      sumIdx (fun ρ =>
+        sumIdx (fun e =>
+          Γtot M r θ e ν a * (Γtot M r θ ρ μ e * g M ρ b r θ))) := by
+      change
+        sumIdx (fun ρ =>
+          sumIdx (fun e =>
+            Γtot M r θ ρ ν a * (Γtot M r θ e μ ρ * g M e b r θ)))
+          =
+        sumIdx (fun ρ =>
+          sumIdx (fun e =>
+            Γtot M r θ e ν a * (Γtot M r θ ρ μ e * g M ρ b r θ)))
+      exact
+        sumIdx_swap_args
+          (fun ρ e => Γtot M r θ ρ ν a * (Γtot M r θ e μ ρ * g M e b r θ))
+    have hpull :
+      sumIdx (fun ρ =>
+        sumIdx (fun e =>
+          Γtot M r θ e ν a * (Γtot M r θ ρ μ e * g M ρ b r θ)))
+      =
+      sumIdx (fun ρ =>
+        g M ρ b r θ * sumIdx (fun e =>
+          Γtot M r θ ρ μ e * Γtot M r θ e ν a)) := by
+      apply sumIdx_congr; intro ρ
+      have hcomm :
+        sumIdx (fun e =>
+          Γtot M r θ e ν a * (Γtot M r θ ρ μ e * g M ρ b r θ))
+        =
+        sumIdx (fun e =>
+          g M ρ b r θ * (Γtot M r θ ρ μ e * Γtot M r θ e ν a)) := by
+        apply sumIdx_congr; intro e; ring
+      calc
+        sumIdx (fun e =>
+          Γtot M r θ e ν a * (Γtot M r θ ρ μ e * g M ρ b r θ))
+            = sumIdx (fun e =>
+                g M ρ b r θ * (Γtot M r θ ρ μ e * Γtot M r θ e ν a)) := hcomm
+        _   = g M ρ b r θ *
+                sumIdx (fun e => Γtot M r θ ρ μ e * Γtot M r θ e ν a) :=
+              sumIdx_mul (g M ρ b r θ)
+                (fun e => Γtot M r θ ρ μ e * Γtot M r θ e ν a)
+    calc
+      _ = _ := hpush
+      _ = _ := hswap
+      _ = _ := hpull
 
-  set rho_core_a :
-    ℝ := sumIdx (fun ρ =>
-           g M ρ ρ r θ *
-             (  Γtot M r θ ρ μ b * Γtot M r θ ρ ν a
-              - Γtot M r θ ρ ν b * Γtot M r θ ρ μ a )) with h_rho_core_a
+  -- Collapse the `g_{ρ e}` part (μ on the left) by diagonality in the left slot.
+  have ΓΓ_cross_collapse_b_μ :
+    sumIdx (fun ρ =>
+      (Γtot M r θ ρ μ a) * sumIdx (fun e => Γtot M r θ e ν b * g M ρ e r θ))
+    =
+    sumIdx (fun ρ =>
+      g M ρ ρ r θ * (Γtot M r θ ρ μ a * Γtot M r θ ρ ν b)) := by
+    classical
+    apply sumIdx_congr; intro ρ
+    have hdiag :
+      sumIdx (fun e => Γtot M r θ e ν b * g M ρ e r θ)
+        = g M ρ ρ r θ * Γtot M r θ ρ ν b := by
+      simpa [mul_comm, mul_left_comm, mul_assoc]
+        using sumIdx_reduce_by_diagonality M r θ ρ (fun e => Γtot M r θ e ν b)
+    ring_nf
+    simpa [hdiag, mul_comm, mul_left_comm, mul_assoc]
+
+  -- Collapse the `g_{ρ e}` part (ν on the left) by diagonality in the left slot.
+  have ΓΓ_cross_collapse_b_ν :
+    sumIdx (fun ρ =>
+      (Γtot M r θ ρ ν a) * sumIdx (fun e => Γtot M r θ e μ b * g M ρ e r θ))
+    =
+    sumIdx (fun ρ =>
+      g M ρ ρ r θ * (Γtot M r θ ρ ν a * Γtot M r θ ρ μ b)) := by
+    classical
+    apply sumIdx_congr; intro ρ
+    have hdiag :
+      sumIdx (fun e => Γtot M r θ e μ b * g M ρ e r θ)
+        = g M ρ ρ r θ * Γtot M r θ ρ μ b := by
+      simpa [mul_comm, mul_left_comm, mul_assoc]
+        using sumIdx_reduce_by_diagonality M r θ ρ (fun e => Γtot M r θ e μ b)
+    ring_nf
+    simpa [hdiag, mul_comm, mul_left_comm, mul_assoc]
+
+  -- Reindex + Fubini for the `g_{e a}` part (μ on the left). No diagonality.
+  have ΓΓ_main_reindex_a_μ :
+    sumIdx (fun ρ =>
+      (Γtot M r θ ρ μ b) * sumIdx (fun e => Γtot M r θ e ν ρ * g M e a r θ))
+    =
+    sumIdx (fun ρ =>
+      g M ρ a r θ * sumIdx (fun e => Γtot M r θ ρ ν e * Γtot M r θ e μ b)) := by
+    classical
+    have hpush :
+      sumIdx (fun ρ =>
+        (Γtot M r θ ρ μ b) * sumIdx (fun e => Γtot M r θ e ν ρ * g M e a r θ))
+      =
+      sumIdx (fun ρ =>
+        sumIdx (fun e =>
+          Γtot M r θ ρ μ b * (Γtot M r θ e ν ρ * g M e a r θ))) := by
+      apply sumIdx_congr; intro ρ
+      change
+        (Γtot M r θ ρ μ b) * sumIdx (fun e => Γtot M r θ e ν ρ * g M e a r θ)
+          =
+        sumIdx (fun e =>
+          Γtot M r θ ρ μ b * (Γtot M r θ e ν ρ * g M e a r θ))
+      exact
+        mul_sumIdx (Γtot M r θ ρ μ b)
+          (fun e => Γtot M r θ e ν ρ * g M e a r θ)
+    have hswap :
+      sumIdx (fun ρ =>
+        sumIdx (fun e =>
+          Γtot M r θ ρ μ b * (Γtot M r θ e ν ρ * g M e a r θ)))
+      =
+      sumIdx (fun ρ =>
+        sumIdx (fun e =>
+          Γtot M r θ e μ b * (Γtot M r θ ρ ν e * g M ρ a r θ))) := by
+      change
+        sumIdx (fun ρ =>
+          sumIdx (fun e =>
+            Γtot M r θ ρ μ b * (Γtot M r θ e ν ρ * g M e a r θ)))
+          =
+        sumIdx (fun ρ =>
+          sumIdx (fun e =>
+            Γtot M r θ e μ b * (Γtot M r θ ρ ν e * g M ρ a r θ)))
+      exact
+        sumIdx_swap_args
+          (fun ρ e => Γtot M r θ ρ μ b * (Γtot M r θ e ν ρ * g M e a r θ))
+    have hpull :
+      sumIdx (fun ρ =>
+        sumIdx (fun e =>
+          Γtot M r θ e μ b * (Γtot M r θ ρ ν e * g M ρ a r θ)))
+      =
+      sumIdx (fun ρ =>
+        g M ρ a r θ * sumIdx (fun e =>
+          Γtot M r θ ρ ν e * Γtot M r θ e μ b)) := by
+      apply sumIdx_congr; intro ρ
+      have hcomm :
+        sumIdx (fun e =>
+          Γtot M r θ e μ b * (Γtot M r θ ρ ν e * g M ρ a r θ))
+        =
+        sumIdx (fun e =>
+          g M ρ a r θ * (Γtot M r θ ρ ν e * Γtot M r θ e μ b)) := by
+        apply sumIdx_congr; intro e; ring
+      calc
+        sumIdx (fun e =>
+          Γtot M r θ e μ b * (Γtot M r θ ρ ν e * g M ρ a r θ))
+            = sumIdx (fun e =>
+                g M ρ a r θ * (Γtot M r θ ρ ν e * Γtot M r θ e μ b)) := hcomm
+        _   = g M ρ a r θ *
+                sumIdx (fun e => Γtot M r θ ρ ν e * Γtot M r θ e μ b) :=
+              sumIdx_mul (g M ρ a r θ)
+                (fun e => Γtot M r θ ρ ν e * Γtot M r θ e μ b)
+    calc
+      _ = _ := hpush
+      _ = _ := hswap
+      _ = _ := hpull
+
+  -- Reindex + Fubini for the `g_{e a}` part (ν on the left). No diagonality.
+  have ΓΓ_main_reindex_a_ν :
+    sumIdx (fun ρ =>
+      (Γtot M r θ ρ ν b) * sumIdx (fun e => Γtot M r θ e μ ρ * g M e a r θ))
+    =
+    sumIdx (fun ρ =>
+      g M ρ a r θ * sumIdx (fun e => Γtot M r θ ρ μ e * Γtot M r θ e ν b)) := by
+    classical
+    have hpush :
+      sumIdx (fun ρ =>
+        (Γtot M r θ ρ ν b) * sumIdx (fun e => Γtot M r θ e μ ρ * g M e a r θ))
+      =
+      sumIdx (fun ρ =>
+        sumIdx (fun e =>
+          Γtot M r θ ρ ν b * (Γtot M r θ e μ ρ * g M e a r θ))) := by
+      apply sumIdx_congr; intro ρ
+      change
+        (Γtot M r θ ρ ν b) * sumIdx (fun e => Γtot M r θ e μ ρ * g M e a r θ)
+          =
+        sumIdx (fun e =>
+          Γtot M r θ ρ ν b * (Γtot M r θ e μ ρ * g M e a r θ))
+      exact
+        mul_sumIdx (Γtot M r θ ρ ν b)
+          (fun e => Γtot M r θ e μ ρ * g M e a r θ)
+    have hswap :
+      sumIdx (fun ρ =>
+        sumIdx (fun e =>
+          Γtot M r θ ρ ν b * (Γtot M r θ e μ ρ * g M e a r θ)))
+      =
+      sumIdx (fun ρ =>
+        sumIdx (fun e =>
+          Γtot M r θ e ν b * (Γtot M r θ ρ μ e * g M ρ a r θ))) := by
+      change
+        sumIdx (fun ρ =>
+          sumIdx (fun e =>
+            Γtot M r θ ρ ν b * (Γtot M r θ e μ ρ * g M e a r θ)))
+          =
+        sumIdx (fun ρ =>
+          sumIdx (fun e =>
+            Γtot M r θ e ν b * (Γtot M r θ ρ μ e * g M ρ a r θ)))
+      exact
+        sumIdx_swap_args
+          (fun ρ e => Γtot M r θ ρ ν b * (Γtot M r θ e μ ρ * g M e a r θ))
+    have hpull :
+      sumIdx (fun ρ =>
+        sumIdx (fun e =>
+          Γtot M r θ e ν b * (Γtot M r θ ρ μ e * g M ρ a r θ)))
+      =
+      sumIdx (fun ρ =>
+        g M ρ a r θ * sumIdx (fun e =>
+          Γtot M r θ ρ μ e * Γtot M r θ e ν b)) := by
+      apply sumIdx_congr; intro ρ
+      have hcomm :
+        sumIdx (fun e =>
+          Γtot M r θ e ν b * (Γtot M r θ ρ μ e * g M ρ a r θ))
+        =
+        sumIdx (fun e =>
+          g M ρ a r θ * (Γtot M r θ ρ μ e * Γtot M r θ e ν b)) := by
+        apply sumIdx_congr; intro e; ring
+      calc
+        sumIdx (fun e =>
+          Γtot M r θ e ν b * (Γtot M r θ ρ μ e * g M ρ a r θ))
+            = sumIdx (fun e =>
+                g M ρ a r θ * (Γtot M r θ ρ μ e * Γtot M r θ e ν b)) := hcomm
+        _   = g M ρ a r θ *
+                sumIdx (fun e => Γtot M r θ ρ μ e * Γtot M r θ e ν b) :=
+              sumIdx_mul (g M ρ a r θ)
+                (fun e => Γtot M r θ ρ μ e * Γtot M r θ e ν b)
+    calc
+      _ = _ := hpush
+      _ = _ := hswap
+      _ = _ := hpull
+
+  -- Collapse the `g_{ρ e}` part (μ on the left) by diagonality in the left slot (a-branch).
+  have ΓΓ_cross_collapse_a_μ :
+    sumIdx (fun ρ =>
+      (Γtot M r θ ρ μ b) * sumIdx (fun e => Γtot M r θ e ν a * g M ρ e r θ))
+    =
+    sumIdx (fun ρ =>
+      g M ρ ρ r θ * (Γtot M r θ ρ μ b * Γtot M r θ ρ ν a)) := by
+    classical
+    apply sumIdx_congr; intro ρ
+    have hdiag :
+      sumIdx (fun e => Γtot M r θ e ν a * g M ρ e r θ)
+        = g M ρ ρ r θ * Γtot M r θ ρ ν a := by
+      simpa [mul_comm, mul_left_comm, mul_assoc]
+        using sumIdx_reduce_by_diagonality M r θ ρ (fun e => Γtot M r θ e ν a)
+    ring_nf
+    simpa [hdiag, mul_comm, mul_left_comm, mul_assoc]
+
+  -- Collapse the `g_{ρ e}` part (ν on the left) by diagonality in the left slot (a-branch).
+  have ΓΓ_cross_collapse_a_ν :
+    sumIdx (fun ρ =>
+      (Γtot M r θ ρ ν b) * sumIdx (fun e => Γtot M r θ e μ a * g M ρ e r θ))
+    =
+    sumIdx (fun ρ =>
+      g M ρ ρ r θ * (Γtot M r θ ρ ν b * Γtot M r θ ρ μ a)) := by
+    classical
+    apply sumIdx_congr; intro ρ
+    have hdiag :
+      sumIdx (fun e => Γtot M r θ e μ a * g M ρ e r θ)
+        = g M ρ ρ r θ * Γtot M r θ ρ μ a := by
+      simpa [mul_comm, mul_left_comm, mul_assoc]
+        using sumIdx_reduce_by_diagonality M r θ ρ (fun e => Γtot M r θ e μ a)
+    calc
+      (Γtot M r θ ρ ν b) * sumIdx (fun e => Γtot M r θ e μ a * g M ρ e r θ)
+          = (Γtot M r θ ρ ν b) * (g M ρ ρ r θ * Γtot M r θ ρ μ a) := by rw [hdiag]
+      _   = g M ρ ρ r θ * (Γtot M r θ ρ ν b * Γtot M r θ ρ μ a) := by ring
 
   have Cμ_def : Gamma_mu_nabla_nu M r θ μ ν a b = Cμa + Cμb := by simpa [Gamma_mu_nabla_nu, hCμa, hCμb]
   have Cν_def : Gamma_nu_nabla_mu M r θ μ ν a b = Cνa + Cνb := by simpa [Gamma_nu_nabla_mu, hCνa, hCνb]
@@ -7891,6 +8303,7 @@ lemma algebraic_identity
   =
     - sumIdx (fun ρ => RiemannUp M r θ ρ a μ ν * g M ρ b r θ) := by
     classical
+
     -- 0) Open only the outer shells; keep sums atomic.
     simp only [nabla_g, RiemannUp, sub_eq_add_neg]
 
@@ -7922,8 +8335,72 @@ lemma algebraic_identity
       =
         bb_core + rho_core_b := by
       classical
-      simpa [h_bb_core, h_rho_core_b]
-        using ΓΓ_quartet_split_b M r θ μ ν a b
+      -- main pair (no diagonality): reindex both parts, then difference with a common left factor
+      have Hμ :
+        sumIdx (fun ρ =>
+          (Γtot M r θ ρ μ a) * sumIdx (fun e => Γtot M r θ e ν ρ * g M e b r θ))
+        =
+        sumIdx (fun ρ =>
+          g M ρ b r θ * sumIdx (fun e => Γtot M r θ ρ ν e * Γtot M r θ e μ a)) :=
+        ΓΓ_main_reindex_b_μ
+      have Hν :
+        sumIdx (fun ρ =>
+          (Γtot M r θ ρ ν a) * sumIdx (fun e => Γtot M r θ e μ ρ * g M e b r θ))
+        =
+        sumIdx (fun ρ =>
+          g M ρ b r θ * sumIdx (fun e => Γtot M r θ ρ μ e * Γtot M r θ e ν a)) :=
+        ΓΓ_main_reindex_b_ν
+      have main_pair :
+        ( sumIdx (fun ρ => (Γtot M r θ ρ μ a) * sumIdx (fun e => Γtot M r θ e ν ρ * g M e b r θ))
+         -sumIdx (fun ρ => (Γtot M r θ ρ ν a) * sumIdx (fun e => Γtot M r θ e μ ρ * g M e b r θ)) )
+        =
+        ( sumIdx (fun ρ => g M ρ b r θ * sumIdx (fun e => Γtot M r θ ρ ν e * Γtot M r θ e μ a))
+         -sumIdx (fun ρ => g M ρ b r θ * sumIdx (fun e => Γtot M r θ ρ μ e * Γtot M r θ e ν a)) ) := by
+        rw [Hμ, Hν]
+
+      -- cross pair (diagonality): collapse `g_{ρ e}`, then difference with common left factor `g_{ρρ}`
+      have Hμ' :
+        sumIdx (fun ρ =>
+          (Γtot M r θ ρ μ a) * sumIdx (fun e => Γtot M r θ e ν b * g M ρ e r θ))
+        =
+        sumIdx (fun ρ =>
+          g M ρ ρ r θ * (Γtot M r θ ρ μ a * Γtot M r θ ρ ν b)) :=
+        ΓΓ_cross_collapse_b_μ
+      have Hν' :
+        sumIdx (fun ρ =>
+          (Γtot M r θ ρ ν a) * sumIdx (fun e => Γtot M r θ e μ b * g M ρ e r θ))
+        =
+        sumIdx (fun ρ =>
+          g M ρ ρ r θ * (Γtot M r θ ρ ν a * Γtot M r θ ρ μ b)) :=
+        ΓΓ_cross_collapse_b_ν
+      have cross_pair :
+        ( sumIdx (fun ρ => (Γtot M r θ ρ μ a) * sumIdx (fun e => Γtot M r θ e ν b * g M ρ e r θ))
+         -sumIdx (fun ρ => (Γtot M r θ ρ ν a) * sumIdx (fun e => Γtot M r θ e μ b * g M ρ e r θ)) )
+        =
+        ( sumIdx (fun ρ => g M ρ ρ r θ * (Γtot M r θ ρ μ a * Γtot M r θ ρ ν b))
+         -sumIdx (fun ρ => g M ρ ρ r θ * (Γtot M r θ ρ ν a * Γtot M r θ ρ μ b)) ) := by
+        rw [Hμ', Hν']
+
+      -- assemble (use outer-scope bb_core, rho_core_b)
+      calc
+        ( sumIdx (fun ρ => (Γtot M r θ ρ μ a) * sumIdx (fun e => Γtot M r θ e ν ρ * g M e b r θ))
+        - sumIdx (fun ρ => (Γtot M r θ ρ ν a) * sumIdx (fun e => Γtot M r θ e μ ρ * g M e b r θ)) )
+      + ( sumIdx (fun ρ => (Γtot M r θ ρ μ a) * sumIdx (fun e => Γtot M r θ e ν b * g M ρ e r θ))
+        - sumIdx (fun ρ => (Γtot M r θ ρ ν a) * sumIdx (fun e => Γtot M r θ e μ b * g M ρ e r θ)) )
+          = ( sumIdx (fun ρ => g M ρ b r θ * sumIdx (fun e => Γtot M r θ ρ ν e * Γtot M r θ e μ a))
+            - sumIdx (fun ρ => g M ρ b r θ * sumIdx (fun e => Γtot M r θ ρ μ e * Γtot M r θ e ν a)) )
+          + ( sumIdx (fun ρ => g M ρ ρ r θ * (Γtot M r θ ρ μ a * Γtot M r θ ρ ν b))
+            - sumIdx (fun ρ => g M ρ ρ r θ * (Γtot M r θ ρ ν a * Γtot M r θ ρ μ b)) ) := by
+              rw [main_pair, cross_pair]
+      _   = sumIdx (fun ρ => g M ρ b r θ * ( sumIdx (fun e => Γtot M r θ ρ ν e * Γtot M r θ e μ a)
+                                             - sumIdx (fun e => Γtot M r θ ρ μ e * Γtot M r θ e ν a) ))
+          + sumIdx (fun ρ => g M ρ ρ r θ * ( (Γtot M r θ ρ μ a * Γtot M r θ ρ ν b)
+                                             - (Γtot M r θ ρ ν a * Γtot M r θ ρ μ b) )) := by
+              congr 1
+              · rw [← sumIdx_map_sub]; simp only [mul_sub]
+              · rw [← sumIdx_map_sub]; simp only [mul_sub]
+      _   = bb_core + rho_core_b := by
+              rw [← h_bb_core, ← h_rho_core_b]
 
     /- 3a) scalar package for the b-branch core -/
     have scalar_finish_bb :
@@ -7933,12 +8410,26 @@ lemma algebraic_identity
               ( sumIdx (fun e => Γtot M r θ b μ e * Γtot M r θ e ν a)
                -sumIdx (fun e => Γtot M r θ b ν e * Γtot M r θ e μ a) ) )
         =
-          - ( ( dCoord μ (fun r θ => Γtot M r θ b ν a) r θ
-               - dCoord ν (fun r θ => Γtot M r θ b μ a) r θ
-               + sumIdx (fun e => Γtot M r θ b μ e * Γtot M r θ e ν a)
-               - sumIdx (fun e => Γtot M r θ b ν e * Γtot M r θ e μ a) )
-              * g M b b r θ ) := by
-      ring
+          ((- dCoord μ (fun r θ => Γtot M r θ b ν a) r θ
+            +  dCoord ν (fun r θ => Γtot M r θ b μ a) r θ)
+           + ( sumIdx (fun e => Γtot M r θ b μ e * Γtot M r θ e ν a)
+             - sumIdx (fun e => Γtot M r θ b ν e * Γtot M r θ e μ a) )) * g M b b r θ := by
+      classical
+      -- Abbreviations (purely local, goal is unchanged):
+      let gbb := g M b b r θ
+      let A := dCoord μ (fun r θ => Γtot M r θ b ν a) r θ
+      let B := dCoord ν (fun r θ => Γtot M r θ b μ a) r θ
+      let C := sumIdx (fun e => Γtot M r θ b μ e * Γtot M r θ e ν a)
+      let D := sumIdx (fun e => Γtot M r θ b ν e * Γtot M r θ e μ a)
+      have commute : gbb * (C - D) = (C - D) * gbb := by ring
+      -- Deterministic normalization: two folds + final regroup
+      calc
+        (-(A) * gbb + B * gbb) + gbb * (C - D)
+            = (-(A) * gbb + B * gbb) + (C - D) * gbb := by
+                simpa [commute]
+        _   = ((-A + B) * gbb) + ((C - D) * gbb)     := by
+                simp [fold_add_left, fold_sub_right]
+        _   = ((-A + B) + (C - D)) * gbb             := by ring
 
     /- 3b) Package core + dG_b as Σ_ρ ... by pulling out δ_{ρ,b} -/
     have core_as_sum_b :
@@ -8022,6 +8513,7 @@ lemma algebraic_identity
   =
     - sumIdx (fun ρ => RiemannUp M r θ ρ b μ ν * g M a ρ r θ) := by
     classical
+
     -- 0) Open only the outer shells; keep sums atomic.
     simp only [nabla_g, RiemannUp, sub_eq_add_neg]
 
@@ -8052,8 +8544,72 @@ lemma algebraic_identity
       =
         aa_core + rho_core_a := by
       classical
-      simpa [h_aa_core, h_rho_core_a]
-        using ΓΓ_quartet_split_a M r θ μ ν a b
+      -- main pair (no diagonality): reindex both parts, then difference with a common left factor
+      have Hμ :
+        sumIdx (fun ρ =>
+          (Γtot M r θ ρ μ b) * sumIdx (fun e => Γtot M r θ e ν ρ * g M e a r θ))
+        =
+        sumIdx (fun ρ =>
+          g M ρ a r θ * sumIdx (fun e => Γtot M r θ ρ ν e * Γtot M r θ e μ b)) :=
+        ΓΓ_main_reindex_a_μ
+      have Hν :
+        sumIdx (fun ρ =>
+          (Γtot M r θ ρ ν b) * sumIdx (fun e => Γtot M r θ e μ ρ * g M e a r θ))
+        =
+        sumIdx (fun ρ =>
+          g M ρ a r θ * sumIdx (fun e => Γtot M r θ ρ μ e * Γtot M r θ e ν b)) :=
+        ΓΓ_main_reindex_a_ν
+      have main_pair :
+        ( sumIdx (fun ρ => (Γtot M r θ ρ μ b) * sumIdx (fun e => Γtot M r θ e ν ρ * g M e a r θ))
+         -sumIdx (fun ρ => (Γtot M r θ ρ ν b) * sumIdx (fun e => Γtot M r θ e μ ρ * g M e a r θ)) )
+        =
+        ( sumIdx (fun ρ => g M ρ a r θ * sumIdx (fun e => Γtot M r θ ρ ν e * Γtot M r θ e μ b))
+         -sumIdx (fun ρ => g M ρ a r θ * sumIdx (fun e => Γtot M r θ ρ μ e * Γtot M r θ e ν b)) ) := by
+        rw [Hμ, Hν]
+
+      -- cross pair (diagonality): collapse `g_{ρ e}`, then difference with common left factor `g_{ρρ}`
+      have Hμ' :
+        sumIdx (fun ρ =>
+          (Γtot M r θ ρ μ b) * sumIdx (fun e => Γtot M r θ e ν a * g M ρ e r θ))
+        =
+        sumIdx (fun ρ =>
+          g M ρ ρ r θ * (Γtot M r θ ρ μ b * Γtot M r θ ρ ν a)) :=
+        ΓΓ_cross_collapse_a_μ
+      have Hν' :
+        sumIdx (fun ρ =>
+          (Γtot M r θ ρ ν b) * sumIdx (fun e => Γtot M r θ e μ a * g M ρ e r θ))
+        =
+        sumIdx (fun ρ =>
+          g M ρ ρ r θ * (Γtot M r θ ρ ν b * Γtot M r θ ρ μ a)) :=
+        ΓΓ_cross_collapse_a_ν
+      have cross_pair :
+        ( sumIdx (fun ρ => (Γtot M r θ ρ μ b) * sumIdx (fun e => Γtot M r θ e ν a * g M ρ e r θ))
+         -sumIdx (fun ρ => (Γtot M r θ ρ ν b) * sumIdx (fun e => Γtot M r θ e μ a * g M ρ e r θ)) )
+        =
+        ( sumIdx (fun ρ => g M ρ ρ r θ * (Γtot M r θ ρ μ b * Γtot M r θ ρ ν a))
+         -sumIdx (fun ρ => g M ρ ρ r θ * (Γtot M r θ ρ ν b * Γtot M r θ ρ μ a)) ) := by
+        rw [Hμ', Hν']
+
+      -- assemble (use outer-scope aa_core, rho_core_a)
+      calc
+        ( sumIdx (fun ρ => (Γtot M r θ ρ μ b) * sumIdx (fun e => Γtot M r θ e ν ρ * g M e a r θ))
+        - sumIdx (fun ρ => (Γtot M r θ ρ ν b) * sumIdx (fun e => Γtot M r θ e μ ρ * g M e a r θ)) )
+      + ( sumIdx (fun ρ => (Γtot M r θ ρ μ b) * sumIdx (fun e => Γtot M r θ e ν a * g M ρ e r θ))
+        - sumIdx (fun ρ => (Γtot M r θ ρ ν b) * sumIdx (fun e => Γtot M r θ e μ a * g M ρ e r θ)) )
+          = ( sumIdx (fun ρ => g M ρ a r θ * sumIdx (fun e => Γtot M r θ ρ ν e * Γtot M r θ e μ b))
+            - sumIdx (fun ρ => g M ρ a r θ * sumIdx (fun e => Γtot M r θ ρ μ e * Γtot M r θ e ν b)) )
+          + ( sumIdx (fun ρ => g M ρ ρ r θ * (Γtot M r θ ρ μ b * Γtot M r θ ρ ν a))
+            - sumIdx (fun ρ => g M ρ ρ r θ * (Γtot M r θ ρ ν b * Γtot M r θ ρ μ a)) ) := by
+              rw [main_pair, cross_pair]
+      _   = sumIdx (fun ρ => g M ρ a r θ * ( sumIdx (fun e => Γtot M r θ ρ ν e * Γtot M r θ e μ b)
+                                             - sumIdx (fun e => Γtot M r θ ρ μ e * Γtot M r θ e ν b) ))
+          + sumIdx (fun ρ => g M ρ ρ r θ * ( (Γtot M r θ ρ μ b * Γtot M r θ ρ ν a)
+                                             - (Γtot M r θ ρ ν b * Γtot M r θ ρ μ a) )) := by
+              congr 1
+              · rw [← sumIdx_map_sub]; simp only [mul_sub]
+              · rw [← sumIdx_map_sub]; simp only [mul_sub]
+      _   = aa_core + rho_core_a := by
+              rw [← h_aa_core, ← h_rho_core_a]
 
     /- 3a) scalar package for the a-branch core -/
     have scalar_finish_aa :
@@ -8063,12 +8619,26 @@ lemma algebraic_identity
               ( sumIdx (fun e => Γtot M r θ a μ e * Γtot M r θ e ν b)
                -sumIdx (fun e => Γtot M r θ a ν e * Γtot M r θ e μ b) ) )
         =
-          - ( ( dCoord μ (fun r θ => Γtot M r θ a ν b) r θ
-               - dCoord ν (fun r θ => Γtot M r θ a μ b) r θ
-               + sumIdx (fun e => Γtot M r θ a μ e * Γtot M r θ e ν b)
-               - sumIdx (fun e => Γtot M r θ a ν e * Γtot M r θ e μ b) )
-              * g M a a r θ ) := by
-      ring
+          ((- dCoord μ (fun r θ => Γtot M r θ a ν b) r θ
+            +  dCoord ν (fun r θ => Γtot M r θ a μ b) r θ)
+           + ( sumIdx (fun e => Γtot M r θ a μ e * Γtot M r θ e ν b)
+             - sumIdx (fun e => Γtot M r θ a ν e * Γtot M r θ e μ b) )) * g M a a r θ := by
+      classical
+      -- Abbreviations (purely local, goal is unchanged):
+      let gaa := g M a a r θ
+      let A := dCoord μ (fun r θ => Γtot M r θ a ν b) r θ
+      let B := dCoord ν (fun r θ => Γtot M r θ a μ b) r θ
+      let C := sumIdx (fun e => Γtot M r θ a μ e * Γtot M r θ e ν b)
+      let D := sumIdx (fun e => Γtot M r θ a ν e * Γtot M r θ e μ b)
+      have commute : gaa * (C - D) = (C - D) * gaa := by ring
+      -- Deterministic normalization: two folds + final regroup
+      calc
+        (-(A) * gaa + B * gaa) + gaa * (C - D)
+            = (-(A) * gaa + B * gaa) + (C - D) * gaa := by
+                simpa [commute]
+        _   = ((-A + B) * gaa) + ((C - D) * gaa)     := by
+                simp [fold_add_left, fold_sub_right]
+        _   = ((-A + B) + (C - D)) * gaa             := by ring
 
     /- 3b) Package core + dG_a as Σ_ρ ... by pulling out δ_{ρ,a} -/
     have core_as_sum_a :
@@ -8536,19 +9106,37 @@ lemma ricci_identity_on_g_rθ_ext
   -- Kill Gamma terms by metric compatibility
   have hμν :
     Gamma_mu_nabla_nu M r θ Idx.r Idx.θ a b = 0 := by
-    have hza1 := nabla_g_zero_ext M r θ h_ext Idx.θ a b
-    have hza2 := nabla_g_zero_ext M r θ h_ext Idx.θ b a
     unfold Gamma_mu_nabla_nu
-    simp only [hza1, hza2]
-    ring
+    calc
+      sumIdx (fun ρ =>
+        (Γtot M r θ ρ Idx.r a) * (nabla_g M r θ Idx.θ ρ b) +
+        (Γtot M r θ ρ Idx.r b) * (nabla_g M r θ Idx.θ a ρ))
+          = sumIdx (fun ρ => (Γtot M r θ ρ Idx.r a) * 0 + (Γtot M r θ ρ Idx.r b) * 0) := by
+              apply sumIdx_congr; intro ρ
+              simp only [nabla_g_zero_ext M r θ h_ext]
+      _   = 0 := by
+          have hpt :
+            (fun ρ => (Γtot M r θ ρ Idx.r a) * 0 + (Γtot M r θ ρ Idx.r b) * 0)
+            = (fun _ => (0 : ℝ)) := by
+            funext ρ; simp
+          simp [hpt, sumIdx_zero]
 
   have hνμ :
     Gamma_nu_nabla_mu M r θ Idx.r Idx.θ a b = 0 := by
-    have hzb1 := nabla_g_zero_ext M r θ h_ext Idx.r a b
-    have hzb2 := nabla_g_zero_ext M r θ h_ext Idx.r b a
     unfold Gamma_nu_nabla_mu
-    simp only [hzb1, hzb2]
-    ring
+    calc
+      sumIdx (fun ρ =>
+        (Γtot M r θ ρ Idx.θ a) * (nabla_g M r θ Idx.r ρ b) +
+        (Γtot M r θ ρ Idx.θ b) * (nabla_g M r θ Idx.r a ρ))
+          = sumIdx (fun ρ => (Γtot M r θ ρ Idx.θ a) * 0 + (Γtot M r θ ρ Idx.θ b) * 0) := by
+              apply sumIdx_congr; intro ρ
+              simp only [nabla_g_zero_ext M r θ h_ext]
+      _   = 0 := by
+          have hpt :
+            (fun ρ => (Γtot M r θ ρ Idx.θ a) * 0 + (Γtot M r θ ρ Idx.θ b) * 0)
+            = (fun _ => (0 : ℝ)) := by
+            funext ρ; simp
+          simp [hpt, sumIdx_zero]
 
   -- From H and LHS0, get 0 = -(R_ba) - (R_ab) ⇒ R_ab + R_ba = 0
   have : (0 : ℝ) - 0
@@ -8616,19 +9204,37 @@ lemma Riemann_swap_a_b_ext
   -- Kill Gamma terms by metric compatibility
   have hμν :
     Gamma_mu_nabla_nu M r θ μ ν a b = 0 := by
-    have hza1 := nabla_g_zero_ext M r θ h_ext ν a b
-    have hza2 := nabla_g_zero_ext M r θ h_ext ν b a
     unfold Gamma_mu_nabla_nu
-    simp only [hza1, hza2]
-    ring
+    calc
+      sumIdx (fun ρ =>
+        (Γtot M r θ ρ μ a) * (nabla_g M r θ ν ρ b) +
+        (Γtot M r θ ρ μ b) * (nabla_g M r θ ν a ρ))
+          = sumIdx (fun ρ => (Γtot M r θ ρ μ a) * 0 + (Γtot M r θ ρ μ b) * 0) := by
+              apply sumIdx_congr; intro ρ
+              simp only [nabla_g_zero_ext M r θ h_ext]
+      _   = 0 := by
+          have hpt :
+            (fun ρ => (Γtot M r θ ρ μ a) * 0 + (Γtot M r θ ρ μ b) * 0)
+            = (fun _ => (0 : ℝ)) := by
+            funext ρ; simp
+          simp [hpt, sumIdx_zero]
 
   have hνμ :
     Gamma_nu_nabla_mu M r θ μ ν a b = 0 := by
-    have hzb1 := nabla_g_zero_ext M r θ h_ext μ a b
-    have hzb2 := nabla_g_zero_ext M r θ h_ext μ b a
     unfold Gamma_nu_nabla_mu
-    simp only [hzb1, hzb2]
-    ring
+    calc
+      sumIdx (fun ρ =>
+        (Γtot M r θ ρ ν a) * (nabla_g M r θ μ ρ b) +
+        (Γtot M r θ ρ ν b) * (nabla_g M r θ μ a ρ))
+          = sumIdx (fun ρ => (Γtot M r θ ρ ν a) * 0 + (Γtot M r θ ρ ν b) * 0) := by
+              apply sumIdx_congr; intro ρ
+              simp only [nabla_g_zero_ext M r θ h_ext]
+      _   = 0 := by
+          have hpt :
+            (fun ρ => (Γtot M r θ ρ ν a) * 0 + (Γtot M r θ ρ ν b) * 0)
+            = (fun _ => (0 : ℝ)) := by
+            funext ρ; simp
+          simp [hpt, sumIdx_zero]
 
   -- 0 = -(R_ba) - (R_ab)
   have hsum0 :
