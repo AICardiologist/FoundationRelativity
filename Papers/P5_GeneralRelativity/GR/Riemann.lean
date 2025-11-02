@@ -1730,29 +1730,51 @@ lemma sumIdx_congr {f g : Idx → ℝ} (h : ∀ i, f i = g i) :
 /-- Off‑diagonal metric vanishes (Schwarzschild is diagonal). -/
 @[simp] lemma g_offdiag_zero (M r θ : ℝ) {i j : Idx} (h : i ≠ j) :
   g M i j r θ = 0 := by
-  cases i <;> cases j <;> (first | exfalso; exact h rfl | simp [g])
+  cases i <;> cases j <;> (first | exact (False.elim (h rfl)) | simp [g])
 
-/-- Insert δ on the **right** when the metric sits on the right: Σ F ρ · g_{ρb} = Σ F ρ · g_{ρb} · δ_{ρb}. -/
+/-- **Helper (right metric): prune off-diagonals without unfolding `g`.** -/
+lemma sumIdx_prune_offdiag_right (M r θ : ℝ) (b : Idx) (F : Idx → ℝ) :
+  sumIdx (fun ρ => F ρ * g M ρ b r θ)
+    =
+  sumIdx (fun ρ => F ρ * g M ρ b r θ * (if ρ = b then 1 else 0)) := by
+  classical
+  refine sumIdx_congr (fun ρ => ?_)
+  by_cases h : ρ = b
+  · subst h; simp
+  ·
+    have hz : g M ρ b r θ = 0 := g_offdiag_zero M r θ h
+    rw [hz, if_neg h]
+    simp
+
+/-- **Helper (left metric): prune off-diagonals without unfolding `g`.** -/
+lemma sumIdx_prune_offdiag_left (M r θ : ℝ) (a : Idx) (F : Idx → ℝ) :
+  sumIdx (fun ρ => g M a ρ r θ * F ρ)
+    =
+  sumIdx (fun ρ => g M a ρ r θ * F ρ * (if ρ = a then 1 else 0)) := by
+  classical
+  refine sumIdx_congr (fun ρ => ?_)
+  by_cases h : ρ = a
+  · subst h; simp
+  ·
+    have hz : g M a ρ r θ = 0 := g_offdiag_zero M r θ (ne_comm.mpr h)
+    rw [hz, if_neg h]
+    simp
+
+/-- Insert δ on the **right** when the metric sits on the right:
+    Σ F ρ · g_{ρb} = Σ F ρ · g_{ρb} · δ_{ρb}. -/
 lemma insert_delta_right_diag (M r θ : ℝ) (b : Idx) (F : Idx → ℝ) :
   sumIdx (fun ρ => F ρ * g M ρ b r θ)
-    = sumIdx (fun ρ => F ρ * g M ρ b r θ * (if ρ = b then 1 else 0)) := by
-  classical
-  refine sumIdx_congr (fun ρ => ?_)
-  by_cases hρ : ρ = b
-  · subst hρ; simp
-  · have : g M ρ b r θ = 0 := g_offdiag_zero M r θ hρ
-    simp [this, hρ]
+    =
+  sumIdx (fun ρ => F ρ * g M ρ b r θ * (if ρ = b then 1 else 0)) := by
+  exact sumIdx_prune_offdiag_right M r θ b F
 
-/-- Insert δ on the **left** when the metric sits on the left: Σ g_{aρ} · F ρ = Σ g_{aρ} · F ρ · δ_{ρa}. -/
+/-- Insert δ on the **left** when the metric sits on the left:
+    Σ g_{aρ} · F ρ = Σ g_{aρ} · F ρ · δ_{ρa}. -/
 lemma insert_delta_left_diag (M r θ : ℝ) (a : Idx) (F : Idx → ℝ) :
   sumIdx (fun ρ => g M a ρ r θ * F ρ)
-    = sumIdx (fun ρ => g M a ρ r θ * F ρ * (if ρ = a then 1 else 0)) := by
-  classical
-  refine sumIdx_congr (fun ρ => ?_)
-  by_cases hρ : ρ = a
-  · subst hρ; simp
-  · have : g M a ρ r θ = 0 := g_offdiag_zero M r θ (ne_comm.mpr hρ)
-    simp [this, hρ]
+    =
+  sumIdx (fun ρ => g M a ρ r θ * F ρ * (if ρ = a then 1 else 0)) := by
+  exact sumIdx_prune_offdiag_left M r θ a F
 
 /-- Split the *payload* `sumIdx` and flip factors so `dCoord(g)` is on the left.
     This targets the **second** e-sum that contains the four `Γtot · dCoord(g)` terms
