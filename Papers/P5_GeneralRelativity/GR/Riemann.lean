@@ -2352,7 +2352,7 @@ lemma g_as_delta_right (M r θ : ℝ) (b : Idx) :
     (fun i => f i * (if i = k then 1 else 0) * c)
       = (fun i => (if i = k then 1 else 0) * (f i * c)) := by
     funext i; ring
-  simpa [hshape] using h
+  simpa [hshape] using h.symm
 
 /-- Swap the order of factors inside a `sumIdx` body (keep out of simp). -/
 lemma sumIdx_swap_factors (A B : Idx → ℝ) :
@@ -3090,11 +3090,11 @@ lemma RiemannUp_swap_mu_nu
     (M r θ : ℝ) (ρ σ μ ν : Idx) :
   RiemannUp M r θ ρ σ μ ν = - RiemannUp M r θ ρ σ ν μ := by
   classical
+  -- Expand once; turn both `sumIdx (A - B)` into `(ΣA) - (ΣB)`; finish with a scalar identity.
   unfold RiemannUp
-  -- Note: dCoord_add/sub removed - simp uses @[simp] _of_diff versions automatically
-  simp [sumIdx, Finset.sum_sub_distrib,
-        sub_eq_add_neg, add_comm, add_left_comm, add_assoc,
-        mul_comm, mul_left_comm, mul_assoc]
+  -- `sumIdx_map_sub` is `@[simp]`, so it rewrites both sides automatically.
+  simp only [sumIdx_map_sub]
+  ring
 
 /-- Antisymmetry in the last two (lower) slots after lowering the first index. -/
 lemma Riemann_swap_c_d
