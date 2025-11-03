@@ -4454,6 +4454,24 @@ lemma nabla_g_zero_ext (M r θ : ℝ) (h_ext : Exterior M r θ) (c a b : Idx) :
   -- The terms cancel exactly by definition of nabla_g
   abel
 
+/-- If a tensor field is pointwise zero, its covariant derivative reduces to the coordinate derivative.
+    This is because the connection terms vanish when multiplied by zero tensor components.
+
+    This general principle captures the mathematical fact that ∇_c T = ∂_c T when T = 0. -/
+lemma nabla_eq_dCoord_of_pointwise_zero
+    (M r θ : ℝ)
+    (T : ℝ → ℝ → ℝ → Idx → Idx → ℝ) (c a b : Idx)
+    (hT : ∀ a b, T M r θ a b = 0) :
+  nabla T M r θ c a b = dCoord c (fun r θ => T M r θ a b) r θ := by
+  classical
+  unfold nabla
+  have h₁ : (fun d => Γtot M r θ d a c * T M r θ d b) = (fun _ => 0) := by
+    funext d; simp [hT d b]
+  have h₂ : (fun d => Γtot M r θ d b c * T M r θ a d) = (fun _ => 0) := by
+    funext d; simp [hT a d]
+  simp only [h₁, h₂, sumIdx_zero]
+  ring
+
 /-! ### Pointwise compat refolds (per-k identities for kk_refold) -/
 
 /-- For fixed `k`, refold the `r`-branch left-slot sum via compatibility. -/
@@ -9506,9 +9524,15 @@ lemma ricci_identity_on_g_rθ_ext
 
   -- nabla definition and symmetry
   have def_rθ : nabla (fun M r θ a b => nabla_g M r θ Idx.θ a b) M r θ Idx.r a b
-              = dCoord Idx.r (fun r θ => nabla_g M r θ Idx.θ a b) r θ := rfl
+              = dCoord Idx.r (fun r θ => nabla_g M r θ Idx.θ a b) r θ := by
+    apply nabla_eq_dCoord_of_pointwise_zero
+    intro a' b'
+    exact nabla_g_zero_ext M r θ h_ext Idx.θ a' b'
   have def_θr : nabla (fun M r θ a b => nabla_g M r θ Idx.r a b) M r θ Idx.θ a b
-              = dCoord Idx.θ (fun r θ => nabla_g M r θ Idx.r a b) r θ := rfl
+              = dCoord Idx.θ (fun r θ => nabla_g M r θ Idx.r a b) r θ := by
+    apply nabla_eq_dCoord_of_pointwise_zero
+    intro a' b'
+    exact nabla_g_zero_ext M r θ h_ext Idx.r a' b'
 
   rw [def_rθ, def_θr, LHS0]
   linarith
