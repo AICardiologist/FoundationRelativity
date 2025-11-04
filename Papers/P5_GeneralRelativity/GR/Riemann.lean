@@ -8762,7 +8762,7 @@ lemma algebraic_identity
       -- Use the packaged form to complete the goal
       exact this
 
-    /-- b‑branch: insert the Kronecker δ pointwise (metric on the right). -/
+    -- b‑branch: insert the Kronecker δ pointwise (metric on the right).
     have h_insert_delta_for_b :
       sumIdx (fun ρ =>
         - ( ( dCoord μ (fun r θ => Γtot M r θ ρ ν a) r θ
@@ -8977,7 +8977,7 @@ lemma algebraic_identity
       exact this
 
     /- 2) Insert the Kronecker δ under the ρ-sum:  Σ Eρ = Σ Eρ·δ_{ρa} -/
-    /-- a‑branch: insert the Kronecker δ pointwise (metric on the left). -/
+    -- a‑branch: insert the Kronecker δ pointwise (metric on the left).
     have h_insert_delta_for_a :
       sumIdx (fun ρ =>
         - ( ( dCoord μ (fun r θ => Γtot M r θ ρ ν b) r θ
@@ -9385,30 +9385,83 @@ lemma algebraic_identity_four_block_old
   -- Three-part strategy: (A) α-rename, (B) collect into P, (C) cancel via congrArg.
   -- See: STATUS_PAUL_SOLUTION_IMPLEMENTATION_OCT30.md for implementation details.
 
-  -- Initial binder-safe flattening
-  simp only [flatten₄₁, flatten₄₂, group_add_sub, fold_sub_right, fold_add_left]
+  -- A1: reorder the binder lambda to the lemma's LHS, then use the packaged splitter (no trans).
+  have hshape :
+    sumIdx (fun e =>
+        - Γtot M r θ e ν a * dCoord μ (fun r θ => g M e b r θ) r θ
+      - Γtot M r θ e ν b * dCoord μ (fun r θ => g M a e r θ) r θ
+      + Γtot M r θ e μ a * dCoord ν (fun r θ => g M e b r θ) r θ
+      + Γtot M r θ e μ b * dCoord ν (fun r θ => g M a e r θ) r θ)
+    =
+    sumIdx (fun e =>
+        - Γtot M r θ e ν a * dCoord μ (fun r θ => g M e b r θ) r θ
+      + Γtot M r θ e μ a * dCoord ν (fun r θ => g M e b r θ) r θ
+      - Γtot M r θ e ν b * dCoord μ (fun r θ => g M a e r θ) r θ
+      + Γtot M r θ e μ b * dCoord ν (fun r θ => g M a e r θ) r θ) := by
+    refine sumIdx_congr (fun e => ?_); ring   -- purely AC on scalars under the binder
 
-  -- JP's surgical fix (Oct 30, 2025): Split and flip the SECOND e-sum (payload block)
-  -- This targets the payload block that contains Γtot · dCoord(g), not the ∂Γ block.
-  -- It flips factors to dCoord(g) · Γtot and splits into 4 separate sums for cancellation.
-  rw [payload_split_and_flip M r θ μ ν a b]
-
-  -- Cancel the four-sum payload cluster using Block A (payload_cancel_all).
-  -- After the split-and-flip, the pattern now matches exactly.
-  have hP0 :
+  have h_payload_flip :
+    sumIdx (fun e =>
+        - Γtot M r θ e ν a * dCoord μ (fun r θ => g M e b r θ) r θ
+      - Γtot M r θ e ν b * dCoord μ (fun r θ => g M a e r θ) r θ
+      + Γtot M r θ e μ a * dCoord ν (fun r θ => g M e b r θ) r θ
+      + Γtot M r θ e μ b * dCoord ν (fun r θ => g M a e r θ) r θ)
+    =
       (sumIdx (fun e => -(dCoord μ (fun r θ => g M e b r θ) r θ) * Γtot M r θ e ν a))
     + (sumIdx (fun e =>  (dCoord ν (fun r θ => g M e b r θ) r θ) * Γtot M r θ e μ a))
     + (sumIdx (fun e => -(dCoord μ (fun r θ => g M a e r θ) r θ) * Γtot M r θ e ν b))
-    + (sumIdx (fun e =>  (dCoord ν (fun r θ => g M a e r θ) r θ) * Γtot M r θ e μ b))
-    = 0 := by
-    simpa [g_symm, add_assoc, add_comm, add_left_comm] using
-      payload_cancel_all M r θ h_ext μ ν a b
+    + (sumIdx (fun e =>  (dCoord ν (fun r θ => g M a e r θ) r θ) * Γtot M r θ e μ b)) := by
+    -- Just reorder to the lemma's LHS and call it. No trans, no extra flip.
+    simpa [hshape] using (payload_split_and_flip M r θ μ ν a b)
 
-  -- Replace the payload cluster with 0.
-  rw [hP0]
-  simp
+  -- A2: Name the four Σ blocks to stabilize the outer algebra and align with `payload_cancel_all`.
+  set A :=
+    sumIdx (fun e => -(dCoord μ (fun r θ => g M e b r θ) r θ) * Γtot M r θ e ν a)
+  set B :=
+    sumIdx (fun e =>  (dCoord ν (fun r θ => g M e b r θ) r θ) * Γtot M r θ e μ a)
+  set C :=
+    sumIdx (fun e => -(dCoord μ (fun r θ => g M a e r θ) r θ) * Γtot M r θ e ν b)
+  set D :=
+    sumIdx (fun e =>  (dCoord ν (fun r θ => g M a e r θ) r θ) * Γtot M r θ e μ b)
+
+  have hP0 : A + B + C + D = 0 := by
+    -- `payload_cancel_all` may present a different parenthesization. Normalize additively only.
+    simpa [A, B, C, D, add_assoc, add_comm, add_left_comm]
+      using (payload_cancel_all M r θ h_ext μ ν a b)
+
+  -- A3: Collapse the four-sum payload in one shot:
+  have h_payload_zero :
+    sumIdx (fun e =>
+        - Γtot M r θ e ν a * dCoord μ (fun r θ => g M e b r θ) r θ
+      - Γtot M r θ e ν b * dCoord μ (fun r θ => g M a e r θ) r θ
+      + Γtot M r θ e μ a * dCoord ν (fun r θ => g M e b r θ) r θ
+      + Γtot M r θ e μ b * dCoord ν (fun r θ => g M a e r θ) r θ)
+    = 0 := by
+    -- Use A1 then A2, no extra simplification.
+    simpa [A, B, C, D] using h_payload_flip.trans hP0
+
+  -- Use the equality; avoid recursive simp loops
+  rw [h_payload_zero]
+  simp only [zero_add, add_zero, sub_zero]  -- stable cleanup only
 
   -- Steps 6-8: Apply remaining blocks to simplify the rest of the goal.
+  -- A2: normalize the ∂Γ–metric cluster inside the binder so `dGamma_match` matches syntactically.
+  have hΓshape :
+    sumIdx (fun e =>
+        - dCoord μ (fun r θ => Γtot M r θ e ν a) r θ * g M e b r θ
+      +   dCoord ν (fun r θ => Γtot M r θ e μ a) r θ * g M e b r θ
+      -   dCoord μ (fun r θ => Γtot M r θ e ν b) r θ * g M a e r θ
+      +   dCoord ν (fun r θ => Γtot M r θ e μ b) r θ * g M a e r θ)
+    =
+    sumIdx (fun e =>
+        - (dCoord μ (fun r θ => Γtot M r θ e ν a) r θ) * g M e b r θ
+      +   (dCoord ν (fun r θ => Γtot M r θ e μ a) r θ) * g M e b r θ
+      -   (dCoord μ (fun r θ => Γtot M r θ e ν b) r θ) * g M a e r θ
+      +   (dCoord ν (fun r θ => Γtot M r θ e μ b) r θ) * g M a e r θ) := by
+    refine sumIdx_congr (fun e => ?_); ring
+
+  -- Apply the pointwise parenthesization fix, then match the library lemma.
+  rw [hΓshape]
   rw [dGamma_match M r θ h_ext μ ν a b]
   rw [main_to_commutator M r θ h_ext μ ν a b]
   rw [cross_block_zero M r θ h_ext μ ν a b]
