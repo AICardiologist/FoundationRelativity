@@ -6104,21 +6104,85 @@ lemma regroup_left_sum_to_RiemannUp
       -- Prove pointwise then lift with sumIdx_congr
       apply sumIdx_congr
       intro ρ
-      -- Expand the fᵢ and fold deterministically; then recognize RiemannUp
-      -- Key: we factor `g M a ρ r θ` over (dr - dθ) and the (ΣΓΓ - ΣΓΓ) block.
-      -- The ring tactic handles `g*X - g*Y = g*(X - Y)` and `g*X + g*Y = g*(X + Y)`.
-      have : f₁ ρ - f₂ ρ + f₃ ρ - f₄ ρ
-          = g M a ρ r θ *
-              ( dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ b) r θ
-              - dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r b) r θ
-              + sumIdx (fun lam =>
-                  Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ b
-                - Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r b) ) := by
-        -- expand fᵢ, then linear algebra
-        simp [f₁, f₂, f₃, f₄]
-        ring
-      -- Now fold to `g * RiemannUp …` using the definition
-      simpa [RiemannUp] using this
+
+      -- Step 1: ∂Γ-block. Expand *only* f₁,f₂; do not unfold dCoord or g.
+      have h12_r :
+          f₁ ρ - f₂ ρ
+            =
+          ( dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ b) r θ
+          - dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r b) r θ ) * g M a ρ r θ := by
+        -- After this `simp only`, the goal is of the form A*g - B*g.
+        simp only [f₁, f₂]
+        -- Deterministic fold: a*c - b*c = (a - b)*c
+        simpa [fold_sub_right]
+      have h12 :
+          f₁ ρ - f₂ ρ
+            =
+          g M a ρ r θ *
+            ( dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ b) r θ
+            - dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r b) r θ ) := by
+        simpa [mul_comm] using h12_r
+
+      -- Step 2: ΓΓ-block. Expand *only* f₃,f₄; fold on the right, then turn (ΣA - ΣB) into Σ(A - B).
+      have h34_step :
+          f₃ ρ - f₄ ρ
+            =
+          ( sumIdx (fun lam =>
+              Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ b)
+          - sumIdx (fun lam =>
+              Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r b) ) * g M a ρ r θ := by
+        simp only [f₃, f₄]
+        simpa [fold_sub_right]
+      have h34 :
+          f₃ ρ - f₄ ρ
+            =
+          g M a ρ r θ *
+            ( sumIdx (fun lam =>
+                Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ b
+              - Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r b) ) := by
+        simpa [mul_comm, sumIdx_map_sub] using h34_step
+
+      -- Step 3: Assemble the two blocks and factor g once.
+      -- First rewrite the LHS by the two pointwise equalities:
+      have hsum' :
+          (f₁ ρ - f₂ ρ) + (f₃ ρ - f₄ ρ)
+            =
+          g M a ρ r θ *
+            ( dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ b) r θ
+            - dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r b) r θ )
+          + g M a ρ r θ *
+            ( sumIdx (fun lam =>
+                Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ b
+              - Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r b) ) := by
+        rw [h12, h34]
+      have hsum :
+          (f₁ ρ - f₂ ρ) + (f₃ ρ - f₄ ρ)
+            =
+          g M a ρ r θ *
+            ( dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ b) r θ
+            - dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r b) r θ
+            + sumIdx (fun lam =>
+                Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ b
+              - Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r b) ) := by
+        -- Factor g once: a*b + a*c = a*(b + c)
+        simpa [fold_add_left] using hsum'
+
+      -- Step 4: Flatten ((x₁ - x₂) + (x₃ - x₄)) and fold to RiemannUp by definition.
+      have hfold :
+          f₁ ρ - f₂ ρ + f₃ ρ - f₄ ρ
+            =
+          g M a ρ r θ *
+            ( dCoord Idx.r (fun r θ => Γtot M r θ ρ Idx.θ b) r θ
+            - dCoord Idx.θ (fun r θ => Γtot M r θ ρ Idx.r b) r θ
+            + sumIdx (fun lam =>
+                Γtot M r θ ρ Idx.r lam * Γtot M r θ lam Idx.θ b
+              - Γtot M r θ ρ Idx.θ lam * Γtot M r θ lam Idx.r b) ) := by
+        simpa [flatten₄₂] using hsum
+
+      -- Final fold-by-definition: the bracket is literally `RiemannUp …`.
+      have hfold' := hfold
+      simp only [RiemannUp] at hfold' ⊢
+      exact hfold'
 
     have step5 :
       ((A - B) + (M_r - M_θ)) + (Extra_r - Extra_θ)
@@ -9278,25 +9342,91 @@ lemma payload_cancel_all (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b : I
        _ = 0 + 0 := by rw [ha, hb]
        _ = 0 := by ring
 
-/-- Flipped variant of `payload_cancel_all` for use with `payload_split_and_flip`.
-    The lemma `payload_split_and_flip` produces sums with factors in `dCoord * Γtot` order (flipped).
-    This variant proves that these flipped sums cancel to zero. -/
+/-- Cancel the four-term payload in the **flipped** (canonical) orientation.
+
+    Shape matches exactly what `payload_split_and_flip` produces:
+    Σ_e [  -(∂_μ g_{eb}) Γ^e_{νa} + (∂_ν g_{eb}) Γ^e_{μa}
+          - (∂_μ g_{ae}) Γ^e_{νb} + (∂_ν g_{ae}) Γ^e_{μb} ] = 0.
+-/
 lemma payload_cancel_all_flipped (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b : Idx) :
-  ( sumIdx (fun e => -(dCoord μ (fun r θ => g M e b r θ) r θ) * Γtot M r θ e ν a) )
-+ ( sumIdx (fun e =>  (dCoord ν (fun r θ => g M e b r θ) r θ) * Γtot M r θ e μ a) )
-+ ( sumIdx (fun e => -(dCoord μ (fun r θ => g M a e r θ) r θ) * Γtot M r θ e ν b) )
-+ ( sumIdx (fun e =>  (dCoord ν (fun r θ => g M a e r θ) r θ) * Γtot M r θ e μ b) )
-  = 0 := by
-  -- Strategy: Flip factors back to match the input format of payload_cancel_all,
-  -- then apply the existing cancellation lemma.
-  -- The goal has factors in `dCoord * Γtot` order (flipped).
-  -- We need to transform to `Γtot * dCoord` order (unflipped) to match payload_cancel_all.
+  sumIdx (fun e =>
+       -(dCoord μ (fun r θ => g M e b r θ) r θ) * Γtot M r θ e ν a
+     +  (dCoord ν (fun r θ => g M e b r θ) r θ) * Γtot M r θ e μ a
+     -  (dCoord μ (fun r θ => g M a e r θ) r θ) * Γtot M r θ e ν b
+     +  (dCoord ν (fun r θ => g M a e r θ) r θ) * Γtot M r θ e μ b) = 0 := by
+  classical
+  -- Step 1: commute factors to the canonical (unflipped) Γ · dCoord(g) pointwise.
+  -- Step 1: pointwise commute to Γ⋅dCoord and regroup as two differences (pure algebra).
+  have hpt :
+    ∀ e,
+      ( -(dCoord μ (fun r θ => g M e b r θ) r θ) * Γtot M r θ e ν a
+      +   (dCoord ν (fun r θ => g M e b r θ) r θ) * Γtot M r θ e μ a
+      -   (dCoord μ (fun r θ => g M a e r θ) r θ) * Γtot M r θ e ν b
+      +   (dCoord ν (fun r θ => g M a e r θ) r θ) * Γtot M r θ e μ b )
+      =
+      ( Γtot M r θ e μ a * dCoord ν (fun r θ => g M e b r θ) r θ
+      - Γtot M r θ e ν a * dCoord μ (fun r θ => g M e b r θ) r θ )
+    + ( Γtot M r θ e μ b * dCoord ν (fun r θ => g M a e r θ) r θ
+      - Γtot M r θ e ν b * dCoord μ (fun r θ => g M a e r θ) r θ ) := by
+    intro e
+    ring  -- ✅ Only ring at purely scalar level, not under binders
 
-  -- Use commutativity of multiplication and properties of negation
-  simp only [neg_mul, mul_comm (dCoord _ _ _ _)]
+  have hunflip :
+    sumIdx (fun e =>
+      -(dCoord μ (fun r θ => g M e b r θ) r θ) * Γtot M r θ e ν a
+    +  (dCoord ν (fun r θ => g M e b r θ) r θ) * Γtot M r θ e μ a
+    -  (dCoord μ (fun r θ => g M a e r θ) r θ) * Γtot M r θ e ν b
+    +  (dCoord ν (fun r θ => g M a e r θ) r θ) * Γtot M r θ e μ b)
+      =
+    sumIdx (fun e =>
+      ( Γtot M r θ e μ a * dCoord ν (fun r θ => g M e b r θ) r θ
+      - Γtot M r θ e ν a * dCoord μ (fun r θ => g M e b r θ) r θ )
+    + ( Γtot M r θ e μ b * dCoord ν (fun r θ => g M a e r θ) r θ
+      - Γtot M r θ e ν b * dCoord μ (fun r θ => g M a e r θ) r θ )) := by
+    refine sumIdx_congr (fun e => ?_)
+    simpa using hpt e
 
-  -- Now the structure matches payload_cancel_all, with AC normalization
-  simpa [add_assoc, add_comm, add_left_comm] using (payload_cancel_all M r θ h_ext μ ν a b)
+  -- Step 2: split the single Σ into the sum of two Σ‑differences.
+  have hsplit :
+    sumIdx (fun e =>
+      ( Γtot M r θ e μ a * dCoord ν (fun r θ => g M e b r θ) r θ
+      - Γtot M r θ e ν a * dCoord μ (fun r θ => g M e b r θ) r θ )
+    + ( Γtot M r θ e μ b * dCoord ν (fun r θ => g M a e r θ) r θ
+      - Γtot M r θ e ν b * dCoord μ (fun r θ => g M a e r θ) r θ ))
+    =
+      (sumIdx (fun e =>
+        Γtot M r θ e μ a * dCoord ν (fun r θ => g M e b r θ) r θ
+      - Γtot M r θ e ν a * dCoord μ (fun r θ => g M e b r θ) r θ))
+    +
+      (sumIdx (fun e =>
+        Γtot M r θ e μ b * dCoord ν (fun r θ => g M a e r θ) r θ
+      - Γtot M r θ e ν b * dCoord μ (fun r θ => g M a e r θ) r θ)) := by
+    simpa [sumIdx_add_distrib]  -- ✅ Simple split using existing lemma
+
+  -- Step 3: apply the existing unflipped cancellation.
+  have h_cancel := payload_cancel_all M r θ h_ext μ ν a b
+
+  -- Step 4: compose the rewrites and close.
+  calc
+    sumIdx (fun e =>
+       -(dCoord μ (fun r θ => g M e b r θ) r θ) * Γtot M r θ e ν a
+     +  (dCoord ν (fun r θ => g M e b r θ) r θ) * Γtot M r θ e μ a
+     -  (dCoord μ (fun r θ => g M a e r θ) r θ) * Γtot M r θ e ν b
+     +  (dCoord ν (fun r θ => g M a e r θ) r θ) * Γtot M r θ e μ b)
+        = sumIdx (fun e =>
+            ( Γtot M r θ e μ a * dCoord ν (fun r θ => g M e b r θ) r θ
+            - Γtot M r θ e ν a * dCoord μ (fun r θ => g M e b r θ) r θ )
+          + ( Γtot M r θ e μ b * dCoord ν (fun r θ => g M a e r θ) r θ
+            - Γtot M r θ e ν b * dCoord μ (fun r θ => g M a e r θ) r θ )) := by simpa using hunflip
+    _   =
+          (sumIdx (fun e =>
+            Γtot M r θ e μ a * dCoord ν (fun r θ => g M e b r θ) r θ
+          - Γtot M r θ e ν a * dCoord μ (fun r θ => g M e b r θ) r θ))
+        +
+          (sumIdx (fun e =>
+            Γtot M r θ e μ b * dCoord ν (fun r θ => g M a e r θ) r θ
+          - Γtot M r θ e ν b * dCoord μ (fun r θ => g M a e r θ) r θ)) := hsplit
+    _   = 0 := h_cancel
 
 /-! ### Block C: Main to Commutator -/
 
