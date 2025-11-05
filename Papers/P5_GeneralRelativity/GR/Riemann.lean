@@ -1776,6 +1776,36 @@ lemma insert_delta_left_diag (M r θ : ℝ) (a : Idx) (F : Idx → ℝ) :
   sumIdx (fun ρ => g M a ρ r θ * F ρ * (if ρ = a then 1 else 0)) := by
   exact sumIdx_prune_offdiag_left M r θ a F
 
+/-! ### Micro-infrastructure for δ-insertion and negation normalization (Phase 2, Nov 4) -/
+
+/-- Pointwise, deterministic flip: put the `-` on the left factor. -/
+lemma flip_neg_prod {A B : ℝ} : -(A * B) = (-A) * B := by ring
+
+/-- Flatten with frontneg; avoids AC search later. -/
+@[simp] lemma flatten4_frontneg (x₁ x₂ x₃ x₄ : ℝ) :
+  -x₁ + x₂ - x₃ + x₄ = (-(x₁) + x₂) - x₃ + x₄ := by ring
+
+/-- If every summand is zero, the finite index sum is zero. -/
+lemma sumIdx_all_zero {f : Idx → ℝ} (h : ∀ i, f i = 0) : sumIdx f = 0 := by
+  classical
+  simp [sumIdx_expand, h]
+
+/-- δ-insertion that tolerates a leading negation; matches the canonical `(-F ρ) * g` head. -/
+lemma insert_delta_right_diag_neg
+    (M r θ : ℝ) (b : Idx) (F : Idx → ℝ) :
+  sumIdx (fun ρ => (-F ρ) * g M ρ b r θ)
+    =
+  sumIdx (fun ρ => (-F ρ) * g M ρ b r θ * (if ρ = b then 1 else 0)) := by
+  exact insert_delta_right_diag M r θ b (fun ρ => -F ρ)
+
+/-- Left-δ version with leading negation. -/
+lemma insert_delta_left_diag_neg
+    (M r θ : ℝ) (a : Idx) (F : Idx → ℝ) :
+  sumIdx (fun ρ => g M a ρ r θ * (-F ρ))
+    =
+  sumIdx (fun ρ => g M a ρ r θ * (-F ρ) * (if ρ = a then 1 else 0)) := by
+  exact insert_delta_left_diag M r θ a (fun ρ => -F ρ)
+
 /-- Split the *payload* `sumIdx` and flip factors so `dCoord(g)` is on the left.
     This targets the **second** e-sum that contains the four `Γtot · dCoord(g)` terms
     after the P/Ca/Cb expansions (Steps 1–4).
@@ -9228,6 +9258,26 @@ lemma payload_cancel_all (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b : I
        _ = 0 + 0 := by rw [ha, hb]
        _ = 0 := by ring
 
+/-- Flipped variant of `payload_cancel_all` for use with `payload_split_and_flip`.
+    The lemma `payload_split_and_flip` produces sums with factors in `dCoord * Γtot` order (flipped).
+    This variant proves that these flipped sums cancel to zero. -/
+lemma payload_cancel_all_flipped (M r θ : ℝ) (h_ext : Exterior M r θ) (μ ν a b : Idx) :
+  ( sumIdx (fun e => -(dCoord μ (fun r θ => g M e b r θ) r θ) * Γtot M r θ e ν a) )
++ ( sumIdx (fun e =>  (dCoord ν (fun r θ => g M e b r θ) r θ) * Γtot M r θ e μ a) )
++ ( sumIdx (fun e => -(dCoord μ (fun r θ => g M a e r θ) r θ) * Γtot M r θ e ν b) )
++ ( sumIdx (fun e =>  (dCoord ν (fun r θ => g M a e r θ) r θ) * Γtot M r θ e μ b) )
+  = 0 := by
+  -- Strategy: Flip factors back to match the input format of payload_cancel_all,
+  -- then apply the existing cancellation lemma.
+  -- The goal has factors in `dCoord * Γtot` order (flipped).
+  -- We need to transform to `Γtot * dCoord` order (unflipped) to match payload_cancel_all.
+
+  -- Use commutativity of multiplication and properties of negation
+  simp only [neg_mul, mul_comm (dCoord _ _ _ _)]
+
+  -- Now the structure matches payload_cancel_all, with AC normalization
+  simpa [add_assoc, add_comm, add_left_comm] using (payload_cancel_all M r θ h_ext μ ν a b)
+
 /-! ### Block C: Main to Commutator -/
 
 /-- Block C: C'_main equals the ΓΓ commutator part of RHS.
@@ -9425,9 +9475,9 @@ lemma algebraic_identity_four_block_old
     sumIdx (fun e =>  (dCoord ν (fun r θ => g M a e r θ) r θ) * Γtot M r θ e μ b)
 
   have hP0 : A + B + C + D = 0 := by
-    -- `payload_cancel_all` may present a different parenthesization. Normalize additively only.
-    simpa [A, B, C, D, add_assoc, add_comm, add_left_comm]
-      using (payload_cancel_all M r θ h_ext μ ν a b)
+    -- FIX (Option 2): Use the flipped variant.
+    -- Since the definitions of A, B, C, D match the lemma exactly, `exact` should work.
+    exact payload_cancel_all_flipped M r θ h_ext μ ν a b
 
   -- A3: Collapse the four-sum payload in one shot:
   have h_payload_zero :
