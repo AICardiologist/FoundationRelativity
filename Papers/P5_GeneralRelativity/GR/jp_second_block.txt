@@ -1,0 +1,93 @@
+  /- SECOND BLOCK (no h_plus/h_minus; no recursive simp) -/
+  -- define the two ρ-bodies once (ASCII names; no Unicode)
+  let U : Idx → ℝ :=
+    fun ρ => sumIdx (fun e => Γtot M r θ ρ μ a * Γtot M r θ e ν b)
+  let V : Idx → ℝ :=
+    fun ρ => sumIdx (fun e => Γtot M r θ ρ ν a * Γtot M r θ e μ b)
+
+  have second_block :
+    sumIdx (fun ρ =>
+      sumIdx (fun e =>
+        ((Γtot M r θ ρ μ a * Γtot M r θ e ν b)
+       - (Γtot M r θ ρ ν a * Γtot M r θ e μ b)) * g M ρ e r θ))
+    =
+    sumIdx (fun ρ => g M ρ b r θ * (U ρ - V ρ)) := by
+    -- pointwise reshaping of the inner subtraction; one `sumIdx_map_sub`
+    apply sumIdx_congr; intro ρ
+    have : (fun e =>
+      ((Γtot M r θ ρ μ a * Γtot M r θ e ν b)
+     - (Γtot M r θ ρ ν a * Γtot M r θ e μ b)) * g M ρ e r θ)
+         = (fun e =>
+             (Γtot M r θ ρ μ a * Γtot M r θ e ν b) * g M ρ e r θ
+           - (Γtot M r θ ρ ν a * Γtot M r θ e μ b) * g M ρ e r θ) := by
+      funext e; ring
+    simp [this, sumIdx_map_sub, U, V, fold_sub_right, mul_comm, mul_left_comm, mul_assoc]
+
+  -- collapse the outer ρ-sum by diagonality (after one symmetry flip)
+  have U_collapse :
+    sumIdx (fun ρ => g M ρ b r θ * U ρ) = g M b b r θ * U b := by
+    have : sumIdx (fun ρ => g M ρ b r θ * U ρ)
+         = sumIdx (fun ρ => g M b ρ r θ * U ρ) := by
+      apply sumIdx_congr; intro ρ; simpa [g_symm_JP M r θ ρ b]
+    simpa [this] using
+      (sumIdx_reduce_by_diagonality M r θ b (fun ρ => U ρ))
+
+  have V_collapse :
+    sumIdx (fun ρ => g M ρ b r θ * V ρ) = g M b b r θ * V b := by
+    have : sumIdx (fun ρ => g M ρ b r θ * V ρ)
+         = sumIdx (fun ρ => g M b ρ r θ * V ρ) := by
+      apply sumIdx_congr; intro ρ; simpa [g_symm_JP M r θ ρ b]
+    simpa [this] using
+      (sumIdx_reduce_by_diagonality M r θ b (fun ρ => V ρ))
+
+  -- final algebra
+  have split_outer :
+    sumIdx (fun ρ => g M ρ b r θ * (U ρ - V ρ))
+      = sumIdx (fun ρ => g M ρ b r θ * U ρ)
+      - sumIdx (fun ρ => g M ρ b r θ * V ρ) := by
+    have : (fun ρ => g M ρ b r θ * (U ρ - V ρ))
+         = (fun ρ => g M ρ b r θ * U ρ - g M ρ b r θ * V ρ) := by
+      funext ρ; simp [fold_sub_right, mul_comm, mul_left_comm, mul_assoc]
+    simpa [this, sumIdx_map_sub]
+
+  have second_block_closed :
+    sumIdx (fun ρ => g M ρ b r θ * (U ρ - V ρ))
+    =
+    g M b b r θ *
+      ( U b - V b ) := by
+    calc
+      sumIdx (fun ρ => g M ρ b r θ * (U ρ - V ρ))
+          = sumIdx (fun ρ => g M ρ b r θ * U ρ)
+            - sumIdx (fun ρ => g M ρ b r θ * V ρ) := split_outer
+      _   = g M b b r θ * U b - g M b b r θ * V b := by
+              rw [U_collapse, V_collapse]
+      _   = g M b b r θ * (U b - V b) := by ring
+
+  -- rewrite the bodies at ρ = b
+  have second_block_final :
+    g M b b r θ * (U b - V b)
+    =
+    g M b b r θ *
+      ( sumIdx (fun e => Γtot M r θ b μ a * Γtot M r θ e ν b)
+      - sumIdx (fun e => Γtot M r θ b ν a * Γtot M r θ e μ b) ) := by
+    simp [U, V]
+
+  -- conclude the second block in the original shape
+  have second_block :
+    sumIdx (fun ρ => sumIdx (fun e =>
+      ((Γtot M r θ ρ μ a * Γtot M r θ e ν b)
+     - (Γtot M r θ ρ ν a * Γtot M r θ e μ b)) * g M ρ e r θ))
+    =
+    g M b b r θ *
+      ( sumIdx (fun e => Γtot M r θ b μ a * Γtot M r θ e ν b)
+      - sumIdx (fun e => Γtot M r θ b ν a * Γtot M r θ e μ b) ) := by
+    -- plug the chain above
+    have := second_block
+    -- (name shadowing avoided by using second_block_closed/final above)
+    exact
+      (by
+        -- first identify with the "g ρb * (U−V)" form
+        have := (by exact (second_block : _))
+        -- then collapse and unfold U/V at ρ = b
+        simpa using
+          (second_block_closed.trans second_block_final))

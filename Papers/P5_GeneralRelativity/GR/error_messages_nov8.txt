@@ -1,0 +1,58 @@
+=== ACTUAL ERROR MESSAGES FOR 19 LINES ===
+
+===== Line 8848 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:8848:4: Tactic `simp` failed with a nested error:
+
+===== Line 8855 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:8855:65: unsolved goals
+
+===== Line 9005 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9005:6: failed to synthesize
+
+===== Line 9020 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9020:33: unsolved goals
+
+===== Line 9037 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9037:8: Type mismatch
+
+===== Line 9041 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9041:12: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+
+===== Line 9072 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9072:22: unsolved goals
+
+===== Line 9123 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9123:65: unsolved goals
+
+===== Line 9271 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9271:6: failed to synthesize
+
+===== Line 9286 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9286:33: unsolved goals
+
+===== Line 9304 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9304:8: Type mismatch
+
+===== Line 9308 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9308:12: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+
+===== Line 9348 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9348:6: invalid 'calc' step, left-hand side is
+
+===== Line 9353 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9353:86: unsolved goals
+
+===== Line 9594 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9594:15: Type mismatch
+
+===== Line 9795 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9795:4: Type mismatch
+
+===== Line 9809 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9809:6: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+
+===== Line 9878 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9878:65: unsolved goals
+
+===== Line 9989 Error =====
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9989:57: unsolved goals
