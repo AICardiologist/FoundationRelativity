@@ -1,0 +1,16 @@
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:8901:6: failed to synthesize
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:8916:33: unsolved goals
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:8935:8: Type mismatch: After simplification, term
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:8945:12: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:8751:65: unsolved goals
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9122:6: failed to synthesize
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9137:33: unsolved goals
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9155:8: Type mismatch
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9159:12: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:8974:65: unsolved goals
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9200:88: unsolved goals
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9437:15: Type mismatch
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9638:4: Type mismatch
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9652:6: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9721:65: unsolved goals
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9832:57: unsolved goals
