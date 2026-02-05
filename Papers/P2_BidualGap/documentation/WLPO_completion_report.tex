@@ -1,0 +1,54 @@
+% WLPO Completion Report for Paper 2 (P2_BidualGap)
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage[american]{babel}
+\usepackage{enumitem}
+\usepackage{hyperref}
+
+\title{WLPO Completion Report (Paper 2)}
+\author{Codex Audit}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Scope}
+This report summarizes:
+\begin{itemize}
+  \item the latest LaTeX draft in \texttt{P2\_BidualGap/documentation},
+  \item explicit incompletenesses in that draft, and
+  \item the Lean-side status for the WLPO $\Rightarrow$ bidual gap direction.
+\end{itemize}
+
+\section*{Latest LaTeX Draft}
+By modification time, the latest draft is:
+\begin{itemize}
+  \item \texttt{documentation/paper-v5.tex}
+\end{itemize}
+
+\section*{Incomplete Parts in the Latest Draft}
+The following are explicit placeholders in \texttt{paper-v5.tex}:
+\begin{itemize}
+  \item \textbf{WLPO $\to$ Gap (coding-based sketch)}: the Lean listing \texttt{gap\_from\_WLPO} ends with \texttt{sorry}.
+  \item \textbf{Stone window construction}: the algebra instance on $\ell^\infty/c_0$ and the Stone window isomorphism contain multiple \texttt{sorry} placeholders (well-defined multiplication, inverse map, and proof of inverses).
+\end{itemize}
+These are the only explicit \texttt{sorry}-style gaps in the latest LaTeX draft.
+
+\section*{Lean Completion Status}
+In \texttt{Papers/P2\_BidualGap/HB/WLPO\_to\_Gap\_HB.lean}, the two previous axioms
+\texttt{dual\_is\_banach\_c0\_from\_WLPO} and
+\texttt{dual\_is\_banach\_c0\_dual\_from\_WLPO}
+were replaced by explicit proofs. The file builds.
+
+\paragraph{Note on Constructivity.}
+The completion currently uses classical operator-norm machinery (via $\sup$ on closed balls)
+for the DualIsBanach obligations. This removes all Lean-level sorries/axioms in the WLPO $\Rightarrow$ gap proof, but it is not yet the fully WLPO-only constructive route envisioned in the CRM plan. A fully WLPO-based locatedness/supremum argument for $\ell^\infty$ remains the remaining conceptual gap if strict constructivity is required.
+
+\section*{Recommended Next Steps (if strict WLPO-only is required)}
+\begin{itemize}
+  \item Implement a WLPO-based locatedness/approximate supremum lemma for bounded sequences.
+  \item Use that to show norm\_located and norm\_attained for $(\ell^1)^*$.
+  \item Rewire the WLPO $\Rightarrow$ gap proof to rely only on WLPO (no classical sup arguments).
+\end{itemize}
+
+\end{document}

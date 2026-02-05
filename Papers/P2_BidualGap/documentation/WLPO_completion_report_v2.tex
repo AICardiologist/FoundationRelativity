@@ -1,0 +1,48 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+
+\title{WLPO Constructive Completion Status (v2)}
+\author{P2\_BidualGap Audit}
+\date{February 5, 2026}
+
+\begin{document}
+\maketitle
+
+\section*{Summary}
+\begin{itemize}
+  \item Lean proof status: \texttt{HB/WLPO\_to\_Gap\_HB.lean} is \emph{fully complete} (no \texttt{sorry}s). The current discharge of \texttt{DualIsBanach} for \texttt{c\_0} and \texttt{(c\_0)\^*} is classical (no axioms), i.e. it does not yet isolate WLPO as the sole logical input.
+  \item A slim sharing folder now exists at \texttt{Slim/} with \texttt{Slim/WLPO\_to\_Gap\_HB.lean} (local copy) and \texttt{Slim/All.lean} (aggregator).
+  \item Latest LaTeX draft appears to be \texttt{documentation/paper-v5.tex} (newest mtime). It still contains explicit proof placeholders (\texttt{sorry}).
+\end{itemize}
+
+\section*{Lean Proof: What Is Complete}
+\begin{itemize}
+  \item \textbf{Main equivalence}: \texttt{Papers.P2.HB.gap\_equiv\_wlpo} proves \texttt{BidualGapStrong\{0\}} $\leftrightarrow$ \texttt{WLPO} in \texttt{HB/WLPO\_to\_Gap\_HB.lean}.
+  \item \textbf{Direct gap witness}: the functional \texttt{G} and the non-reflexivity argument for \texttt{c\_0} are complete (no sorries).
+\end{itemize}
+
+\section*{WLPO-Constructive Gaps (Still Open)}
+The present Lean proof uses classical norm-attainment and operator-norm arguments to discharge \texttt{DualIsBanach}. To make the proof WLPO-constructive, the following pieces still need to be formalized:
+\begin{itemize}
+  \item \textbf{Dual isometry \((\ell^1)^* \cong \ell^\infty\)}: The skeleton exists in \texttt{WIP/DualIsometries.lean}, but the isometry and norm equality are not filled.
+  \item \textbf{WLPO \(\Rightarrow\) locatedness of sup in \(\ell^\infty\)}: implement a WLPO-based bisection for the supremum of bounded sequences (see \texttt{HB/IMPLEMENTATION\_PLAN.md}).
+  \item \textbf{DualIsBanach for \((c_0)^*\)}: after the two items above, transport the operator norm/attainment to finish the WLPO-only route.
+\end{itemize}
+
+\section*{Latest LaTeX Draft: Incomplete Places}
+In \texttt{documentation/paper-v5.tex}, the following explicit placeholders remain:
+\begin{itemize}
+  \item Line ~757: \texttt{sorry} in the WLPO-to-gap sketch.
+  \item Line ~802: \texttt{sorry} in the algebra structure on \(\ell^\infty / c_0\).
+  \item Lines ~817--820: \texttt{sorry} placeholders in the Stone window equivalence construction.
+\end{itemize}
+
+\section*{Next Actions If You Want a Fully WLPO-Constructive Lean Proof}
+\begin{itemize}
+  \item Complete \texttt{WIP/DualIsometries.lean} Part B (\((\ell^1)^* \cong \ell^\infty\)) or add a new finished file and wire it into \texttt{HB/WLPO\_to\_Gap\_HB.lean}.
+  \item Implement \texttt{located\_sup\_norm\_of\_WLPO} and then replace the current classical \texttt{DualIsBanach} proofs with WLPO-based ones.
+  \item Update \texttt{paper-v5.tex} to remove the explicit \texttt{sorry} blocks.
+\end{itemize}
+
+\end{document}

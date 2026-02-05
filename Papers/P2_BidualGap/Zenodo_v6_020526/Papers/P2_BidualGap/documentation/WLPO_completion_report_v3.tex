@@ -1,0 +1,51 @@
+% NOTE: Supporting report only. The main paper is paper-v6-020526.tex.
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+
+\title{WLPO Constructive Completion Status (v3)}
+\author{P2\_BidualGap Audit}
+\date{February 5, 2026}
+
+\begin{document}
+\maketitle
+
+\section*{Summary}
+\begin{itemize}
+  \item \textbf{Lean proof status}: \texttt{HB/WLPO\_to\_Gap\_HB.lean} remains complete (no \texttt{sorry}s). The direct dual witness \texttt{G} now uses the constructive $\sigma_\varepsilon$ coefficients, avoiding sign case splits.
+  \item \textbf{WLPO usage}: norm attainment for \(\ell^1\) now calls \texttt{exists\_coeff\_near\_sup\_WLPO}; it uses WLPO to decide the ``all false vs not all false'' case, but still uses classical extraction of a witness index.
+  \item \textbf{Build status}: full \texttt{lake build} succeeded. There are still \texttt{sorry} declarations in \texttt{Papers/P1\_GBC/RankOneToggle/Spectrum.lean}; P2 HB/Slim files are sorry-free (script pass).
+  \item \textbf{Small folder}: added \texttt{LeanProof/} as a lightweight wrapper that re-exports \texttt{HB/WLPO\_to\_Gap\_HB.lean} and provides \texttt{LeanProof/All.lean}.
+\end{itemize}
+
+\section*{Lean Proof: What Changed}
+\begin{itemize}
+  \item \texttt{HB/DirectDual.lean}: replaced sign-vector coefficients with $\sigma_\varepsilon$; finite-sum bounds now use \(2\,\|f\|\). This keeps the direct witness constructive in spirit.
+  \item \texttt{HB/WLPO\_DualBanach.lean}: replaced the classical \texttt{exists\_coeff\_near\_sup} with \texttt{exists\_coeff\_near\_sup\_WLPO}. WLPO decides the bound; a classical step still extracts a witness.
+\end{itemize}
+
+\section*{CRM Constructivity Status}
+The HB path is \emph{improved but not fully CRM-constructive}. Remaining classical dependencies include:
+\begin{itemize}
+  \item witness extraction from \texttt{\textasciitilde forall} in \texttt{exists\_coeff\_near\_sup\_WLPO};
+  \item summability via \texttt{summable\_of\_sum\_le} (tsum existence in Lean's classical reals);
+  \item Hahn--Banach style dual isometries in \texttt{HB/DualIsometriesComplete.lean}.
+\end{itemize}
+
+\section*{Latest LaTeX Draft: Incomplete Places}
+\textbf{Latest draft:} \texttt{documentation/paper-v5.tex} (newest mtime).
+\begin{itemize}
+  \item Line ~757: \texttt{sorry} in the WLPO-to-gap sketch.
+  \item Line ~802: \texttt{sorry} in the algebra structure on \(\ell^\infty / c_0\).
+  \item Lines ~817--820: \texttt{sorry} placeholders in the Stone window equivalence construction.
+\end{itemize}
+\textbf{Other drafts:} \texttt{paper-final.tex} still contains explicit \texttt{sorry} blocks (e.g., lines ~899, ~905).
+
+\section*{Next Actions for Full CRM Compliance}
+\begin{itemize}
+  \item Replace classical witness extraction in \texttt{exists\_coeff\_near\_sup\_WLPO} with a constructive witness principle (or explicitly assume LPO/Markov).
+  \item Replace classical summability lemmas with constructive Cauchy bounds where possible.
+  \item Isolate Hahn--Banach dependencies in a classical-only namespace and keep the WLPO path free of them.
+\end{itemize}
+
+\end{document}

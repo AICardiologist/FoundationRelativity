@@ -1,11 +1,5 @@
 {"log":
  [{"message":
    ".> LEAN_PATH=././.lake/build/lib DYLD_LIBRARY_PATH=././.lake/build/lib /Users/quantmann/.elan/toolchains/leanprover--lean4---v4.8.0/bin/lean ././././Papers/P2_BidualGap/HB/OptionB/CorePure.lean -R ./././. -o ././.lake/build/lib/Papers/P2_BidualGap/HB/OptionB/CorePure.olean -i ././.lake/build/lib/Papers/P2_BidualGap/HB/OptionB/CorePure.ilean -c ././.lake/build/ir/Papers/P2_BidualGap/HB/OptionB/CorePure.c --json",
-   "level": "trace"},
-  {"message":
-   "././././Papers/P2_BidualGap/HB/OptionB/CorePure.lean:22:35: unused variable `G`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
-   "level": "warning"},
-  {"message":
-   "././././Papers/P2_BidualGap/HB/OptionB/CorePure.lean:32:26: unused variable `G`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
-   "level": "warning"}],
- "depHash": "16857557150636356250"}
+   "level": "trace"}],
+ "depHash": "451477339726710872"}
