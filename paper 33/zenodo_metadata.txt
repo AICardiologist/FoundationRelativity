@@ -1,0 +1,14 @@
+ZENODO UPLOAD METADATA -- Paper 33
+====================================
+
+TITLE:
+QCD One-Loop Renormalization and Confinement: Asymptotic Freedom, the Mass Gap, and Why Confinement Is Free over BISH + LPO (Paper 33, Constructive Reverse Mathematics Series)
+
+DESCRIPTION:
+Paper 33 in the Constructive Reverse Mathematics of Mathematical Physics series. This paper provides a complete constructive reverse-mathematical calibration of quantum chromodynamics (QCD) at one-loop order, extended into the non-perturbative sector including confinement and the Yang-Mills mass gap. Asymptotic freedom and the Lambda_QCD divergence are BISH-computable (mirroring Paper 32's QED analysis with the sign of the beta function flipped). The key finding is that confinement is logically free: the LPO already paid for the continuum limit automatically subsidizes both the WLPO needed for mass gap decisions and Markov's Principle needed for strict positivity extraction. Discrete RG steps, Lambda_QCD divergence, and finite-lattice mass gaps are all BISH. Threshold crossings cost WLPO, the continuum limit costs LPO, and mass gap plus confinement are subsumed. All results formalized in Lean 4 over Mathlib with zero sorry. The formalization comprises 6 Lean source files.
+
+KEYWORDS:
+quantum chromodynamics, QCD, one-loop renormalization, asymptotic freedom, confinement, Yang-Mills mass gap, lattice QCD, continuum limit, constructive reverse mathematics, BISH, LPO, WLPO, Markov's Principle, Lean 4, Mathlib, formal verification, renormalization group, Millennium Prize Problem
+
+COPYRIGHT STATEMENT:
+Copyright 2026 Paul Chun-Kit Lee. Code licensed under Apache License 2.0. Paper licensed under Creative Commons Attribution 4.0 International (CC-BY 4.0).
