@@ -158,12 +158,19 @@ Every paper with its bottom line. Papers 1 and 3 withdrawn; Papers 60 and 62 ret
 
 ### Physics Papers
 
+#### Foundations (Papers 2–6)
+
 | # | Title | Bottom line |
 |---|-------|------------|
 | 2 | The Bidual Gap and WLPO | Banach space non-reflexivity detection ≡ WLPO |
 | 4 | Axiom Calibration for Quantum Spectra | Five spectral properties stratified BISH → WLPO+MP |
 | 5 | Schwarzschild Curvature Verification | GR curvature calibrated across five loci, BISH → LPO |
 | 6 | Heisenberg Uncertainty (v2) | Preparation uncertainty BISH; measurement uncertainty DC |
+
+#### Physical Calibrations (Papers 7–28)
+
+| # | Title | Bottom line |
+|---|-------|------------|
 | 7 | Physical Bidual Gap | Trace-class non-reflexivity ≡ WLPO |
 | 8 | 1D Ising Model and LPO | Finite-size bounds BISH; thermodynamic limit ≡ LPO |
 | 9 | Ising Formulation-Invariance | Same LPO cost from combinatorial and transfer-matrix routes |
@@ -186,6 +193,11 @@ Every paper with its bottom line. Papers 1 and 3 withdrawn; Papers 60 and 62 ret
 | 26 | Bidual Gap Arithmetic Route | Second WLPO-completeness proof via Gödel sequences |
 | 27 | Bell Angle Optimisation | LLPO ≡ exact IVT; strictly below WLPO |
 | 28 | Newton vs. Lagrange vs. Hamilton | Equations of motion BISH; action minimisation FT (dispensable) |
+
+#### Ceiling and Dispensability (Papers 29–35)
+
+| # | Title | Bottom line |
+|---|-------|------------|
 | 29 | Fekete's Subadditive Lemma and LPO | Fekete ≡ LPO; the cost is genuine |
 | 30 | Dispensability of the Fan Theorem | Every FT prediction recoverable in BISH + LPO |
 | 31 | Dispensability of Dependent Choice | Every DC prediction recoverable in BISH + LPO |
@@ -193,6 +205,11 @@ Every paper with its bottom line. Papers 1 and 3 withdrawn; Papers 60 and 62 ret
 | 33 | QCD Renormalisation and Confinement | Confinement free — subsidised by LPO for continuum limit |
 | 34 | Scattering Amplitudes | Fixed-order Bhabha cross section pure BISH |
 | 35 | Logical Constitution: Metatheorem | BISH + LPO ceiling; three mechanisms equivalent |
+
+#### Undecidability and Beyond (Papers 36–44)
+
+| # | Title | Bottom line |
+|---|-------|------------|
 | 36 | Spectral Gap Undecidability = LPO | Cubitt ≡ LPO |
 | 37 | Undecidability Landscape = LPO | Three further results, all LPO |
 | 38 | Wang Tiling | All quantum undecidability from Wang tiling (LPO) |
@@ -205,6 +222,8 @@ Every paper with its bottom line. Papers 1 and 3 withdrawn; Papers 60 and 62 ret
 
 ### Arithmetic Papers
 
+#### Five Conjectures (Papers 45–49)
+
 | # | Title | Bottom line |
 |---|-------|------------|
 | 45 | Weight-Monodromy and LPO | De-omniscientising descent: geometric origin replaces LPO with BISH |
@@ -212,6 +231,11 @@ Every paper with its bottom line. Papers 1 and 3 withdrawn; Papers 60 and 62 ret
 | 47 | Fontaine–Mazur and LPO | De Rham ≡ LPO; Faltings comparison descends to BISH |
 | 48 | BSD and LPO | L(E,1)=0 ≡ LPO; Néron–Tate gives Archimedean polarisation |
 | 49 | Hodge Conjecture | Hodge type ≡ LPO; polarisation available but insufficient |
+
+#### DPT Framework and Tests (Papers 50–59)
+
+| # | Title | Bottom line |
+|---|-------|------------|
 | **50** | **Three Axioms for the Motive** | **DPT: decidable morphisms + algebraic spectrum + polarisation** |
 | 51 | Archimedean Rescue in BSD | Positive-definite metric converts rank-1 from MP to BISH |
 | 52 | Decidability Transfer | Conjecture D for abelian 3-folds via char-p transfer |
@@ -222,11 +246,21 @@ Every paper with its bottom line. Papers 1 and 3 withdrawn; Papers 60 and 62 ret
 | 57 | All Nine Heegner Fields | Extension to all nine class-number-1 imaginary quadratic fields |
 | 58 | Class Number Correction | h·Nm(𝔄) = f for h > 1 |
 | 59 | De Rham Decidability + DPT Completeness | DPT complete: three axioms suffice |
+
+#### Three-Invariant Hierarchy and Self-Intersection (Papers 61–66)
+
+| # | Title | Bottom line |
+|---|-------|------------|
 | 61 | Lang's Conjecture as MP→BISH Gate | Effective Lang bound converts rank ≥ 2 from MP to BISH |
 | 63 | Intermediate Jacobian Obstruction | Algebraic J^p ↔ low Hodge ↔ Northcott ↔ MP |
 | 64 | Uniform p-Adic Decidability | p-adic side uniformly BISH; 23,454 pairs verified |
 | 65 | Self-Intersection Beyond Cyclic Cubics | h·Nm(𝔄) = f on 1,220 pairs; zero exceptions |
 | 66 | Form-Class Resolution | Trace-zero form classifies non-cyclic totally real cubics |
+
+#### Synthesis and Trilogy (Papers 67–71)
+
+| # | Title | Bottom line |
+|---|-------|------------|
 | **67** | **The Motive Is a Decidability Certificate** | **Monograph: (r, ℓ, c) classify all motives** |
 | 68 | Fermat's Last Theorem Is BISH | Wiles WLPO; Kisin bypass → BISH |
 | 69 | Function Field Langlands Is BISH | Algebraic-vs-transcendental boundary, not discrete-vs-continuous |
