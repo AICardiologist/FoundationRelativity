@@ -519,3 +519,4 @@ The table makes clear that P27 is a riskier project than P26. The mathematical i
 4. Calibration link to LLPO
 5. Honest assessment of correspondence vs. calibration status
 6. Documentation connecting P27 to P26 for future categorical work
+

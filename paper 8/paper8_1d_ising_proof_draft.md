@@ -631,3 +631,4 @@ So A2 follows from exp(x) ≥ 1 + x for all x ∈ ℝ (applied with x = -δ).
 
 All three inequalities are constructively valid (they follow from the
 constructive Taylor series expansion of exp).
+

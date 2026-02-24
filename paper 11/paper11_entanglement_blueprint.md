@@ -851,3 +851,4 @@ It is that the *conceptual infrastructure of quantum entanglement* —
 Bell inequalities, entanglement measures, partial traces — lives at
 BISH, adding a new column to the calibration table that no previous
 paper addressed.
+

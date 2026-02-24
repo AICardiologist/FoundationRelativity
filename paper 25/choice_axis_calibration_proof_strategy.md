@@ -281,3 +281,4 @@ The paper should produce an updated calibration table incorporating the new axis
 5. **Updated calibration table** with the choice axis integrated.
 6. **Discussion section** on the DC ceiling thesis and its philosophical implications.
 7. **Metastability sidebar** explaining the relationship to proof mining and why full convergence (not metastability) is the right notion for CRM calibration.
+

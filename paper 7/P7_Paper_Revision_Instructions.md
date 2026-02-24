@@ -176,3 +176,4 @@ Based on the full audit, here are brief notes on what other papers need. These a
 ## Tone Guidance
 
 Same as Paper 11: confident but precise. The equivalence is correct. The BISH content of the forward direction (Ishihara kernel) is genuinely constructive — it's a constructive algorithm, and the 196-line self-contained proof in WLPOFromWitness.lean is strong evidence. The reverse direction uses WLPO as hypothesis (so classical content is *intended*). Lemma B uses Hahn-Banach, which is constructively available for separable spaces. The paper should convey all of this clearly without either overclaiming ("`#print axioms` certifies BISH") or underclaiming ("we can't be sure it's constructive").
+
