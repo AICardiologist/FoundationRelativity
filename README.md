@@ -9,81 +9,121 @@
 
 **70 papers. ~88,000 lines Lean 4. One finding:**
 
----
-
-## The Central Claim
-
 **The logical cost of mathematics is the logical cost of the real numbers.**
 
-Every non-constructive principle required by any physical theory or arithmetic theorem enters through one place: the Archimedean completion of the rationals — the real number line. Remove ℝ and everything collapses to Bishop-style constructive mathematics (BISH), where every object is computable and every proof carries an algorithm.
-
-The intuition that the continuum is the source of difficulty is old. Brouwer said as much in 1907. Bishop built a programme around it. What is new here is:
-
-1. **Uniform calibration.** A single framework classifies the logical cost of theorems across both mathematical physics (44 papers) and arithmetic geometry (22 papers). No prior work attempted this.
-
-2. **The specific mechanism: u(ℝ) = ∞.** The u-invariant of the reals — the fact that positive-definite quadratic forms exist in every dimension — is the engine. This forces three apparently unrelated fields to develop the same inner-product architecture: the Hilbert space inner product in physics, the Rosati involution on abelian varieties, and the Petersson inner product on automorphic forms. They are the same construction, seen through the same logical lens.
-
-3. **Projection vs. search.** Physics extracts information from ℝ by *projecting* (measurement collapses a state to an eigenvalue). Arithmetic extracts information from ℝ by *searching* (find a rational point, decide whether a series converges). Projection needs only LPO. Search needs MP. That asymmetry is why number theory is harder than physics — not because its objects are more complicated, but because its access to the continuum is less direct.
-
-4. **Physics encodes Langlands.** Multiple physical theories (gauge theory, string dualities, conformal field theory) independently rediscover the Langlands correspondence. This programme explains why: they share the same logical constraint. Both are controlled by the spectral theory of ℝ.
+Every non-constructive principle required by any physical theory or arithmetic theorem enters through one place: the real number line. Remove ℝ and everything collapses to Bishop-style constructive mathematics (BISH), where every object is computable and every proof carries an algorithm.
 
 ---
 
 ## The Logical Hierarchy
 
-Constructive reverse mathematics classifies theorems by which non-constructive principles they require. The hierarchy, from weakest to strongest:
-
 ```
 BISH  ⊂  BISH + MP  ⊂  BISH + LLPO  ⊂  BISH + WLPO  ⊂  BISH + LPO  ⊂  CLASS
 ```
 
-| Principle | What it decides | Logical cost |
-|-----------|----------------|--------------|
-| **BISH** | Nothing — all searches bounded, all witnesses explicit | Free |
-| **MP** (Markov) | An unbounded search that cannot fail to terminate, terminates | Cheap |
-| **LLPO** | The sign of a real number | Moderate |
-| **WLPO** | Whether a real number equals zero | Moderate |
-| **LPO** | Whether a binary sequence contains a 1 | Expensive |
-| **CLASS** | Everything — law of excluded middle | Maximum |
+| Principle | What it decides |
+|-----------|----------------|
+| **BISH** | Nothing — all searches bounded, all witnesses explicit |
+| **MP** (Markov) | An unbounded search that cannot fail to terminate, terminates |
+| **LLPO** | The sign of a real number |
+| **WLPO** | Whether a real number equals zero |
+| **LPO** | Whether a binary sequence contains a 1 |
 
-Two independent principles — the **Fan Theorem** (FT) and **Dependent Choice** (DC) — are physically dispensable and sit outside this chain.
-
-**The programme's calibration:** all of empirical physics lives at BISH + LPO. All of arithmetic geometry lives between BISH and BISH + LPO, with an MP residual. Classical logic (CLASS) is never needed.
+Two independent principles — the **Fan Theorem** (FT) and **Dependent Choice** (DC) — sit outside this chain.
 
 ---
 
-## The Programme in Four Phases
+## Part One: Physics (Papers 2–44)
 
-### Phase 1 — Physics (Papers 2–44)
+### The finding
 
-Forty-three papers audit the logical content of physical theories: quantum mechanics, general relativity, quantum field theory, statistical mechanics, the Standard Model. The conclusion (Paper 40): **BISH + LPO is the complete logical constitution of empirically accessible physics.** LPO enters through exactly one door — the spectral theorem for unbounded self-adjoint operators on L²(ℝⁿ). Every other ingredient is BISH.
+**BISH + LPO is the complete logical constitution of empirically accessible physics.** Forty-three papers audit the logical content of quantum mechanics, general relativity, quantum field theory, statistical mechanics, quantum information, the Standard Model, AdS/CFT, and cosmology. Every empirical prediction lands at or below BISH + LPO. Classical logic is never needed.
 
-### Phase 2 — Arithmetic Geometry (Papers 45–66)
+LPO enters through exactly one door: the spectral theorem for unbounded self-adjoint operators on L²(ℝⁿ). That is the sole non-constructive ingredient in all of physics.
 
-Twenty-two papers build the DPT (de-omniscientising, projecting, testing) framework for motives. Three axioms. Five conjectures exhibit LPO → BISH descent with an MP residual. Key results:
+### What is surprising
 
-- **Three-invariant hierarchy** (Papers 59–62): rank *r*, Hodge level *ℓ*, and Lang constant *c* classify the full decidability landscape of arithmetic objects.
-- **h = f discovery** (Papers 56–58, 65–66): the Faltings height times the norm of the different equals the conductor on CM abelian fourfolds. Verified on 1,220 pairs. This is a new identity, not a CRM classification.
+**The ceiling is uniform.** You might expect different physical theories to scatter across the hierarchy — QM at one level, GR at another, QFT somewhere else. They don't. They all hit the same ceiling. The logical constitution of the Standard Model is the logical constitution of the 1D Ising model.
 
-### Phase 3 — The Trilogy (Papers 68–70)
+**The cost is genuine.** Fekete's Subadditive Lemma — the workhorse behind thermodynamic limits, free energy convergence, and phase-transition arguments — is *equivalent* to LPO (Paper 29). You cannot eliminate the non-constructive cost. It is not an artefact of a particular proof strategy.
 
-The trilogy asks: how cheap can the hardest theorems be?
+**FT and DC are dispensable.** The Fan Theorem (compact optimisation, action minimisers) and Dependent Choice (ergodic theorems, strong law of large numbers) are logically independent of the omniscience spine. Both are physically dispensable: every empirical prediction they yield is recoverable in BISH + LPO (Papers 30–31). The variational formulation of mechanics is logically unnecessary for any prediction.
 
-**Paper 68: Fermat's Last Theorem is BISH.** The Wiles–Taylor proof costs BISH + WLPO — the non-constructive content lives entirely in the weight-1 Artin representation obstruction. But Kisin's 2009 proof (p = 2 dihedral bypass) avoids this obstruction. The net cost: BISH. The most famous theorem in number theory requires no non-constructive principles at all. The heavy machinery (Galois representations, modularity lifting, Hecke algebras) is scaffolding, not structure.
+**The Landau pole is BISH.** QED's Landau pole — naively the most "non-constructive" object in renormalisation — is fully constructive. The closed-form solution provides an explicit Cauchy modulus. No omniscience required (Paper 32).
 
-**Paper 69: Function Field Langlands is BISH.** Both proofs of the function field Langlands correspondence (L. Lafforgue 2002, V. Lafforgue 2018) are audited. Both are BISH. The key discovery is that the boundary between constructive and non-constructive is *not* discrete-vs-continuous spectrum (the naive expectation) but **algebraic-vs-transcendental spectral parameters**. Over function fields, even the continuous spectrum has algebraic parameters (z = q⁻ˢ lives on a compact algebraic torus), so the entire trace formula is BISH. Over number fields, the analogous parameters involve Γ(s) for s ∈ iℝ — transcendental — which forces WLPO. The correspondence itself is cheap. The base field is expensive.
+**Confinement is free.** QCD confinement (mass gap, WLPO) is subsidised by the LPO already paid for the continuum limit. Once you pay for the thermodynamic limit, confinement adds zero logical cost (Paper 33).
 
-**Paper 70: The Archimedean Principle.** Four theorems formalise the central claim:
-- **(A)** The CRM level of any theorem is determined by one parameter: its distance from the Archimedean place.
-- **(B)** The MP Gap: physics descends by projection (→ BISH). Arithmetic descends by search (→ BISH + MP). The gap is exactly Markov's Principle.
-- **(C)** Automorphic CRM Incompleteness: the witness triple (5, 5, 2) shows there exist automorphic objects whose constructive status cannot be resolved within the current framework.
-- **(D)** Three Spectral Gaps are Σ⁰₂ — the classification boundaries are arithmetically definable.
+**All undecidability is LPO.** Cubitt's spectral gap undecidability, phase diagram uncomputability, 1D spectral gaps, uncomputable RG flows — every quantum undecidability result traces back to Wang tiling, which is LPO. Quantum undecidability introduces nothing beyond thermodynamic limits (Papers 36–38).
 
-Paper 70 also explains why physics and Langlands are connected (§5.5) and why function fields serve as a lattice regularisation of number fields (§5.6): both are consequences of removing the Archimedean place.
+**The measurement problem dissolves.** Copenhagen (WLPO), Many-Worlds (DC), Bohmian mechanics (LPO) sit at provably distinct positions in the hierarchy. The "measurement problem" is not one problem but three logically incompatible commitments (Paper 44).
 
-### Phase 4 — Applications (Paper 71)
+### Physics synthesis papers
 
-The Archimedean Principle applied to cryptography and computation.
+| Paper | Title | Role |
+|-------|-------|------|
+| **10** | Logical Geography of Mathematical Physics | First atlas — 50 calibration entries across 11 domains |
+| **12** | Constructive History of Mathematical Physics | 150-year narrative through the CRM lens |
+| **40** | Logical Constitution of Physical Reality | Monograph proving the BISH + LPO ceiling (~35k lines Lean 4) |
+
+---
+
+## Part Two: Arithmetic Geometry (Papers 45–71)
+
+### The finding
+
+The same framework that classifies physics classifies arithmetic geometry. Five major conjectures (Hodge, Tate, BSD, Fontaine–Mazur, Weight-Monodromy) each exhibit a *de-omniscientising descent*: geometric origin converts LPO-dependent claims to BISH-decidable ones. The residual that survives is Markov's Principle — the cost of unbounded search.
+
+### The DPT framework (Paper 50)
+
+Three axioms distil Grothendieck's category of numerical motives:
+1. **Decidable morphisms** (Standard Conjecture D)
+2. **Algebraic spectrum** (eigenvalues in Q̄)
+3. **Archimedean polarisation** (positive-definite bilinear form)
+
+These three axioms are exactly what de-omniscientisation requires. They are also exactly what the Archimedean place provides: u(ℝ) = ∞ guarantees positive-definite forms in every dimension. At every finite prime p, u(ℚₚ) = 4 blocks this in dimension ≥ 5.
+
+### Three-invariant hierarchy (Papers 59–63)
+
+Three numbers classify the logical cost of cycle-search for any motive:
+- **Rank r**: analytic rank of the L-function. r = 0 or 1 → BISH. r ≥ 2 → MP (Minkowski forces unbounded search).
+- **Hodge level ℓ**: ℓ ≤ 1 → intermediate Jacobian is algebraic → Northcott bounds search → MP. ℓ ≥ 2 → non-algebraic complex torus → LPO.
+- **Lang constant c**: effective height lower bound converts MP to BISH by bounding the search.
+
+### The h = f identity (Papers 56–58, 65–66)
+
+A new arithmetic identity, not a CRM classification: the Faltings height times the norm of the Steinitz class equals the conductor on CM abelian fourfolds. Verified on 1,220 pairs with zero exceptions.
+
+### The trilogy (Papers 68–70) — confirmation, not surprise
+
+**Paper 68: FLT is BISH.** The Wiles path costs BISH + WLPO (weight-1 obstruction). Kisin's 2009 bypass avoids it. Net cost: BISH. This confirms the DPT prediction that major arithmetic theorems are cheaper than they look.
+
+**Paper 69: Function field Langlands is BISH.** Predicted by the absence of an Archimedean place. The one genuine discovery: the CRM boundary is algebraic-vs-transcendental spectral parameters, not discrete-vs-continuous spectrum.
+
+**Paper 70: The Archimedean Principle.** Synthesis, not discovery. Names the mechanism (u(ℝ) = ∞), formalises the projection-vs-search gap, explains why physics and Langlands share an architecture.
+
+**Paper 71: Applications.** Lattice cryptography is Archimedean-hard; SVP phase transition sits at the projection/search boundary.
+
+### Arithmetic synthesis papers
+
+| Paper | Title | Role |
+|-------|-------|------|
+| **50** | Three Axioms for the Motive | DPT framework — three axioms for Grothendieck's motives |
+| **67** | The Motive Is a Decidability Certificate | Arithmetic monograph — (r, ℓ, c) classify all motives |
+| **70** | The Archimedean Principle | Capstone — u(ℝ) = ∞ unifies physics and arithmetic |
+
+---
+
+## What Connects the Two Halves
+
+The mechanism is **u(ℝ) = ∞**: positive-definite quadratic forms exist over ℝ in every dimension. Three fields independently exploit this via the same architecture:
+
+| Field | Inner-product structure | How it uses u(ℝ) = ∞ |
+|-------|------------------------|----------------------|
+| Physics | Hilbert space ⟨ψ,φ⟩ | Spectral theorem → measurement → projection |
+| Arithmetic geometry | Rosati involution on abelian varieties | Néron–Tate height → bounded search |
+| Automorphic theory | Petersson inner product | Trace formula → spectral decomposition |
+
+Physics descends by *projection* (→ BISH). Arithmetic descends by *search* (→ BISH + MP). The gap is exactly Markov's Principle. That is why number theory is harder than physics.
 
 ---
 
@@ -96,28 +136,6 @@ The Archimedean Principle applied to cryptography and computation.
 | Physics is "more constructive" than pure math (folk intuition) | Projection vs. search as precise explanation, with the gap being exactly MP |
 | Langlands programme connects automorphic forms and Galois representations | Physics-Langlands connections explained as shared logical constraint from ℝ |
 | Individual constructive proofs exist for individual theorems | Systematic classification of 70 theorems revealing a single architectural pattern |
-
----
-
-## Key Discoveries
-
-1. **BISH + LPO = physics** — the logical constitution is uniform across QM, GR, QFT, stat mech (Paper 40)
-2. **Three-invariant hierarchy** — rank, Hodge level, Lang constant classify all motives (Papers 59–62)
-3. **h · Nm(𝔄) = f** — Faltings height times norm of different equals conductor on CM abelian fourfolds; 1,220 pairs verified (Papers 56–58, 65–66)
-4. **FLT is BISH** — the most famous theorem in number theory needs no non-constructive principles (Paper 68)
-5. **Weight-1 obstruction: irreducible but bypassable** — five failure modes of the Wiles path, all bypassed by Kisin (Paper 68)
-6. **Algebraic-vs-transcendental boundary** — the CRM boundary in automorphic theory is about the nature of spectral *parameters*, not the topology of the *spectrum* (Paper 69)
-7. **Function field = lattice regularisation** — removing the Archimedean place does for Langlands what putting QFT on a lattice does for physics (Paper 70)
-8. **Projection vs. search** — the precise reason number theory is harder than physics (Paper 70)
-9. **The Archimedean Principle** — the logical cost of mathematics is the logical cost of ℝ (Paper 70)
-
----
-
-## CRM as Diagnostic Tool
-
-CRM does not compute new numbers or prove new theorems about specific mathematical objects. It is a *diagnostic*: it tells you where logical difficulty lives and why. The value is knowing where computational approximations fail and understanding the structural reason.
-
-When a physicist discretises a PDE and the scheme blows up, or a number theorist's algorithm fails to converge, or an optimisation landscape has a non-computable minimum — CRM says these are not accidents. They are manifestations of the same boundary: the point where the Archimedean structure of ℝ forces a non-constructive step.
 
 ---
 
@@ -134,126 +152,86 @@ These are signposts, not planned work. The programme stops at Paper 70.
 
 ---
 
-## Start Here: The Six Synthesis Papers
-
-These six papers are the programme's best entry points. Each synthesises a phase; together they tell the whole story.
-
-| Paper | Title | What it does |
-|-------|-------|-------------|
-| **10** | Logical Geography of Mathematical Physics | First atlas — 50 calibration entries across 11 physics domains in one table |
-| **12** | Constructive History of Mathematical Physics | Narrative history — 150 years of mathematical physics told through the CRM lens |
-| **40** | Logical Constitution of Physical Reality | Physics monograph — proves BISH + LPO is the complete logical constitution of empirical physics (~35k lines Lean 4) |
-| **50** | Three Axioms for the Motive | Arithmetic axioms — the DPT framework distilling five conjectures into three axioms for Grothendieck's category of motives |
-| **67** | The Motive Is a Decidability Certificate | Arithmetic monograph — synthesises Papers 45–66; three invariants (rank, Hodge level, Lang constant) classify all motives |
-| **70** | The Archimedean Principle | Capstone — the logical cost of mathematics is the logical cost of ℝ; unifies physics and arithmetic via u(ℝ) = ∞ |
-
----
-
 ## Complete Paper List
 
 Every paper with its bottom line. Papers 1 and 3 withdrawn; Papers 60 and 62 retired (merged into 59 and 63).
 
-### Part I — Foundations (Papers 2–6)
+### Physics Papers
 
 | # | Title | Bottom line |
 |---|-------|------------|
 | 2 | The Bidual Gap and WLPO | Banach space non-reflexivity detection ≡ WLPO |
 | 4 | Axiom Calibration for Quantum Spectra | Five spectral properties stratified BISH → WLPO+MP |
-| 5 | Schwarzschild Curvature Verification | GR curvature verification calibrated across five loci, BISH → LPO |
-| 6 | Heisenberg Uncertainty (v2) | Preparation uncertainty is BISH; measurement uncertainty needs DC |
-
-### Part II — Physical Calibrations (Papers 7–28)
-
-| # | Title | Bottom line |
-|---|-------|------------|
-| 7 | Physical Bidual Gap | Trace-class non-reflexivity ≡ WLPO; quantum state space gap is constructively inaccessible |
+| 5 | Schwarzschild Curvature Verification | GR curvature calibrated across five loci, BISH → LPO |
+| 6 | Heisenberg Uncertainty (v2) | Preparation uncertainty BISH; measurement uncertainty DC |
+| 7 | Physical Bidual Gap | Trace-class non-reflexivity ≡ WLPO |
 | 8 | 1D Ising Model and LPO | Finite-size bounds BISH; thermodynamic limit ≡ LPO |
-| 9 | Ising Formulation-Invariance | Same LPO cost from combinatorial and transfer-matrix derivations |
-| **10** | **Logical Geography of Mathematical Physics** | **Synthesis: 50 calibration entries across 11 physics domains** |
+| 9 | Ising Formulation-Invariance | Same LPO cost from combinatorial and transfer-matrix routes |
+| **10** | **Logical Geography of Mathematical Physics** | **Synthesis: 50 entries across 11 domains** |
 | 11 | Entanglement, CHSH, Tsirelson Bound | Tsirelson bound and entanglement entropy are BISH |
-| **12** | **Constructive History of Mathematical Physics** | **Synthesis: 150-year narrative of physics through the CRM lens** |
-| 13 | Event Horizon as Logical Boundary | Interior geometry BISH; singularity assertion LPO |
-| 14 | Quantum Decoherence | Finite-step decoherence BISH; completed limit LPO |
+| **12** | **Constructive History of Mathematical Physics** | **Synthesis: 150-year narrative** |
+| 13 | Event Horizon as Logical Boundary | Interior geometry BISH; singularity LPO |
+| 14 | Quantum Decoherence | Finite-step BISH; completed limit LPO |
 | 15 | Noether's Theorem | Local conservation BISH; global energy LPO |
-| 16 | Born Rule | Single-trial probability BISH; frequentist convergence DC |
+| 16 | Born Rule | Single-trial BISH; frequentist convergence DC |
 | 17 | Bekenstein–Hawking Formula | Finite entropy BISH; density convergence LPO |
-| 18 | Yukawa RG Stratification | RG step BISH; threshold crossings WLPO; global coupling LPO |
+| 18 | Yukawa RG Stratification | RG step BISH; thresholds WLPO; global coupling LPO |
 | 19 | WKB Tunneling and LLPO | Amplitude BISH; turning points LLPO; semiclassical limit LPO |
-| 20 | Observable-Dependent Logical Cost | Same system, different questions → different logical costs |
+| 20 | Observable-Dependent Logical Cost | Same system, different questions → different costs |
 | 21 | Bell Nonlocality and LLPO | CHSH violation BISH; disjunctive conclusion LLPO |
-| 22 | Markov's Principle and Radioactive Decay | "Nonzero decay rate → eventual detection" ≡ MP |
-| 23 | Fan Theorem and Optimisation | Extreme Value Theorem ≡ FT; physically dispensable |
+| 22 | Markov's Principle and Radioactive Decay | "Nonzero decay → eventual detection" ≡ MP |
+| 23 | Fan Theorem and Optimisation | EVT ≡ FT; physically dispensable |
 | 24 | Kochen–Specker and LLPO | KS uncolourability BISH; sign decision LLPO (≡ Bell) |
 | 25 | Choice Axis: Ergodic Theorems | Mean ergodic ≡ CC; Birkhoff pointwise ≡ DC |
-| 26 | Bidual Gap Arithmetic Route | Second proof of WLPO-completeness via Gödel sequences |
-| 27 | Bell Angle Optimisation | LLPO ≡ exact IVT; Bell angle-finding strictly below WLPO |
+| 26 | Bidual Gap Arithmetic Route | Second WLPO-completeness proof via Gödel sequences |
+| 27 | Bell Angle Optimisation | LLPO ≡ exact IVT; strictly below WLPO |
 | 28 | Newton vs. Lagrange vs. Hamilton | Equations of motion BISH; action minimisation FT (dispensable) |
+| 29 | Fekete's Subadditive Lemma and LPO | Fekete ≡ LPO; the cost is genuine |
+| 30 | Dispensability of the Fan Theorem | Every FT prediction recoverable in BISH + LPO |
+| 31 | Dispensability of Dependent Choice | Every DC prediction recoverable in BISH + LPO |
+| 32 | QED Renormalisation: Landau Pole | Landau pole is BISH; thresholds WLPO |
+| 33 | QCD Renormalisation and Confinement | Confinement free — subsidised by LPO for continuum limit |
+| 34 | Scattering Amplitudes | Fixed-order Bhabha cross section pure BISH |
+| 35 | Logical Constitution: Metatheorem | BISH + LPO ceiling; three mechanisms equivalent |
+| 36 | Spectral Gap Undecidability = LPO | Cubitt ≡ LPO |
+| 37 | Undecidability Landscape = LPO | Three further results, all LPO |
+| 38 | Wang Tiling | All quantum undecidability from Wang tiling (LPO) |
+| 39 | Beyond LPO: Thermodynamic Stratification | Generic spectral gap Σ⁰₂; extensive observables cap at LPO |
+| **40** | **Logical Constitution of Physical Reality** | **Monograph: BISH + LPO is the complete constitution** |
+| 41 | AdS/CFT Diagnostic | Holographic dictionary axiom-preserving; bulk ≡ boundary |
+| 42 | Cosmological Constant Problem | 10¹²⁰ discrepancy adds no new logical resources |
+| 43 | Ceiling and Constructive Schools | BISH + LPO unifies Bishop, Brouwer, Markov |
+| 44 | Measurement Problem Dissolved | Copenhagen (WLPO), Many-Worlds (DC), Bohm (LPO) |
 
-### Part III — Ceiling and Dispensability (Papers 29–35)
-
-| # | Title | Bottom line |
-|---|-------|------------|
-| 29 | Fekete's Subadditive Lemma and LPO | Fekete ≡ LPO; the LPO cost is genuine and ineliminable |
-| 30 | Dispensability of the Fan Theorem | Every FT prediction is recoverable in BISH + LPO |
-| 31 | Dispensability of Dependent Choice | Every DC prediction is recoverable in BISH + LPO |
-| 32 | QED Renormalisation: Landau Pole | Landau pole is BISH (!); threshold crossings WLPO |
-| 33 | QCD Renormalisation and Confinement | Confinement is free — LPO for the continuum limit subsidises the mass gap |
-| 34 | Scattering Amplitudes | Fixed-order cross sections (Bhabha) pure BISH |
-| 35 | Logical Constitution: Metatheorem | BISH + LPO ceiling established; three mechanisms mutually equivalent |
-
-### Part IV — Undecidability and Beyond (Papers 36–44)
-
-| # | Title | Bottom line |
-|---|-------|------------|
-| 36 | Spectral Gap Undecidability = LPO | Cubitt's undecidability is Turing–Weihrauch ≡ LPO |
-| 37 | Undecidability Landscape = LPO | Three further undecidability results, all LPO |
-| 38 | Wang Tiling | All quantum undecidability descends from Wang tiling (LPO) |
-| 39 | Beyond LPO: Thermodynamic Stratification | Generic spectral gap is Σ⁰₂; extensive observables cap at LPO |
-| **40** | **Logical Constitution of Physical Reality** | **Physics monograph: BISH + LPO is the complete constitution** |
-| 41 | AdS/CFT Diagnostic | Holographic dictionary is axiom-preserving; bulk ≡ boundary cost |
-| 42 | Cosmological Constant Problem | The 10¹²⁰ discrepancy introduces no new logical resources |
-| 43 | Ceiling and Constructive Schools | BISH + LPO unifies Bishop, Brouwer, Markov; disagreement localises to MP |
-| 44 | Measurement Problem Dissolved | Copenhagen (WLPO), Many-Worlds (DC), Bohm (LPO) — three distinct positions |
-
-### Part V — Arithmetic Geometry (Papers 45–59)
+### Arithmetic Papers
 
 | # | Title | Bottom line |
 |---|-------|------------|
 | 45 | Weight-Monodromy and LPO | De-omniscientising descent: geometric origin replaces LPO with BISH |
-| 46 | Tate Conjecture and LPO | Galois-invariance decidability ≡ LPO; Standard Conjecture D is the decidability axiom |
-| 47 | Fontaine–Mazur and LPO | De Rham condition ≡ LPO; Faltings comparison descends to BISH |
-| 48 | BSD and LPO | L(E,1)=0 decision ≡ LPO; Néron–Tate height gives Archimedean polarisation |
-| 49 | Hodge Conjecture | Hodge type decidability ≡ LPO; polarisation available but insufficient |
-| **50** | **Three Axioms for the Motive** | **DPT framework: decidable morphisms + algebraic spectrum + Archimedean polarisation** |
-| 51 | Archimedean Rescue in BSD | Positive-definite metric converts rank-1 search from MP to BISH |
-| 52 | Decidability Transfer | Standard Conjecture D for abelian 3-folds via characteristic-p transfer |
-| 53 | CM Decidability Oracle | Verified decision procedure for all 13 CM elliptic curves over ℚ |
+| 46 | Tate Conjecture and LPO | Galois-invariance ≡ LPO; Conjecture D is the decidability axiom |
+| 47 | Fontaine–Mazur and LPO | De Rham ≡ LPO; Faltings comparison descends to BISH |
+| 48 | BSD and LPO | L(E,1)=0 ≡ LPO; Néron–Tate gives Archimedean polarisation |
+| 49 | Hodge Conjecture | Hodge type ≡ LPO; polarisation available but insufficient |
+| **50** | **Three Axioms for the Motive** | **DPT: decidable morphisms + algebraic spectrum + polarisation** |
+| 51 | Archimedean Rescue in BSD | Positive-definite metric converts rank-1 from MP to BISH |
+| 52 | Decidability Transfer | Conjecture D for abelian 3-folds via char-p transfer |
+| 53 | CM Decidability Oracle | Decision procedure for all 13 CM elliptic curves over ℚ |
 | 54 | Bloch–Kato Calibration | First out-of-sample DPT test; Axiom 1 fails for mixed motives |
 | 55 | K3 Surfaces and Kuga–Satake | Second out-of-sample test; full DPT success |
-| 56 | Exotic Weil Self-Intersection | deg(w·w) = √disc(F) on three CM abelian fourfolds |
-| 57 | All Nine Heegner Fields | Extension of Paper 56 to all nine class-number-1 imaginary quadratic fields |
-| 58 | Class Number Correction | h·Nm(𝔄) = f for h > 1; verified for ℚ(√-5) |
-| 59 | De Rham Decidability + DPT Completeness | DPT is complete: three axioms + automatic de Rham decidability suffice |
-
-### Part VI — Three-Invariant Hierarchy and Self-Intersection (Papers 61–66)
-
-| # | Title | Bottom line |
-|---|-------|------------|
-| 61 | Lang's Conjecture as MP→BISH Gate | Effective Lang height bound converts rank ≥ 2 from MP to BISH |
-| 63 | Intermediate Jacobian Obstruction | Algebraic J^p ↔ low Hodge ↔ Northcott ↔ MP; four-way equivalence |
-| 64 | Uniform p-Adic Decidability | p-adic side uniformly BISH-decidable; 23,454 (E,p) pairs verified |
-| 65 | Self-Intersection Beyond Cyclic Cubics | h·Nm(𝔄) = f verified on 1,220 pairs; zero exceptions |
-| 66 | Form-Class Resolution | Trace-zero binary quadratic form classifies non-cyclic totally real cubics |
-
-### Part VII — Synthesis (Papers 67–71)
-
-| # | Title | Bottom line |
-|---|-------|------------|
-| **67** | **The Motive Is a Decidability Certificate** | **Arithmetic monograph: (r, ℓ, c) classify all motives** |
-| 68 | Fermat's Last Theorem Is BISH | Wiles costs WLPO; Kisin bypass gives BISH; FLT needs no non-constructive principles |
-| 69 | Function Field Langlands Is BISH | Both Lafforgue proofs BISH; boundary is algebraic-vs-transcendental, not discrete-vs-continuous |
-| **70** | **The Archimedean Principle** | **Capstone: the only expensive thing is ℝ; u(ℝ) = ∞ unifies all 70 papers** |
-| 71 | Archimedean Principle in Cryptography | Lattice crypto is Archimedean-hard; SVP phase transition at projection/search boundary |
+| 56 | Exotic Weil Self-Intersection | deg(w·w) = √disc(F) on CM abelian fourfolds |
+| 57 | All Nine Heegner Fields | Extension to all nine class-number-1 imaginary quadratic fields |
+| 58 | Class Number Correction | h·Nm(𝔄) = f for h > 1 |
+| 59 | De Rham Decidability + DPT Completeness | DPT complete: three axioms suffice |
+| 61 | Lang's Conjecture as MP→BISH Gate | Effective Lang bound converts rank ≥ 2 from MP to BISH |
+| 63 | Intermediate Jacobian Obstruction | Algebraic J^p ↔ low Hodge ↔ Northcott ↔ MP |
+| 64 | Uniform p-Adic Decidability | p-adic side uniformly BISH; 23,454 pairs verified |
+| 65 | Self-Intersection Beyond Cyclic Cubics | h·Nm(𝔄) = f on 1,220 pairs; zero exceptions |
+| 66 | Form-Class Resolution | Trace-zero form classifies non-cyclic totally real cubics |
+| **67** | **The Motive Is a Decidability Certificate** | **Monograph: (r, ℓ, c) classify all motives** |
+| 68 | Fermat's Last Theorem Is BISH | Wiles WLPO; Kisin bypass → BISH |
+| 69 | Function Field Langlands Is BISH | Algebraic-vs-transcendental boundary, not discrete-vs-continuous |
+| **70** | **The Archimedean Principle** | **Capstone: the only expensive thing is ℝ** |
+| 71 | Archimedean Principle in Cryptography | Lattice crypto Archimedean-hard; SVP at projection/search boundary |
 
 ---
 
