@@ -1,0 +1,58 @@
+ZENODO DEPOSIT METADATA — Paper 69
+====================================
+
+Title:
+The Logical Cost of the Archimedean Place: Function Field Langlands is BISH (Paper 69 of the Constructive Reverse Mathematics Series)
+
+Authors:
+Lee, Paul Chun-Kit (New York University, Brooklyn, NY)
+
+DOI:
+10.5281/zenodo.18749757
+
+Publication Date:
+2026-02-23
+
+Resource Type:
+Publication / Preprint
+
+License:
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Keywords:
+constructive reverse mathematics, function field Langlands, Laurent Lafforgue, Vincent Lafforgue, GL_n, reductive groups, Langlands correspondence, Bishop constructive mathematics, BISH, WLPO, Archimedean place, Grothendieck-Lefschetz trace formula, Arthur-Selberg trace formula, shtuka, excursion algebra, geometric Satake, Lean 4, formal verification
+
+Related Identifiers:
+- Continues: Paper 68, "Fermat's Last Theorem Is BISH" (10.5281/zenodo.18749965)
+- Is part of: Constructive Reverse Mathematics Series, Papers 1-70
+- Comparison with: Paper 68 (number field Langlands audit, BISH + WLPO)
+- Successor: Paper 70 (synthesis: the logical cost of R)
+- Series DOI: 10.5281/zenodo.17054050
+
+Description:
+
+CRM audit of the function field Langlands correspondence. Both Laurent Lafforgue's proof for GL_n (Inventiones, 2002) and Vincent Lafforgue's proof for general reductive groups (JAMS, 2018) are classified at BISH: every component operates within Bishop's constructive mathematics, with no omniscience principle required.
+
+The principal finding is the comparison with number fields. Paper 68 established that Wiles's proof route costs BISH + WLPO, with the WLPO entering solely through the Arthur-Selberg trace formula at the Archimedean place. The function field F_q(C) has no Archimedean place. Every component which costs WLPO over number fields has an algebraic counterpart over function fields that costs nothing: the Grothendieck-Lefschetz trace formula replaces the Arthur-Selberg trace formula; rational Plancherel measures replace transcendental ones; finite-dimensional spaces of cusp forms replace infinite-dimensional L^2 spaces.
+
+Structural discovery: the boundary between BISH and WLPO in the trace formula is not discrete-vs-continuous spectrum, but algebraic-vs-transcendental spectral parameters. The comparison yields: the logical cost of the Langlands program is the logical cost of R.
+
+FORMAL VERIFICATION
+
+Lean 4 formalization: 236 lines (Main.lean), pure Lean 4 kernel (no Mathlib).
+Build: 0 errors, 0 warnings, 0 sorry.
+Classical.choice: Not present in #print axioms for any theorem.
+Axioms: 28 custom axioms (14 component/classification pairs).
+
+DEPOSIT CONTENTS
+
+paper69_funcfield.pdf    — Paper (13 pages)
+paper69_funcfield.tex    — LaTeX source
+P69_FuncField/           — Lean 4 Lake project (builds with `lake build`)
+README.txt               — Package description
+
+NOTES
+
+This paper was produced with AI assistance (Anthropic Claude) for computation, literature search, and manuscript preparation. All mathematical claims are either formally verified in Lean 4 or explicitly flagged as unverified.
+
+The author is a practicing cardiologist and not a professional mathematician. All claims should be evaluated on their formal content rather than on the author's credentials.

@@ -1,0 +1,56 @@
+Paper 64 — Zenodo upload metadata
+
+
+Title:
+Uniform p-Adic Decidability for Elliptic Curves: Computational Evidence and Proof (Paper 64, Constructive Reverse Mathematics Series)
+
+Upload type: Publication > Preprint
+
+Publication date: 2026-02-22
+
+Authors:
+Lee, Paul Chun-Kit  |  New York University
+
+DOI: 10.5281/zenodo.18737090
+
+Description:
+Paper 64 of the Constructive Reverse Mathematics series.
+
+MAIN RESULT: The p-adic precision bound N_M = v_p(#E(F_p)) for crystalline decidability of elliptic curves E/Q satisfies N_M <= 2 for all (E, p), with N_M = 2 only possible at p = 2, and N_M <= 1 for every p >= 3. For p >= 5, equality N_M = 1 holds if and only if E is anomalous at p (a_p = 1). The proof is a short argument from the Hasse bound |a_p| <= 2*sqrt(p).
+
+The principal consequence is that p-adic crystalline decidability for elliptic curves requires at most two digits of p-adic precision at p = 2 and at most one digit everywhere else. The p-adic side of the decidability problem is thus uniformly trivial, contrasting sharply with the Archimedean side, where rank creates genuine stratification (Papers 59, 61). This asymmetry -- p-adic uniform, Archimedean stratified -- is a clean structural result within the Decidable Polarized Tannakian (DPT) framework.
+
+Computational verification: 1,812 elliptic curves across 15 primes, covering 23,454 (E, p) pairs. Zero exceptions. N_M does not correlate with rank, torsion structure, or CM status.
+
+Package contains: LaTeX source and PDF (10 pages), self-contained Python computation script, all generated CSV/JSON data files, computation report, and 6 PNG plots.
+
+Access right: Open Access
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Language: English
+
+Keywords (one per line):
+elliptic curves
+p-adic precision
+crystalline decidability
+Hasse bound
+anomalous primes
+constructive reverse mathematics
+BISH
+LPO
+Markov's Principle
+Decidable Polarized Tannakian
+point counting
+LMFDB
+
+Subjects:
+Mathematical logic and foundations
+Number theory
+
+Related identifiers:
+DOI 10.5281/zenodo.17054050  |  relation: isPartOf  |  type: publication
+(parent series DOI)
+
+Additional notes:
+AI-assisted writing using Claude (Anthropic, Opus 4.6) under human direction. All mathematical content specified by the author. Computation is self-contained Python with direct enumeration point counting (no external APIs beyond initial LMFDB curve data). No Lean formalization for this paper.

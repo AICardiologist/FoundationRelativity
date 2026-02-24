@@ -1,0 +1,67 @@
+ZENODO DEPOSIT METADATA — Paper 67
+====================================
+
+Title:
+The Motive Is a Decidability Certificate: Constructive Reverse Mathematics in Arithmetic Geometry (Paper 67 of the Constructive Reverse Mathematics Series)
+
+Authors:
+Lee, Paul Chun-Kit (New York University, Brooklyn, NY)
+
+DOI:
+10.5281/zenodo.18746343
+
+Publication Date:
+2026-11-23
+
+Resource Type:
+Publication / Preprint
+
+License:
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Keywords:
+constructive reverse mathematics, arithmetic geometry, motives, decidability, Bishop constructive mathematics, BISH, LPO, WLPO, Hodge conjecture, Tate conjecture, BSD conjecture, Fontaine-Mazur conjecture, weight-monodromy conjecture, de-omniscientizing descent, DPT framework, CM abelian fourfolds, exotic Weil class, self-intersection, Steinitz ideal class, conductor identity, trace-zero lattice, form class, p-adic decidability, Lean 4, formal verification
+
+Related Identifiers:
+- Is supplement to: Paper 40, "Logical Constitution of Physical Reality" (CRM Series physics synthesis)
+- Is part of: Constructive Reverse Mathematics Series, Papers 1-67
+- Synthesizes: Papers 45-66 (arithmetic geometry phase of the CRM Series)
+- References: Papers 50-53 (DPT framework, CM oracle), Papers 56-58 (Weil lattice identity), Papers 64-66 (p-adic and form-class extensions)
+- Series DOI: 10.5281/zenodo.17054050
+
+Description:
+
+Every major conjecture in arithmetic geometry—Hodge, Tate, BSD, Fontaine-Mazur, Weight-Monodromy—has a precise logical address.  This monograph finds those addresses.
+
+Working in Bishop's constructive mathematics (BISH), we ask a question that classical number theory never asks: how much omniscience does each conjecture actually cost?  The answer, assembled across twenty-two papers (Papers 45-66 of the Constructive Reverse Mathematics series), is that the motive itself acts as a decidability certificate.  Geometric origin—the property that converts a cohomological datum into a cycle—systematically eliminates the need for the Limited Principle of Omniscience (LPO), reducing problems from undecidable to constructively solvable.
+
+THE CLASSIFICATION
+
+Three invariants—analytic rank, Hodge level, and the effective Lang constant—classify every pure or mixed motive into a decidability tier: from BISH (fully constructive) through BISH + MP and BISH + WLPO, up to BISH + LPO (full omniscience).  All five great conjectures exhibit a uniform de-omniscientizing descent from LPO to BISH, mediated by the motive's geometry.  In cohomological dimension below 4, every calibrated conjecture descends to BISH; at dimension 4, the Hodge conjecture hits a wall requiring LPO.  At finite primes, p-adic precision is bounded by 2, making finite places computationally trivial and resolving the open "Axiom 5" question of the Decidable Polarized Tannakian (DPT) framework.
+
+THE DISCOVERY
+
+The constructive lens also found something classical mathematics missed entirely.  For CM abelian fourfolds, the self-intersection degree of the exotic Weil class satisfies an exact arithmetic identity: h * Nm(A) = f, where f is the conductor, A is the Steinitz ideal class, and h is the Hermitian self-pairing.  This identity holds across all nine principal Heegner fields, generalizes to 1,220 field pairs with zero exceptions, and extends to non-cyclic cubics through the trace-zero lattice form class.  The identity was invisible at classical resolution—it required the constructive proof's finer granularity to see.
+
+FORMAL VERIFICATION
+
+Fifty-three papers in the series carry Lean 4 + Mathlib formalizations totaling 86,898 lines, with twenty-two achieving zero sorry.  The verification corpus is summarized in Table 2.
+
+STRUCTURE
+
+Part I  — The Map: Decidable Polarized Tannakian (DPT) framework, de-omniscientizing descent, dimension-4 wall, p-adic resolution, mixed motive frontier.
+Part II — The Identity: the h = f discovery, Steinitz generalization, computational verification at scale, form-class extension to non-cyclic cubics.
+Part III — The Architecture: methodology, future directions (Taylor-Wiles audit, Fermat's Last Theorem, Langlands correspondence).
+
+DEPOSIT CONTENTS
+
+paper67.pdf    — Compiled monograph (17 pages)
+paper67.tex    — LaTeX source
+
+To compile: pdflatex paper67.tex (two passes for TOC and references)
+
+NOTES
+
+This paper was produced with AI assistance (Anthropic Claude) for computation, literature search, and manuscript preparation.  All mathematical claims are either formally verified in Lean 4 (in constituent papers) or explicitly flagged as unverified.
+
+The author is a practicing cardiologist and not a professional mathematician.  All claims should be evaluated on their formal content rather than on the author's credentials.

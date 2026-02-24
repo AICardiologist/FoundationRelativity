@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+title: "Class Number Correction for Exotic Weil Classes on CM Abelian Fourfolds (Paper 58, Constructive Reverse Mathematics Series)"
+message: "If you use this software, please cite it using the metadata from this file."
+type: software
+authors:
+  - family-names: Lee
+    given-names: Paul Chun-Kit
+    affiliation: New York University
+    email: dr.paul.c.lee@gmail.com
+abstract: "Paper 58: extends the h = f formula for exotic Weil self-intersection to class number h_K > 1. Corrected formula h * Nm(a) = f where a is the Steinitz class. Verified for K = Q(sqrt(-5)) with all nine conductors. Norm obstruction is decidable in BISH. Lean 4 formalization: 6 modules, 803 lines, zero sorry, zero custom axioms."
+keywords:
+  - constructive reverse mathematics
+  - class number
+  - exotic Weil class
+  - Steinitz class
+  - norm obstruction
+  - CM abelian fourfold
+  - Gram matrix
+  - conductor
+  - arithmetic geometry
+  - formal verification
+  - Lean 4
+  - Mathlib
+license: Apache-2.0
+date-released: "2026-02-21"

@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+- family-names: "Lee"
+  given-names: "Paul Chun-Kit"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+  affiliation: "New York University"
+title: "The Weight-Monodromy Conjecture and LPO: Constructive Calibration of Spectral Sequence Degeneration via De-Omniscientizing Descent (Paper 45, Constructive Reverse Mathematics Series)"
+version: "1.0.0"
+doi: 10.5281/zenodo.18676170
+date-released: 2026-02-17
+url: "https://doi.org/10.5281/zenodo.18676170"
+abstract: >-
+  Paper 45 of the Constructive Reverse Mathematics series. We apply CRM to
+  calibrate the logical strength of spectral sequence degeneration in the
+  context of the Weight-Monodromy Conjecture for smooth projective varieties
+  over p-adic fields. C1: polarization forces degeneration in BISH. C2:
+  DecidesDegeneration(K) is equivalent to LPO(K). C3: no positive-definite
+  Hermitian form exists over p-adic fields in dimension >= 3. C4: geometric
+  degeneration is decidable in BISH via de-omniscientizing descent. Formalized
+  in Lean 4 over Mathlib (1,247 lines, zero errors, zero sorry).
+keywords:
+  - "constructive reverse mathematics"
+  - "Weight-Monodromy Conjecture"
+  - "LPO"
+  - "spectral sequence"
+  - "de-omniscientizing descent"
+  - "formal verification"
+  - "Lean 4"
+  - "Mathlib"
+  - "arithmetic geometry"
+  - "p-adic fields"
+license: Apache-2.0

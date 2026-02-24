@@ -1,0 +1,52 @@
+ZENODO METADATA FOR PAPER 28
+DOI: 10.5281/zenodo.18616620
+
+=== TITLE ===
+Newton vs. Lagrange vs. Hamilton: Constructive Stratification of Classical Mechanics (Paper 28, CRM Series)
+
+=== AUTHORS ===
+Paul Chun-Kit Lee (dr.paul.c.lee@gmail.com)
+
+=== DESCRIPTION ===
+Paper 28 in the Constructive Reverse Mathematics (CRM) series. Lean 4 formalization proving that the three textbook formulations of classical mechanics -- Newtonian (equation of motion), Lagrangian (variational), and Hamiltonian (phase space) -- are constructively stratified: they require different logical principles.
+
+For the discrete harmonic oscillator with N=2 time steps:
+
+(1) BISH half: The Euler-Lagrange equation (8m-k)q = 4m(A+B) has a unique explicit solution. Proof is purely algebraic -- no Fan Theorem needed.
+
+(2) Hamilton half (BISH): Hamilton's equations have a unique explicit solution. The discrete Legendre transform bridging Lagrangian and Hamiltonian formulations is an invertible BISH-level map.
+
+(3) FT half: The assertion that every continuous function on [0,1] attains its minimum (and in particular that the action functional S has a minimizer) is equivalent to the Fan Theorem.
+
+All equation-solving is BISH. All optimization is FT. The bridge between formulations is BISH.
+
+Formalized in Lean 4 with Mathlib (621 lines, 6 source files, zero sorry, zero custom axioms). Includes LaTeX companion paper (17 pages).
+
+=== KEYWORDS ===
+constructive reverse mathematics
+Fan Theorem
+BISH
+classical mechanics
+Euler-Lagrange equations
+Hamilton's equations
+Legendre transform
+Lean 4
+Mathlib
+formal verification
+constructive mathematics
+variational principles
+
+=== RESOURCE TYPE ===
+Software / Dataset
+
+=== LICENSE ===
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+=== RELATED IDENTIFIERS ===
+Paper 23 (Fan Theorem and optimization): 10.5281/zenodo.18604312
+Paper 10 (Logical geography): 10.5281/zenodo.18580342
+
+=== SUBJECTS ===
+Mathematical Physics
+Constructive Mathematics
+Formal Methods

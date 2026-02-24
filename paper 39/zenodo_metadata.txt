@@ -1,0 +1,14 @@
+ZENODO UPLOAD METADATA -- Paper 39
+====================================
+
+TITLE:
+Beyond LPO: The Thermodynamic Stratification of Physical Undecidability (Paper 39, Constructive Reverse Mathematics Series)
+
+DESCRIPTION:
+Paper 39 in the Constructive Reverse Mathematics of Mathematical Physics series. While Papers 36-38 showed all known physical undecidabilities are LPO (Sigma-1-zero), this paper proves the ceiling is not Sigma-1-zero. A modified Cubitt encoding --- running a Turing machine on all inputs simultaneously via Robinson tiling with perimeter counters --- encodes the Sigma-2-zero-complete Finiteness Problem. The generic spectral gap (without promise gap) is Sigma-2-zero/Pi-2-zero-complete, requiring LPO-prime (the Turing jump of LPO). The central result is the Thermodynamic Stratification Theorem: computational complexity bifurcates on thermodynamic scaling. Extensive observables (energy density, magnetization) cap at LPO via Fekete's subadditive lemma, while intensive observables (spectral gap) reach LPO-prime. Crucially, empirical physics --- which operates at finite precision and therefore measures extensive quantities --- remains capped at LPO. Promise-gapped physics (all of Papers 36-38) also caps at LPO. All results formalized in Lean 4 over Mathlib with zero sorry. The formalization comprises 8 Lean source files.
+
+KEYWORDS:
+Sigma-2-zero completeness, Turing jump, LPO-prime, thermodynamic scaling, extensive observables, intensive observables, Finiteness Problem, Robinson tiling, spectral gap, promise gap, constructive reverse mathematics, LPO, Limited Principle of Omniscience, arithmetic hierarchy, Lean 4, Mathlib, formal verification, quantum many-body physics, Fekete's lemma
+
+COPYRIGHT STATEMENT:
+Copyright 2026 Paul Chun-Kit Lee. Code licensed under Apache License 2.0. Paper licensed under Creative Commons Attribution 4.0 International (CC-BY 4.0).

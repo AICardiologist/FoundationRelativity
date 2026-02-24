@@ -25,10 +25,19 @@ Thumbs.db
 .Rhistory
 texput.log
 
-# Local development files  
+# Local development files
 old_files/
 .tmp.driveupload/
 /.lake/
+
+# All nested .lake build caches (can be multi-GB)
+**/.lake/
+
+# Bundle archives (large, reproducible from source)
+paper_2_bundle/
+paper_2_bundle.tar.gz
+paper_2_bundle.zip
+paper_7_bundle/
 
 # Hide non-essential Paper directories
 Papers/P*_*_AUDIT_*.md

@@ -1,0 +1,65 @@
+{
+  "title": "The Bloch-Kato Calibration — Out-of-Sample Test of the DPT Framework (Paper 54, Constructive Reverse Mathematics Series)",
+  "description": "<p>Paper 54 of the Constructive Reverse Mathematics series. First out-of-sample test of the Decidability-Preserving Transfer (DPT) framework, calibrating the Bloch&ndash;Kato conjecture against DPT axioms.</p>\n<p>Key results: (A) LPO isolation for zero-testing: analytic evaluation is computable but zero-testing requires LPO. (B) Axiom 2 realized by Deligne Weil I: Frobenius eigenvalues have prescribed absolute value. (C) Axiom 3 partial: Hodge&ndash;Riemann unconditional, Beilinson height pairing conditional. (D) Axiom 1 fails for mixed motives: Ext<sup>1</sup> decidability is not available. (E) p-adic Tamagawa obstruction: u-invariant of Q<sub>p</sub> forces isotropy. (F) Descent diagram assembles the full calibration verdict with explicit fracture points.</p>\n<p>The Lean 4 / Mathlib formalization comprises 8 source files (1,139 lines), compiles with zero errors, zero warnings, and zero sorry gaps. 7 principled axioms encode deep published results (Deligne Weil I, Hodge&ndash;Riemann, Bridges&ndash;Richman) and one conjecture (Beilinson).</p>\n<p>Code is distributed exclusively via this Zenodo record.</p>",
+  "upload_type": "software",
+  "publication_date": "2026-02-21",
+  "creators": [
+    {
+      "name": "Lee, Paul Chun-Kit",
+      "affiliation": "New York University",
+      "orcid": "0000-0000-0000-0000"
+    }
+  ],
+  "access_right": "open",
+  "license": "Apache-2.0",
+  "keywords": [
+    "constructive reverse mathematics",
+    "Bloch-Kato conjecture",
+    "DPT framework",
+    "decidability-preserving transfer",
+    "LPO",
+    "p-adic obstruction",
+    "Tamagawa numbers",
+    "Deligne Weil I",
+    "Hodge-Riemann",
+    "mixed motives",
+    "arithmetic geometry",
+    "formal verification",
+    "Lean 4",
+    "Mathlib",
+    "constructive mathematics"
+  ],
+  "subjects": [
+    {
+      "term": "Mathematical logic and foundations",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85082397",
+      "scheme": "url"
+    },
+    {
+      "term": "Algebraic geometry",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85003438",
+      "scheme": "url"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "relation": "isPartOf",
+      "identifier": "10.5281/zenodo.17054050",
+      "resource_type": "software",
+      "scheme": "doi"
+    }
+  ],
+  "version": "2.0.0",
+  "language": "eng",
+  "notes": "AI-assisted formalization using Claude (Anthropic, Opus 4.6) for Lean 4 code generation under human direction. All mathematical content specified by the author; every theorem verified by the Lean 4 type checker. Built with Lean 4 v4.29.0-rc1 and Mathlib. Reproducible via 'lake build' (zero errors, zero sorry). Code available exclusively on Zenodo (not hosted on GitHub).",
+  "references": [
+    "Bloch, S. and Kato, K. (1990). L-functions and Tamagawa numbers of motives. In: The Grothendieck Festschrift, vol. I, Birkhauser, 333-400.",
+    "Deligne, P. (1974). La conjecture de Weil. I. Inst. Hautes Etudes Sci. Publ. Math. 43, 273-307.",
+    "Burns, D. and Flach, M. (1996). Motivic L-functions and Galois module structures. Math. Ann. 305, 65-102.",
+    "Bridges, D. and Richman, F. (1987). Varieties of Constructive Mathematics. Cambridge University Press.",
+    "Bishop, E. and Bridges, D. (1985). Constructive Analysis. Springer.",
+    "Beilinson, A. (1987). Height pairing between algebraic cycles. In: Current Trends in Arithmetical Algebraic Geometry, Contemp. Math. 67, AMS, 1-24.",
+    "Hodge, W.V.D. (1941). The Theory and Applications of Harmonic Integrals. Cambridge University Press.",
+    "Lam, T.Y. (2005). Introduction to Quadratic Forms over Fields. Graduate Studies in Mathematics 67, AMS."
+  ]
+}

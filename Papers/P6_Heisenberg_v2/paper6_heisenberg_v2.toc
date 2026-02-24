@@ -1,0 +1,23 @@
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
+\contentsline {paragraph}{What changed in v2.}{2}{section*.2}%
+\contentsline {paragraph}{Organization.}{2}{section*.3}%
+\contentsline {paragraph}{Scope \& Dependencies.}{2}{section*.4}%
+\contentsline {section}{\numberline {2}Background and Related Work}{3}{section.2}%
+\contentsline {paragraph}{Historical development.}{3}{section*.5}%
+\contentsline {paragraph}{Formalization landscape.}{3}{section*.6}%
+\contentsline {paragraph}{Constructive analysis context.}{3}{section*.7}%
+\contentsline {section}{\numberline {3}Definitions and Bridge Lemmas}{3}{section.3}%
+\contentsline {section}{\numberline {4}Robertson--Schr\"odinger Inequality}{4}{section.4}%
+\contentsline {section}{\numberline {5}Schr\"odinger Strengthening}{4}{section.5}%
+\contentsline {section}{\numberline {6}Measurement Uncertainty and $\mathsf {DC}_{\omega }$}{5}{section.6}%
+\contentsline {section}{\numberline {7}Implications and Interpretation}{5}{section.7}%
+\contentsline {paragraph}{The geometry/choice distinction.}{5}{section*.8}%
+\contentsline {paragraph}{Constructive quantum mechanics.}{5}{section*.9}%
+\contentsline {paragraph}{v1 $\to $ v2 upgrade.}{5}{section*.10}%
+\contentsline {section}{\numberline {8}Calibration Summary}{5}{section.8}%
+\contentsline {section}{\numberline {9}Formalization Architecture}{5}{section.9}%
+\contentsline {paragraph}{Module structure.}{6}{section*.11}%
+\contentsline {paragraph}{Key proof strategies.}{6}{section*.12}%
+\contentsline {paragraph}{Axiom profile.}{6}{section*.13}%
+\contentsline {paragraph}{Lean-to-LaTeX symbol reference.}{6}{section*.14}%
+\contentsline {section}{\numberline {10}Reproducibility}{7}{section.10}%

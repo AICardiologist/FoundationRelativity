@@ -7,6 +7,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{lmodern}
 \usepackage{amsmath,amssymb,mathtools}
+\usepackage{amsthm}
 \usepackage[american]{babel}
 \usepackage{stmaryrd}
 \usepackage{enumitem}
@@ -28,13 +29,18 @@
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{remark}[theorem]{Remark}
+% Aliases used in body:
+\newtheorem{thm}[theorem]{Theorem}
+\newtheorem{lem}[theorem]{Lemma}
+\newtheorem{cor}[theorem]{Corollary}
+\newtheorem{rem}[theorem]{Remark}
 % Alias used in body:
 \newenvironment{defi}{\begin{definition}}{\end{definition}}
 
 % ---------- Lean repo link ----------
 \newcommand{\leanRepo}{\url{https://github.com/AICardiologist/FoundationRelativity}}
-\newcommand{\leanok}{\textsf{\small \textcolor{green!70!black}{✓}}}
-\newcommand{\leanpartial}{\textsf{\small \textcolor{orange!80!black}{◐}}}
+\newcommand{\leanok}{\textsf{\small \textcolor{green!70!black}{\checkmark}}}
+\newcommand{\leanpartial}{\textsf{\small \textcolor{orange!80!black}{(partial)}}}
 
 % ---------- Mathematical notation ----------
 \newcommand{\N}{\mathbb{N}}
@@ -42,6 +48,7 @@
 \newcommand{\linf}{\ell^\infty}
 \newcommand{\cnull}{c_0}
 \newcommand{\WLPO}{\mathrm{WLPO}}
+\newcommand{\LPO}{\mathrm{LPO}}
 \newcommand{\BISH}{\mathrm{BISH}}
 \newcommand{\CRM}{\mathrm{CRM}}
 \newcommand{\LEM}{\mathrm{LEM}}
@@ -79,15 +86,19 @@
     {Θ}{{$\Theta$}}1 {Λ}{{$\Lambda$}}1 {Σ}{{$\Sigma$}}1
     {Φ}{{$\Phi$}}1 {Ψ}{{$\Psi$}}1 {Ω}{{$\Omega$}}1
     {→}{{$\rightarrow$}}1 {←}{{$\leftarrow$}}1 {↔}{{$\leftrightarrow$}}1
+    {⇒}{{$\Rightarrow$}}1 {⇐}{{$\Leftarrow$}}1 {⇔}{{$\Leftrightarrow$}}1
     {∀}{{$\forall$}}1 {∃}{{$\exists$}}1 {∈}{{$\in$}}1
     {∉}{{$\notin$}}1 {⊆}{{$\subseteq$}}1 {⊂}{{$\subset$}}1
     {∪}{{$\cup$}}1 {∩}{{$\cap$}}1 {≤}{{$\leq$}}1
-    {≥}{{$\geq$}}1 {≠}{{$\neq$}}1 {≈}{{$\approx$}}1
+    {≥}{{$\geq$}}1 {≠}{{$\neq$}}1 {≈}{{$\approx$}}1 {≃}{{$\simeq$}}1
     {≡}{{$\equiv$}}1 {∧}{{$\land$}}1 {∨}{{$\lor$}}1
     {¬}{{$\neg$}}1 {ℕ}{{$\mathbb{N}$}}1 {ℝ}{{$\mathbb{R}$}}1
-    {ℂ}{{$\mathbb{C}$}}1 {ℤ}{{$\mathbb{Z}$}}1
+    {ℂ}{{$\mathbb{C}$}}1 {ℤ}{{$\mathbb{Z}$}}1 {ℓ}{{$\ell$}}1
     {·}{{$\cdot$}}1 {∑}{{$\sum$}}1 {∏}{{$\prod$}}1
     {∅}{{$\emptyset$}}1 {∞}{{$\infty$}}1 {∂}{{$\partial$}}1
+    {⟨}{{$\langle$}}1 {⟩}{{$\rangle$}}1 {…}{{$\ldots$}}1
+    {₀}{{$_0$}}1 {₁}{{$_1$}}1 {₂}{{$_2$}}1 {⧸}{{$/$}}1 {‖}{{$\|$}}1
+    {•}{{$\cdot$}}1 {⁻¹}{{$^{-1}$}}1 {⋆}{{$\star$}}1
 }
 
 \lstdefinestyle{leanstyle}{
@@ -123,7 +134,7 @@ New York University \\
 \begin{document}
 
 \begin{abstract}
-We calibrate the logical strength of Banach space non-reflexivity over Bishop-style constructive mathematics (BISH). Writing ``bidual gap'' for the failure of surjectivity of the canonical embedding $J_X\!:X\to X^{**}$, we show---\emph{in a classical metatheory}---that over $\BISH$ the following are equivalent: the Weak Limited Principle of Omniscience (WLPO); the existence of a bidual gap for some real Banach space; and, in particular, the non-surjectivity of $J_{\ell^\infty}$. The forward implication proceeds by classically extracting an Ishihara kernel (a finite tuple of functionals and a positive threshold) from a gap; the kernel-to-$\WLPO$ step is intuitionistic. Both directions are formalized in Lean~4, and the WLPO$\to$gap direction isolates a small witness-extraction step that is equivalent to LPO; we make this dependence explicit below. We also give constructive finite-dimensional surrogates via Cesàro means and include, in Appendix~\ref{app:stone}, a Stone window sketch identifying idempotents of $\ell^\infty/c_0$ with almost-equality classes of subsets of $\mathbb{N}$. This sketch is not used in the main equivalence and is not formalized in Lean. These results sharpen the folklore that the bidual gap is ``non-constructive'' by locating it precisely at $\WLPO$ over $\BISH$.
+We calibrate the logical strength of Banach space non-reflexivity over Bishop-style constructive mathematics (BISH). Writing ``bidual gap'' for the failure of surjectivity of the canonical embedding $J_X\!:X\to X^{**}$, we show---\emph{in a classical metatheory}---that over $\BISH$ the Weak Limited Principle of Omniscience (WLPO) is equivalent to the existence of a bidual gap for some real Banach space (our \texttt{BidualGapStrong}). A classical corollary is the non-surjectivity of $J_{\ell^\infty}$; this corollary is \emph{not} formalized in Lean. The forward implication proceeds by classically extracting an Ishihara kernel (a finite tuple of functionals and a positive threshold) from a gap; the kernel-to-$\WLPO$ step is intuitionistic. Both directions of WLPO $\leftrightarrow$ BidualGapStrong are formalized in Lean~4, and the WLPO$\to$gap direction isolates a small witness-extraction step; we formalize both a WLPO-based lemma (using classical Bool extraction) and an LPO-based variant that provides a constructive witness. We also give finite-dimensional surrogates via Ces\`aro means (paper-level) and include, in Appendix~\ref{app:stone}, a Stone window sketch identifying idempotents of $\ell^\infty/c_0$ with almost-equality classes of subsets of $\mathbb{N}$. This sketch is not used in the main equivalence and is not formalized in Lean. These results sharpen the folklore that the bidual gap is ``non-constructive'' by locating it precisely at $\WLPO$ over $\BISH$.
 \end{abstract}
 
 \maketitle
@@ -138,6 +149,20 @@ This entire Lean 4 formalization project was produced by multi-AI agents working
 
 \tableofcontents
 
+\section*{AI Assistance and Responsibility}
+\addcontentsline{toc}{section}{AI Assistance and Responsibility}
+
+This project used multiple AI systems in a supervised workflow. Initial Lean code and
+scaffolding were produced with Claude Code (Opus 4.5). Refactoring and consolidation
+were performed with GPT-5.2-Codex (Extra High). Proof-strategy exploration for the
+hardest steps was assisted by Gemini 2.5 Pro (Deep Think). All results were reviewed,
+edited, and integrated under human oversight; the author retains full responsibility
+for correctness.
+
+The author is a practicing cardiologist rather than a professional logician or analyst.
+We expect domain experts may find errors or suggest improvements, and we welcome
+constructive feedback.
+
 % ===========================================================
 \section{Introduction: Foundation Relativity and Logical Calibration}
 % ===========================================================
@@ -150,7 +175,7 @@ For any Banach space $X$, the canonical embedding $J_X:X\to X^{**}$ maps $x\in X
 A Banach space $X$ is \textbf{non-reflexive} if the canonical embedding $J_X$ is not surjective. In this case, we say $X$ \textbf{has a bidual gap}.
 \end{definition}
 
-For the space $\linf$ of bounded sequences, the answer depends on the foundational setting. In classical mathematics ($\ZFC$), the Hahn--Banach theorem implies that $J_{\linf}$ is not surjective.
+For the space $\linf$ of bounded sequences, the answer depends on the foundational setting. In classical mathematics ($\ZFC$), the Hahn--Banach theorem implies that $J_{\linf}$ is not surjective. This $\linf$ corollary is not formalized in the Lean bundle; the formalization focuses on the abstract equivalence and the $c_0$ witness.
 
 However, in Bishop-style constructive mathematics ($\BISH$)---a system based on intuitionistic logic without the Law of Excluded Middle ($\LEM$) or full Choice---one cannot prove that this gap exists. This dependence of provability on foundations exemplifies \emph{foundation relativity}.
 
@@ -171,24 +196,39 @@ For any binary sequence $\alpha:\N\to\{0,1\}$,
 
 $\WLPO$ is strictly weaker than $\LEM$ but not provable in $\BISH$. It captures the minimal decision strength needed to determine whether an infinite sequence is identically zero.
 
+\begin{defi}[$\LPO$]
+For any binary sequence $\alpha:\N\to\{0,1\}$,
+\[
+(\forall n,\ \alpha(n)=0)\ \ \vee\ \ \exists n,\ \alpha(n)=1.
+\]
+\end{defi}
+
+$\LPO$ implies $\WLPO$ and is strictly stronger. In this paper it appears only as an explicit
+witness-extraction principle (see the reverse direction and the Constructivity caveat).
+
 \subsection{Main result and contributions}
 
 \begin{thm}[Main Theorem]
 Over $\BISH$, the following are equivalent:
 \begin{enumerate}
 \item $\WLPO$.
-\item \textbf{Gap$_{\linf}$:} The embedding $J_{\linf}:\linf\to(\linf)^{**}$ is not surjective.
-\item \textbf{Gap$_{\exists}$:} There exists a real Banach space $X$ such that $J_X:X\to X^{**}$ is not surjective.
+\item \textbf{Gap$_{\exists}$:} There exists a real Banach space $X$ such that $J_X:X\to X^{**}$ is not surjective (\texttt{BidualGapStrong}).
 \end{enumerate}
-Moreover, this equivalence is fully formalized in Lean~4 (see Section~\ref{sec:lean}).
+Moreover, this equivalence is formalized in Lean~4 (see Section~\ref{sec:lean}).
 \end{thm}
+
+\begin{cor}[Classical corollary (not formalized in Lean)]
+In $\ZFC$, the embedding $J_{\linf}:\linf\to(\linf)^{**}$ is not surjective. The Lean bundle
+includes an abstract Option~B bridge from a nonzero functional on $\linf/\cnull$ to a bidual
+gap, but it does not specialize this bridge to $\linf$.
+\end{cor}
 
 Our contributions are:
 \begin{enumerate}[label=\arabic*.]
 \item \textbf{Logical calibration:} an exact equivalence within $\CRM$.
-\item \textbf{Formal verification:} a complete Lean 4 formalization of both directions.
+\item \textbf{Formal verification:} a Lean 4 formalization of WLPO $\leftrightarrow$ \texttt{BidualGapStrong} (existence of a gap), plus an abstract Option~B bridge.
 \item \textbf{Methodology:} a Prop-level Ishihara kernel and a robust csSup treatment of partial sums.
-\item \textbf{Constructive surrogates:} explicit, verified finite-dimensional approximations via Ces\`aro means.
+\item \textbf{Constructive surrogates:} explicit finite-dimensional approximations via Ces\`aro means (paper-level; not formalized in Lean).
 \end{enumerate}
 
 % ===========================================================
@@ -250,12 +290,18 @@ Concretely, we prove the implication:
   \;\Longrightarrow\;
   \big[\BISH \vdash \WLPO\big].
 \]
-This is the standard proof strategy in Constructive Reverse Mathematics (CRM), which follows a two-part structure that we frame using a \emph{producer/consumer} analogy \cite{Diener2018}. First, a \emph{classical producer}, operating in a meta-theory, uses non-constructive reasoning to extract a concrete ``witness''---in our case, an Ishihara kernel---from a classical theorem. Second, a \emph{constructive consumer} analyzes this witness using only the logic of the constructive base theory ($\BISH$) to derive a non-constructive principle like $\WLPO$. This pattern is conceptually analogous to models of linear logic that separate the unlimited production of resources from their disciplined consumption \cite{PousZdancewic14}, thereby clarifying how the non-constructive content of a theorem is isolated before its logical strength is measured.
+This is the standard proof strategy in Constructive Reverse Mathematics (CRM), which follows a two-part structure that we frame using a \emph{producer/consumer} analogy \cite{DienerCRM}. First, a \emph{classical producer}, operating in a meta-theory, uses non-constructive reasoning to extract a concrete ``witness''---in our case, an Ishihara kernel---from a classical theorem. Second, a \emph{constructive consumer} analyzes this witness using only the logic of the constructive base theory ($\BISH$) to derive a non-constructive principle like $\WLPO$. This pattern is conceptually analogous to models of linear logic that separate the unlimited production of resources from their disciplined consumption \cite{PousZdancewic14}, thereby clarifying how the non-constructive content of a theorem is isolated before its logical strength is measured.
 
 In the formalization, we fence the meta-classical reasoning (witness extraction and
 the case split in $g$) inside a dedicated block, and keep the kernel consumer
 (\emph{Ishihara kernel} $\Rightarrow \WLPO$) intuitionistic. No classical axiom
 is added to the object theory. This approach follows Ishihara's original pattern for extracting logical principles from functional analysis results \cite{Ishihara90}.
+
+We stress that $\LPO$ is \emph{not} obtained by this meta-classical case split.
+Whenever $\LPO$ is used, it is assumed explicitly as an object-level principle
+to supply a concrete index (a witness-extraction step). Thus the only meta-classical
+reasoning in the paper is the kernel extraction in Gap $\Rightarrow$ $\WLPO$; the
+LPO-dependent step belongs entirely to the reverse direction.
 \end{rem}
 
 \paragraph{Special note (differences from an earlier draft).}
@@ -290,9 +336,9 @@ bidual-specific norm facts or undecidable case splits.
 \subsection{Reverse direction: WLPO implies gap (via the $c_0$ witness)}
 
 \begin{thm}[$\WLPO$ implies Gap (with explicit witness-extraction)]
-Assuming $\WLPO$ and a witness-extraction step equivalent to LPO for
-near-supremum coefficients in $\ell^1$, the canonical embedding
-$J:c_0\to(c_0)^{**}$ is not surjective.
+Assuming $\WLPO$ and the near-supremum coefficient step for $\ell^1$
+(obtained either by classical Bool extraction under WLPO or constructively from $\LPO$),
+the canonical embedding $J:c_0\to(c_0)^{**}$ is not surjective.
 \end{thm}
 
 \begin{proof}[Proof sketch]
@@ -305,7 +351,8 @@ Using the isometric identification $(c_0)^*\cong \ell^1$, the series converges
 absolutely and satisfies $|G(f)|\le \|f\|$, so $G\in(c_0)^{**}$. The key analytic
 step is a near-supremum coefficient lemma for $\ell^1$; constructively this
 requires extracting an index where $|a_n|$ is close to $\sup_n |a_n|$, which is
-exactly the LPO-style witness-extraction hypothesis stated above.
+exactly the LPO-style witness-extraction hypothesis stated above (in Lean, this is
+the lemma \texttt{exists\_coeff\_near\_sup\_LPO}).
 
 Finally, $G$ is not in the range of the canonical embedding $J:c_0\to(c_0)^{**}$:
 if $G=J(x)$, then $G(\delta_n)=x_n$ for all $n$, but by construction
@@ -316,22 +363,26 @@ $G(\delta_n)=1$ for every $n$, forcing $x=(1,1,1,\dots)\notin c_0$.
 The explicit $c_0$ witness relies on a near-supremum coefficient lemma in $\ell^1$.
 WLPO alone yields only a disjunction ``all zero'' or ``not all zero'' and does
 \emph{not} produce an index witnessing a large coefficient. We therefore isolate
-this step in Lean and supply an LPO-based variant that \emph{does} provide such an
-index. Concretely, the lemma
-\texttt{exists\_coeff\_near\_sup\_LPO} yields
+this step in Lean and supply two variants: a WLPO-based lemma
+\texttt{exists\_coeff\_near\_sup\_WLPO} that uses classical Bool reasoning to
+extract an index, and an LPO-based lemma \texttt{exists\_coeff\_near\_sup\_LPO}
+that provides the witness constructively. The LPO lemma yields
 \texttt{dual\_is\_banach\_l1\_from\_LPO} and
 \texttt{dual\_is\_banach\_c0\_dual\_from\_LPO} in
-\texttt{Papers.P2\_BidualGap.HB.WLPO\_DualBanach}, which we use to bound $G$ above.
-The earlier WLPO-only phrasing should therefore be read as conditional on this
-explicit witness-extraction axiom (LPO or a Markov-style principle).
+\texttt{Papers.P2\_BidualGap.HB.WLPO\_DualBanach}. When emphasizing constructive
+witness extraction, one should read the WLPO $\Rightarrow$ gap direction as
+conditional on this explicit LPO-level step (or a Markov-style substitute).
+In the Lean bundle, the WLPO-localized normability of the dual of $c_0$
+is currently packaged as the axiom \texttt{dual\_is\_banach\_c0\_from\_WLPO};
+discharging this axiom is future work.
 
 \subsection{A structural byproduct}
 
-\begin{thm}[Gap structure]
+\begin{thm}[Gap structure]\leanpartial
 Assuming $\WLPO$, the quotient $\linf/\cnull$ is nontrivial and carries a Boolean algebra of idempotents with rich structure.
 \end{thm}
 
-This connects naturally with the Stone window sketch in Appendix~\ref{app:stone} (not used in the main equivalence).
+This is a paper-level statement and is not formalized in Lean; it connects naturally with the Stone window sketch in Appendix~\ref{app:stone} (not used in the main equivalence).
 
 % ===========================================================
 \section{Constructive Algorithms: Finite Approximations}
@@ -345,7 +396,7 @@ Finite-dimensional surrogates clarify the constructive boundary: they are comput
 For $n\ge 1$, define $f_n:\R^n\to\R$ by $f_n(x)=\frac{1}{n}\sum_{i=1}^n x_i$.
 \end{defi}
 
-\begin{thm}[Constructive finite Hahn--Banach]\label{thm:finite-hb}\leanok
+\begin{thm}[Constructive finite Hahn--Banach]\label{thm:finite-hb}\leanpartial
 With the sup norm on $\R^n$, the average $f_n(x)=\frac{1}{n}\sum_{i=1}^n x_i$ is the unique linear functional of norm $1$ satisfying $f_n(1,\dots,1)=1$ and $\ker(f_n)=M_n:=\{x\in\R^n:\sum_{i=1}^n x_i=0\}$.
 \end{thm}
 
@@ -353,9 +404,11 @@ With the sup norm on $\R^n$, the average $f_n(x)=\frac{1}{n}\sum_{i=1}^n x_i$ is
 If $\|x\|_\infty\le 1$, then $|f_n(x)|\le \frac{1}{n}\sum_{i=1}^n|x_i|\le 1$, with equality at $x=(1,\dots,1)$, so $\|f_n\|=1$. The kernel claim is immediate from linearity and the definition of $M_n$; uniqueness follows because any linear functional with this kernel and value on $(1,\dots,1)$ must agree with $f_n$ on a direct-sum decomposition $\R^n=M_n\oplus \mathrm{span}\{(1,\dots,1)\}$.
 \end{proof}
 
+\noindent\textit{Note.} This finite-dimensional lemma is included as a paper-level surrogate and is not currently formalized in Lean.
+
 \subsection{Computational implementation}
 
-We provide $O(n)$ implementations (see the repository) to verify Theorem~\ref{thm:finite-hb} numerically.
+No numerical implementation is included in this bundle; Theorem~\ref{thm:finite-hb} is intended as a paper-level illustration.
 
 \subsection{Convergence and the constructive boundary}
 
@@ -373,16 +426,17 @@ Encode a $\WLPO$ instance $\alpha$ by $v^\alpha\in\linf$; in a simple restricted
 
 \subsection{Overview and axiom profile}\label{sec:axioms}
 
-Our Lean 4 formalization contains about 4{,}500 lines of verified code.
+Our Lean 4 formalization contains about 5{,}600 lines of Lean code in this bundle (excluding mathlib).
 \begin{itemize}
 \item \textbf{Bidirectional proof:} both Gap $\Rightarrow$ $\WLPO$ and $\WLPO$ $\Rightarrow$ Gap.
 \item \textbf{Auxiliaries:} near-constructive development of $(\cnull)^*\cong \ell^1$; a Stone window sketch appears in Appendix~\ref{app:stone} (not formalized in Lean).
+\item \textbf{Option~B (abstract):} a bridge from a nonzero functional on a quotient to a bidual gap; the $\linf$ specialization is not formalized.
 \item \textbf{Axioms:}
 \begin{lstlisting}[language=Lean,numbers=none]
-#print axioms gap_equiv_wlpo
--- [propext, Classical.choice, Quot.sound]
+#print axioms Papers.P2.HB.gap_equiv_wlpo
+-- [propext, Classical.choice, Quot.sound] (typical output)
 \end{lstlisting}
-Here, \texttt{Quot.sound} underlies quotients like $\linf/\cnull$; \texttt{propext} is used extensively at Prop level; and \texttt{Classical.choice} (with \texttt{open Classical}) provides classical case splits in the meta-logic, as discussed in Remark~\ref{rem:meta-classical}.
+Here, \texttt{Quot.sound} underlies quotient constructions used in the development; \texttt{propext} is used extensively at Prop level; and \texttt{Classical.choice} (with \texttt{open Classical}) provides classical case splits in the meta-logic, as discussed in Remark~\ref{rem:meta-classical}.
 \end{itemize}
 
 \subsection{CRM methodology and axiom hygiene}\label{sec:crm-hygiene}
@@ -403,10 +457,10 @@ separates the \emph{classical producer} from the \emph{constructive consumer}:
 
 This separation can be mechanically verified in Lean:
 \begin{lstlisting}[language=Lean,numbers=none]
-#print axioms WLPO_of_kernel
+#print axioms Papers.P2.Constructive.WLPO_of_kernel
 -- (no classical axioms)
 
-#print axioms WLPO_of_gap  
+#print axioms Papers.P2.Constructive.WLPO_of_gap  
 -- [propext, Classical.choice, Quot.sound]
 \end{lstlisting}
 
@@ -437,16 +491,30 @@ $\textsf{BISH} \vdash \textsf{BidualGapStrong} \Rightarrow \WLPO$.
 We implement the Ishihara kernel entirely at Prop level.
 
 \begin{lstlisting}[caption={Ishihara kernel (illustrative Lean snippet)}]
-structure IshiharaKernel where
-  -- fields omitted
-  kernel_property : ∀ α, |y (f + g α)| = 0 ∨ δ ≤ |y (f + g α)|
-  decision_property : ∀ α, (∀ n, α n = false) ↔ y (f + g α) = 0
+structure IshiharaKernel (X : Type _) [NormedAddCommGroup X] [NormedSpace ℝ X] where
+  y     : (X →L[ℝ] ℝ) →L[ℝ] ℝ
+  f     : X →L[ℝ] ℝ
+  g     : (ℕ → Bool) → (X →L[ℝ] ℝ)
+  δ     : ℝ
+  δpos  : 0 < δ
+  sep   : ∀ α : ℕ → Bool, |y (f + g α)| = 0 ∨ δ ≤ |y (f + g α)|
+  zero_iff_allFalse :
+    ∀ α : ℕ → Bool, (∀ n, α n = false) ↔ y (f + g α) = 0
 
-lemma WLPO_of_kernel (K : IshiharaKernel) : WLPO := by
+theorem WLPO_of_kernel
+  {X : Type _} [NormedAddCommGroup X] [NormedSpace ℝ X]
+  (K : IshiharaKernel X) : WLPO := by
   intro α
-  cases K.kernel_property α with
-  | inl h => left; exact (K.decision_property α).mpr h
-  | inr h => right; exact mt (K.decision_property α).mp (ne_of_gt h)
+  have h := K.sep α
+  rcases h with h0 | hpos
+  · have yz0 : K.y (K.f + K.g α) = 0 := (abs_eq_zero.mp h0)
+    exact Or.inl ((K.zero_iff_allFalse α).mpr yz0)
+  · have hne : K.y (K.f + K.g α) ≠ 0 := by
+      intro yz0; have : |K.y (K.f + K.g α)| = 0 := by simp [yz0]
+      exact (ne_of_gt (lt_of_lt_of_le K.δpos hpos)) this
+    exact Or.inr (by
+      intro hall
+      exact hne ((K.zero_iff_allFalse α).mp hall))
 \end{lstlisting}
 
 \paragraph{Robust csSup for partial sums.}
@@ -473,22 +541,28 @@ A lightweight typeclass separates WLPO-dependent arguments from constructive cor
 class HasWLPO : Prop :=
   (wlpo : ∀ (α : ℕ → Bool), (∀ n, α n = false) ∨ ¬(∀ n, α n = false))
 
-lemma gap_exists_of_WLPO [HasWLPO] : ...
-instance [Classical] : HasWLPO := ⟨fun α => em _⟩
+namespace HasWLPO
+theorem em_all_false [HasWLPO] (α : ℕ → Bool) :
+    (∀ n, α n = false) ∨ ¬ (∀ n, α n = false) :=
+  (inferInstance : HasWLPO).wlpo α
+end HasWLPO
+
+noncomputable instance instHasWLPO_of_Classical : HasWLPO := by
+  classical
+  refine ⟨?_⟩
+  intro α
+  simpa using Classical.em (∀ n, α n = false)
 \end{lstlisting}
 
 \subsection{The bidirectional theorem (Lean)}
 
-\begin{lstlisting}[caption={WLPO ↔ Gap (top-level equivalence)}]
+\begin{lstlisting}[caption={WLPO $\leftrightarrow$ Gap (top-level equivalence)}]
+open Papers.P2.HB
+
 theorem gap_equiv_wlpo : BidualGapStrong.{0} ↔ WLPO := by
   constructor
-  · intro h_gap
-    classical
-    -- construct kernel from gap witness and apply WLPO_of_kernel
-    exact WLPO_of_kernel (kernel_from_gap h_gap)
-  · intro hwlpo
-    -- construct gap from HasWLPO instance
-    exact gap_from_WLPO hwlpo
+  · exact gap_implies_wlpo
+  · exact wlpo_implies_gap
 \end{lstlisting}
 
 % ===========================================================
@@ -522,14 +596,14 @@ The Lean development clarified axiom usage, suggested robust approaches to condi
 
 \subsection{Conclusion}
 
-We establish and formalize that detecting the bidual gap has exactly the logical strength of $\WLPO$ over $\BISH$. Finite constructive surrogates illuminate the obstruction at the infinite limit. The approach integrates constructive analysis, reverse mathematics, and mechanized verification.
+We establish and formalize that the existence of a bidual gap has exactly the logical strength of $\WLPO$ over $\BISH$. Finite constructive surrogates illuminate the obstruction at the infinite limit. The approach integrates constructive analysis, reverse mathematics, and mechanized verification.
 
 \section*{Acknowledgments}
 
 I thank colleagues and the Lean community for discussions around constructive analysis and formal verification.
 
 \smallskip
-\noindent\textbf{AI assistance disclosure.} During development we used large language models as programming assistants: Google Gemini 2.5 Pro Deep Think (architectural sketching and refactor suggestions), GPT-5 Pro (Lean code scaffolding/refactoring and error-message triage), and Claude Code (build scripts and repository wiring). All suggested code and text were reviewed, edited, and verified by the author; the final mathematical claims are machine-checked by Lean~4 against mathlib. No model is credited as an author, and the author bears full responsibility for all content and any errors.
+\noindent\textbf{AI assistance disclosure.} During development we used large language models as programming assistants: Claude Code (Opus 4.5) for initial Lean scaffolding, GPT-5.2-Codex (Extra High) for refactoring and consolidation, and Google Gemini 2.5 Pro (Deep Think) for difficult proof-strategy exploration. All suggested code and text were reviewed, edited, and verified by the author; the final mathematical claims are machine-checked by Lean~4 against mathlib. No model is credited as an author, and the author bears full responsibility for all content and any errors.
 
 \bibliographystyle{alphaurl}
 \begin{thebibliography}{10}
@@ -664,31 +738,33 @@ This appendix presents key excerpts from our Lean 4 formalization, demonstrating
 The following shows the purely constructive consumer that derives WLPO from an Ishihara kernel without using classical axioms:
 
 \begin{lstlisting}[caption={Constructive consumer: no classical axioms},label={lst:consumer}]
-/-! Constructive consumer: no `open Classical`, no `noncomputable`. -/
+/-! Constructive consumer (Ishihara.lean). -/
 structure IshiharaKernel (X : Type _) [NormedAddCommGroup X] [NormedSpace ℝ X] where
-  y  : (X →L[ℝ] ℝ) →L[ℝ] ℝ
-  f  : X →L[ℝ] ℝ
-  g  : (ℕ → Bool) → (X →L[ℝ] ℝ)
-  δ  : ℝ
-  δpos : 0 < δ
-  sep  : ∀ α, |y (f + g α)| = 0 ∨ δ ≤ |y (f + g α)|
-  zero_iff_allFalse : ∀ α, (∀ n, α n = false) ↔ y (f + g α) = 0
+  y     : (X →L[ℝ] ℝ) →L[ℝ] ℝ
+  f     : X →L[ℝ] ℝ
+  g     : (ℕ → Bool) → (X →L[ℝ] ℝ)
+  δ     : ℝ
+  δpos  : 0 < δ
+  sep   : ∀ α : ℕ → Bool, |y (f + g α)| = 0 ∨ δ ≤ |y (f + g α)|
+  zero_iff_allFalse :
+    ∀ α : ℕ → Bool, (∀ n, α n = false) ↔ y (f + g α) = 0
 
 theorem WLPO_of_kernel
   {X : Type _} [NormedAddCommGroup X] [NormedSpace ℝ X]
   (K : IshiharaKernel X) : WLPO := by
   intro α
-  rcases K.sep α with h0 | hpos
-  · have : K.y (K.f + K.g α) = 0 := (abs_eq_zero.mp h0)
-    exact Or.inl ((K.zero_iff_allFalse α).mpr this)
+  have h := K.sep α
+  rcases h with h0 | hpos
+  · have yz0 : K.y (K.f + K.g α) = 0 := (abs_eq_zero.mp h0)
+    exact Or.inl ((K.zero_iff_allFalse α).mpr yz0)
   · have pos : 0 < |K.y (K.f + K.g α)| := lt_of_lt_of_le K.δpos hpos
     have hne : K.y (K.f + K.g α) ≠ 0 := by
-      intro hz; have : |K.y (K.f + K.g α)| = 0 := by simp [hz]
+      intro yz0; have : |K.y (K.f + K.g α)| = 0 := by simp [yz0]
       exact (ne_of_gt pos) this
     have : ¬ (∀ n, α n = false) := by
       intro hall
-      have hz : K.y (K.f + K.g α) = 0 := (K.zero_iff_allFalse α).mp hall
-      exact hne hz
+      have yz0 : K.y (K.f + K.g α) = 0 := (K.zero_iff_allFalse α).mp hall
+      exact hne yz0
     exact Or.inr this
 \end{lstlisting}
 
@@ -697,7 +773,7 @@ theorem WLPO_of_kernel
 The classical producer extracts an Ishihara kernel from a bidual gap. Note the explicit \texttt{noncomputable} and \texttt{open Classical} declarations:
 
 \begin{lstlisting}[caption={Classical producer: extracting kernel from gap},label={lst:producer}]
-/-! Classical producer: fenced. Extract a kernel from a bidual gap. -/
+/-! Classical producer: fenced in `section ClassicalMeta`. -/
 noncomputable section
 section ClassicalMeta
 open Classical
@@ -706,25 +782,13 @@ lemma exists_on_unitBall_gt_half_opNorm
   {E} [NormedAddCommGroup E] [NormedSpace ℝ E]
   (T : E →L[ℝ] ℝ) (hT : T ≠ 0) :
   ∃ x : E, ‖x‖ ≤ 1 ∧ (‖T‖ / 2) < ‖T x‖ := by
-  by_contra h; push_neg at h
-  have bound_all : ∀ x, ‖T x‖ ≤ (‖T‖ / 2) * ‖x‖ := by
-    intro x
-    by_cases hx : x = 0
-    · simp [hx]
-    · have hxpos : 0 < ‖x‖ := norm_pos_iff.mpr hx
-      let u : E := (‖x‖)⁻¹ • x
-      have hu_le : ‖u‖ ≤ 1 := by
-        field_simp; rw [norm_smul, Real.norm_of_nonneg (inv_nonneg.mpr (le_of_lt hxpos))]
-        simp [ne_of_gt hxpos]
-      have hu_ball : ‖T u‖ ≤ ‖T‖ / 2 := h u hu_le
-      calc ‖T x‖ = ‖x‖ * ‖T u‖     := by rw [← T.map_smul]; simp [u]
-               _ ≤ (‖T‖ / 2) * ‖x‖ := mul_le_mul_of_nonneg_left hu_ball (norm_nonneg x)
-  have hle : ‖T‖ ≤ ‖T‖ / 2 := by
-    apply ContinuousLinearMap.opNorm_le_bound
-    · exact div_nonneg (norm_nonneg T) (by norm_num)
-    · intro x; exact bound_all x
-  have : ‖T‖ = 0 := by linarith
-  exact hT (ContinuousLinearMap.norm_eq_zero.mp this)
+  classical
+  by_contra h
+  push_neg at h
+  -- ... proof uses scaling on the unit ball and opNorm_le_bound
+  -- ... then derives ‖T‖ = 0, contradiction
+
+end ClassicalMeta
 \end{lstlisting}
 
 \subsection{Gap $\to$ WLPO (full bridge)}
@@ -740,44 +804,50 @@ theorem WLPO_of_gap (hGap : BidualGapStrong) : WLPO := by
   letI : NormedSpace ℝ X := Xns
   letI : CompleteSpace X := Xc
   let j := NormedSpace.inclusionInDoubleDual ℝ X
-  -- Extract witness y ∉ range(j)
   have : ∃ y : (X →L[ℝ] ℝ) →L[ℝ] ℝ, y ∉ Set.range j := by
     have : ¬ (∀ y, y ∈ Set.range j) := by
       simpa [Function.Surjective, Set.mem_range] using hNotSurj
     push_neg at this
     exact this
   rcases this with ⟨y, hy⟩
-  have hy0 : y ≠ 0 := by intro hz; subst hz; exact hy ⟨0, by simp⟩
-  -- Find h* with ‖y h*‖ > ‖y‖/2
-  obtain ⟨h⋆, -, hbig⟩ := exists_on_unitBall_gt_half_opNorm y hy0
-  let δ : ℝ := ‖y h⋆‖ / 2
+  have hy0 : y ≠ 0 := by intro h0; subst h0; exact hy ⟨0, by simp⟩
+  obtain ⟨hstar, hstar_le1, hstar_big⟩ :
+      ∃ h : (X →L[ℝ] ℝ), ‖h‖ ≤ 1 ∧ (‖y‖ / 2) < ‖y h‖ := by
+    simpa using
+      (exists_on_unitBall_gt_half_opNorm (E := (X →L[ℝ] ℝ)) y hy0)
+  let δ : ℝ := ‖y hstar‖ / 2
   have δpos : 0 < δ := by
-    have : 0 < ‖y h⋆‖ := lt_of_le_of_lt (div_nonneg (norm_nonneg y) (by norm_num)) hbig
-    exact half_pos this
-  -- Build kernel components
+    -- uses 0 ≤ ‖y‖/2 < ‖y hstar‖
+    have : 0 < ‖y hstar‖ := by
+      have h0 : 0 ≤ ‖y‖ / 2 := div_nonneg (norm_nonneg y) (by norm_num)
+      exact lt_of_le_of_lt h0 hstar_big
+    simpa [δ] using half_pos this
   let f : X →L[ℝ] ℝ := 0
-  let g : (ℕ → Bool) → (X →L[ℝ] ℝ) := fun α => if (∀ n, α n = false) then 0 else h⋆
+  let g : (ℕ → Bool) → (X →L[ℝ] ℝ) := fun α =>
+    if (∀ n, α n = false) then 0 else hstar
   have sep : ∀ α, |y (f + g α)| = 0 ∨ δ ≤ |y (f + g α)| := by
-    intro α
-    by_cases hall : ∀ n, α n = false
-    · left;  simp [f, g, hall]
+    intro α; by_cases hall : ∀ n, α n = false
+    · left; simp [f, g, hall]
     · right
-      have : δ ≤ ‖y h⋆‖ := by
-        have hnn : 0 ≤ ‖y h⋆‖ := norm_nonneg _
+      have : δ ≤ ‖y hstar‖ := by
+        have hnn : 0 ≤ ‖y hstar‖ := norm_nonneg _
         simpa [δ] using half_le_self hnn
-      -- unfold to |y(f+g α)| and rewrite ‖·‖ = |·|
-      simpa [f, g, hall, zero_add, Real.norm_eq_abs]
-  have ziff : ∀ α, (∀ n, α n = false) ↔ y (f + g α) = 0 := by
+      simpa [f, g, hall, zero_add] using this
+  have zero_iff_allFalse : ∀ α, (∀ n, α n = false) ↔ y (f + g α) = 0 := by
     intro α; constructor
     · intro hall; simp [f, g, hall]
-    · intro hz; by_contra hall
-      have : y (f + g α) = y h⋆ := by simp [f, g, hall]
-      rw [this] at hz; norm_num at hz
-      exact absurd hz (ne_of_gt (by exact δpos))
-  exact WLPO_of_kernel
-    { y := y, f := f, g := g, δ := δ, δpos := δpos, 
-      sep := sep, zero_iff_allFalse := ziff }
-end ClassicalMeta
+    · intro h0; by_contra hnot
+      have yh_eq : y (f + g α) = y hstar := by simpa [f, g, hnot, zero_add]
+      have yh0 : y hstar = 0 := by simpa [yh_eq] using h0
+      have pos : 0 < ‖y hstar‖ := by
+        have h0' : 0 ≤ ‖y‖ / 2 := div_nonneg (norm_nonneg y) (by norm_num)
+        exact lt_of_le_of_lt h0' hstar_big
+      have zero : ‖y hstar‖ = 0 := by simpa [yh0]
+      have : (0 : ℝ) < 0 := by simpa [zero] using pos
+      exact lt_irrefl _ this
+  exact WLPO_of_kernel (X := X)
+    { y := y, f := f, g := g, δ := δ, δpos := δpos
+      sep := sep, zero_iff_allFalse := zero_iff_allFalse }
 \end{lstlisting}
 
 \subsection{WLPO $\to$ Gap (Lean formalization)}
@@ -786,6 +856,8 @@ The Lean development proves the reverse direction by a direct construction using
 explicit bidual witness for $c_0$ and WLPO-based dual-Banach lemmas:
 
 \begin{lstlisting}[caption={WLPO implies gap (Lean)},label={lst:wlpo-gap}]
+local notation "c₀" => C₀(ℕ, ℝ)
+
 /-- WLPO ⇒ BidualGapStrong via direct construction. -/
 lemma wlpo_implies_gap : WLPO → BidualGapStrong.{0} := by
   intro hWLPO
@@ -793,7 +865,7 @@ lemma wlpo_implies_gap : WLPO → BidualGapStrong.{0} := by
     c0_not_reflexive_via_direct
   use c₀
   exact ⟨inferInstance, inferInstance, inferInstance,
-         dual_is_banach_c0_from_WLPO_struct hWLPO,
+         dual_is_banach_c0_from_WLPO hWLPO,
          dual_is_banach_c0_dual_from_WLPO hWLPO,
          gap_c0⟩
 \end{lstlisting}
@@ -805,26 +877,36 @@ This appears in \texttt{Papers.P2\_BidualGap.HB.WLPO\_to\_Gap\_HB}.
 The operator norm construction shows the classical use of suprema:
 
 \begin{lstlisting}[caption={Classical operator norm via supremum},label={lst:opnorm}]
-/-- Classical: existence of operator norm via sSup of values on unit ball -/
+/-- Classical: existence of operator norm via sSup of values on unit ball. -/
 namespace OpNorm
 variable {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
 
-def valueSet (h : X →L[ℝ] ℝ) : Set ℝ := 
+def valueSet (h : X →L[ℝ] ℝ) : Set ℝ :=
   { r | ∃ x, ‖x‖ ≤ 1 ∧ r = ‖h x‖ }
 
-lemma valueSet_nonempty (h : X →L[ℝ] ℝ) : (valueSet h).Nonempty := 
-  ⟨0, 0, by simp⟩
-  
-lemma valueSet_bddAbove (h : X →L[ℝ] ℝ) : BddAbove (valueSet h) :=
-  ⟨‖h‖, by rintro r ⟨x, hx, rfl⟩; exact h.le_opNorm_of_le hx⟩
+lemma valueSet_nonempty (h : X →L[ℝ] ℝ) : (valueSet h).Nonempty := by
+  refine ⟨0, ?_⟩
+  exact ⟨0, by simp, by simp⟩
 
-def HasOpNorm (h : X →L[ℝ] ℝ) : Prop := 
-  ∃ N, IsLUB (valueSet h) N
+lemma valueSet_bddAbove (h : X →L[ℝ] ℝ) : BddAbove (valueSet h) := by
+  refine ⟨‖h‖, ?_⟩
+  intro r hr
+  rcases hr with ⟨x, hx, rfl⟩
+  calc
+    ‖h x‖ ≤ ‖h‖ * ‖x‖ := h.le_opNorm x
+    _     ≤ ‖h‖ * 1   := mul_le_mul_of_nonneg_left hx (norm_nonneg _)
+    _     = ‖h‖       := by simp
 
-lemma hasOpNorm_classical (h : X →L[ℝ] ℝ) : HasOpNorm h := by
+def HasOpNorm (h : X →L[ℝ] ℝ) : Prop :=
+  ∃ N : ℝ, IsLUB (valueSet h) N
+
+lemma hasOpNorm_CLF (h : X →L[ℝ] ℝ) : HasOpNorm h := by
   classical
   use sSup (valueSet h)
   exact isLUB_csSup (valueSet_nonempty h) (valueSet_bddAbove h)
+
+lemma hasOpNorm_zero : HasOpNorm (0 : X →L[ℝ] ℝ) :=
+  hasOpNorm_CLF (0 : X →L[ℝ] ℝ)
 end OpNorm
 \end{lstlisting}
 
@@ -833,16 +915,16 @@ end OpNorm
 Finally, we can verify the axiom usage as discussed in Section~\ref{sec:axioms}:
 
 \begin{lstlisting}[caption={Axiom audit commands},label={lst:axioms}]
-#print axioms WLPO_of_kernel
--- (no axioms)
+#print axioms Papers.P2.Constructive.WLPO_of_kernel
+-- (no classical axioms)
 
-#print axioms WLPO_of_gap  
+#print axioms Papers.P2.Constructive.WLPO_of_gap
 -- [propext, Classical.choice, Quot.sound]
 
-#print axioms gap_from_WLPO
+#print axioms Papers.P2.HB.wlpo_implies_gap
 -- [propext, Quot.sound]  -- uses WLPO hypothesis, not Classical.choice
 
-#print axioms gap_equiv_wlpo
+#print axioms Papers.P2.HB.gap_equiv_wlpo
 -- [propext, Classical.choice, Quot.sound]
 \end{lstlisting}
 

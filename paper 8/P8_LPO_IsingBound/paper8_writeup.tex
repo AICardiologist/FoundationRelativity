@@ -1,0 +1,1442 @@
+\documentclass[11pt,a4paper]{article}
+
+% ====================================================================
+% Packages
+% ====================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{cleveref}
+\usepackage{natbib}
+\usepackage{mdframed}
+
+% ====================================================================
+% Theorem environments
+% ====================================================================
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% ====================================================================
+% Lean 4 code listing style
+% ====================================================================
+\definecolor{lean-keyword}{RGB}{0,0,180}
+\definecolor{lean-comment}{RGB}{0,128,0}
+\definecolor{lean-string}{RGB}{163,21,21}
+\definecolor{lean-bg}{RGB}{248,248,248}
+
+\lstdefinelanguage{lean4}{
+  keywords={theorem,lemma,def,class,instance,import,open,variable,
+            noncomputable,section,namespace,end,where,let,have,show,
+            intro,obtain,use,exact,rw,simp,apply,by,fun,match,if,
+            then,else,do,return,axiom,abbrev,private,attribute,
+            suffices,change,congr,ext,constructor,rintro,push_neg,
+            linarith,absurd,set_option,omit,in,set,cases},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+  morestring=[b]',
+}
+
+\lstset{
+  language=lean4,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{lean-keyword}\bfseries,
+  commentstyle=\color{lean-comment}\itshape,
+  stringstyle=\color{lean-string},
+  backgroundcolor=\color{lean-bg},
+  frame=single,
+  framerule=0.5pt,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2,
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+  xleftmargin=15pt,
+  captionpos=b,
+}
+
+% ====================================================================
+% Macros
+% ====================================================================
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\LPO}{\mathrm{LPO}}
+\newcommand{\WLPO}{\mathrm{WLPO}}
+\newcommand{\LLPO}{\mathrm{LLPO}}
+\newcommand{\BMC}{\mathrm{BMC}}
+\newcommand{\BISH}{\mathrm{BISH}}
+\newcommand{\eigenP}{\lambda_+}
+\newcommand{\eigenM}{\lambda_-}
+\newcommand{\fN}{f_N}
+\newcommand{\finf}{f_\infty}
+\newcommand{\ZN}{Z_N}
+\newcommand{\gfun}{g}
+\newcommand{\Lean}{\textsc{Lean~4}}
+\newcommand{\Mathlib}{\textsc{Mathlib4}}
+\newcommand{\leanok}{\textsf{\small \textcolor{green!70!black}{\checkmark}}}
+\newcommand{\leanpartial}{\textsf{\small \textcolor{orange!80!black}{(partial)}}}
+
+% ====================================================================
+% Title
+% ====================================================================
+\title{%
+  \textbf{The Logical Cost of the Thermodynamic Limit:}\\[6pt]
+  LPO-Equivalence and BISH-Dispensability\\
+  for the 1D Ising Free Energy\\[6pt]
+  {\normalsize A Lean~4 Formalization}%
+}
+
+\author{
+  Paul Chun-Kit Lee\thanks{%
+    New York University.
+    AI-assisted formalization; see \S\ref{sec:ai} for methodology.} \\
+  New York University \\
+  \texttt{dr.paul.c.lee@gmail.com}
+}
+
+\date{February 2026}
+
+% ====================================================================
+\begin{document}
+\maketitle
+
+% ====================================================================
+\begin{abstract}
+We prove two complementary results about the thermodynamic limit
+of the one-dimensional Ising model, formalized in \Lean{}.
+(A)~The finite-size error bound
+$|\fN(\beta) - \finf(\beta)| \leq \frac{1}{N}\tanh(\beta)^N$
+is provable in Bishop-style constructive mathematics ($\BISH$)
+without any omniscience principle. A constructive witness $N_0$
+for any prescribed accuracy $\varepsilon > 0$ is explicitly
+computed. (B)~The existence of the thermodynamic limit as a
+completed real number is equivalent over $\BISH$ to the Limited
+Principle of Omniscience ($\LPO$), via the known equivalence between
+$\LPO$ and bounded monotone convergence instantiated through the
+Ising free energy function. Together, these results establish that
+the $\LPO$ cost of the thermodynamic limit is genuine and
+dispensable: the idealization costs exactly $\LPO$, but the empirical
+content requires no omniscience. The combined formalization
+comprises 1374 lines of \Lean{} across 18 modules with zero
+sorries.
+\end{abstract}
+
+\tableofcontents
+
+% ====================================================================
+\section{Introduction}\label{sec:intro}
+% ====================================================================
+
+The thermodynamic limit is the foundational idealization of
+equilibrium statistical mechanics. For a lattice system
+$\Lambda \subset \ZZ^d$ with Hamiltonian $H_\Lambda$, the
+free energy density $f_\Lambda(\beta) = -\frac{1}{|\Lambda|}
+\log Z_\Lambda(\beta)$ is defined for each finite volume. The
+thermodynamic limit asserts that $\finf(\beta) =
+\lim_{|\Lambda| \to \infty} f_\Lambda(\beta)$ exists. Classically,
+this existence follows from subadditivity and the monotone
+convergence theorem: a bounded, monotone sequence of real numbers
+converges.
+
+From a constructive standpoint, the monotone convergence theorem is
+not available in Bishop-style constructive mathematics ($\BISH$). It
+is equivalent over $\BISH$ to the Limited Principle of Omniscience
+($\LPO$), which asserts that for any binary sequence $\alpha :
+\NN \to \{0,1\}$, either $\alpha(n) = 0$ for all $n$ or
+there exists $n_0$ with $\alpha(n_0) = 1$. This equivalence was
+established by Bridges and V\^{\i}\c{t}\u{a} \cite{BV06} as part of the systematic
+classification of constructive reverse mathematics initiated by
+Ishihara \cite{Ish06} and, independently, Veldman \cite{Vel05}.
+
+The question we address is: what is the exact logical cost of the
+thermodynamic limit, and is this cost essential for the physics?
+
+We answer both questions completely for the one-dimensional Ising
+model with nearest-neighbour interactions. Our results are as follows.
+
+Part~A establishes \emph{dispensability}. For the 1D Ising chain with
+uniform coupling $J$ and inverse temperature $\beta$, we prove
+explicit error bounds $|\fN(\beta) - \finf(\beta)| \leq
+\frac{1}{N}\tanh(\beta)^N$ with a constructive witness $N_0$ for
+any prescribed accuracy $\varepsilon > 0$. The proof is entirely
+$\BISH$-valid: no omniscience principle is required. The finite-system
+prediction approximates the infinite-volume answer with computable
+error, and monotone convergence is bypassed via the closed-form
+transfer-matrix solution.
+
+Part~B establishes \emph{calibration}. The existence of the
+thermodynamic limit as a completed real number (not merely its
+approximability) is equivalent to $\LPO$ over $\BISH$. Specifically,
+we prove that bounded monotone convergence---instantiated through the
+free energy function $\gfun(J) = -\log(2\cosh(\beta J))$ of the 1D
+Ising model---is equivalent to $\LPO$ via an explicit encoding of
+binary sequences into coupling sequences.
+
+Together, these results establish that the $\LPO$ cost of the
+thermodynamic limit is genuine (it is equivalent to, not merely
+sufficient for, a known omniscience principle) and dispensable
+(the empirical predictions require no omniscience at all).
+
+Both results are formalized in \Lean{} with \Mathlib{} dependencies.
+The combined formalization comprises 1374 lines across 18 modules,
+with zero sorries and a clean axiom profile: Part~A uses no
+omniscience principles whatsoever, while Part~B's main theorem
+\texttt{lpo\_of\_bmc} carries only the standard \Lean{} metatheory axioms
+(\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}).
+The forward direction of the $\LPO \leftrightarrow \BMC$ equivalence
+is axiomatized as \texttt{bmc\_of\_lpo}, citing Bridges and
+V\^{\i}\c{t}\u{a} \cite{BV06}.
+
+This paper contributes to a programme of constructive reverse
+mathematics applied to mathematical physics, which assigns to each
+physical idealization a precise position in the constructive hierarchy.
+The programme has established the following calibrations:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Physical layer} & \textbf{Principle} & \textbf{Status} \\
+\midrule
+Finite-volume Gibbs states & $\BISH$ & Trivially calibrated \\
+Finite-size approximations & $\BISH$ & Part~A (this paper) \\
+Bidual-gap witness & $\equiv \WLPO$ & Papers~2, 7 \cite{Lee26a,Lee26b} \\
+Thermodynamic limit existence & $\equiv \LPO$ & Part~B (this paper) \\
+Spectral gap decidability & Undecidable & Cubitt et al.\ \cite{CPW15} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Our results calibrate two rows of this table, upgrading them from
+``route-costed'' to ``formally verified.''
+
+The paper is organized as follows. \Cref{sec:prelim} reviews the
+constructive framework, the 1D Ising model, and the free energy
+function. \Cref{sec:partA} presents the $\BISH$ dispensability proof
+(Part~A). \Cref{sec:partB} presents the $\LPO$ calibration
+(Part~B). \Cref{sec:discussion} discusses the synthesis of both
+parts, their relation to the phase-transition debate, and future
+directions. \Cref{sec:lean} describes the \Lean{} formalization.
+\Cref{sec:appendix} collects elementary inequalities.
+
+
+% ====================================================================
+\section{Preliminaries}\label{sec:prelim}
+% ====================================================================
+
+\subsection{Constructive Frameworks}
+
+We work within Bishop-style constructive mathematics ($\BISH$):
+intuitionistic logic with countable and dependent choice
+\cite{Bis67,BB85}. The key omniscience principles form a strict
+hierarchy over $\BISH$:
+
+\begin{definition}[LPO]\label{def:lpo} \leanok{}
+The \emph{Limited Principle of Omniscience} is
+\[
+  \LPO \;:\equiv\;
+  \forall \alpha : \NN \to \{0,1\},\;
+  \bigl(\forall n,\;\alpha(n) = 0\bigr) \;\lor\;
+  \bigl(\exists n,\;\alpha(n) = 1\bigr).
+\]
+\end{definition}
+
+\begin{definition}[BMC]\label{def:bmc} \leanok{}
+\emph{Bounded Monotone Convergence} is the assertion that every
+bounded non-decreasing sequence of reals has a limit: for every
+$a : \NN \to \RR$ with $a_n \leq a_{n+1}$ and $a_n \leq M$ for
+all~$n$, there exists $L \in \RR$ and a convergence modulus such
+that for all $\varepsilon > 0$, there exists $N_0$ with
+$|a_N - L| < \varepsilon$ for all $N \geq N_0$.
+\end{definition}
+
+The equivalence $\LPO \leftrightarrow \BMC$ was established by
+Bridges and V\^{\i}\c{t}\u{a} \cite{BV06}. The stronger
+$\LPO$ implies the \emph{Weak} Limited Principle of Omniscience
+($\WLPO$: $\forall \alpha, (\forall n, \alpha(n) = 0) \lor
+\lnot(\forall n, \alpha(n) = 0)$), which in turn implies the
+Lesser Limited Principle of Omniscience ($\LLPO$). Markov's
+Principle is independent of $\WLPO$ over $\BISH$: neither
+implies the other \cite{BV06}.
+
+\begin{remark}[Constructive status of $\LPO$]\label{rem:lpo}
+$\LPO$ is classically trivial (an instance of excluded middle)
+but constructively independent: it is neither provable nor refutable
+in $\BISH$. Crucially, $\LPO$ provides a \emph{witness} in the
+second disjunct ($\exists n, \alpha(n) = 1$), not merely the
+double negation thereof. This witness-providing character is what
+makes $\LPO$ strictly stronger than $\WLPO$.
+\end{remark}
+
+\subsection{The 1D Ising Model}
+
+Fix a positive integer $N$ (the number of spins). The configuration
+space is $\Omega_N = \{-1, +1\}^N$. The Hamiltonian with periodic
+boundary conditions and coupling $J > 0$ is
+\[
+  H_N(\sigma) = -J \sum_{i=1}^{N} \sigma_i \sigma_{i+1},
+  \qquad \sigma_{N+1} := \sigma_1.
+\]
+For simplicity we set $J = 1$ in Part~A (the general case follows
+by rescaling $\beta$).
+
+\begin{definition}[Transfer matrix]\label{def:transfer} \leanok{}
+The $2 \times 2$ transfer matrix $T$ has entries
+$T(s, s') = \exp(\beta \cdot s \cdot s')$ for $s, s' \in \{-1, +1\}$:
+\[
+  T = \begin{pmatrix} e^{\beta} & e^{-\beta} \\ e^{-\beta} & e^{\beta} \end{pmatrix}.
+\]
+\end{definition}
+
+\begin{definition}[Eigenvalues]\label{def:eigen} \leanok{}
+The eigenvalues of $T$ are
+\[
+  \eigenP = e^{\beta} + e^{-\beta} = 2\cosh(\beta), \qquad
+  \eigenM = e^{\beta} - e^{-\beta} = 2\sinh(\beta).
+\]
+The corresponding eigenvectors are $(1,1)^T/\sqrt{2}$ and
+$(1,-1)^T/\sqrt{2}$.
+\end{definition}
+
+\begin{lemma}[Eigenvalue properties]\label{lem:eigprops} \leanok{}
+For all $\beta > 0$:
+\begin{enumerate}[label=(\alph*)]
+  \item $\eigenP > \eigenM > 0$,
+  \item $\eigenP > 2$,
+  \item $0 < \eigenM / \eigenP < 1$,
+  \item $\eigenM / \eigenP = \tanh(\beta)$, with
+    $0 < \tanh(\beta) < 1$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(a)~$\eigenP - \eigenM = 2e^{-\beta} > 0$, and
+$\eigenM = 2\sinh(\beta) > 0$ for $\beta > 0$.
+(b)~$\cosh(\beta) > 1$ for $\beta > 0$.
+(c)~Immediate from~(a).
+(d)~$\eigenM / \eigenP = 2\sinh(\beta) / (2\cosh(\beta)) =
+\tanh(\beta)$. For $\beta > 0$, the numerator is positive and
+strictly less than the denominator.
+\end{proof}
+
+\begin{remark}[Constructive validity]\label{rem:eigen-constr}
+All inequalities in \Cref{lem:eigprops} are strict and witnessed
+by explicit positive gaps. For rational $\beta$, $\tanh(\beta)$ is
+a well-defined constructive real with $0 < \tanh(\beta) < 1$, and
+the gap $1 - \tanh(\beta) = 2e^{-\beta}/(e^{\beta} + e^{-\beta})$
+is constructively positive.
+\end{remark}
+
+\begin{definition}[Partition function]\label{def:partition} \leanok{}
+The partition function of the 1D Ising model with $N$ spins is
+defined as
+\[
+  \ZN(\beta) := \eigenP^N + \eigenM^N.
+\]
+This equals $\operatorname{Tr}(T^N)$, proved in the formalization
+as a bonus lemma (\texttt{PartitionTrace.lean}).
+\end{definition}
+
+\begin{definition}[Finite-volume free energy density]\label{def:fN} \leanok{}
+\[
+  \fN(\beta) := -\frac{1}{N} \log \ZN(\beta)
+  = -\frac{1}{N} \log\bigl(\eigenP^N + \eigenM^N\bigr).
+\]
+\end{definition}
+
+\begin{definition}[Infinite-volume free energy density]\label{def:finf} \leanok{}
+\[
+  \finf(\beta) := -\log(\eigenP) = -\log(2\cosh\beta).
+\]
+\end{definition}
+
+\begin{remark}[Constructive note]\label{rem:finf-constr}
+The infinite-volume free energy density $\finf(\beta)$ is
+\emph{not} defined as a limit. It is defined by an explicit
+closed-form expression. For rational $\beta > 0$, $\finf(\beta)$
+is a constructively well-defined real number. No omniscience
+principle is needed to define it. The classical route defines
+$\finf = \lim_{N \to \infty} \fN$, proves the limit exists by
+monotone convergence ($\LPO$), and then computes the limit. We skip
+the middle step entirely: we \emph{define} $\finf$ by closed form,
+and then \emph{prove} that $\fN$ converges to it with explicit bounds.
+\end{remark}
+
+\subsection{The Free Energy Function $\gfun(J)$}
+
+The following function plays a central role in Part~B.
+
+\begin{definition}[Free energy at coupling $J$]\label{def:gJ} \leanok{}
+For $\beta > 0$ and $J > 0$, define
+\[
+  \gfun(J) := -\log(2\cosh(\beta J)).
+\]
+This is the infinite-volume free energy density of the 1D Ising
+chain with uniform coupling~$J$.
+\end{definition}
+
+\begin{lemma}[Strict anti-monotonicity of $\gfun$]\label{lem:ganti} \leanok{}
+For $\beta > 0$, the function $\gfun$ is strictly decreasing on
+$(0, \infty)$: if $0 < J_0 < J_1$, then $\gfun(J_0) > \gfun(J_1)$.
+\end{lemma}
+
+\begin{proof}
+The chain of implications is: $J_1 > J_0 > 0$ implies
+$\beta J_1 > \beta J_0 > 0$ (multiply by $\beta > 0$), implies
+$\cosh(\beta J_1) > \cosh(\beta J_0)$ (since $\cosh$ is strictly
+increasing on $(0, \infty)$), implies
+$\log(2\cosh(\beta J_1)) > \log(2\cosh(\beta J_0))$ (since $\log$
+is strictly increasing on $(0, \infty)$), implies
+$\gfun(J_1) < \gfun(J_0)$ (negate both sides).
+\end{proof}
+
+\begin{lemma}[Gap lemma]\label{lem:gap} \leanok{}
+Fix $\beta > 0$ and $0 < J_0 < J_1$. Then
+\[
+  \delta := \gfun(J_0) - \gfun(J_1) =
+  \log\frac{\cosh(\beta J_1)}{\cosh(\beta J_0)} > 0.
+\]
+\end{lemma}
+
+\begin{proof}
+Immediate from \Cref{lem:ganti}: $J_1 > J_0$ implies
+$\gfun(J_1) < \gfun(J_0)$, so $\gfun(J_0) - \gfun(J_1) > 0$.
+\end{proof}
+
+\begin{remark}[Constructive positivity of $\delta$]\label{rem:gap-constr}
+For rational $\beta$, $J_0$, $J_1$, the gap $\delta$ is a
+constructively computable positive real. The positivity is witnessed
+by an explicit lower bound computable from $\beta$, $J_0$, $J_1$
+via the power series of $\cosh$. This is essential: the decision
+procedure in Part~B (\Cref{sec:partB}) uses $\delta > 0$ as a
+constructive fact.
+\end{remark}
+
+
+% ====================================================================
+\section{Part A: BISH Dispensability}\label{sec:partA}
+% ====================================================================
+
+We now prove that the finite-size error bound for the 1D Ising model
+is provable in $\BISH$ without any omniscience principle.
+
+\subsection{Free Energy Decomposition}
+
+\begin{lemma}[Decomposition]\label{lem:decomp} \leanok{}
+For all $N \geq 1$ and $\beta > 0$, with $r = \tanh(\beta)$:
+\[
+  \fN(\beta) = -\log(\eigenP) - \frac{1}{N}\log(1 + r^N).
+\]
+\end{lemma}
+
+\begin{proof}
+We compute:
+\begin{align*}
+  \fN(\beta) &= -\frac{1}{N}\log(\eigenP^N + \eigenM^N) \\
+  &= -\frac{1}{N}\log\bigl(\eigenP^N(1 + (\eigenM/\eigenP)^N)\bigr) \\
+  &= -\frac{1}{N}\bigl(N\log(\eigenP) + \log(1 + r^N)\bigr) \\
+  &= -\log(\eigenP) - \frac{1}{N}\log(1 + r^N). \qedhere
+\end{align*}
+\end{proof}
+
+\subsection{The Error Bound}
+
+\begin{theorem}[Finite-size bound]\label{thm:error} \leanok{}
+For all $N \geq 1$ and $\beta > 0$, with $r = \tanh(\beta) \in (0,1)$:
+\[
+  |\fN(\beta) - \finf(\beta)| = \frac{1}{N}\log(1 + r^N).
+\]
+Moreover,
+\[
+  0 < \frac{1}{N}\log(1 + r^N) \leq \frac{1}{N} r^N.
+\]
+\end{theorem}
+
+\begin{proof}
+The proof proceeds in four steps.
+
+\medskip\noindent\textbf{Step 1: Exact error.}
+From \Cref{lem:decomp},
+\[
+  \fN(\beta) - \finf(\beta) =
+  \bigl[-\log(\eigenP) - \tfrac{1}{N}\log(1 + r^N)\bigr]
+  - \bigl[-\log(\eigenP)\bigr]
+  = -\frac{1}{N}\log(1 + r^N).
+\]
+Since $0 < r < 1$, we have $0 < r^N < 1$, so $1 < 1 + r^N < 2$,
+hence $\log(1 + r^N) > 0$. Therefore $\fN(\beta) - \finf(\beta) < 0$
+and $|\fN(\beta) - \finf(\beta)| = \frac{1}{N}\log(1 + r^N) > 0$.
+
+\medskip\noindent\textbf{Step 2: Upper bound via $\log(1+x) \leq x$.}
+The elementary inequality $\log(1 + x) \leq x$ for $x > 0$
+(see \Cref{sec:appendix}, inequality~A1) applied with $x = r^N$ gives
+$\log(1 + r^N) \leq r^N$, so
+\[
+  |\fN(\beta) - \finf(\beta)| \leq \frac{1}{N} r^N.
+\]
+
+\medskip\noindent\textbf{Step 3: Geometric decay.}
+Since $r = \tanh(\beta) < 1$ for $\beta > 0$, the bound
+$\frac{1}{N} r^N$ decays geometrically (in fact, super-exponentially
+in $N$ since the prefactor $1/N$ also decreases). Setting
+$c(\beta) = -\log(\tanh\beta) > 0$, we have
+$r^N = \exp(-c(\beta) N)$.
+
+\medskip\noindent\textbf{Step 4: Combined bound.}
+\[
+  |\fN(\beta) - \finf(\beta)| \leq \frac{1}{N} \exp(-c(\beta) N)
+\]
+where $c(\beta) = -\log(\tanh\beta) > 0$. For the weaker but
+cleaner bound: since $1 - \tanh(\beta) = 2/(e^{2\beta}+1)$
+and $-\log(1-\delta) \geq \delta$ for $0 < \delta < 1$
+(inequality~A2), we get
+$c(\beta) \geq 2/(e^{2\beta}+1)$, giving
+$|\fN(\beta) - \finf(\beta)| \leq
+\frac{1}{N} \exp\bigl(-2N/(e^{2\beta}+1)\bigr)$.
+\end{proof}
+
+\subsection{Constructive $N_0$ Witness}
+
+\begin{corollary}[Constructive $N_0$]\label{cor:N0} \leanok{}
+For every $\beta > 0$ and $\varepsilon > 0$, there exists a
+constructively computable $N_0 \in \NN$ such that for all
+$N \geq N_0$:
+\[
+  |\fN(\beta) - \finf(\beta)| < \varepsilon.
+\]
+\end{corollary}
+
+\begin{proof}
+We need $\frac{1}{N} r^N < \varepsilon$, i.e., $r^N < N\varepsilon$.
+Since $r = \tanh(\beta) < 1$, the sequence $r^N$ decreases
+geometrically to~$0$ while $N\varepsilon$ grows linearly, so the
+inequality is eventually satisfied. The witness $N_0$ can be found
+by bounded search: for each candidate $N = 1, 2, 3, \ldots$,
+compute the upper bound $\frac{1}{N}\tanh(\beta)^N$ and check
+whether it is less than $\varepsilon$. Since $\tanh(\beta)^N$
+decreases exponentially to~$0$, there exists a first $N_0$ where
+this holds, and it can be found by finite search (which terminates
+because the Archimedean property of $\RR$ provides an a priori
+upper bound via \texttt{exists\_pow\_lt\_of\_lt\_one} in \Mathlib{}).
+\end{proof}
+
+\begin{remark}[No omniscience in the search]\label{rem:N0-constr}
+The search for $N_0$ is a bounded search over a decidable predicate
+on $\NN$. It requires no omniscience principle: we are searching for
+a \emph{witness} to an inequality involving constructively computable
+reals, and the search terminates because we have an explicit a~priori
+upper bound on $N_0$.
+\end{remark}
+
+\subsection{The Dispensability Theorem}
+
+\begin{theorem}[Dispensability]\label{thm:disp} \leanok{}
+For the 1D Ising model with periodic boundary conditions, the
+following is provable in $\BISH$ (no omniscience principle required):
+for every $\beta > 0$ and $\varepsilon > 0$, there exists
+$N_0 \in \NN$ (constructively computable from $\beta$ and
+$\varepsilon$) such that for all $N \geq N_0$,
+\[
+  |\fN(\beta) - \finf(\beta)| < \varepsilon,
+\]
+where $\fN(\beta) = -\frac{1}{N}\log(\eigenP^N + \eigenM^N)$ and
+$\finf(\beta) = -\log(2\cosh\beta)$.
+\end{theorem}
+
+\begin{proof}
+This is the content of \Cref{thm:error} and \Cref{cor:N0}. Every
+step uses only arithmetic of real numbers ($\BISH$), properties of
+$\exp$ and $\log$ (constructive), the inequality $\log(1+x) \leq x$
+for $x > 0$ (constructive; \Cref{sec:appendix}), and bounded search
+on $\NN$ (no omniscience needed). No use is made of the monotone
+convergence theorem ($\LPO$), the Bolzano--Weierstra\ss{} theorem
+($\LPO$), or any omniscience principle ($\WLPO$, $\LPO$, $\LLPO$).
+\end{proof}
+
+\begin{remark}[Classical vs.\ constructive routes]\label{rem:routes}
+The classical proof that $\fN(\beta) \to \finf(\beta)$ uses the
+following route: (1)~show $\{\fN\}$ is bounded and monotone (using
+subadditivity); (2)~apply the monotone convergence theorem (costs
+$\LPO$); (3)~identify the limit as $-\log(2\cosh\beta)$ by separate
+calculation. Our proof replaces steps~(1)--(2) with a direct
+computation: define $\finf(\beta)$ by closed form, compute
+$|\fN - \finf|$ explicitly, and bound the error using elementary
+inequalities. The empirical content---``for large enough $N$, $\fN$
+approximates $\finf$ within $\varepsilon$''---is the same, but the
+logical cost is $\BISH$ instead of $\LPO$.
+\end{remark}
+
+
+% ====================================================================
+\section{Part B: LPO Calibration}\label{sec:partB}
+% ====================================================================
+
+We now prove that the existence of the thermodynamic limit as a
+completed real number is equivalent to $\LPO$ over $\BISH$.
+
+\subsection{Forward Direction: LPO $\Rightarrow$ BMC}
+
+\begin{theorem}[LPO implies BMC]\label{thm:forward} \leanpartial{}
+$\LPO$ implies $\BMC$.
+\end{theorem}
+
+\begin{proof}
+This is \cite[Theorem~2.1.5]{BV06}. We axiomatize it as
+\texttt{bmc\_of\_lpo} and cite the original proof.
+The argument proceeds by binary search on the value axis: given a
+bounded monotone sequence $(a_n)$ and using $\LPO$ at each step to
+decide whether the sequence eventually exceeds a given rational
+threshold, one constructs the supremum as a constructive real.
+\end{proof}
+
+\begin{remark}[Axiomatization]\label{rem:axiom}
+The forward direction is axiomatized following the same pattern as
+\texttt{ell1\_not\_reflexive} in \cite{Lee26b}. The novel content
+of this paper is the backward direction and the physical
+instantiation. A complete formalization of the forward direction is
+an elimination target for future work.
+\end{remark}
+
+\subsection{The Encoding}
+
+The backward direction encodes an arbitrary binary sequence into a
+free energy sequence of the 1D Ising model.
+
+\begin{definition}[Running maximum]\label{def:runmax} \leanok{}
+Given $\alpha : \NN \to \{0,1\}$, define the running maximum
+$m : \NN \to \{0,1\}$ by
+\[
+  m(0) := \alpha(0), \qquad
+  m(n+1) := \max\bigl(m(n),\, \alpha(n+1)\bigr).
+\]
+Equivalently, $m(n) = \max(\alpha(0), \alpha(1), \ldots, \alpha(n))$.
+\end{definition}
+
+The running maximum has the following properties, all $\BISH$-provable:
+$m$ is non-decreasing (in the $\{0,1\}$ order), $m(n) = 0$ if and
+only if $\alpha(k) = 0$ for all $k \leq n$, and $m(n) = 1$ if and
+only if there exists $k \leq n$ with $\alpha(k) = 1$.
+
+\begin{definition}[Coupling sequence]\label{def:coupling} \leanok{}
+Fix $0 < J_0 < J_1$. Define $J : \NN \to \RR$ by
+\[
+  J(n) := \begin{cases} J_0 & \text{if } m(n) = 0, \\
+  J_1 & \text{if } m(n) = 1. \end{cases}
+\]
+\end{definition}
+
+The coupling sequence takes values in $\{J_0, J_1\}$, is
+non-decreasing (since $m$ is non-decreasing and $J_0 < J_1$), and
+is bounded: $J_0 \leq J(n) \leq J_1$.
+
+\begin{definition}[Encoded sequence]\label{def:encoded} \leanok{}
+Define $F : \NN \to \RR$ by
+\[
+  F(n) := \gfun(J(n)) = -\log\bigl(2\cosh(\beta \cdot J(n))\bigr).
+\]
+\end{definition}
+
+Since $\gfun$ is strictly decreasing (\Cref{lem:ganti}) and $J$ is
+non-decreasing, $F$ is non-increasing. Equivalently, $-F$ is
+non-decreasing and bounded above by $-\gfun(J_1)$, so $\BMC$ applies
+to $-F$.
+
+\subsection{The Two Regimes}
+
+There are exactly two cases for the eventual behavior of the encoded
+sequence.
+
+If $\alpha \equiv 0$, then $m \equiv 0$, $J \equiv J_0$, and
+$F \equiv \gfun(J_0)$. The sequence is constant; its limit is
+$\gfun(J_0)$.
+
+If there exists $n_0$ with $\alpha(n_0) = 1$, then for all
+$n \geq n_0$: $m(n) = 1$, $J(n) = J_1$, $F(n) = \gfun(J_1)$.
+The sequence is eventually constant at $\gfun(J_1)$; its limit is
+$\gfun(J_1)$.
+
+In both cases, the limit exists trivially (eventually constant
+sequences converge in $\BISH$). But \emph{which} limit obtains
+depends on $\alpha$, and $\BISH$ cannot decide this without $\LPO$.
+The gap $\delta = \gfun(J_0) - \gfun(J_1) > 0$ separates the two
+possible limit values.
+
+\subsection{The Decision Procedure}
+
+\begin{theorem}[BMC implies LPO]\label{thm:backward} \leanok{}
+$\BMC$ implies $\LPO$.
+\end{theorem}
+
+\begin{proof}
+Let $\alpha : \NN \to \{0,1\}$ be given. Fix $\beta = 1$,
+$J_0 = 1$, $J_1 = 2$ (any positive values with $J_0 < J_1$ suffice).
+Construct the encoded sequence $F$ and its negation $-F$ as above.
+
+\medskip\noindent\textbf{Step 1: Apply BMC.}
+The sequence $-F$ is non-decreasing and bounded above by
+$-\gfun(J_1)$. By $\BMC$, there exists $L_{\mathrm{neg}} \in \RR$
+with a convergence modulus: for every $\varepsilon > 0$, there
+exists $N_0$ such that $|(-F)(N) - L_{\mathrm{neg}}| < \varepsilon$
+for all $N \geq N_0$.
+
+\medskip\noindent\textbf{Step 2: Compute the gap.}
+Set $\delta = \gfun(J_0) - \gfun(J_1) > 0$ (\Cref{lem:gap}).
+
+\medskip\noindent\textbf{Step 3: Get $N_1$ from the modulus.}
+Apply the convergence modulus with $\varepsilon = \delta/2$ to
+obtain $N_1$ such that $|(-F)(N_1) - L_{\mathrm{neg}}| < \delta/2$.
+
+\medskip\noindent\textbf{Step 4: Case split on $m(N_1)$.}
+The value $m(N_1) = \texttt{runMax}\;\alpha\;N_1$ is a Bool, so the
+case split is definitionally decidable---no real-number comparison
+is needed.
+
+\medskip\noindent\textbf{Case $m(N_1) = \mathtt{false}$:}
+We prove $\forall n, \alpha(n) = 0$ by contradiction. Suppose there
+exists $n_0$ with $\alpha(n_0) = 1$. Then the limit of $-F$ is
+$-\gfun(J_1)$, since $F$ is eventually constant at $\gfun(J_1)$
+(see \Cref{def:encoded}). But $F(N_1) = \gfun(J_0)$ (since
+$m(N_1) = \mathtt{false}$ implies $J(N_1) = J_0$), so
+\[
+  |(-F)(N_1) - L_{\mathrm{neg}}| =
+  |-\gfun(J_0) - (-\gfun(J_1))| =
+  |\gfun(J_1) - \gfun(J_0)| = \delta.
+\]
+But the modulus gives $|(-F)(N_1) - L_{\mathrm{neg}}| < \delta/2$,
+a contradiction. Therefore $\lnot(\exists n_0, \alpha(n_0) = 1)$.
+Since $\alpha(n) \in \{0, 1\}$ is decidable for each~$n$, this
+gives $\forall n, \alpha(n) = 0$.
+
+\medskip\noindent\textbf{Case $m(N_1) = \mathtt{true}$:}
+By the characterization of the running maximum, $m(N_1) = 1$ implies
+there exists $k \leq N_1$ with $\alpha(k) = 1$. A bounded search
+over $\{0, 1, \ldots, N_1\}$ finds the witness.
+\end{proof}
+
+\begin{remark}[Decidability of the case split]\label{rem:decidable}
+The case split on $m(N_1)$ is the key constructive insight: it is a
+Bool case split, not a real-number comparison. We do not need to
+compare $F(N_1)$ with $\gfun(J_0)$ as real numbers. We compute
+$m(N_1)$ from $\alpha(0), \ldots, \alpha(N_1)$ by finite recursion
+and branch on the result. If $m(N_1) = \mathtt{true}$, we already
+have our witness (bounded search on $\{0, \ldots, N_1\}$). If
+$m(N_1) = \mathtt{false}$, we derive a contradiction from the
+convergence bound.
+\end{remark}
+
+\begin{remark}[Constructive validity of $\lnot\exists \to \forall\lnot$]\label{rem:neg-exists}
+The step from $\lnot(\exists n, \alpha(n) = 1)$ to
+$\forall n, \alpha(n) = 0$ is constructively valid because
+$\alpha(n) \in \{0, 1\}$---the predicate is decidable. We are
+\emph{not} using the classical equivalence
+$\lnot\exists x.\, P(x) \leftrightarrow \forall x.\, \lnot P(x)$
+for arbitrary predicates (which requires excluded middle). For
+decidable predicates on~$\NN$, the equivalence is $\BISH$-valid.
+\end{remark}
+
+\subsection{The Equivalence Theorem}
+
+\begin{theorem}[LPO $\leftrightarrow$ BMC]\label{thm:equiv} \leanok{}/\leanpartial{}
+Over $\BISH$, $\LPO \leftrightarrow \BMC$.
+\end{theorem}
+
+\begin{proof}
+Forward: \Cref{thm:forward} (\cite{BV06}; axiomatized as
+\texttt{bmc\_of\_lpo}).
+Backward: \Cref{thm:backward} (fully proved in
+\texttt{PartB\_Backward.lean}).
+\end{proof}
+
+
+% ====================================================================
+\section{Discussion}\label{sec:discussion}
+% ====================================================================
+
+\subsection{The Dispensability--Calibration Conjunction}
+
+Neither Part~A nor Part~B says much in isolation. Part~A alone is a
+calculation: the 1D Ising model has a closed-form solution, so of
+course finite-size bounds are elementary. Part~B alone is an
+instantiation of a known equivalence: $\BMC \leftrightarrow \LPO$
+is Bridges--V\^{\i}\c{t}\u{a}, and dressing it in Ising clothing
+does not change the abstract content. The force of the paper lies
+in the conjunction.
+
+Part~B establishes that the monotone-convergence route to the
+thermodynamic limit genuinely costs $\LPO$---the cost is not an
+artefact of a particular proof strategy but an intrinsic feature of
+the limit assertion. Part~A then shows that this cost is
+dispensable for empirical predictions: the finite-system prediction
+$\fN(\beta)$ approximates $\finf(\beta)$ within $\varepsilon$
+for constructively computable $N_0$, and the proof uses nothing
+beyond $\BISH$. The pattern is: the idealization costs omniscience;
+the empirical content does not.
+
+This pattern is precisely what the logical geography hypothesis
+predicts. The 1D Ising model is the first complete test
+case---the simplest model where the dispensability question is
+nontrivial and verifiable.
+
+\subsection{The Constructive Reverse Mathematics Programme}
+
+This paper is part of a programme that assigns to each physical
+idealization a precise position in the constructive hierarchy.
+The programme methodology is as follows: for a given physical
+theory, identify the key mathematical idealizations (infinite
+limits, existence of witnesses, decidability assertions), determine
+the exact logical cost of each idealization over $\BISH$ (by
+proving equivalence with a known omniscience principle or showing
+$\BISH$-validity), and then ask whether the empirical content of
+the theory can be recovered at a lower logical cost.
+
+The programme has so far established the following calibrations.
+Papers~2 and~7 \cite{Lee26a,Lee26b} showed that the bidual gap---the
+existence of a constructive witness to Banach space
+non-reflexivity---is equivalent to $\WLPO$ for both $\ell^1$ and
+the trace-class operators $S_1(H)$. In the algebraic formulation
+of quantum mechanics, $S_1(H)$ is the natural state space, and
+non-reflexivity means the bidual $S_1(H)^{**}$ contains ``singular
+states'' not representable by any density matrix. The $\WLPO$
+equivalence calibrates the logical cost of witnessing these singular
+states.
+
+The present paper calibrates two further layers. Part~A shows that
+finite-size approximations to the thermodynamic limit are
+$\BISH$-valid, requiring no omniscience. Part~B shows that the full
+thermodynamic limit (as a completed real number) costs exactly
+$\LPO$, which is strictly stronger than $\WLPO$.
+
+The resulting calibration landscape is:
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Physical layer} & \textbf{Principle} & \textbf{Status} & \textbf{Source} \\
+\midrule
+Finite-volume Gibbs states & $\BISH$ & Calibrated & Trivial \\
+Finite-size approximations & $\BISH$ & Calibrated & Part~A \\
+Bidual-gap witness ($S_1(H)$) & $\equiv \WLPO$ & Calibrated & Papers~2, 7 \\
+Thermodynamic limit existence & $\equiv \LPO$ & Calibrated & Part~B \\
+Spectral gap decidability & Undecidable & Established & Cubitt et al.\ \cite{CPW15} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The hierarchy $\BISH \subsetneq \WLPO \subsetneq \LPO \subsetneq
+\mathrm{LEM}$ is strictly ordered over $\BISH$, and the physical
+layers sit at distinct rungs. Each formalization carries a machine-checked
+axiom audit confirming the claimed logical cost.
+
+An important feature of the programme is that the dispensability
+pattern---idealizations cost omniscience, but empirical content does
+not---may be generic. The 1D Ising model is the simplest test case
+where this can be verified, but the methodology applies to any
+physical theory with an explicit finite-size/infinite-volume
+dichotomy. Whether the pattern persists for higher-dimensional models,
+models with phase transitions, or quantum field theories remains
+an open question.
+
+\subsection{Relation to the Phase-Transition Debate}
+
+The philosophical literature on the ``paradox of phase
+transitions''---the apparent indispensability of infinite
+idealizations for explaining phase transitions in finite
+systems---has been active for two decades. Batterman \cite{Bat02,Bat05}
+argued that infinite limits play an essential and irreducible
+explanatory role. Butterfield \cite{But11} and Callender \cite{Cal01}
+pushed back, arguing that finite-system approximations suffice for
+physical predictions even if the mathematical apparatus of the
+thermodynamic limit is explanatorily convenient. Van~Wierst
+\cite{vW19} explored the consequences of adopting constructive
+mathematics for the phase transition framework, arguing that
+constructive mathematics forces ``de-idealizations'' of standard
+statistical-mechanical theories.
+
+Our results make this debate precise in one model. The
+thermodynamic limit is not merely ``convenient''---it has a precise
+logical cost ($\LPO$), and this cost is not an artefact of the proof
+but an equivalence. At the same time, the limit is genuinely
+dispensable for predictions: the finite-size error bound is
+$\BISH$-provable. The 1D Ising model, admittedly, does not exhibit
+phase transitions, so our dispensability result does not directly
+address the paradox as stated (which concerns the necessity of
+infinite limits for \emph{explaining} phase transitions). But it does
+establish the methodology: for each physical layer, determine the
+exact logical cost and then ask whether the empirical content can
+be recovered at a lower cost.
+
+\subsection{The Encoding Objection}
+
+A natural objection to Part~B is that the encoding of binary
+sequences into coupling sequences---and the subsequent application
+of the free energy function $\gfun(J)$---is merely bounded monotone
+convergence in disguise. The encoded sequence
+$F(N) \in \{\gfun(J_0), \gfun(J_1)\}$ is a $\{0,1\}$-valued
+monotone sequence composed with a strictly decreasing function, and
+the decision procedure is just the abstract $\BMC \to \LPO$ proof
+applied to this specific case.
+
+This objection is mathematically correct and interpretively
+irrelevant. The abstract equivalence $\BMC \leftrightarrow \LPO$ is
+known from \cite{BV06}. The contribution of Part~B is not a new
+theorem in constructive reverse mathematics but a verified
+observation that $\BMC$, when instantiated through the 1D Ising free
+energy, \emph{is} the assertion that the thermodynamic limit exists.
+The formalization makes explicit what the mathematical prose leaves
+implicit: the encoding is $\BISH$-valid, the gap
+$\delta = \gfun(J_0) - \gfun(J_1) > 0$ is constructively positive,
+and the witness extraction works without hidden omniscience. The
+\Lean{} axiom audit confirms this.
+
+This is the same methodological move as \cite{Lee26a}, where the
+abstract equivalence between $\WLPO$ and $\lnot\lnot$-stable
+decidability was known from Ishihara and Diener, and the
+contribution was the specific Banach-space instantiation and the
+machine verification.
+
+\subsection{Limitations and Future Directions}
+
+The 1D Ising model is the simplest nontrivial lattice model, and
+our results exploit its complete solvability. The key open
+questions are as follows.
+
+First, regarding \emph{higher dimensions}: the 2D Ising model
+(Onsager solution \cite{Ons44}) has a phase transition. Does the
+finite-size error bound remain $\BISH$-provable? The Onsager
+solution involves elliptic integrals, whose constructive status
+requires investigation.
+
+Second, regarding \emph{general Hamiltonians}: for
+translation-invariant, finite-range Hamiltonians on $\ZZ^d$, the
+thermodynamic limit exists classically by subadditivity \cite{Rue99}.
+Is the existence always $\LPO$-equivalent, or does it depend on the
+Hamiltonian?
+
+Third, regarding \emph{ineliminability}: an ineliminability
+result---showing that \emph{any} constructive proof of free energy
+convergence for a specific model must use $\BMC$---would be a
+genuinely new contribution to constructive reverse mathematics.
+This is an open problem beyond the scope of the present paper.
+
+
+% ====================================================================
+\section{Lean 4 Formalization}\label{sec:lean}
+% ====================================================================
+
+\subsection{Module Structure}
+
+The formalization is organized as a single \Lean{} project with two
+parts sharing common infrastructure.
+
+\paragraph{Part A: BISH dispensability (730 lines, 10 modules).}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{File} & \textbf{Lines} & \textbf{Purpose} \\
+\midrule
+\texttt{Basic.lean}             & 67  & Core definitions: LPO, eigenvalues, partition function, free energy \\
+\texttt{EigenvalueProps.lean}   & 119 & $\eigenP > \eigenM > 0$, $\tanh$ properties, partition positivity \\
+\texttt{LogBounds.lean}         & 70  & Elementary inequalities: $\log(1+x) \leq x$, geometric decay \\
+\texttt{TransferMatrix.lean}    & 117 & $2 \times 2$ transfer matrix $T$, projector decomposition \\
+\texttt{PartitionTrace.lean}    & 64  & Bonus: $\operatorname{Tr}(T^N) = \eigenP^N + \eigenM^N$ \\
+\texttt{FreeEnergyDecomp.lean}  & 87  & $\fN = -\log\eigenP - \frac{1}{N}\log(1 + r^N)$ \\
+\texttt{ErrorBound.lean}        & 72  & $|\fN - \finf| \leq \frac{1}{N} r^N$ \\
+\texttt{ComputeN0.lean}         & 54  & Constructive $N_0$ from $\beta$ and $\varepsilon$ \\
+\texttt{Main.lean}              & 72  & Assembly of dispensability theorem + axiom audit \\
+\texttt{SmokeTest.lean}         & 7   & Minimal import validation \\
+\bottomrule
+\end{tabular}
+\caption{Part A file manifest.}
+\label{tab:partA}
+\end{table}
+
+\paragraph{Part B: LPO calibration (644 lines, 8 modules).}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{File} & \textbf{Lines} & \textbf{Purpose} \\
+\midrule
+\texttt{PartB\_Defs.lean}            & 76  & Definitions: BMC, runMax, couplingSeq, encodedSeq \\
+\texttt{PartB\_RunMax.lean}          & 103 & Running maximum: monotonicity, characterization lemmas \\
+\texttt{PartB\_FreeEnergyAnti.lean}  & 73  & $\gfun(J)$ strictly anti-monotone for $\beta > 0$ \\
+\texttt{PartB\_CouplingSeq.lean}     & 76  & Coupling: monotonicity, bounds, eventual constancy \\
+\texttt{PartB\_EncodedSeq.lean}      & 83  & Encoded sequence: $-F$ non-decreasing, bounded \\
+\texttt{PartB\_Forward.lean}         & 21  & Axiom: LPO $\to$ BMC \cite{BV06} \\
+\texttt{PartB\_Backward.lean}        & 154 & Main theorem: BMC $\to$ LPO via free energy encoding \\
+\texttt{PartB\_Main.lean}            & 58  & Assembly: LPO $\leftrightarrow$ BMC + axiom audit \\
+\bottomrule
+\end{tabular}
+\caption{Part B file manifest.}
+\label{tab:partB}
+\end{table}
+
+Combined total: 18 files, 1374 lines.
+
+\subsection{Core Definitions}
+
+The definitions in \texttt{Basic.lean} encode LPO, the transfer
+matrix eigenvalues, and the free energy:
+
+\begin{lstlisting}[caption={Core definitions (Basic.lean).}]
+/-- Limited Principle of Omniscience. -/
+def LPO : Prop :=
+  forall (a : Nat -> Bool),
+    (forall n, a n = false) ||| (exists n, a n = true)
+
+noncomputable def transferEigenPlus (b : Real) : Real :=
+  2 * Real.cosh b
+noncomputable def transferEigenMinus (b : Real) : Real :=
+  2 * Real.sinh b
+
+noncomputable def partitionFn (b : Real) (N : Nat) : Real :=
+  (transferEigenPlus b) ^ N + (transferEigenMinus b) ^ N
+
+noncomputable def freeEnergyDensity (b : Real) (N : Nat)
+    (_hN : 0 < N) : Real :=
+  -(1 / (N : Real)) * Real.log (partitionFn b N)
+
+noncomputable def freeEnergyInfVol (b : Real) : Real :=
+  -Real.log (transferEigenPlus b)
+\end{lstlisting}
+
+The Part~B definitions in \texttt{PartB\_Defs.lean} encode BMC, the
+running maximum, coupling sequence, and encoded sequence:
+
+\begin{lstlisting}[caption={Part B definitions (PartB\_Defs.lean).}]
+def BMC : Prop :=
+  forall (a : Nat -> Real) (M : Real),
+    Monotone a -> (forall n, a n <= M) ->
+    exists L : Real, forall e : Real, 0 < e ->
+      exists N0 : Nat, forall N : Nat, N0 <= N ->
+        |a N - L| < e
+
+def runMax (a : Nat -> Bool) : Nat -> Bool
+  | 0 => a 0
+  | n + 1 => a (n + 1) || runMax a n
+
+noncomputable def couplingSeq (a : Nat -> Bool)
+    (J0 J1 : Real) (n : Nat) : Real :=
+  if runMax a n then J1 else J0
+
+noncomputable def freeEnergyAtCoupling (b J : Real) : Real :=
+  -Real.log (2 * Real.cosh (b * J))
+
+noncomputable def encodedSeq (a : Nat -> Bool)
+    (b J0 J1 : Real) (n : Nat) : Real :=
+  freeEnergyAtCoupling b (couplingSeq a J0 J1 n)
+\end{lstlisting}
+
+\subsection{Main Theorem: Dispensability}
+
+\begin{lstlisting}[caption={Dispensability theorem (Main.lean).}]
+theorem ising_1d_dispensability
+    (b : Real) (hb : 0 < b) (e : Real) (he : 0 < e) :
+    exists N0 : Nat, 0 < N0 && forall N : Nat, N0 <= N ->
+      (hN : 0 < N) ->
+        |freeEnergyDensity b N hN - freeEnergyInfVol b| < e
+\end{lstlisting}
+
+\subsection{Main Theorem: BMC $\to$ LPO}
+
+The full proof of the backward direction
+(\texttt{PartB\_Backward.lean}) is the main novel content of the
+formalization. We reproduce it here in full:
+
+\begin{lstlisting}[caption={BMC implies LPO (PartB\_Backward.lean, complete proof).}]
+theorem lpo_of_bmc (hBMC : BMC) : LPO := by
+  intro a
+  set b : Real := 1
+  set J0 : Real := 1
+  set J1 : Real := 2
+  have hb : (0 : Real) < b := one_pos
+  have hJ0 : (0 : Real) < J0 := one_pos
+  have hJ_lt : J0 < J1 := by norm_num
+  have hJ_le : J0 <= J1 := le_of_lt hJ_lt
+  set F := encodedSeq a b J0 J1 with hF_def
+  have hMono : Monotone (fun n => -F n) :=
+    neg_encodedSeq_mono a hb hJ0 hJ_le
+  have hBdd : forall n, (fun n => -F n) n
+      <= -freeEnergyAtCoupling b J1 :=
+    neg_encodedSeq_bounded a hb hJ0 hJ_le
+  obtain <<L_neg, hL>> := hBMC (fun n => -F n)
+    (-freeEnergyAtCoupling b J1) hMono hBdd
+  set d := freeEnergyAtCoupling b J0
+    - freeEnergyAtCoupling b J1 with hd_def
+  have hd : 0 < d := freeEnergy_gap_pos hb hJ0 hJ_lt
+  obtain <<N1, hN1>> := hL (d / 2) (half_pos hd)
+  have hN1_self := hN1 N1 (le_refl _)
+  cases hm : runMax a N1
+  . -- Case: runMax a N1 = false
+    left
+    apply bool_not_exists_implies_all_false
+    intro <<n0, hn0>>
+    have hL_val := neg_limit_of_exists_true a hL hn0
+    have hFN1 : F N1 = freeEnergyAtCoupling b J0 := by
+      simp only [hF_def, encodedSeq, couplingSeq, hm,
+        Bool.false_eq_true, ite_false]
+    have habs : |(-F N1) - L_neg| = d := by
+      rw [hFN1, hL_val]
+      simp only [neg_sub_neg]
+      rw [abs_sub_comm]
+      exact abs_of_pos hd
+    have : |(-F N1) - L_neg| < d / 2 := hN1_self
+    linarith
+  . -- Case: runMax a N1 = true
+    right
+    obtain <<k, _, hk>> := runMax_witness a
+      (show runMax a N1 = true from hm)
+    exact <<k, hk>>
+\end{lstlisting}
+
+\subsection{Equivalence and Axiom Audit}
+
+\begin{lstlisting}[caption={Equivalence theorem and axiom audit (PartB\_Main.lean).}]
+theorem lpo_iff_bmc : LPO <-> BMC :=
+  <<bmc_of_lpo, lpo_of_bmc>>
+
+-- Part A main theorem:
+#print axioms ising_1d_dispensability
+-- [propext, Classical.choice, Quot.sound]
+
+-- Part B backward direction:
+#print axioms lpo_of_bmc
+-- [propext, Classical.choice, Quot.sound]
+
+-- Part B equivalence:
+#print axioms lpo_iff_bmc
+-- [propext, Classical.choice, Quot.sound,
+--  Papers.P8.bmc_of_lpo]
+\end{lstlisting}
+
+The Part~A audit confirms that the $\BISH$ dispensability proof uses
+no omniscience principles. \texttt{Classical.choice} is the ambient
+\Lean{} metatheory, not an object-level axiom. The Part~B audit
+shows that the novel content (backward direction) is fully proved,
+while the forward direction is axiomatized with citation.
+
+\subsection{Design Decisions}
+
+\paragraph{Direct eigenvalue definition of $\ZN$.}
+The partition function $\ZN$ is defined directly as
+$\eigenP^N + \eigenM^N$ (the eigenvalue formula). The classical
+identity $\ZN = \operatorname{Tr}(T^N) = \sum_\sigma
+\exp(-\beta H_N(\sigma))$ is provided as a bonus lemma
+(\texttt{PartitionTrace.lean}) connecting the definition to the
+transfer matrix, but is not used in either Part~A or Part~B. The
+heavier direction (configuration sum $= \operatorname{Tr}(T^N)$) is
+documented in the paper but omitted from the formalization. This
+keeps the axiom profile clean without bridge axioms.
+
+\paragraph{The \texttt{bmc\_of\_lpo} axiom.}
+The forward direction ($\LPO \to \BMC$) is axiomatized, following
+the same pattern as \texttt{ell1\_not\_reflexive} in \cite{Lee26b}.
+The novel content of the paper is the backward direction and the
+physical instantiation. A complete formalization of the forward
+direction is an elimination target for future work.
+
+\subsection{AI-Assisted Methodology}\label{sec:ai}
+
+This formalization was developed using \textbf{Claude Opus~4.6}
+(Anthropic, 2026) via the \textbf{Claude Code} command-line interface,
+following the same human--AI workflow as Papers~2 and~7
+\cite{Lee26a,Lee26b,Anthropic2026}. The human author wrote
+mathematical blueprints specifying all theorem statements, proof
+strategies, and target \Mathlib{} APIs. Claude Opus~4.6 then explored
+the \Mathlib{} codebase to locate exact API signatures and import
+paths, generated the \Lean{} proof terms, and handled debugging of
+tactic proofs against \Mathlib{} v4.28. The human author reviewed all
+proofs for mathematical correctness and \Mathlib{} conventions. Final
+verification was by \texttt{lake build} (0~errors, 0~warnings,
+0~sorries).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Task} & \textbf{Human} & \textbf{AI (Claude Opus 4.6)} \\
+\midrule
+Mathematical blueprint    & \checkmark & \\
+Proof strategy design     & \checkmark & \\
+\Mathlib{} API discovery  & & \checkmark \\
+\Lean{} proof generation  & & \checkmark \\
+Proof review              & \checkmark & \\
+Build verification        & & \checkmark \\
+Paper writing             & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\caption{Division of labor between human and AI.}
+\label{tab:division}
+\end{table}
+
+\subsection{Reproducibility}
+
+\begin{mdframed}[backgroundcolor=gray!10]
+\textbf{Reproducibility Box}
+\begin{itemize}
+\item \textbf{Repository}: \url{https://github.com/quantmann/FoundationRelativity}
+\item \textbf{LaTeX source \& PDF}: \url{https://doi.org/10.5281/zenodo.18516813}
+\item \textbf{Lean toolchain}: \texttt{leanprover/lean4:v4.28.0-rc1}
+\item \textbf{mathlib4 commit}: \texttt{7091f0f601d5aaea565d2304c1a290cc8af03e18}
+\item \textbf{Build}: \texttt{lake exe cache get \&\& lake build}
+\item \textbf{Bundle target}: \texttt{Papers}
+  (imports \texttt{Main} + \texttt{PartB\_Main})
+\item \textbf{Status}: 0~errors, 0~warnings, 0~sorries.
+  18~files, 1374~lines total.
+\item \textbf{Axiom profile}:
+  \texttt{ising\_1d\_dispensability}: \texttt{[propext, Classical.choice, Quot.sound]}.
+  \texttt{lpo\_of\_bmc}: \texttt{[propext, Classical.choice, Quot.sound]}.
+  \texttt{lpo\_iff\_bmc}: \texttt{[propext, Classical.choice, Quot.sound,
+  Papers.P8.bmc\_of\_lpo]}.
+\end{itemize}
+\end{mdframed}
+
+
+% ====================================================================
+\section*{Acknowledgments}
+% ====================================================================
+
+The \Lean{} formalization was developed using Claude Opus~4.6
+(Anthropic, 2026) via the Claude Code CLI tool. We thank the
+\Mathlib{} community for maintaining the comprehensive library
+of formalized mathematics that made this work possible.
+
+
+% ====================================================================
+\appendix
+\section{Elementary Inequalities}\label{sec:appendix}
+% ====================================================================
+
+For reference, the constructive inequalities used in the Part~A proof.
+
+\begin{lemma}[A1]\label{lem:A1}
+For $x > 0$: $\log(1 + x) \leq x$.
+\end{lemma}
+
+\begin{proof}
+Equivalent to $1 + x \leq \exp(x)$, which follows from the Taylor
+series $\exp(x) = 1 + x + x^2/2! + \cdots \geq 1 + x$ for $x > 0$.
+\end{proof}
+
+\begin{lemma}[A2]\label{lem:A2}
+For $0 < \delta < 1$: $-\log(1 - \delta) \geq \delta$.
+\end{lemma}
+
+\begin{proof}
+Equivalent to $1 - \delta \leq \exp(-\delta)$, which is inequality~A1
+applied with $x = -\delta$: $\exp(-\delta) \geq 1 + (-\delta) =
+1 - \delta$.
+\end{proof}
+
+\begin{lemma}[A3]\label{lem:A3}
+For $0 < r < 1$ and $N \geq 1$: $r^N \leq \exp(-N(1-r))$.
+\end{lemma}
+
+\begin{proof}
+Set $\delta = 1 - r > 0$. Then $r = 1 - \delta \leq \exp(-\delta)$
+by A2 (applied as $\exp(\delta) \geq 1 + \delta$, so
+$1 - \delta \leq \exp(-\delta)$). Hence
+$r^N \leq \exp(-\delta)^N = \exp(-N\delta) = \exp(-N(1-r))$.
+\end{proof}
+
+All three inequalities are constructively valid: they follow from the
+constructive Taylor series expansion of $\exp$.
+
+
+% ====================================================================
+% Bibliography
+% ====================================================================
+\bibliographystyle{plainnat}
+
+\begin{thebibliography}{30}
+
+\bibitem[Anthropic(2026)]{Anthropic2026}
+Anthropic.
+\newblock Claude {Opus}~4.6 and {Claude Code} {CLI}.
+\newblock \url{https://www.anthropic.com/claude}, 2026.
+
+\bibitem[Batterman(2002)]{Bat02}
+R.~W.~Batterman.
+\newblock \emph{The Devil in the Details: Asymptotic Reasoning in
+  Explanation, Reduction, and Emergence}.
+\newblock Oxford University Press, New York, 2002.
+
+\bibitem[Batterman(2005)]{Bat05}
+R.~W.~Batterman.
+\newblock Critical phenomena and breaking drops: Infinite idealizations
+  in physics.
+\newblock \emph{Studies in History and Philosophy of Modern Physics},
+  36:225--244, 2005.
+
+\bibitem[Baxter(1982)]{Bax82}
+R.~J.~Baxter.
+\newblock \emph{Exactly Solved Models in Statistical Mechanics}.
+\newblock Academic Press, London, 1982.
+
+\bibitem[Bishop(1967)]{Bis67}
+E.~Bishop.
+\newblock \emph{Foundations of Constructive Analysis}.
+\newblock McGraw-Hill, New York, 1967.
+
+\bibitem[Bishop and Bridges(1985)]{BB85}
+E.~Bishop and D.~Bridges.
+\newblock \emph{Constructive Analysis}.
+\newblock Grundlehren der mathematischen Wissenschaften, vol.~279.
+  Springer, Berlin, 1985.
+
+\bibitem[Bridges and V{\^\i}{\c{t}}{\u{a}}(2006)]{BV06}
+D.~S.~Bridges and L.~S.~V{\^\i}{\c{t}}{\u{a}}.
+\newblock \emph{Techniques of Constructive Analysis}.
+\newblock Universitext. Springer, New York, 2006.
+
+\bibitem[Butterfield(2011)]{But11}
+J.~Butterfield.
+\newblock Less is different: Emergence and reduction reconciled.
+\newblock \emph{Foundations of Physics}, 41(6):1065--1135, 2011.
+
+\bibitem[Callender(2001)]{Cal01}
+C.~Callender.
+\newblock Taking thermodynamics too seriously.
+\newblock \emph{Studies in History and Philosophy of Science Part~B},
+  32(4):539--553, 2001.
+
+\bibitem[Cubitt et~al.(2015)]{CPW15}
+T.~S.~Cubitt, D.~Perez-Garcia, and M.~M.~Wolf.
+\newblock Undecidability of the spectral gap.
+\newblock \emph{Nature}, 528:207--211, 2015.
+
+\bibitem[{de Moura} et~al.(2021)]{deMoura2021}
+L.~{de Moura}, S.~Kong, J.~Avigad, F.~{van Doorn}, and M.~{von Raumer}.
+\newblock The {Lean} theorem prover (system description).
+\newblock In \emph{CADE-25}, LNAI 9195, pages 378--388. Springer, 2015.
+\newblock Lean~4: \url{https://lean-lang.org/}, 2021--present.
+
+\bibitem[Diener(2018)]{Die18}
+H.~Diener.
+\newblock \emph{Constructive Reverse Mathematics}.
+\newblock Habilitationsschrift, Universit\"at Siegen, 2018.
+\newblock arXiv:1804.05495.
+
+\bibitem[Fletcher et~al.(2019)]{FPRRS19}
+S.~C.~Fletcher, P.~Palacios, L.~Ruetsche, and E.~Shech.
+\newblock Infinite idealizations in science: an introduction.
+\newblock \emph{Synthese}, 196(5):1657--1669, 2019.
+
+\bibitem[Ishihara(1990)]{Ish90}
+H.~Ishihara.
+\newblock An omniscience principle, the {K\"onig} lemma and the
+  {Hahn--Banach} theorem.
+\newblock \emph{Zeitschrift f\"ur Mathematische Logik und Grundlagen
+  der Mathematik}, 36:237--240, 1990.
+
+\bibitem[Ishihara(2005)]{Ish05}
+H.~Ishihara.
+\newblock Constructive reverse mathematics: compactness properties.
+\newblock In L.~Crosilla and P.~Schuster, editors,
+  \emph{From Sets and Types to Topology and Analysis},
+  Oxford Logic Guides, vol.~48, pages 245--267.
+  Oxford University Press, 2005.
+
+\bibitem[Ishihara(2006)]{Ish06}
+H.~Ishihara.
+\newblock Reverse mathematics in {Bishop's} constructive mathematics.
+\newblock \emph{Philosophia Scientiae, Cahier Sp\'ecial}, 6:43--59, 2006.
+
+\bibitem[Lee(2026a)]{Lee26a}
+P.~C.-K.~Lee.
+\newblock {WLPO} equivalence of the bidual gap in $\ell^1$: a {Lean}~4
+  formalization.
+\newblock Preprint, 2026. Paper~2 in the constructive reverse
+  mathematics series.
+
+\bibitem[Lee(2026b)]{Lee26b}
+P.~C.-K.~Lee.
+\newblock Non-reflexivity of $S_1(H)$ implies {WLPO}: a {Lean}~4
+  formalization.
+\newblock Preprint, 2026. Paper~7 in the constructive reverse
+  mathematics series.
+
+\bibitem[Lee(2026c)]{Lee26c}
+P.~C.-K.~Lee.
+\newblock A logical geography of physical idealizations.
+\newblock In preparation, 2026.
+
+\bibitem[Mandelkern(1988)]{Man88}
+M.~Mandelkern.
+\newblock Limited omniscience and the {Bolzano--Weierstrass} principle.
+\newblock \emph{Bulletin of the London Mathematical Society},
+  20:319--320, 1988.
+
+\bibitem[{Mathlib Community}(2020--)]{Mathlib2020}
+{Mathlib Community}.
+\newblock \emph{Mathlib}: the math library for {Lean}.
+\newblock \url{https://leanprover-community.github.io/mathlib4_docs/},
+  2020--present.
+
+\bibitem[Menon and Callender(2013)]{MC13}
+T.~Menon and C.~Callender.
+\newblock Turn and face the strange\ldots{} Ch-ch-changes: Philosophical
+  questions raised by phase transitions.
+\newblock In R.~Batterman, editor,
+  \emph{The Oxford Handbook of Philosophy of Physics}, pages 189--223.
+  Oxford University Press, 2013.
+
+\bibitem[Onsager(1944)]{Ons44}
+L.~Onsager.
+\newblock Crystal statistics. {I.} A two-dimensional model with an
+  order-disorder transition.
+\newblock \emph{Physical Review}, 65:117--149, 1944.
+
+\bibitem[Ruelle(1999)]{Rue99}
+D.~Ruelle.
+\newblock \emph{Statistical Mechanics: Rigorous Results}.
+\newblock Imperial College Press, London, 1999.
+\newblock Reprint of the 1969 edition.
+
+\bibitem[Shech(2013)]{She13}
+E.~Shech.
+\newblock What is the paradox of phase transitions?
+\newblock \emph{Philosophy of Science}, 80(5):1170--1181, 2013.
+
+\bibitem[Simpson(2009)]{Sim09}
+S.~G.~Simpson.
+\newblock \emph{Subsystems of Second Order Arithmetic}.
+\newblock Cambridge University Press, 2nd edition, 2009.
+
+\bibitem[van Wierst(2019)]{vW19}
+P.~van~Wierst.
+\newblock The paradox of phase transitions in the light of constructive
+  mathematics.
+\newblock \emph{Synthese}, 196(5):1863--1884, 2019.
+
+\bibitem[Veldman(2005)]{Vel05}
+W.~Veldman.
+\newblock Brouwer's real thesis on bars.
+\newblock \emph{Philosophia Scientiae, Cahier Sp\'ecial}, 6:21--42, 2005.
+
+\end{thebibliography}
+
+\end{document}

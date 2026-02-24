@@ -1,0 +1,66 @@
+{
+  "title": "Analytic Rank Stratification of Mixed Motives: Completing the DPT Framework (Paper 60, Constructive Reverse Mathematics Series)",
+  "description": "<p>Paper 60 of the Constructive Reverse Mathematics series. We prove that the DPT framework for numerical equivalence on pure motives is complete: Axioms 1&ndash;3 plus automatic de Rham decidability (Paper 59) suffice. No mixed motive axiom is needed because numerical equivalence projects away from the kernel of the cycle class map.</p>\n<p>We then initiate the extended framework for rational equivalence by proving an analytic rank stratification theorem: the logical complexity of computing Ext<sup>1</sup>(&Qopf;(0), M) is determined by ord<sub>s=s<sub>0</sub></sub> L(M, s). For r = 0, exact verification is BISH (Ext<sup>1</sup> = 0). For r = 1, the L-function isolates a 1-dimensional regulator; Bloch&ndash;Kato bounds the height and Northcott bounds the search, yielding BISH (conditional on Bloch&ndash;Kato). For r &ge; 2, the L-function provides only a lattice covolume; by Minkowski&rsquo;s geometry of numbers, covolume cannot bound individual basis vectors in dimension &ge; 2, requiring Markov&rsquo;s Principle.</p>\n<p>The rank &ge; 2 obstruction is structural and removable only by Lang&rsquo;s Height Lower Bound Conjecture (open). The pure motive programme (Papers 50&ndash;59) and this mixed motive frontier together constitute the complete DPT framework.</p>\n<p>This paper has no Lean formalization &mdash; LaTeX and PDF only.</p>",
+  "upload_type": "publication",
+  "publication_type": "article",
+  "publication_date": "2026-02-21",
+  "creators": [
+    {
+      "name": "Lee, Paul Chun-Kit",
+      "affiliation": "New York University",
+      "orcid": "0000-0000-0000-0000"
+    }
+  ],
+  "access_right": "open",
+  "license": "CC-BY-4.0",
+  "keywords": [
+    "DPT completeness",
+    "analytic rank stratification",
+    "mixed motives",
+    "Ext^1",
+    "Northcott property",
+    "Markov's Principle",
+    "L-functions",
+    "Bloch-Kato",
+    "BISH",
+    "constructive reverse mathematics",
+    "numerical equivalence",
+    "rational equivalence",
+    "arithmetic geometry",
+    "geometry of numbers",
+    "Lang's conjecture"
+  ],
+  "subjects": [
+    {
+      "term": "Mathematical logic and foundations",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85082397",
+      "scheme": "url"
+    },
+    {
+      "term": "Algebraic geometry",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85003438",
+      "scheme": "url"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "relation": "isPartOf",
+      "identifier": "10.5281/zenodo.17054050",
+      "resource_type": "publication",
+      "scheme": "doi"
+    }
+  ],
+  "version": "1.0.0",
+  "language": "eng",
+  "notes": "AI-assisted writing using Claude (Anthropic, Opus 4.6) under human direction. All mathematical content specified by the author. This paper contains no formal verification (no Lean code). LaTeX and PDF only.",
+  "references": [
+    "Bloch, S. and Kato, K. (1990). L-functions and Tamagawa numbers of motives. In: The Grothendieck Festschrift, vol. I, Birkhauser, 333-400.",
+    "Colmez, P. and Fontaine, J.-M. (2000). Construction des representations p-adiques semi-stables. Invent. Math. 140, 1-43.",
+    "Gross, B.H. and Zagier, D.B. (1986). Heegner points and derivatives of L-series. Invent. Math. 84, 225-320.",
+    "Kolyvagin, V.A. (1988). Finiteness of E(Q) and Sha(E, Q) for a subclass of Weil curves. Izv. Akad. Nauk SSSR 52, 522-540.",
+    "Lang, S. (1983). Fundamentals of Diophantine Geometry. Springer.",
+    "Northcott, D.G. (1949). An inequality in the theory of arithmetic on algebraic varieties. Proc. Cambridge Philos. Soc. 45, 502-509.",
+    "Silverman, J.H. (1990). The difference between the Weil height and the canonical height on elliptic curves. Math. Comp. 55, 723-743.",
+    "Bishop, E. and Bridges, D. (1985). Constructive Analysis. Springer."
+  ]
+}

@@ -1579,7 +1579,7 @@ noncomputable section ClassicalCorollaries
 open Classical
 
 /-- Classical corollary: Under WLPO, transport completeness from `ℓ¹` to `(c₀)^*` via the dual isometry. -/
-theorem dual_is_banach_c0_from_WLPO :
+theorem dual_is_banach_c0_from_WLPO_classical :
   DualIsBanach c₀ := by
   haveI : HasWLPO := instHasWLPO_of_Classical
   exact dual_is_banach_c0_from_WLPO_underWLPO

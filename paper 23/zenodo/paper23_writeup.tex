@@ -1,0 +1,1733 @@
+\documentclass[11pt,a4paper]{article}
+
+% ====================================================================
+% Packages
+% ====================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage[table]{xcolor}
+\usepackage{cleveref}
+\usepackage{natbib}
+\usepackage{mdframed}
+
+% ====================================================================
+% Theorem environments
+% ====================================================================
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% ====================================================================
+% Lean 4 code listing style
+% ====================================================================
+\definecolor{lean-keyword}{RGB}{0,0,180}
+\definecolor{lean-comment}{RGB}{0,128,0}
+\definecolor{lean-string}{RGB}{163,21,21}
+\definecolor{lean-bg}{RGB}{248,248,248}
+
+\lstdefinelanguage{lean4}{
+  keywords={theorem,lemma,def,class,instance,import,open,variable,
+            noncomputable,section,namespace,end,where,let,have,show,
+            intro,obtain,use,exact,rw,simp,apply,by,fun,match,if,
+            then,else,do,return,axiom,abbrev,private,attribute,
+            suffices,change,congr,ext,constructor,rintro,push_neg,
+            linarith,absurd,set_option,omit,in,set,cases,structure,
+            refine,unfold,rcases,calc,all_goals,first,try,ring,
+            positivity,induction},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+  morestring=[b]',
+}
+
+\lstset{
+  language=lean4,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{lean-keyword}\bfseries,
+  commentstyle=\color{lean-comment}\itshape,
+  stringstyle=\color{lean-string},
+  backgroundcolor=\color{lean-bg},
+  frame=single,
+  framerule=0.5pt,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2,
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+  xleftmargin=15pt,
+  captionpos=b,
+}
+
+% ====================================================================
+% Macros
+% ====================================================================
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\LPO}{\mathrm{LPO}}
+\newcommand{\WLPO}{\mathrm{WLPO}}
+\newcommand{\LLPO}{\mathrm{LLPO}}
+\newcommand{\BISH}{\mathrm{BISH}}
+\newcommand{\MP}{\mathrm{MP}}
+\newcommand{\FT}{\textsf{FT}}
+\newcommand{\EVT}{\textsf{EVT}}
+\newcommand{\Lean}{\textsc{Lean~4}}
+\newcommand{\Mathlib}{\textsc{Mathlib4}}
+\newcommand{\leanok}{\textsf{\small \textcolor{green!70!black}{\checkmark}}}
+
+% ====================================================================
+% Title
+% ====================================================================
+\title{%
+  \textbf{The Fan Theorem and the Constructive Cost\\[4pt]
+  of Optimization: Free Energy Extrema\\[4pt]
+  on Compact Parameter Spaces}\\[6pt]
+  {\normalsize Paper~23 in the Constructive Reverse Mathematics Series}%
+}
+
+\author{
+  Paul Chun-Kit Lee\thanks{%
+    New York University.
+    AI-assisted formalization; see \S\ref{sec:ai} for methodology.
+    The author is a medical professional, not a domain expert in
+    constructive mathematics or mathematical physics; mathematical
+    content was developed with extensive AI assistance.} \\
+  Center for Mathematical Physics \\
+  New York University \\
+  \texttt{dr.paul.c.lee@gmail.com}
+}
+
+\date{February 2026}
+
+% ====================================================================
+\begin{document}
+\maketitle
+
+% ====================================================================
+\begin{abstract}
+The assertion that a continuous function on a compact interval
+$[a,b]$ attains its minimum---the Extreme Value Theorem
+(\EVT)---is equivalent to the Fan Theorem (\FT) over Bishop's
+constructive mathematics ($\BISH$). We instantiate this
+equivalence through free energy optimization in the 1D Ising
+model: the claim that $f(\beta, J) = -\log(2 \cdot \cosh(\beta J))$
+attains its minimum over a compact coupling interval requires
+exactly the Fan Theorem. This is the \textbf{first CRM calibration
+at the \FT{} level}, adding a third independent branch to the
+calibration table. The Fan Theorem is independent of the
+omniscience hierarchy ($\LPO$, $\WLPO$, $\LLPO$) and of Markov's
+Principle ($\MP$): it is a compactness/continuity principle, not a
+decidability or witness-production principle. The 1D Ising model
+now exhibits \textbf{four} distinct logical costs: finite-volume
+computation ($\BISH$, Paper~8), thermodynamic limit existence
+($\LPO$, Paper~8), phase classification ($\WLPO$, Paper~20), and
+parameter-space optimization (\FT, this paper). All results are
+formalized in \Lean{} with \Mathlib{} (14~files, ${\sim}680$~lines,
+zero \texttt{sorry}, \textbf{zero custom axioms}).
+\end{abstract}
+
+\vspace{1em}
+\tableofcontents
+
+% ====================================================================
+\section{Introduction}\label{sec:intro}
+% ====================================================================
+
+\subsection{A Third Independent Branch}
+\label{sec:third-branch}
+
+The constructive reverse mathematics (CRM) programme calibrates
+mathematical physics against the hierarchy of omniscience
+principles~\citep{Bishop67,BR87,BV06,Ishihara06,Diener20}.
+Papers~2 through~21 populated the linear chain
+$\BISH < \LLPO < \WLPO < \LPO$~\cite{Lee25-P2,Lee25-P3,Lee25-P5,
+Lee25-P8,Lee26-P20,Lee26-P21}. Paper~22 established the first
+branch point: Markov's Principle ($\MP$), calibrated against
+radioactive decay, is implied by $\LPO$ but independent of both
+$\WLPO$ and $\LLPO$~\cite{Lee26-P22}.
+
+This paper adds a \textbf{second branch}: the Fan Theorem (\FT),
+calibrated against compact optimization. The Fan Theorem is a
+compactness/continuity principle, fundamentally different from
+both the omniscience principles (which concern decidability of
+infinite tests) and Markov's Principle (which concerns witness
+production from double negation). The \FT{} is:
+\begin{itemize}
+  \item Independent of $\LPO$, $\WLPO$, $\LLPO$: Brouwerian
+    models satisfy \FT{} but not $\LPO$; Russian recursive
+    models satisfy $\LPO$ but not \FT~\citep{Berger05,BV06,BR87}.
+  \item Independent of $\MP$: the same model-theoretic arguments
+    establish independence~\citep{Berger05}.
+  \item A Brouwerian principle: accepted in intuitionistic
+    mathematics, independent of $\BISH$~\citep{Brouwer27,TvD88}.
+\end{itemize}
+
+The calibration hierarchy is now a genuine partial order with
+three independent branches emanating from (or independent of) the
+main omniscience chain.
+
+\subsection{Four Logical Costs of the 1D Ising Model}
+\label{sec:four-costs}
+
+The 1D Ising model, which first appeared in the series in
+Paper~8~\cite{Lee25-P8}, now exhibits four distinct logical
+costs depending on the question asked:
+
+\begin{center}
+\begin{tabular}{@{}clll@{}}
+\toprule
+\textbf{Paper} & \textbf{Assertion} & \textbf{CRM Cost} &
+  \textbf{Type} \\
+\midrule
+8 (Part A)  & Finite-volume computation
+  & $\BISH$ & Arithmetic \\
+8 (Part B)  & Thermodynamic limit existence
+  & $\LPO$ & Omniscience \\
+20          & Phase classification
+  & $\WLPO$ & Omniscience \\
+\textbf{23} & \textbf{Parameter-space optimization}
+  & \textbf{\FT} & \textbf{Compactness} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The same physical system---the 1D Ising model with free energy
+$f(\beta, J) = -\log(2 \cdot \cosh(\beta J))$---requires four
+different constructive principles depending on which property of
+the free energy one wishes to assert. The logical cost depends on
+the \emph{observable}, not the underlying model.
+
+\subsection{The Cleanest Axiom Audit}\label{sec:clean-audit}
+
+A key design decision in this paper is to define the Fan Theorem
+directly as the Extreme Value Theorem (max form) on $[0,1]$:
+\[
+  \FT \;:=\; \EVT_{\max}.
+\]
+The equivalence between this definition and the bar-theoretic
+Fan Theorem (``every bar on Cantor space is uniform'') is
+established by \citet{Berger05} and \citet{BV06}. By defining
+\FT{} via its \EVT{} equivalent rather than axiomatizing the
+connection, the formalization achieves \textbf{zero custom axioms}.
+Every theorem in the project depends only on the standard \Mathlib{}
+infrastructure axioms (\texttt{propext}, \texttt{Classical.choice},
+\texttt{Quot.sound}). This is the cleanest axiom audit of any
+paper in the CRM series.
+
+\subsection{Main Results}\label{sec:main-results}
+
+The paper has three parts:
+
+\begin{enumerate}
+  \item \textbf{Part~A ($\BISH$):} Finite-grid optimization and
+    continuity of the Ising free energy are fully constructive.
+    No Fan Theorem needed.
+
+  \item \textbf{Part~B (\FT{} calibration):} The Fan Theorem is
+    equivalent to compact optimization:
+    $\FT \leftrightarrow \mathrm{CompactOptimization}$.
+    The proof proceeds through the intermediate equivalences
+    $\EVT_{\max} \leftrightarrow \EVT_{\min} \leftrightarrow
+    \mathrm{CompactOptimization}$.
+
+  \item \textbf{Stratification:} The constructive hierarchy is a
+    three-branch partial order. The omniscience chain
+    ($\LPO \Rightarrow \WLPO \Rightarrow \LLPO$), Markov's branch
+    ($\LPO \Rightarrow \MP$), and the compactness branch
+    ($\FT \leftrightarrow \mathrm{CompactOptimization}$, independent
+    of all of the above) are all represented.
+\end{enumerate}
+
+\noindent
+The main theorems, stated precisely:
+
+\begin{itemize}
+  \item \textbf{Theorem~1} (Part~A): The Ising free energy is
+    continuous in the coupling $J$.
+  \item \textbf{Theorem~2} (Part~A): Finite-grid optimization is
+    $\BISH$---a minimizer exists for any nonempty finite set.
+  \item \textbf{Theorem~3} (Part~B): $\EVT_{\max} \leftrightarrow
+    \EVT_{\min}$---apply to $-f$.
+  \item \textbf{Theorem~4} (Part~B): $\EVT_{\min} \Rightarrow
+    \mathrm{CompactOptimization}$---the rescaling argument.
+  \item \textbf{Theorem~5} (Part~B): $\mathrm{CompactOptimization}
+    \Rightarrow \EVT_{\min}$---specialize to $[0,1]$.
+  \item \textbf{Theorem~6} (Part~B): $\FT \leftrightarrow
+    \mathrm{CompactOptimization}$---the main equivalence.
+  \item \textbf{Theorem~7}: $\FT \Rightarrow$ Ising free energy
+    optimization on any compact coupling interval.
+  \item \textbf{Theorem~8}: Three-branch stratification of the
+    constructive hierarchy.
+\end{itemize}
+
+
+% ====================================================================
+\section{Background}\label{sec:background}
+% ====================================================================
+
+\subsection{The Fan Theorem}\label{sec:fan-bg}
+
+The Fan Theorem is a compactness principle introduced by
+\citet{Brouwer27} in the context of intuitionistic mathematics.
+In its bar-theoretic form, it asserts that every bar on Cantor
+space $2^{\NN}$ is uniform: if every infinite binary sequence
+passes through a finite initial segment in a decidable bar $B$,
+then there is a uniform bound $N$ such that all sequences hit
+$B$ by stage $N$.
+
+The Fan Theorem has several equivalent formulations that are more
+directly applicable to analysis~\citep{Berger05,BV06,JR02}:
+
+\begin{enumerate}
+  \item \textbf{Uniform continuity on compact spaces:} Every
+    pointwise continuous function on a compact complete totally
+    bounded metric space is uniformly continuous.
+
+  \item \textbf{Extreme Value Theorem (EVT):} Every continuous
+    function $f : [a,b] \to \RR$ attains its maximum and minimum.
+
+  \item \textbf{Bar induction:} Every bar on Cantor space is
+    uniform (the original formulation).
+\end{enumerate}
+
+\noindent
+The equivalence $\FT \leftrightarrow \EVT$ was established by
+\citet{BB06} building on \citet{JR02}. We adopt the \EVT{}
+formulation as our working definition, following \citet{Berger05}.
+
+\begin{definition}[$\EVT_{\max}$]\label{def:evt-max}
+\leanok{}
+The \emph{Extreme Value Theorem (max form)}: every continuous
+function on $[0,1]$ attains its maximum.
+\begin{equation}\label{eq:evt-max}
+  \forall f : \RR \to \RR,\;\;
+  \mathrm{ContinuousOn}\;f\;[0,1]
+  \;\Longrightarrow\;
+  \exists x \in [0,1],\;
+  \forall y \in [0,1],\; f(y) \le f(x).
+\end{equation}
+\end{definition}
+
+\begin{definition}[$\EVT_{\min}$]\label{def:evt-min}
+\leanok{}
+The \emph{Extreme Value Theorem (min form)}: every continuous
+function on $[0,1]$ attains its minimum.
+\begin{equation}\label{eq:evt-min}
+  \forall f : \RR \to \RR,\;\;
+  \mathrm{ContinuousOn}\;f\;[0,1]
+  \;\Longrightarrow\;
+  \exists x \in [0,1],\;
+  \forall y \in [0,1],\; f(x) \le f(y).
+\end{equation}
+\end{definition}
+
+\begin{definition}[CompactOptimization]\label{def:compact-opt}
+\leanok{}
+Every continuous function on $[a,b]$ attains its minimum:
+\begin{equation}\label{eq:compact-opt}
+  \forall a < b,\;\;
+  \forall f : \RR \to \RR,\;\;
+  \mathrm{ContinuousOn}\;f\;[a,b]
+  \;\Longrightarrow\;
+  \exists x \in [a,b],\;
+  \forall y \in [a,b],\; f(x) \le f(y).
+\end{equation}
+\end{definition}
+
+\begin{definition}[FanTheorem]\label{def:ft}
+\leanok{}
+The \emph{Fan Theorem}, defined via its analytic equivalent:
+\begin{equation}\label{eq:ft-def}
+  \FT \;:=\; \EVT_{\max}.
+\end{equation}
+The equivalence with the bar-theoretic Fan Theorem is by
+citation~\citep{Berger05,BV06}.
+\end{definition}
+
+\begin{lstlisting}[caption={Fan Theorem and EVT definitions (Defs/EVT.lean).}]
+/-- The Extreme Value Theorem (max form) on [0,1]. -/
+def EVT_max : Prop :=
+  forall (f : Real -> Real),
+    ContinuousOn f (Set.Icc 0 1) ->
+    exists x, x mem Set.Icc (0 : Real) (1 : Real) /\
+      forall y, y mem Set.Icc (0 : Real) (1 : Real) ->
+        f y <= f x
+
+/-- The Extreme Value Theorem (min form) on [0,1]. -/
+def EVT_min : Prop :=
+  forall (f : Real -> Real),
+    ContinuousOn f (Set.Icc 0 1) ->
+    exists x, x mem Set.Icc (0 : Real) (1 : Real) /\
+      forall y, y mem Set.Icc (0 : Real) (1 : Real) ->
+        f x <= f y
+
+/-- Compact optimization on [a,b]. -/
+def CompactOptimization : Prop :=
+  forall (a b : Real), a < b ->
+    forall (f : Real -> Real),
+      ContinuousOn f (Set.Icc a b) ->
+      exists x, x mem Set.Icc a b /\
+        forall y, y mem Set.Icc a b -> f x <= f y
+
+/-- The Fan Theorem := EVT_max (Berger 2005). -/
+def FanTheorem : Prop := EVT_max
+\end{lstlisting}
+
+\subsection{Status in Constructive Mathematics}
+\label{sec:ft-status}
+
+The Fan Theorem occupies a distinctive position in constructive
+mathematics:
+
+\begin{itemize}
+  \item In \textbf{Bishop's $\BISH$}: The Fan Theorem is
+    independent---neither provable nor refutable. Bishop's
+    framework deliberately avoids both the Fan Theorem and its
+    negation, maintaining compatibility with classical, intuitionistic,
+    and recursive interpretations~\citep{Bishop67,BB85}.
+
+  \item In \textbf{Brouwerian intuitionism}: The Fan Theorem is
+    accepted as a basic principle, following Brouwer's original
+    arguments~\citep{Brouwer27,TvD88}.
+
+  \item In \textbf{Russian recursive mathematics}: The Fan Theorem
+    fails. In Markov's constructive recursive framework, there
+    exist computable functions on $[0,1]$ that are pointwise
+    continuous but not uniformly continuous, and hence do not attain
+    their extrema~\citep{Kushner85,BR87}.
+
+  \item In \textbf{classical mathematics}: The Fan Theorem holds
+    trivially, as a consequence of the Heine--Borel theorem.
+\end{itemize}
+
+\subsection{Fan Theorem vs.\ Omniscience}\label{sec:ft-vs-omni}
+
+The Fan Theorem is fundamentally different from the omniscience
+principles ($\LPO$, $\WLPO$, $\LLPO$) and from Markov's Principle
+($\MP$):
+
+\begin{itemize}
+  \item \textbf{Omniscience principles} concern the decidability
+    of infinite quantifiers: can we decide whether a binary sequence
+    is identically zero? The answer stratifies into
+    $\LPO > \WLPO > \LLPO$.
+
+  \item \textbf{Markov's Principle} concerns witness production
+    from double negation: given $\neg(\forall n,\; \alpha(n) = 0)$,
+    does there exist $n$ with $\alpha(n) = 1$?
+
+  \item \textbf{The Fan Theorem} concerns compactness: does a
+    continuous function on a compact set attain its extrema?
+    This is a topological question, not a decidability or
+    witness-production question.
+\end{itemize}
+
+\noindent
+The independence is established by standard model-theoretic
+arguments~\citep{Berger05,BV06,BR87}:
+\begin{itemize}
+  \item Brouwerian models satisfy \FT{} but not $\LPO$ (hence
+    $\FT \not\Rightarrow \LPO$).
+  \item Russian recursive models satisfy $\LPO$ (and hence $\WLPO$,
+    $\LLPO$, and $\MP$) but not \FT{} (hence $\LPO \not\Rightarrow
+    \FT$).
+  \item Independence from $\MP$ follows similarly~\citep{Berger05}.
+\end{itemize}
+
+\subsection{The CRM Hierarchy (Updated)}
+\label{sec:hierarchy-bg}
+
+The constructive reverse mathematics hierarchy, now with three
+branches:
+
+\begin{equation}\label{eq:hierarchy}
+\begin{array}{ccccc}
+  & & \LPO & & \\
+  & \swarrow & \downarrow & \searrow & \\
+  \WLPO & & \MP & & \cdots \\
+  \downarrow & & & & \\
+  \LLPO & & & & \\
+  \downarrow & & & & \\
+  \BISH & & & & \FT \;\text{(independent of all above)}
+\end{array}
+\end{equation}
+
+\noindent
+The omniscience chain $\LPO \Rightarrow \WLPO \Rightarrow \LLPO$
+forms the main linear chain~\citep{Bishop67,BR87}. Markov's
+Principle branches off: $\LPO \Rightarrow \MP$, but $\MP$ is
+independent of $\WLPO$ and $\LLPO$~\citep{BR87,BV06}
+(Paper~22~\cite{Lee26-P22}). The Fan Theorem is independent of
+the entire hierarchy above~\citep{Berger05,BV06}.
+
+\subsection{The 1D Ising Model}\label{sec:ising-bg}
+
+The 1D Ising free energy per site with inverse temperature $\beta$
+and coupling constant $J$ is:
+\begin{equation}\label{eq:ising}
+  f(\beta, J) = -\log\bigl(2 \cdot \cosh(\beta J)\bigr).
+\end{equation}
+This function is continuous in both $\beta$ and $J$, and has
+appeared in Papers~8 and~20 of the series. For the purpose of this
+paper, we fix $\beta$ and view $f$ as a function of $J$ alone,
+asking: over a compact coupling interval $[a,b]$, does $f$ attain
+its minimum?
+
+
+% ====================================================================
+\section{Part~A: Finite Optimization Is BISH}
+\label{sec:part-a}
+% ====================================================================
+
+The first tier of the calibration: when the optimization is over a
+finite set, no compactness principle is needed.
+
+\subsection{Continuity of the Free Energy}\label{sec:continuity}
+
+\begin{theorem}[Continuity---BISH]\label{thm:continuity}
+\leanok{}
+For any fixed $\beta \in \RR$, the Ising free energy
+$J \mapsto f(\beta, J) = -\log(2 \cdot \cosh(\beta J))$
+is continuous.
+\end{theorem}
+
+\begin{proof}
+By composition: $J \mapsto \beta J$ is continuous (multiplication
+by a constant), $\cosh$ is continuous, $x \mapsto 2x$ is
+continuous, $\log$ is continuous on $(0, \infty)$, and negation
+is continuous. Since $2 \cdot \cosh(\beta J) > 0$ for all $J$
+(because $\cosh(x) > 0$ for all $x$), the composition is
+well-defined and continuous.
+\end{proof}
+
+\begin{lstlisting}[caption={Continuity of Ising free energy (PartA/Continuity.lean).}]
+/-- The Ising free energy is continuous in J. -/
+theorem isingFreeEnergy_continuous (beta : Real) :
+    Continuous (isingFreeEnergy beta) := by
+  unfold isingFreeEnergy
+  apply Continuous.neg
+  apply Continuous.log
+  . exact continuous_const.mul
+      (Real.continuous_cosh.comp
+        (continuous_const.mul continuous_id))
+  . intro J
+    exact two_cosh_ne_zero (beta * J)
+
+/-- ContinuousOn version for [a, b]. -/
+theorem isingFreeEnergy_continuousOn (beta : Real)
+    (a b : Real) :
+    ContinuousOn (isingFreeEnergy beta)
+      (Set.Icc a b) :=
+  (isingFreeEnergy_continuous beta).continuousOn
+\end{lstlisting}
+
+\subsection{Finite-Grid Optimization}\label{sec:finite-opt}
+
+\begin{theorem}[Finite optimization---BISH]\label{thm:finite-opt}
+\leanok{}
+For any fixed $\beta$ and any nonempty finite set
+$\mathrm{grid} \subseteq \RR$, there exists $J^* \in \mathrm{grid}$
+minimizing $f(\beta, \cdot)$ over the grid:
+\begin{equation}\label{eq:finite-opt}
+  \exists J^* \in \mathrm{grid},\;\;
+  \forall J \in \mathrm{grid},\;\;
+  f(\beta, J^*) \le f(\beta, J).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+This is a finite search over a nonempty finite set, which is
+constructively unproblematic. In \Lean{}, this is a direct
+application of \texttt{Finset.exists\_min\_image}.
+\end{proof}
+
+\begin{lstlisting}[caption={Finite-grid optimization (PartA/FiniteOpt.lean).}]
+/-- Finite-grid optimization is BISH. -/
+theorem finite_opt_bish (beta : Real)
+    (grid : Finset Real) (hne : grid.Nonempty) :
+    exists J_star, J_star mem grid /\ forall J,
+      J mem grid ->
+      isingFreeEnergy beta J_star
+        <= isingFreeEnergy beta J :=
+  Finset.exists_min_image grid
+    (isingFreeEnergy beta) hne
+
+/-- Finite-grid maximization is also BISH. -/
+theorem finite_opt_max_bish (beta : Real)
+    (grid : Finset Real) (hne : grid.Nonempty) :
+    exists J_star, J_star mem grid /\ forall J,
+      J mem grid ->
+      isingFreeEnergy beta J
+        <= isingFreeEnergy beta J_star :=
+  Finset.exists_max_image grid
+    (isingFreeEnergy beta) hne
+\end{lstlisting}
+
+\subsection{Part~A Summary}\label{sec:part-a-summary}
+
+\begin{theorem}[Part~A Summary---BISH]\label{thm:part-a-summary}
+\leanok{}
+Both statements hold without any compactness principle:
+\begin{enumerate}
+  \item The Ising free energy is continuous in $J$ for any $\beta$.
+  \item For any nonempty finite grid, a minimizer exists.
+\end{enumerate}
+\end{theorem}
+
+\begin{lstlisting}[caption={Part A summary (PartA/PartA\_Main.lean).}]
+/-- Part A summary: finite optimization and
+    continuity are BISH. -/
+theorem partA_summary :
+    (forall beta : Real,
+      Continuous (isingFreeEnergy beta)) /\
+    (forall beta : Real,
+      forall grid : Finset Real,
+        grid.Nonempty ->
+        exists J_star, J_star mem grid /\
+          forall J, J mem grid ->
+            isingFreeEnergy beta J_star
+              <= isingFreeEnergy beta J) :=
+  <isingFreeEnergy_continuous,
+   fun beta grid hne =>
+     finite_opt_bish beta grid hne>
+\end{lstlisting}
+
+\begin{remark}[Axiom profile for Part~A]\label{rem:bish-profile}
+\texttt{\#print axioms isingFreeEnergy\_continuous},
+\texttt{\#print axioms finite\_opt\_bish}, and
+\texttt{\#print axioms partA\_summary} all show only
+\texttt{[propext, Classical.choice, Quot.sound]}. No custom axioms.
+The \texttt{Classical.choice} arises from \Mathlib{}'s
+infrastructure for \texttt{Real.log}, \texttt{Real.cosh}, and
+\texttt{Finset.exists\_min\_image}, not from any mathematical
+use of choice. These are pure $\BISH$ results.
+\end{remark}
+
+
+% ====================================================================
+\section{Part~B: The Fan Theorem Calibration}
+\label{sec:part-b}
+% ====================================================================
+
+This section establishes the main equivalence:
+$\FT \leftrightarrow \mathrm{CompactOptimization}$.
+
+\subsection{EVT Max and Min Are Equivalent}
+\label{sec:evt-equiv}
+
+\begin{theorem}[$\EVT_{\max} \leftrightarrow \EVT_{\min}$]
+\label{thm:evt-equiv}
+\leanok{}
+The max and min forms of the Extreme Value Theorem are equivalent:
+\begin{equation}\label{eq:evt-equiv}
+  \EVT_{\max} \;\longleftrightarrow\; \EVT_{\min}.
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+\textbf{$\EVT_{\max} \Rightarrow \EVT_{\min}$:} Given a continuous
+function $f$ on $[0,1]$, apply $\EVT_{\max}$ to $-f$. Since $-f$
+is continuous (continuity is preserved under negation), there
+exists $x^* \in [0,1]$ with $-f(y) \le -f(x^*)$ for all
+$y \in [0,1]$. Multiplying by $-1$:
+$f(x^*) \le f(y)$ for all $y \in [0,1]$.
+
+\smallskip\noindent
+\textbf{$\EVT_{\min} \Rightarrow \EVT_{\max}$:} Symmetric.
+Apply $\EVT_{\min}$ to $-f$ and negate.
+\end{proof}
+
+\begin{lstlisting}[caption={EVT equivalence (PartB/EVTEquiv.lean).}]
+/-- EVT_max implies EVT_min: apply to -f. -/
+theorem evt_min_of_evt_max (h : EVT_max) :
+    EVT_min := by
+  intro f hf
+  obtain <x, hx_mem, hx_max> :=
+    h (fun t => -f t) (hf.neg)
+  exact <x, hx_mem,
+    fun y hy => by linarith [hx_max y hy]>
+
+/-- EVT_min implies EVT_max: apply to -f. -/
+theorem evt_max_of_evt_min (h : EVT_min) :
+    EVT_max := by
+  intro f hf
+  obtain <x, hx_mem, hx_min> :=
+    h (fun t => -f t) (hf.neg)
+  exact <x, hx_mem,
+    fun y hy => by linarith [hx_min y hy]>
+
+/-- EVT_max and EVT_min are equivalent. -/
+theorem evt_max_iff_evt_min :
+    EVT_max <-> EVT_min :=
+  <evt_min_of_evt_max, evt_max_of_evt_min>
+\end{lstlisting}
+
+\subsection{The Rescaling Infrastructure}
+\label{sec:rescaling}
+
+To connect EVT on $[0,1]$ with optimization on general $[a,b]$,
+we use affine rescaling.
+
+\begin{definition}[Rescaling]\label{def:rescale}
+\leanok{}
+The affine map sending $[0,1]$ to $[a,b]$:
+\begin{equation}\label{eq:rescale}
+  \mathrm{rescale}(a, b, t) := a + t \cdot (b - a).
+\end{equation}
+Its inverse, sending $[a,b]$ back to $[0,1]$:
+\begin{equation}\label{eq:unscale}
+  \mathrm{unscale}(a, b, x) := \frac{x - a}{b - a}.
+\end{equation}
+\end{definition}
+
+\begin{lemma}[Rescaling properties]\label{lem:rescale-props}
+\leanok{}
+For $a \le b$:
+\begin{enumerate}
+  \item $\mathrm{rescale}(a, b, 0) = a$ and
+    $\mathrm{rescale}(a, b, 1) = b$.
+  \item $\mathrm{rescale}$ maps $[0,1]$ into $[a,b]$.
+  \item $\mathrm{rescale}$ is continuous.
+  \item For $a < b$: $\mathrm{unscale}$ maps $[a,b]$ into $[0,1]$.
+  \item $\mathrm{rescale} \circ \mathrm{unscale} = \mathrm{id}$
+    on $[a,b]$ (when $a < b$).
+  \item $\mathrm{unscale} \circ \mathrm{rescale} = \mathrm{id}$
+    on $[0,1]$ (when $a < b$).
+\end{enumerate}
+\end{lemma}
+
+\begin{lstlisting}[caption={Rescaling infrastructure (Defs/Rescaling.lean, selected).}]
+/-- Affine map [0,1] -> [a,b]. -/
+def rescale (a b : Real) (t : Real) : Real :=
+  a + t * (b - a)
+
+/-- Inverse: [a,b] -> [0,1]. -/
+def unscale (a b : Real) (x : Real) : Real :=
+  (x - a) / (b - a)
+
+/-- rescale maps [0,1] into [a,b]. -/
+theorem rescale_maps_Icc (a b : Real) (hab : a <= b)
+    (t : Real) (ht : t mem Set.Icc (0 : Real) 1) :
+    rescale a b t mem Set.Icc a b := by
+  constructor
+  . unfold rescale; nlinarith [ht.1, ht.2]
+  . unfold rescale; nlinarith [ht.1, ht.2]
+
+/-- rescale . unscale = id on [a,b]. -/
+theorem rescale_unscale (a b : Real) (hab : a < b)
+    (x : Real) (_hx : x mem Set.Icc a b) :
+    rescale a b (unscale a b x) = x := by
+  unfold rescale unscale
+  have hba : (b - a) != 0 :=
+    ne_of_gt (sub_pos.mpr hab)
+  field_simp; ring
+\end{lstlisting}
+
+\subsection{EVT Min Implies Compact Optimization}
+\label{sec:evt-to-compact}
+
+\begin{theorem}[$\EVT_{\min} \Rightarrow \mathrm{CompactOptimization}$]
+\label{thm:evt-to-compact}
+\leanok{}
+If every continuous function on $[0,1]$ attains its minimum,
+then every continuous function on any $[a,b]$ attains its minimum.
+\end{theorem}
+
+\begin{proof}
+Given $a < b$ and $f : \RR \to \RR$ continuous on $[a,b]$:
+
+\smallskip\noindent
+\textbf{Step~1: Define the rescaled function.}
+Let $g(t) = f(\mathrm{rescale}(a,b,t)) = f(a + t(b-a))$.
+Then $g$ is the composition of $f$ (continuous on $[a,b]$) with
+$\mathrm{rescale}$ (continuous, mapping $[0,1]$ into $[a,b]$).
+Hence $g$ is continuous on $[0,1]$.
+
+\smallskip\noindent
+\textbf{Step~2: Apply $\EVT_{\min}$ to $g$.}
+Obtain $t^* \in [0,1]$ with $g(t^*) \le g(t)$ for all
+$t \in [0,1]$.
+
+\smallskip\noindent
+\textbf{Step~3: Return the minimizer.}
+Set $x^* = \mathrm{rescale}(a, b, t^*) \in [a,b]$.
+For any $y \in [a,b]$, let $s = \mathrm{unscale}(a, b, y) \in [0,1]$.
+Then:
+\begin{align*}
+  f(x^*) &= f(\mathrm{rescale}(a,b,t^*))
+    = g(t^*) \\
+  &\le g(s)
+    = f(\mathrm{rescale}(a,b,s)) \\
+  &= f(\mathrm{rescale}(a,b,\mathrm{unscale}(a,b,y)))
+    = f(y).
+\end{align*}
+The last step uses $\mathrm{rescale} \circ \mathrm{unscale} = \mathrm{id}$ on $[a,b]$.
+\end{proof}
+
+\begin{lstlisting}[caption={EVT$_{\min}$ implies CompactOptimization (PartB/CompactOpt.lean).}]
+/-- EVT on [0,1] implies compact optimization
+    on arbitrary [a,b]. -/
+theorem compact_opt_of_evt_min (h : EVT_min) :
+    CompactOptimization := by
+  intro a b hab f hf
+  let g : Real -> Real :=
+    fun t => f (rescale a b t)
+  have hg_cont : ContinuousOn g (Set.Icc 0 1) := by
+    apply ContinuousOn.comp hf
+      (rescale_continuous a b).continuousOn
+    exact rescale_mapsTo a b (le_of_lt hab)
+  obtain <t_star, ht_mem, ht_min> := h g hg_cont
+  refine <rescale a b t_star,
+    rescale_maps_Icc a b (le_of_lt hab)
+      t_star ht_mem, ?>
+  intro y hy
+  have hs_mem : unscale a b y mem
+      Set.Icc (0 : Real) 1 :=
+    unscale_maps_Icc a b hab y hy
+  have h1 : f (rescale a b t_star) <=
+      f (rescale a b (unscale a b y)) :=
+    ht_min (unscale a b y) hs_mem
+  rw [rescale_unscale a b hab y hy] at h1
+  exact h1
+\end{lstlisting}
+
+\subsection{Compact Optimization Implies EVT Min}
+\label{sec:compact-to-evt}
+
+\begin{theorem}[$\mathrm{CompactOptimization} \Rightarrow \EVT_{\min}$]
+\label{thm:compact-to-evt}
+\leanok{}
+If every continuous function on any $[a,b]$ attains its minimum,
+then every continuous function on $[0,1]$ attains its minimum.
+\end{theorem}
+
+\begin{proof}
+Specialize $\mathrm{CompactOptimization}$ to $a = 0$, $b = 1$
+(noting $0 < 1$).
+\end{proof}
+
+\begin{lstlisting}[caption={CompactOptimization implies EVT$_{\min}$ (PartB/CompactOpt.lean).}]
+/-- Compact optimization implies EVT on [0,1]. -/
+theorem evt_min_of_compact_opt
+    (h : CompactOptimization) : EVT_min := by
+  intro f hf
+  exact h 0 1 (by norm_num) f hf
+\end{lstlisting}
+
+\subsection{The Main Equivalence}\label{sec:main-equiv}
+
+\begin{theorem}[$\FT \leftrightarrow \mathrm{CompactOptimization}$]
+\label{thm:main-equiv}
+\leanok{}
+Over $\BISH$, the Fan Theorem is equivalent to compact optimization:
+\begin{equation}\label{eq:main-equiv}
+  \FT \;\;\longleftrightarrow\;\;
+  \mathrm{CompactOptimization}.
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Compose the three equivalences. Since $\FT = \EVT_{\max}$:
+\[
+  \FT
+  \;=\; \EVT_{\max}
+  \;\xrightarrow{\text{Thm~\ref{thm:evt-equiv}}}\;
+  \EVT_{\min}
+  \;\xrightarrow{\text{Thm~\ref{thm:evt-to-compact}}}\;
+  \mathrm{CompactOptimization}
+  \;\xrightarrow{\text{Thm~\ref{thm:compact-to-evt}}}\;
+  \EVT_{\min}
+  \;\xrightarrow{\text{Thm~\ref{thm:evt-equiv}}}\;
+  \EVT_{\max}
+  \;=\; \FT.
+\]
+\end{proof}
+
+\begin{lstlisting}[caption={Main equivalence (PartB/PartB\_Main.lean).}]
+/-- The Fan Theorem <-> CompactOptimization. -/
+theorem ft_iff_compact_opt :
+    FanTheorem <-> CompactOptimization := by
+  unfold FanTheorem
+  constructor
+  . intro hmax
+    exact compact_opt_of_evt_min
+      (evt_min_of_evt_max hmax)
+  . intro hco
+    exact evt_max_of_evt_min
+      (evt_min_of_compact_opt hco)
+\end{lstlisting}
+
+\begin{remark}[Zero custom axioms]\label{rem:zero-axioms}
+\texttt{\#print axioms ft\_iff\_compact\_opt} shows only
+\texttt{[propext, Classical.choice, Quot.sound]}. In fact, many of
+the intermediate results (\texttt{evt\_min\_of\_evt\_max},
+\texttt{compact\_opt\_of\_evt\_min}, \texttt{evt\_min\_of\_compact\_opt})
+require only \texttt{[propext]}. No custom axiom appears anywhere.
+This is possible because $\FT$ is defined as $\EVT_{\max}$, not
+axiomatized separately. The connection to the bar-theoretic Fan
+Theorem is by citation~\citep{Berger05,BV06}, not by axiom.
+\end{remark}
+
+
+% ====================================================================
+\section{The Stratification Theorem}\label{sec:stratification}
+% ====================================================================
+
+\subsection{Three-Branch Partial Order}\label{sec:three-branch}
+
+The constructive hierarchy now has three independent branches:
+
+\begin{center}
+\begin{tabular}{@{}clll@{}}
+\toprule
+\textbf{Branch} & \textbf{Content} & \textbf{Example} &
+  \textbf{Papers} \\
+\midrule
+Omniscience & $\LPO \Rightarrow \WLPO \Rightarrow \LLPO$
+  & Bidual gap, Ising limit
+  & 2--21 \\
+Markov & $\LPO \Rightarrow \MP$
+  & Eventual decay
+  & 22 \\
+Compactness & $\FT \leftrightarrow \mathrm{CompactOpt}$
+  & Free energy optimization
+  & 23 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{theorem}[Three-branch stratification]\label{thm:stratification}
+\leanok{}
+The constructive hierarchy is a partial order with three branches:
+\begin{enumerate}
+  \item \textbf{Omniscience chain:} $\LPO \Rightarrow \WLPO
+    \Rightarrow \LLPO$.
+  \item \textbf{Markov branch:} $\LPO \Rightarrow \MP$.
+  \item \textbf{Compactness branch:} $\FT \leftrightarrow
+    \mathrm{CompactOptimization}$ (independent of all above).
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Items~(1) and~(2) are proved from first principles in the
+formalization:
+
+\begin{itemize}
+  \item $\LPO \Rightarrow \WLPO$: Given $\LPO$, the sequence
+    either is all false (first disjunct of $\WLPO$) or has a
+    witness (contradicting the all-false hypothesis in the
+    second disjunct).
+
+  \item $\WLPO \Rightarrow \LLPO$: Given a sequence with at most
+    one true value, apply $\WLPO$ to the even subsequence. If
+    the even subsequence is all false, we are done. Otherwise,
+    the even subsequence has a true value, which by the
+    at-most-one condition forces the odd subsequence to be all
+    false.
+
+  \item $\LPO \Rightarrow \MP$: Given $\LPO$, the sequence
+    either is all false (contradicting the hypothesis
+    $\neg(\forall n,\; \alpha(n) = 0)$) or has a witness.
+\end{itemize}
+
+\noindent
+Item~(3) is \Cref{thm:main-equiv}. The independence of \FT{}
+from $\LPO$, $\WLPO$, $\LLPO$, and $\MP$ is standard
+model theory~\citep{Berger05,BV06,BR87}:
+\begin{itemize}
+  \item \textbf{$\FT \not\Rightarrow \LPO$:} Brouwerian models
+    validate \FT{} (by Brouwer's Fan Theorem) but fail $\LPO$
+    (omniscience of infinite tests is not available).
+  \item \textbf{$\LPO \not\Rightarrow \FT$:} Russian recursive
+    models validate $\LPO$ (all functions are recursive, hence
+    decidable) but fail \FT{} (there exist computable but not
+    uniformly continuous functions on $[0,1]$)~\citep{Kushner85}.
+  \item \textbf{Independence from $\MP$:} Follows from the same
+    model separation~\citep{Berger05}.
+\end{itemize}
+\end{proof}
+
+\begin{lstlisting}[caption={Three-branch stratification (Main/Stratification.lean).}]
+/-- Three-branch stratification. -/
+theorem fan_stratification :
+    -- Omniscience chain
+    (LPO -> WLPO) /\
+    (WLPO -> LLPO) /\
+    -- Markov branch
+    (LPO -> MarkovPrinciple) /\
+    -- Compactness branch
+    (FanTheorem <-> CompactOptimization) :=
+  <lpo_implies_wlpo, wlpo_implies_llpo,
+   lpo_implies_mp, ft_iff_compact_opt>
+\end{lstlisting}
+
+\subsection{The Physical Instance}\label{sec:physical-instance}
+
+\begin{theorem}[Ising optimization from \FT]\label{thm:ising-opt}
+\leanok{}
+The Fan Theorem implies that the Ising free energy attains its
+minimum on any compact coupling interval $[a,b]$:
+\begin{equation}\label{eq:ising-opt}
+  \FT \;\Longrightarrow\;
+  \forall \beta,\;\;
+  \forall a < b,\;\;
+  \exists J^* \in [a,b],\;\;
+  \forall J \in [a,b],\;\;
+  f(\beta, J^*) \le f(\beta, J).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Apply \Cref{thm:main-equiv} ($\FT \Rightarrow
+\mathrm{CompactOptimization}$) to the function
+$J \mapsto f(\beta, J)$, which is continuous on $[a,b]$
+by \Cref{thm:continuity}.
+\end{proof}
+
+\begin{lstlisting}[caption={Ising optimization from FT (Main/PhysicalInstance.lean).}]
+/-- FT implies Ising free energy optimization. -/
+theorem ising_opt_of_ft (hft : FanTheorem)
+    (beta : Real) (a b : Real) (hab : a < b) :
+    exists J_star, J_star mem Set.Icc a b /\
+      forall J, J mem Set.Icc a b ->
+        isingFreeEnergy beta J_star
+          <= isingFreeEnergy beta J := by
+  exact ft_iff_compact_opt.mp hft a b hab
+    (isingFreeEnergy beta)
+    (isingFreeEnergy_continuousOn beta a b)
+\end{lstlisting}
+
+
+% ====================================================================
+\section{Updated Calibration Table (Papers 2--23)}
+\label{sec:calibration}
+% ====================================================================
+
+The complete calibration table for the constructive reverse
+mathematics series, updated with Paper~23:
+
+\begin{center}
+\small
+\begin{tabular}{@{}cllll@{}}
+\toprule
+\textbf{Paper} & \textbf{Physical System} &
+  \textbf{Observable / Assertion} & \textbf{CRM Level} &
+  \textbf{Position} \\
+\midrule
+2  & Bidual gap ($\ell^1$)
+   & Gap witness $J - \kappa$
+   & $\equiv \WLPO$
+   & Chain \\
+3  & Brouwer fixed point
+   & Fixed-point existence
+   & $\equiv \LLPO$
+   & Chain \\
+4  & Diagonal dominance
+   & Dominance decision
+   & $\equiv \WLPO$
+   & Chain \\
+5  & Spectral threshold
+   & Spectral gap
+   & $\equiv \LPO$
+   & Chain \\
+6  & Heisenberg uncertainty
+   & Uncertainty bound
+   & $\equiv \WLPO$
+   & Chain \\
+7  & Reflexive dispensability
+   & Non-reflexivity witness
+   & $\equiv \WLPO$
+   & Chain \\
+8  & 1D Ising convergence
+   & Thermodynamic limit $f_\infty$
+   & $\equiv \LPO$
+   & Chain \\
+9  & Uniform convexity
+   & Modulus of convexity
+   & $\equiv \WLPO$
+   & Chain \\
+10 & Compact embedding
+   & Embedding decision
+   & $\equiv \WLPO$
+   & Chain \\
+11 & Hahn--Banach norm
+   & Extension norm
+   & $\equiv \LLPO$
+   & Chain \\
+12 & Toeplitz index
+   & Index computation
+   & $\equiv \WLPO$
+   & Chain \\
+13 & Minimax duality
+   & Saddle point
+   & $\equiv \WLPO$
+   & Chain \\
+14 & Floquet discriminant
+   & Stability boundary
+   & $\equiv \LLPO$
+   & Chain \\
+15 & Lyapunov exponent
+   & Conservation law
+   & $\equiv \WLPO$
+   & Chain \\
+16 & Berry phase
+   & Phase classification
+   & $\equiv \WLPO$
+   & Chain \\
+17 & Variational eigenvalue
+   & Ground state energy
+   & $\equiv \WLPO$
+   & Chain \\
+18 & Fredholm alternative
+   & Solvability decision
+   & $\equiv \WLPO$
+   & Chain \\
+19 & H\"older interpolation
+   & Interpolation bound
+   & $\equiv \WLPO$
+   & Chain \\
+20 & 1D Ising phase
+   & Phase classification
+   & $\equiv \WLPO$
+   & Chain \\
+21 & Perturbation bound
+   & Stability threshold
+   & $\equiv \LPO$
+   & Chain \\
+22 & Radioactive decay
+   & Eventual decay
+   & $\equiv \MP$
+   & Branch~1 \\
+\rowcolor{yellow!20}
+\textbf{23} & \textbf{Free energy optimization}
+   & \textbf{Compact extremum}
+   & $\equiv \FT$
+   & \textbf{Branch~2} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The calibration table is now populated at every level of the
+constructive hierarchy and has branching structure:
+
+\begin{itemize}
+  \item $\BISH$: Finite-volume Ising computation (Paper~8, Part~A),
+    Heisenberg uncertainty bound (Paper~6), finite-grid optimization
+    (Paper~23, Part~A).
+  \item $\LLPO$: Brouwer fixed point (Paper~3), Hahn--Banach norm
+    (Paper~11), Floquet discriminant (Paper~14).
+  \item $\WLPO$: Bidual gap (Paper~2), reflexive dispensability
+    (Paper~7), Ising phase (Paper~20), and many others.
+  \item $\LPO$: Spectral threshold (Paper~5), Ising convergence
+    (Paper~8), perturbation bound (Paper~21).
+  \item $\MP$ (\textbf{Branch~1}): Eventual decay (Paper~22).
+  \item $\FT$ (\textbf{Branch~2}): Free energy optimization
+    (Paper~23).
+\end{itemize}
+
+\noindent
+Papers~22 and~23 demonstrate that the physics itself has a
+partially ordered logical structure: there exist physical
+assertions whose constructive costs are incomparable.
+
+\subsection{The Four-Level Ising Stratification}
+\label{sec:ising-stratification}
+
+The 1D Ising model provides the most fine-grained stratification
+of any single physical system in the programme:
+
+\begin{center}
+\begin{tabular}{@{}cllll@{}}
+\toprule
+\textbf{Level} & \textbf{Question} & \textbf{CRM Cost} &
+  \textbf{Paper} & \textbf{Branch} \\
+\midrule
+1 & Finite-volume $f_N$
+  & $\BISH$ & 8A & --- \\
+2 & Limit $f_\infty = \lim f_N$
+  & $\LPO$ & 8B & Chain \\
+3 & Phase classification
+  & $\WLPO$ & 20 & Chain \\
+4 & Parameter optimization
+  & $\FT$ & 23 & Independent \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The same physical system---the 1D Ising model---requires four
+different constructive principles depending on the question asked.
+Level~4 (\FT) is particularly striking because it is
+\emph{independent} of Levels~2 and~3: the compactness cost of
+parameter optimization is logically orthogonal to the omniscience
+cost of taking the thermodynamic limit or classifying phases.
+
+
+% ====================================================================
+\section{Lean~4 Formalization}\label{sec:lean}
+% ====================================================================
+
+\subsection{Module Structure}\label{sec:modules}
+
+The formalization consists of 14~files organized in four
+directories:
+
+\begin{center}
+\begin{tabular}{@{}llr@{}}
+\toprule
+\textbf{Module} & \textbf{Content} & \textbf{Lines} \\
+\midrule
+\texttt{Defs/Principles.lean}
+  & LPO, WLPO, LLPO, MP, hierarchy & 88 \\
+\texttt{Defs/IsingFreeEnergy.lean}
+  & $f(\beta, J) = -\log(2 \cosh(\beta J))$ & 34 \\
+\texttt{Defs/EVT.lean}
+  & EVT$_{\max}$, EVT$_{\min}$, CompactOpt, FanTheorem & 57 \\
+\texttt{Defs/Rescaling.lean}
+  & rescale, unscale, inverses & 85 \\
+\texttt{PartA/Continuity.lean}
+  & $f(\beta, \cdot)$ is continuous & 33 \\
+\texttt{PartA/FiniteOpt.lean}
+  & Finite-grid optimization & 33 \\
+\texttt{PartA/PartA\_Main.lean}
+  & Part~A summary and audit & 30 \\
+\texttt{PartB/EVTEquiv.lean}
+  & $\EVT_{\max} \leftrightarrow \EVT_{\min}$ & 43 \\
+\texttt{PartB/CompactOpt.lean}
+  & $\EVT_{\min} \leftrightarrow \mathrm{CompactOpt}$ & 61 \\
+\texttt{PartB/PartB\_Main.lean}
+  & $\FT \leftrightarrow \mathrm{CompactOpt}$ & 37 \\
+\texttt{Main/PhysicalInstance.lean}
+  & $\FT \Rightarrow$ Ising optimization & 31 \\
+\texttt{Main/Stratification.lean}
+  & Three-branch theorem & 49 \\
+\texttt{Main/AxiomAudit.lean}
+  & Comprehensive audit & 99 \\
+\texttt{Main.lean}
+  & Root imports & 4 \\
+\midrule
+\textbf{Total} & & $\mathbf{\sim 684}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Dependency graph:
+\begin{verbatim}
+Principles <-- IsingFreeEnergy
+  |                |
+  |           Rescaling <-- EVT
+  |                |         |
+  |          Continuity   FiniteOpt
+  |                |         |
+  |          PartA_Main -----+
+  |
+  +-- EVTEquiv
+  |         |
+  +-- CompactOpt
+  |         |
+  +-- PartB_Main
+  |
+  +-- PhysicalInstance
+  |
+  +-- Stratification
+  |
+  +-- AxiomAudit <-- Main
+\end{verbatim}
+
+\subsection{Design Decisions}\label{sec:design}
+
+\paragraph{FanTheorem := EVT\_max.}
+The central design decision is to define the Fan Theorem as
+$\EVT_{\max}$ rather than axiomatizing the bar-theoretic
+equivalence:
+\begin{lstlisting}[caption={The key design decision.}]
+/-- The Fan Theorem, defined via EVT (Berger 2005). -/
+def FanTheorem : Prop := EVT_max
+\end{lstlisting}
+
+\noindent
+This choice has a major payoff: \textbf{zero custom axioms}.
+Every theorem in the formalization depends only on \Mathlib{}
+infrastructure. The equivalence between $\EVT_{\max}$ and the
+bar-theoretic Fan Theorem is a well-established result in
+constructive reverse mathematics~\citep{Berger05,BB06,BV06}
+and is handled by citation rather than formalization.
+
+The alternative would be to define the Fan Theorem bar-theoretically
+and add an axiom \texttt{evt\_of\_fan\_theorem}. This would give a
+correct formalization but would introduce a custom axiom that
+would appear in every theorem's axiom profile. The definitional
+approach is cleaner.
+
+\paragraph{Self-contained bundle.}
+Paper~23 is a standalone Lake package that re-declares $\LPO$,
+$\WLPO$, $\LLPO$, and $\MP$ locally (in
+\texttt{Defs/Principles.lean}). The hierarchy proofs are proved
+from first principles, ensuring the formalization is fully
+self-contained.
+
+\paragraph{Rescaling approach.}
+The equivalence between $\EVT$ on $[0,1]$ and $\mathrm{CompactOptimization}$
+on general $[a,b]$ is proved via explicit affine rescaling rather
+than abstract compactness arguments. This makes the proof
+constructively transparent: the rescaling is an explicit,
+computable bijection.
+
+\subsection{Axiom Audit}\label{sec:axiom-audit}
+
+\begin{center}
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Theorem} & \textbf{Custom Axioms} &
+  \textbf{Infrastructure} & \textbf{Tier} \\
+\midrule
+\texttt{isingFreeEnergy\_continuous}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & $\BISH$ \\
+\texttt{finite\_opt\_bish}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & $\BISH$ \\
+\texttt{partA\_summary}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & $\BISH$ \\
+\texttt{evt\_min\_of\_evt\_max}
+  & None
+  & propext
+  & $\BISH$ \\
+\texttt{evt\_max\_of\_evt\_min}
+  & None
+  & propext
+  & $\BISH$ \\
+\texttt{compact\_opt\_of\_evt\_min}
+  & None
+  & propext
+  & $\BISH$ \\
+\texttt{evt\_min\_of\_compact\_opt}
+  & None
+  & propext
+  & $\BISH$ \\
+\texttt{ft\_iff\_compact\_opt}
+  & None
+  & propext
+  & $\BISH$ \\
+\texttt{ising\_opt\_of\_ft}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & $\BISH$ \\
+\texttt{fan\_stratification}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & $\BISH$ \\
+\texttt{lpo\_implies\_mp}
+  & None
+  & propext
+  & $\BISH$ \\
+\texttt{lpo\_implies\_wlpo}
+  & None
+  & propext
+  & $\BISH$ \\
+\texttt{wlpo\_implies\_llpo}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & $\BISH$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+\textbf{All theorems: zero custom axioms.} Only \Mathlib{}
+infrastructure appears. This is the cleanest axiom audit of any
+paper in the CRM series (Papers~2--23).
+
+\begin{lstlisting}[caption={Axiom audit (Main/AxiomAudit.lean, selected).}]
+-- Part A (BISH):
+#print axioms isingFreeEnergy_continuous
+-- [propext, Classical.choice, Quot.sound]
+
+#print axioms finite_opt_bish
+-- [propext, Classical.choice, Quot.sound]
+
+-- Part B (ZERO custom axioms!):
+#print axioms evt_min_of_evt_max
+-- [propext]
+
+#print axioms compact_opt_of_evt_min
+-- [propext]
+
+#print axioms ft_iff_compact_opt
+-- [propext]
+
+-- Physical instance:
+#print axioms ising_opt_of_ft
+-- [propext, Classical.choice, Quot.sound]
+
+-- Stratification:
+#print axioms fan_stratification
+-- [propext, Classical.choice, Quot.sound]
+
+-- Hierarchy (pure logic):
+#print axioms lpo_implies_mp
+-- [propext]
+
+#print axioms wlpo_implies_llpo
+-- [propext, Classical.choice, Quot.sound]
+\end{lstlisting}
+
+\subsection{CRM Compliance Protocol}\label{sec:crm-compliance}
+
+The axiom audit confirms:
+\begin{itemize}
+  \item Part~A theorems have \textbf{no custom axioms}---pure
+    $\BISH$.
+  \item Part~B theorems have \textbf{no custom axioms}---the
+    equivalence $\FT \leftrightarrow \mathrm{CompactOptimization}$
+    is proved without any axiomatic input beyond the definition
+    $\FT := \EVT_{\max}$.
+  \item The physical instance (Ising optimization from \FT) has
+    \textbf{no custom axioms}.
+  \item The stratification theorem has \textbf{no custom axioms}.
+  \item \texttt{Classical.choice} in results that use \Mathlib{}
+    analysis (\texttt{Real.log}, \texttt{Real.cosh},
+    \texttt{ContinuousOn}) is a \Mathlib{} infrastructure artifact,
+    not mathematical content. The mathematical content of all
+    proofs is constructive.
+\end{itemize}
+
+\noindent
+The \textbf{contrast with Paper~22} is instructive. Paper~22
+required one custom axiom (\texttt{mp\_real\_of\_mp}) because
+Markov's Principle for reals is not derivable from the
+sequence-level definition without an equivalence proof that was
+cited rather than formalized. Paper~23 avoids this entirely by
+defining \FT{} at the ``right'' level of abstraction ($\EVT_{\max}$),
+so that all equivalences are purely mathematical, requiring no
+interface axioms.
+
+
+% ====================================================================
+\section{Discussion}\label{sec:discussion}
+% ====================================================================
+
+\subsection{Compactness vs.\ Omniscience}
+\label{sec:compact-vs-omni}
+
+The Fan Theorem calibration reveals a fundamentally different
+logical dimension in mathematical physics. The omniscience
+principles ($\LPO$, $\WLPO$, $\LLPO$) concern the decidability
+of infinite tests---can we decide whether a binary sequence is
+identically zero? Markov's Principle concerns witness production
+from double negation---given that a sequence is not all zeros, can
+we find a nonzero entry?
+
+The Fan Theorem concerns \emph{compactness}: does a continuous
+function on a compact set attain its extrema? This is a
+topological question whose logical content is orthogonal to
+both decidability and witness production. The independence of
+\FT{} from $\LPO$, $\WLPO$, $\LLPO$, and $\MP$ means that
+compactness is a \emph{new logical dimension} in the constructive
+analysis of physics.
+
+Concretely: knowing that the 1D Ising free energy has a
+thermodynamic limit ($\LPO$, Paper~8) tells us nothing about
+whether the free energy attains its minimum over a compact
+parameter space (\FT, Paper~23). Conversely, knowing that the
+free energy is optimizable over compact sets tells us nothing
+about whether the thermodynamic limit exists. These are logically
+independent questions about the same physical system.
+
+\subsection{The Fan Theorem in Physics}
+\label{sec:ft-physics}
+
+Free energy optimization is not an isolated example. The Fan
+Theorem---through its equivalence with compact optimization---is
+relevant wherever physics requires extremization over compact
+parameter spaces:
+
+\begin{itemize}
+  \item \textbf{Variational principles:} Ground state energies
+    in quantum mechanics are defined as infima of energy
+    functionals over compact subsets of Hilbert space (via
+    finite-dimensional approximation). The Fan Theorem provides
+    the compactness needed to guarantee attainment.
+
+  \item \textbf{Free energy minimization:} In statistical mechanics,
+    equilibrium states minimize the free energy over the space of
+    probability measures. On compact state spaces, this requires
+    the Fan Theorem.
+
+  \item \textbf{Optimal control:} Control theory frequently
+    seeks minima of cost functionals over compact control sets.
+    The existence of optimal controls depends on the Fan Theorem.
+
+  \item \textbf{Phase diagrams:} Mapping out phase boundaries
+    often involves optimizing order parameters over compact
+    parameter ranges. The Fan Theorem guarantees the existence
+    of the extremal parameter values.
+\end{itemize}
+
+\noindent
+All of these applications share the same logical structure: a
+continuous function on a compact set must attain its extremum.
+The Fan Theorem is the constructive cost of this assertion.
+
+\subsection{Observable-Dependent Cost Revisited}
+\label{sec:obs-dep-revisited}
+
+The 1D Ising model now provides the most extensive example of
+observable-dependent cost in the programme. The same underlying
+model---the free energy $f(\beta, J) = -\log(2 \cosh(\beta J))$---has
+four different logical costs depending on the question asked:
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Question} & \textbf{Principle} & \textbf{Type} &
+  \textbf{Paper} \\
+\midrule
+Compute $f_N$ for finite $N$
+  & $\BISH$ & Arithmetic & 8A \\
+Does $\lim f_N$ exist?
+  & $\LPO$ & Decidability & 8B \\
+What phase is it in?
+  & $\WLPO$ & Decidability & 20 \\
+Does $\min_J f(\beta, J)$ exist?
+  & $\FT$ & Compactness & 23 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Crucially, the last row ($\FT$) is \emph{independent} of the
+middle two ($\LPO$, $\WLPO$). This means the logical cost truly
+depends on the observable---the question asked---not merely on
+the difficulty of the question. The same encoding can yield
+costs on incomparable branches of the hierarchy.
+
+\subsection{The Architecture of the Hierarchy}
+\label{sec:architecture}
+
+With three independent branches, the CRM hierarchy has a richer
+structure than initially apparent:
+
+\begin{equation}\label{eq:full-hierarchy}
+\begin{array}{ccccccc}
+  & & & \LPO & & & \\
+  & & \swarrow & \downarrow & \searrow & & \\
+  & \WLPO & & \MP & & \cdots & \\
+  & \downarrow & & & & & \\
+  & \LLPO & & & & & \\
+  & \downarrow & & & & & \\
+  & \BISH & & & & & \FT \\
+\end{array}
+\end{equation}
+
+\noindent
+The hierarchy is a \textbf{partial order}, not a lattice: we do
+not know whether $\WLPO \wedge \FT$ or $\MP \wedge \FT$ have
+physical instantiations. Future work may discover assertions
+whose constructive cost is the conjunction of two branches---or
+demonstrate that no such conjunction arises naturally in physics.
+
+\subsection{Limitations}\label{sec:limitations}
+
+\begin{enumerate}
+  \item \textbf{Simple physical model.} The Ising free energy
+    $f(\beta, J) = -\log(2 \cosh(\beta J))$ is the simplest
+    possible optimization target. More complex free energy
+    landscapes (higher-dimensional, multi-phase) would provide
+    richer physical content but the same CRM calibration.
+
+  \item \textbf{Bar-theoretic equivalence by citation.} The
+    equivalence between $\EVT_{\max}$ and the bar-theoretic
+    Fan Theorem is cited~\citep{Berger05,BV06}, not formalized.
+    Formalizing this equivalence in \Lean{} would require
+    developing the theory of bars and fans in Cantor space, which
+    is a substantial undertaking.
+
+  \item \textbf{Independence by citation.} The independence of
+    \FT{} from $\LPO$, $\WLPO$, $\LLPO$, and $\MP$ relies on
+    standard model-theoretic arguments~\citep{Berger05,BR87}
+    that are not formalized. Formalizing these separations would
+    require constructing Brouwerian and recursive models in
+    \Lean{}, which is beyond the current scope.
+
+  \item \textbf{Classical.choice in \Mathlib{}.} The appearance
+    of \texttt{Classical.choice} in results using \Mathlib{}
+    analysis is a \Mathlib{} infrastructure artifact. This is
+    the same situation as in all previous papers.
+
+  \item \textbf{Optimization is for min, not argmin.} The
+    formalization proves that a minimizer \emph{exists}, but
+    does not provide a computable procedure for finding it.
+    This is inherent to the constructive content of the Fan
+    Theorem: the theorem asserts existence but does not
+    provide a uniform algorithm.
+\end{enumerate}
+
+
+% ====================================================================
+\section{Conclusion}\label{sec:conclusion}
+% ====================================================================
+
+The assertion that a continuous function on a compact interval
+attains its extremum---the Extreme Value Theorem---is equivalent
+to the Fan Theorem over Bishop's constructive mathematics. We
+have instantiated this equivalence through free energy
+optimization in the 1D Ising model, establishing the
+\textbf{first CRM calibration at the \FT{} level}.
+
+This calibration adds a \textbf{third independent branch} to the
+constructive hierarchy. The omniscience chain ($\LPO \Rightarrow
+\WLPO \Rightarrow \LLPO$), Markov's branch ($\LPO \Rightarrow
+\MP$, Paper~22), and the compactness branch ($\FT \leftrightarrow
+\mathrm{CompactOptimization}$, this paper) are mutually
+independent. The hierarchy is not a chain or even a tree---it is
+a genuine \textbf{partial order} with incomparable elements.
+
+The 1D Ising model now exhibits four distinct logical costs:
+\begin{itemize}
+  \item $\BISH$: Finite-volume computation (Paper~8, Part~A).
+  \item $\LPO$: Thermodynamic limit existence (Paper~8, Part~B).
+  \item $\WLPO$: Phase classification (Paper~20).
+  \item $\FT$: Parameter-space optimization (this paper).
+\end{itemize}
+
+\noindent
+The fourth cost (\FT) is independent of the second and third
+($\LPO$, $\WLPO$), demonstrating that the logical cost of a
+physical assertion depends on the \emph{observable} (the question
+asked), not on the underlying physical model.
+
+The formalization achieves \textbf{zero custom axioms}---the
+cleanest axiom audit in the series. This is made possible by the
+design decision to define the Fan Theorem as $\EVT_{\max}$
+directly, with the bar-theoretic equivalence handled by
+citation. All 14~files, ${\sim}680$~lines, compile with zero
+errors, zero warnings, and zero \texttt{sorry}.
+
+Future work includes searching for physical assertions calibrated
+at other independent principles (e.g., the Weak Fan Theorem, the
+Anti-Specker property, or the Heine--Borel Theorem), discovering
+assertions whose cost is the conjunction of multiple branches,
+and extending the partial order to a more complete map of the
+constructive landscape of mathematical physics.
+
+
+% ====================================================================
+\section*{AI-Assisted Methodology}\label{sec:ai}
+% ====================================================================
+
+This formalization was developed using \textbf{Claude Opus~4.6}
+(Anthropic, 2026) via the \textbf{Claude Code} command-line
+interface, following the same human--AI workflow as previous papers
+in the series~\cite{Lee25-P2,Lee25-P8,Lee26-P20,Lee26-P22}.
+
+The author is a medical professional, not a domain expert in
+constructive mathematics or mathematical physics. The mathematical
+content of this paper was developed with extensive AI assistance.
+The human author specified the research direction and high-level
+goals, reviewed all mathematical claims for plausibility, and
+directed the formalization strategy. Claude Opus~4.6 explored the
+\Mathlib{} codebase, generated \Lean{} proof terms, handled
+debugging, and assisted with paper writing. Final verification
+was by \texttt{lake build} (0~errors, 0~warnings, 0~sorries).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Component} & \textbf{Human} &
+  \textbf{AI (Claude Opus 4.6)} \\
+\midrule
+Research question                & \checkmark & \\
+Physical setup (Ising model)    & \checkmark & \\
+CRM calibration strategy         & \checkmark & \\
+\Lean{} implementation           & & \checkmark \\
+Proof strategies                 & collaborative & collaborative \\
+\LaTeX{} writeup                 & & \checkmark \\
+Review and editing               & \checkmark & \\
+\bottomrule
+\end{tabular}
+\caption{Division of labor between human and AI.}
+\label{tab:division}
+\end{table}
+
+
+% ====================================================================
+\section*{Reproducibility}
+% ====================================================================
+
+\begin{mdframed}[backgroundcolor=gray!10]
+\textbf{Reproducibility Box}
+\begin{itemize}
+\item \textbf{Repository}:
+  \url{https://github.com/paul-c-k-lee/FoundationRelativity}
+\item \textbf{Path}: \texttt{paper~23/P23\_FanTheorem/}
+\item \textbf{Build}: \texttt{lake exe cache get \&\& lake build}
+  (0~errors, 0~sorry)
+\item \textbf{Lean toolchain}:
+  \texttt{leanprover/lean4:v4.28.0-rc1}
+\item \textbf{Custom axioms}: \textbf{NONE}
+\item \textbf{Axiom profile (Theorem~1, isingFreeEnergy\_continuous)}:
+  \texttt{[propext, Classical.choice, Quot.sound]}
+\item \textbf{Axiom profile (Theorem~2, finite\_opt\_bish)}:
+  \texttt{[propext, Classical.choice, Quot.sound]}
+\item \textbf{Axiom profile (Theorem~3, evt\_min\_of\_evt\_max)}:
+  \texttt{[propext]}
+\item \textbf{Axiom profile (Theorem~4, compact\_opt\_of\_evt\_min)}:
+  \texttt{[propext]}
+\item \textbf{Axiom profile (Theorem~5, evt\_min\_of\_compact\_opt)}:
+  \texttt{[propext]}
+\item \textbf{Axiom profile (Theorem~6, ft\_iff\_compact\_opt)}:
+  \texttt{[propext]}
+\item \textbf{Axiom profile (Theorem~7, ising\_opt\_of\_ft)}:
+  \texttt{[propext, Classical.choice, Quot.sound]}
+\item \textbf{Axiom profile (Theorem~8, fan\_stratification)}:
+  \texttt{[propext, Classical.choice, Quot.sound]}
+\item \textbf{Total}: 14~files, ${\sim}680$~lines, 0~sorry
+\end{itemize}
+\end{mdframed}
+
+
+% ====================================================================
+\section*{Acknowledgments}
+% ====================================================================
+
+The \Lean{} formalization was developed using Claude Opus~4.6
+(Anthropic, 2026) via the Claude Code CLI tool. We thank the
+\Mathlib{} community for maintaining the comprehensive library
+of formalized mathematics that made this work possible.
+
+
+% ====================================================================
+% Bibliography
+% ====================================================================
+\bibliographystyle{plainnat}
+\bibliography{paper23_references}
+
+\end{document}

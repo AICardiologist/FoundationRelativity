@@ -1,0 +1,70 @@
+{
+  "title": "Decidability Transfer via Specialization: Standard Conjecture D for Abelian Threefolds (Paper 52, Constructive Reverse Mathematics Series)",
+  "description": "<p>Paper 52 of the Constructive Reverse Mathematics series. We prove that Standard Conjecture D (numerical equivalence implies homological equivalence) for abelian varieties A/Q of dimension g &le; 3 follows from the Tate conjecture for divisors&mdash;which is unconditional by Tate (1966)&mdash;and the structural properties of the Lefschetz ring over finite fields, without invoking Standard Conjecture B or characteristic-0 Hodge theory.</p>\n<p>The proof transfers decidability from characteristic p to characteristic 0 via the Fulton specialization map. The mechanism has three components: (i) the smooth proper base change isomorphism identifies homological triviality across characteristics; (ii) the Lefschetz ring of A<sub>p</sub> has unconditionally definite primitive components (Milne 2002, via the Rosati involution); (iii) the liftable subspace U = im(sp) is stable under the Lefschetz operators L and &Lambda; because the Fourier-Mukai transform specializes via the Poincar&eacute; bundle on the N&eacute;ron model (K&uuml;nnemann 1993, 1994). For g &le; 3, all Tate classes are Lefschetz classes, yielding the transfer.</p>\n<p>The argument fails sharply at dimension 4, where exotic Tate classes first appear outside the Lefschetz ring (Milne 2001). For each even g &ge; 6, Agugliaro (2025) constructs non-liftable exotic classes providing explicit counterexamples.</p>\n<p>The logical transfer architecture is formalized in Lean 4 over Mathlib (4 source files, 369 lines). The bundle compiles with zero errors, zero warnings, and zero sorry. Both the core theorem (<code>sub_lefschetz_non_degenerate</code>) and the main theorem (<code>decidability_transfer_g_le_3</code>) use <strong>zero custom axioms</strong>. The three geometric inputs enter as hypotheses, not axioms, making both theorems pure logical implications.</p>\n<p>Code is distributed exclusively via this Zenodo record.</p>",
+  "upload_type": "software",
+  "publication_date": "2026-02-20",
+  "creators": [
+    {
+      "name": "Lee, Paul Chun-Kit",
+      "affiliation": "New York University",
+      "orcid": "0000-0000-0000-0000"
+    }
+  ],
+  "access_right": "open",
+  "license": "Apache-2.0",
+  "keywords": [
+    "constructive reverse mathematics",
+    "Standard Conjecture D",
+    "decidability transfer",
+    "specialization map",
+    "abelian varieties",
+    "abelian threefolds",
+    "Tate conjecture",
+    "Lefschetz ring",
+    "Rosati involution",
+    "numerical equivalence",
+    "homological equivalence",
+    "Chow groups",
+    "algebraic geometry",
+    "constructive mathematics",
+    "BISH",
+    "formal verification",
+    "Lean 4",
+    "Mathlib"
+  ],
+  "subjects": [
+    {
+      "term": "Mathematical logic and foundations",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85082397",
+      "scheme": "url"
+    },
+    {
+      "term": "Algebraic geometry",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85003438",
+      "scheme": "url"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "relation": "isPartOf",
+      "identifier": "10.5281/zenodo.17054050",
+      "resource_type": "software",
+      "scheme": "doi"
+    }
+  ],
+  "version": "2.0.0",
+  "language": "eng",
+  "notes": "AI-assisted formalization using Claude (Anthropic, Opus 4.6) for Lean 4 code generation under human direction. All mathematical content specified by the author; every theorem verified by the Lean 4 type checker. Built with Lean 4 v4.29.0-rc1 and Mathlib. Reproducible via 'lake build' (zero errors, zero sorry, zero custom axioms). Code available exclusively on Zenodo (not hosted on GitHub).",
+  "references": [
+    "Tate, J. (1966). Endomorphisms of abelian varieties over finite fields. Inventiones math., 2:134-144.",
+    "Milne, J.S. (2002). Polarizations and Grothendieck's Standard Conjectures. Annals of Math., 155:599-610.",
+    "Milne, J.S. (2001). The Tate conjecture over finite fields (AIM talk).",
+    "Künnemann, K. (1993). On the Chow motive of an abelian scheme. Proceedings of Symposia in Pure Mathematics, 55(1):189-205.",
+    "Künnemann, K. (1994). A Lefschetz decomposition for Chow motives of abelian schemes. Inventiones math., 113:85-102.",
+    "Fulton, W. (1998). Intersection Theory, 2nd ed. Springer.",
+    "Deligne, P. (1980). La conjecture de Weil II. Publ. Math. IHES, 52:137-252.",
+    "Agugliaro, T. (2025). Standard conjecture of Hodge type for powers of abelian varieties. arXiv:2502.06853.",
+    "Bridges, D. and Richman, F. (1987). Varieties of Constructive Mathematics. Cambridge University Press.",
+    "Bishop, E. and Bridges, D. (1985). Constructive Analysis. Springer."
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "title": "K3 Surfaces, the Kuga-Satake Construction, and the DPT Framework (Paper 55, Constructive Reverse Mathematics Series)",
+  "description": "<p>Paper 55 of the Constructive Reverse Mathematics series. Second out-of-sample test of the Decidability-Preserving Transfer (DPT) framework, applied to K3 surfaces and the Kuga&ndash;Satake construction. Achieves a full decomposition demonstrating the codimension principle.</p>\n<p>Key results: (A) Motivated cycle transfer via Andr&eacute; (1996). (B) Axiom 2 independence via Deligne Weil I. (C) Kuga&ndash;Satake construction provides Axiom 3 through the Clifford algebra and Rosati involution. (D) Supersingular bypass at Picard number &rho; = 22. (E) No Picard boundary: decidability does not degrade as &rho; varies. (F) Calabi&ndash;Yau threefold correction: weight-3 Hodge&ndash;Riemann restores positive-definiteness. (G) 7-row comparison table assembling the full calibration verdict.</p>\n<p>The Lean 4 / Mathlib formalization comprises 8 source files (1,131 lines), compiles with zero errors, zero warnings, and zero sorry gaps. 9 principled axioms encode deep published results (Andr&eacute; 1996, Lieberman 1968, Matsusaka 1957, Deligne 1974, Lawson&ndash;Michelsohn 1989, van Geemen 2000, Nygaard&ndash;Ogus 1985 / Charles 2013, Lefschetz 1924, Hodge 1941 / Griffiths 1969).</p>\n<p>Code is distributed exclusively via this Zenodo record.</p>",
+  "upload_type": "software",
+  "publication_date": "2026-02-21",
+  "creators": [
+    {
+      "name": "Lee, Paul Chun-Kit",
+      "affiliation": "New York University",
+      "orcid": "0000-0000-0000-0000"
+    }
+  ],
+  "access_right": "open",
+  "license": "Apache-2.0",
+  "keywords": [
+    "constructive reverse mathematics",
+    "K3 surfaces",
+    "Kuga-Satake construction",
+    "DPT framework",
+    "decidability-preserving transfer",
+    "codimension principle",
+    "motivated cycles",
+    "supersingular",
+    "Picard number",
+    "Calabi-Yau threefolds",
+    "Deligne Weil I",
+    "Hodge-Riemann",
+    "Rosati involution",
+    "Clifford algebra",
+    "algebraic geometry",
+    "arithmetic geometry",
+    "formal verification",
+    "Lean 4",
+    "Mathlib",
+    "constructive mathematics"
+  ],
+  "subjects": [
+    {
+      "term": "Mathematical logic and foundations",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85082397",
+      "scheme": "url"
+    },
+    {
+      "term": "Algebraic geometry",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85003438",
+      "scheme": "url"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "relation": "isPartOf",
+      "identifier": "10.5281/zenodo.17054050",
+      "resource_type": "software",
+      "scheme": "doi"
+    }
+  ],
+  "version": "2.0.0",
+  "language": "eng",
+  "notes": "AI-assisted formalization using Claude (Anthropic, Opus 4.6) for Lean 4 code generation under human direction. All mathematical content specified by the author; every theorem verified by the Lean 4 type checker. Built with Lean 4 v4.29.0-rc1 and Mathlib. Reproducible via 'lake build' (zero errors, zero sorry, 9 principled axioms). Code available exclusively on Zenodo (not hosted on GitHub).",
+  "references": [
+    "Andre, Y. (1996). Pour une theorie inconditionnelle des motifs. Inst. Hautes Etudes Sci. Publ. Math. 83, 5-49.",
+    "Lieberman, D.I. (1968). Numerical and homological equivalence of algebraic cycles on Hodge manifolds. Amer. J. Math. 90, 366-374.",
+    "Matsusaka, T. (1957). The criteria for algebraic equivalence and the torsion group. Amer. J. Math. 79, 53-66.",
+    "Deligne, P. (1974). La conjecture de Weil. I. Inst. Hautes Etudes Sci. Publ. Math. 43, 273-307.",
+    "Lawson, H.B. and Michelsohn, M.-L. (1989). Spin Geometry. Princeton University Press.",
+    "van Geemen, B. (2000). Kuga-Satake varieties and the Hodge conjecture. In: The Arithmetic and Geometry of Algebraic Cycles, NATO Sci. Ser. 548, 51-82.",
+    "Nygaard, N.O. and Ogus, A. (1985). Tate's conjecture for K3 surfaces of finite height. Annals of Math. 122, 461-507.",
+    "Charles, F. (2013). The Tate conjecture for K3 surfaces over finite fields. Inventiones math. 194, 119-145.",
+    "Lefschetz, S. (1924). L'analysis situs et la geometrie algebrique. Gauthier-Villars.",
+    "Hodge, W.V.D. (1941). The Theory and Applications of Harmonic Integrals. Cambridge University Press.",
+    "Griffiths, P. (1969). On the periods of certain rational integrals. Annals of Math. 90, 460-541.",
+    "Bridges, D. and Richman, F. (1987). Varieties of Constructive Mathematics. Cambridge University Press.",
+    "Bishop, E. and Bridges, D. (1985). Constructive Analysis. Springer."
+  ]
+}

@@ -1,0 +1,14 @@
+ZENODO UPLOAD METADATA -- Paper 36
+====================================
+
+TITLE:
+Stratifying Spectral Gap Undecidability: Cubitt's Theorem Is LPO (Paper 36, Constructive Reverse Mathematics Series)
+
+DESCRIPTION:
+Paper 36 in the Constructive Reverse Mathematics of Mathematical Physics series. The celebrated result of Cubitt, Perez-Garcia, and Wolf (2015) showed that determining whether a many-body quantum Hamiltonian is gapped or gapless is undecidable. This paper calibrates that undecidability as Turing-Weihrauch equivalent to LPO (the Limited Principle of Omniscience). The key insight is that the macroscopic quantum undecidability costs exactly one thermodynamic limit --- the same logical price paid for phase transitions, continuum limits, and all other infinite-volume completions across physics. The stratification reveals: finite-volume spectral gap is BISH-computable, the thermodynamic limit costs LPO, pointwise decidability requires LPO, gap zero-test costs WLPO (subsumed by LPO), and uniform decidability costs LPO. All results formalized in Lean 4 over Mathlib with zero sorry. The formalization comprises 8 Lean source files.
+
+KEYWORDS:
+spectral gap, undecidability, Cubitt-Perez-Garcia-Wolf, thermodynamic limit, quantum many-body systems, Hamiltonian, gapped gapless, Weihrauch reduction, constructive reverse mathematics, LPO, Limited Principle of Omniscience, WLPO, BISH, Lean 4, Mathlib, formal verification, quantum information
+
+COPYRIGHT STATEMENT:
+Copyright 2026 Paul Chun-Kit Lee. Code licensed under Apache License 2.0. Paper licensed under Creative Commons Attribution 4.0 International (CC-BY 4.0).

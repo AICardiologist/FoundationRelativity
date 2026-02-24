@@ -1,0 +1,14 @@
+ZENODO UPLOAD METADATA -- Paper 31
+====================================
+
+TITLE:
+The Physical Dispensability of Dependent Choice: A Lean 4 Formalization (Paper 31, Constructive Reverse Mathematics Series)
+
+DESCRIPTION:
+Paper 31 in the Constructive Reverse Mathematics of Mathematical Physics series. This paper proves that Dependent Choice (DC) is physically dispensable: every empirically accessible prediction derived from DC-calibrated results --- the Strong Law of Large Numbers (SLLN) and the Birkhoff pointwise ergodic theorem --- is recoverable in BISH + LPO without invoking DC. The key insight is that DC is needed only for infinite quantifier swaps that no finite apparatus can perform. The Weak Law of Large Numbers (WLLN) suffices for all SLLN predictions via BISH-computable Chebyshev bounds, and the Mean Ergodic Theorem (MET) suffices for all Birkhoff predictions via LPO modulus extraction. The master theorem establishes that BISH + LPO is the complete logical constitution of empirically accessible physics, with DC, the Fan Theorem, and other strong set-existence principles all dispensable. All results formalized in Lean 4 over Mathlib with zero sorry. The formalization comprises 5 Lean source files.
+
+KEYWORDS:
+constructive reverse mathematics, Dependent Choice, DC, strong law of large numbers, SLLN, weak law of large numbers, WLLN, mean ergodic theorem, Birkhoff pointwise ergodic theorem, quantifier swap, Limited Principle of Omniscience, LPO, countable choice, BISH, empirical completeness, Lean 4, Mathlib, formal verification, constructive mathematics, physical dispensability
+
+COPYRIGHT STATEMENT:
+Copyright 2026 Paul Chun-Kit Lee. Code licensed under Apache License 2.0. Paper licensed under Creative Commons Attribution 4.0 International (CC-BY 4.0).

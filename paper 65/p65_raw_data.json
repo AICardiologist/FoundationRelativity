@@ -1,0 +1,22 @@
+{
+  "squarefree_count": 122,
+  "conductor_count": 10,
+  "valid_conductors": [
+    7,
+    9,
+    13,
+    19,
+    37,
+    61,
+    79,
+    97,
+    139,
+    163
+  ],
+  "total_pairs": 1220,
+  "confirmed": 1220,
+  "exceptions": 0,
+  "undetermined": 0,
+  "non_cyclic_cubics_count": 24,
+  "family1_analyses": 216
+}

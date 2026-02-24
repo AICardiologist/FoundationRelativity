@@ -1,0 +1,74 @@
+{
+  "title": "The Measurement Problem Dissolved: Constructive Stratification of Quantum Interpretations (Paper 44, Lean 4 Formalization)",
+  "description": "<p>We apply the axiom calibration framework of constructive reverse mathematics (CRM) to the measurement problem of quantum mechanics. Rather than treating the measurement problem as a single conceptual puzzle, we examine three major interpretations — Copenhagen, Many-Worlds, and Bohmian mechanics — and determine the constructive principle each requires over Bishop's constructive mathematics (BISH).</p>\n<p><strong>The measurement problem is not one problem but three.</strong> The Copenhagen postulate (decidability of superposition versus eigenstate for a qubit) calibrates at WLPO in its minimal formalization, or at LPO in its strong formalization. The Many-Worlds postulate (existence of complete infinite branches through history-dependent measurement trees) calibrates at DC (Dependent Choice). The Bohmian trajectory postulate (existence of asymptotic velocity for every guided trajectory) calibrates at LPO (equivalently, Bounded Monotone Convergence). Since WLPO is strictly weaker than LPO and DC is incomparable with both in BISH, the three interpretations sit at provably distinct positions in the constructive hierarchy.</p>\n<p>The accompanying Lean 4 / Mathlib formalization (10 files, ~1,100 lines, zero errors) includes three sorry-free calibration directions (both Copenhagen variants and the DC-to-Many-Worlds direction), one fully proved BISH bonus with a Σ-type witness, and sorry'd proof obligations transparently tracked via the axiom audit.</p>\n<p>Paper 44 of the Foundation Relativity series.</p>",
+  "upload_type": "software",
+  "publication_date": "2026-02-17",
+  "creators": [
+    {
+      "name": "Lee, Paul Chun-Kit",
+      "affiliation": "New York University",
+      "orcid": "0000-0000-0000-0000"
+    }
+  ],
+  "access_right": "open",
+  "license": "Apache-2.0",
+  "keywords": [
+    "constructive reverse mathematics",
+    "measurement problem",
+    "quantum mechanics",
+    "quantum interpretations",
+    "Copenhagen interpretation",
+    "Many-Worlds interpretation",
+    "Bohmian mechanics",
+    "WLPO",
+    "LPO",
+    "Dependent Choice",
+    "axiom calibration",
+    "formal verification",
+    "Lean 4",
+    "Mathlib",
+    "constructive mathematics",
+    "Bishop's constructive mathematics"
+  ],
+  "subjects": [
+    {
+      "term": "Mathematical logic and foundations",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85082397",
+      "scheme": "url"
+    },
+    {
+      "term": "Quantum theory",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85109469",
+      "scheme": "url"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "relation": "isPartOf",
+      "identifier": "10.5281/zenodo.17054050",
+      "resource_type": "software",
+      "scheme": "doi"
+    },
+    {
+      "relation": "references",
+      "identifier": "10.5281/zenodo.13356587",
+      "resource_type": "software",
+      "scheme": "doi"
+    }
+  ],
+  "version": "1.0.0",
+  "language": "eng",
+  "notes": "AI-assisted formalization using Claude (Anthropic) for Lean 4 code generation and proof strategy exploration. All mathematical content specified by the author; every theorem verified by the Lean 4 type checker. Built with Lean 4 v4.28.0-rc1 and Mathlib. Reproducible via 'lake build' (zero errors, 2047 jobs).",
+  "references": [
+    "Bishop, E. (1967). Foundations of Constructive Analysis. McGraw-Hill.",
+    "Bishop, E. and Bridges, D. (1985). Constructive Analysis. Springer.",
+    "Bridges, D. and Richman, F. (1987). Varieties of Constructive Mathematics. Cambridge University Press.",
+    "Bridges, D. and Vîță, L. (2006). Techniques of Constructive Analysis. Springer.",
+    "Ishihara, H. (2006). Reverse mathematics in Bishop's constructive mathematics. Philosophia Scientiae, CS 6:43-59.",
+    "Wallace, D. (2012). The Emergent Multiverse. Oxford University Press.",
+    "Dürr, D., Goldstein, S., and Zanghì, N. (2013). Quantum Physics Without Quantum Philosophy. Springer.",
+    "Bell, J.S. (1987). Speakable and Unspeakable in Quantum Mechanics. Cambridge University Press.",
+    "Döring, A. and Isham, C. (2008). A topos foundation for theories of physics. J. Math. Phys. 49:053515.",
+    "Cubitt, T., Perez-Garcia, D., and Wolf, M. (2015). Undecidability of the spectral gap. Nature 528:207-211."
+  ]
+}

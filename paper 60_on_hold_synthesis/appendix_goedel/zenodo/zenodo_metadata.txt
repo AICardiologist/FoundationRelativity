@@ -1,0 +1,75 @@
+======================================================================
+ZENODO UPLOAD METADATA — Paper 55
+======================================================================
+
+DOI: 10.5281/zenodo.18718136
+
+Title:
+  Is Goedel Absent from the Motive? Arithmetical Absoluteness, the Hilbert Gap, and Why Incompleteness Spares Real Mathematics (Paper 55, Constructive Reverse Mathematics Series)
+
+Description:
+  Paper 55 of the Constructive Reverse Mathematics series. This paper organizes known results from mathematical logic — Shoenfield absoluteness, Goedel's second incompleteness theorem, and the arithmetical classification of algebraic geometry statements — into a coherent meta-mathematical audit of the CRM program's foundations.
+
+  Theorem A (Arithmetical Classification): Conjecture D, for a fixed variety over a countable algebraically closed field of characteristic 0, is a Pi_2^0 sentence in first-order arithmetic; in positive characteristic, cycle class vanishing degrades to Pi_1^0, making the full statement Pi_3^0. In either case, the sentence is within the scope of Shoenfield absoluteness.
+
+  Theorem B (Cohen Immunity): By Shoenfield's absoluteness theorem, Conjecture D is absolute between all transitive models of ZFC. Cohen forcing and large cardinal axioms cannot affect its truth value.
+
+  Theorem C (Residual Epistemological Status): Absoluteness does not imply provability. We distinguish the two modes of independence — Cohen independence (set-theoretic, ruled out) and Goedel independence (arithmetical, not ruled out) — and characterize the residual epistemological question precisely.
+
+  The broader observation — that virtually all theorems in number theory, algebraic geometry, analysis, and mathematical physics are arithmetical, hence immune to set-theoretic independence — is not new (cf. Feferman, Simpson), but the explicit three-layer explanation via Shoenfield absoluteness, the arithmetical barrier, and the Hilbert conflation may clarify the mechanism. The paper also reviews three convergent prior programs (Macintyre, McLarty, Friedman) that approached the question from model theory, proof theory, and reverse mathematics respectively.
+
+  A companion Lean 4 formalization (4 files, 554 lines) verifies the logical plumbing — the chain of implications from Pi_2^0 classification through Shoenfield absoluteness to Cohen immunity — but not the mathematical inputs (computability of cycle classes, Shoenfield's theorem itself). Eight of ten Lean theorems use no axioms at all.
+
+Upload Type: software
+
+Publication Date: 2026-02-20
+
+Keywords:
+  constructive reverse mathematics
+  Goedel incompleteness
+  Shoenfield absoluteness
+  Cohen independence
+  Standard Conjecture D
+  arithmetical hierarchy
+  Pi_2^0
+  ZFC
+  motives
+  algebraic cycles
+  cycle class map
+  numerical equivalence
+  homological equivalence
+  Hilbert gap
+  Macintyre
+  McLarty
+  Friedman Grand Conjecture
+  formal verification
+  Lean 4
+  Mathlib
+  mathematical logic
+  algebraic geometry
+
+License: Apache License 2.0 (code), CC-BY-4.0 (paper)
+
+Copyright Notice:
+  Copyright (c) 2026 Paul Chun-Kit Lee. Code licensed under the Apache License 2.0. Paper licensed under CC-BY-4.0. To view a copy of the Apache License, visit https://www.apache.org/licenses/LICENSE-2.0. To view a copy of CC-BY-4.0, visit https://creativecommons.org/licenses/by/4.0/.
+
+Files to Upload:
+  P55_GoedelConjD_zenodo.zip containing:
+    README.md
+    REPRODUCIBILITY.md
+    LICENSE (Apache 2.0)
+    paper55_goedel_conj_d.pdf
+    paper55_goedel_conj_d.tex
+    P55_GoedelConjD/           (Lean 4 bundle, 4 source files)
+      lean-toolchain
+      lakefile.lean
+      lake-manifest.json
+      Papers.lean
+      Papers/P55_GoedelConjD/
+        Defs.lean              -- 190 lines: Pi02Sentence, Sigma12Sentence, definitions
+        Absoluteness.lean      -- 116 lines: Shoenfield absoluteness chain
+        CohenImmunity.lean     -- 145 lines: Cohen immunity from absoluteness
+        Main.lean              -- 103 lines: Theorems A, B, C, axiom audit
+
+Notes:
+  AI-assisted formalization using Claude (Anthropic, Opus 4.6) for Lean 4 code generation under human direction. All mathematical content specified by the author; every theorem verified by the Lean 4 type checker. Built with Lean 4 v4.29.0-rc1 and Mathlib. Reproducible via 'lake build' (zero errors, zero sorry). Code available exclusively on Zenodo (not hosted on GitHub).

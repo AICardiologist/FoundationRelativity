@@ -1,0 +1,74 @@
+Title:
+The Modularity Theorem is BISH + WLPO: The BCDT Extension Adds No Logical Cost (Paper 69, Constructive Reverse Mathematics Series)
+
+Authors:
+Lee, Paul Chun-Kit (New York University)
+
+Publication Date:
+2026-02-23
+
+Type:
+Software / Dataset (Lean 4 formalization + LaTeX paper)
+
+Version:
+1.0
+
+License:
+Apache-2.0 (Lean 4 code) / CC-BY 4.0 (LaTeX paper and PDF)
+Copyright 2026 Paul Chun-Kit Lee
+
+Language:
+English
+
+Keywords:
+constructive reverse mathematics, modularity theorem, BCDT, Breuil-Conrad-Diamond-Taylor, Lean 4, formal verification, WLPO, BISH, elliptic curves, 3-5 switching, icosahedral case, Langlands-Tunnell, omniscience principles, PGL2(F3), solvable groups
+
+Abstract:
+Paper 68 showed that Wiles's proof of the modularity of semistable elliptic curves over Q calibrates at BISH + WLPO, with the WLPO localized entirely in the Langlands-Tunnell theorem (Stage 1). We extend this classification to the full modularity theorem for all elliptic curves over Q (Breuil-Conrad-Diamond-Taylor 2001).
+
+The extension introduces three new ingredients: Breuil's classification of finite flat group schemes, Conrad's local-global compatibility, and the Diamond-Taylor 3-5 switching argument. All three are BISH. The icosahedral case (A5 in PGL2(F5)) never arises because every invocation of residual modularity in the BCDT proof is delegated to p = 3, where PGL2(F3) = S4 is solvable and Langlands-Tunnell applies unconditionally.
+
+The classification of the full modularity theorem is BISH + WLPO, identical to the semistable case. The Lean 4 verification (324 lines across two files, zero sorry) formalizes the logical assembly: each BCDT ingredient is classified by definition, and the join is machine-checked.
+
+Related Identifiers:
+Part of: Constructive Reverse Mathematics Series (Papers 1-69)
+Extends: Paper 68 (Wiles's proof CRM audit, doi:10.5281/zenodo.18748460)
+References: Paper 50 (Atlas Survey), Paper 59 (p-adic comparison), Paper 67 (Arithmetic Geometry Synthesis)
+
+Subjects:
+Mathematical Logic
+Number Theory
+Formal Verification
+Constructive Mathematics
+
+Technical Details:
+Lean version: leanprover/lean4:v4.29.0-rc1
+Dependency: Mathlib4 (via lakefile.lean)
+Lean files: 2 (324 lines total)
+Sorry count: 0
+Warning count: 0
+Error count: 0
+Opaque types: 0
+Axioms: 0
+LaTeX pages: 13
+References: 20
+
+File Manifest:
+README.md                                       Overview and build instructions
+metadata.txt                                     This file
+LICENSE                                          Dual license (Apache 2.0 / CC-BY 4.0)
+paper69.tex                                      LaTeX source
+paper69.pdf                                      Compiled PDF (12 pages)
+P69_BCDT/lean-toolchain                          Lean version pin
+P69_BCDT/lakefile.lean                           Lake build configuration
+P69_BCDT/lake-manifest.json                      Mathlib4 dependency lock
+P69_BCDT/Papers.lean                             Root import file
+P69_BCDT/Papers/P69_BCDT/Paper69_CRMBase.lean             CRM hierarchy, Paper 68 stage defs (120 lines)
+P69_BCDT/Papers/P69_BCDT/Paper69_Classification.lean      BCDT classification theorems (204 lines)
+
+Build Instructions:
+1. Lean: cd P69_BCDT && lake update && lake build
+2. LaTeX: pdflatex paper69.tex && pdflatex paper69.tex && pdflatex paper69.tex
+
+Contact:
+dr.paul.c.lee@gmail.com

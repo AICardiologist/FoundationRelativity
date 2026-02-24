@@ -1,0 +1,78 @@
+Title:
+Fermat's Last Theorem is BISH: A Constructive Reverse Mathematics Audit (Paper 68, Constructive Reverse Mathematics Series)
+
+Authors:
+Lee, Paul Chun-Kit (New York University)
+
+DOI:
+10.5281/zenodo.18749965
+
+Publication Date:
+2026-02-23
+
+Type:
+Software / Dataset (Lean 4 formalization + LaTeX paper)
+
+Version:
+3.0
+
+License:
+Apache-2.0 (Lean 4 code) / CC-BY 4.0 (LaTeX paper and PDF)
+Copyright 2026 Paul Chun-Kit Lee
+
+Language:
+English
+
+Keywords:
+constructive reverse mathematics, Fermat's Last Theorem, Wiles's proof, BISH, Taylor-Wiles method, Lean 4, formal verification, WLPO, Fan Theorem, Markov's Principle, Brochard, effective Chebotarev, Langlands-Tunnell, Kisin, Khare-Wintenberger, dihedral modularity, omniscience principles, de-omniscientizing descent, potential modularity
+
+Abstract:
+We perform a stage-by-stage constructive reverse mathematics audit of Wiles's proof of the modularity of semistable elliptic curves over Q, and hence of Fermat's Last Theorem. The proof decomposes into five stages: residual modularity (Langlands-Tunnell), deformation ring construction, Hecke algebra construction, the numerical criterion, and Taylor-Wiles patching.
+
+Our principal finding is an asymmetry: Stages 2-5 are fully constructive (BISH), while Stage 1 requires WLPO (Weak Limited Principle of Omniscience). The non-constructive content of Wiles's proof is concentrated entirely at its entry point -- the analytic theory of weight 1 automorphic forms -- and the Taylor-Wiles engine contributes zero logical cost.
+
+We then show that Stage 1 can be bypassed entirely. The 21st-century proof route (Kisin 2009, Khare-Wintenberger 2009), which replaces Wiles's residual prime p = 3 with p = 2, reduces the base case to dihedral modularity (GL_2(F_2) = S_3), where Hecke's algebraic theta series provide a BISH construction. An equivalent bypass via potential modularity (Taylor, Buzzard-Taylor) restricts to a totally real field where the representation becomes dihedral, then uses weight 2 base change (also BISH). The overall classification of Fermat's Last Theorem is therefore BISH. The WLPO was an artefact of Wiles's choice of residual prime, not a property of the theorem.
+
+Two post-Wiles developments drive the Stage 5 classification: Brochard's proof of de Smit's conjecture (2017), which eliminates the infinite inverse limit, and unconditional effective Chebotarev bounds (Lagarias-Montgomery-Odlyzko 1979, Ahn-Kwon 2019), which make the Taylor-Wiles prime search a bounded computation. Neither result was motivated by constructive foundations; the community unknowingly eliminated the Fan Theorem from the proof of FLT over twenty-two years.
+
+The Lean 4 verification (493 lines across three files, zero sorry) formalizes the logical assembly: deep theorems are axiomatized and flagged; the conditional classification is machine-checked.
+
+Related Identifiers:
+Part of: Constructive Reverse Mathematics Series (Papers 1-68)
+References: Paper 50 (Atlas Survey), Paper 59 (p-adic comparison), Paper 67 (Arithmetic Geometry Synthesis)
+
+Subjects:
+Mathematical Logic
+Number Theory
+Formal Verification
+Constructive Mathematics
+
+Technical Details:
+Lean version: leanprover/lean4:v4.29.0-rc1
+Dependency: Mathlib4 (via lakefile.lean)
+Lean files: 3 (493 lines total)
+Sorry count: 0
+Warning count: 0
+Error count: 0
+LaTeX pages: 18
+References: 28
+
+File Manifest:
+README.md                                       Overview and build instructions
+metadata.txt                                     This file
+paper68.tex                                      LaTeX source
+paper68.pdf                                      Compiled PDF (18 pages)
+P68_WilesFLT/lean-toolchain                      Lean version pin
+P68_WilesFLT/lakefile.lean                       Lake build configuration
+P68_WilesFLT/lake-manifest.json                  Mathlib4 dependency lock
+P68_WilesFLT/Papers.lean                         Root import file
+P68_WilesFLT/Papers/P68_WilesFLT/Paper68_Axioms.lean       Shared axioms, CRM hierarchy (132 lines)
+P68_WilesFLT/Papers/P68_WilesFLT/Paper68_Stage5.lean       Target 1: Stage 5 is BISH (178 lines)
+P68_WilesFLT/Papers/P68_WilesFLT/Paper68_Asymmetry.lean    Target 2: Asymmetry Theorem (183 lines)
+
+Build Instructions:
+1. Lean: cd P68_WilesFLT && lake update && lake build
+2. LaTeX: pdflatex paper68.tex && pdflatex paper68.tex
+
+Contact:
+dr.paul.c.lee@gmail.com

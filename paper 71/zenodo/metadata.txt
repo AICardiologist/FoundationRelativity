@@ -1,0 +1,86 @@
+Title: The Archimedean Principle in Cryptography and Numerical Computation: Engineering Applications of Constructive Reverse Mathematics (Paper 71, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+Affiliation: New York University
+Email: dr.paul.c.lee@gmail.com
+
+DOI: 10.5281/zenodo.18752015
+
+Date: February 2026
+
+Type: Publication (preprint + software)
+
+License: Apache-2.0
+
+Description:
+  Four engineering consequences of the Archimedean Principle (Paper 70)
+  in the CRM series.
+
+  Theorem A (Archimedean Security): Lattice-based cryptography (SVP, LWE,
+  Ring-LWE) is not amenable to Shor-type quantum attacks because solution
+  targets are metric (Archimedean norm bounds), not algebraic
+  (group-theoretic relations).
+
+  Theorem B (SVP Phase Transition): Exponential approximation is
+  projection-descent (LLL, BISH); polynomial approximation is
+  search-descent (BKZ, BISH+MP).
+
+  Theorem C (Conjugacy Design Principle): Maximize Fourier conjugacy
+  between algebraic operations and metric security assumptions.
+  Kyber > NTRU > RSA ordered by conjugacy index.
+
+  Theorem D (Eigendecomposition Integrality): Any nontrivial
+  eigendecomposition of a positive-definite integer matrix introduces
+  irreducible transcendental contamination.
+
+  All four applications follow from one mechanism: projection descent
+  eliminates MP; search descent preserves it; the Archimedean metric is
+  canonically conjugate to algebraic spectral decomposition.
+
+Keywords:
+  constructive reverse mathematics
+  formal verification
+  Lean 4
+  lattice cryptography
+  post-quantum cryptography
+  Archimedean principle
+  Markov's principle
+  SVP
+  LWE
+  constructive mathematics
+
+Lean 4 Formalization:
+  Toolchain: leanprover/lean4:v4.28.0-rc1
+  Mathlib: v4.28.0-rc1
+  Build: lake build (0 errors, 0 warnings, 0 sorry)
+
+File Structure:
+  paper71.tex          LaTeX source
+  paper71.pdf          Compiled paper (15 pages)
+  README.md            Build instructions and file descriptions
+  metadata.txt         This file
+  P71_QuantumCRM/      Lean 4 formalization bundle
+    lakefile.lean        Build configuration (Mathlib dependency)
+    lean-toolchain       Lean version pinning
+    Papers.lean          Root import
+    Papers/P71_QuantumCRM/
+      Defs.lean            CRM hierarchy, descent types, target types,
+                           conjugacy levels, dimensional arguments
+      Problems.lean        Cryptographic problem profiles, scheme profiles,
+                           approximation regimes, algorithm types
+      Security.lean        All four main theorems + assembly
+      Integrality.lean     Sum-of-integer-squares lemma (Mathlib proof)
+      Main.lean            Root module + axiom audit
+
+Axiom Inventory:
+  Classification theorems (native_decide): Lean.ofReduceBool, Lean.trustCompiler
+  Integrality lemma (Mathlib proof): propext, Classical.choice, Quot.sound
+
+Series Context:
+  Paper 70: The Archimedean Principle (foundation for this paper)
+  Paper 50: CRM Atlas (master survey)
+  Papers 51-53: Tetralogy support papers
+  Paper 45: Calibration pattern reference
+
+Related DOIs:
+  Series repository: https://doi.org/10.5281/zenodo.17054050

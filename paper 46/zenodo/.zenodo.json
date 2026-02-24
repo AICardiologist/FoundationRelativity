@@ -1,0 +1,77 @@
+{
+  "title": "The Tate Conjecture and LPO: Galois-Invariance, Cycle Verification, and Standard Conjecture D as a Decidability Axiom (Paper 46, Constructive Reverse Mathematics Series)",
+  "description": "<p>Paper 46 of the Constructive Reverse Mathematics series. We apply CRM to calibrate the logical strength of the Tate Conjecture for smooth projective varieties over finite fields. We establish four theorems (T1&ndash;T4) that classify which components require LPO and which are BISH-compatible.</p>\n<p><strong>T1</strong> (Galois-Invariance &harr; LPO): Deciding membership in ker(Frob &minus; I) over &Qopf;<sub>&ell;</sub> is equivalent to LPO(&Qopf;<sub>&ell;</sub>). Full proof from encoding axioms.</p>\n<p><strong>T2</strong> (Cycle Verification in BISH): Given a finite complementary basis, numerical equivalence of algebraic cycles is decidable in BISH&mdash;requiring only integer arithmetic. Full proof, no calibration axioms.</p>\n<p><strong>T3</strong> (Polarization Obstruction): The Poincar&eacute; pairing on V cannot be anisotropic in dimension &ge; 5, blocking the polarization strategy over &Qopf;<sub>&ell;</sub>.</p>\n<p><strong>T4</strong> (Standard Conjecture D as Decidability Axiom): T4a: deciding homological equivalence requires LPO(&Qopf;<sub>&ell;</sub>). T4b: Standard Conjecture D converts homological equivalence to BISH-decidable numerical equivalence. SCD is precisely the axiom that <em>de-omniscientizes</em> the morphism spaces of the motivic category.</p>\n<p>The Lean 4 / Mathlib formalization comprises 6 source files (771 lines), compiles with zero errors, zero warnings, and zero sorry. 21 custom axioms, all explicitly documented.</p>\n<p>Code is distributed exclusively via this Zenodo record.</p>",
+  "upload_type": "software",
+  "publication_date": "2026-02-18",
+  "creators": [
+    {
+      "name": "Lee, Paul Chun-Kit",
+      "affiliation": "New York University",
+      "orcid": "0000-0000-0000-0000"
+    }
+  ],
+  "access_right": "open",
+  "license": "Apache-2.0",
+  "keywords": [
+    "constructive reverse mathematics",
+    "Tate Conjecture",
+    "LPO",
+    "Standard Conjecture D",
+    "Galois-invariance",
+    "algebraic cycles",
+    "numerical equivalence",
+    "homological equivalence",
+    "de-omniscientizing descent",
+    "u-invariant",
+    "Poincare pairing",
+    "BISH",
+    "formal verification",
+    "Lean 4",
+    "Mathlib",
+    "constructive mathematics",
+    "motivic category"
+  ],
+  "subjects": [
+    {
+      "term": "Mathematical logic and foundations",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85082397",
+      "scheme": "url"
+    },
+    {
+      "term": "Algebraic geometry",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85003438",
+      "scheme": "url"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "relation": "isPartOf",
+      "identifier": "10.5281/zenodo.17054050",
+      "resource_type": "software",
+      "scheme": "doi"
+    },
+    {
+      "relation": "continues",
+      "identifier": "10.5281/zenodo.18676170",
+      "resource_type": "software",
+      "scheme": "doi"
+    }
+  ],
+  "version": "1.0.0",
+  "language": "eng",
+  "notes": "AI-assisted formalization using Claude (Anthropic, Opus 4.6) for Lean 4 code generation under human direction. All mathematical content specified by the author; every theorem verified by the Lean 4 type checker. Built with Lean 4 v4.29.0-rc1 and Mathlib. Reproducible via 'lake build' (zero errors, zero sorry). Code available exclusively on Zenodo (not hosted on GitHub).",
+  "references": [
+    "Tate, J. (1965). Algebraic cycles and poles of zeta functions. In Arithmetical Algebraic Geometry, 93-110.",
+    "Tate, J. (1966). Endomorphisms of abelian varieties over finite fields. Invent. Math., 2:134-144.",
+    "Grothendieck, A. (1969). Standard conjectures on algebraic cycles. In Algebraic Geometry (Bombay 1968), 193-199.",
+    "Faltings, G. (1983). Endlichkeitssaetze fuer abelsche Varietaeten ueber Zahlkoerpern. Invent. Math., 73:349-366.",
+    "Deligne, P. (1974). La conjecture de Weil I. Publ. Math. IHES, 43:273-307.",
+    "Bridges, D. and Richman, F. (1987). Varieties of Constructive Mathematics. Cambridge University Press.",
+    "Lam, T.Y. (2005). Introduction to Quadratic Forms over Fields. AMS Graduate Studies 67.",
+    "Scharlau, W. (1985). Quadratic and Hermitian Forms. Springer Grundlehren 270.",
+    "Bishop, E. and Bridges, D. (1985). Constructive Analysis. Springer.",
+    "Kleiman, S. (1968). Algebraic cycles and the Weil conjectures. In Dix exposes sur la cohomologie des schemas, 359-386.",
+    "Jannsen, U. (1992). Motives, numerical equivalence, and semi-simplicity. Invent. Math., 107:447-452.",
+    "Lee, P.C.-K. (2026). Paper 45: Weight-Monodromy Conjecture and LPO. CRM Series. DOI: 10.5281/zenodo.18676170."
+  ]
+}

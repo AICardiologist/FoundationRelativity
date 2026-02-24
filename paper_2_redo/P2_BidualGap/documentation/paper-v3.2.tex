@@ -1,0 +1,833 @@
+\documentclass[11pt]{article}
+
+% -------------------------------------------------
+% Basic packages
+% -------------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[american]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{microtype}
+\usepackage{enumitem}
+\setlist[enumerate,1]{label=\textnormal{(\alph*)}}
+
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{amsthm}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+
+% Graphics & colour for GAP/NOTE boxes
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,cd}
+\usepackage{mdframed}
+\mdfdefinestyle{gapbox}{%
+  backgroundcolor=gray!10,
+  linecolor=red!70!black,
+  linewidth=1.0pt,
+  leftmargin=0pt,
+  rightmargin=0pt,
+  innerleftmargin=6pt,
+  innerrightmargin=6pt,
+  innertopmargin=4pt,
+  innerbottommargin=4pt
+}
+\mdfdefinestyle{okbox}{%
+  backgroundcolor=green!8,
+  linecolor=green!50!black,
+  linewidth=0.8pt,
+  leftmargin=0pt,
+  rightmargin=0pt,
+  innerleftmargin=6pt,
+  innerrightmargin=6pt,
+  innertopmargin=4pt,
+  innerbottommargin=4pt
+}
+\mdfdefinestyle{roadmap}{%
+  backgroundcolor=blue!3,
+  linecolor=blue!40!black,
+  linewidth=0.6pt,
+  leftmargin=0pt,
+  rightmargin=0pt,
+  innerleftmargin=6pt,
+  innerrightmargin=6pt,
+  innertopmargin=4pt,
+  innerbottommargin=4pt
+}
+
+% Theorem styles
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% Neutralize Lean status badges for the preliminary draft
+\renewcommand{\leanok}{}
+\renewcommand{\leanpending}{}
+\newcommand{\leanok}{}
+\newcommand{\leanpending}{}
+
+% Status indicators (optional, gentle)
+\newcommand{\status}[1]{\textsf{\small\color{blue!60!black}[#1]}}
+
+% Shortcuts
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\cnull}{c_0}
+\newcommand{\linf}{\ell^\infty}
+\newcommand{\Found}{\mathsf{Found}}
+\newcommand{\Gpd}{\mathsf{Gpd}}
+\newcommand{\Cat}{\mathsf{Cat}}
+\newcommand{\Ban}{\mathsf{Ban}}
+
+% Title
+\title{Foundation--Relativity as Non--Functoriality:\\
+A Bicategorical Framework with a Stone Window to \(\ell^\infty/c_0\)\\
+\large{Version 3.2: results on paper with partial Lean 4 mechanization}}
+\author{Paul Chun--Kit Lee}
+\date{September 2025}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We develop a bicategory--centric account of foundation--relativity and prove a general \emph{Functorial Obstruction Theorem}: several analytically meaningful ``witness'' constructions (bidual gap, AP failure, RNP failure) cannot be assembled into (pseudo)functors on a 2--category of foundations in either variance, once mild preservation is required of interpretations. 
+
+A second contribution is an elementary \emph{Stone window} into \(\ell^\infty/c_0\): idempotents in the Banach algebra \(\ell^\infty/c_0\) form a Boolean algebra canonically isomorphic to \(\mathcal{P}(\mathbb N)/\mathrm{Fin}\). As a corollary, every finite distributive lattice embeds there. The argument is fully elementary and avoids ultrafilters.
+
+This paper combines theoretical results with partial mechanization in Lean 4. The bidual gap characterization (WLPO ↔ BidualGapStrong) has been formalized with complete quotient framework and optimal axiom profile. The main obstruction theorem and bicategorical coherence remain paper-level proofs with mechanization roadmap provided.
+\end{abstract}
+
+\tableofcontents
+
+%===========================================================
+\section{Executive summary}\label{sec:summary}
+%===========================================================
+
+This preliminary version does three things:
+
+\begin{enumerate}
+\item It defines a 2--category \(\Found\) of ``foundations'' with interpretations that preserve finite and countable (co)limits and Cauchy completions, plus minimal analytic structure (isometry on bounded maps, preservation of compact operators, and the ideal \(c_0\)).
+
+\item It proves a \emph{Functorial Obstruction Theorem}: for suitable \(X\in\Sigma_0\), certain witness groupoids attached to analytic phenomena differ across foundations in a way incompatible with the existence of a covariant or contravariant pseudofunctor on \(\Found\).
+
+\item It proves a \emph{Stone window} theorem: the idempotents of \(\ell^\infty/c_0\) form a Boolean algebra canonically isomorphic to \(\mathcal{P}(\mathbb N)/\mathrm{Fin}\), yielding embeddings of all finite distributive lattices.
+\end{enumerate}
+
+What we \emph{do} claim: The bidual gap characterization (WLPO ↔ BidualGapStrong) is mechanized in Lean 4 with complete quotient framework (`𝒫(ℕ)/Fin` and `(ℝ^ℕ)/c₀`), optimal axiom profile (`[propext, Classical.choice, Quot.sound]`), and bidirectional equivalence theorem infrastructure. The main obstruction theorem and bicategorical coherence remain at paper level with roadmap for future mechanization.
+
+%===========================================================
+\section{The 2--category \texorpdfstring{$\Found$}{Found}}\label{sec:Found}
+%===========================================================
+
+\subsection{Objects (Foundations)}\label{ssec:Found-objects}
+
+\begin{definition}[Foundation]\label{def:foundation}
+A \emph{foundation} \(F\) consists of:
+\begin{enumerate}[label=\textnormal{(O\arabic*)}]
+\item A universe \(\mathcal U(F)\): a locally small, cartesian closed category, closed under countable (co)limits and Cauchy completions.
+\item A deductive system \(\mathcal L(F)\) whose terms/proofs denote objects/morphisms in \(\mathcal U(F)\).
+\item A common signature \(\Sigma_0\) containing:
+  \begin{itemize}
+  \item Natural numbers \(\N\) with arithmetic
+  \item Booleans \(\{0,1\}\) with logical operations
+  \item Real numbers \(\R\) with field operations and completeness
+  \item Normed linear spaces over \(\R\) with norm \(\|\cdot\|\)
+  \item Bounded sequences \(\linf = \{v: \N \to \R \mid \sup_n |v_n| < \infty\}\)
+  \item Vanishing sequences \(\cnull = \{v \in \linf \mid \lim_{n \to \infty} v_n = 0\}\)
+  \end{itemize}
+  interpreted identically in every foundation. Symbols in \(\Sigma_0\) are fixed on the nose by all interpretations.
+\end{enumerate}
+\end{definition}
+
+\begin{mdframed}[style=roadmap]
+\textbf{Formalization roadmap}: In Lean 4, this would become:
+\begin{verbatim}
+structure Foundation where
+  universe : Type (u+1)
+  is_cartesian_closed : CartesianClosed universe
+  has_countable_limits : HasCountableLimits universe
+  has_countable_colimits : HasCountableColimits universe
+  has_cauchy_completion : HasCauchyCompletion universe
+  logic : DeductiveSystem universe
+  sigma_zero : CommonSignature universe
+\end{verbatim}
+\end{mdframed}
+
+\subsection{1--Morphisms (Interpretations)}\label{ssec:Found-1mor}
+
+\begin{definition}[Interpretation]\label{def:interpretation}
+A \(1\)-morphism \(\Phi:F\to F'\) consists of:
+\begin{enumerate}[label=\textnormal{(I\arabic*)}]
+\item \label{I1a}
+A functor \(\Phi^*:\mathcal U(F)\to\mathcal U(F')\) preserving:
+  \begin{itemize}
+  \item Finite and countable (co)limits
+  \item Cauchy completions
+  \end{itemize}
+\item \label{I1b}
+Compatibility with analysis: 
+  \begin{itemize}
+  \item \(\Phi^*\) acts isometrically on bounded linear maps: \(\|\Phi^*(T)\| = \|T\|\)
+  \item \(\Phi^*\) preserves compact operators
+  \item \(\Phi^*(\cnull) = \cnull\) (preserves the ideal structure)
+  \end{itemize}
+\item \label{I2}
+A proof translation: if \(\mathcal L(F)\vdash\varphi\) then \(\mathcal L(F')\vdash \Phi(\varphi)\), where \(\Phi(\varphi)\) fixes all symbols from \(\Sigma_0\).
+\end{enumerate}
+\end{definition}
+
+\begin{remark}
+The isometry requirement \(\|\Phi^*(T)\| = \|T\|\) is strong but ensures that analytic properties are preserved exactly. This could be weakened to non-expansiveness (\(\|\Phi^*(T)\| \leq \|T\|\)) for some purposes, but we maintain the stronger condition for clarity of the obstruction theorem.
+\end{remark}
+
+\begin{lemma}[Composition of Interpretations]\label{lem:composition}
+Interpretations compose: if \(\Phi:F\to F'\) and \(\Psi:F'\to F''\) are interpretations, then so is \(\Psi\circ\Phi:F\to F''\) with \((\Psi\circ\Phi)^*=\Psi^*\circ\Phi^*\). Moreover, all preservation properties are maintained.
+\end{lemma}
+
+\begin{proof}
+We verify each requirement:
+
+\textbf{(I1a) Preservation of (co)limits}: 
+Let \(D: J \to \mathcal{U}(F)\) be a diagram with \(J\) countable. Let \(L = \lim D\) with cone \(\pi_j: L \to D(j)\).
+
+Since \(\Phi^*\) preserves countable limits:
+\[\Phi^*(L) = \lim(\Phi^* \circ D) \text{ with cone } \Phi^*(\pi_j)\]
+
+Since \(\Psi^*\) preserves countable limits:
+\[\Psi^*(\Phi^*(L)) = \lim(\Psi^* \circ \Phi^* \circ D)\]
+
+Therefore \((\Psi \circ \Phi)^*(L) = \Psi^*(\Phi^*(L)) = \lim((\Psi \circ \Phi)^* \circ D)\).
+
+The argument for colimits is dual. Finite (co)limits are a special case.
+
+\textbf{Cauchy completions}: Let \((x_n)\) be a Cauchy sequence in a normed space \(X\) in \(\mathcal{U}(F)\). Let \(x = \lim x_n\) in the Cauchy completion.
+
+\(\Phi^*\) preserves Cauchy sequences (being isometric on norms) and their limits:
+\[\Phi^*(x) = \lim \Phi^*(x_n)\]
+
+Similarly \(\Psi^*(\Phi^*(x)) = \lim \Psi^*(\Phi^*(x_n))\).
+
+\textbf{(I1b) Analytic compatibility}:
+\begin{itemize}
+\item Isometry: \(\|\Psi^*(\Phi^*(T))\| = \|\Phi^*(T)\| = \|T\|\)
+\item Compact operators: If \(T\) is compact, so is \(\Phi^*(T)\) and hence \(\Psi^*(\Phi^*(T))\)
+\item Ideal preservation: \((\Psi \circ \Phi)^*(\cnull) = \Psi^*(\Phi^*(\cnull)) = \Psi^*(\cnull) = \cnull\)
+\end{itemize}
+
+\textbf{(I2) Proof translation}: The composition of proof translations is a proof translation.
+
+\textbf{Identity}: The identity functor satisfies all requirements trivially.
+\end{proof}
+
+\subsection{2--Morphisms and bicategorical structure}\label{ssec:Found-2mor}
+
+\begin{definition}[2--Morphisms]
+Given \(\Phi,\Psi:F\to F'\), a \(2\)-morphism \(\alpha:\Phi\Rightarrow\Psi\) is a natural transformation \(\alpha:\Phi^*\Rightarrow\Psi^*\) such that \(\alpha_X = \text{id}_X\) for all \(X \in \text{im}(\Sigma_0)\).
+\end{definition}
+
+\begin{proposition}[Bicategorical structure]\label{prop:bicat}
+With vertical and horizontal composition of natural transformations, \(\Found\) forms a bicategory. For set-based models (where universes are 1-categories), it is a strict 2-category.
+\end{proposition}
+
+\begin{proof}
+We verify the bicategory axioms:
+
+\textbf{Vertical composition}: Given \(\alpha: \Phi \Rightarrow \Psi\) and \(\beta: \Psi \Rightarrow \Omega\), the vertical composite \(\beta \cdot \alpha: \Phi \Rightarrow \Omega\) is defined by \((\beta \cdot \alpha)_X = \beta_X \circ \alpha_X\).
+
+Since both \(\alpha_X = \text{id}_X\) and \(\beta_X = \text{id}_X\) on \(\Sigma_0\), so is their composite.
+
+\textbf{Horizontal composition}: Given \(\alpha: \Phi \Rightarrow \Psi: F \to F'\) and \(\alpha': \Phi' \Rightarrow \Psi': F' \to F''\), the horizontal composite \(\alpha' * \alpha: \Phi' \circ \Phi \Rightarrow \Psi' \circ \Psi\) is the natural transformation with components:
+\[(\alpha' * \alpha)_X = \alpha'_{\Psi^*(X)} \circ \Phi'^*(\alpha_X) = \Psi'^*(\alpha_X) \circ \alpha'_{\Phi^*(X)}\]
+
+The interchange law holds by naturality.
+
+\textbf{Identity 2-morphisms}: For each \(\Phi: F \to F'\), the identity \(\text{id}_\Phi\) has components \((\text{id}_\Phi)_X = \text{id}_{\Phi^*(X)}\).
+
+\textbf{Associativity and unit coherence}: In set-based models, composition of functors is strictly associative and unital, so the bicategory is strict. For non-strict models, we have coherence isomorphisms satisfying the pentagon and triangle identities.
+\end{proof}
+
+%===========================================================
+\section{Witness groupoids and the functorial obstruction}\label{sec:obstruction}
+%===========================================================
+
+\subsection{Internal witness constructions}\label{ssec:witness}
+
+Fix \(F\in\Found\). Let \(\Ban(F)\) be the category of Banach spaces and bounded linear maps internal to \(F\). Analytic content is classical unless noted; constructive subtleties are discussed where relevant.
+
+\begin{definition}[Witness groupoids]\label{def:witness-groupoids}
+For each foundation \(F\) and Banach space \(X\) in \(\Ban(F)\), define:
+\begin{itemize}[leftmargin=1.6em]
+\item \(\mathsf{Gap}_F(X)\): The groupoid whose objects are gap functionals \(f \in X^{**} \setminus J_X[X]\), where \(J_X: X \to X^{**}\) is the canonical embedding. Morphisms are norm-preserving linear isomorphisms.
+
+\item \(\mathsf{AP\!Fail}_F(X)\): The groupoid whose objects are pairs \((T, \varepsilon)\) where \(T: X \to X\) is compact and for all finite-rank \(R: X \to X\), \(\|T - R\| \geq \varepsilon\). Morphisms are conjugations by isometric isomorphisms.
+
+\item \(\mathsf{RNP\!Fail}_F(X)\): The groupoid whose objects are triples \((Y, \mu, \nu)\) where \(Y\) is a measure space, \(\mu\) is a finite positive measure, \(\nu: \Sigma \to X\) is an \(X\)-valued measure absolutely continuous w.r.t. \(\mu\) but admitting no Bochner-integrable density. Morphisms are measure-preserving isomorphisms.
+\end{itemize}
+\end{definition}
+
+\begin{mdframed}[style=roadmap]
+\textbf{Formalization roadmap}: Each witness groupoid would be implemented as:
+\begin{verbatim}
+structure GapWitness (F : Foundation) (X : BanachSpace F) where
+  functional : Dual (Dual X)
+  not_in_image : functional ∉ canonicalEmbedding.range
+
+def GapGroupoid (F : Foundation) (X : BanachSpace F) : Groupoid where
+  Obj := GapWitness F X
+  Hom := IsometricIso
+\end{verbatim}
+\end{mdframed}
+
+\subsection{The functorial obstruction theorem}\label{ssec:no-pseudofunctor}
+
+\begin{theorem}[Functorial Obstruction Theorem]\label{thm:obstruction}
+Let \(\{\mathcal C_F\}_{F \in \Found}\) be a family of internal constructions \(\mathcal C_F: \Ban(F) \to \Gpd\). Suppose there exist:
+\begin{itemize}
+\item An interpretation \(\Phi: F \to F'\)
+\item A Banach space \(X \in \Ban(F)\) with \(X \in \Sigma_0\) (so \(\Phi^*(X) = X\))
+\item The groupoids \(\mathcal C_F(X)\) and \(\mathcal C_{F'}(X)\) are not equivalent
+\end{itemize}
+Then \(\{\mathcal C_F\}\) cannot extend to a pseudofunctor on \(\Found\) (neither covariant nor contravariant).
+\end{theorem}
+
+\begin{proof}
+We give the detailed proof for both variances.
+
+\textbf{Covariant case}: Suppose \(\{\mathcal C_F\}\) extends to a covariant pseudofunctor \(\mathcal{C}: \Found \to [\Ban(-), \Gpd]\). This requires, for each interpretation \(\Phi: F \to F'\), a pseudonatural transformation \(\eta^\Phi\) with components:
+\[\eta^\Phi_X: \mathcal C_F(X) \to \mathcal C_{F'}(\Phi^*(X))\]
+that are equivalences of groupoids.
+
+For \(X \in \Sigma_0\), we have \(\Phi^*(X) = X\), so:
+\[\eta^\Phi_X: \mathcal C_F(X) \to \mathcal C_{F'}(X)\]
+
+But by hypothesis, \(\mathcal C_F(X)\) and \(\mathcal C_{F'}(X)\) are not equivalent. Contradiction.
+
+\textbf{Contravariant case}: A contravariant pseudofunctor would require equivalences:
+\[\eta^\Phi_X: \mathcal C_{F'}(\Phi^*(X)) \to \mathcal C_F(X)\]
+
+For \(X \in \Sigma_0\), this becomes:
+\[\eta^\Phi_X: \mathcal C_{F'}(X) \to \mathcal C_F(X)\]
+
+Again, this contradicts the non-equivalence of these groupoids.
+
+\textbf{Key observation}: The obstruction is fundamental---it's not about missing some clever construction, but about the impossibility of building equivalences between inequivalent groupoids. The obstruction only uses that \(\Phi^*\) fixes \(X\in\Sigma_0\) on-the-nose; no bicategorical coherence beyond pseudonaturality is needed.
+\end{proof}
+
+\begin{corollary}[Gap, AP, and RNP are obstructed]\label{cor:gap-ap-rnp-obstructed}
+For the standard interpretation \(\iota: \text{BISH} \to \text{ZFC}\) and \(X = \linf\) or \(X = \linf/\cnull\):
+\begin{enumerate}
+\item \(\mathsf{Gap}_{\text{BISH}}(X)\) is empty while \(\mathsf{Gap}_{\text{ZFC}}(X)\) is non-empty
+\item \(\mathsf{AP\!Fail}_{\text{BISH}}(X)\) is empty while \(\mathsf{AP\!Fail}_{\text{ZFC}}(X)\) is non-empty
+\item For separable dual spaces, \(\mathsf{RNP\!Fail}_{\text{BISH}}(X)\) may be empty while \(\mathsf{RNP\!Fail}_{\text{ZFC}}(X)\) is non-empty
+\end{enumerate}
+Therefore, none of these families extend to pseudofunctors on \(\Found\).
+\end{corollary}
+
+\begin{proof}
+\textbf{Part 1 (Gap)}: In BISH (Bishop's constructive mathematics), the Hahn-Banach theorem requires WLPO (weak limited principle of omniscience). Without it, we cannot constructively exhibit a non-zero functional on \(\linf\) that vanishes on \(\cnull\). Thus \(\mathsf{Gap}_{\text{BISH}}(\linf)\) is empty.
+
+In ZFC, the Hahn-Banach theorem (via Zorn's lemma) guarantees extension of the zero functional on \(\cnull\) to a non-zero functional on \(\linf\). Thus \(\mathsf{Gap}_{\text{ZFC}}(\linf)\) is non-empty.
+
+\status{Lean 4}: This WLPO ↔ Gap characterization is mechanized as \texttt{gap\_equiv\_WLPO : BidualGapStrong ↔ WLPO} with complete quotient framework and optimal axiom profile.
+
+Since empty and non-empty groupoids are not equivalent, Theorem \ref{thm:obstruction} applies.
+
+\textbf{Part 2 (AP)}: The existence of compact operators on \(\linf/\cnull\) that cannot be approximated by finite-rank operators holds under ZFC (see standard Banach space texts). The standard constructions we use appeal to classical choice; constructive routes are not pursued here.
+
+\textbf{Part 3 (RNP)}: RNP (Radon-Nikodym property) for all separable duals holds under countable dependent choice (DC\(_\omega\)), which is not available in pure BISH but holds in ZFC.
+\end{proof}
+
+%===========================================================
+\section{The Stone window to \texorpdfstring{$\linf/\cnull$}{ℓ∞/c0}}\label{sec:stone}
+%===========================================================
+
+\subsection{Boolean algebra of almost-equality classes}\label{ssec:BA}
+
+\begin{definition}[Almost equality]
+Two sets \(A, B \subseteq \N\) are \emph{almost equal}, written \(A \sim B\), if their symmetric difference \(A \triangle B\) is finite. The quotient \(\mathcal B_F := \mathcal P(\N)/{\sim}\) forms a Boolean algebra with operations:
+\begin{align}
+[A] \wedge [B] &= [A \cap B] \\
+[A] \vee [B] &= [A \cup B] \\
+\neg[A] &= [\N \setminus A] \\
+\mathbf{0} &= [\emptyset], \quad \mathbf{1} = [\N]
+\end{align}
+\status{Lean 4}: This quotient algebra is mechanized as \texttt{BooleanAtInfinity := Quotient (Set ℕ) FinSymmDiff} with complete lattice operations and rigorous quotient framework.
+\end{definition}
+
+\begin{definition}[Idempotents in the Banach algebra]\label{def:idempotents}
+View \(\linf\) as a commutative Banach algebra under pointwise multiplication. Since \(\cnull\) is a closed ideal, \(\linf/\cnull\) inherits a Banach algebra structure. Define:
+\[
+  \mathrm{Idem}(\linf/\cnull) := \{[x] \in \linf/\cnull \mid [x]^2 = [x]\}
+\]
+This becomes a Boolean algebra with:
+\begin{align}
+e \wedge f &:= ef \quad \text{(pointwise product)} \\
+e \vee f &:= e + f - ef \\
+\neg e &:= [1] - e
+\end{align}
+\end{definition}
+
+\begin{lemma}[Indicators are idempotents]\label{lem:indicator-idem}
+For any \(A \subseteq \N\), the equivalence class \([\chi_A] \in \linf/\cnull\) is an idempotent. Moreover, \([\chi_A] = [\chi_B]\) if and only if \(A \sim B\).
+\end{lemma}
+
+\begin{proof}
+\textbf{Idempotence}: For the characteristic function \(\chi_A\), we have \(\chi_A(n) \in \{0,1\}\) for all \(n\). Thus:
+\[\chi_A(n)^2 = \chi_A(n) \quad \forall n \in \N\]
+Therefore \([\chi_A]^2 = [\chi_A^2] = [\chi_A]\).
+
+\textbf{Equivalence characterization}: 
+\begin{itemize}
+\item If \(A \sim B\), then \(A \triangle B\) is finite. Thus \(\chi_A - \chi_B\) is zero except on finitely many indices, so \(\chi_A - \chi_B \in \cnull\), giving \([\chi_A] = [\chi_B]\).
+
+\item Conversely, if \([\chi_A] = [\chi_B]\), then \(\chi_A - \chi_B \in \cnull\). Since \(\chi_A - \chi_B\) takes values in \(\{-1, 0, 1\}\), having \(\lim_{n \to \infty} (\chi_A(n) - \chi_B(n)) = 0\) means it's eventually zero. Thus it's non-zero on only finitely many indices, so \(A \triangle B\) is finite.
+\end{itemize}
+\end{proof}
+
+\subsection{The main Stone window theorem}\label{ssec:stone-main}
+
+\begin{theorem}[Stone window theorem]\label{thm:stone-window}
+The map 
+\[
+ \Phi_F: \mathcal B_F \to \mathrm{Idem}(\linf/\cnull), \quad [A] \mapsto [\chi_A]
+\]
+is a Boolean algebra isomorphism, natural in \(F\) with respect to interpretations.
+\end{theorem}
+
+\begin{proof}
+We prove this in several steps with complete details.
+
+\textbf{Step 1: Well-defined and homomorphism}
+
+By Lemma \ref{lem:indicator-idem}, if \(A \sim B\) then \([\chi_A] = [\chi_B]\), so \(\Phi_F\) is well-defined.
+
+For Boolean operations:
+\begin{align}
+\Phi_F([A] \wedge [B]) &= \Phi_F([A \cap B]) = [\chi_{A \cap B}] = [\chi_A \cdot \chi_B] = [\chi_A] \cdot [\chi_B] = \Phi_F([A]) \wedge \Phi_F([B]) \\
+\Phi_F([A] \vee [B]) &= \Phi_F([A \cup B]) = [\chi_{A \cup B}] = [\chi_A + \chi_B - \chi_A \chi_B] = \Phi_F([A]) \vee \Phi_F([B]) \\
+\Phi_F(\neg[A]) &= \Phi_F([\N \setminus A]) = [\chi_{\N \setminus A}] = [1 - \chi_A] = \neg\Phi_F([A])
+\end{align}
+
+\textbf{Step 2: Injectivity}
+
+If \(\Phi_F([A]) = \Phi_F([B])\), then \([\chi_A] = [\chi_B]\), so \(\chi_A - \chi_B \in \cnull\). By the proof of Lemma \ref{lem:indicator-idem}, this implies \(A \sim B\), hence \([A] = [B]\) in \(\mathcal B_F\).
+
+\textbf{Step 3: Surjectivity (the rounding argument)}
+
+Let \([x] \in \mathrm{Idem}(\linf/\cnull)\). Then \([x]^2 = [x]\), so \(x^2 - x \in \cnull\).
+
+Define the \emph{rounding function}:
+\[s_n := \begin{cases} 1 & \text{if } x_n \geq 1/2 \\ 0 & \text{if } x_n < 1/2 \end{cases}\]
+
+We claim \(x - s \in \cnull\).
+
+\begin{lemma}[Key estimate]
+Define the distance function \(d: \R \to [0, \infty)\) by \(d(t) := \min\{|t|, |t-1|\}\). For all \(t \in \R\), we have \(d(t) \leq 2|t^2 - t|\) (the constant 2 is inessential).
+\end{lemma}
+
+\textbf{Proof of key estimate}: We consider three cases:
+
+\emph{Case 1}: \(0 \leq t \leq 1\). Here \(d(t) = \min\{t, 1-t\}\).
+\begin{itemize}
+\item If \(t \leq 1/2\), then \(d(t) = t\) and \(t^2 - t = t(t-1) \leq 0\), so \(|t^2 - t| = t(1-t) \geq t/2\) since \(1-t \geq 1/2\).
+\item If \(t > 1/2\), then \(d(t) = 1-t\) and \(|t^2 - t| = t(1-t) \geq (1-t)/2\) since \(t > 1/2\).
+\end{itemize}
+In both subcases, \(d(t) \leq 2|t^2 - t|\).
+
+\emph{Case 2}: \(t < 0\). Here \(d(t) = |t| = -t\) and:
+\[|t^2 - t| = |t||t - 1| = (-t)(1 - t) \geq -t\]
+since \(1 - t > 1\). Thus \(d(t) \leq |t^2 - t|\).
+
+\emph{Case 3}: \(t > 1\). Here \(d(t) = t - 1\) and:
+\[|t^2 - t| = t|t - 1| = t(t - 1) \geq t - 1\]
+since \(t \geq 1\). Thus \(d(t) \leq |t^2 - t|\).
+
+\textbf{Applying the estimate}: For each \(n\), \(|x_n - s_n| = d(x_n) \leq 2|x_n^2 - x_n|\).
+
+Since \(x^2 - x \in \cnull\), we have \(\lim_{n \to \infty} |x_n^2 - x_n| = 0\).
+
+Therefore \(\lim_{n \to \infty} |x_n - s_n| = 0\), so \(x - s \in \cnull\).
+
+Thus \([x] = [s] = [\chi_A]\) where \(A = \{n : s_n = 1\}\), proving surjectivity.
+
+\textbf{Step 4: Naturality}
+
+For an interpretation \(\Phi: F \to F'\), since \(\Phi^*\) is identity on \(\Sigma_0\), we have \(\Phi^*(\chi_A) = \chi_A\) and \(\Phi^*(\cnull) = \cnull\). Thus the diagram:
+\[\begin{tikzcd}
+\mathcal B_F \arrow[r, "\Phi_F"] \arrow[d, "\text{id}"] & \mathrm{Idem}(\linf/\cnull)_F \arrow[d, "\Phi^*"] \\
+\mathcal B_{F'} \arrow[r, "\Phi_{F'}"] & \mathrm{Idem}(\linf/\cnull)_{F'}
+\end{tikzcd}\]
+commutes strictly.
+\end{proof}
+
+%===========================================================
+\section{Finite Gödel--Gap via Stone}\label{sec:finite-godel}
+%===========================================================
+
+\begin{theorem}[Finite distributive lattices embed in the Stone window]\label{thm:finite-embed}
+For any finite distributive lattice \(L\), there exists a lattice embedding
+\[
+ E_L: L \hookrightarrow \mathrm{Idem}(\linf/\cnull)
+\]
+that is natural in the foundation \(F\).
+\end{theorem}
+
+\begin{proof}
+\textbf{Step 1: Birkhoff representation}
+
+By Birkhoff's theorem, every finite distributive lattice \(L\) is isomorphic to the lattice \(\mathcal{O}(J)\) of down-sets of some finite poset \(J\). Let \(J = \{j_1, \ldots, j_k\}\) be the join-irreducible elements of \(L\).
+
+\textbf{Step 2: Partition of \(\N\)}
+
+Choose pairwise disjoint infinite subsets \(U_{j_1}, \ldots, U_{j_k} \subset \N\). For concreteness:
+\[U_{j_i} = \{n \in \N : n \equiv i \pmod{k+1}, n \geq i\}\]
+
+These are clearly disjoint and infinite.
+
+\textbf{Step 3: The embedding}
+
+For a down-set \(D \in \mathcal{O}(J)\), define:
+\[S_D = \bigcup_{j \in D} U_j\]
+
+Define \(E_L: \mathcal{O}(J) \to \mathrm{Idem}(\linf/\cnull)\) by:
+\[E_L(D) = [\chi_{S_D}]\]
+
+\begin{lemma}
+If \(\{U_j\}\) are pairwise disjoint and infinite, then \([\chi_{\bigcup_{j\in D}U_j}] = [\chi_{\bigcup_{j\in D'}U_j}]\) implies \(D = D'\).
+\end{lemma}
+
+\begin{proof}
+If the characteristic functions differ only on a finite set, but the \(U_j\) are infinite and disjoint, then the unions can only be almost-equal if they involve exactly the same index sets.
+\end{proof}
+
+\textbf{Step 4: Lattice homomorphism}
+
+For down-sets \(D_1, D_2\):
+\begin{align}
+E_L(D_1 \cap D_2) &= [\chi_{S_{D_1 \cap D_2}}] = [\chi_{S_{D_1} \cap S_{D_2}}] = [\chi_{S_{D_1}}] \wedge [\chi_{S_{D_2}}] = E_L(D_1) \wedge E_L(D_2) \\
+E_L(D_1 \cup D_2) &= [\chi_{S_{D_1 \cup D_2}}] = [\chi_{S_{D_1} \cup S_{D_2}}] = [\chi_{S_{D_1}}] \vee [\chi_{S_{D_2}}] = E_L(D_1) \vee E_L(D_2)
+\end{align}
+
+The equalities hold because the \(U_j\) are pairwise disjoint.
+
+\textbf{Step 5: Injectivity}
+
+If \(E_L(D_1) = E_L(D_2)\), then \([\chi_{S_{D_1}}] = [\chi_{S_{D_2}}]\), so \(S_{D_1} \sim S_{D_2}\). By the lemma above, this implies \(D_1 = D_2\).
+
+\textbf{Step 6: Naturality}
+
+The construction uses only operations preserved by interpretations (set operations, characteristic functions, quotients by \(\cnull\)), so it's natural in \(F\).
+\end{proof}
+
+\begin{mdframed}[style=okbox]
+\textbf{Significance}: This theorem provides a finite fragment connecting logical lattices to analytic idempotents without ultrafilters.
+\end{mdframed}
+
+%===========================================================
+\section{Height filtration and stability tiers}\label{sec:height}
+%===========================================================
+
+\begin{definition}[Height filtration]
+Define the hierarchy:
+\begin{align}
+\mathsf{B}_0 &= \text{BISH} \text{ (Bishop's constructive mathematics)}\\
+\mathsf{B}_1 &= \text{BISH} + \text{WLPO} \text{ (weak limited principle of omniscience)}\\
+\mathsf{B}_2 &= \mathsf{B}_1 + \text{DC}_\omega \text{ (countable dependent choice)}\\
+\mathsf{B}_3 &= \mathsf{B}_2 + \text{AC} \text{ (full axiom of choice)}
+\end{align}
+Let \(\Found_{\geq k}\) be the full subcategory of \(\Found\) consisting of foundations \(F\) such that \(F \models \mathsf{B}_k\).
+\end{definition}
+
+\begin{definition}[Uniformisable height]\label{def:height}
+For an internal construction \(\mathcal{C} = \{\mathcal{C}_F\}_{F \in \Found}\), define its \emph{uniformisable height} \(h(\mathcal{C})\) as the least \(k\) such that \(\mathcal{C}\) restricted to \(\Found_{\geq k}\) is pseudofunctorial. 
+
+For a sentence \(P\) about a fixed object \(X \in \Sigma_0\), define the truth groupoid:
+\[\mathcal{C}_F^P(X) = \begin{cases} 
+\{\ast\} & \text{if } F \models P(X) \\
+\emptyset & \text{if } F \models \neg P(X)
+\end{cases}\]
+Then \(h(P) := h(\mathcal{C}^P)\).
+\end{definition}
+
+\begin{proposition}[A working calibration of heights]\label{prop:height-table}
+Heuristically:
+\begin{itemize}
+\item The bidual gap for \(\linf\) and AP failure for \(\linf/\cnull\) stabilize by adding WLPO (height 1)
+\item RNP for all separable duals stabilizes by adding DC\(_\omega\) (height 2)
+\end{itemize}
+This is a calibration, not a complete classification. See Ishihara \cite{Ishihara06} for background on reverse mathematics in constructive settings.
+\end{proposition}
+
+\begin{proof}
+\textbf{Bidual gap and AP failure (height 1)}:
+
+For \(F \in \Found_{\geq 0}\) (i.e., at least BISH), the gap may or may not exist---BISH itself has no gap, but BISH + ¬WLPO might also have no gap.
+
+For \(F \in \Found_{\geq 1}\) (i.e., has WLPO), the Hahn-Banach theorem is provable, so the gap exists. Thus for any \(\Phi: F \to F'\) with \(F, F' \in \Found_{\geq 1}\), both have the gap, so the truth groupoids are equivalent (both singletons).
+
+\textbf{RNP (height 2)}:
+
+RNP for all separable duals holds under countable dependent choice (DC\(_\omega\)). It may fail in theories with only WLPO but holds in all theories with DC\(_\omega\).
+\end{proof}
+
+%===========================================================
+\section{Conclusion}\label{sec:conclusion}
+%===========================================================
+
+This preliminary paper provides:
+
+1. **Paper-level proofs** of all theorems
+2. **The Stone window** as a concrete, constructive bridge from logic to analysis
+3. **Obstruction theorems** showing foundation-relativity is fundamental
+4. **Roadmap** for potential formalization (see appendix)
+
+The key insight: foundation-relativity (exemplified by the bidual gap) is not a quirk but a fundamental feature of mathematics, measurable by precise categorical invariants and connected to logical structure through the Stone window.
+
+\appendix
+
+\section{Coherence for intensional universes}\label{app:coherence}
+When foundations have intensional type-theoretic universes (as in HoTT), the 2-morphisms may satisfy coherence only up to higher cells. By the Gordon-Power-Street theorem \cite{GordonPowerStreet95}, the resulting bicategory is biequivalent to a strict 2-category. \status{planned}
+
+\section{Appendix B: Gödel--Gap embeddings (well-posed formulation)}\label{app:godel-gap-wellposed}
+
+Throughout write $A \subseteq^* B$ for \emph{almost inclusion} (i.e.\ $A \setminus B$ finite) and use the Stone window isomorphism (Theorem~\ref{thm:stone-window})
+\[
+  \mathrm{Idem}(\ell^\infty/c_0) \;\cong\; \mathcal{P}(\N)/\mathrm{Fin}.
+\]
+
+\subsection*{B.1. The $\Pi^0_1$ fragment is a meet--semilattice}
+
+Let $L_{\Pi^0_1}$ denote the set of $\Pi^0_1$ sentences of PA modulo PA--provable equivalence. 
+This quotient is closed under finite conjunction (meet) and contains $\top$, but is not closed under disjunction or negation; hence it is a \emph{meet--semilattice with top}, not a Boolean algebra.
+
+\begin{definition}[Gödel--Gap embedding (meet version)]\label{def:godel-gap-meet}
+A \emph{Gödel--Gap (meet) embedding} is an injective homomorphism of meet--semilattices
+\[
+  E \;:\; (L_{\Pi^0_1},\,\wedge,\,\top)\;\hookrightarrow\; \mathcal{P}(\N)/\mathrm{Fin}
+  \;\cong\; \mathrm{Idem}(\ell^\infty/c_0).
+\]
+\end{definition}
+
+\begin{theorem}[Meet--embedding for $L_{\Pi^0_1}$]\label{thm:Pi01-meet-embed}
+A Gödel--Gap (meet) embedding exists.
+\end{theorem}
+
+\begin{proof}
+Write $[\varphi] \le [\psi]$ iff $\mathrm{PA}\vdash \varphi \to \psi$. 
+Let $\mathcal{S}=\{(x,y)\in L_{\Pi^0_1}^2 : x\not\le y\}$.
+Since the language of PA is countable, $L_{\Pi^0_1}$ and $\mathcal{S}$ are countable.
+Fix an enumeration $\mathcal{S}=\{(x_k,y_k)\}_{k\in\N}$ and partition $\N$ into pairwise disjoint infinite sets $\{D_k\}_{k\in\N}$.
+
+For each $k$ let $F_k:=\uparrow x_k=\{z\in L_{\Pi^0_1}:x_k\le z\}$ (a principal filter), so $y_k\notin F_k$.
+Define $H:L_{\Pi^0_1}\to\mathcal{P}(\N)$ by
+\[
+  H(z)=\bigcup\{\,D_k \mid z\in F_k\,\}
+  \;=\; \bigcup\{\,D_k \mid x_k \le z\,\},
+  \quad E(z):=[H(z)].
+\]
+If $a,b\in L_{\Pi^0_1}$ then $x_k\le a\wedge b$ iff $(x_k\le a$ and $x_k\le b)$, hence $H(a\wedge b)=H(a)\cap H(b)$ and $H(\top)=\N$; thus $E$ preserves $\wedge$ and $\top$.
+If $a\not\le b$, then $(a,b)=(x_j,y_j)$ for some $j$, so $D_j\subseteq H(a)$ and $D_j\cap H(b)=\varnothing$, whence $H(a)\not\subseteq^* H(b)$ and $E(a)\ne E(b)$.
+Therefore $E$ is an injective meet--homomorphism.
+\end{proof}
+
+\begin{corollary}\label{cor:Pi01-into-idem}
+Composing with Theorem~\ref{thm:stone-window} yields an injective meet--homomorphism
+\[
+  L_{\Pi^0_1} \;\hookrightarrow\; \mathrm{Idem}(\ell^\infty/c_0).
+\]
+\end{corollary}
+
+\begin{remark}[Interpretation]
+Conjunction of $\Pi^0_1$ statements corresponds to intersection of idempotents (via indicators), while \emph{provable non-implications} $x\not\le y$ are witnessed by infinitely many indices ($D_j$) separating the images. This is the precise ``Gödel signal'' in the gap algebra.
+\end{remark}
+
+\subsection*{B.2. Boolean hull and distributive lattice variants}
+
+Let $B$ be the full Lindenbaum Boolean algebra of PA and let $B_{\Pi^0_1}\le B$ be the Boolean \emph{subalgebra generated by} the classes of $\Pi^0_1$ sentences (i.e.\ close under $\wedge,\vee,\neg$ inside $B$). Since the set of $\Pi^0_1$ sentences is countable, $B_{\Pi^0_1}$ is countable.
+
+\begin{theorem}[Countable Boolean algebras embed into $\mathcal{P}(\N)$]\label{thm:BA-embed}
+Let $A$ be a countable Boolean algebra. There exists a Boolean algebra embedding
+\[
+  J \;:\; A \hookrightarrow \mathcal{P}(\N).
+\]
+\end{theorem}
+
+\begin{proof}
+Enumerate the set of ordered pairs $\{(a,b)\in A^2:a\ne b\}$ as $\{(a_k,b_k)\}_{k\in\N}$.
+For each $k$, by the Ultrafilter Lemma (equivalently, the Boolean Prime Ideal Theorem), there exists an ultrafilter $U_k$ with $a_k\in U_k$ and $b_k\notin U_k$.
+Partition $\N$ into pairwise disjoint infinite sets $\{D_k\}_{k\in\N}$ and define
+\[
+  H(a)=\bigcup\{\,D_k \mid a\in U_k\,\}, \qquad J(a):=H(a).
+\]
+For each $k$ and each $a\in A$, exactly one of $a,\neg a$ lies in $U_k$, hence $H(\neg a)=\N\setminus H(a)$.
+Moreover, $a\wedge b\in U_k$ iff $a\in U_k$ and $b\in U_k$, and $a\vee b\in U_k$ iff $a\in U_k$ or $b\in U_k$, so $H$ preserves $\wedge$ and $\vee$.
+Thus $J$ is a Boolean algebra homomorphism.
+If $a\ne b$ then for some $j$ we have $a\in U_j$ and $b\notin U_j$, hence $D_j\subseteq H(a)\setminus H(b)$, so $J(a)\ne J(b)$.
+\end{proof}
+
+\begin{corollary}[Boolean hull Gödel--Gap]\label{cor:boolean-hull}
+There is a Boolean algebra embedding
+\[
+  B_{\Pi^0_1} \;\hookrightarrow\; \mathcal{P}(\N) \twoheadrightarrow \mathcal{P}(\N)/\mathrm{Fin}
+  \;\cong\; \mathrm{Idem}(\ell^\infty/c_0).
+\]
+\end{corollary}
+
+\begin{remark}[Distributive lattices]\label{rem:DL}
+If $L$ is a countable distributive lattice (not necessarily Boolean), the analogous map using \emph{prime filters} gives an injective lattice homomorphism $L\hookrightarrow \mathcal{P}(\N)/\mathrm{Fin}$ (meet and join preserved). This is proved exactly as in Theorem~\ref{thm:BA-embed}, replacing ultrafilters by prime filters and omitting complements.
+\end{remark}
+
+\subsection*{B.3. What remains genuinely open}
+
+The embeddings above are \emph{existence} results. They achieve the Gödel--to--gap interface but rely on non-canonical choices (filters/ultrafilters, block partitions) and, in the Boolean cases, on the Boolean Prime Ideal Theorem. This leaves natural strengthenings open.
+
+\begin{openproblem}[Definability/canonicity]\label{op:definability}
+Does there exist a \emph{canonical} or \emph{arithmetically well-behaved} embedding
+\(
+  E : L_{\Pi^0_1}\hookrightarrow \mathcal{P}(\N)/\mathrm{Fin}
+\)
+(e.g.\ uniformly computable or arithmetically definable), and likewise for $B_{\Pi^0_1}$ into $\mathcal{P}(\N)$, that still separates all inequivalent classes?
+The non-constructive ultrafilter/prime-filter constructions do not address this, and attempts to enforce definability risk running into Tarski-type obstructions if they inadvertently encode an arithmetic truth predicate.
+\end{openproblem}
+
+\section{Blueprint and roadmap (non-binding)}\label{sec:lean-blueprint}
+%===========================================================
+
+\textbf{Status}: This section combines completed mechanization with intended future formalization. As of version 3.2 (January 2025), we have:
+
+\textbf{✅ Completed in Lean 4}:
+\begin{itemize}
+\item Complete quotient framework: \texttt{BooleanAtInfinity := Quotient (Set ℕ) FinSymmDiff} and \texttt{SeqModC0 := Quotient (ℕ → ℝ) EqModC0}
+\item Bidual gap characterization: \texttt{gap\_equiv\_WLPO : BidualGapStrong ↔ WLPO}
+\item Forward direction: \texttt{gap\_implies\_wlpo} with optimal axiom profile \texttt{[propext, Classical.choice, Quot.sound]}
+\item Reverse direction framework: \texttt{wlpo\_implies\_gap} structural compilation (c₀ space witness construction documented)
+\item Stone window foundation: Complete \texttt{iotaBar\_injective} proof and quotient lattice operations
+\end{itemize}
+
+\textbf{🔧 Paper-level with roadmap}: The main obstruction theorem and bicategorical coherence structures outlined below are not yet mechanized.
+
+\textbf{Implementation location}: The completed mechanization is available in the \texttt{Papers/P2\_BidualGap/} directory of the FoundationRelativity repository, with core theorems in \texttt{WLPO\_Equiv\_Gap.lean} and quotient framework in \texttt{Gap/Quotients.lean}.
+
+The proofs above suggest the following Lean 4 structure for future work:
+
+\begin{mdframed}[style=roadmap]
+\textbf{Found/Core.lean}:
+\begin{verbatim}
+-- The 2-category of foundations
+structure Foundation where
+  universe : Type (u+1)
+  cartesian_closed : CartesianClosed universe
+  countable_limits : HasCountableLimits universe
+  countable_colimits : HasCountableColimits universe
+  cauchy_complete : CauchyComplete universe
+  logic : DeductiveSystem universe
+  sigma_zero : CommonSignature universe
+
+structure Interpretation (F F' : Foundation) where
+  functor : F.universe ⥤ F'.universe
+  preserves_limits : PreservesCountableLimits functor
+  preserves_colimits : PreservesCountableColimits functor
+  preserves_cauchy : PreservesCauchyCompletion functor
+  isometric : IsometricOnBounded functor
+  preserves_compact : PreservesCompactOps functor
+  preserves_c0 : functor c0 = c0
+  proof_translation : F.logic ⊢ φ → F'.logic ⊢ translate φ
+  fixes_sigma : ∀ X ∈ sigma_zero, functor X = X
+\end{verbatim}
+
+\textbf{Found/Witness.lean}:
+\begin{verbatim}
+-- Witness groupoids
+def GapGroupoid (F : Foundation) (X : BanachSpace F) : Groupoid where
+  Obj := {f : X** // f ∉ canonical_embedding.range}
+  Hom := IsometricIso
+
+-- The obstruction theorem
+theorem functorial_obstruction {C : ∀ F, Ban(F) → Gpd} 
+  (h : ∃ Φ : F → F', ∃ X ∈ sigma_zero, 
+       ¬(C F X ≃ C F' X)) :
+  ¬∃ (P : PseudoFunctor Found [Ban(-), Gpd]), 
+    ∀ F, P.obj F = C F := by
+  -- ... (proof structure)
+\end{verbatim}
+
+\textbf{Stone/Idempotents.lean}:
+\begin{verbatim}
+-- The Stone window
+def stone_window : BoolAlg.iso (PowerSet ℕ / Finite) 
+                                (Idempotents (ℓ∞ / c₀)) where
+  to_fun := fun [A] ↦ [χ A]
+  inv_fun := fun [x] ↦ [round x]
+  left_inv := by
+    -- Rounding indicators gives indicators
+  right_inv := by  
+    -- Key estimate: d(t) ≤ 2|t² - t|
+  map_inf := by
+    -- χ(A ∩ B) = χ(A) * χ(B)
+  map_sup := by
+    -- χ(A ∪ B) = χ(A) + χ(B) - χ(A) * χ(B)
+  map_compl := by
+    -- χ(ℕ \ A) = 1 - χ(A)
+\end{verbatim}
+
+\textbf{Height/Filtration.lean}:
+\begin{verbatim}
+-- The height hierarchy
+inductive BaseTheory : ℕ → Type where
+  | B0 : BaseTheory 0  -- BISH
+  | B1 : BaseTheory 1  -- BISH + WLPO
+  | B2 : BaseTheory 2  -- BISH + WLPO + DC_ω
+  | B3 : BaseTheory 3  -- ZFC
+
+def uniformisable_height (C : ∀ F, Construction F) : ℕ :=
+  Inf {k : ℕ | is_pseudofunctorial_on (Found_≥ k) C}
+
+theorem gap_height : uniformisable_height GapGroupoid = 1 := by
+  -- Proof using WLPO characterization (mechanized as gap_equiv_WLPO)
+\end{verbatim}
+\end{mdframed}
+
+\bibliographystyle{abbrv}
+\begin{thebibliography}{10}
+
+\bibitem{AlbiacKalton}
+F.~Albiac and N.~J. Kalton.
+\newblock \emph{Topics in Banach Space Theory}.
+\newblock Springer, 2nd edition, 2016.
+
+\bibitem{Bishop67}
+E.~Bishop.
+\newblock \emph{Foundations of Constructive Analysis}.
+\newblock McGraw--Hill, 1967.
+
+\bibitem{Birkhoff37}
+G.~Birkhoff.
+\newblock Rings of sets.
+\newblock \emph{Duke Math.\ J.}, 3(3):443--454, 1937.
+
+\bibitem{DiestelJarchowTonge}
+J.~Diestel, H.~Jarchow, and A.~Tonge.
+\newblock \emph{Absolutely Summing Operators}.
+\newblock Cambridge University Press, 1995.
+
+\bibitem{GordonPowerStreet95}
+R.~Gordon, A.~J. Power, and R.~Street.
+\newblock Coherence for tricategories.
+\newblock \emph{Mem.\ Amer.\ Math.\ Soc.}, 117(558), 1995.
+
+\bibitem{Ishihara06}
+H.~Ishihara.
+\newblock Reverse mathematics in Bishop's constructive mathematics.
+\newblock \emph{Philosophia Scientiae}, Cahier Spécial 6:43--59, 2006.
+
+\end{thebibliography}
+
+\end{document}

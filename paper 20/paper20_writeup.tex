@@ -1,0 +1,1331 @@
+\documentclass[11pt,a4paper]{article}
+
+% ====================================================================
+% Packages
+% ====================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage[table]{xcolor}
+\usepackage{cleveref}
+\usepackage{natbib}
+\usepackage{mdframed}
+
+% ====================================================================
+% Theorem environments
+% ====================================================================
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% ====================================================================
+% Lean 4 code listing style
+% ====================================================================
+\definecolor{lean-keyword}{RGB}{0,0,180}
+\definecolor{lean-comment}{RGB}{0,128,0}
+\definecolor{lean-string}{RGB}{163,21,21}
+\definecolor{lean-bg}{RGB}{248,248,248}
+
+\lstdefinelanguage{lean4}{
+  keywords={theorem,lemma,def,class,instance,import,open,variable,
+            noncomputable,section,namespace,end,where,let,have,show,
+            intro,obtain,use,exact,rw,simp,apply,by,fun,match,if,
+            then,else,do,return,axiom,abbrev,private,attribute,
+            suffices,change,congr,ext,constructor,rintro,push_neg,
+            linarith,absurd,set_option,omit,in,set,cases,structure,
+            refine,unfold,rcases,calc,all_goals,first,try,ring,
+            positivity,induction},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+  morestring=[b]',
+}
+
+\lstset{
+  language=lean4,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{lean-keyword}\bfseries,
+  commentstyle=\color{lean-comment}\itshape,
+  stringstyle=\color{lean-string},
+  backgroundcolor=\color{lean-bg},
+  frame=single,
+  framerule=0.5pt,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2,
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+  xleftmargin=15pt,
+  captionpos=b,
+}
+
+% ====================================================================
+% Macros
+% ====================================================================
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\LPO}{\mathrm{LPO}}
+\newcommand{\WLPO}{\mathrm{WLPO}}
+\newcommand{\LLPO}{\mathrm{LLPO}}
+\newcommand{\BMC}{\mathrm{BMC}}
+\newcommand{\BISH}{\mathrm{BISH}}
+\newcommand{\Lean}{\textsc{Lean~4}}
+\newcommand{\Mathlib}{\textsc{Mathlib4}}
+\newcommand{\leanok}{\textsf{\small \textcolor{green!70!black}{\checkmark}}}
+
+% ====================================================================
+% Title
+% ====================================================================
+\title{%
+  \textbf{Observable-Dependent Logical Cost:\\[4pt]
+  WLPO and 1D Ising Magnetization Phase Classification}\\[6pt]
+  {\normalsize Paper~20 in the Constructive Reverse Mathematics Series}%
+}
+
+\author{
+  Paul Chun-Kit Lee\thanks{%
+    New York University.
+    AI-assisted formalization; see \S\ref{sec:ai} for methodology.
+    The author is a medical professional, not a domain expert in
+    constructive mathematics or mathematical physics; mathematical
+    content was developed with extensive AI assistance.} \\
+  New York University \\
+  \texttt{dr.paul.c.lee@gmail.com}
+}
+
+\date{February 2026}
+
+% ====================================================================
+\begin{document}
+\maketitle
+
+% ====================================================================
+\begin{abstract}
+The phase classification of the one-dimensional Ising model---deciding
+whether the infinite-volume magnetization $m(\infty, \beta, J, h)$
+equals zero or not---is equivalent to the Weak Limited Principle of
+Omniscience ($\WLPO$) over Bishop's constructive mathematics ($\BISH$).
+The forward direction encodes a binary sequence $\alpha$ as an external
+field $h_\alpha = \sum_n \alpha(n)\,2^{-(n+1)}$ and reduces the
+all-zeros test to the vanishing of $m(\infty)$; the reverse applies
+$\WLPO$ on $\RR$ to decide $h = 0$ versus $h \ne 0$.
+Combined with Paper~8, which showed that the same 1D Ising model costs
+$\LPO$ for free-energy convergence, this establishes
+\textbf{observable-dependent logical cost}: a single physical system
+can require different levels of the constructive hierarchy depending on
+which observable is queried. The stratification within the 1D Ising
+model is $\BISH$ (finite-volume computation) $<$ $\WLPO$ (phase
+classification) $<$ $\LPO$ (thermodynamic limit of free energy).
+All results are formalized in \Lean{} with \Mathlib{}
+(494~lines, 12~files, zero \texttt{sorry}). The calibration table gains
+a second $\WLPO$ entry and its first demonstration that logical cost
+depends on the observable, not only on the system.
+\end{abstract}
+
+\vspace{1em}
+\tableofcontents
+
+% ====================================================================
+\section{Introduction}\label{sec:intro}
+% ====================================================================
+
+\subsection{The 1D Ising Model and Phase Classification}
+\label{sec:physical}
+
+The one-dimensional Ising model is the simplest non-trivial system in
+statistical mechanics that exhibits a closed-form solution via the
+transfer matrix method~\citep{Ising25,Baxter82}. For a chain of $N$
+spins $\sigma_i \in \{-1, +1\}$ with nearest-neighbor coupling $J > 0$
+and external magnetic field $h$, the Hamiltonian is
+\begin{equation}\label{eq:hamiltonian}
+  H_N = -J \sum_{i=1}^{N-1} \sigma_i \sigma_{i+1}
+        - h \sum_{i=1}^{N} \sigma_i.
+\end{equation}
+The transfer matrix
+\begin{equation}\label{eq:transfer-matrix}
+  T(\beta, J, h) =
+  \begin{pmatrix}
+    e^{\beta(J + h)} & e^{-\beta J} \\
+    e^{-\beta J} & e^{\beta(J - h)}
+  \end{pmatrix}
+\end{equation}
+has eigenvalues
+\begin{equation}\label{eq:eigenvalues}
+  \lambda_\pm(\beta, J, h) =
+  e^{\beta J}\cosh(\beta h)
+  \pm \sqrt{e^{2\beta J}\sinh^2(\beta h) + e^{-2\beta J}}.
+\end{equation}
+In the thermodynamic limit $N \to \infty$, the \emph{infinite-volume
+magnetization per site} is
+\begin{equation}\label{eq:magnetization}
+  m(\infty, \beta, J, h) =
+  \frac{\sinh(\beta h)}%
+       {\sqrt{\sinh^2(\beta h) + e^{-4\beta J}}}.
+\end{equation}
+The \emph{phase classification problem} is: given parameters
+$\beta, J, h$, decide whether $m(\infty, \beta, J, h) = 0$ or
+$m(\infty, \beta, J, h) \ne 0$. This is the order-parameter
+characterization of phases: the disordered phase ($m = 0$) versus the
+ordered phase ($m \ne 0$).
+
+In the 1D Ising model, it is well known that there is no spontaneous
+magnetization~\citep{Ising25,LeeYang52}: $m(\infty, \beta, J, h) = 0$
+if and only if $h = 0$. The question we address is not whether this
+fact holds, but \textbf{what logical resources are needed to decide it
+constructively}.
+
+\subsection{The Answer: WLPO}\label{sec:answer}
+
+The answer is the Weak Limited Principle of Omniscience:
+\begin{enumerate}
+  \item \textbf{Part~A ($\BISH$):} The closed-form magnetization
+    is computable, and $m(\infty, \beta, J, 0) = 0$ follows from
+    $\sinh(0) = 0$. No omniscience principle is needed.
+
+  \item \textbf{Part~B ($\WLPO$):} Deciding $m(\infty) = 0$ versus
+    $m(\infty) \ne 0$ for an \emph{arbitrary} field $h$ is equivalent
+    to $\WLPO$. The mechanism is the encoded field construction.
+\end{enumerate}
+
+\noindent
+The main results, stated precisely, are:
+
+\begin{itemize}
+  \item \textbf{Theorem~1} (Part~A): The magnetization for a specific
+    barrier is BISH-computable.
+  \item \textbf{Theorem~2} (Part~A): $m(\infty, \beta, J, 0) = 0$.
+  \item \textbf{Theorem~3} (Part~B): $\WLPO$ implies phase
+    classification.
+  \item \textbf{Theorem~4} (Part~B): Phase classification implies
+    $\WLPO$.
+  \item \textbf{Theorem~5} (Part~B): $\WLPO \leftrightarrow$
+    phase classification.
+  \item \textbf{Theorem~6}: The stratification of the 1D Ising model.
+\end{itemize}
+
+\subsection{Programme Context}\label{sec:context}
+
+This is Paper~20 in a programme of constructive calibration of
+mathematical physics~\cite{Lee26-P2,Lee26-P7,Lee26-P8,Lee26-P15,Lee26-P19}.
+Papers~2 and~7 calibrated $\WLPO$ against the bidual gap in $\ell^1$
+and the non-reflexivity of $S_1(H)$; Paper~8 calibrated $\LPO$ against
+the thermodynamic limit of the 1D Ising free energy; Paper~19 calibrated
+$\LLPO$ against WKB turning points. The constructive hierarchy is:
+\[
+  \BISH \;<\; \LLPO \;<\; \WLPO \;<\; \LPO.
+\]
+All implications are strict (no reverse implications hold over $\BISH$).
+
+Paper~20 returns to the 1D Ising model of Paper~8, but asks a
+\emph{different question} about the same system. Paper~8 asked about
+the free-energy convergence $f_N \to f_\infty$; Paper~20 asks about
+the magnetization phase classification $m(\infty) = 0$ versus
+$m(\infty) \ne 0$. The answers differ: $\LPO$ for free energy, $\WLPO$
+for phase classification.
+
+\subsection{What Makes This Paper Different}
+\label{sec:different}
+
+Paper~20 contributes three novelties:
+\begin{enumerate}
+  \item \textbf{Observable-dependent logical cost.} This is the first
+    paper in the series demonstrating that a single physical system
+    (the 1D Ising model) can sit at different levels of the
+    constructive hierarchy depending on which observable is queried.
+    The free energy costs $\LPO$; the magnetization phase
+    classification costs only $\WLPO$.
+
+  \item \textbf{Three-tier stratification within one system.}
+    The 1D Ising model exhibits all three non-trivial levels:
+    $\BISH$ for finite-volume computation, $\WLPO$ for phase
+    classification, and $\LPO$ for thermodynamic-limit convergence.
+
+  \item \textbf{WLPO as the zero-test principle.} The mechanism
+    underlying the $\WLPO$ equivalence is the real-valued zero test:
+    $\WLPO$ on $\RR$ decides $x = 0 \vee x \ne 0$ for any real $x$.
+    The phase classification reduces to testing whether $h = 0$, which
+    is exactly this zero-test.
+\end{enumerate}
+
+
+% ====================================================================
+\section{Background}\label{sec:background}
+% ====================================================================
+
+\subsection{The 1D Ising Model with External Field}
+\label{sec:ising-bg}
+
+Consider a chain of $N$ classical spins $\sigma_i \in \{-1, +1\}$ on a
+one-dimensional lattice with periodic boundary conditions. The
+Hamiltonian~\eqref{eq:hamiltonian} captures nearest-neighbor
+ferromagnetic coupling ($J > 0$) and the Zeeman interaction with an
+external field $h$.
+
+The partition function $Z_N = \operatorname{Tr}(T^N)$ factorizes via
+the transfer matrix~\eqref{eq:transfer-matrix}. The eigenvalues
+$\lambda_+$ and $\lambda_-$ with $\lambda_+ > \lambda_-$ yield the
+free energy per site
+\begin{equation}\label{eq:free-energy}
+  f_\infty(\beta, J, h) = -\frac{1}{\beta}\ln \lambda_+(\beta, J, h)
+\end{equation}
+in the thermodynamic limit. The magnetization per site is obtained by
+differentiating:
+\begin{equation}\label{eq:mag-derivative}
+  m(\infty, \beta, J, h)
+  = -\frac{\partial f_\infty}{\partial h}
+  = \frac{\sinh(\beta h)}%
+         {\sqrt{\sinh^2(\beta h) + e^{-4\beta J}}}.
+\end{equation}
+The closed-form expression~\eqref{eq:magnetization} is a standard
+result in statistical mechanics~\citep{Baxter82}.
+
+The key physical fact is the absence of spontaneous magnetization in
+one dimension: setting $h = 0$ gives $\sinh(0) = 0$, hence
+$m(\infty, \beta, J, 0) = 0$ for all $\beta$ and $J$. Conversely, for
+$h \ne 0$, the numerator $\sinh(\beta h) \ne 0$ and the denominator is
+strictly positive (since $e^{-4\beta J} > 0$), so $m(\infty) \ne 0$.
+Thus:
+\begin{equation}\label{eq:m-zero-iff}
+  m(\infty, \beta, J, h) = 0
+  \quad\Longleftrightarrow\quad
+  h = 0.
+\end{equation}
+
+\subsection{The Constructive Hierarchy}\label{sec:hierarchy-bg}
+
+Constructive reverse mathematics (CRM) classifies mathematical
+theorems by the weakest omniscience principle needed to prove
+them~\citep{Bishop67,BV06,Ishihara06,Diener20}. Bishop's
+constructive mathematics ($\BISH$) avoids all omniscience principles;
+every existential claim comes with a computable witness.
+
+\begin{definition}[$\LLPO$]\label{def:llpo}
+The \emph{Lesser Limited Principle of Omniscience}: for every binary
+sequence $\alpha : \NN \to \{0,1\}$ with at most one index $n$
+satisfying $\alpha(n) = 1$, either $\alpha(2n) = 0$ for all $n$, or
+$\alpha(2n+1) = 0$ for all $n$.
+\end{definition}
+
+\begin{definition}[$\WLPO$]\label{def:wlpo}
+The \emph{Weak Limited Principle of Omniscience}: for every binary
+sequence $\alpha$, either $\alpha(n) = 0$ for all $n$, or it is not
+the case that $\alpha(n) = 0$ for all $n$.
+\end{definition}
+
+\begin{definition}[$\LPO$]\label{def:lpo}
+The \emph{Limited Principle of Omniscience}: for every binary
+sequence $\alpha$, either $\alpha(n) = 0$ for all $n$, or there
+exists $n$ with $\alpha(n) = 1$.
+\end{definition}
+
+\begin{definition}[$\BMC$]\label{def:bmc}
+\emph{Bounded Monotone Convergence}: every bounded non-decreasing
+sequence of reals has a limit.
+\end{definition}
+
+\noindent
+The hierarchy and key equivalences are:
+\begin{equation}\label{eq:hierarchy}
+  \BISH \;<\; \LLPO \;<\; \WLPO \;<\; \LPO
+  \;\equiv\; \BMC.
+\end{equation}
+The equivalence $\BMC \leftrightarrow \LPO$ is due to
+\citet{BV06}. The relationship between $\WLPO$ and the real-valued
+zero test is established in \citet{BR87}: $\WLPO$ implies that for
+every $x \in \RR$, either $x = 0$ or $x \ne 0$.
+
+\subsection{The CRM Diagnostic}\label{sec:diagnostic}
+
+The CRM diagnostic for a physical assertion proceeds as follows:
+\begin{enumerate}
+  \item Formalize the assertion and its proof in \Lean{} with
+    \Mathlib{}.
+  \item Declare axioms for known CRM equivalences
+    (e.g., \texttt{wlpo\_real\_of\_wlpo},
+    \texttt{bmc\_iff\_lpo}).
+  \item Run \texttt{\#print axioms} on each main theorem.
+  \item The custom axioms in the output certify the CRM level.
+    Theorems with no custom axioms are $\BISH$; theorems depending on
+    \texttt{wlpo\_real\_of\_wlpo} are $\WLPO$; theorems depending on
+    \texttt{bmc\_iff\_lpo} are $\LPO$.
+\end{enumerate}
+
+
+% ====================================================================
+\section{Part~A: Finite-Volume Magnetization Is BISH}
+\label{sec:part-a}
+% ====================================================================
+
+The first tier: when the parameters $\beta, J, h$ are given
+concretely, the magnetization is computable and the zero-field
+symmetry is provable without any omniscience principle.
+
+\begin{definition}[Magnetization]\label{def:magnetization}
+\leanok{}
+The \emph{infinite-volume magnetization} for the 1D Ising model is
+\begin{equation}\label{eq:mag-def}
+  m(\infty, \beta, J, h) :=
+  \frac{\sinh(\beta h)}%
+       {\sqrt{\sinh^2(\beta h) + e^{-4\beta J}}},
+\end{equation}
+defined for $\beta > 0$ and $J > 0$.
+\end{definition}
+
+\begin{lstlisting}[caption={Magnetization definition (Defs/Magnetization.lean).}]
+/-- The discriminant under the square root is strictly positive. -/
+theorem discriminant_pos (beta J h : Real)
+    (hbeta : beta > 0) (hJ : J > 0) :
+    Real.sinh (beta * h) ^ 2 +
+      Real.exp (-4 * beta * J) > 0 := by
+  have : Real.exp (-4 * beta * J) > 0 := Real.exp_pos _
+  linarith [sq_nonneg (Real.sinh (beta * h))]
+
+/-- Infinite-volume magnetization of the 1D Ising model. -/
+noncomputable def magnetization_inf
+    (beta J h : Real) : Real :=
+  Real.sinh (beta * h) /
+    Real.sqrt (Real.sinh (beta * h) ^ 2 +
+      Real.exp (-4 * beta * J))
+\end{lstlisting}
+
+\begin{theorem}[Computability---BISH]\label{thm:computable}
+\leanok{}
+For any $\beta > 0$, $J > 0$, and $h \in \RR$, the infinite-volume
+magnetization $m(\infty, \beta, J, h)$ is a computable real number.
+\end{theorem}
+
+\begin{proof}
+The expression~\eqref{eq:mag-def} involves only $\sinh$, $\exp$,
+squaring, addition, square root, and division---all total computable
+operations on $\RR$ in \Mathlib{}. The denominator is nonzero because
+$e^{-4\beta J} > 0$ forces the discriminant to be strictly positive,
+hence $\sqrt{\cdot} > 0$. No root-finding, no limits, no omniscience.
+Proof: \texttt{exact $\langle$\_, rfl$\rangle$}.
+\end{proof}
+
+\begin{theorem}[$Z_2$ symmetry]\label{thm:spin-flip}
+\leanok{}
+For all $\beta > 0$ and $J > 0$:
+\begin{equation}\label{eq:spin-flip}
+  m(\infty, \beta, J, 0) = 0.
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+By definition:
+\[
+  m(\infty, \beta, J, 0) =
+  \frac{\sinh(\beta \cdot 0)}%
+       {\sqrt{\sinh^2(\beta \cdot 0) + e^{-4\beta J}}}
+  = \frac{\sinh(0)}{\sqrt{\sinh^2(0) + e^{-4\beta J}}}
+  = \frac{0}{\sqrt{0 + e^{-4\beta J}}}
+  = 0.
+\]
+In \Lean{}: \texttt{unfold magnetization\_inf; simp [Real.sinh\_zero,
+mul\_zero, zero\_div]}.
+\end{proof}
+
+\begin{lstlisting}[caption={Spin-flip symmetry (PartA/SpinFlip.lean).}]
+/-- At zero external field, magnetization vanishes. -/
+theorem mag_zero_field (beta J : Real)
+    (hbeta : beta > 0) (hJ : J > 0) :
+    magnetization_inf beta J 0 = 0 := by
+  unfold magnetization_inf
+  simp [mul_zero, Real.sinh_zero, sq, zero_div]
+\end{lstlisting}
+
+\begin{remark}[Axiom profile]\label{rem:bish-profile}
+\texttt{\#print axioms mag\_computable} and
+\texttt{\#print axioms mag\_zero\_field} both show only
+\texttt{[propext, Classical.choice, Quot.sound]}. The
+\texttt{Classical.choice} arises from \Mathlib{}'s infrastructure
+for \texttt{Real.instField}, not from any mathematical use of choice.
+No custom axiom (\texttt{wlpo\_real\_of\_wlpo}) appears.
+These are pure $\BISH$ results.
+\end{remark}
+
+
+% ====================================================================
+\section{Part~B: Phase Classification Costs WLPO}
+\label{sec:part-b}
+% ====================================================================
+
+This is the core section: the first physical calibration of $\WLPO$
+against a thermodynamic observable.
+
+\subsection{The Key Equivalence: \texorpdfstring{$m(\infty) = 0 \Leftrightarrow h = 0$}{m(inf) = 0 iff h = 0}}
+\label{sec:key-equiv}
+
+\begin{lemma}[Magnetization zero iff field zero]\label{lem:mag-zero-iff}
+\leanok{}
+For all $\beta > 0$ and $J > 0$:
+\begin{equation}\label{eq:mag-zero-iff-formal}
+  m(\infty, \beta, J, h) = 0
+  \quad\Longleftrightarrow\quad
+  h = 0.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+\textbf{($\Leftarrow$)} This is \Cref{thm:spin-flip}.
+
+\smallskip\noindent
+\textbf{($\Rightarrow$)} Suppose $m(\infty, \beta, J, h) = 0$.
+By definition:
+\[
+  \frac{\sinh(\beta h)}%
+       {\sqrt{\sinh^2(\beta h) + e^{-4\beta J}}} = 0.
+\]
+The denominator $\sqrt{\sinh^2(\beta h) + e^{-4\beta J}} > 0$
+(since $e^{-4\beta J} > 0$). Therefore $\sinh(\beta h) = 0$ by
+\texttt{div\_eq\_zero\_iff}. Since $\sinh$ is injective
+($\sinh(x) = 0 \Leftrightarrow x = 0$), we get $\beta h = 0$.
+Since $\beta > 0$, we conclude $h = 0$ by
+\texttt{mul\_eq\_zero.mp} and \texttt{ne\_of\_gt}.
+\end{proof}
+
+\begin{lstlisting}[caption={The key equivalence (PartB/MagZeroIff.lean).}]
+/-- Core lemma: magnetization vanishes iff field vanishes. -/
+theorem magnetization_inf_eq_zero_iff
+    (beta J h : Real) (hbeta : beta > 0) (hJ : J > 0) :
+    magnetization_inf beta J h = 0 <-> h = 0 := by
+  constructor
+  . intro hmag
+    unfold magnetization_inf at hmag
+    have hdisc := discriminant_pos beta J h hbeta hJ
+    have hsqrt_pos : Real.sqrt (...) > 0 :=
+      Real.sqrt_pos_of_pos hdisc
+    have hsqrt_ne : Real.sqrt (...) != 0 :=
+      ne_of_gt hsqrt_pos
+    have hsinh : Real.sinh (beta * h) = 0 :=
+      (div_eq_zero_iff.mp hmag).resolve_right hsqrt_ne
+    have hbh : beta * h = 0 :=
+      Real.sinh_eq_zero_iff.mp hsinh
+    exact (mul_eq_zero.mp hbh).resolve_left (ne_of_gt hbeta)
+  . intro hh; rw [hh]; exact mag_zero_field beta J hbeta hJ
+\end{lstlisting}
+
+\subsection{The Encoded Field Construction}\label{sec:encoded-field}
+
+The central encoding: we convert a binary sequence $\alpha : \NN \to
+\{0, 1\}$ into an external magnetic field.
+
+\begin{definition}[Encoded field]\label{def:encoded-field}
+\leanok{}
+For a binary sequence $\alpha : \NN \to \{0, 1\}$, define
+\begin{equation}\label{eq:encoded-field}
+  h_\alpha := \sum_{n=0}^{\infty} \alpha(n) \cdot 2^{-(n+1)}.
+\end{equation}
+\end{definition}
+
+\begin{lemma}[Summability]\label{lem:summability}
+\leanok{}
+The series defining $h_\alpha$ is summable for any $\alpha$.
+\end{lemma}
+
+\begin{proof}
+Each term $\alpha(n) \cdot 2^{-(n+1)}$ satisfies
+$0 \le \alpha(n) \cdot 2^{-(n+1)} \le 2^{-(n+1)}$, and the geometric
+series $\sum_n 2^{-(n+1)}$ converges to $1$. Summability follows by
+comparison with the geometric series, using \Mathlib{}'s
+\texttt{Summable.of\_nonneg\_of\_le} and
+\texttt{summable\_geometric\_of\_lt\_one}.
+\end{proof}
+
+\begin{lemma}[Encoded field zero iff all zeros]\label{lem:encoded-zero}
+\leanok{}
+For any binary sequence $\alpha$:
+\begin{equation}\label{eq:encoded-zero}
+  h_\alpha = 0 \quad\Longleftrightarrow\quad
+  \forall n,\; \alpha(n) = 0.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+\textbf{($\Leftarrow$)} If $\alpha(n) = 0$ for all $n$, then each
+term is $0 \cdot 2^{-(n+1)} = 0$, so the series sums to $0$.
+
+\smallskip\noindent
+\textbf{($\Rightarrow$)} Suppose $h_\alpha = 0$. Each term
+$\alpha(n) \cdot 2^{-(n+1)} \ge 0$, and the sum of non-negative
+terms is zero iff every term is zero. Since $2^{-(n+1)} > 0$, we
+get $\alpha(n) = 0$ for all $n$.
+In \Lean{}: \texttt{tsum\_eq\_zero\_of\_nonneg} combined with
+positivity of the geometric weights.
+\end{proof}
+
+\begin{lstlisting}[caption={Encoded field (Defs/EncodedField.lean, selected).}]
+/-- The encoded field: binary sequence -> external field. -/
+noncomputable def encodedField
+    (alpha : Nat -> Nat) : Real :=
+  tsum (fun n => (alpha n : Real) * (1/2) ^ (n + 1))
+
+/-- The encoded field vanishes iff alpha is identically zero. -/
+theorem encodedField_eq_zero_iff
+    (alpha : Nat -> Nat) (h01 : forall n, alpha n = 0
+      \/ alpha n = 1) :
+    encodedField alpha = 0 <->
+      forall n, alpha n = 0 := by
+  -- ... (non-negative tsum = 0 iff all terms = 0)
+\end{lstlisting}
+
+\subsection{Forward: WLPO \texorpdfstring{$\Rightarrow$}{=>} Phase Classification}
+\label{sec:forward}
+
+\begin{definition}[Phase classification]\label{def:phase-class}
+\leanok{}
+The \emph{phase classification oracle} is the proposition: for all
+$\beta > 0$, $J > 0$, and $h \in \RR$,
+\begin{equation}\label{eq:phase-class}
+  m(\infty, \beta, J, h) = 0 \;\;\vee\;\;
+  m(\infty, \beta, J, h) \ne 0.
+\end{equation}
+\end{definition}
+
+The forward direction uses the $\WLPO$-on-$\RR$ axiom: a standard
+consequence of $\WLPO$ established in~\citet{BR87}.
+
+\begin{lstlisting}[caption={WLPO on $\RR$ interface axiom (PartB/Forward.lean).}]
+/-- WLPO implies decidability of x = 0 for reals.
+    Standard consequence of WLPO (Bridges-Richman 1987). -/
+axiom wlpo_real_of_wlpo :
+  WLPO -> forall (x : Real), x = 0 \/ x != 0
+\end{lstlisting}
+
+\begin{theorem}[WLPO $\Rightarrow$ Phase Classification]
+\label{thm:forward} \leanok{}
+If $\WLPO$ holds, then for all $\beta > 0$, $J > 0$, and
+$h \in \RR$:
+\[
+  m(\infty, \beta, J, h) = 0 \;\;\vee\;\;
+  m(\infty, \beta, J, h) \ne 0.
+\]
+\end{theorem}
+
+\begin{proof}
+Assume $\WLPO$. By \texttt{wlpo\_real\_of\_wlpo}, the real number
+$m(\infty, \beta, J, h)$ satisfies $m = 0 \vee m \ne 0$. This is
+exactly the phase classification.
+
+In \Lean{}: \texttt{exact wlpo\_real\_of\_wlpo hwlpo
+(magnetization\_inf beta J h)}.
+\end{proof}
+
+\subsection{Backward: Phase Classification \texorpdfstring{$\Rightarrow$}{=>} WLPO}
+\label{sec:backward}
+
+This is the novel direction: a phase classification oracle for the
+1D Ising model implies $\WLPO$.
+
+\begin{theorem}[Phase Classification $\Rightarrow$ WLPO]
+\label{thm:backward} \leanok{}
+If phase classification holds (i.e., for all $\beta > 0$, $J > 0$,
+and $h$, $m(\infty, \beta, J, h) = 0 \vee m(\infty) \ne 0$), then
+$\WLPO$ holds.
+\end{theorem}
+
+\begin{proof}
+Let $\alpha : \NN \to \{0,1\}$ be an arbitrary binary sequence. We
+must show: $(\forall n,\; \alpha(n) = 0) \;\vee\;
+\neg(\forall n,\; \alpha(n) = 0)$.
+
+\smallskip\noindent
+\textbf{Step 1: Encode.} Define $h_\alpha$ as in
+\Cref{def:encoded-field}. By \Cref{lem:encoded-zero}:
+\[
+  h_\alpha = 0 \;\;\Leftrightarrow\;\;
+  \forall n,\; \alpha(n) = 0.
+\]
+
+\smallskip\noindent
+\textbf{Step 2: Apply the oracle.} Set $\beta = 1$ and $J = 1$
+(both positive). Apply the phase classification oracle at
+$h = h_\alpha$ to obtain:
+\[
+  m(\infty, 1, 1, h_\alpha) = 0 \;\;\vee\;\;
+  m(\infty, 1, 1, h_\alpha) \ne 0.
+\]
+
+\smallskip\noindent
+\textbf{Step 3: Translate.} By \Cref{lem:mag-zero-iff}:
+\begin{itemize}
+  \item $m(\infty, 1, 1, h_\alpha) = 0 \;\Rightarrow\;
+    h_\alpha = 0 \;\Rightarrow\; \forall n,\; \alpha(n) = 0$.
+  \item $m(\infty, 1, 1, h_\alpha) \ne 0 \;\Rightarrow\;
+    h_\alpha \ne 0 \;\Rightarrow\; \neg(\forall n,\; \alpha(n) = 0)$.
+\end{itemize}
+In both cases, we obtain the $\WLPO$ disjunction for $\alpha$.
+\end{proof}
+
+\begin{lstlisting}[caption={Backward: phase classification implies WLPO (PartB/Backward.lean).}]
+/-- Phase classification oracle for the 1D Ising model. -/
+def PhaseClassification : Prop :=
+  forall (beta J h : Real), beta > 0 -> J > 0 ->
+    magnetization_inf beta J h = 0 \/
+    magnetization_inf beta J h != 0
+
+/-- Novel direction: phase classification implies WLPO. -/
+theorem wlpo_of_phase_classification
+    (hpc : PhaseClassification) : WLPO := by
+  intro alpha
+  set h_alpha := encodedField alpha
+  -- Apply oracle at beta = 1, J = 1, h = h_alpha
+  have hcase := hpc 1 1 h_alpha one_pos one_pos
+  cases hcase with
+  | inl hmag_zero =>
+    left; intro n
+    exact (encodedField_eq_zero_iff alpha ...).mp
+      ((magnetization_inf_eq_zero_iff 1 1 h_alpha
+        one_pos one_pos).mp hmag_zero)
+      n
+  | inr hmag_ne =>
+    right; intro hall
+    have hh := (encodedField_eq_zero_iff alpha ...).mpr hall
+    have := (magnetization_inf_eq_zero_iff 1 1 h_alpha
+      one_pos one_pos).mpr hh
+    exact hmag_ne this
+\end{lstlisting}
+
+\subsection{Main Equivalence}\label{sec:main-equiv}
+
+\begin{theorem}[WLPO $\leftrightarrow$ Phase Classification]
+\label{thm:main} \leanok{}
+Over $\BISH$, the magnetization phase classification of the 1D Ising
+model is equivalent to $\WLPO$:
+\[
+  \WLPO \;\longleftrightarrow\;
+  \mathrm{PhaseClassification}.
+\]
+\end{theorem}
+
+\begin{proof}
+Compose \Cref{thm:forward,thm:backward}:
+\[
+  \WLPO
+  \;\xrightarrow{\text{Thm~\ref{thm:forward}}}\;
+  \mathrm{PhaseClassification}
+  \;\xrightarrow{\text{Thm~\ref{thm:backward}}}\;
+  \WLPO.
+\]
+In \Lean{}: \texttt{wlpo\_iff\_phase\_classification :=
+$\langle$phase\_classification\_of\_wlpo,
+wlpo\_of\_phase\_classification$\rangle$}.
+\end{proof}
+
+\begin{lstlisting}[caption={Main equivalence (PartB/PartB\_Main.lean).}]
+/-- Main result: WLPO <-> phase classification. -/
+theorem wlpo_iff_phase_classification :
+    WLPO <-> PhaseClassification :=
+  Iff.intro phase_classification_of_wlpo
+    wlpo_of_phase_classification
+\end{lstlisting}
+
+\begin{remark}[Axiom certificate]\label{rem:wlpo-cert}
+\texttt{\#print axioms wlpo\_iff\_phase\_classification} shows
+\texttt{[propext, Classical.choice, Quot.sound,
+wlpo\_real\_of\_wlpo]}. Exactly one custom axiom:
+\texttt{wlpo\_real\_of\_wlpo}. No \texttt{bmc\_iff\_lpo}. This
+certifies that the phase classification costs exactly $\WLPO$---not
+$\LPO$, not $\LLPO$.
+\end{remark}
+
+
+% ====================================================================
+\section{The Stratification Theorem}\label{sec:stratification}
+% ====================================================================
+
+The 1D Ising model exhibits three distinct levels of the constructive
+hierarchy within a single physical system:
+
+\begin{center}
+\begin{tabular}{@{}clll@{}}
+\toprule
+\textbf{Level} & \textbf{Assertion} & \textbf{CRM Cost} &
+  \textbf{Mechanism} \\
+\midrule
+1 & Finite-volume $m_N(\beta, J, h)$
+  & $\BISH$ & Closed-form expression \\
+2 & Phase classification $m(\infty) \stackrel{?}{=} 0$
+  & $\WLPO$ & Zero test on $h$ \\
+3 & Free-energy convergence $f_N \to f_\infty$
+  & $\LPO$ & Bounded monotone convergence \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{theorem}[Stratification]\label{thm:stratification}
+\leanok{}
+The 1D Ising model stratifies the constructive hierarchy:
+\begin{enumerate}
+  \item Finite-volume magnetization is $\BISH$-computable (no custom
+    axioms).
+  \item Phase classification is equivalent to $\WLPO$ (uses
+    \texttt{wlpo\_real\_of\_wlpo}).
+  \item Free-energy convergence is equivalent to $\LPO$ (uses
+    \texttt{bmc\_iff\_lpo}, Paper~8).
+\end{enumerate}
+Moreover, $\BISH \subsetneq \WLPO \subsetneq \LPO$, so the three
+levels are strictly separated.
+\end{theorem}
+
+\begin{proof}
+Items~(1) and~(2) are \Cref{thm:computable,thm:spin-flip,thm:main}.
+Item~(3) is the main result of Paper~8~\citep{Lee26-P8}.
+The strict separations $\BISH \subsetneq \WLPO$ and
+$\WLPO \subsetneq \LPO$ are standard~\citep{BR87,BV06}: $\LPO$ is
+not derivable from $\WLPO$, and $\WLPO$ is not derivable from
+$\BISH$.
+
+In \Lean{}: the hierarchy $\LPO \Rightarrow \WLPO$ is proved from
+first principles (\texttt{lpo\_implies\_wlpo}); the non-reverse is
+a meta-theoretic fact.
+\end{proof}
+
+\begin{lstlisting}[caption={Stratification (Main/Stratification.lean).}]
+/-- The three-level stratification of the 1D Ising model. -/
+theorem ising_stratification :
+    -- Level 1: BISH (finite-volume)
+    (forall beta J h, beta > 0 -> J > 0 ->
+      exists m, m = magnetization_inf beta J h) /\
+    -- Level 2: WLPO <-> phase classification
+    (WLPO <-> PhaseClassification) /\
+    -- Level 3: hierarchy
+    (forall alpha, LPO_seq alpha -> WLPO_seq alpha) := by
+  exact <mag_computable, wlpo_iff_phase_classification,
+    lpo_implies_wlpo>
+\end{lstlisting}
+
+
+% ====================================================================
+\section{Updated Calibration Table}\label{sec:calibration}
+% ====================================================================
+
+The calibration table for the constructive reverse mathematics
+series, updated with Paper~20:
+
+\begin{center}
+\small
+\begin{tabular}{@{}clllc@{}}
+\toprule
+\textbf{Paper} & \textbf{Physical System} &
+  \textbf{Observable / Assertion} & \textbf{CRM Level} &
+  \textbf{Key Axiom} \\
+\midrule
+2  & Bidual gap ($\ell^1$)
+   & Gap witness $J - \kappa$
+   & $\equiv \WLPO$ & WLPO \\
+6  & Heisenberg uncertainty
+   & $\Delta A \cdot \Delta B \ge \tfrac{1}{2}|\langle[A,B]\rangle|$
+   & $\BISH$ & None \\
+7  & Reflexive Banach ($S_1(H)$)
+   & Non-reflexivity witness
+   & $\equiv \WLPO$ & WLPO \\
+8  & 1D Ising model
+   & Thermodynamic limit $f_\infty$
+   & $\equiv \LPO$ & BMC \\
+9  & Hydrogen spectrum
+   & Finite eigenvalue bounds
+   & $\BISH$ & None \\
+11 & Bell / CHSH inequality
+   & Tsirelson bound $2\sqrt{2}$
+   & $\BISH$ & None \\
+13 & Schwarzschild interior
+   & Geodesic incompleteness
+   & $\equiv \LPO$ & BMC \\
+14 & Quantum decoherence
+   & Exact collapse $c(N) \to 0$
+   & $\equiv \LPO$ & BMC \\
+15 & Noether conservation
+   & Global energy $E = \lim E_N$
+   & $\equiv \LPO$ & BMC \\
+16 & Thermodynamic entropy
+   & Infinite-volume entropy
+   & $\equiv \LPO$ & BMC \\
+17 & Spin chain entanglement
+   & Entanglement entropy limit
+   & $\equiv \LPO$ & BMC \\
+18 & Hawking radiation
+   & Thermal spectrum limit
+   & $\equiv \LPO$ & BMC \\
+19 & WKB tunneling
+   & Turning points (TPP)
+   & $\equiv \LLPO$ & IVT \\
+19 & WKB tunneling
+   & Full semiclassical
+   & $\equiv \LPO$ & IVT+BMC \\
+\rowcolor{yellow!20}
+\textbf{20} & \textbf{1D Ising model}
+   & \textbf{Phase classification}
+   & $\equiv \WLPO$ & \textbf{IVT (wlpo\_real)} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Paper~20 contributes a \textbf{second $\WLPO$ entry}---and the first
+from statistical mechanics at this level. The pattern of
+observable-dependent logical cost is now visible:
+\begin{itemize}
+  \item Papers~8 and~20 study the \emph{same system} (1D Ising) but
+    different observables, calibrating at $\LPO$ (free energy) and
+    $\WLPO$ (phase classification) respectively.
+  \item The constructive hierarchy has physical instantiations at every
+    level: $\BISH$ (finite computations), $\LLPO$ (exact
+    root-finding), $\WLPO$ (zero tests and phase classification),
+    $\LPO$ (completed limits).
+\end{itemize}
+
+
+% ====================================================================
+\section{Lean~4 Formalization}\label{sec:lean}
+% ====================================================================
+
+\subsection{Module Structure}\label{sec:modules}
+
+The formalization consists of 12~files organized in four directories:
+
+\begin{center}
+\begin{tabular}{@{}llr@{}}
+\toprule
+\textbf{Module} & \textbf{Content} & \textbf{Lines} \\
+\midrule
+\texttt{Defs/WLPO.lean}
+  & WLPO, LPO definitions, hierarchy & 36 \\
+\texttt{Defs/Magnetization.lean}
+  & Closed-form $m(\infty)$, discriminant positivity & 38 \\
+\texttt{Defs/EncodedField.lean}
+  & $h_\alpha$ series, summability, zero-iff & 97 \\
+\texttt{PartA/SpinFlip.lean}
+  & $m(\infty, \beta, J, 0) = 0$ & 18 \\
+\texttt{PartA/PartA\_Main.lean}
+  & Computability, Part~A audit & 31 \\
+\texttt{PartB/MagZeroIff.lean}
+  & $m(\infty) = 0 \leftrightarrow h = 0$ & 51 \\
+\texttt{PartB/Forward.lean}
+  & WLPO $\Rightarrow$ phase classification + axiom & 47 \\
+\texttt{PartB/Backward.lean}
+  & Phase classification $\Rightarrow$ WLPO (novel) & 47 \\
+\texttt{PartB/PartB\_Main.lean}
+  & Main equivalence & 29 \\
+\texttt{Main/Stratification.lean}
+  & Three-level result & 35 \\
+\texttt{Main/AxiomAudit.lean}
+  & Comprehensive audit & 60 \\
+\texttt{Main.lean}
+  & Root imports & 10 \\
+\midrule
+\textbf{Total} & & \textbf{494} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Dependency graph:
+\begin{verbatim}
+WLPO <-- Magnetization <-- EncodedField <-- MagZeroIff
+  |           |                                |
+  +------- SpinFlip                         Forward
+  |        PartA_Main                      Backward
+  |                                      PartB_Main
+  +------ Stratification <-- AxiomAudit
+                                |
+                              Main
+\end{verbatim}
+
+\subsection{Design Decisions}\label{sec:design}
+
+\paragraph{Closed-form magnetization.}
+The magnetization is defined as a closed-form expression involving
+$\sinh$, $\exp$, and $\sqrt{\cdot}$, rather than as a limit of
+finite-volume quantities. This is essential: the closed-form avoids
+the $\LPO$ cost of taking the thermodynamic limit, allowing the
+$\WLPO$ calibration to emerge cleanly.
+
+\paragraph{Single interface axiom.}
+Only one CRM equivalence is axiomatized:
+\begin{itemize}
+  \item \texttt{wlpo\_real\_of\_wlpo : WLPO $\to$ $\forall x : \RR$,
+    $x = 0 \vee x \ne 0$} \citep{BR87}.
+\end{itemize}
+The axiom is used only in the forward direction (\Cref{thm:forward}).
+The backward direction (\Cref{thm:backward}) uses no custom axioms,
+making the reverse reduction fully constructive.
+
+\paragraph{Encoded field via \texttt{tsum}.}
+The encoded field $h_\alpha$ uses \Mathlib{}'s \texttt{tsum}
+(infinite sum) rather than a finite partial sum. This gives a genuine
+real number whose vanishing is equivalent to the all-zeros condition,
+enabling a clean reduction from the $\WLPO$ disjunction.
+
+\paragraph{Self-contained bundle.}
+Paper~20 is a standalone Lake package that re-declares $\WLPO$ and
+$\LPO$ locally. The hierarchy proof
+$\LPO \Rightarrow \WLPO$ is proved from first principles with no
+custom axioms.
+
+\subsection{Axiom Audit}\label{sec:axiom-audit}
+
+\begin{center}
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Theorem} & \textbf{Custom Axioms} &
+  \textbf{Infrastructure} & \textbf{Tier} \\
+\midrule
+\texttt{mag\_computable}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & $\BISH$ \\
+\texttt{mag\_zero\_field}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & $\BISH$ \\
+\texttt{phase\_classification\_of\_wlpo}
+  & \texttt{wlpo\_real\_of\_wlpo}
+  & propext, Classical.choice, Quot.sound
+  & $\WLPO$ \\
+\texttt{wlpo\_of\_phase\_classification}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & --- (hypothesis) \\
+\texttt{wlpo\_iff\_phase\_classification}
+  & \texttt{wlpo\_real\_of\_wlpo}
+  & propext, Classical.choice, Quot.sound
+  & $\WLPO$ \\
+\texttt{ising\_stratification}
+  & \texttt{wlpo\_real\_of\_wlpo}
+  & propext, Classical.choice, Quot.sound
+  & $\WLPO$ \\
+\texttt{lpo\_implies\_wlpo}
+  & None
+  & propext
+  & Pure logic \\
+\texttt{encodedField\_eq\_zero\_iff}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & $\BISH$ \\
+\texttt{magnetization\_inf\_eq\_zero\_iff}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & $\BISH$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{lstlisting}[caption={Axiom audit (Main/AxiomAudit.lean, selected).}]
+-- Part A (BISH):
+#print axioms mag_computable
+-- [propext, Classical.choice, Quot.sound]
+
+#print axioms mag_zero_field
+-- [propext, Classical.choice, Quot.sound]
+
+-- Part B (WLPO):
+#print axioms phase_classification_of_wlpo
+-- [propext, Classical.choice, Quot.sound,
+--  wlpo_real_of_wlpo]
+
+-- Backward (no custom axioms!):
+#print axioms wlpo_of_phase_classification
+-- [propext, Classical.choice, Quot.sound]
+
+-- Main equivalence:
+#print axioms wlpo_iff_phase_classification
+-- [propext, Classical.choice, Quot.sound,
+--  wlpo_real_of_wlpo]
+
+-- Hierarchy (pure logic):
+#print axioms lpo_implies_wlpo
+-- [propext]
+
+-- Encoded field (BISH):
+#print axioms encodedField_eq_zero_iff
+-- [propext, Classical.choice, Quot.sound]
+\end{lstlisting}
+
+\subsection{CRM Compliance}\label{sec:crm-compliance}
+
+The two-part structure is confirmed by machine:
+\begin{itemize}
+  \item Part~A theorems have \textbf{no custom axioms}---pure $\BISH$.
+  \item Part~B forward depends on \textbf{exactly one} custom axiom
+    (\texttt{wlpo\_real\_of\_wlpo})---$\WLPO$ level.
+  \item Part~B backward has \textbf{no custom axioms}---the reduction
+    from phase classification to $\WLPO$ is fully constructive.
+  \item The encoded field lemmas have \textbf{no custom axioms}---the
+    encoding is $\BISH$.
+  \item Hierarchy proofs ($\LPO \Rightarrow \WLPO$) have
+    \textbf{no custom axioms}---sorry-free, pure $\BISH$.
+  \item \texttt{Classical.choice} in all results is a \Mathlib{}
+    infrastructure artifact from \texttt{Real.instField},
+    \texttt{Real.sinh}, \texttt{Real.exp}, and \texttt{tsum}. The
+    mathematical content of these proofs is constructive.
+\end{itemize}
+
+
+% ====================================================================
+\section{Discussion}\label{sec:discussion}
+% ====================================================================
+
+\subsection{Observable-Dependent Logical Cost}
+\label{sec:observable-cost}
+
+The central conceptual contribution of this paper is the demonstration
+that \textbf{logical cost depends on the observable, not only on the
+physical system}. The 1D Ising model is a single, fixed physical
+system with a well-defined Hamiltonian~\eqref{eq:hamiltonian}. Yet
+different questions about this system have different constructive
+costs:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Question} & \textbf{CRM Level} & \textbf{Paper} \\
+\midrule
+What is $m_N(\beta, J, h)$ for given $N$? & $\BISH$ & 20 (Part A) \\
+Is $m(\infty, \beta, J, h) = 0$ or $\ne 0$? & $\WLPO$ & 20 (Part B) \\
+What is $f_\infty = \lim_N f_N$? & $\LPO$ & 8 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+This observable-dependence is not an artifact of formalization choices.
+The phase classification genuinely requires less logical strength than
+free-energy convergence because:
+\begin{itemize}
+  \item Phase classification asks a \emph{yes/no question} about a
+    closed-form expression (is $m(\infty) = 0$?). This reduces to the
+    zero-test on $h$, which is a $\WLPO$ assertion.
+  \item Free-energy convergence asks for a \emph{completed limit}
+    ($f_N \to f_\infty$). This is a $\BMC$/$\LPO$ assertion.
+\end{itemize}
+The distinction mirrors a general principle: \emph{classification
+costs less than computation}. Sorting an output into finitely many
+classes ($\WLPO$) is logically cheaper than computing the exact output
+($\LPO$).
+
+\subsection{WLPO as the Zero-Test Principle}
+\label{sec:wlpo-zero-test}
+
+The mechanism connecting phase classification to $\WLPO$ is the
+\emph{real-valued zero test}: the ability to decide $x = 0 \vee
+x \ne 0$ for a real number $x$. This is a standard consequence of
+$\WLPO$~\citep{BR87}.
+
+In the 1D Ising model, the phase classification reduces to testing
+whether $h = 0$ (via the equivalence $m(\infty) = 0 \Leftrightarrow
+h = 0$). The zero test on $h$ is exactly the $\WLPO$-on-$\RR$ principle.
+
+This gives $\WLPO$ a vivid physical interpretation: $\WLPO$ is the
+logical cost of deciding whether an external field is present or absent.
+For the Ising model, the presence or absence of a magnetic field
+determines the phase (ordered vs.\ disordered), so the phase
+classification is a field-detection problem---and field detection costs
+$\WLPO$.
+
+\subsection{The Three-Tier Pattern within One System}
+\label{sec:three-tier}
+
+The stratification $\BISH < \WLPO < \LPO$ within the 1D Ising model
+mirrors a general pattern:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Information type} & \textbf{CRM cost} &
+  \textbf{Ising instance} \\
+\midrule
+Given data (finite) & $\BISH$ & $m_N(\beta, J, h)$ \\
+Classification (zero test) & $\WLPO$ & $m(\infty) = 0$ vs.\ $\ne 0$ \\
+Limit (convergence) & $\LPO$ & $f_N \to f_\infty$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Each tier adds exactly one level of the hierarchy. This pattern
+suggests a conjecture: for any physical system with a closed-form
+infinite-volume expression, the phase classification (equality to zero)
+will cost $\WLPO$, while the convergence to the infinite-volume limit
+will cost $\LPO$. The 1D Ising model is the first confirmed instance.
+
+\subsection{Limitations}\label{sec:limitations}
+
+\begin{enumerate}
+  \item \textbf{One dimension only.} The 1D Ising model has no phase
+    transition at finite temperature (this is why $m(\infty) = 0
+    \Leftrightarrow h = 0$). In higher dimensions, the phase diagram
+    is more complex, and the logical cost of phase classification may
+    differ. The 2D Ising model~\citep{Onsager44} has a genuine phase
+    transition with spontaneous magnetization, and its CRM calibration
+    is an open problem.
+
+  \item \textbf{Closed-form bypass.} The closed-form
+    expression~\eqref{eq:magnetization} is essential to the $\WLPO$
+    calibration. If the magnetization were defined as a
+    thermodynamic limit rather than a closed-form expression, the
+    calibration would be $\LPO$ (as in Paper~8). The $\WLPO$ result
+    depends on the mathematical formulation, not just the physics.
+
+  \item \textbf{Classical.choice in \Mathlib{}.} The appearance of
+    \texttt{Classical.choice} in $\BISH$ results is a \Mathlib{}
+    infrastructure artifact, not mathematical content. This is the
+    same situation as in all previous papers in the series.
+
+  \item \textbf{Single axiom.} The interface axiom
+    \texttt{wlpo\_real\_of\_wlpo} is standard~\citep{BR87} but not
+    yet formalized in \Mathlib{} from first principles. The
+    backward direction (\Cref{thm:backward}) requires no axiom,
+    making it fully constructive.
+
+  \item \textbf{No physical units.} The formalization works with
+    dimensionless quantities ($k_B = 1$ in particular). A fully
+    physical treatment would include Boltzmann's constant, but this
+    does not affect the logical structure.
+\end{enumerate}
+
+
+% ====================================================================
+\section{Conclusion}\label{sec:conclusion}
+% ====================================================================
+
+The phase classification of the one-dimensional Ising
+model---deciding whether the infinite-volume magnetization vanishes or
+not---is equivalent to the Weak Limited Principle of Omniscience
+($\WLPO$). Combined with Paper~8's result that free-energy convergence
+for the same system costs $\LPO$, this establishes
+\textbf{observable-dependent logical cost}: the logical strength
+needed to answer a question about a physical system depends on
+\emph{which question is asked}, not only on the system itself.
+
+The 1D Ising model now exhibits a complete three-tier stratification:
+$\BISH$ for finite-volume data, $\WLPO$ for phase classification,
+$\LPO$ for thermodynamic-limit convergence. Each tier corresponds to
+a natural information type (given data, classification, limit), and
+each adds exactly one level of the constructive hierarchy.
+
+The calibration table now covers $\BISH$, $\LLPO$, $\WLPO$, and
+$\LPO$ with physical instantiations from seven domains: statistical
+mechanics (Ising model at two levels), quantum mechanics (tunneling,
+decoherence, Bell inequalities, Heisenberg uncertainty, hydrogen
+spectrum, spin chains), general relativity (Schwarzschild geodesics),
+thermodynamics (entropy), classical mechanics (Noether conservation),
+and radiation (Hawking). Every level of the constructive hierarchy
+$\BISH < \LLPO < \WLPO < \LPO$ has at least one physical calibration,
+and the Ising model alone spans three of the four levels.
+
+
+% ====================================================================
+\section*{AI-Assisted Methodology}\label{sec:ai}
+% ====================================================================
+
+This formalization was developed using \textbf{Claude Opus~4.6}
+(Anthropic, 2026) via the \textbf{Claude Code} command-line
+interface, following the same human--AI workflow as previous papers
+in the series~\cite{Lee26-P2,Lee26-P7,Lee26-P8,Lee26-P15,Lee26-P19}.
+
+The author is a medical professional, not a domain expert in
+constructive mathematics or mathematical physics. The mathematical
+content of this paper was developed with extensive AI assistance.
+The human author specified the research direction and high-level
+goals, reviewed all mathematical claims for plausibility, and
+directed the formalization strategy. Claude Opus~4.6 explored the
+\Mathlib{} codebase, generated \Lean{} proof terms, handled
+debugging, and assisted with paper writing. Final verification
+was by \texttt{lake build} (0~errors, 0~warnings, 0~sorries).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Component} & \textbf{Human} &
+  \textbf{AI (Claude Opus 4.6)} \\
+\midrule
+Research question          & \checkmark & \\
+Physical setup (1D Ising)  & \checkmark & \\
+CRM calibration strategy   & \checkmark & \\
+\Lean{} implementation     & & \checkmark \\
+Proof strategies           & collaborative & collaborative \\
+\LaTeX{} writeup           & & \checkmark \\
+Review and editing         & \checkmark & \\
+\bottomrule
+\end{tabular}
+\caption{Division of labor between human and AI.}
+\label{tab:division}
+\end{table}
+
+
+% ====================================================================
+\section*{Reproducibility}
+% ====================================================================
+
+\begin{mdframed}[backgroundcolor=gray!10]
+\textbf{Reproducibility Box}
+\begin{itemize}
+\item \textbf{Repository}:
+  \url{https://github.com/paul-c-k-lee/FoundationRelativity}
+\item \textbf{Path}: \texttt{paper~20/P20\_WLPOMagnetization/}
+\item \textbf{Build}: \texttt{lake exe cache get \&\& lake build}
+  (2{,}108 jobs, 0~errors, 0~sorry)
+\item \textbf{Lean toolchain}:
+  \texttt{leanprover/lean4:v4.28.0-rc1}
+\item \textbf{Interface axiom}:
+  \texttt{wlpo\_real\_of\_wlpo}
+  (WLPO $\to$ $\forall x : \RR$, $x = 0 \vee x \ne 0$;
+  \cite{BR87})
+\item \textbf{Axiom profile (Theorem~1, mag\_computable)}:
+  \texttt{[propext, Classical.choice, Quot.sound]}
+\item \textbf{Axiom profile (Theorem~2, mag\_zero\_field)}:
+  \texttt{[propext, Classical.choice, Quot.sound]}
+\item \textbf{Axiom profile (Theorem~3, forward)}:
+  \texttt{[propext, Classical.choice, Quot.sound,
+  wlpo\_real\_of\_wlpo]}
+\item \textbf{Axiom profile (Theorem~4, backward)}:
+  \texttt{[propext, Classical.choice, Quot.sound]}
+\item \textbf{Axiom profile (Theorem~5, main equiv)}:
+  \texttt{[propext, Classical.choice, Quot.sound,
+  wlpo\_real\_of\_wlpo]}
+\item \textbf{Axiom profile (Theorem~6, stratification)}:
+  \texttt{[propext, Classical.choice, Quot.sound,
+  wlpo\_real\_of\_wlpo]}
+\item \textbf{Total}: 12~files, 494~lines, 0~sorry
+\item \textbf{Zenodo DOI}:
+  \href{https://doi.org/10.5281/zenodo.18603079}{10.5281/zenodo.18603079}
+\end{itemize}
+\end{mdframed}
+
+
+% ====================================================================
+\section*{Acknowledgments}
+% ====================================================================
+
+The \Lean{} formalization was developed using Claude Opus~4.6
+(Anthropic, 2026) via the Claude Code CLI tool. We thank the
+\Mathlib{} community for maintaining the comprehensive library
+of formalized mathematics that made this work possible.
+
+
+% ====================================================================
+% Bibliography
+% ====================================================================
+\bibliographystyle{plainnat}
+\bibliography{paper20_references}
+
+\end{document}

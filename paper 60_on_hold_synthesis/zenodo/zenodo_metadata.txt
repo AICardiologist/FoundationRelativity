@@ -1,0 +1,55 @@
+======================================================================
+ZENODO UPLOAD METADATA — Paper 54
+======================================================================
+
+DOI: 10.5281/zenodo.18718131
+
+Title:
+  Decidability, Visibility, and the Architecture of Mathematical Truth: A Synthesis of the Constructive Reverse Mathematics Program (Paper 54, Constructive Reverse Mathematics Series)
+
+Description:
+  Paper 54 of the Constructive Reverse Mathematics series. This paper synthesizes the CRM program developed across Papers 1-53. The program calibrates mathematical theorems against logical principles — BISH, WLPO, LPO, MP, FT — revealing three structurally distinct obstructions to computation:
+
+  (1) Logical obstructions (omniscience principles, Papers 2-31): theorems requiring excluded middle decompose into strata keyed to WLPO, LPO, and MP. The undecidability genealogy (Papers 29-42) advances the thesis that empirical physics requires exactly BISH+LPO: every physical undecidability result calibrated in the series is LPO-equivalent, traceable to Wang tiling. Markov's Principle governs the residual cost of physical actualization.
+
+  (2) Geometric obstructions (visibility failures in the Lefschetz ring, Papers 52-53): in arithmetic geometry, the Standard Conjectures function as decidability axioms ensuring decidable equivalence relations on cycle spaces. The motive is a decidability certificate. The dimension-4 boundary for abelian varieties is sharp, confirmed computationally (deg(w . w) = 7 > 0).
+
+  (3) Diophantine obstructions (irreducible Markov search, Papers 45-51): Diophantine problems require witness search that cannot be reduced to decidable tests, governed by MP rather than LPO.
+
+  No new formal theorems are proved; this is an interpretive essay drawing on 53 papers, 12 with Lean 4 formalizations. It proposes novel interpretive frameworks — particularly the obstruction trichotomy and the de-omniscientizing descent pattern — that organize the prior results in ways not explicit in the individual papers.
+
+Upload Type: publication / preprint
+
+Publication Date: 2026-02-20
+
+Keywords:
+  constructive reverse mathematics
+  omniscience principles
+  BISH
+  WLPO
+  LPO
+  Markov's Principle
+  Fan Theorem
+  Standard Conjectures
+  decidability
+  motives
+  undecidability genealogy
+  Wang tiling
+  spectral gap
+  Lefschetz ring
+  arithmetical hierarchy
+  constructive mathematics
+  mathematical physics
+  algebraic geometry
+  synthesis
+
+License: Creative Commons Attribution 4.0 International (CC-BY-4.0)
+
+Copyright Notice:
+  Copyright (c) 2026 Paul Chun-Kit Lee. This work is licensed under the Creative Commons Attribution 4.0 International License (CC-BY-4.0). To view a copy of this license, visit https://creativecommons.org/licenses/by/4.0/.
+
+Files to Upload:
+  paper54_synthesis.pdf
+
+Notes:
+  AI-assisted research (Claude, Opus 4.6). Interpretive synthesis essay — no new formal theorems or Lean code. Draws on 53 prior papers in the CRM series, 12 of which include Lean 4 formalizations. Part of the Foundation Relativity series. See Paper 50 (Atlas Survey) for series overview.

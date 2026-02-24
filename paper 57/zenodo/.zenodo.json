@@ -1,0 +1,62 @@
+{
+  "title": "Exotic Weil Self-Intersection Across All Nine Heegner Fields (Paper 57, Constructive Reverse Mathematics and Arithmetic Geometry Series)",
+  "description": "<p>Paper 57 of the Constructive Reverse Mathematics and Arithmetic Geometry series. We extend Paper 56 to <strong>all nine</strong> class-number-1 imaginary quadratic fields, completing the Baker&ndash;Heegner&ndash;Stark landscape: d &isin; {1, 2, 3, 7, 11, 19, 43, 67, 163}.</p>\n<p>For each field K = Q(&radic;(&minus;d)), we compute the trace matrix, verify the discriminant via <code>native_decide</code>, derive the Weil class degree via the cyclic conductor theorem (disc(F) = conductor&sup2;, so d&#8320; = conductor), and assemble the full 9-row pattern table with Heuristic Regularity and Dispensability of Physical Totality verdicts.</p>\n<p>Results: d=1 &rarr; disc=81, deg=9; d=2 &rarr; disc=361, deg=19; d=3 &rarr; disc=49, deg=7; d=7 &rarr; disc=169, deg=13; d=11 &rarr; disc=1369, deg=37; d=19 &rarr; disc=3721, deg=61; d=43 &rarr; disc=6241, deg=79; d=67 &rarr; disc=26569, deg=163; d=163 &rarr; disc=9409, deg=97.</p>\n<p>The Lean 4 / Mathlib formalization comprises 3 active modules (~918 lines) plus 1 deprecated module, totaling ~1,257 lines. Sorry budget: 1 principled axiom (<code>weil_class_degree_eq_conductor</code>), 0 gaps. All nine discriminant and Gram matrix computations are machine-verified.</p>\n<p>Code is distributed exclusively via this Zenodo record.</p>",
+  "upload_type": "software",
+  "publication_date": "2026-02-21",
+  "creators": [
+    {
+      "name": "Lee, Paul Chun-Kit",
+      "affiliation": "New York University",
+      "orcid": "0000-0000-0000-0000"
+    }
+  ],
+  "access_right": "open",
+  "license": "Apache-2.0",
+  "keywords": [
+    "class number 1",
+    "Baker-Heegner-Stark",
+    "exotic Weil class",
+    "self-intersection",
+    "CM abelian fourfold",
+    "imaginary quadratic field",
+    "Lean 4",
+    "Mathlib",
+    "constructive reverse mathematics",
+    "arithmetic geometry",
+    "Gram matrix",
+    "conductor",
+    "discriminant",
+    "formal verification",
+    "constructive mathematics"
+  ],
+  "subjects": [
+    {
+      "term": "Mathematical logic and foundations",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85082397",
+      "scheme": "url"
+    },
+    {
+      "term": "Algebraic geometry",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85003438",
+      "scheme": "url"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "relation": "isPartOf",
+      "identifier": "10.5281/zenodo.17054050",
+      "resource_type": "software",
+      "scheme": "doi"
+    }
+  ],
+  "version": "4.0.0",
+  "language": "eng",
+  "notes": "AI-assisted formalization using Claude (Anthropic, Opus 4.6) for Lean 4 code generation under human direction. All mathematical content specified by the author; every theorem verified by the Lean 4 type checker. Built with Lean 4 v4.29.0-rc1 and Mathlib. Reproducible via 'lake build'. Code available exclusively on Zenodo (not hosted on GitHub).",
+  "references": [
+    "Baker, A. (1966). Linear forms in the logarithms of algebraic numbers. Mathematika, 13:204-216.",
+    "Heegner, K. (1952). Diophantische Analysis und Modulfunktionen. Math. Z., 56:227-253.",
+    "Stark, H.M. (1967). A complete determination of the complex quadratic fields of class-number one. Michigan Math. J., 14:1-27.",
+    "Bridges, D. and Richman, F. (1987). Varieties of Constructive Mathematics. Cambridge University Press.",
+    "Bishop, E. and Bridges, D. (1985). Constructive Analysis. Springer."
+  ]
+}

@@ -1,0 +1,69 @@
+======================================================================
+ZENODO UPLOAD METADATA — Paper 52
+======================================================================
+
+DOI: 10.5281/zenodo.18732559
+
+Title:
+  Decidability Transfer via Specialization: Standard Conjecture D for Abelian Threefolds (Paper 52, Constructive Reverse Mathematics Series)
+
+Description:
+  Paper 52 of the Constructive Reverse Mathematics series. We prove that Standard Conjecture D (numerical equivalence implies homological equivalence) for abelian varieties A/Q of dimension g <= 3 follows from the Tate conjecture for divisors—which is unconditional by Tate (1966)—and the structural properties of the Lefschetz ring over finite fields, without invoking Standard Conjecture B or characteristic-0 Hodge theory.
+
+  The proof transfers decidability from characteristic p to characteristic 0 via the Fulton specialization map. The mechanism has three components: (i) the smooth proper base change isomorphism identifies homological triviality across characteristics; (ii) the Lefschetz ring of A_p has unconditionally definite primitive components (Milne 2002, via the Rosati involution); (iii) the liftable subspace U = im(sp) is stable under the Lefschetz operators L and Lambda because the Fourier-Mukai transform specializes via the Poincare bundle on the Neron model (Kunnemann 1993, 1994). For g <= 3, all Tate classes are Lefschetz classes, yielding the transfer.
+
+  The argument fails sharply at dimension 4, where exotic Tate classes first appear outside the Lefschetz ring (Milne 2001). For each even g >= 6, Agugliaro (2025) constructs non-liftable exotic classes providing explicit counterexamples.
+
+  The logical transfer architecture is formalized in Lean 4 over Mathlib (4 source files, 369 lines). The bundle compiles with zero errors, zero warnings, and zero sorry's. Both the core theorem (sub_lefschetz_non_degenerate) and the main theorem (decidability_transfer_g_le_3) use ZERO custom axioms. The three geometric inputs enter as hypotheses, not axioms, making both theorems pure logical implications.
+
+  In the CRM interpretation, the result demonstrates that BISH-decidable equality on numerical motives over F_p transfers to BISH-decidable equality over Q through the Lefschetz operators that survive reduction to characteristic p.
+
+Upload Type: software
+
+Publication Date: 2026-02-20
+
+Keywords:
+  constructive reverse mathematics
+  Standard Conjecture D
+  decidability transfer
+  specialization map
+  abelian varieties
+  abelian threefolds
+  Tate conjecture
+  Lefschetz ring
+  Rosati involution
+  numerical equivalence
+  homological equivalence
+  Chow groups
+  algebraic geometry
+  constructive mathematics
+  BISH
+  formal verification
+  Lean 4
+  Mathlib
+
+License: Apache License 2.0 (code); CC-BY-4.0 (paper)
+
+Copyright Notice:
+  Copyright (c) 2026 Paul Chun-Kit Lee. Code licensed under Apache 2.0. Paper licensed under Creative Commons Attribution 4.0 International (CC-BY-4.0).
+
+Files to Upload:
+  paper52_decidability_transfer.zip (contains all files below)
+    paper52_decidability_transfer.tex   -- LaTeX source
+    paper52_decidability_transfer.pdf   -- Compiled paper (17 pages)
+    README.md                           -- Bundle documentation
+    REPRODUCIBILITY.md                  -- Build and verification details
+    .zenodo.json                        -- Machine-readable metadata
+    P52_DecidabilityTransfer/           -- Lean 4 formalization bundle
+      lean-toolchain                    -- Lean 4 v4.29.0-rc1
+      lakefile.lean                     -- Lake build configuration
+      lake-manifest.json                -- Pinned Mathlib dependency
+      Papers.lean                       -- Root import
+      Papers/P52_DecidabilityTransfer/
+        Core/SubLefschetzNonDegenerate.lean  -- 111 lines: core theorem (full proof)
+        Defs/GeometricAxioms.lean            --  88 lines: GeometricData structure
+        Main/DecidabilityTransfer.lean       --  81 lines: 7-step transfer proof
+        Main/AxiomAudit.lean                 --  89 lines: axiom verification
+
+Notes:
+  AI-assisted formalization using Claude (Anthropic, Opus 4.6) for Lean 4 code generation under human direction. All mathematical content specified by the author; every theorem verified by the Lean 4 type checker. Built with Lean 4 v4.29.0-rc1 and Mathlib. Reproducible via 'lake build' (zero errors, zero sorry, zero custom axioms). Code available exclusively on Zenodo (not hosted on GitHub). Part of the Foundation Relativity series applying constructive reverse mathematics to the Standard Conjectures program. See Paper 50 (Atlas Survey) for series overview.

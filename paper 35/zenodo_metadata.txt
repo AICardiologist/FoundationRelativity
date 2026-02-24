@@ -1,0 +1,14 @@
+ZENODO UPLOAD METADATA -- Paper 35
+====================================
+
+TITLE:
+The Logical Constitution of Empirical Physics --- A Conservation Metatheorem (Paper 35, Constructive Reverse Mathematics Series)
+
+DESCRIPTION:
+Paper 35 in the Constructive Reverse Mathematics of Mathematical Physics series. This paper proves the Conservation Metatheorem: the logical cost of empirically accessible physics is exactly BISH + LPO, and this bound is both necessary and sufficient. The proof synthesizes the 38 calibration entries from Papers 2-34 into a unified metatheorem. Four main results establish the conservation law: (A) finite compositions of computable functions preserve BISH cost, (B) limits with explicit moduli remain BISH while limits without moduli cost exactly LPO, (C) all 38 calibration entries across the series are at or below LPO, and (D) bounded monotone convergence, Cauchy completeness, and bounded supremum are all equivalent to LPO, confirming that the single principle underlying all non-BISH costs is exactly the Limited Principle of Omniscience. All results formalized in Lean 4 over Mathlib with zero sorry. The formalization comprises 7 Lean source files.
+
+KEYWORDS:
+conservation metatheorem, constructive reverse mathematics, BISH, LPO, Limited Principle of Omniscience, logical constitution, empirical physics, bounded monotone convergence, Cauchy completeness, limit theory, calibration table, Lean 4, Mathlib, formal verification, constructive mathematics, metatheorem
+
+COPYRIGHT STATEMENT:
+Copyright 2026 Paul Chun-Kit Lee. Code licensed under Apache License 2.0. Paper licensed under Creative Commons Attribution 4.0 International (CC-BY 4.0).

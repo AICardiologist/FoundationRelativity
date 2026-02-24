@@ -1,0 +1,81 @@
+Title:
+The Archimedean Principle: Why Physics and Number Theory Share a Logical Architecture (Paper 70, Constructive Reverse Mathematics Series)
+
+Authors:
+Lee, Paul Chun-Kit (New York University)
+
+DOI:
+10.5281/zenodo.18750992
+
+Publication Date:
+2026-02-23
+
+Type:
+Software / Dataset (Lean 4 formalization + LaTeX paper)
+
+Version:
+1.0
+
+License:
+Apache-2.0 (Lean 4 code) / CC-BY 4.0 (LaTeX paper and PDF)
+Copyright 2026 Paul Chun-Kit Lee
+
+Language:
+English
+
+Keywords:
+constructive reverse mathematics, Archimedean principle, u-invariant, positive-definiteness, Lean 4, formal verification, BISH, LPO, Markov's Principle, MP gap, projection descent, search descent, Ramanujan bound, automorphic CRM incompleteness, spectral gap, Weil Riemann hypothesis, Rosati involution, Petersson inner product, Langlands correspondence, function field, lattice regularization, DPT framework, Kapustin-Witten, Feigin-Frenkel, Freed-Hopkins-Teleman, condensed mathematics
+
+Abstract:
+This capstone paper identifies a single structural principle underlying 70 papers of Constructive Reverse Mathematics: the real numbers are the sole source of logical difficulty in mathematical physics and arithmetic geometry. The mechanism is u(R) = infinity -- the real numbers are the only completion of Q where positive-definite forms exist in every dimension -- and three fields independently exploit it via the same architecture (Hilbert space inner product, Rosati involution, Petersson inner product).
+
+The principle is established by four theorems. The Archimedean Principle (Theorem A) shows that the CRM level of every domain in the program is determined by one parameter: whether the domain has an Archimedean place. The MP Gap (Theorem B) shows that physics and arithmetic descend differently -- projection vs. search -- producing a strict logical separation BISH < BISH + MP. Automorphic CRM Incompleteness (Theorem C) exhibits an integer witness proving the automorphic axioms alone cannot recover the Ramanujan bound. Three Spectral Gaps (Theorem D) identifies identical Sigma^0_2 quantifier structure across physics, automorphic theory, and arithmetic.
+
+Paper 68 showed that Fermat's Last Theorem is BISH. Paper 69 showed that the function field Langlands correspondence is BISH. This paper identifies what makes anything expensive: the Archimedean place, and specifically u(R) = infinity.
+
+All results are formalized in Lean 4 over Mathlib with zero sorrys and zero custom axioms for the core theorems (0 errors, 0 warnings). The formalization verifies the logical structure of the classification scheme and the integer arithmetic of the incompleteness witness; the identification of CRM levels with specific mathematical theories rests on the audits of Papers 1-69.
+
+Related Identifiers:
+Part of: Constructive Reverse Mathematics Series (Papers 1-70)
+References: Paper 40 (Physics synthesis), Paper 50 (DPT framework / Three axioms for the motive), Paper 68 (FLT is BISH), Paper 69 (Function field Langlands)
+
+Subjects:
+Mathematical Logic
+Number Theory
+Mathematical Physics
+Formal Verification
+Constructive Mathematics
+
+Technical Details:
+Lean version: leanprover/lean4:v4.28.0-rc1
+Dependency: Mathlib4 (via lakefile.lean)
+Lean files: 6 (545 lines total)
+Sorry count: 0
+Warning count: 0
+Error count: 0
+LaTeX pages: 16
+Figures: 2
+References: 22
+
+File Manifest:
+README.md                                                   Overview and build instructions
+metadata.txt                                                This file
+paper70.tex                                                 LaTeX source
+paper70.pdf                                                 Compiled PDF (16 pages)
+P70_Archimedean/lean-toolchain                              Lean version pin
+P70_Archimedean/lakefile.lean                               Lake build configuration
+P70_Archimedean/lake-manifest.json                          Mathlib4 dependency lock
+P70_Archimedean/Papers.lean                                 Root import file
+P70_Archimedean/Papers/P70_Archimedean/Defs.lean            CRM hierarchy, descent types, domain profiles (104 lines)
+P70_Archimedean/Papers/P70_Archimedean/WeilRH.lean          Weil RH from CRM axioms (47 lines)
+P70_Archimedean/Papers/P70_Archimedean/Ramanujan.lean       Automorphic CRM incompleteness, Z-witness (101 lines)
+P70_Archimedean/Papers/P70_Archimedean/SpectralGaps.lean    Three spectral gaps as Sigma^0_2 + MP gap (92 lines)
+P70_Archimedean/Papers/P70_Archimedean/ArchimedeanPrinciple.lean  DPT assembly + main theorem (150 lines)
+P70_Archimedean/Papers/P70_Archimedean/Main.lean            Root module + #check audit (46 lines)
+
+Build Instructions:
+1. Lean: cd P70_Archimedean && lake update && lake build
+2. LaTeX: pdflatex paper70.tex && pdflatex paper70.tex
+
+Contact:
+dr.paul.c.lee@gmail.com

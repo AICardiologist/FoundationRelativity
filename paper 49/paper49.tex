@@ -1,0 +1,888 @@
+
+\documentclass[11pt]{article}
+
+% ------------------------------------------------------------
+% Standard LaTeX packages
+% ------------------------------------------------------------
+\usepackage[margin=1in]{geometry}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{amsthm}
+\usepackage[american]{babel}
+\usepackage{stmaryrd}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,cd}
+\usepackage{listings}
+\usepackage[x11names,table]{xcolor}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{mdframed}
+\usepackage{pifont}
+\usepackage{url}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+% Define theorem-like environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% ---------- Lean repo link ----------
+\newcommand{\leanRepo}{\url{https://doi.org/10.5281/zenodo.18683802}}
+\newcommand{\leanok}{\textsf{\small \textcolor{green!70!black}{\checkmark}}}
+
+% ---------- Mathematical notation ----------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Qbar}{\overline{\Q}}
+\newcommand{\Qell}{\Q_\ell}
+\newcommand{\Qp}{\Q_p}
+\newcommand{\Fq}{\mathbb{F}_q}
+\newcommand{\Proj}{\mathbb{P}}
+\newcommand{\WLPO}{\mathrm{WLPO}}
+\newcommand{\LPO}{\mathrm{LPO}}
+\newcommand{\BISH}{\mathrm{BISH}}
+\newcommand{\CRM}{\mathrm{CRM}}
+\newcommand{\LEM}{\mathrm{LEM}}
+\newcommand{\MP}{\mathrm{MP}}
+\newcommand{\adj}{\dagger}
+\newcommand{\ip}[2]{\langle #1, #2 \rangle}
+
+% ---------- Paper 49 specific notation ----------
+\newcommand{\HC}{H_\C}
+\newcommand{\HQ}{H_\Q}
+\newcommand{\CH}{\mathrm{CH}^r(X) \otimes \Q}
+\newcommand{\cl}{\mathrm{cl}}
+\newcommand{\HR}{Q}
+
+% ---------- Code listing style for Lean ----------
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinelanguage{Lean}{
+  keywords={theorem, lemma, def, definition, axiom, structure, class, instance,
+            by, exact, intro, intros, apply, refine, constructor, use, obtain,
+            have, show, from, fun, assume, let, in, if, then, else,
+            match, with, end, namespace, section, variable, variables,
+            example, begin, sorry, admit, noncomputable, classical,
+            import, open, export, private, protected, mutual, meta,
+            do, for, while, return, try, catch, finally,
+            Type, Prop, Sort, Type*, forall, exists, where, extends,
+            set, push_neg, rw, simp, omega, nlinarith, linarith,
+            ext, rfl, congr, fin_cases, haveI, letI, attribute,
+            rcases, left, right},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+  literate=
+    {α}{{$\alpha$}}1 {β}{{$\beta$}}1 {γ}{{$\gamma$}}1
+    {δ}{{$\delta$}}1 {ε}{{$\varepsilon$}}1 {ζ}{{$\zeta$}}1
+    {η}{{$\eta$}}1 {θ}{{$\theta$}}1 {ι}{{$\iota$}}1
+    {κ}{{$\kappa$}}1 {λ}{{$\lambda$}}1 {μ}{{$\mu$}}1
+    {ν}{{$\nu$}}1 {ξ}{{$\xi$}}1 {π}{{$\pi$}}1
+    {ρ}{{$\rho$}}1 {σ}{{$\sigma$}}1 {τ}{{$\tau$}}1
+    {φ}{{$\varphi$}}1 {χ}{{$\chi$}}1 {ψ}{{$\psi$}}1
+    {ω}{{$\omega$}}1 {Γ}{{$\Gamma$}}1 {Δ}{{$\Delta$}}1
+    {Θ}{{$\Theta$}}1 {Λ}{{$\Lambda$}}1 {Σ}{{$\Sigma$}}1
+    {Φ}{{$\Phi$}}1 {Ψ}{{$\Psi$}}1 {Ω}{{$\Omega$}}1
+    {→}{{$\rightarrow$}}1 {←}{{$\leftarrow$}}1 {↔}{{$\leftrightarrow$}}1
+    {⇒}{{$\Rightarrow$}}1 {⇐}{{$\Leftarrow$}}1 {⇔}{{$\Leftrightarrow$}}1
+    {∀}{{$\forall$}}1 {∃}{{$\exists$}}1 {∈}{{$\in$}}1
+    {∉}{{$\notin$}}1 {⊆}{{$\subseteq$}}1 {⊂}{{$\subset$}}1
+    {∪}{{$\cup$}}1 {∩}{{$\cap$}}1 {≤}{{$\leq$}}1
+    {≥}{{$\geq$}}1 {≠}{{$\neq$}}1 {≈}{{$\approx$}}1 {≃}{{$\simeq$}}1
+    {≡}{{$\equiv$}}1 {∧}{{$\land$}}1 {∨}{{$\lor$}}1
+    {¬}{{$\neg$}}1 {ℕ}{{$\mathbb{N}$}}1 {ℝ}{{$\mathbb{R}$}}1
+    {ℂ}{{$\mathbb{C}$}}1 {ℤ}{{$\mathbb{Z}$}}1 {ℓ}{{$\ell$}}1
+    {·}{{$\cdot$}}1 {∑}{{$\sum$}}1 {∏}{{$\prod$}}1
+    {∅}{{$\emptyset$}}1 {∞}{{$\infty$}}1 {∂}{{$\partial$}}1
+    {⟨}{{$\langle$}}1 {⟩}{{$\rangle$}}1 {…}{{$\ldots$}}1
+    {₀}{{$_0$}}1 {₁}{{$_1$}}1 {₂}{{$_2$}}1 {⧸}{{$/$}}1 {‖}{{$\|$}}1
+    {•}{{$\cdot$}}1 {⁻¹}{{$^{-1}$}}1 {⋆}{{$\star$}}1
+    {∘}{{$\circ$}}1
+}
+
+\lstdefinestyle{leanstyle}{
+    language=Lean,
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    numberstyle=\tiny\color{codegray}
+}
+
+\lstset{style=leanstyle}
+
+% ---------- Title and author ----------
+\title{The Hodge Conjecture and Constructive Omniscience:\\
+A Calibration of Algebraic Descent\\
+and Archimedean Polarization\\[6pt]
+{\large (Paper 49, Constructive Reverse Mathematics Series)}}
+\author{Paul Chun-Kit Lee\thanks{Lean 4 formalization available at \leanRepo.} \\
+New York University \\
+\texttt{dr.paul.c.lee@gmail.com}}
+\date{February 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We apply Constructive Reverse Mathematics to calibrate the logical strength of the Hodge Conjecture for smooth projective varieties over~$\C$. We establish five theorems (H1--H5) constituting a \emph{constructive calibration} of the interplay between Archimedean polarization and algebraic descent.
+Theorem~H1 proves that Hodge type~$(r,r)$ decidability is equivalent to $\LPO(\C)$.
+Theorem~H2 shows that rationality testing requires at least~$\LPO$; the full characterization is $\LPO + \MP$.
+Theorem~H3 establishes that the Hodge--Riemann polarization is \emph{available} ($u(\R) = 1$) but \emph{blind} to the rational lattice: the pairing of rational classes is generally transcendental.
+Theorem~H4 shows that algebraic cycle verification is decidable in~$\BISH$ via integer intersection numbers.
+Theorem~H5 proves that Hodge class detection requires~$\LPO$, but the Hodge Conjecture reduces it to $\BISH + \MP$ through the cycle class map.
+The unique phenomenon: polarization is \emph{available but insufficient}---it splits continuous space into Hodge types but cannot see rational structure. All results are formalized in Lean~4 over Mathlib; the bundle compiles with 0~errors and 0~\texttt{sorry}s.
+\end{abstract}
+
+\tableofcontents
+
+% ===========================================================
+\section{Introduction}
+\label{sec:intro}
+% ===========================================================
+
+\subsection{Main results}
+
+Let $X$ be a smooth projective variety of dimension~$n$ over~$\C$. The Hodge Conjecture (Hodge, 1950~\cite{Hodge1950}) asserts that every rational cohomology class of Hodge type~$(r,r)$ is a $\Q$-linear combination of algebraic cycle classes:
+\[
+H^{2r}(X(\C), \Q) \cap H^{r,r}(X) \;=\; \Q\text{-span of } \{\cl(Z) : Z \in \CH\}.
+\]
+This is one of the seven Clay Millennium Problems and remains open in general. Known cases include divisors (the Lefschetz~$(1,1)$ theorem~\cite{Lefschetz1924}), abelian varieties of CM type (Deligne~\cite{Deligne1982}), and certain low-dimensional cases.
+
+This paper applies Constructive Reverse Mathematics ($\CRM$) to the logical structure of the Hodge Conjecture. We establish:
+
+\begin{description}[leftmargin=2em]
+\item[Theorem A] (H1: Hodge Type $\leftrightarrow$ LPO). \leanok\ Deciding whether a cohomology class $x \in \HC$ is of Hodge type~$(r,r)$ (annihilated by the complement projection) is equivalent to $\LPO(\C)$:
+\[
+(\forall\, x \in \HC,\; \text{is\_hodge\_type\_rr}(x) \lor \neg\,\text{is\_hodge\_type\_rr}(x)) \;\;\leftrightarrow\;\; \LPO(\C).
+\]
+The forward direction encodes a scalar~$z \in \C$ into a class whose Hodge type status depends on~$z = 0$. The reverse uses coordinate-wise zero-testing on the finite-dimensional~$\HC$.
+
+\item[Theorem B] (H2: Rationality $\Rightarrow$ LPO). \leanok\ If rationality (membership in the image of $\HQ \to \HC$) is decidable for all $x \in \HC$, then $\LPO(\C)$ holds. The full characterization is $\LPO + \MP$: $\LPO$ for zero-testing complex coordinates against rational values, $\MP$ for the unbounded search over~$\Q$ for a witness~$p/q$.
+
+\item[Theorem C] (H3: Polarization Available but Blind). \leanok\ The Hodge--Riemann form~$\HR$ is positive-definite on $(r,r)$-classes: $\HR(x,x) > 0$ for all nonzero $x \in H^{r,r}$. This Archimedean polarization is \emph{available} because $u(\R) = 1$. However, $\HR$ is \emph{blind} to the rational lattice: the pairing $\HR(\iota(q_1), \iota(q_2))$ of rational classes is generally transcendental, not rational.
+
+\item[Theorem D] (H4: Cycle Verification in BISH). \leanok\ Numerical equivalence of algebraic cycles is decidable in~$\BISH$. Intersection numbers $Z \cdot W \in \Z$ have decidable equality; numerical equivalence relative to a finite basis is a finite conjunction of decidable $\Z$-equalities. In contrast, verifying a cycle class identity in~$\HC$ (over~$\C$) requires~$\LPO$.
+
+\item[Theorem E] (H5: The Nexus). \leanok\ Detecting Hodge classes (rational $\land$ type~$(r,r)$) requires~$\LPO$. But the Hodge Conjecture reduces detection to $\BISH + \MP$: the conjecture provides a cycle~$Z$, rationality provides~$q \in \HQ$, and checking $\cl(Z) = q$ in~$\HQ$ is $\BISH$-decidable. Neither polarization alone (blind to~$\Q$) nor algebraic descent alone (cannot determine Hodge type) suffices.
+\end{description}
+
+\subsection{Constructive Reverse Mathematics: a brief primer}
+
+$\CRM$ calibrates mathematical statements against logical principles of increasing strength within Bishop-style constructive mathematics ($\BISH$). The hierarchy relevant to this paper is:
+\[
+\BISH \;\subset\; \BISH + \MP \;\subset\; \BISH + \LPO \;\subset\; \text{CLASS}.
+\]
+Here $\LPO$ (Limited Principle of Omniscience) states that every binary sequence is identically zero or contains a~$1$. In field-theoretic form, $\LPO(K)$ states $\forall x \in K,\; x = 0 \lor x \neq 0$. Markov's Principle ($\MP$) states that if it is impossible for a decidable predicate to hold everywhere, then a counterexample exists: $\neg\neg\exists n,\, P(n) \to \exists n,\, P(n)$ for decidable~$P$. For a thorough treatment of $\CRM$, see Bridges--Richman~\cite{BridgesRichman1987} and Ishihara~\cite{Ishihara2006}; for the broader program of which this paper is part, see Papers~1--48 of this series~\cite{Paper45,Paper46,Paper48} and the atlas survey~\cite{Paper50}.
+
+\subsection{Current state of the art}
+
+The Hodge Conjecture was formulated by Hodge~\cite{Hodge1950} in 1950 and included as a Clay Millennium Problem in 2000. For divisors ($r = 1$), it is the classical Lefschetz~$(1,1)$ theorem~\cite{Lefschetz1924}. Grothendieck~\cite{Grothendieck1969} proposed a generalization, but Atiyah--Hirzebruch~\cite{AtiyahHirzebruch1962} showed the integral version fails. Deligne~\cite{Deligne1982} proved the conjecture for abelian varieties of CM type. Voisin~\cite{Voisin2002} showed that the conjecture cannot be extended to K\"ahler manifolds. Lewis~\cite{Lewis1991} provides a survey of known results and techniques.
+
+The constructive calibration we perform here is novel: no prior work has applied $\CRM$ to the logical structure of the Hodge Conjecture. The key new phenomenon---polarization \emph{available but insufficient}---distinguishes this paper from Papers~45--47 (where $p$-adic polarization is \emph{blocked}) and Paper~48 (where Archimedean polarization is both available and \emph{useful} via the N\'eron--Tate height).
+
+\subsection{Position in the atlas}
+
+This is Paper~49 of a series applying constructive reverse mathematics to the ``five great conjectures'' program. The preceding papers in the arithmetic geometry block are:
+\begin{itemize}
+\item \textbf{Papers 45--47} (Weight-Monodromy, Tate, Langlands): $p$-adic setting. Polarization is \emph{blocked} ($u(\Qp) = 4$ prevents positive-definite forms in dimension~$\geq 3$). De-omniscientizing descent proceeds via geometric origin, Galois invariance, or automorphic structure, descending coefficients from undecidable~$\Qell$ to decidable~$\Qbar$.
+\item \textbf{Paper 48} (BSD): Archimedean setting. Polarization is \emph{available and useful}: the N\'eron--Tate height pairing is positive-definite on~$E(\Q) \otimes \R$ and directly provides a $\BISH$ bridge from~$\R$ to~$\Q$.
+\item \textbf{Paper 49} (Hodge): Archimedean setting. Polarization is \emph{available but insufficient}: the Hodge--Riemann form is positive-definite on~$(r,r)$-classes ($u(\R) = 1$), but it is blind to the rational lattice. The Hodge Conjecture is the nexus where algebraic descent (cycle classes) and Archimedean polarization (Hodge--Riemann metric) must interact.
+\end{itemize}
+This completes the five-conjecture constructive calibration. Paper~50 provides the atlas survey.
+
+% ===========================================================
+\section{Preliminaries}
+\label{sec:prelim}
+% ===========================================================
+
+\begin{definition}[Limited Principle of Omniscience]
+$\LPO$ is the assertion that for every binary sequence $a : \N \to \{0,1\}$, either $\forall n,\; a(n) = 0$ or $\exists n,\; a(n) = 1$.
+\end{definition}
+
+\begin{definition}[LPO for a field]
+$\LPO(K)$ is the assertion $\forall x \in K,\; x = 0 \lor x \neq 0$.
+\end{definition}
+
+\begin{definition}[Markov's Principle]
+$\MP$ is the assertion: for any decidable predicate~$P$ on~$\N$, if $\neg\neg\exists n,\, P(n)$ then $\exists n,\, P(n)$.
+\end{definition}
+
+\begin{definition}[Complex cohomology]
+For a smooth projective variety~$X$ over~$\C$, we write $\HC = H^{2r}(X(\C), \C)$ for the complex cohomology in degree~$2r$. This is a finite-dimensional $\C$-vector space carrying the Hodge decomposition.
+\end{definition}
+
+\begin{definition}[Rational cohomology]
+$\HQ = H^{2r}(X(\C), \Q)$ is the rational cohomology, a finite-dimensional $\Q$-vector space with \emph{decidable equality}: rational coefficients are computable, so $\Q$-linear combinations can be compared exactly.
+\end{definition}
+
+\begin{definition}[Rational inclusion]
+The inclusion $\iota : \HQ \hookrightarrow \HC$ is the $\Q$-linear map induced by the coefficient inclusion $\Q \hookrightarrow \C$. It embeds the rational lattice into the complex cohomology.
+\end{definition}
+
+\begin{definition}[Hodge decomposition]
+$\HC$ admits an orthogonal decomposition into Hodge types. We write $\pi_{r,r} : \HC \to \HC$ for the projection onto $H^{r,r}(X)$ and $\pi_{\mathrm{comp}} : \HC \to \HC$ for the projection onto the complement. For all $x \in \HC$:
+\[
+x = \pi_{r,r}(x) + \pi_{\mathrm{comp}}(x), \qquad \pi_{r,r} \circ \pi_{\mathrm{comp}} = 0.
+\]
+\end{definition}
+
+\begin{definition}[Hodge type $(r,r)$]
+A class $x \in \HC$ is of \emph{Hodge type~$(r,r)$} if $\pi_{\mathrm{comp}}(x) = 0$, equivalently $\pi_{r,r}(x) = x$.
+\end{definition}
+
+\begin{definition}[Rational class]
+A class $x \in \HC$ is \emph{rational} if $x \in \mathrm{im}(\iota)$, i.e., $\exists\, q \in \HQ,\; \iota(q) = x$.
+\end{definition}
+
+\begin{definition}[Hodge class]
+A class $x \in \HC$ is a \emph{Hodge class} if it is both rational and of Hodge type~$(r,r)$:
+\[
+\text{is\_hodge\_class}(x) \;:=\; (\exists\, q \in \HQ,\; \iota(q) = x) \;\land\; \pi_{\mathrm{comp}}(x) = 0.
+\]
+\end{definition}
+
+\begin{definition}[Hodge Conjecture]
+For every Hodge class $x \in \HC$, there exists an algebraic cycle $Z \in \CH$ such that $\iota(\cl(Z)) = x$.
+\end{definition}
+
+\begin{definition}[Hodge--Riemann bilinear form]
+The Hodge--Riemann form $\HR : \HC \times \HC \to \R$ is defined by $\HR(x,y) = \int_{X(\C)} x \wedge \ast\bar{y}$. On $(r,r)$-classes, $\HR$ is positive-definite: $\HR(x,x) > 0$ for $x \neq 0$.
+\end{definition}
+
+\begin{definition}[Chow group and cycle class map]
+$\CH$ is the Chow group of codimension-$r$ algebraic cycles modulo rational equivalence, tensored with~$\Q$. The \emph{cycle class map} $\cl : \CH \to \HQ$ is $\Q$-linear. The \emph{intersection pairing} $Z \cdot W \in \Z$ takes integer values.
+\end{definition}
+
+\begin{definition}[Numerical equivalence]
+Cycles $Z_1, Z_2 \in \CH$ are \emph{numerically equivalent} relative to a finite basis $\{W_1, \ldots, W_m\}$ if $Z_1 \cdot W_j = Z_2 \cdot W_j$ for all $j = 1, \ldots, m$.
+\end{definition}
+
+\noindent
+For background on constructive mathematics, see Bridges--Richman~\cite{BridgesRichman1987}, Bishop--Bridges~\cite{BishopBridges1985}, and Bridges--V\^{\i}\c{t}\u{a}~\cite{BridgesVita2006}. For Hodge theory, see Deligne~\cite{Deligne1971} and Voisin~\cite{Voisin2002book,Voisin2003book}. For intersection theory and algebraic cycles, see Griffiths--Harris~\cite{GriffithsHarris1978}.
+
+% ===========================================================
+\section{Main Results}
+\label{sec:results}
+% ===========================================================
+
+\subsection{Theorem A (H1): Hodge type decidability $\leftrightarrow$ LPO}
+
+\begin{theorem}[H1]
+\label{thm:H1}
+Deciding whether a cohomology class is of Hodge type~$(r,r)$ is equivalent to $\LPO(\C)$:
+\[
+(\forall\, x \in \HC,\; \text{is\_hodge\_type\_rr}(x) \lor \neg\,\text{is\_hodge\_type\_rr}(x)) \;\;\leftrightarrow\;\; \LPO(\C).
+\]
+\end{theorem}
+
+\begin{proof}
+$(\Rightarrow)$\; Suppose Hodge type is decidable for all $x \in \HC$. We show $\LPO(\C)$: given an arbitrary $z \in \C$, we must decide $z = 0 \lor z \neq 0$.
+
+Choose $w \in \HC$ with $\pi_{\mathrm{comp}}(w) \neq 0$ (such $w$ exists since the Hodge decomposition of~$X$ is nontrivial). Set $x = z \cdot w$. By $\C$-linearity of $\pi_{\mathrm{comp}}$:
+\[
+\pi_{\mathrm{comp}}(x) = z \cdot \pi_{\mathrm{comp}}(w).
+\]
+Since $\pi_{\mathrm{comp}}(w) \neq 0$, we have $\pi_{\mathrm{comp}}(x) = 0 \iff z = 0$. Thus:
+\[
+\text{is\_hodge\_type\_rr}(x) \;\;\leftrightarrow\;\; z = 0.
+\]
+The decidability oracle applied to $x$ decides $z = 0$. This construction is formalized as the encoding axiom \texttt{encode\_scalar\_to\_hodge\_type}.
+
+$(\Leftarrow)$\; Suppose $\LPO(\C)$ holds. For any $x \in \HC$, express $y = \pi_{\mathrm{comp}}(x)$ in coordinates $(z_1, \ldots, z_n)$ relative to a basis of the complement summand ($\HC$ is finite-dimensional). Apply $\LPO(\C)$ to each coordinate: $z_i = 0 \lor z_i \neq 0$. This is a finite conjunction of decidable propositions, hence decidable. All coordinates vanish iff $y = 0$ iff $x$ is of Hodge type~$(r,r)$. This is formalized as the bridge axiom \texttt{LPO\_decides\_hodge\_type}. \qedhere
+\end{proof}
+
+\begin{remark}
+The encoding pattern is identical to that of Paper~46, Theorem~T1 (Galois-invariance $\leftrightarrow$ $\LPO$ for the Tate Conjecture), with the Hodge complement projection $\pi_{\mathrm{comp}}$ replacing the kernel of $\mathrm{Frob} - I$.
+\end{remark}
+
+\subsection{Theorem B (H2): Rationality testing requires LPO}
+
+\begin{theorem}[H2]
+\label{thm:H2}
+If rationality is decidable for all $x \in \HC$, then $\LPO(\C)$ holds:
+\[
+(\forall\, x \in \HC,\; \text{is\_rational}(x) \lor \neg\,\text{is\_rational}(x)) \;\;\Longrightarrow\;\; \LPO(\C).
+\]
+\end{theorem}
+
+\begin{proof}
+Given $z \in \C$, we construct $x \in \HC$ whose rationality encodes~$z = 0$.
+
+Choose $w \in \HC$ not in $\mathrm{im}(\iota)$ (such~$w$ exists since $\HC \cong \C^n$ has $\Q$-dimension at least~$2n$, strictly exceeding $\dim_\Q \HQ$ for~$n \geq 1$) and a nonzero rational class $q_0 \in \HQ$. Set:
+\[
+x = \iota(q_0) + z \cdot w.
+\]
+When $z = 0$: $x = \iota(q_0)$ is rational. When $z \neq 0$: $x = \iota(q_0) + z \cdot w$ leaves the rational lattice (since $w \notin \mathrm{im}(\iota)$ and scalar multiplication by nonzero~$z$ preserves this). Thus $\text{is\_rational}(x) \iff z = 0$. The oracle on $x$ decides $z = 0$.
+
+This is formalized as the encoding axiom \texttt{encode\_scalar\_to\_rationality}. \qedhere
+\end{proof}
+
+\begin{remark}[Markov's Principle component]
+\label{rem:MP}
+The full characterization of rationality decidability is $\LPO + \MP$:
+\begin{itemize}
+\item $\LPO$ (formalized above): testing whether a given complex number equals a specific rational $p/q$ requires exact zero-testing ($z - p/q = 0$?).
+\item $\MP$ (documented, not formalized as a biconditional): even with $\LPO$, \emph{finding} which $p/q \in \Q$ equals~$z$ requires unbounded search over all rationals. This is Markov's Principle applied to the decidable predicate $P(n) := |\text{enumerate}(n) - z| = 0$ over an enumeration of~$\Q$.
+\end{itemize}
+Together: rationality testing $= \LPO$ (test) $+ \MP$ (search).
+\end{remark}
+
+\subsection{Theorem C (H3): Polarization available but blind}
+
+\begin{theorem}[H3a: Archimedean polarization available]
+\label{thm:H3a}
+For any nonzero $x \in H^{r,r}(X)$ (i.e., $\pi_{r,r}(x) = x$ and $x \neq 0$):
+\[
+\HR(x, x) > 0.
+\]
+\end{theorem}
+
+\begin{proof}
+This is the Hodge--Riemann positivity property on $(r,r)$-classes. The positive-definiteness holds because $u(\R) = 1$: over~$\R$, positive-definite quadratic forms exist in all dimensions. In the formalization, this is the axiom \texttt{hodge\_riemann\_pos\_def\_on\_primitive}. (Strictly, the classical Hodge--Riemann bilinear relations assert positivity on \emph{primitive} classes; the formalization axiomatizes positivity for all $(r,r)$-classes as a simplification capturing the essential feature for the calibration.)
+
+\emph{Contrast with Papers~45--47:} Over $p$-adic fields, $u(\Qp) = 4$ (Hasse--Minkowski; Lam~\cite{Lam2005}; Serre~\cite{Serre1973}), so positive-definite Hermitian forms cannot exist in dimension~$\geq 3$. The polarization strategy is permanently blocked there. Over~$\R$, no such obstruction exists. \qedhere
+\end{proof}
+
+\begin{theorem}[H3b: Polarization blind to rational lattice]
+\label{thm:H3b}
+It is not the case that the Hodge--Riemann pairing of rational classes is always rational:
+\[
+\neg\, (\forall\, q_1, q_2 \in \HQ,\; \exists\, r \in \Q,\; \HR(\iota(q_1), \iota(q_2)) = r).
+\]
+\end{theorem}
+
+\begin{proof}
+The values $\HR(\iota(q_1), \iota(q_2)) = \int_{X(\C)} \iota(q_1) \wedge \ast\overline{\iota(q_2)}$ are period integrals. As documented by Kontsevich--Zagier~\cite{KontsevichZagier2001}, period integrals of algebraic varieties over~$\Q$ are generally transcendental numbers---there is no structural reason for them to land in~$\Q$.
+
+In the formalization, this is the axiom \texttt{polarization\_blind\_to\_Q}. It encapsulates the deep arithmetic fact that the Hodge--Riemann metric, while providing positive-definiteness (Theorem~\ref{thm:H3a}), cannot distinguish rational cohomology classes from irrational ones. \qedhere
+\end{proof}
+
+\begin{remark}[Hodge splitting is BISH from the metric]
+\label{rem:H3c}
+Given the positive-definite metric of Theorem~\ref{thm:H3a}, the Hodge decomposition (projection onto $H^{r,r}$) is computable in~$\BISH$: orthogonal projection in a positive-definite inner product space is constructive (distance minimization in a strictly convex space). This does not require~$\LPO$: the metric converts the decidability question ``is $\pi_{\mathrm{comp}}(x) = 0$?'' (which requires~$\LPO$ abstractly, by Theorem~\ref{thm:H1}) into an equational computation ``compute the orthogonal projection'' (which is~$\BISH$).
+
+The key insight: the metric \emph{solves} the Hodge type question (H1) without~$\LPO$, but it \emph{cannot} solve the rationality question (H2). The Hodge Conjecture requires \emph{both}.
+\end{remark}
+
+\subsection{Theorem D (H4): Cycle verification is BISH}
+
+\begin{theorem}[H4: Cycle verification in BISH]
+\label{thm:H4}
+Numerical equivalence of algebraic cycles is decidable in~$\BISH$. For any finite basis $\{W_1, \ldots, W_m\}$ of the complementary Chow group and any cycles $Z_1, Z_2$:
+\[
+(\forall\, j,\; Z_1 \cdot W_j = Z_2 \cdot W_j) \;\lor\; \neg(\forall\, j,\; Z_1 \cdot W_j = Z_2 \cdot W_j).
+\]
+\end{theorem}
+
+\begin{proof}
+The proof proceeds by reduction to decidable integer arithmetic:
+
+\emph{Step 1.} Intersection numbers $Z \cdot W \in \Z$ are integers. Integer equality is decidable in~$\BISH$ (compare digits).
+
+\emph{Step 2.} For each basis element $W_j$, the proposition $Z_1 \cdot W_j = Z_2 \cdot W_j$ is a decidable $\Z$-equality.
+
+\emph{Step 3.} Numerical equivalence is the universal quantification $\forall\, j \in \{1, \ldots, m\}$ of these decidable propositions. A finite conjunction of decidable propositions is decidable (by \texttt{Fintype.decidable\-Forall\-Fintype} in the Lean formalization).
+
+No omniscience principle is required: the verification reduces entirely to finitely many integer comparisons. \qedhere
+\end{proof}
+
+\begin{theorem}[H4e: Verification in $\HC$ requires LPO]
+\label{thm:H4e}
+If one can decide whether $\iota(\cl(Z)) = x$ for all $Z$ and $x \in \HC$, then $\LPO(\C)$ holds.
+\end{theorem}
+
+\begin{proof}
+Given $z \in \C$, the encoding axiom \texttt{encode\_scalar\_to\_cycle\_in\_HC} provides $Z \in \CH$ and $x \in \HC$ with $\iota(\cl(Z)) = x \iff z = 0$. The oracle decides $z = 0$.
+
+This contrast is the essence of the Hodge calibration:
+\begin{itemize}
+\item In $\HQ$ (rational lattice): verification is $\BISH$. \checkmark
+\item In $\HC$ (complex ambient space): verification requires $\LPO$. \ding{55}
+\end{itemize}
+The Hodge Conjecture asserts that Hodge classes come from cycles, converting the $\HC$ question to an $\HQ$ question. \qedhere
+\end{proof}
+
+\subsection{Theorem E (H5): The nexus}
+
+\begin{theorem}[H5a: Hodge class detection requires LPO]
+\label{thm:H5a}
+If Hodge class detection is decidable for all $x \in \HC$, then $\LPO(\C)$ holds:
+\[
+(\forall\, x \in \HC,\; \text{is\_hodge\_class}(x) \lor \neg\,\text{is\_hodge\_class}(x)) \;\;\Longrightarrow\;\; \LPO(\C).
+\]
+\end{theorem}
+
+\begin{proof}
+Given $z \in \C$, the encoding axiom \texttt{encode\_scalar\_to\_hodge\_class} provides $x \in \HC$ with $\text{is\_hodge\_class}(x) \iff z = 0$.
+
+The construction: take a nonzero rational $(r,r)$-class $v_0 = \iota(q_0)$ with $\pi_{r,r}(v_0) = v_0$ (such classes exist on any smooth projective variety of positive dimension). Choose $w \in \HC$ with $\pi_{\mathrm{comp}}(w) \neq 0$. Set $x = v_0 + z \cdot w$.
+\begin{itemize}
+\item $z = 0$: $x = v_0$ is rational and $(r,r)$, hence a Hodge class.
+\item $z \neq 0$: $\pi_{\mathrm{comp}}(x) = z \cdot \pi_{\mathrm{comp}}(w) \neq 0$, so $x$ is not of Hodge type~$(r,r)$.
+\end{itemize}
+The oracle on $x$ decides $z = 0$.
+
+Informally, detecting Hodge classes is at least as hard as detecting either component, each of which requires~$\LPO$ (Theorems~\ref{thm:H1} and~\ref{thm:H2}). The formal proof uses a direct encoding (axiom \texttt{encode\_scalar\_to\_hodge\_class}) rather than composing H1 and H2. \qedhere
+\end{proof}
+
+\begin{theorem}[H5b: Hodge Conjecture reduces detection to BISH + MP]
+\label{thm:H5b}
+Assuming the Hodge Conjecture, for any Hodge class $x \in \HC$, there exist $Z \in \CH$ and $q \in \HQ$ with $\iota(q) = x$ and
+\[
+\cl(Z) = q \;\lor\; \cl(Z) \neq q.
+\]
+\end{theorem}
+
+\begin{proof}
+Let $x$ be a Hodge class. The Hodge Conjecture provides $Z \in \CH$ with $\iota(\cl(Z)) = x$. The rationality component of $\text{is\_hodge\_class}(x)$ provides $q \in \HQ$ with $\iota(q) = x$. The proposition $\cl(Z) = q$ is a $\HQ$-equality, and $\HQ$ has decidable equality ($\Q$-vector space with computable coefficients). Therefore $\cl(Z) = q \lor \cl(Z) \neq q$.
+
+Thus the conjecture converts the detection problem from:
+\begin{itemize}
+\item $\LPO$: test $x \in H^{r,r}$ and $x \in \mathrm{im}(\iota)$ in $\HC$ (over~$\C$)
+\end{itemize}
+to:
+\begin{itemize}
+\item $\MP + \BISH$: search for $Z$ ($\MP$) and verify $\cl(Z) = q$ in $\HQ$ ($\BISH$).
+\end{itemize}
+The $\MP$ component (unbounded search for the witnessing cycle) is not formalized; the Lean theorem shows that once the conjecture provides~$Z$, the verification step $\cl(Z) = q$ is $\BISH$-decidable. \qedhere
+\end{proof}
+
+\begin{theorem}[H5c: Nexus observation]
+\label{thm:H5c}
+The following conjunction holds:
+\begin{enumerate}
+\item Polarization is available: $\forall\, x \in H^{r,r},\; x \neq 0 \implies \HR(x,x) > 0$.
+\item Polarization is blind to~$\Q$: the pairing of rational classes is not generally rational.
+\item Detecting Hodge classes requires~$\LPO$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Part~(1) is Theorem~\ref{thm:H3a}. Part~(2) is Theorem~\ref{thm:H3b}. Part~(3) is Theorem~\ref{thm:H5a}.
+
+Together, these show that neither mechanism alone detects Hodge classes:
+\begin{itemize}
+\item \emph{Polarization alone}: can split $\HC$ into Hodge types ($\BISH$ from the metric, Remark~\ref{rem:H3c}), but cannot see the rational lattice (Theorem~\ref{thm:H3b}).
+\item \emph{Algebraic descent alone}: can verify rational structure ($\BISH$ in $\HQ$, Theorem~\ref{thm:H4}), but cannot determine Hodge type without the metric.
+\end{itemize}
+The Hodge Conjecture asserts that when \emph{both} conditions hold simultaneously ($x$ is rational \emph{and} type~$(r,r)$), the cause is algebraic geometry: $x = \iota(\cl(Z))$ for some cycle~$Z$. \qedhere
+\end{proof}
+
+% ===========================================================
+\section{CRM Audit}
+\label{sec:crm}
+% ===========================================================
+
+\subsection{Constructive strength classification}
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{Result} & \textbf{Strength} & \textbf{Necessary?} & \textbf{Sufficient?} \\
+\midrule
+Theorem A (H1, $\Rightarrow$) & $\BISH$ & Yes & Yes \\
+Theorem A (H1, $\Leftarrow$) & $\BISH + \LPO$ & $\LPO$ necessary & $\LPO$ sufficient \\
+Theorem B (H2, $\Rightarrow$) & $\BISH$ & Yes & Yes \\
+Theorem C (H3a) & $\BISH$ (from axiom) & Yes & Yes \\
+Theorem C (H3b) & $\BISH$ (from axiom) & Yes & Yes \\
+Theorem D (H4) & $\BISH$ & Yes (integer arith.) & Yes \\
+Theorem D (H4e) & $\BISH$ & Yes & Yes \\
+Theorem E (H5a, $\Rightarrow$) & $\BISH$ & Yes & Yes \\
+Theorem E (H5b) & $\BISH + \MP$ & $\MP$ for search & $\MP$ sufficient \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip\noindent
+\emph{Note on $\BISH$ classification.} The ``$\BISH$'' labels above refer to \emph{proof content} (explicit witnesses, no omniscience principles as hypotheses), not to Lean's \texttt{\#print axioms} output. Lean's $\R$ and $\C$ (Cauchy completions) pervasively introduce \texttt{Classical.choice} as an infrastructure artifact; all theorems over~$\R$ carry it. Constructive stratification is established by the structure of the proof, not by the axiom checker (cf.\ Paper~10, \S Methodology).
+
+\subsection{What descends, from where, to where}
+
+The central $\CRM$ phenomenon of Paper~49 is an \emph{algebraic descent in logical strength}:
+\[
+\underbrace{\LPO(\C)}_{\text{Detection in }\HC} \;\;\xrightarrow{\quad\text{Hodge Conjecture}\quad}\;\; \underbrace{\BISH + \MP}_{\text{Verification in }\HQ}.
+\]
+The mechanism: the Hodge Conjecture converts the detection problem from $\HC$ (where equality requires~$\LPO$ over~$\C$) to $\HQ$ (where equality is decidable in~$\BISH$ over~$\Q$). The $\MP$ component handles the existential search for the witnessing algebraic cycle.
+
+This is \emph{algebraic descent}: the conjecture asserts that Hodge classes have algebraic representatives, descending the verification from the transcendental ($\C$-coefficients) to the algebraic ($\Q$-coefficients).
+
+\subsection{Comparison with Papers 45--48}
+
+\begin{center}
+\small
+\begin{tabular}{lllll}
+\toprule
+\textbf{Paper} & \textbf{Conjecture} & \textbf{Setting} & \textbf{Polarization} & \textbf{Descent} \\
+\midrule
+45 & WMC & $p$-adic & Blocked ($u = 4$) & $\Qell \to \Qbar$ \\
+46 & Tate & $p$-adic & Blocked ($u = 4$) & $\Qell \to \Qbar$ \\
+47 & Langlands & $p$-adic & Blocked ($u = 4$) & $\Qell \to \Qbar$ \\
+48 & BSD & Archimedean & Available + useful & $\R \to \Q$ \\
+49 & Hodge & Archimedean & Available but insufficient & $\C \to \Q$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Paper~49 occupies a unique position: polarization is \emph{available} (unlike Papers~45--47) but \emph{insufficient} (unlike Paper~48). The Hodge--Riemann metric splits continuous space into Hodge types but cannot see the rational lattice. This is why the Hodge Conjecture requires the \emph{conjunction} of polarization and algebraic descent.
+
+% ===========================================================
+\section{Formal Verification}
+\label{sec:formal}
+% ===========================================================
+
+\subsection{File structure and build status}
+
+The Lean~4 bundle resides at \texttt{paper~49/P49\_Hodge/} with the following structure:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{File} & \textbf{Lines} & \textbf{Content} \\
+\midrule
+\texttt{Defs.lean} & 306 & Definitions, axioms, constructive principles \\
+\texttt{H1\_HodgeTypeLPO.lean} & 86 & Theorem H1 (full proof) \\
+\texttt{H2\_RationalityLPO.lean} & 67 & Theorem H2 (full proof) \\
+\texttt{H3\_Polarization.lean} & 102 & Theorem H3 (from axioms) \\
+\texttt{H4\_CycleVerify.lean} & 126 & Theorem H4 (full proof) + H4e \\
+\texttt{H5\_Nexus.lean} & 130 & Theorems H5a, H5b, H5c \\
+\texttt{Main.lean} & 208 & Assembly + axiom audit \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\noindent
+\textbf{Build status:} \texttt{lake build} $\to$ \textbf{0 errors, 0 warnings, 0 \texttt{sorry}s}. Lean~4 version: \texttt{v4.29.0-rc1}. Mathlib4 dependency via \texttt{lakefile.lean}.
+
+\subsection{Axiom inventory}
+
+The formalization uses 28 custom axioms organized into eight categories:
+
+\begin{center}
+\small
+\begin{tabular}{rlll}
+\toprule
+\textbf{\#} & \textbf{Axiom} & \textbf{Status} & \textbf{Category} \\
+\midrule
+1--4 & \texttt{H\_C}, \texttt{H\_C\_addCommGroup}, & Used & Complex cohomology \\
+     & \texttt{H\_C\_module}, \texttt{H\_C\_finiteDim} & & \\
+5--9 & \texttt{H\_Q}, \texttt{H\_Q\_addCommGroup}, & Used & Rational cohomology \\
+     & \texttt{H\_Q\_module}, \texttt{H\_Q\_finiteDim}, & & \\
+     & \texttt{H\_Q\_decidableEq} & & \\
+10--11 & \texttt{H\_C\_module\_Q}, & Used & Rational inclusion \\
+       & \texttt{rational\_inclusion} & & \\
+\midrule
+12--15 & \texttt{hodge\_projection\_rr}, & Used & Hodge decomposition \\
+       & \texttt{hodge\_projection\_complement}, & & \\
+       & \texttt{hodge\_decomposition}, & & \\
+       & \texttt{hodge\_projections\_complementary} & & \\
+16--17 & \texttt{hodge\_riemann}, & Used & Hodge--Riemann form \\
+       & \texttt{hodge\_riemann\_pos\_def\_on\_primitive} & & \\
+\midrule
+18--22 & \texttt{ChowGroup}, \texttt{ChowGroup\_addCommGroup}, & Used & Chow group \\
+       & \texttt{ChowGroup\_module}, \texttt{cycle\_class}, & & infrastructure \\
+       & \texttt{intersection} & & \\
+\midrule
+23--24 & \texttt{encode\_scalar\_to\_hodge\_type}, & Used & H1 encoding \\
+       & \texttt{LPO\_decides\_hodge\_type} & & \\
+25 & \texttt{encode\_scalar\_to\_rationality} & Used & H2 encoding \\
+26 & \texttt{encode\_scalar\_to\_cycle\_in\_HC} & Used & H4e encoding \\
+27 & \texttt{encode\_scalar\_to\_hodge\_class} & Used & H5a encoding \\
+28 & \texttt{polarization\_blind\_to\_Q} & Used & H3b (periods) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\noindent
+All 28 axioms are \emph{load-bearing}: each appears in \texttt{\#print axioms} output for at least one theorem. Axioms 1--22 declare arithmetic geometry infrastructure not available in Mathlib. Axioms 23--28 encode mathematical content (scalar encodings, polarization blindness) whose informal justifications are documented in the Lean docstrings.
+
+\subsection{Key code snippets}
+
+\textbf{Theorem H1} (forward direction---encoding pattern):
+
+\begin{lstlisting}
+theorem hodge_type_requires_LPO :
+    (∀ (x : H_C), is_hodge_type_rr x ∨ ¬ is_hodge_type_rr x)
+    → LPO_C := by
+  intro h_dec z
+  obtain ⟨x, hx⟩ := encode_scalar_to_hodge_type z
+  rcases h_dec x with h_in | h_not_in
+  · left; exact hx.mp h_in
+  · right; exact fun hz => h_not_in (hx.mpr hz)
+\end{lstlisting}
+
+\textbf{Theorem H4} (BISH decidability via integer arithmetic):
+
+\begin{lstlisting}
+instance num_equiv_fin_decidable {m : ℕ}
+    (basis : Fin m → ChowGroup)
+    (Z₁ Z₂ : ChowGroup) :
+    Decidable (num_equiv_fin basis Z₁ Z₂) :=
+  Fintype.decidableForallFintype
+
+theorem cycle_verification_BISH {m : ℕ}
+    (basis : Fin m → ChowGroup)
+    (Z₁ Z₂ : ChowGroup) :
+    num_equiv_fin basis Z₁ Z₂
+    ∨ ¬ num_equiv_fin basis Z₁ Z₂ :=
+  (num_equiv_fin_decidable basis Z₁ Z₂).em
+\end{lstlisting}
+
+\textbf{Theorem H5b} (Hodge Conjecture $\to$ BISH + MP):
+
+\begin{lstlisting}
+theorem hodge_conjecture_reduces_to_BISH :
+    hodge_conjecture →
+    ∀ (x : H_C), is_hodge_class x →
+      ∃ (Z : ChowGroup) (q : H_Q),
+        rational_inclusion q = x ∧
+        (cycle_class Z = q ∨ cycle_class Z ≠ q) := by
+  intro hHC x hx
+  obtain ⟨Z, hZ⟩ := hHC x hx
+  obtain ⟨q, hq⟩ := hx.1
+  exact ⟨Z, q, hq,
+    (H_Q_decidableEq (cycle_class Z) q).em⟩
+\end{lstlisting}
+
+\subsection{\texttt{\#print axioms} output}
+
+\begin{center}
+\small
+\begin{tabular}{ll}
+\toprule
+\textbf{Theorem} & \textbf{Custom axioms} \\
+\midrule
+\texttt{hodge\_type\_iff\_LPO} (H1) & \texttt{encode\_scalar\_to\_hodge\_type}, \\
+ & \texttt{LPO\_decides\_hodge\_type} + infra \\
+\texttt{rationality\_requires\_LPO} (H2) & \texttt{encode\_scalar\_to\_rationality} + infra \\
+\texttt{archimedean\_polarization\_available} (H3a) & \texttt{hodge\_riemann\_pos\_def\_on\_primitive} + infra \\
+\texttt{polarization\_blind\_to\_\ldots} (H3b) & \texttt{polarization\_blind\_to\_Q} + infra \\
+\texttt{cycle\_verification\_BISH} (H4) & \textbf{No encoding axioms} (infra only) \\
+\texttt{cycle\_verification\_in\_HC\_\ldots} (H4e) & \texttt{encode\_scalar\_to\_cycle\_in\_HC} + infra \\
+\texttt{hodge\_class\_detection\_\ldots} (H5a) & \texttt{encode\_scalar\_to\_hodge\_class} + infra \\
+\texttt{hodge\_conjecture\_reduces\_\ldots} (H5b) & \texttt{H\_Q\_decidableEq} + infra \\
+\texttt{nexus\_observation} (H5c) & All axioms combined \\
+\texttt{hodge\_calibration\_summary} & All axioms combined \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\noindent
+\textbf{Classical.choice audit.} The Lean infrastructure axiom \texttt{Classical.choice} appears in all theorems due to Mathlib's construction of~$\R$ and~$\C$ as Cauchy completions. This is an infrastructure artifact: all theorems over~$\R$ in Lean/Mathlib carry \texttt{Classical.choice}. The constructive stratification is established by \emph{proof content}---explicit witnesses vs.\ principle-as-hypothesis---not by the axiom checker output (cf.\ Paper~10, \S Methodology).
+
+Critically, \texttt{Classical.dec} does \emph{not} appear. The \texttt{Decidable} instances in H4 are derived from \texttt{Int.decEq} and \texttt{Fintype.decidableForallFintype} (Mathlib infrastructure), not from classical omniscience.
+
+\subsection{Reproducibility}
+
+The Lean~4 source files are archived at Zenodo: \leanRepo. To reproduce:
+
+\begin{enumerate}
+\item Install Lean~4 via \texttt{elan} with toolchain \texttt{leanprover/lean4:v4.29.0-rc1}.
+\item Run \texttt{lake build} in the \texttt{P49\_Hodge/} directory.
+\item Verify: 0 errors, 0 warnings, 0 \texttt{sorry}s.
+\end{enumerate}
+
+\noindent The build fetches Mathlib4 automatically via \texttt{lakefile.lean}. No external dependencies beyond Lean~4 and Mathlib are required.
+
+% ===========================================================
+\section{Discussion}
+\label{sec:discuss}
+% ===========================================================
+
+\subsection{The nexus pattern}
+
+Paper~49 identifies a new pattern in the five-conjecture program: polarization \emph{available but insufficient}. This contrasts with:
+\begin{itemize}
+\item \textbf{Papers 45--47} ($p$-adic): polarization \emph{blocked} by the $u$-invariant obstruction. De-omniscientizing descent proceeds by descending the coefficient field ($\Qell \to \Qbar$) via geometric origin, Galois invariance, or automorphic structure.
+\item \textbf{Paper 48} (BSD): polarization \emph{available and useful}. The N\'eron--Tate height pairing is positive-definite and rational-valued on $E(\Q) \otimes \R$, directly bridging $\R$ to~$\Q$ in~$\BISH$.
+\item \textbf{Paper 49} (Hodge): polarization \emph{available but insufficient}. The Hodge--Riemann form is positive-definite on $(r,r)$-classes, enabling constructive Hodge splitting ($\BISH$ from the metric). But it is blind to the rational lattice: the metric sees continuous structure but not arithmetic structure.
+\end{itemize}
+The Hodge Conjecture lives at the exact point where these two mechanisms---Archimedean polarization and algebraic descent---must interact. The conjecture asserts that when both conditions coincide (rational \emph{and} type~$(r,r)$), the cause is algebraic geometry.
+
+\subsection{Connection to existing literature}
+
+The Hodge--Riemann bilinear relations are due to Hodge~\cite{Hodge1950}; the modern treatment follows Griffiths~\cite{GriffithsHarris1978} and Voisin~\cite{Voisin2002book}. The transcendence of periods connects to the Kontsevich--Zagier period conjecture~\cite{KontsevichZagier2001}: period integrals $\int_{X(\C)} \alpha \wedge \ast\bar{\beta}$ are generally transcendental numbers, which is precisely why the metric cannot see the rational lattice.
+
+Grothendieck's standard conjectures~\cite{Grothendieck1969} aim to provide a framework where algebraic cycles control cohomological data. The constructive calibration adds a new dimension: the standard conjectures would provide algebraic descent from transcendental ($\C$-valued) to algebraic ($\Q$-valued) computations, which is precisely the logical descent from~$\LPO$ to~$\BISH$.
+
+\subsection{Open questions}
+
+\begin{enumerate}
+\item Can the $\LPO$ calibration for H1 be sharpened to~$\WLPO$ by considering approximate Hodge type (``$\|\pi_{\mathrm{comp}}(x)\| < \varepsilon$ for all~$\varepsilon > 0$'' instead of ``$\pi_{\mathrm{comp}}(x) = 0$'')?
+\item Is there a constructive proof that the Hodge--Riemann form restricted to $\mathrm{im}(\iota)$ has special algebraic structure, i.e., that periods of rational classes satisfy additional constraints beyond transcendence?
+\item Can the $\MP$ component of H2 be eliminated if one restricts to bounded-height rational classes (replacing unbounded search over~$\Q$ with bounded search over $\{p/q : |p|, |q| \leq N\}$)?
+\item What is the precise $\CRM$ strength of the Hodge Conjecture itself---as a proposition, does it require $\LPO$, $\MP$, or neither?
+\end{enumerate}
+
+% ===========================================================
+\section{Conclusion}
+\label{sec:conclusion}
+% ===========================================================
+
+We have applied constructive reverse mathematics to the Hodge Conjecture and established that:
+
+\begin{itemize}
+\item Hodge type~$(r,r)$ decidability is \emph{exactly}~$\LPO(\C)$ (Lean-verified, full proof from encoding axioms).
+\item Rationality testing requires at least~$\LPO$; the full characterization is $\LPO + \MP$ (Lean-verified for the $\LPO$ component).
+\item The Hodge--Riemann polarization is available ($u(\R) = 1$) but blind to the rational lattice (Lean-verified from axioms).
+\item Algebraic cycle verification is decidable in~$\BISH$ (Lean-verified, full proof via integer arithmetic).
+\item Hodge class detection requires~$\LPO$, but the Hodge Conjecture reduces it to $\BISH + \MP$ (Lean-verified from axioms + conjecture hypothesis).
+\end{itemize}
+
+\noindent
+The constructive calibration does not resolve the Hodge Conjecture, but it reframes the problem: the conjecture provides \emph{algebraic descent}, converting detection in~$\HC$ (requiring~$\LPO$ over~$\C$) to verification in~$\HQ$ (decidable in~$\BISH$ over~$\Q$). The unique position of Paper~49 in the five-conjecture atlas---polarization available but insufficient---shows that the Hodge Conjecture is fundamentally about the \emph{nexus} of two mechanisms, neither of which suffices alone.
+
+% ===========================================================
+\section*{Acknowledgments}
+\addcontentsline{toc}{section}{Acknowledgments}
+% ===========================================================
+
+We thank the Mathlib contributors for the decidability infrastructure (\texttt{Fintype.decidable\-Forall\-Fintype}, \texttt{Int.decEq}), linear algebra, and complex number formalization that made these proofs possible. We are grateful to the constructive reverse mathematics community---especially the foundational work of Bishop, Bridges, Richman, and Ishihara---for developing the framework that makes calibrations like these possible. This paper is dedicated to Errett Bishop, whose vision of constructive mathematics as a practical tool continues to find new applications.
+
+The Lean~4 formalization was produced using AI code generation (Claude Code, Opus~4.6) under human direction. The author is a practicing cardiologist rather than a professional logician or algebraic geometer; all mathematical claims should be evaluated on their formal content. We welcome constructive feedback from domain experts.
+
+% ===========================================================
+% References
+% ===========================================================
+\begin{thebibliography}{99}
+
+\bibitem{AtiyahHirzebruch1962}
+M.~F. Atiyah and F.~Hirzebruch.
+\newblock Analytic cycles on complex manifolds.
+\newblock \emph{Topology}, 1:25--45, 1962.
+
+\bibitem{BishopBridges1985}
+E.~Bishop and D.~Bridges.
+\newblock \emph{Constructive Analysis}.
+\newblock Springer, 1985.
+
+\bibitem{BridgesRichman1987}
+D.~Bridges and F.~Richman.
+\newblock \emph{Varieties of Constructive Mathematics}.
+\newblock LMS Lecture Note Series 97. Cambridge University Press, 1987.
+
+\bibitem{BridgesVita2006}
+D.~Bridges and L.~V\^{\i}\c{t}\u{a}.
+\newblock \emph{Techniques of Constructive Analysis}.
+\newblock Springer, 2006.
+
+\bibitem{Deligne1971}
+P.~Deligne.
+\newblock Th\'eorie de Hodge II.
+\newblock \emph{Publ. Math. IH\'ES}, 40:5--57, 1971.
+
+\bibitem{Deligne1982}
+P.~Deligne.
+\newblock Hodge cycles on abelian varieties.
+\newblock In \emph{Hodge Cycles, Motives, and Shimura Varieties}, Springer LNM 900, pages 9--100, 1982.
+
+\bibitem{GriffithsHarris1978}
+P.~Griffiths and J.~Harris.
+\newblock \emph{Principles of Algebraic Geometry}.
+\newblock Wiley, 1978.
+
+\bibitem{Grothendieck1969}
+A.~Grothendieck.
+\newblock Standard conjectures on algebraic cycles.
+\newblock In \emph{Algebraic Geometry (Bombay, 1968)}, pages 193--199. Oxford University Press, 1969.
+
+\bibitem{Hodge1950}
+W.~V.~D. Hodge.
+\newblock The topological invariants of algebraic varieties.
+\newblock In \emph{Proceedings of the International Congress of Mathematicians (Cambridge, 1950)}, vol.~1, pages 182--192, 1952.
+
+\bibitem{Ishihara2006}
+H.~Ishihara.
+\newblock Reverse mathematics in Bishop's constructive mathematics.
+\newblock \emph{Philosophia Scientiae}, CS~6:43--59, 2006.
+
+\bibitem{KontsevichZagier2001}
+M.~Kontsevich and D.~Zagier.
+\newblock Periods.
+\newblock In \emph{Mathematics Unlimited---2001 and Beyond}, pages 771--808. Springer, 2001.
+
+\bibitem{Lam2005}
+T.~Y. Lam.
+\newblock \emph{Introduction to Quadratic Forms over Fields}.
+\newblock AMS Graduate Studies in Mathematics 67, 2005.
+
+\bibitem{Lefschetz1924}
+S.~Lefschetz.
+\newblock \emph{L'analysis situs et la g\'eom\'etrie alg\'ebrique}.
+\newblock Gauthier-Villars, 1924.
+
+\bibitem{Lewis1991}
+J.~D. Lewis.
+\newblock \emph{A Survey of the Hodge Conjecture}.
+\newblock CRM Monograph Series 10. AMS, 1991.
+
+\bibitem{Serre1973}
+J.-P. Serre.
+\newblock \emph{A Course in Arithmetic}.
+\newblock Springer GTM 7, 1973.
+
+\bibitem{Voisin2002}
+C.~Voisin.
+\newblock A counterexample to the Hodge conjecture extended to K\"ahler varieties.
+\newblock \emph{Int. Math. Res. Not.}, 2002(20):1057--1075, 2002.
+
+\bibitem{Voisin2002book}
+C.~Voisin.
+\newblock \emph{Hodge Theory and Complex Algebraic Geometry I}.
+\newblock Cambridge Studies in Advanced Mathematics 76. Cambridge University Press, 2002.
+
+\bibitem{Voisin2003book}
+C.~Voisin.
+\newblock \emph{Hodge Theory and Complex Algebraic Geometry II}.
+\newblock Cambridge Studies in Advanced Mathematics 77. Cambridge University Press, 2003.
+
+\bibitem{Paper45}
+P.~C.-K. Lee.
+\newblock The Weight-Monodromy Conjecture and LPO: A Constructive Calibration.
+\newblock Paper~45, this series.
+
+\bibitem{Paper46}
+P.~C.-K. Lee.
+\newblock The Tate Conjecture and Constructive Omniscience.
+\newblock Paper~46, this series.
+
+\bibitem{Paper48}
+P.~C.-K. Lee.
+\newblock The Birch and Swinnerton-Dyer Conjecture and Constructive Omniscience.
+\newblock Paper~48, this series.
+
+\bibitem{Paper50}
+P.~C.-K. Lee.
+\newblock Constructive Reverse Mathematics and the Five Great Conjectures: Atlas Survey.
+\newblock Paper~50, this series.
+
+\end{thebibliography}
+
+\end{document}

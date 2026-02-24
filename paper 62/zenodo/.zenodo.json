@@ -1,0 +1,76 @@
+{
+  "title": "The Northcott Boundary: Hodge Level and the MP/LPO Frontier for Mixed Motives (Paper 62, Constructive Reverse Mathematics Series)",
+  "description": "<p>Paper 62 of the Constructive Reverse Mathematics series. We identify the sharp boundary between Markov&rsquo;s Principle (MP) and the Limited Principle of Omniscience (LPO) for decidability of Ext<sup>1</sup>(&Qopf;(0), M) in the DPT framework.</p>\n<p>The boundary is controlled by the <em>Hodge level</em> of the motive: when all nonzero Hodge numbers satisfy |p &minus; q| &le; 1, the intermediate Jacobian is an abelian variety, the Northcott property transfers via the Abel-Jacobi isomorphism, and decidability requires at most MP. When some h<sup>p,q</sup> &ne; 0 with |p &minus; q| &ge; 2, the intermediate Jacobian is a non-algebraic complex torus, the Northcott property fails structurally, and decidability escalates to LPO.</p>\n<p>The main novelty is Theorem C (No Weak Northcott): no intermediate condition prevents the LPO escalation. Each degree-d slice of the cycle space is BISH-decidable, but quantifying over all degrees requires LPO. The proof is an explicit constructive reduction.</p>\n<p>Combined with Papers 60&ndash;61, the full DPT hierarchy for mixed motives is governed by three invariants: the analytic rank r, the Hodge level &ell;, and the effective Lang constant. As a consequence, cycle groups on Calabi&ndash;Yau threefolds with h<sup>3,0</sup> &ge; 1 &mdash; the compactification spaces of string theory &mdash; are structurally LPO, placing the string landscape beyond the reach of any search procedure.</p>\n<p>Includes Lean 4 formalization (7 files, 954 lines, 0 errors, 0 warnings, 0 sorry).</p>",
+  "upload_type": "publication",
+  "publication_type": "article",
+  "publication_date": "2026-02-22",
+  "creators": [
+    {
+      "name": "Lee, Paul Chun-Kit",
+      "affiliation": "New York University",
+      "orcid": "0000-0000-0000-0000"
+    }
+  ],
+  "access_right": "open",
+  "license": "CC-BY-4.0",
+  "keywords": [
+    "Northcott property",
+    "Hodge level",
+    "mixed motives",
+    "Ext^1",
+    "Abel-Jacobi map",
+    "intermediate Jacobian",
+    "LPO",
+    "Markov's Principle",
+    "BISH",
+    "constructive reverse mathematics",
+    "Lean 4",
+    "formal verification",
+    "abelian variety",
+    "Calabi-Yau threefold",
+    "cubic threefold",
+    "Clemens-Griffiths",
+    "Mumford",
+    "Baker's theorem",
+    "arithmetic geometry",
+    "string theory",
+    "flux vacua",
+    "D-brane charges"
+  ],
+  "subjects": [
+    {
+      "term": "Mathematical logic and foundations",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85082397",
+      "scheme": "url"
+    },
+    {
+      "term": "Algebraic geometry",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85003438",
+      "scheme": "url"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "relation": "isPartOf",
+      "identifier": "10.5281/zenodo.17054050",
+      "resource_type": "publication",
+      "scheme": "doi"
+    }
+  ],
+  "version": "1.0.0",
+  "language": "eng",
+  "notes": "AI-assisted writing using Claude (Anthropic, Opus 4.6) under human direction. All mathematical content specified by the author. Lean 4 formalization included (7 files, 954 lines). Three axioms for classical results (Neron-Tate, Mumford, Baker); all other theorems fully proved.",
+  "references": [
+    "Clemens, C.H. and Griffiths, P.A. (1972). The intermediate Jacobian of the cubic threefold. Ann. of Math. (2) 95, 281-356.",
+    "Bloch, S. and Murre, J.P. (1979). On the Chow group of certain types of Fano threefolds. Compositio Math. 39, 47-105.",
+    "Mumford, D. (1969). Rational equivalence of 0-cycles on surfaces. J. Math. Kyoto Univ. 9, 195-204.",
+    "Griffiths, P.A. (1968). Periods of integrals on algebraic manifolds, I and II. Amer. J. Math. 90, 568-626 and 805-865.",
+    "Neron, A. (1965). Quasi-fonctions et hauteurs sur les varietes abeliennes. Ann. of Math. (2) 82, 249-331.",
+    "Northcott, D.G. (1949). An inequality in the theory of arithmetic on algebraic varieties. Proc. Cambridge Philos. Soc. 45, 502-509.",
+    "Baker, A. (1966). Linear forms in the logarithms of algebraic numbers. Mathematika 13, 204-216.",
+    "Voisin, C. (2013). Abel-Jacobi map, integral Hodge classes and decomposition of the diagonal. J. Algebraic Geom. 22, 141-174.",
+    "Bishop, E. and Bridges, D. (1985). Constructive Analysis. Springer.",
+    "Denef, F. and Douglas, M.R. (2004). Distributions of flux vacua. J. High Energy Phys. 2004(05), 072.",
+    "Bousso, R. and Polchinski, J. (2000). Quantization of four-form fluxes and dynamical neutralization of the cosmological constant. J. High Energy Phys. 2000(06), 006."
+  ]
+}

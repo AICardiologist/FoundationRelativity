@@ -1,0 +1,22 @@
+-- Paper 59: De Rham Decidability — The p-adic Precision Bound
+-- Paul C.-K. Lee, February 2026
+--
+-- Module structure:
+--   1. Defs                  — Core structures: EllipticCurveData, GoodReductionData (0 sorry)
+--   2. PadicVal              — Divisibility-based valuation helpers (0 sorry)
+--   3. VerificationTable     — 24 verified precision bound entries across 4 curves (0 sorry)
+--   4. WeakAdmissibility     — Hasse ⟹ #E(𝔽_p) > 0, N_M well-defined (0 sorry)
+--   5. Interpretation        — CRM interpretation: Axiom 5 is a theorem (0 sorry)
+--   6. Main                  — Assembly, axiom audit (0 sorry)
+--
+-- Total sorry budget: 0.
+--
+-- Series: Constructive Reverse Mathematics and Arithmetic Geometry
+-- Depends on: Paper 50 (DPT axioms), Paper 51 (BSD calibration, exceptional zero)
+--
+-- Main result: For elliptic curves E/ℚ with good reduction at prime p,
+--   N_M = v_p(det(1 - φ)) = v_p(1 - a_p + p) = v_p(#E(𝔽_p))
+-- The precision bound is the p-adic valuation of the point count.
+-- Verified for X₀(11), X₀(14), X₀(15), 37a across multiple primes (24 entries).
+
+import Papers.P59_DeRhamDecidability.Main

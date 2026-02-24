@@ -1,0 +1,45 @@
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Physical Context}{2}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}The Answer}{3}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Programme Context}{3}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}What Makes Paper~17 Different}{3}{subsection.1.4}%
+\contentsline {section}{\numberline {2}Background}{4}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Constructive Reverse Mathematics}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}The Diagnostic}{4}{subsection.2.2}%
+\contentsline {section}{\numberline {3}The Physics: LQG Spin Network State Counting}{4}{section.3}%
+\contentsline {subsection}{\numberline {3.1}The Horizon Model}{4}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}The State Counting Problem}{4}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}The Generating Function}{5}{subsection.3.3}%
+\contentsline {paragraph}{Counting convention.}{5}{section*.2}%
+\contentsline {paragraph}{Constructive witness for $Z(0^+) = \infty $.}{5}{section*.3}%
+\contentsline {section}{\numberline {4}Finite Entropy at BISH}{5}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Admissible Configurations are Finite}{5}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Entropy is Computable}{6}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Axiom Certificate}{6}{subsection.4.3}%
+\contentsline {section}{\numberline {5}Entropy Convergence and LPO}{6}{section.5}%
+\contentsline {subsection}{\numberline {5.1}The Encoding}{6}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Forward Direction: LPO $\Rightarrow $ Convergence}{7}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Backward Direction: Convergence $\Rightarrow $ LPO}{7}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}The Equivalence}{7}{subsection.5.4}%
+\contentsline {paragraph}{Shared encoding infrastructure.}{8}{section*.4}%
+\contentsline {section}{\numberline {6}The Subleading Correction}{8}{section.6}%
+\contentsline {subsection}{\numberline {6.1}The Generating Function $Z(t)$}{8}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Saddle Point Existence}{8}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}The $-3/2$ Coefficient}{8}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}Error Bound and Full Structure}{9}{subsection.6.4}%
+\contentsline {subsection}{\numberline {6.5}Axiom Profile}{9}{subsection.6.5}%
+\contentsline {section}{\numberline {7}Domain Invariance}{10}{section.7}%
+\contentsline {subsection}{\numberline {7.1}The Five-Domain Table}{10}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}What Five Domains Mean}{10}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Extended Calibration Table}{10}{subsection.7.3}%
+\contentsline {section}{\numberline {8}Lean Formalisation}{10}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Module Structure}{10}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Key Design Decisions}{10}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}Axiom Audit}{11}{subsection.8.3}%
+\contentsline {subsection}{\numberline {8.4}CRM Audit}{11}{subsection.8.4}%
+\contentsline {section}{\numberline {9}Discussion}{12}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Quantum Gravity and Logical Cost}{12}{subsection.9.1}%
+\contentsline {subsection}{\numberline {9.2}The Cellar and the Cathedral}{12}{subsection.9.2}%
+\contentsline {subsection}{\numberline {9.3}Programme Context}{12}{subsection.9.3}%
+\contentsline {subsection}{\numberline {9.4}Limitations}{13}{subsection.9.4}%
+\contentsline {section}{\numberline {10}Conclusion}{13}{section.10}%

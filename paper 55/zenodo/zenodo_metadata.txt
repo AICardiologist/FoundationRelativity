@@ -1,0 +1,34 @@
+ZENODO UPLOAD METADATA — Paper 55
+===================================
+
+DOI: 10.5281/zenodo.18733731
+
+TITLE:
+K3 Surfaces, the Kuga-Satake Construction, and the DPT Framework (Paper 55, Constructive Reverse Mathematics Series)
+
+UPLOAD TYPE: Software
+
+PUBLICATION DATE: 2026-02-21
+
+AUTHORS:
+Lee, Paul Chun-Kit — New York University
+
+LICENSE: Apache-2.0
+
+DESCRIPTION:
+Paper 55 of the Constructive Reverse Mathematics series. Second out-of-sample test of the Decidability-Preserving Transfer (DPT) framework, applied to K3 surfaces and the Kuga-Satake construction. Achieves a full decomposition demonstrating the codimension principle.
+
+Key results: (A) Motivated cycle transfer via Andre (1996). (B) Axiom 2 independence via Deligne Weil I. (C) Kuga-Satake construction provides Axiom 3 through the Clifford algebra and Rosati involution. (D) Supersingular bypass at Picard number rho = 22. (E) No Picard boundary: decidability does not degrade as rho varies. (F) Calabi-Yau threefold correction: weight-3 Hodge-Riemann restores positive-definiteness. (G) 7-row comparison table assembling the full calibration verdict.
+
+The Lean 4 / Mathlib formalization comprises 8 source files (1,131 lines), compiles with zero errors, zero warnings, and zero sorry gaps. 9 principled axioms encode deep published results (Andre 1996, Lieberman 1968, Matsusaka 1957, Deligne 1974, Lawson-Michelsohn 1989, van Geemen 2000, Nygaard-Ogus 1985 / Charles 2013, Lefschetz 1924, Hodge 1941 / Griffiths 1969).
+
+Code is distributed exclusively via this Zenodo record.
+
+KEYWORDS:
+constructive reverse mathematics, K3 surfaces, Kuga-Satake construction, DPT framework, decidability-preserving transfer, codimension principle, motivated cycles, supersingular, Picard number, Calabi-Yau threefolds, Deligne Weil I, Hodge-Riemann, Rosati involution, Clifford algebra, algebraic geometry, arithmetic geometry, formal verification, Lean 4, Mathlib, constructive mathematics
+
+RELATED IDENTIFIER:
+isPartOf — DOI: 10.5281/zenodo.17054050
+
+NOTES:
+AI-assisted formalization using Claude (Anthropic, Opus 4.6) for Lean 4 code generation under human direction. All mathematical content specified by the author; every theorem verified by the Lean 4 type checker. Built with Lean 4 v4.29.0-rc1 and Mathlib. Reproducible via 'lake build' (zero errors, zero sorry, 9 principled axioms). Code available exclusively on Zenodo (not hosted on GitHub).

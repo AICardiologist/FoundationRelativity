@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+- family-names: "Lee"
+  given-names: "Paul Chun-Kit"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+  affiliation: "New York University"
+title: "The CM Decidability Oracle: Verified Computation from Elliptic Curves to the Fourfold Boundary (Paper 53, Constructive Reverse Mathematics Series)"
+version: "1.0.0"
+doi: 10.5281/zenodo.18713089
+date-released: 2026-02-20
+url: "https://doi.org/10.5281/zenodo.18713089"
+abstract: >-
+  Paper 53 of the Constructive Reverse Mathematics series. We exhibit a verified
+  decision procedure for numerical equivalence on products of the 13 CM elliptic
+  curves over Q with class number 1, implemented in Lean 4 with zero sorry
+  keywords. We then extend the computation to the dimension-4 boundary identified
+  by the DPT framework. For Milne's CM abelian fourfold, the self-intersection
+  of the exotic Weil class is deg(w.w) = 7 > 0, confirming the Hodge-Riemann
+  bilinear relations. Theorem C (the fourfold sign computation) depends on no
+  custom axioms -- it is pure verified arithmetic. Formalized in Lean 4 over
+  Mathlib (1,597 lines, 15 files, zero errors, zero sorry).
+keywords:
+  - "constructive reverse mathematics"
+  - "CM elliptic curves"
+  - "numerical equivalence"
+  - "Standard Conjecture D"
+  - "DPT framework"
+  - "Weil classes"
+  - "abelian fourfolds"
+  - "Hodge-Riemann bilinear relations"
+  - "formal verification"
+  - "Lean 4"
+  - "Mathlib"
+  - "algebraic geometry"
+license: Apache-2.0

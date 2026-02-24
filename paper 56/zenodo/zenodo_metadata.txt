@@ -1,0 +1,39 @@
+ZENODO UPLOAD METADATA — Paper 56
+===================================
+
+DOI: 10.5281/zenodo.18734021
+VERSION: 2.0.0
+
+TITLE:
+Self-Intersection of Exotic Weil Classes and Field Discriminants: The Formula deg(w_0 . w_0) = sqrt(disc(F)) for CM Abelian Fourfolds (Paper 56, Constructive Reverse Mathematics and Arithmetic Geometry Series)
+
+UPLOAD TYPE: Software
+
+PUBLICATION DATE: 2026-02-21
+
+AUTHORS:
+Lee, Paul Chun-Kit — New York University
+
+LICENSE: Apache-2.0
+
+DESCRIPTION:
+Paper 56 of the Constructive Reverse Mathematics and Arithmetic Geometry series. We compute the self-intersection degree deg(w_0 . w_0) = sqrt(disc(F)) for exotic Weil classes on three CM abelian fourfolds of Weil type, providing explicit numerical evidence at the boundary of the DPT framework.
+
+Example 1 (K = Q(sqrt(-3)), F = Q(zeta_7 + zeta_7^{-1})): disc(F) = 49, deg = 7.
+Example 2 (K = Q(i), F = Q(zeta_9 + zeta_9^{-1})): disc(F) = 81, deg = 9.
+Example 3 (K = Q(sqrt(-7))): disc(F) = 169, deg = 13.
+
+All degrees are positive (Hodge-Riemann), all exotic Weil classes are algebraic (Schoen). The discriminant equation det(G) = disc(F) is exact, established via the cyclic conductor theorem. The 3x3 determinants are computed by native_decide.
+
+The Lean 4 / Mathlib formalization comprises 9 active modules + 2 deprecated (~1,666 lines total, ~1,331 active), compiles with zero errors, zero warnings, and zero sorry gaps. 10 principled axioms encode published results (Milne, Shimura, Schoen). Correction history: v2 (conductor-based) is current; v1/v3 discriminant equation deprecated.
+
+Code is distributed exclusively via this Zenodo record.
+
+KEYWORDS:
+exotic Weil class, self-intersection, CM abelian fourfold, DPT boundary, Hodge-Riemann, Schoen algebraicity, discriminant equation, Lean 4, Mathlib, constructive reverse mathematics, arithmetic geometry, conductor, trace matrix, formal verification, constructive mathematics
+
+RELATED IDENTIFIER:
+isPartOf — DOI: 10.5281/zenodo.17054050
+
+NOTES:
+AI-assisted formalization using Claude (Anthropic, Opus 4.6) for Lean 4 code generation under human direction. All mathematical content specified by the author; every theorem verified by the Lean 4 type checker. Built with Lean 4 v4.29.0-rc1 and Mathlib. Reproducible via 'lake build' (zero errors, zero sorry). Code available exclusively on Zenodo (not hosted on GitHub).

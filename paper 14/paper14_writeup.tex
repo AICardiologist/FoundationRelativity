@@ -1,0 +1,1142 @@
+\documentclass[11pt,a4paper]{article}
+
+% ====================================================================
+% Packages
+% ====================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{cleveref}
+\usepackage{natbib}
+\usepackage{mdframed}
+
+% ====================================================================
+% Theorem environments
+% ====================================================================
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% ====================================================================
+% Lean 4 code listing style
+% ====================================================================
+\definecolor{lean-keyword}{RGB}{0,0,180}
+\definecolor{lean-comment}{RGB}{0,128,0}
+\definecolor{lean-string}{RGB}{163,21,21}
+\definecolor{lean-bg}{RGB}{248,248,248}
+
+\lstdefinelanguage{lean4}{
+  keywords={theorem,lemma,def,class,instance,import,open,variable,
+            noncomputable,section,namespace,end,where,let,have,show,
+            intro,obtain,use,exact,rw,simp,apply,by,fun,match,if,
+            then,else,do,return,axiom,abbrev,private,attribute,
+            suffices,change,congr,ext,constructor,rintro,push_neg,
+            linarith,absurd,set_option,omit,in,set,cases,structure,
+            refine,unfold,rcases,calc,all_goals,first,try,ring},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+  morestring=[b]',
+}
+
+\lstset{
+  language=lean4,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{lean-keyword}\bfseries,
+  commentstyle=\color{lean-comment}\itshape,
+  stringstyle=\color{lean-string},
+  backgroundcolor=\color{lean-bg},
+  frame=single,
+  framerule=0.5pt,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2,
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+  xleftmargin=15pt,
+  captionpos=b,
+}
+
+% ====================================================================
+% Macros
+% ====================================================================
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\LPO}{\mathrm{LPO}}
+\newcommand{\WLPO}{\mathrm{WLPO}}
+\newcommand{\LLPO}{\mathrm{LLPO}}
+\newcommand{\BMC}{\mathrm{BMC}}
+\newcommand{\ABC}{\mathrm{ABC}}
+\newcommand{\BISH}{\mathrm{BISH}}
+\newcommand{\Lean}{\textsc{Lean~4}}
+\newcommand{\Mathlib}{\textsc{Mathlib4}}
+\newcommand{\leanok}{\textsf{\small \textcolor{green!70!black}{\checkmark}}}
+\newcommand{\leanpartial}{\textsf{\small \textcolor{orange!80!black}{(partial)}}}
+\newcommand{\Tr}{\mathrm{Tr}}
+\newcommand{\ket}[1]{|#1\rangle}
+\newcommand{\bra}[1]{\langle #1|}
+\newcommand{\ketbra}[2]{|#1\rangle\!\langle #2|}
+
+% ====================================================================
+% Title
+% ====================================================================
+\title{%
+  \textbf{The Measurement Problem as a Logical Artefact:}\\[6pt]
+  Constructive Calibration of Quantum Decoherence\\[6pt]
+  {\normalsize Paper~14 in the Constructive Reverse Mathematics Series}%
+}
+
+\author{
+  Paul Chun-Kit Lee\thanks{%
+    New York University.
+    AI-assisted formalization; see \S\ref{sec:ai} for methodology.
+    The author is a medical professional, not a domain expert in
+    constructive mathematics or quantum foundations; mathematical
+    content was developed with extensive AI assistance.} \\
+  New York University \\
+  \texttt{dr.paul.c.lee@gmail.com}
+}
+
+\date{February 2026}
+
+% ====================================================================
+\begin{document}
+\maketitle
+
+% ====================================================================
+\begin{abstract}
+We formalize in \Lean{} a decomposition of quantum decoherence
+into constructive content layers.
+%
+A single qubit coupled to $N$ environmental qubits via
+controlled-rotation unitaries $U(\theta)$ undergoes decoherence:
+the off-diagonal coherence $c(N) = \|\rho_0^{01}\| \cdot
+|\!\cos(\theta/2)|^N$ decays geometrically. For any
+$\varepsilon > 0$, there exists an explicitly computable $N_0$
+such that $c(N) < \varepsilon$ for all $N \geq N_0$.
+All of this is $\BISH$ (Height~0).
+%
+The abstract principle that \emph{every} bounded antitone
+decoherence process converges to a definite real
+limit---the completed-limit formulation of exact
+decoherence---is equivalent to the Limited Principle of
+Omniscience ($\LPO$), via the sign-flip equivalence
+$\ABC \leftrightarrow \BMC$ and the Bridges--V\^{\i}\c{t}\u{a}
+equivalence $\BMC \leftrightarrow \LPO$.
+%
+This is the third physical domain---after the 1D~Ising
+thermodynamic limit (Paper~8) and Schwarzschild geodesic
+incompleteness (Paper~13)---producing the same
+$\BMC \leftrightarrow \LPO$ pattern. Three independent
+physical theories, one logical structure.
+%
+The formalization comprises 805~lines across 9~modules with
+zero \texttt{sorry} statements. Two interface assumptions
+(\texttt{bmc\_of\_lpo} and \texttt{lpo\_of\_bmc}) are
+axiomatized with citation.
+The \texttt{Classical.choice} in the axiom profile arises from
+\Mathlib{} infrastructure; the constructive calibration is
+established by proof-content analysis (see \S\ref{sec:certification}
+and Paper~10).
+\end{abstract}
+
+\tableofcontents
+
+% ====================================================================
+\section{Introduction}\label{sec:intro}
+% ====================================================================
+
+\subsection{Physical Context}\label{sec:physical}
+
+The quantum measurement problem asks: what physical process
+causes a quantum superposition to become a definite classical
+outcome? The decoherence programme~\cite{Zeh70,Zurek91,Joos85,Schlosshauer07}
+provides a partial answer: interaction with the environment
+suppresses quantum coherence. A system initially in a
+superposition $\alpha\ket{0} + \beta\ket{1}$ evolves, through
+entanglement with environmental degrees of freedom, into a
+state whose reduced density matrix is approximately diagonal.
+The off-diagonal elements---the quantum coherence---decay
+exponentially with the number of environmental interactions.
+
+The decoherence programme does not solve the measurement
+problem in full. It explains the loss of interference but does
+not explain why one outcome rather than another is observed.
+Different interpretations (Copenhagen, many-worlds,
+decoherent histories) agree on the decoherence dynamics but
+disagree on what happens ``at the limit'': does the wave
+function actually collapse to a definite state, or do all
+branches persist?
+
+\subsection{The CRM Question}\label{sec:crm-question}
+
+From the standpoint of constructive reverse mathematics (CRM),
+the question becomes precise: what is the logical cost of
+asserting that decoherence reaches completion?
+
+The answer decomposes into two layers:
+\begin{itemize}
+  \item The \textbf{finite decoherence} content---the system is
+    $\varepsilon$-close to classical after an explicitly computable
+    number of interactions---is $\BISH$. No omniscience principle
+    is needed.
+  \item The \textbf{exact decoherence} assertion---every bounded
+    antitone decoherence process converges to a definite real
+    limit---is equivalent to $\LPO$.
+\end{itemize}
+
+This decomposition mirrors Paper~8's treatment of the 1D~Ising
+model~\cite{Lee26-P8}, where finite-size bounds are $\BISH$ but the
+thermodynamic limit costs $\LPO$, and Paper~13's treatment of
+Schwarzschild geodesic incompleteness~\cite{Lee26-P13}, where the
+specific cycloid reaches $r = 0$ constructively but the universal
+completeness principle costs $\LPO$.
+
+\subsection{Contributions}\label{sec:contributions}
+
+\begin{enumerate}
+  \item Machine-verified proof that the assertion ``every bounded
+    antitone sequence converges'' is equivalent to $\LPO$
+    (805~lines of \Lean{}, zero \texttt{sorry}).
+  \item Explicit $\BISH$ content: geometric decay formula
+    $c(N) = c_0 \cdot r^N$, constructive $\varepsilon$-bound,
+    trace preservation, verification of the decoherence map
+    against the physical definition---all Height~0.
+  \item The third domain-invariance result: quantum decoherence
+    joins statistical mechanics (Paper~8) and general relativity
+    (Paper~13) in exhibiting the same
+    $\BMC \leftrightarrow \LPO$ pattern.
+  \item The $\ABC \leftrightarrow \BMC$ equivalence (antitone
+    bounded convergence $\leftrightarrow$ monotone bounded
+    convergence) fully proved in \Lean{} via sign-flip, with
+    no custom axioms.
+\end{enumerate}
+
+\subsection{Related Work}\label{sec:related}
+
+Paper~8~\cite{Lee26-P8} proved that bounded monotone convergence,
+instantiated through the 1D~Ising free energy, is equivalent to
+$\LPO$. Paper~13~\cite{Lee26-P13} extended this to Schwarzschild
+interior geodesic incompleteness. The equivalence
+$\BMC \leftrightarrow \LPO$ is due to Bridges and
+V\^{\i}\c{t}\u{a}~\cite{BV06} (Theorem~2.1.5).
+Paper~11~\cite{Lee26-P11} formalized partial trace and
+entanglement at $\BISH$, providing infrastructure reused here.
+
+To our knowledge, no prior work applies constructive reverse
+mathematics to quantum decoherence or the measurement problem.
+
+
+% ====================================================================
+\section{Background}\label{sec:background}
+% ====================================================================
+
+\subsection{Constructive Reverse Mathematics}\label{sec:crm-bg}
+
+Constructive reverse mathematics (CRM) classifies mathematical
+theorems by the weakest omniscience principle needed to prove
+them~\cite{Bishop67,BV06,Ishihara06}. Bishop's constructive
+mathematics ($\BISH$) avoids all omniscience principles; every
+existential claim comes with a computable witness.
+
+The key principles for this paper are:
+\begin{itemize}
+  \item \textbf{LPO} (Limited Principle of Omniscience): For every
+    binary sequence $\alpha : \NN \to \{0,1\}$, either all terms
+    are zero or some term is one. Equivalent to: every bounded
+    monotone sequence of reals converges ($\BMC$).
+  \item \textbf{BMC} (Bounded Monotone Convergence): Every
+    monotone sequence bounded above has a limit. Equivalent to
+    $\LPO$ by~\cite{BV06}.
+  \item \textbf{ABC} (Antitone Bounded Convergence): Every antitone
+    (non-increasing) sequence bounded below has a limit. Equivalent
+    to $\BMC$ by sign-flip (proved in this paper).
+\end{itemize}
+
+\subsection{Quantum Decoherence}\label{sec:decoherence-bg}
+
+We model decoherence via the simplest non-trivial scenario: a
+single system qubit interacting with a single environment qubit.
+The system state is a $2 \times 2$ density matrix
+$\rho \in M_2(\CC)$. The environment starts in the ground state
+$\ket{0}$.
+
+The interaction is modeled by a controlled-rotation unitary
+$U(\theta) \in M_4(\CC)$:
+\begin{equation}\label{eq:unitary}
+  U(\theta) = \ketbra{0}{0} \otimes I
+  + \ketbra{1}{1} \otimes R_y(\theta),
+\end{equation}
+where $R_y(\theta)$ is the rotation matrix
+$\bigl[\begin{smallmatrix} \cos(\theta/2) & -\sin(\theta/2) \\
+\sin(\theta/2) & \cos(\theta/2) \end{smallmatrix}\bigr]$.
+If the system qubit is $\ket{0}$, the environment is unchanged;
+if the system qubit is $\ket{1}$, the environment rotates by
+$\theta$.
+
+The decoherence map is the composite operation: embed
+$\rho \mapsto \rho \otimes \ketbra{0}{0}$, conjugate by $U(\theta)$,
+and trace out the environment:
+\begin{equation}\label{eq:decoherence-map}
+  \Phi_\theta(\rho) = \Tr_E\bigl[
+    U(\theta) \cdot (\rho \otimes \ketbra{0}{0}) \cdot U(\theta)^\dagger
+  \bigr].
+\end{equation}
+The result is:
+\begin{equation}\label{eq:explicit}
+  \Phi_\theta(\rho)_{ij} = \begin{cases}
+    \rho_{00} & (i,j) = (0,0), \\
+    \rho_{01} \cdot \cos(\theta/2) & (i,j) = (0,1), \\
+    \rho_{10} \cdot \cos(\theta/2) & (i,j) = (1,0), \\
+    \rho_{11} & (i,j) = (1,1).
+  \end{cases}
+\end{equation}
+Diagonal entries are preserved; off-diagonal entries are
+multiplied by $\cos(\theta/2) \in (-1, 1)$.
+
+
+% ====================================================================
+\section{Finite Decoherence at BISH}\label{sec:bish}
+% ====================================================================
+
+\subsection{The Geometric Decay Formula}\label{sec:geometric}
+
+\begin{definition}[Coherence]\label{def:coherence} \leanok{}
+The \emph{coherence} after $N$ decoherence steps is
+\[
+  c(N) = \|(\Phi_\theta^{[N]}(\rho_0))_{01}\|,
+\]
+the norm of the $(0,1)$ entry of the $N$-fold iterated
+decoherence map applied to the initial state $\rho_0$.
+\end{definition}
+
+\begin{theorem}[Geometric decay]\label{thm:geometric} \leanok{}
+For any initial state $\rho_0$, interaction angle $\theta$,
+and step count $N$:
+\[
+  c(N) = \|\rho_0^{01}\| \cdot |\!\cos(\theta/2)|^N.
+\]
+\end{theorem}
+
+\begin{proof}
+By induction on $N$. The base case $N = 0$ is immediate:
+$c(0) = \|\rho_0^{01}\|$. For the inductive step, the
+$\texttt{decoherenceMap\_01}$ lemma gives
+$(\Phi_\theta(\sigma))_{01} = \sigma_{01} \cdot
+\cos(\theta/2)$ for any $\sigma$. Applying this at
+$\sigma = \Phi_\theta^{[n]}(\rho_0)$ and using the inductive
+hypothesis:
+\begin{align*}
+  (\Phi_\theta^{[n+1]}(\rho_0))_{01}
+  &= (\Phi_\theta^{[n]}(\rho_0))_{01} \cdot \cos(\theta/2) \\
+  &= \rho_0^{01} \cdot (\cos(\theta/2))^n \cdot \cos(\theta/2) \\
+  &= \rho_0^{01} \cdot (\cos(\theta/2))^{n+1}.
+\end{align*}
+Taking norms and using $\|a \cdot b\| = \|a\| \cdot |b|$ for
+$b \in \RR$ gives the result.
+\end{proof}
+
+\subsection{Monotonicity and Boundedness}\label{sec:monotone}
+
+\begin{theorem}[Coherence is antitone]\label{thm:antitone} \leanok{}
+If $|\!\cos(\theta/2)| \leq 1$, then $c$ is antitone
+(non-increasing): $m \leq n \implies c(n) \leq c(m)$.
+\end{theorem}
+
+\begin{proof}
+From $c(N) = c_0 \cdot r^N$ where $r = |\!\cos(\theta/2)|
+\in [0,1]$ and $c_0 = \|\rho_0^{01}\| \geq 0$. Since
+$r \leq 1$, the power $r^N$ is non-increasing:
+$r^{n+1} = r^n \cdot r \leq r^n$.
+\end{proof}
+
+\begin{theorem}[Coherence is non-negative]\label{thm:nonneg} \leanok{}
+$c(N) \geq 0$ for all $N$.
+\end{theorem}
+
+\begin{proof}
+$c(N) = \|\cdot\| \geq 0$ by the norm axiom.
+\end{proof}
+
+\subsection{The BISH $\varepsilon$-Bound}\label{sec:epsilon}
+
+\begin{theorem}[Constructive $\varepsilon$-approximation]
+\label{thm:epsilon} \leanok{}
+For any $\varepsilon > 0$, if $0 < \theta < \pi$ (so each
+interaction produces genuine decoherence) and
+$\|\rho_0^{01}\| > 0$ (the initial state has non-trivial
+coherence), then there exists an explicit $N_0$ such that
+$c(N) < \varepsilon$ for all $N \geq N_0$.
+\end{theorem}
+
+\begin{proof}
+Set $r = |\!\cos(\theta/2)|$. Since $0 < \theta < \pi$,
+the half-angle $\theta/2 \in (0, \pi/2)$ satisfies
+$0 < \cos(\theta/2) < 1$, so $0 \leq r < 1$.
+
+We need $c_0 \cdot r^N < \varepsilon$, i.e.,
+$r^N < \varepsilon / c_0$ where $c_0 = \|\rho_0^{01}\| > 0$.
+By the \Mathlib{} lemma \texttt{exists\_pow\_lt\_of\_lt\_one}
+(for $0 < \varepsilon/c_0$ and $r < 1$), there exists $N_0$
+with $r^{N_0} < \varepsilon / c_0$. For any $N \geq N_0$:
+\[
+  c(N) = c_0 \cdot r^N \leq c_0 \cdot r^{N_0}
+  < c_0 \cdot \frac{\varepsilon}{c_0} = \varepsilon.
+\]
+The witness $N_0$ is constructive: it depends only on
+$\theta$, $\varepsilon$, and $c_0$.
+\end{proof}
+
+\begin{remark}[BISH status]\label{rem:bish}
+All results in this section are $\BISH$ (Height~0). The
+geometric decay formula is explicit, the $\varepsilon$-bound
+provides a computable witness, and no omniscience principle is
+needed. In particular, \emph{finite decoherence is
+constructive}: a quantum system interacting with a finite
+environment becomes indistinguishable from a classical system
+(to any finite-precision observation) after a computable
+number of interactions. No infinite environment, no completed
+limit, no $\LPO$.
+\end{remark}
+
+\subsection{Verification of the Decoherence Map}\label{sec:verification}
+
+\begin{theorem}[Physical verification]\label{thm:physical} \leanok{}
+The explicit formula~\eqref{eq:explicit} equals the physical
+definition~\eqref{eq:decoherence-map}:
+\[
+  \Phi_\theta^{\mathrm{explicit}}(\rho)
+  = \Tr_E\bigl[U(\theta) \cdot (\rho \otimes \ketbra{0}{0})
+    \cdot U(\theta)^\dagger\bigr].
+\]
+\end{theorem}
+
+\begin{proof}
+Brute-force $4 \times 4$ matrix computation. The proof proceeds
+by \texttt{ext i j; fin\_cases i; fin\_cases j}, generating four
+goals (one per entry of the $2 \times 2$ output matrix). Each
+goal expands to a sum of products over $\mathrm{Fin}\;2 \times
+\mathrm{Fin}\;2$ indices. Three of four cases close by
+\texttt{ring}; the $(1,1)$ case requires the Pythagorean identity
+$\cos^2(\theta/2) + \sin^2(\theta/2) = 1$, which is
+$\BISH$-valid.
+\end{proof}
+
+This verification bridges the gap between the algebraic formula
+and the physical model: the explicit decoherence map is
+\emph{derived}, not assumed.
+
+
+% ====================================================================
+\section{Exact Decoherence and LPO}\label{sec:lpo}
+% ====================================================================
+
+\subsection{The Sign-Flip Equivalence}\label{sec:signflip}
+
+\begin{definition}[ABC]\label{def:abc} \leanok{}
+\emph{Antitone Bounded Convergence} ($\ABC$): every antitone
+sequence $f : \NN \to \RR$ bounded below converges to a
+definite limit.
+\end{definition}
+
+\begin{theorem}[$\ABC \leftrightarrow \BMC$]
+\label{thm:abc-bmc} \leanok{}
+Antitone bounded-below convergence is equivalent to monotone
+bounded-above convergence.
+\end{theorem}
+
+\begin{proof}
+\textbf{($\ABC \Rightarrow \BMC$):} Given a monotone sequence
+$a$ bounded above by $M$, define $g(n) = -a(n)$. Then $g$ is
+antitone and bounded below by $-M$. By $\ABC$, $g$ converges to
+some $L_{\mathrm{neg}}$. Then $a$ converges to $-L_{\mathrm{neg}}$.
+
+\smallskip\noindent
+\textbf{($\BMC \Rightarrow \ABC$):} Given an antitone sequence
+$f$ bounded below by $B$, define $g(n) = -f(n)$. Then $g$ is
+monotone and bounded above by $-B$. By $\BMC$, $g$ converges to
+some $L_{\mathrm{neg}}$. Then $f$ converges to $-L_{\mathrm{neg}}$.
+
+\smallskip\noindent
+Both directions use only the algebraic identity
+$|{-}x - L_{\mathrm{neg}}| = |x - ({-}L_{\mathrm{neg}})|$,
+which is $\BISH$.
+\end{proof}
+
+\begin{remark}
+The $\ABC \leftrightarrow \BMC$ equivalence is fully proved in
+\Lean{} with no custom axioms. The \texttt{\#print axioms}
+output for \texttt{abc\_iff\_bmc} shows only
+\texttt{[propext, Classical.choice, Quot.sound]}---standard
+\Mathlib{} infrastructure.
+\end{remark}
+
+\subsection{The Headline Theorem}\label{sec:headline}
+
+\begin{theorem}[Exact decoherence $\leftrightarrow$ LPO]
+\label{thm:main} \leanok{}
+\[
+  \bigl(\forall f : \NN \to \RR,\;
+  \text{Antitone}\;f \to
+  (\exists B,\;\forall n,\;B \leq f(n)) \to
+  \exists L,\;\forall \varepsilon > 0,\;
+  \exists N_0,\;\forall N \geq N_0,\;
+  |f(N) - L| < \varepsilon\bigr)
+  \;\;\longleftrightarrow\;\; \LPO.
+\]
+\end{theorem}
+
+\begin{proof}
+The left-hand side is definitionally equal to $\ABC$. By
+\Cref{thm:abc-bmc}, $\ABC \leftrightarrow \BMC$. By the
+Bridges--V\^{\i}\c{t}\u{a} equivalence~\cite{BV06},
+$\BMC \leftrightarrow \LPO$. Composing:
+$\ABC \leftrightarrow \BMC \leftrightarrow \LPO$.
+
+In \Lean{}: \texttt{abc\_iff\_bmc.trans lpo\_iff\_bmc.symm}.
+\end{proof}
+
+\subsection{The Coherence Instance}\label{sec:instance}
+
+\begin{theorem}[Coherence is an instance of ABC]
+\label{thm:instance} \leanok{}
+For any initial state $\rho_0$ and angle $\theta$ with
+$|\!\cos(\theta/2)| \leq 1$, the coherence sequence $c$ is
+antitone and bounded below by $0$.
+\end{theorem}
+
+\begin{proof}
+Antitonicity is \Cref{thm:antitone}; the lower bound is
+\Cref{thm:nonneg}.
+\end{proof}
+
+Therefore, asserting that the coherence converges \emph{exactly}
+to a definite limit---for all initial states and all angle
+sequences, including those with no computable decay rate---is
+equivalent to $\LPO$.
+
+
+% ====================================================================
+\section{The Measurement Problem Dissolves}\label{sec:dissolves}
+% ====================================================================
+
+The measurement problem asks whether the decoherence process
+reaches completion: does the off-diagonal coherence actually
+reach zero, or does it merely approach zero?
+
+Different interpretations answer differently:
+\begin{itemize}
+  \item \textbf{Copenhagen:} The wave function collapses upon
+    measurement. The limit is reached.
+  \item \textbf{Many-worlds:} All branches persist. The limit
+    is reached in each branch's reduced state.
+  \item \textbf{Decoherent histories:} Decoherence is
+    approximate. The limit is approached but never reached.
+\end{itemize}
+
+At $\BISH$, these three interpretations agree: the system is
+$\varepsilon$-close to diagonal for any desired $\varepsilon$,
+after a computable number of interactions (\Cref{thm:epsilon}).
+No experiment with finite precision can distinguish between
+``exactly diagonal'' and ``$\varepsilon$-close to diagonal.''
+
+The interpretations disagree only about the completed limit:
+does the coherence reach exactly zero? This is a question about
+bounded monotone convergence---specifically, about whether the
+assertion ``every bounded antitone sequence converges'' holds.
+That assertion is $\LPO$.
+
+The programme does not adjudicate between interpretations. It
+shows that the disagreement is about a mathematical assertion
+($\ABC$, equivalent to $\BMC$ and hence to $\LPO$) that no
+finite experiment can distinguish from its constructive
+approximation. The ``residual'' measurement problem---why one
+outcome rather than another, whether collapse ``really''
+happens---can only be formulated at the $\LPO$ level.
+
+We do not claim that decoherence solves the measurement
+problem. We claim that the residual problem has a precise
+logical cost: $\LPO$.
+
+
+% ====================================================================
+\section{Domain Invariance}\label{sec:invariance}
+% ====================================================================
+
+Paper~14 is the third physical domain producing the
+$\BMC \leftrightarrow \LPO$ pattern:
+
+\begin{center}
+\begin{tabular}{@{}p{2.8cm}p{3.8cm}p{4.2cm}@{}}
+\toprule
+\textbf{Domain} & \textbf{Bounded Monotone Sequence} &
+\textbf{LPO Content} \\
+\midrule
+Stat.\ Mech.\ (P8) & Free energy $f_N$ &
+  Thermodynamic limit exists \\
+Gen.\ Rel.\ (P13) & Radial coordinate $r(\tau)$ &
+  Geodesic incompleteness \\
+Quantum Meas.\ (P14) & Coherence $c(N)$ &
+  Decoherence completes (collapse) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+In each case:
+\begin{itemize}
+  \item The \emph{finite} physics is $\BISH$: finite-size
+    partition functions, the cycloid geodesic, finite-step
+    decoherence.
+  \item The \emph{infinite limit} assertion costs $\LPO$: the
+    thermodynamic limit, geodesic completeness, exact
+    decoherence.
+  \item The mechanism is identical: the physical quantity is a
+    bounded monotone sequence, and asserting its completed limit
+    is $\BMC$, which is $\LPO$.
+\end{itemize}
+
+The calibration table for the full series, updated with
+Paper~14:
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Physical layer} & \textbf{Principle} & \textbf{Status} &
+\textbf{Source} \\
+\midrule
+Finite-volume Gibbs states & $\BISH$ & Calibrated & Trivial \\
+Finite-size approximations (Ising) & $\BISH$ & Calibrated &
+  Paper~8 \\
+Schwarzschild exterior & $\BISH$ & Calibrated & Paper~1 \\
+Interior finite-time physics & $\BISH$ & Calibrated & Paper~13 \\
+Tsirelson bound (CHSH $\leq 2\sqrt{2}$) & $\BISH$ & Calibrated &
+  Paper~11 \\
+Bell state entropy ($\log 2$) & $\BISH$ & Calibrated &
+  Paper~11 \\
+Finite-step decoherence & $\BISH$ & Calibrated & Paper~14 \\
+Bidual-gap witness ($S_1(H)$) & $\equiv \WLPO$ & Calibrated &
+  Papers~2, 7 \\
+Thermodynamic limit (Ising) & $\equiv \LPO$ & Calibrated &
+  Paper~8 \\
+Geodesic incompleteness & $\equiv \LPO$ & Calibrated &
+  Paper~13 \\
+Exact decoherence (collapse) & $\equiv \LPO$ & Calibrated &
+  Paper~14 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The pattern is consistent: all $\LPO$ costs arise from completed
+infinite limits; all finite-time and finite-size physics is $\BISH$.
+
+
+% ====================================================================
+\section{Lean Formalization}\label{sec:lean}
+% ====================================================================
+
+\subsection{Architecture}\label{sec:architecture}
+
+The formalization is organized as a single \Lean{} project with
+9~modules:
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{Module} & \textbf{Lines} & \textbf{Content} \\
+\midrule
+\texttt{Defs.lean}              & 105 & Core definitions:
+  decoherence map, coherence, partial trace \\
+\texttt{PartialTrace.lean}      &  37 & Partial trace lemmas
+  (re-stated from Paper~11) \\
+\texttt{DecoherenceMap.lean}    & 105 & Entry lemmas,
+  trace preservation, physical verification \\
+\texttt{FiniteDecoherence.lean} &  85 & $N$-step iteration,
+  geometric decay formula \\
+\texttt{MonotoneDecay.lean}     &  54 & Antitonicity,
+  non-negativity, initial bound \\
+\texttt{CauchyModulus.lean}     & 101 & BISH $\varepsilon$-bound
+  (headline constructive result) \\
+\texttt{LPO\_BMC.lean}          &  62 & LPO, BMC definitions +
+  axiomatized equivalence \\
+\texttt{ExactDecoherence.lean}  & 161 & ABC $\leftrightarrow$ BMC
+  (proved), headline LPO theorem \\
+\texttt{Main.lean}              &  95 & Assembly +
+  \texttt{\#print axioms} audit \\
+\midrule
+\textbf{Total}                  & \textbf{805} & \\
+\bottomrule
+\end{tabular}
+\caption{Module structure of Paper~14.}
+\label{tab:modules}
+\end{table}
+
+\subsection{Key Design Decisions}\label{sec:design}
+
+\paragraph{Explicit formula first.}
+The decoherence map is defined directly via the explicit
+formula~\eqref{eq:explicit} rather than through the
+Kronecker product--conjugation--partial trace chain. A
+separate verification theorem (\texttt{decoherenceMap\_eq\_physical})
+connects it to the physical definition~\eqref{eq:decoherence-map}.
+This avoids the high risk of Kronecker product unfolding while
+preserving the physical connection.
+
+\paragraph{Standalone package.}
+Paper~14 is a self-contained Lake package. It cannot import
+Paper~8 or Paper~11 as Lake dependencies, so LPO, BMC, and the
+partial trace are re-defined. The BMC $\leftrightarrow$ LPO
+equivalence is axiomatized with citation.
+
+\paragraph{Abstract equivalence for the reverse direction.}
+The LPO content arises from the abstract equivalence
+$\ABC \leftrightarrow \BMC$, not from encoding binary sequences
+into physical quantities. The coherence sequence is an
+\emph{instance} of the abstract framework; the logical
+structure provides the equivalence.
+
+\subsection{Core Definitions}\label{sec:core-defs}
+
+\begin{lstlisting}[caption={Decoherence map (Defs.lean, excerpt).}]
+/-- The single-step decoherence map on 2x2 density matrices. -/
+def decoherenceMap (t : Real) (r : Matrix (Fin 2) (Fin 2) C) :
+    Matrix (Fin 2) (Fin 2) C :=
+  fun i j =>
+    match i, j with
+    | 0, 0 => r 0 0
+    | 0, 1 => r 0 1 * (Real.cos (t / 2))
+    | 1, 0 => r 1 0 * (Real.cos (t / 2))
+    | 1, 1 => r 1 1
+
+/-- Coherence after N decoherence steps. -/
+def coherence (r0 : Matrix (Fin 2) (Fin 2) C) (t : Real)
+    (N : Nat) : Real :=
+  ||(decoherenceMap t ^[N] r0) 0 1||
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Controlled-rotation unitary (Defs.lean, excerpt).}]
+/-- The controlled-rotation unitary on C2 x C2. -/
+def controlledRotation (t : Real) :
+    Matrix (Fin 2 * Fin 2) (Fin 2 * Fin 2) C :=
+  fun i j =>
+    if i = (0, 0) && j = (0, 0) then 1
+    else if i = (0, 1) && j = (0, 1) then 1
+    else if i = (1, 0) && j = (1, 0) then (Real.cos (t/2))
+    else if i = (1, 0) && j = (1, 1) then (-Real.sin (t/2))
+    else if i = (1, 1) && j = (1, 0) then (Real.sin (t/2))
+    else if i = (1, 1) && j = (1, 1) then (Real.cos (t/2))
+    else 0
+\end{lstlisting}
+
+\begin{lstlisting}[caption={LPO, BMC, and ABC (LPO\_BMC.lean and ExactDecoherence.lean).}]
+def LPO : Prop :=
+  forall (a : Nat -> Bool),
+    (forall n, a n = false) ||| (exists n, a n = true)
+
+def BMC : Prop :=
+  forall (a : Nat -> Real) (M : Real),
+    Monotone a -> (forall n, a n <= M) ->
+    exists L : Real, forall e : Real, 0 < e ->
+      exists N0 : Nat, forall N : Nat,
+        N0 <= N -> |a N - L| < e
+
+axiom bmc_of_lpo : LPO -> BMC
+axiom lpo_of_bmc : BMC -> LPO
+
+def ABC : Prop :=
+  forall (f : Nat -> Real), Antitone f ->
+    (exists B : Real, forall n, B <= f n) ->
+    exists L : Real, forall e : Real, 0 < e ->
+      exists N0 : Nat, forall N : Nat,
+        N0 <= N -> |f N - L| < e
+\end{lstlisting}
+
+\subsection{Main Theorems}\label{sec:main-thms}
+
+\begin{lstlisting}[caption={Geometric decay formula (FiniteDecoherence.lean).}]
+theorem coherence_eq_geometric (r0 : Matrix (Fin 2) (Fin 2) C)
+    (t : Real) (N : Nat) :
+    coherence r0 t N = ||r0 0 1|| * |Real.cos (t / 2)| ^ N := by
+  simp only [coherence, decoherence_iterate_offdiag]
+  rw [norm_mul, norm_pow, Complex.norm_real, Real.norm_eq_abs]
+\end{lstlisting}
+
+\begin{lstlisting}[caption={BISH $\varepsilon$-bound (CauchyModulus.lean).}]
+theorem decoherence_epsilon_bound (r0 : Matrix (Fin 2) (Fin 2) C)
+    (t : Real) (ht : 0 < t && t < pi) (hc : 0 < ||r0 0 1||)
+    (e : Real) (he : e > 0) :
+    exists N0 : Nat, forall N, N0 <= N ->
+      coherence r0 t N < e := by
+  set r := |Real.cos (t / 2)| with hr_def
+  have hr_lt_one : r < 1 := abs_cos_half_lt_one ht
+  set c0 := ||r0 0 1|| with hc0_def
+  obtain <<N0, hN0>> :=
+    exists_pow_lt_of_lt_one (div_pos he hc) hr_lt_one
+  exact <<N0, fun N hN => by
+    rw [coherence_eq_geometric]
+    calc c0 * r ^ N
+        <= c0 * r ^ N0 := by
+          apply mul_le_mul_of_nonneg_left _ (le_of_lt hc)
+          exact pow_le_pow_of_le_one (abs_nonneg _)
+            (le_of_lt hr_lt_one) hN
+      _ < c0 * (e / c0) := by
+          apply mul_lt_mul_of_pos_left hN0 hc
+      _ = e := by field_simp>>
+\end{lstlisting}
+
+\begin{lstlisting}[caption={ABC $\leftrightarrow$ BMC (ExactDecoherence.lean, BMC direction).}]
+-- BMC -> ABC (the reverse direction)
+intro hBMC f hf hB
+obtain <<B, hB>> := hB
+-- -f is monotone and bounded above by -B
+have h_mono : Monotone (fun n => -f n) :=
+  fun m n hmn => neg_le_neg (hf hmn)
+have h_bdd : forall n, (fun n => -f n) n <= -B :=
+  fun n => neg_le_neg (hB n)
+obtain <<L_neg, hL>> :=
+  hBMC (fun n => -f n) (-B) h_mono h_bdd
+exact <<-L_neg, fun e he => by
+  obtain <<N0, hN0>> := hL e he
+  exact <<N0, fun N hN => by
+    have := hN0 N hN
+    rwa [show -f N - L_neg = -(f N - (-L_neg))
+      from by ring, abs_neg] at this>>>>
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Headline theorem (ExactDecoherence.lean).}]
+theorem exact_decoherence_iff_LPO :
+    (forall (f : Nat -> Real), Antitone f ->
+      (exists B : Real, forall n, B <= f n) ->
+      exists L : Real, forall e : Real, 0 < e ->
+        exists N0 : Nat, forall N : Nat,
+          N0 <= N -> |f N - L| < e)
+    <-> LPO := by
+  rw [show (...) = ABC from rfl]
+  exact abc_iff_bmc.trans lpo_iff_bmc.symm
+\end{lstlisting}
+
+\subsection{Axiom Audit}\label{sec:axioms}
+
+The \texttt{Main.lean} module audits the axiom profile of each
+theorem:
+
+\begin{lstlisting}[caption={Axiom audit (Main.lean, selected).}]
+#print axioms coherence_eq_geometric
+-- [propext, Classical.choice, Quot.sound]
+
+#print axioms decoherence_epsilon_bound
+-- [propext, Classical.choice, Quot.sound]
+
+#print axioms abc_iff_bmc
+-- [propext, Classical.choice, Quot.sound]
+
+#print axioms exact_decoherence_iff_LPO
+-- [propext, Classical.choice, Quot.sound,
+--  bmc_of_lpo, lpo_of_bmc]
+\end{lstlisting}
+
+\noindent
+The \texttt{Classical.choice} appearing in the $\BISH$ results
+arises from \Mathlib{}'s real number and complex number
+infrastructure---specifically, the constructions of $\RR$ and
+$\CC$ via Cauchy completion, which pervasively use
+\texttt{Classical.choice} as a metatheoretic convenience. The
+mathematical content of these proofs is constructive: they
+involve only explicit trigonometric computation and induction.
+The constructive calibration is established by proof-content
+analysis, following the methodology described in Paper~10.
+
+
+% ====================================================================
+\section{Certification Methodology}\label{sec:certification}
+% ====================================================================
+
+\subsection{Axiom Profile}\label{sec:axiom-profile}
+
+All theorems carry \texttt{[propext, Classical.choice, Quot.sound]}
+from \Mathlib{}, plus \texttt{bmc\_of\_lpo} and
+\texttt{lpo\_of\_bmc} for the LPO equivalence. The $\BISH$
+results have \texttt{Classical.choice} from \Mathlib{}
+infrastructure only.
+
+Notably, \texttt{abc\_iff\_bmc} has \emph{no custom axioms}---the
+sign-flip equivalence is fully proved.
+
+\subsection{Certification Level}\label{sec:cert-level}
+
+Paper~14 contains two certification levels (Paper~10 terminology):
+\begin{itemize}
+  \item \textbf{Level~0 ($\BISH$):} Geometric decay formula,
+    $\varepsilon$-bound, trace preservation, physical
+    verification. Finite-dimensional explicit computation.
+  \item \textbf{Level~1 (intentional classical):} The LPO
+    equivalence via $\ABC \leftrightarrow \BMC \leftrightarrow
+    \LPO$. The two axiomatized lemmas are the sole classical
+    content.
+\end{itemize}
+
+\subsection{The Axiomatized Equivalences}\label{sec:axiom-discussion}
+
+Two axioms are used:
+\begin{itemize}
+  \item \texttt{bmc\_of\_lpo}: $\LPO \Rightarrow \BMC$.
+    From Bridges--V\^{\i}\c{t}\u{a}~\cite{BV06}, Theorem~2.1.5.
+  \item \texttt{lpo\_of\_bmc}: $\BMC \Rightarrow \LPO$.
+    Fully verified in Paper~8~\cite{Lee26-P8} via encoding into
+    the 1D~Ising free energy sequence.
+\end{itemize}
+These are the same interface assumptions used in Paper~13. They
+are conservative: they introduce no new logical content beyond
+what $\LPO$ already provides.
+
+\subsection{Methodological Limitations}\label{sec:limitations}
+
+\begin{enumerate}
+  \item \textbf{Classical.choice is a Mathlib infrastructure
+    artifact.} The proof-content analysis methodology for
+    handling this is described in Paper~10~\cite{Lee26-P10}.
+
+  \item \textbf{Single-qubit model.} We formalize the simplest
+    decoherence scenario: one system qubit interacting with
+    single environmental qubits. Extension to multi-qubit
+    systems or continuous environments would require additional
+    infrastructure.
+
+  \item \textbf{The LPO cost is on the universal principle, not
+    any specific process.} The uniform-angle decoherence
+    $c(N) = c_0 \cdot r^N$ converges constructively
+    (\Cref{thm:epsilon}). The $\LPO$ cost attaches to the
+    assertion that \emph{every} bounded antitone sequence
+    converges.
+
+  \item \textbf{The formalization abstracts from the full
+    quantum formalism.} We do not formalize Hilbert spaces,
+    operator algebras, or CPTP maps in full generality. The
+    decoherence map is defined via explicit $2 \times 2$ matrix
+    formulae, verified against the physical definition by brute
+    force.
+\end{enumerate}
+
+
+% ====================================================================
+\section{AI-Assisted Methodology}\label{sec:ai}
+% ====================================================================
+
+This formalization was developed using \textbf{Claude Opus~4.6}
+(Anthropic, 2026) via the \textbf{Claude Code} command-line
+interface, following the same human--AI workflow as Papers~2, 7,
+8, 11, and~13~\cite{Lee26-P2,Lee26-P7,Lee26-P8,Lee26-P11,Lee26-P13,Anthropic2026}.
+
+The author is a medical professional, not a domain expert in
+constructive mathematics or quantum foundations. The mathematical
+content of this paper was developed with extensive AI assistance.
+The human author specified the research direction and high-level
+goals, reviewed all mathematical claims for plausibility, and
+directed the formalization strategy. Claude Opus~4.6 explored the
+\Mathlib{} codebase, generated \Lean{} proof terms, handled
+debugging, and assisted with paper writing. Final verification
+was by \texttt{lake build} (0~errors, 0~warnings, 0~sorries).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Task} & \textbf{Human} & \textbf{AI (Claude Opus 4.6)} \\
+\midrule
+Research direction       & \checkmark & \\
+Mathematical blueprint   & \checkmark & \checkmark \\
+Proof strategy design    & \checkmark & \checkmark \\
+\Mathlib{} API discovery & & \checkmark \\
+\Lean{} proof generation & & \checkmark \\
+Proof review             & \checkmark & \\
+Build verification       & & \checkmark \\
+Paper writing            & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\caption{Division of labor between human and AI.}
+\label{tab:division}
+\end{table}
+
+
+% ====================================================================
+\section*{Reproducibility}
+% ====================================================================
+
+\begin{mdframed}[backgroundcolor=gray!10]
+\textbf{Reproducibility Box}
+\begin{itemize}
+\item \textbf{Repository}:
+  \url{https://github.com/AICardiologist/FoundationRelativity}
+\item \textbf{Path}: \texttt{Papers/P14\_Decoherence/}
+\item \textbf{Build}: \texttt{lake exe cache get \&\& lake build}
+  (1{,}950 jobs, 0~errors, 0~sorry)
+\item \textbf{Lean toolchain}:
+  \texttt{leanprover/lean4:v4.28.0-rc1}
+\item \textbf{Mathlib version}: commit \texttt{7091f0f6}
+\item \textbf{Interface axioms}: \texttt{bmc\_of\_lpo}
+  (Bridges--V\^{\i}\c{t}\u{a}~\cite{BV06}),
+  \texttt{lpo\_of\_bmc} (Paper~8~\cite{Lee26-P8})
+\item \textbf{Axiom audit}: \texttt{Main.lean}
+\item \textbf{Axiom profile (main theorem)}:
+  \texttt{[propext, Classical.choice, Quot.sound,
+  bmc\_of\_lpo, lpo\_of\_bmc]}
+\item \textbf{Axiom profile (BISH content)}:
+  \texttt{[propext, Classical.choice, Quot.sound]}
+  (Mathlib infra only)
+\item \textbf{Axiom profile (abc\_iff\_bmc)}:
+  \texttt{[propext, Classical.choice, Quot.sound]}
+  (no custom axioms)
+\item \textbf{Total}: 9~files, 805~lines, 0~sorry
+\item \textbf{Zenodo DOI}: \href{https://doi.org/10.5281/zenodo.18569068}{10.5281/zenodo.18569068}
+\end{itemize}
+\end{mdframed}
+
+
+% ====================================================================
+\section*{Acknowledgments}
+% ====================================================================
+
+The \Lean{} formalization was developed using Claude Opus~4.6
+(Anthropic, 2026) via the Claude Code CLI tool. We thank the
+\Mathlib{} community for maintaining the comprehensive library
+of formalized mathematics that made this work possible.
+
+
+% ====================================================================
+% Bibliography
+% ====================================================================
+\bibliographystyle{plainnat}
+
+\begin{thebibliography}{30}
+
+\bibitem[Anthropic(2026)]{Anthropic2026}
+Anthropic.
+\newblock Claude {Opus}~4.6 and {Claude Code} {CLI}.
+\newblock \url{https://www.anthropic.com/claude}, 2026.
+
+\bibitem[Bishop(1967)]{Bishop67}
+E.~Bishop.
+\newblock \emph{Foundations of Constructive Analysis}.
+\newblock McGraw-Hill, New York, 1967.
+
+\bibitem[Bridges and V{\^\i}{\c{t}}{\u{a}}(2006)]{BV06}
+D.~S.~Bridges and L.~S.~V{\^\i}{\c{t}}{\u{a}}.
+\newblock \emph{Techniques of Constructive Analysis}.
+\newblock Universitext. Springer, New York, 2006.
+
+\bibitem[{de Moura} et~al.(2021)]{deMoura2021}
+L.~{de Moura}, S.~Kong, J.~Avigad, F.~{van Doorn}, and M.~{von Raumer}.
+\newblock The {Lean} theorem prover (system description).
+\newblock In \emph{CADE-25}, LNAI 9195, pages 378--388. Springer, 2015.
+\newblock Lean~4: \url{https://lean-lang.org/}, 2021--present.
+
+\bibitem[Ishihara(2006)]{Ishihara06}
+H.~Ishihara.
+\newblock Reverse mathematics in {Bishop}'s constructive mathematics.
+\newblock \emph{Philosophia Scientiae}, Cahier sp\'ecial 6:43--59, 2006.
+
+\bibitem[Joos and Zeh(1985)]{Joos85}
+E.~Joos and H.~D.~Zeh.
+\newblock The emergence of classical properties through interaction with
+  the environment.
+\newblock \emph{Zeitschrift f\"ur Physik B}, 59:223--243, 1985.
+
+\bibitem[Lee(2026a)]{Lee26-P1}
+P.~C.-K.~Lee.
+\newblock Schwarzschild exterior curvature verification in {Lean}~4.
+\newblock Preprint, 2026. Paper~1 in the constructive reverse
+  mathematics series.
+
+\bibitem[Lee(2026b)]{Lee26-P2}
+P.~C.-K.~Lee.
+\newblock {WLPO} equivalence of the bidual gap in $\ell^1$: a {Lean}~4
+  formalization.
+\newblock Preprint, 2026. Paper~2 in the constructive reverse
+  mathematics series.
+
+\bibitem[Lee(2026c)]{Lee26-P7}
+P.~C.-K.~Lee.
+\newblock Non-reflexivity of $S_1(H)$ implies {WLPO}: a {Lean}~4
+  formalization.
+\newblock Preprint, 2026. Paper~7 in the constructive reverse
+  mathematics series.
+
+\bibitem[Lee(2026d)]{Lee26-P8}
+P.~C.-K.~Lee.
+\newblock The logical cost of the thermodynamic limit: {LPO}-equivalence
+  and {BISH}-dispensability for the {1D} {Ising} free energy.
+\newblock Preprint, 2026. Paper~8 in the constructive reverse
+  mathematics series.
+
+\bibitem[Lee(2026e)]{Lee26-P10}
+P.~C.-K.~Lee.
+\newblock The logical geography of mathematical physics: constructive
+  calibration from density matrices to the event horizon.
+\newblock Preprint, 2026. Zenodo DOI: 10.5281/zenodo.18527877.
+  Paper~10 in the constructive reverse mathematics series.
+
+\bibitem[Lee(2026f)]{Lee26-P11}
+P.~C.-K.~Lee.
+\newblock Constructive entanglement: {CHSH}, {Tsirelson} bound, and {Bell}
+  state entropy at {BISH}.
+\newblock Preprint, 2026. Zenodo DOI: 10.5281/zenodo.18527676.
+  Paper~11 in the constructive reverse mathematics series.
+
+\bibitem[Lee(2026g)]{Lee26-P12}
+P.~C.-K.~Lee.
+\newblock The map and the territory: a constructive history of mathematical
+  physics.
+\newblock Preprint, 2026. Zenodo DOI: 10.5281/zenodo.18529007.
+  Paper~12 in the constructive reverse mathematics series.
+
+\bibitem[Lee(2026h)]{Lee26-P13}
+P.~C.-K.~Lee.
+\newblock The event horizon as a logical boundary: {Schwarzschild} interior
+  geodesic incompleteness and {LPO} in {Lean}~4.
+\newblock Preprint, 2026. Zenodo DOI: 10.5281/zenodo.18529007.
+  Paper~13 in the constructive reverse mathematics series.
+
+\bibitem[{Mathlib Community}(2020--)]{Mathlib2020}
+{Mathlib Community}.
+\newblock \emph{Mathlib}: the math library for {Lean}.
+\newblock \url{https://leanprover-community.github.io/mathlib4_docs/},
+  2020--present.
+
+\bibitem[Schlosshauer(2007)]{Schlosshauer07}
+M.~Schlosshauer.
+\newblock \emph{Decoherence and the Quantum-to-Classical Transition}.
+\newblock Springer, Berlin, 2007.
+
+\bibitem[Zeh(1970)]{Zeh70}
+H.~D.~Zeh.
+\newblock On the interpretation of measurement in quantum theory.
+\newblock \emph{Foundations of Physics}, 1(1):69--76, 1970.
+
+\bibitem[Zurek(1991)]{Zurek91}
+W.~H.~Zurek.
+\newblock Decoherence and the transition from quantum to classical.
+\newblock \emph{Physics Today}, 44(10):36--44, 1991.
+
+\end{thebibliography}
+
+\end{document}

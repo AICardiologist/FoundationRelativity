@@ -777,7 +777,7 @@ lemma wlpo_implies_gap : WLPO → BidualGapStrong.{0} := by
     c0_not_reflexive_via_direct
   use c₀
   exact ⟨inferInstance, inferInstance, inferInstance,
-         dual_is_banach_c0_from_WLPO_struct hWLPO,
+         dual_is_banach_c0_from_WLPO hWLPO,
          dual_is_banach_c0_dual_from_WLPO hWLPO,
          gap_c0⟩
 \end{lstlisting}

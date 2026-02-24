@@ -1,0 +1,94 @@
+ZENODO UPLOAD METADATA -- Paper 43
+====================================
+
+TITLE:
+What the Ceiling Means: Constructive Schools, Physical Actualisation, and the Fine Structure of BISH+LPO (Paper 43, Constructive Reverse Mathematics Series)
+
+DOI:
+10.5281/zenodo.18665418
+
+AUTHORS:
+Paul Chun-Kit Lee (dr.paul.c.lee@gmail.com)
+
+DESCRIPTION:
+Paper 43 in the Constructive Reverse Mathematics (CRM) of Mathematical Physics series. This paper interprets the BISH+LPO ceiling established in Paper 40 through the lens of three constructive schools --- Bishop, Brouwer, and Markov --- identifying exactly where they disagree about physics.
+
+The constructive mathematics community contains three schools that disagree about which principles beyond BISH are legitimate. Bishop's BISH (1967) maintains deliberate neutrality, accepting only constructive methods. Brouwer's intuitionism rejects LPO, MP, and all omniscience principles, while accepting the Fan Theorem and bar induction. Markov's Russian constructivism (1954) accepts MP and Church's Thesis but rejects LPO.
+
+The programme's calibration table, read through these three schools, localizes their disagreement to a single principle: Markov's Principle (MP). MP is the unique principle where the three schools have three distinct positions --- acceptance (Markov), rejection (Brouwer), and deliberate silence (Bishop).
+
+Key results:
+
+1. LPO strictly implies MP (five-line proof, pure logic). The BISH+LPO ceiling already contains MP. No new tier is needed. This corrects a framing in Paper 22.
+
+2. The mathematical content of radioactive decay is BISH. The detection time t0 = (log(1/eps) + 1)/lambda is a computable witness requiring no omniscience principle. Every computable quantity in exponential decay --- survival probability, detection time, moments --- is BISH.
+
+3. Physical actualisation --- the step from "probability of non-occurrence is zero" to "the event actually occurs" --- requires Cournot's Principle (a physical postulate, not a theorem) plus MP. The three-step chain: BISH computation -> Cournot exclusion -> MP witness extraction.
+
+4. The same actualisation chain governs radioactive decay, Poincare recurrence, and false vacuum decay. Three physically distinct systems, one logical mechanism, identical axiom cost.
+
+5. Three defensible readings of the calibration table: strict Bishopian (BISH alone), standard (BISH+LPO, Paper 40's position), inclusive (BISH+LPO+MP = BISH+LPO since LPO implies MP). The programme does not choose between readings --- it provides the measurements that make the choice precise.
+
+Main formalized results:
+- lpo_implies_mp: LPO strictly implies MP (pure logic, propext only)
+- detection_time_bish: Detection time is BISH-computable (Mathlib infrastructure only)
+- poincare_nonreturn_measure_zero: Non-return set has measure zero (BISH)
+- not_eternal_survival: Cournot applied to eternal survival set
+- atom_decays_mp: Three-step actualisation chain for radioactive decay (Cournot + MP)
+- orbit_returns_mp: Poincare recurrence actualisation (Cournot + MP)
+- vacuum_decays_mp: False vacuum decay (reuses atom_decays_mp)
+- fine_structure: Assembly theorem (hierarchy + BISH content)
+- lpo_subsidizes_actualisation: LPO -> MP (re-export)
+
+Axiom profile: 2 custom axioms (cournot = physical postulate; survival_prob_zero = model bridge) + 3 Lean infrastructure (propext, Classical.choice, Quot.sound). MarkovPrinciple appears as a hypothesis in theorem statements, not as an axiom. Zero sorry. Zero warnings.
+
+Technical details:
+- Lean 4: leanprover/lean4:v4.28.0
+- Mathlib4 (pinned via lake-manifest.json)
+- Build: cd P43_Actualisation && lake exe cache get && lake build
+- Status: 0 errors, 0 warnings, 0 sorry
+- Size: 12 modules, ~770 lines
+
+KEYWORDS:
+Markov's Principle
+constructive schools
+Bishop
+Brouwer
+Markov
+physical actualisation
+Cournot's Principle
+radioactive decay
+Poincare recurrence
+false vacuum decay
+omniscience principles
+LPO
+WLPO
+LLPO
+BISH
+constructive reverse mathematics
+Lean 4
+Mathlib
+formal verification
+constructive mathematics
+mathematical physics
+measure theory
+exponential decay
+stochastic actualisation
+algorithmic randomness
+
+COPYRIGHT STATEMENT:
+Copyright 2026 Paul Chun-Kit Lee. Code licensed under Apache License 2.0. Paper licensed under Creative Commons Attribution 4.0 International (CC-BY 4.0).
+
+RESOURCE TYPE:
+Software / Dataset
+
+VERSION:
+v1.0
+
+RELATED IDENTIFIERS:
+Paper 22 (Markov Decay): (predecessor, corrected framing)
+Paper 23 (Fan Theorem): (Fan Theorem independence from LPO/MP)
+Paper 29 (Fekete equiv LPO): https://doi.org/10.5281/zenodo.18632776
+Paper 40 (Defending BISH+LPO): https://doi.org/10.5281/zenodo.18654773
+Paper 41 (AdS/CFT): https://doi.org/10.5281/zenodo.18654780
+Paper 42 (Cosmological Constant): https://doi.org/10.5281/zenodo.18654789

@@ -1,0 +1,14 @@
+ZENODO UPLOAD METADATA -- Paper 34
+====================================
+
+TITLE:
+Scattering Amplitudes Are Constructively Computable: Bhabha Scattering, Feynman Integrals, and the Fixed-Order Cross Section in BISH (Paper 34, Constructive Reverse Mathematics Series)
+
+DESCRIPTION:
+Paper 34 in the Constructive Reverse Mathematics of Mathematical Physics series. This paper proves that fixed-order scattering cross sections --- the quantities directly measured at particle collider experiments --- are fully BISH-computable (constructive, no omniscience). A six-tier stratification classifies every operation in a standard QED calculation: tree-level amplitudes (BISH), dilogarithm and special functions (BISH), dimensional regularization with MS-bar subtraction (BISH), Bloch-Nordsieck infrared cancellation (BISH), the inclusive fixed-order cross section (BISH, the main result), and all-orders perturbative summation (LPO via bounded monotone convergence). The result implies that every number a collider experiment actually reports lives in BISH --- the classical-logic cost of particle physics is entirely an artifact of attempting to sum an infinite perturbative series, not of computing any individual prediction. All results formalized in Lean 4 over Mathlib with zero sorry. The formalization comprises 8 Lean source files.
+
+KEYWORDS:
+scattering amplitudes, quantum electrodynamics, QED, Bhabha scattering, Feynman integrals, tree-level amplitudes, one-loop integrals, dilogarithm, dimensional regularization, Bloch-Nordsieck cancellation, infrared divergence, constructive reverse mathematics, BISH, LPO, Lean 4, Mathlib, formal verification, collider physics, cross section
+
+COPYRIGHT STATEMENT:
+Copyright 2026 Paul Chun-Kit Lee. Code licensed under Apache License 2.0. Paper licensed under Creative Commons Attribution 4.0 International (CC-BY 4.0).

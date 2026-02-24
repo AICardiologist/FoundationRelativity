@@ -1,0 +1,39 @@
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}From a Linear Chain to a Partial Order}{2}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}The Physical Insight}{2}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Main Results}{3}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}What Makes This Paper Different}{3}{subsection.1.4}%
+\contentsline {section}{\numberline {2}Background}{4}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Exponential Decay}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Markov's Principle}{4}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}The CRM Hierarchy}{4}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}The CRM Diagnostic}{5}{subsection.2.4}%
+\contentsline {section}{\numberline {3}Part~A: Detection with Known Bounds Is BISH}{5}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Physical Setup}{5}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Detection Time Is Positive}{6}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Detection Time Works}{6}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Detection with a Known Witness}{7}{subsection.3.4}%
+\contentsline {section}{\numberline {4}Part~B: The MP Calibration}{7}{section.4}%
+\contentsline {subsection}{\numberline {4.1}The Encoded Rate}{7}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Forward: MP $\Rightarrow $ EventualDecay}{9}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Backward: EventualDecay $\Rightarrow $ MP (Novel)}{9}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}The Equivalence}{11}{subsection.4.4}%
+\contentsline {section}{\numberline {5}The Stratification Theorem}{11}{section.5}%
+\contentsline {section}{\numberline {6}Updated Calibration Table}{13}{section.6}%
+\contentsline {section}{\numberline {7}Lean~4 Formalization}{13}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Module Structure}{13}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Design Decisions}{14}{subsection.7.2}%
+\contentsline {paragraph}{Single interface axiom.}{14}{section*.2}%
+\contentsline {paragraph}{Non-negative form of MP for reals.}{14}{section*.3}%
+\contentsline {paragraph}{Bool-valued sequences.}{14}{section*.4}%
+\contentsline {paragraph}{EventualDecay stated inline in the backward direction.}{14}{section*.5}%
+\contentsline {paragraph}{Self-contained bundle.}{14}{section*.6}%
+\contentsline {subsection}{\numberline {7.3}Axiom Audit}{15}{subsection.7.3}%
+\contentsline {subsection}{\numberline {7.4}CRM Compliance Protocol}{15}{subsection.7.4}%
+\contentsline {section}{\numberline {8}Discussion}{16}{section.8}%
+\contentsline {subsection}{\numberline {8.1}The Partial Order Structure}{16}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Proton Decay and the Physics of MP}{16}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}Observable-Dependent Cost}{16}{subsection.8.3}%
+\contentsline {subsection}{\numberline {8.4}MP as the ``Eventually Observe'' Principle}{17}{subsection.8.4}%
+\contentsline {subsection}{\numberline {8.5}Limitations}{17}{subsection.8.5}%
+\contentsline {section}{\numberline {9}Conclusion}{17}{section.9}%

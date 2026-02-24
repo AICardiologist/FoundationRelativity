@@ -1,0 +1,113 @@
+ZENODO UPLOAD METADATA -- Paper 29
+==================================
+
+TITLE
+-----
+Fekete's Subadditive Lemma is Equivalent to LPO: A Lean 4 Formalization (Paper 29, CRM Series)
+
+
+AUTHORS
+-------
+Paul Chun-Kit Lee (New York University)
+
+
+DESCRIPTION
+-----------
+Paper 29 in the Constructive Reverse Mathematics (CRM) of Physics series.
+
+This deposit contains the complete Lean 4 + Mathlib formalization proving
+that Fekete's Subadditive Lemma -- the assertion that every subadditive
+sequence with u(n)/n bounded below converges -- is equivalent to the
+Limited Principle of Omniscience (LPO) over Bishop-style constructive
+mathematics (BISH). Includes the accompanying paper (LaTeX source and
+compiled PDF).
+
+
+MAIN RESULTS
+
+Backward direction (fully proved, zero sorry):
+
+  * lpo_of_fekete: Given any binary sequence alpha, encode it into a mock
+    free energy F_n = -n * x_n where x_n = 1 iff exists k < n, alpha(k) =
+    true. F is subadditive with F_n/n >= -1. Applying Fekete's lemma and
+    evaluating at a sufficiently large truncation decides LPO.
+
+Forward direction (axiomatized from literature):
+
+  * fekete_of_lpo: Composes LPO -> BMC (Bridges-Vita 2006, Theorem 2.1.5)
+    with the classical Fekete proof via bounded monotone convergence
+    (available in Mathlib as Subadditive.tendsto_lim).
+
+Main equivalence:
+
+  * fekete_iff_lpo: FeketeConvergence <-> LPO (over BISH).
+
+
+THREE-TIER HIERARCHY FOR THERMODYNAMIC-LIMIT CONVERGENCE
+
+  Route                                  Logical Cost   Example
+  --------------------------------------------------------------------------
+  Exact solution (closed-form modulus)   BISH           1D Ising (Papers 8, 9)
+  Cluster expansion (exponential decay)  BISH           High-temp lattice gases
+  Generic subadditivity (Fekete)         LPO            This paper
+
+The LPO cost becomes ineliminable when explicit finite-size bounds are
+unavailable -- typically near phase transitions where correlation lengths
+diverge. This resolves Problem 1 from Paper 10.
+
+
+AXIOM CERTIFICATE
+
+  * Backward direction: [propext, Classical.choice, Quot.sound] -- standard
+    Mathlib infrastructure only. No LPO, WLPO, LLPO, or custom axioms.
+
+  * Full equivalence: Above plus bmc_of_lpo and fekete_of_bmc (axiomatized,
+    citing Bridges-Vita 2006 and Mathlib's Subadditive.tendsto_lim).
+
+  * Zero sorry. Zero custom axioms in backward direction.
+
+
+TECHNICAL DETAILS
+
+  * Lean 4: leanprover/lean4:v4.28.0-rc1
+  * Mathlib4: commit 2598404fe9e0a5aee87ffca4ff83e2d01b23b024
+  * Build: cd P29_FeketeLPO && lake exe cache get && lake build
+  * Status: 0 errors, 0 warnings, 0 sorry
+
+
+PACKAGE CONTENTS
+
+  P29_FeketeLPO/              Self-contained Lean 4 package (6 source files, 549 lines)
+  paper29_fekete_lpo.tex      LaTeX source
+  paper29_fekete_lpo.pdf      Compiled paper
+  README.md                   Build instructions and file manifest
+
+
+KEYWORDS
+--------
+constructive reverse mathematics, Fekete's lemma, subadditive sequences,
+Limited Principle of Omniscience, LPO, thermodynamic limit, BISH, Lean 4,
+Mathlib, formal verification, constructive mathematics, statistical mechanics,
+phase transitions
+
+
+LICENSE
+-------
+Apache 2.0 (code) / Creative Commons Attribution 4.0 International (CC BY 4.0) (paper)
+
+
+RELATED IDENTIFIERS
+--------------------
+Paper 8 (1D Ising / LPO): https://doi.org/10.5281/zenodo.18516813
+Paper 9 (Ising formulation-invariance): https://doi.org/10.5281/zenodo.18517570
+Paper 10 (Logical geography / synthesis): https://doi.org/10.5281/zenodo.18580342
+
+
+RESOURCE TYPE
+-------------
+Software / Dataset
+
+
+VERSION
+-------
+v1.0

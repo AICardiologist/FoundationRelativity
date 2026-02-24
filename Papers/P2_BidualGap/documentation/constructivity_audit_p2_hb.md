@@ -35,12 +35,14 @@ Impact:
 - The direct witness `G` is closer to CRM‑friendly (no sign case‑split), but summability is still classical in Lean’s ℝ.
 
 ### `HB/WLPO_to_Gap_HB.lean` and `Slim/WLPO_to_Gap_HB.lean`
-Classical usage:
-- `open Classical …` at top.
-- The lemma `dual_is_banach_c0_from_WLPO_struct` is classical (uses `exists_rat_abs_sub_le` etc.).
+Classical usage / assumptions:
+- `dual_is_banach_c0_from_WLPO` is now an **axiom** (WLPO‑localized normability for `c₀`).
+- The bidual step uses `HB/WLPO_DualBanach.lean`, whose WLPO‑variant still performs classical
+  Bool extraction to obtain a witness index.
 
 Impact:
-- The current end‑to‑end HB proof uses classical tools for `DualIsBanach c₀`.
+- The current end‑to‑end HB proof remains non‑CRM‑constructive unless the axiom is discharged
+  or replaced by an explicit witness principle (e.g., LPO/Markov).
 
 ### `HB/SimpleFacts.lean`
 Classical usage:

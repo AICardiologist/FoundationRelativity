@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+- family-names: "Lee"
+  given-names: "Paul Chun-Kit"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+  affiliation: "New York University"
+title: "Exotic Weil Class Self-Intersection on CM Abelian Fourfolds: Explicit Computation at the DPT Boundary (Paper 56, Constructive Reverse Mathematics and Arithmetic Geometry Series)"
+version: "1.0.0"
+date-released: 2026-02-21
+abstract: >-
+  Paper 56 of the Constructive Reverse Mathematics and Arithmetic Geometry
+  series. Computes self-intersection degree deg(w_0 . w_0) = sqrt(disc(F))
+  for exotic Weil classes on three CM abelian fourfolds of Weil type.
+  Example 1 (K=Q(sqrt(-3))): disc=49, deg=7. Example 2 (K=Q(i)): disc=81,
+  deg=9. Example 3 (K=Q(sqrt(-7))): disc=169, deg=13. All positive
+  (Hodge-Riemann), all algebraic (Schoen). Discriminant equation exact via
+  cyclic conductor theorem. Formalized in Lean 4 over Mathlib (9 active
+  modules, ~1,331 lines, zero errors, zero sorry, 10 principled axioms).
+keywords:
+  - "exotic Weil class"
+  - "self-intersection"
+  - "CM abelian fourfold"
+  - "DPT boundary"
+  - "Hodge-Riemann"
+  - "Schoen algebraicity"
+  - "discriminant equation"
+  - "formal verification"
+  - "Lean 4"
+  - "Mathlib"
+  - "arithmetic geometry"
+license: Apache-2.0
