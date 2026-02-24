@@ -90,6 +90,11 @@ __pycache__/
 # Private / internal (never publish)
 # ============================================================
 master folder/
+CLAUDE.md
+.claude/
+Makefile
+SORRY_ALLOWLIST.txt
+alignment_report.json
 
 # ============================================================
 # Withdrawn, retired, discarded, archived content

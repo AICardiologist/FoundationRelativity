@@ -1,18 +1,20 @@
-# Git attributes for Foundation-Relativity project
+# Git attributes for Constructive Reverse Mathematics Series
 
-# Research papers - treat as binary
-docs/papers/*.pdf binary
-docs/papers/*.tex text
-docs/papers/*.bib text
+# PDFs are binary
+*.pdf binary
 
 # Lean build artifacts
 *.olean binary
 *.ilean binary
-lake-manifest.json text
 
-# Documentation
+# Text files
+*.lean text eol=lf
+*.tex text
+*.bib text
 *.md text
 *.txt text
-
-# Lean source files
-*.lean text eol=lf
+*.json text
+*.yml text
+*.yaml text
+*.py text eol=lf
+*.sh text eol=lf
