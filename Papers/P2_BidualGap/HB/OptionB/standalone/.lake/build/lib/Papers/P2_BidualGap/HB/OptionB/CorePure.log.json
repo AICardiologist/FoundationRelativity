@@ -1,5 +1,0 @@
-{"log":
- [{"message":
-   ".> LEAN_PATH=././.lake/build/lib DYLD_LIBRARY_PATH=././.lake/build/lib /Users/quantmann/.elan/toolchains/leanprover--lean4---v4.8.0/bin/lean ././././Papers/P2_BidualGap/HB/OptionB/CorePure.lean -R ./././. -o ././.lake/build/lib/Papers/P2_BidualGap/HB/OptionB/CorePure.olean -i ././.lake/build/lib/Papers/P2_BidualGap/HB/OptionB/CorePure.ilean -c ././.lake/build/ir/Papers/P2_BidualGap/HB/OptionB/CorePure.c --json",
-   "level": "trace"}],
- "depHash": "451477339726710872"}

@@ -1,11 +1,31 @@
 # ============================================================
-# Build artifacts
+# Lean build artifacts
 # ============================================================
 /.lake/
 **/.lake/
 *.olean
 *.ilean
 *.clean
+
+# ============================================================
+# LaTeX build artifacts
+# ============================================================
+*.aux
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.blg
+*.bbl
+*.synctex.gz
+*.nav
+*.snm
+*.vrb
+*.run.xml
+*-blx.bib
+.latexmkrc
 
 # ============================================================
 # IDE / OS / temp
@@ -25,6 +45,48 @@ old_files/
 .tmp.driveupload/
 
 # ============================================================
+# Python
+# ============================================================
+__pycache__/
+*.pyc
+*.pyo
+
+# ============================================================
+# Archives (reproducible from source)
+# ============================================================
+*.zip
+*.tar.gz
+
+# ============================================================
+# Backup / variant / dev snapshot files
+# ============================================================
+*.backup
+*.backup-*
+*.bak
+*.bak.*
+*.before*
+*.future
+*.orig
+*.rej
+*.patch
+*.lean.bisect*
+*.lean.bottleneck*
+*.lean.broken*
+*.lean.modular_backup
+*.lean.route_*
+*.lean.shields
+*.lean.simpa_fix*
+*.lean.step*
+*.lean.test
+*.lean.uncommitted*
+*.lean.with_sorries*
+**/_backup_*/
+**/_zenodo_pkg_*/
+**/Zenodo_Deliverables/
+**/Zenodo_v*/
+*.sb-*
+
+# ============================================================
 # Private / internal (never publish)
 # ============================================================
 master folder/
@@ -35,12 +97,11 @@ master folder/
 old_paper_abandoned/
 paper_2_redo/
 paper_2_bundle/
-paper_2_bundle.tar.gz
-paper_2_bundle.zip
 paper_7_bundle/
 paper 58_old_obsolete_do_not_read/
 paper 60_on_hold_synthesis/
 paper 60_withdrawn/
+paper 62/
 paper 69_old_discard/
 paper 70_old_discard/
 paper 71_old_discard/
@@ -50,6 +111,10 @@ Human-AI-unpublished/
 untitled folder/
 untitled folder 2/
 untitled folder 3/
+**/archive_old_drafts/
+**/archive_old_pdfs/
+**/CReal_obsolete/
+**/*_deprecated.lean
 
 # ============================================================
 # Obsolete top-level files
@@ -65,6 +130,41 @@ UNIFIED_PR_TEMPLATE.md
 crm_research_plan.md
 paper11_rg_assessment.md
 mathlib_reflexive_search_report.txt
+
+# ============================================================
+# Build logs / dev diagnostics
+# ============================================================
+build_*.txt
+**/build_*.txt
+error_*.txt
+**/error_*.txt
+
+# ============================================================
+# Internal dev / session documents
+# ============================================================
+**/VICTORY_*.md
+**/SPRINT_*.md
+**/SESSION_*.md
+**/CONSULTATION_*.md
+**/TACTICAL_*.md
+**/GUIDANCE_*.md
+**/CHECKPOINT_*.md
+**/PASTE_READY*.md
+**/WORK_ORDER*.md
+**/EDITORIAL_MEMO*.md
+**/communication/correspondence/
+
+# ============================================================
+# CI / test infrastructure (removed from repo)
+# ============================================================
+.ci/
+test/
+
+# ============================================================
+# RTF / macOS document formats (not part of deliverables)
+# ============================================================
+*.rtf
+*.rtfd/
 
 # ============================================================
 # Papers/ internal development files
