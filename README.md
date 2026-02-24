@@ -23,13 +23,13 @@ BISH  ⊂  BISH + MP  ⊂  BISH + LLPO  ⊂  BISH + WLPO  ⊂  BISH + LPO  ⊂  
 
 | Principle | What it decides |
 |-----------|----------------|
-| **BISH** | Nothing — all searches bounded, all witnesses explicit |
-| **MP** (Markov) | An unbounded search that cannot fail to terminate, terminates |
-| **LLPO** | The sign of a real number |
-| **WLPO** | Whether a real number equals zero |
-| **LPO** | Whether a binary sequence contains a 1 |
+| **BISH** | Nothing — every existential witness is computed, every disjunction is decided by the proof |
+| **MP** (Markov) | ¬¬∃ → ∃ for decidable predicates: if an unbounded search cannot fail, it succeeds |
+| **LLPO** | For every real x: x ≤ 0 or x ≥ 0 (sign is decidable) |
+| **WLPO** | For every real x: x = 0 or x ≠ 0 (equality to zero is decidable) |
+| **LPO** | For every binary sequence: it is identically zero or it contains a 1 (omniscience) |
 
-Two independent principles — the **Fan Theorem** (FT) and **Dependent Choice** (DC) — sit outside this chain.
+Two independent principles — the **Fan Theorem** (FT, every bar is uniform: compact spaces behave classically) and **Dependent Choice** (DC, sequential choices along a total relation) — sit outside this chain.
 
 ---
 
