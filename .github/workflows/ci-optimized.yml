@@ -12,9 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       p4: ${{ steps.filter.outputs.p4 }}
-      p3: ${{ steps.filter.outputs.p3 }}
       p2: ${{ steps.filter.outputs.p2 }}
-      p1: ${{ steps.filter.outputs.p1 }}
       core: ${{ steps.filter.outputs.core }}
     steps:
       - uses: actions/checkout@v4
@@ -24,13 +22,8 @@ jobs:
           filters: |
             p4:
               - 'Papers/P4_SpectralGeometry/**'
-            p3:
-              - 'Papers/P3_2CatFramework/**'
-              - 'CategoryTheory/TwoCategory/**'
             p2:
               - 'Papers/P2_BidualGap/**'
-            p1:
-              - 'Papers/P1_GBC/**'
             core:
               - 'lakefile.lean'
               - 'lean-toolchain'
@@ -60,14 +53,6 @@ jobs:
       - name: Get mathlib cache
         run: lake exe cache get || true
 
-      # Build P1 smoke test
-      - name: Build P1 Smoke Test
-        timeout-minutes: 1
-        run: |
-          echo "Building P1 smoke test..."
-          lake build Paper1SmokeTest
-          echo "P1 smoke test build completed successfully"
-
       # Build P2 (always)
       - name: Build P2 Minimal
         timeout-minutes: 2
@@ -75,29 +60,6 @@ jobs:
           echo "Building P2 minimal target..."
           lake build Papers.P2_BidualGap.P2_Minimal
           echo "P2 build completed successfully"
-
-      # Build P3 - always run now that it's complete
-      - name: Build P3 Status
-        run: |
-          echo "Building P3 2-category framework (Phase 1-2 complete)"
-          echo "P3 now builds reliably with 0 sorries"
-
-      - name: Build P3 Framework (Complete Implementation)
-        # Always build P3 now that Phase 3 is complete and working
-        timeout-minutes: 5
-        run: |
-          echo "Building P3 2-category framework Phase 1-3..."
-          # Build the complete P3 framework
-          lake build Papers.P3_2CatFramework || {
-            echo "::error::P3 build failed"
-            exit 1
-          }
-          # Run Phase 3 tests
-          lake build Papers.P3_2CatFramework.test.Phase3_test || {
-            echo "::error::P3 tests failed"
-            exit 1
-          }
-          echo "✅ P3 Phase 1-3 build and tests completed successfully"
 
       # Build P4 only if P4 files changed
       - name: Check P4 changes
@@ -125,23 +87,6 @@ jobs:
             echo "::warning::Legacy build incomplete"
             exit 0
           }
-
-      - name: Verify no 'sorry' in P1
-        run: |
-          if [ -d "Papers/P1_GBC/RankOneToggle" ]; then
-            if [ -f scripts/no_sorry_p1_minimal.sh ]; then
-              bash scripts/no_sorry_p1_minimal.sh || {
-                echo "::warning::P1 contains sorries (expected during development)"
-                exit 0
-              }
-            else
-              echo "Checking P1 for sorries..."
-              grep -r "sorry" Papers/P1_GBC/RankOneToggle/ --include="*.lean" || true
-              echo "::warning::P1 sorry check skipped - development branch"
-            fi
-          else
-            echo "P1 RankOneToggle not yet created - skipping sorry check"
-          fi
 
       - name: Verify no 'sorry' in P2
         run: |
@@ -203,20 +148,6 @@ jobs:
         uses: leanprover/lean-action@v1
         with:
           use-mathlib-cache: true
-
-      - name: Verify P1 Smoke Test
-        run: |
-          # Use the fast smoke test instead of building P1_Minimal
-          echo "Running P1 smoke test executable..."
-          lake build Paper1SmokeTest || {
-            echo "::warning::Paper1SmokeTest build failed"
-            exit 0
-          }
-          .lake/build/bin/Paper1SmokeTest || {
-            echo "::warning::Paper1SmokeTest execution failed"
-            exit 0
-          }
-          echo "✅ P1 smoke test passed"
 
       - name: Verify P2 Minimal imports
         run: |

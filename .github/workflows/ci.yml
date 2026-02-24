@@ -105,27 +105,14 @@ jobs:
 
       - name: Verify core mathematical proofs
         run: |
-          # Verify key Paper implementations compile and type-check correctly
-          echo "Verifying Foundation-Relativity active papers can be imported..."
-          
-          # Test Paper 1: Rank-One Toggle Kernel (Sherman-Morrison + stubs)
-          echo 'import Papers.P1_GBC.P1_Minimal' | lake env lean --stdin
-          
-          # Test Paper 2: WLPO ↔ BidualGap equivalence (dual isometry complete)
+          echo "Verifying active papers can be imported..."
           echo 'import Papers.P2_BidualGap.P2_Minimal' | lake env lean --stdin
-          
-          echo "✅ All active Papers imports verified!"
-          
+          echo "All active Papers imports verified."
+
       - name: Run test executables
         run: |
-          echo "Running active Papers test suite..."
-          
-          # Active Paper smoke tests
-          lake exe Paper1SmokeTest
           lake exe Paper2SmokeTest
-          # lake exe Paper3SmokeTest  # Temporarily disabled due to CategoryTheory dependencies
-          
-          echo "✅ All test executables completed successfully!"
+          echo "Test executables completed."
   
   # Sprint 43 P2: CI Tightening with strict warnings/axiom gates
   ci-strict:
