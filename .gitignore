@@ -116,6 +116,24 @@ untitled folder 3/
 **/CReal_obsolete/
 **/*_deprecated.lean
 
+# Withdrawn papers (Papers 1, 3)
+Papers/P1_GBC/
+Papers/P3_2CatFramework/
+Papers/P3C_DCwAxis/
+Papers/P3C_DCwAxis.lean
+
+# Zenodo nested duplicates (keep only metadata, not code copies)
+**/zenodo/**/*.lean
+**/zenodo/**/lakefile*
+**/zenodo/**/lean-toolchain
+**/zenodo/**/*.toml
+**/zenodo/**/*.tex
+**/zenodo/**/*.bib
+**/zenodo/**/*.pdf
+**/zenodo/**/*.sty
+**/zenodo/**/*.bst
+**/zenodo/**/lake-manifest.json
+
 # ============================================================
 # Obsolete top-level files
 # ============================================================
