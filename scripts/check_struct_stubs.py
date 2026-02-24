@@ -87,13 +87,22 @@ def main():
     all_issues = []
     
     # Directories to skip
-    skip_dirs = {'.lake', 'lake-packages', '.git', 'build', '.github', 'examples', 'WIP', 'standalone'}
+    skip_dirs = {'.lake', 'lake-packages', '.git', 'build', '.github', 'examples',
+                 'WIP', 'standalone', 'old_paper_abandoned', 'paper_2_redo',
+                 'Archived', 'zenodo', 'archive_old_pdfs'}
+
+    # Also skip frozen published paper directories (Zenodo-archived, reproducibility-locked)
+    skip_prefixes = ('paper ', 'Paper ')
     
     # Find all Lean files
     lean_files = []
     for lean_file in root.rglob('*.lean'):
         # Skip if in excluded directory
         if any(part in skip_dirs for part in lean_file.parts):
+            continue
+
+        # Skip frozen published paper directories
+        if any(part.startswith(skip_prefixes) for part in lean_file.parts):
             continue
         
         # Skip generated files
