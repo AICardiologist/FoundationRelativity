@@ -73,7 +73,7 @@ LPO enters through exactly one door: the spectral theorem for unbounded self-adj
 
 The same framework that classifies physics classifies arithmetic geometry. Five major conjectures (Hodge, Tate, BSD, Fontaine–Mazur, Weight-Monodromy) each exhibit a *de-omniscientising descent*: geometric origin converts LPO-dependent claims to BISH-decidable ones. The residual that survives is Markov's Principle — the cost of unbounded search.
 
-### The DPT framework (Paper 50)
+### The Decidable Polarized Tannakian (DPT) framework (Paper 50)
 
 Three axioms distil Grothendieck's category of numerical motives:
 1. **Decidable morphisms** (Standard Conjecture D)
