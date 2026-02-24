@@ -1068,3 +1068,4 @@ The audit should show:
 - The `Classical.*` usage pattern should match Paper 9 Part B exactly
 
 If the audit matches, formulation-invariance is verified.
+
