@@ -1,0 +1,1321 @@
+\documentclass[11pt,a4paper]{article}
+
+% ====================================================================
+% Packages
+% ====================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage[table]{xcolor}
+\usepackage{cleveref}
+\usepackage{natbib}
+\usepackage{mdframed}
+
+% ====================================================================
+% Theorem environments
+% ====================================================================
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% ====================================================================
+% Lean 4 code listing style
+% ====================================================================
+\definecolor{lean-keyword}{RGB}{0,0,180}
+\definecolor{lean-comment}{RGB}{0,128,0}
+\definecolor{lean-string}{RGB}{163,21,21}
+\definecolor{lean-bg}{RGB}{248,248,248}
+
+\lstdefinelanguage{lean4}{
+  keywords={theorem,lemma,def,class,instance,import,open,variable,
+            noncomputable,section,namespace,end,where,let,have,show,
+            intro,obtain,use,exact,rw,simp,apply,by,fun,match,if,
+            then,else,do,return,axiom,abbrev,private,attribute,
+            suffices,change,congr,ext,constructor,rintro,push_neg,
+            linarith,absurd,set_option,omit,in,set,cases,structure,
+            refine,unfold,rcases,calc,all_goals,first,try,ring,
+            positivity,induction},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+  morestring=[b]',
+}
+
+\lstset{
+  language=lean4,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{lean-keyword}\bfseries,
+  commentstyle=\color{lean-comment}\itshape,
+  stringstyle=\color{lean-string},
+  backgroundcolor=\color{lean-bg},
+  frame=single,
+  framerule=0.5pt,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2,
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+  xleftmargin=15pt,
+  captionpos=b,
+}
+
+% ====================================================================
+% Macros
+% ====================================================================
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\LPO}{\mathrm{LPO}}
+\newcommand{\WLPO}{\mathrm{WLPO}}
+\newcommand{\LLPO}{\mathrm{LLPO}}
+\newcommand{\BMC}{\mathrm{BMC}}
+\newcommand{\BISH}{\mathrm{BISH}}
+\newcommand{\CHSH}{\mathrm{CHSH}}
+\newcommand{\Lean}{\textsc{Lean~4}}
+\newcommand{\Mathlib}{\textsc{Mathlib4}}
+\newcommand{\leanok}{\textsf{\small \textcolor{green!70!black}{\checkmark}}}
+
+% ====================================================================
+% Title
+% ====================================================================
+\title{%
+  \textbf{Bell Nonlocality and the Constructive Cost of Disjunction:\\[4pt]
+  An LLPO Calibration}\\[6pt]
+  {\normalsize Paper~21 in the Constructive Reverse Mathematics Series}%
+}
+
+\author{
+  Paul Chun-Kit Lee\thanks{%
+    New York University.
+    AI-assisted formalization; see \S\ref{sec:ai} for methodology.
+    The author is a medical professional, not a domain expert in
+    constructive mathematics or mathematical physics; mathematical
+    content was developed with extensive AI assistance.} \\
+  New York University \\
+  \texttt{dr.paul.c.lee@gmail.com}
+}
+
+\date{February 2026}
+
+% ====================================================================
+\begin{document}
+\maketitle
+
+% ====================================================================
+\begin{abstract}
+The disjunctive interpretation of Bell's theorem---deciding whether
+the nonlocality asymmetry between Alice and Bob leans ``Alice-side''
+($\le 0$) or ``Bob-side'' ($\ge 0$)---is equivalent to the Lesser
+Limited Principle of Omniscience ($\LLPO$) over Bishop's constructive
+mathematics ($\BISH$). The forward direction applies the standard
+real-valued form of $\LLPO$ (sign decidability:
+$x \le 0 \lor 0 \le x$) to the encoded Bell asymmetry; the reverse
+encodes a binary sequence $\alpha$ with the $\mathrm{AtMostOne}$
+predicate into a pair of geometric series whose difference---the Bell
+asymmetry---has sign determined by the parity of the unique nonzero
+index. Combined with Part~A, which proves the $\CHSH$ bound, the
+Tsirelson violation $S_Q = 2\sqrt{2} > 2$, and $\neg\mathrm{LHV}$
+entirely in $\BISH$, this establishes a \textbf{three-level
+stratification}: $\BISH$ (Bell negation) $<$ $\LLPO$ (disjunctive
+Bell conclusion) $<$ $\WLPO$ (hierarchy). All results are formalized
+in \Lean{} with \Mathlib{} (751~lines, 14~files, zero
+\texttt{sorry}). This is the first CRM calibration of a quantum
+foundations result at the $\LLPO$ level, and the first to measure the
+constructive cost of the step from ``local realism is refuted'' to
+``the nonlocality favors one party over the other.''
+\end{abstract}
+
+\vspace{1em}
+\tableofcontents
+
+% ====================================================================
+\section{Introduction}\label{sec:intro}
+% ====================================================================
+
+\subsection{Bell's Theorem and Its Disjunctive Interpretation}
+\label{sec:bell-disjunction}
+
+Bell's theorem~\citep{Bell64} demonstrates that no local hidden
+variable (LHV) theory can reproduce the correlations predicted by
+quantum mechanics. In the $\CHSH$ formulation~\citep{CHSH69}, any
+deterministic assignment of four dichotomic ($\pm 1$) observables
+satisfies $|S| \le 2$, while the quantum prediction achieves
+$S_Q = 2\sqrt{2} \approx 2.828$~\citep{Tsirelson80}, confirmed
+experimentally~\citep{Aspect82}.
+
+The \emph{negation} form---``no LHV model can reproduce $S > 2$''---is
+a finite contradiction: 16 cases show $|S| \le 2$, yet quantum
+mechanics exceeds this bound. The negation is pure $\BISH$.
+
+But physicists routinely take an additional step: from ``local realism
+is refuted,'' they conclude \emph{either} locality fails \emph{or}
+realism fails. This disjunctive step is not free. We formalize a
+precise version of this disjunction by encoding it as a
+\textbf{sign decision} on the Bell asymmetry---the difference between
+Alice-side and Bob-side contributions to Bell violation---and show
+that this sign decision has the exact constructive strength of $\LLPO$.
+
+\subsection{The Answer: LLPO}\label{sec:answer}
+
+The answer is the Lesser Limited Principle of Omniscience:
+\begin{enumerate}
+  \item \textbf{Part~A ($\BISH$):} The $\CHSH$ bound $|S| \le 2$, the
+    Tsirelson violation $S_Q > 2$, and $\neg\mathrm{LHV}$ are all
+    provable without any omniscience principle.
+
+  \item \textbf{Part~B ($\LLPO$):} Deciding the sign of the Bell
+    asymmetry---$\mathrm{bellAsymmetry}\;\alpha \le 0$ versus
+    $0 \le \mathrm{bellAsymmetry}\;\alpha$---for sequences with
+    $\mathrm{AtMostOne}$ is equivalent to $\LLPO$.
+\end{enumerate}
+
+\noindent
+The main results, stated precisely, are:
+
+\begin{itemize}
+  \item \textbf{Theorem~1} (Part~A): $\CHSH$ bound---for all LHV
+    assignments, $S \in \{-2, +2\}$.
+  \item \textbf{Theorem~2} (Part~A): Quantum violation---$S_Q > 2$.
+  \item \textbf{Theorem~3} (Part~A): $\neg\mathrm{LHV}$---no
+    deterministic assignment achieves $S > 2$.
+  \item \textbf{Theorem~4} (Part~B): $\LLPO \Rightarrow$
+    BellSignDecision.
+  \item \textbf{Theorem~5} (Part~B): BellSignDecision $\Rightarrow$
+    $\LLPO$ (novel direction).
+  \item \textbf{Theorem~6} (Part~B): $\LLPO \leftrightarrow$
+    BellSignDecision.
+  \item \textbf{Theorem~7}: Three-level stratification.
+\end{itemize}
+
+\subsection{Programme Context}\label{sec:context}
+
+This is Paper~21 in a programme of constructive calibration of
+mathematical physics~\cite{Lee26-P2,Lee26-P7,Lee26-P8,Lee26-P15,Lee26-P19,Lee26-P20}.
+Papers~2 and~7 calibrated $\WLPO$ against the bidual gap and
+non-reflexivity; Paper~8 calibrated $\LPO$ against the 1D Ising
+free energy; Paper~19 calibrated $\LLPO$ against WKB turning points;
+Paper~20 calibrated $\WLPO$ against Ising magnetization phase
+classification. The constructive hierarchy is:
+\[
+  \BISH \;<\; \LLPO \;<\; \WLPO \;<\; \LPO.
+\]
+All implications are strict (no reverse implications hold over
+$\BISH$). Paper~21 contributes the first $\LLPO$ calibration of a
+quantum foundations result.
+
+\subsection{What Makes This Paper Different}
+\label{sec:different}
+
+Paper~21 contributes three novelties:
+\begin{enumerate}
+  \item \textbf{First LLPO calibration in quantum foundations.}
+    Previous quantum calibrations in the series were at $\BISH$
+    (Heisenberg, Paper~6) or $\LPO$ (decoherence). This is the first
+    to land at $\LLPO$, the weakest nontrivial omniscience principle.
+
+  \item \textbf{Measuring the cost of disjunction.} Physicists
+    routinely move from ``local realism is refuted'' (a negation,
+    $\BISH$) to ``either locality or realism fails'' (a disjunction).
+    We show this step costs exactly $\LLPO$---it is not free.
+
+  \item \textbf{LLPO as the sign-decision principle.} The mechanism
+    underlying the $\LLPO$ equivalence is real-valued sign
+    decidability: $\LLPO$ decides $x \le 0 \lor 0 \le x$ for any real
+    $x$. The Bell asymmetry sign is a physically meaningful instance.
+\end{enumerate}
+
+
+% ====================================================================
+\section{Background}\label{sec:background}
+% ====================================================================
+
+\subsection{The CHSH Setup}\label{sec:chsh-bg}
+
+The $\CHSH$ experiment involves two spacelike-separated parties,
+Alice and Bob, each choosing between two measurement settings.
+Alice's settings yield outcomes $a_1, a_2 \in \{-1, +1\}$; Bob's
+yield $b_1, b_2 \in \{-1, +1\}$. The $\CHSH$ correlator is
+\begin{equation}\label{eq:chsh-expr}
+  S = a_1 b_1 + a_1 b_2 + a_2 b_1 - a_2 b_2.
+\end{equation}
+
+In a local hidden variable model, each run produces a deterministic
+assignment $(a_1, a_2, b_1, b_2) \in \{-1, +1\}^4$. There are
+$2^4 = 16$ such assignments. The $\CHSH$ bound states that for every
+assignment, $S \in \{-2, +2\}$ and hence $|S| \le 2$.
+
+Quantum mechanics, using the singlet state
+$|\Psi^-\rangle = \tfrac{1}{\sqrt{2}}(|01\rangle - |10\rangle)$
+with optimal measurement angles, achieves
+$S_Q = 2\sqrt{2}$~\citep{Tsirelson80}. This is the Tsirelson bound:
+$2\sqrt{2}$ is the maximum quantum value. Since $2\sqrt{2} > 2$,
+no LHV model can reproduce the quantum correlations.
+
+\subsection{The Constructive Hierarchy: \texorpdfstring{$\BISH < \LLPO < \WLPO < \LPO$}{BISH < LLPO < WLPO < LPO}}
+\label{sec:hierarchy-bg}
+
+Constructive reverse mathematics (CRM) classifies mathematical
+theorems by the weakest omniscience principle needed to prove
+them~\citep{Bishop67,BV06,Ishihara06,Diener20}. Bishop's
+constructive mathematics ($\BISH$) avoids all omniscience principles;
+every existential claim comes with a computable witness.
+
+\begin{definition}[$\LLPO$]\label{def:llpo}
+The \emph{Lesser Limited Principle of Omniscience}: for every binary
+sequence $\alpha : \NN \to \{0,1\}$ with at most one index $n$
+satisfying $\alpha(n) = 1$, either $\alpha(2n) = 0$ for all $n$, or
+$\alpha(2n+1) = 0$ for all $n$.
+\end{definition}
+
+\begin{definition}[$\WLPO$]\label{def:wlpo}
+The \emph{Weak Limited Principle of Omniscience}: for every binary
+sequence $\alpha$, either $\alpha(n) = 0$ for all $n$, or it is not
+the case that $\alpha(n) = 0$ for all $n$.
+\end{definition}
+
+\begin{definition}[$\LPO$]\label{def:lpo}
+The \emph{Limited Principle of Omniscience}: for every binary
+sequence $\alpha$, either $\alpha(n) = 0$ for all $n$, or there
+exists $n$ with $\alpha(n) = 1$.
+\end{definition}
+
+\noindent
+The hierarchy and key equivalences are:
+\begin{equation}\label{eq:hierarchy}
+  \BISH \;<\; \LLPO \;<\; \WLPO \;<\; \LPO
+  \;\equiv\; \BMC.
+\end{equation}
+The equivalence $\LLPO \leftrightarrow (x \le 0 \lor 0 \le x)$ on
+$\RR$ is due to \citet{Ishihara06} and \citet{BR87}. This
+real-valued form of $\LLPO$---sign decidability---is the mechanism
+that connects the Bell sign decision to $\LLPO$.
+
+\subsection{The CRM Diagnostic}\label{sec:diagnostic}
+
+The CRM diagnostic for a physical assertion proceeds as follows:
+\begin{enumerate}
+  \item Formalize the assertion and its proof in \Lean{} with
+    \Mathlib{}.
+  \item Declare axioms for known CRM equivalences
+    (e.g., \texttt{llpo\_real\_of\_llpo}).
+  \item Run \texttt{\#print axioms} on each main theorem.
+  \item The custom axioms in the output certify the CRM level.
+    Theorems with no custom axioms are $\BISH$; theorems depending on
+    \texttt{llpo\_real\_of\_llpo} are $\LLPO$; theorems depending on
+    \texttt{wlpo\_real\_of\_wlpo} are $\WLPO$.
+\end{enumerate}
+
+
+% ====================================================================
+\section{Part~A: Bell Negation Is BISH}\label{sec:part-a}
+% ====================================================================
+
+The first tier: the $\CHSH$ bound, the Tsirelson violation, and the
+$\neg\mathrm{LHV}$ conclusion are all pure $\BISH$. No omniscience
+principle is needed.
+
+\subsection{CHSH Bound}\label{sec:chsh-bound}
+
+\begin{definition}[LHV Assignment]\label{def:lhv}
+\leanok{}
+A \emph{local hidden variable assignment} is a tuple
+$(a_1, a_2, b_1, b_2) \in \RR^4$ with each component constrained to
+$\{-1, +1\}$.
+\end{definition}
+
+\begin{lstlisting}[caption={LHV assignment structure (Defs/CHSH.lean).}]
+/-- A local hidden variable assignment: four dichotomic values. -/
+structure LHVAssignment where
+  a1 : Real  -- Alice's outcome for setting 1
+  a2 : Real  -- Alice's outcome for setting 2
+  b1 : Real  -- Bob's outcome for setting 1
+  b2 : Real  -- Bob's outcome for setting 2
+  ha1 : a1 = 1 \/ a1 = -1
+  ha2 : a2 = 1 \/ a2 = -1
+  hb1 : b1 = 1 \/ b1 = -1
+  hb2 : b2 = 1 \/ b2 = -1
+\end{lstlisting}
+
+\begin{theorem}[CHSH Bound---BISH]\label{thm:chsh-bound}
+\leanok{}
+For any deterministic LHV assignment $m$, the $\CHSH$ expression
+satisfies $S(m) \in \{-2, +2\}$. In particular, $|S(m)| \le 2$.
+\end{theorem}
+
+\begin{proof}
+There are $2^4 = 16$ possible assignments of
+$(a_1, a_2, b_1, b_2) \in \{-1, +1\}^4$. For each assignment,
+direct computation shows $S \in \{-2, +2\}$. In \Lean{}:
+\begin{quote}
+\texttt{rcases ha1 with rfl | rfl <;>
+rcases ha2 with rfl | rfl <;>
+rcases hb1 with rfl | rfl <;>
+rcases hb2 with rfl | rfl <;> norm\_num}
+\end{quote}
+\end{proof}
+
+\begin{lstlisting}[caption={CHSH bound (PartA/CHSHBound.lean).}]
+/-- Theorem 1: The CHSH expression for any deterministic
+    assignment equals +/-2. Proof by 16-case analysis. -/
+theorem chsh_bound (m : LHVAssignment) :
+    chshExpr m = 2 \/ chshExpr m = -2 := by
+  obtain <a1, a2, b1, b2, ha1, ha2, hb1, hb2> := m
+  simp only [chshExpr]
+  rcases ha1 with rfl | rfl <;> rcases ha2 with rfl | rfl <;>
+  rcases hb1 with rfl | rfl <;> rcases hb2 with rfl | rfl <;>
+  norm_num
+\end{lstlisting}
+
+\subsection{Quantum Violation}\label{sec:quantum-violation}
+
+\begin{theorem}[Quantum Violation---BISH]\label{thm:quantum-violation}
+\leanok{}
+The quantum $\CHSH$ value exceeds the classical bound:
+\begin{equation}\label{eq:tsirelson}
+  S_Q = 2\sqrt{2} > 2.
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Since $\sqrt{2} > 1$ (because $2 > 1$ and $\sqrt{\cdot}$ is strictly
+monotone on non-negative reals), we have $2\sqrt{2} > 2 \cdot 1 = 2$.
+In \Lean{}:
+\begin{quote}
+\texttt{have h1 : (1 : Real) < Real.sqrt 2 := ...\\
+linarith}
+\end{quote}
+\end{proof}
+
+\begin{lstlisting}[caption={Quantum violation (PartA/QuantumViolation.lean).}]
+/-- Theorem 2: S_quantum = 2*sqrt(2) > 2. -/
+theorem S_quantum_gt_two : S_quantum > 2 := by
+  unfold S_quantum
+  have h1 : (1 : Real) < Real.sqrt 2 := by
+    rw [show (1 : Real) = Real.sqrt 1 from
+      (Real.sqrt_one).symm]
+    exact Real.sqrt_lt_sqrt (by norm_num) (by norm_num)
+  linarith
+\end{lstlisting}
+
+\subsection{\texorpdfstring{$\neg$LHV}{Negation of LHV}}\label{sec:neg-lhv}
+
+\begin{theorem}[Bell Negation---BISH]\label{thm:neg-lhv}
+\leanok{}
+No deterministic LHV assignment achieves $S > 2$:
+\begin{equation}\label{eq:neg-lhv}
+  \neg\exists\, m : \mathrm{LHVAssignment},\;\;
+  \mathrm{chshExpr}(m) > 2.
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Suppose $\exists m$ with $\mathrm{chshExpr}(m) > 2$. By
+\Cref{thm:chsh-bound}, $|S(m)| \le 2$, so $S(m) \le 2$, contradicting
+$S(m) > 2$. Pure contradiction; no omniscience needed.
+\end{proof}
+
+\begin{lstlisting}[caption={Bell negation (PartA/BellNegation.lean).}]
+/-- Theorem 3: No deterministic LHV assignment achieves S > 2.
+    This is BISH --- a finite contradiction. -/
+theorem neg_lhv :
+    Not (Exists (fun (m : LHVAssignment) =>
+      chshExpr m > 2)) := by
+  intro <m, hm>
+  have hbound := chsh_abs_bound m
+  have : chshExpr m <= |chshExpr m| := le_abs_self _
+  linarith
+\end{lstlisting}
+
+\begin{remark}[Axiom profile for Part~A]\label{rem:bish-profile}
+\texttt{\#print axioms chsh\_bound}, \texttt{\#print axioms
+S\_quantum\_gt\_two}, and \texttt{\#print axioms neg\_lhv} all show
+only \texttt{[propext, Classical.choice, Quot.sound]}. The
+\texttt{Classical.choice} arises from \Mathlib{}'s infrastructure
+for \texttt{Real.instField}, not from any mathematical use of choice.
+No custom axiom (\texttt{llpo\_real\_of\_llpo}) appears.
+These are pure $\BISH$ results.
+\end{remark}
+
+
+% ====================================================================
+\section{Part~B: The Disjunctive Conclusion Costs LLPO}
+\label{sec:part-b}
+% ====================================================================
+
+This is the core section: the first calibration of $\LLPO$ against
+a quantum foundations result.
+
+\subsection{The Encoded Bell Asymmetry}\label{sec:encoded-asymmetry}
+
+\begin{definition}[Even and odd fields]\label{def:fields}
+\leanok{}
+For a binary sequence $\alpha : \NN \to \{0, 1\}$, define:
+\begin{align}
+  \mathrm{evenField}(\alpha) &:= \sum_{n=0}^{\infty}
+    [\alpha(2n) = 1] \cdot ({\tfrac{1}{2}})^{n+1},
+    \label{eq:even-field} \\
+  \mathrm{oddField}(\alpha) &:= \sum_{n=0}^{\infty}
+    [\alpha(2n+1) = 1] \cdot ({\tfrac{1}{2}})^{n+1},
+    \label{eq:odd-field}
+\end{align}
+where $[\cdot]$ is the Iverson bracket.
+\end{definition}
+
+\begin{definition}[Bell asymmetry]\label{def:bell-asymmetry}
+\leanok{}
+The \emph{Bell asymmetry} is the difference:
+\begin{equation}\label{eq:bell-asymmetry}
+  \mathrm{bellAsymmetry}(\alpha) :=
+  \mathrm{evenField}(\alpha) - \mathrm{oddField}(\alpha).
+\end{equation}
+Physically, this represents the imbalance between ``Alice-side'' and
+``Bob-side'' contributions to the Bell violation, parameterized by
+$\alpha$.
+\end{definition}
+
+\begin{definition}[BellSignDecision]\label{def:bell-sign}
+\leanok{}
+The \emph{Bell sign decision} is the proposition: for all
+$\alpha : \NN \to \{0, 1\}$ with $\mathrm{AtMostOne}(\alpha)$,
+\begin{equation}\label{eq:bell-sign}
+  \mathrm{bellAsymmetry}(\alpha) \le 0 \;\;\vee\;\;
+  0 \le \mathrm{bellAsymmetry}(\alpha).
+\end{equation}
+\end{definition}
+
+\begin{lstlisting}[caption={Encoded Bell asymmetry (Defs/EncodedAsymmetry.lean, selected).}]
+/-- The Bell asymmetry: difference between even-field and
+    odd-field signals. -/
+def bellAsymmetry (alpha : Nat -> Bool) : Real :=
+  evenField alpha - oddField alpha
+
+/-- The Bell sign decision: for every alpha with AtMostOne,
+    the asymmetry has a decidable sign. -/
+def BellSignDecision : Prop :=
+  forall (alpha : Nat -> Bool), AtMostOne alpha ->
+    bellAsymmetry alpha <= 0 \/ 0 <= bellAsymmetry alpha
+\end{lstlisting}
+
+\begin{lemma}[Summability]\label{lem:summability}
+\leanok{}
+Both $\mathrm{evenField}$ and $\mathrm{oddField}$ define summable
+series. Each term is bounded by $({\tfrac{1}{2}})^{n+1}$, and the
+geometric series $\sum_n ({\tfrac{1}{2}})^{n+1}$ converges to~$1$.
+\end{lemma}
+
+\begin{lemma}[Zero-iff characterizations]\label{lem:zero-iff}
+\leanok{}
+\begin{align}
+  \mathrm{evenField}(\alpha) = 0
+  &\;\;\Longleftrightarrow\;\;
+  \forall n,\; \alpha(2n) = 0,
+  \label{eq:even-zero-iff} \\
+  \mathrm{oddField}(\alpha) = 0
+  &\;\;\Longleftrightarrow\;\;
+  \forall n,\; \alpha(2n+1) = 0.
+  \label{eq:odd-zero-iff}
+\end{align}
+\end{lemma}
+
+\begin{proof}
+Each series has non-negative terms bounded by a geometric series. A
+non-negative summable series sums to zero iff every term is zero. Since
+the geometric weights $({\tfrac{1}{2}})^{n+1} > 0$, the term at
+index~$n$ vanishes iff $\alpha(2n) = 0$ (respectively
+$\alpha(2n+1) = 0$).
+\end{proof}
+
+\subsection{Sign-Iff Lemmas}\label{sec:sign-iff}
+
+The core of the backward direction: under $\mathrm{AtMostOne}$, the
+sign of the Bell asymmetry determines parity.
+
+\begin{lemma}[Nonpositive implies even false]\label{lem:nonpos}
+\leanok{}
+Under $\mathrm{AtMostOne}(\alpha)$: if
+$\mathrm{bellAsymmetry}(\alpha) \le 0$, then $\forall n,\;
+\alpha(2n) = 0$.
+\end{lemma}
+
+\begin{proof}
+Suppose for contradiction that $\alpha(2k) = 1$ for some $k$. Then:
+\begin{enumerate}
+  \item $\mathrm{evenField}(\alpha) > 0$ (by
+    \texttt{Summable.tsum\_pos} at the $k$-th term).
+  \item $\mathrm{AtMostOne}$ forces all odd entries to be~$0$
+    (since $\alpha(2k) = 1$ and $\alpha(2j+1) = 1$ would give
+    $2k = 2j+1$, contradicting parity).
+  \item $\mathrm{oddField}(\alpha) = 0$ (by \Cref{lem:zero-iff}).
+  \item $\mathrm{bellAsymmetry}(\alpha) = \mathrm{evenField}(\alpha)
+    - 0 > 0$, contradicting $\le 0$.
+\end{enumerate}
+\end{proof}
+
+\begin{lemma}[Nonnegative implies odd false]\label{lem:nonneg}
+\leanok{}
+Under $\mathrm{AtMostOne}(\alpha)$: if
+$0 \le \mathrm{bellAsymmetry}(\alpha)$, then $\forall n,\;
+\alpha(2n+1) = 0$.
+\end{lemma}
+
+\begin{proof}
+Symmetric: if $\alpha(2k+1) = 1$, then $\mathrm{oddField} > 0$,
+$\mathrm{AtMostOne}$ forces all even entries to $0$,
+$\mathrm{evenField} = 0$, and $\mathrm{bellAsymmetry} < 0$,
+contradicting $\ge 0$.
+\end{proof}
+
+\begin{lstlisting}[caption={Sign-iff lemmas (PartB/SignIff.lean, selected).}]
+/-- Under AtMostOne, bellAsymmetry <= 0 implies all even
+    entries are false. -/
+theorem bellAsymmetry_nonpos_implies_even_false
+    (alpha : Nat -> Bool) (hamo : AtMostOne alpha)
+    (hle : bellAsymmetry alpha <= 0) :
+    forall n, alpha (2 * n) = false := by
+  intro n; by_contra hne; push_neg at hne
+  -- ... tsum_pos + AtMostOne => contradiction
+\end{lstlisting}
+
+\subsection{Forward: LLPO \texorpdfstring{$\Rightarrow$}{=>} BellSignDecision}
+\label{sec:forward}
+
+\begin{theorem}[LLPO $\Rightarrow$ BellSignDecision]
+\label{thm:forward} \leanok{}
+If $\LLPO$ holds, then for all $\alpha$ with $\mathrm{AtMostOne}$:
+\[
+  \mathrm{bellAsymmetry}(\alpha) \le 0 \;\;\vee\;\;
+  0 \le \mathrm{bellAsymmetry}(\alpha).
+\]
+\end{theorem}
+
+\begin{proof}
+Assume $\LLPO$. By \texttt{llpo\_real\_of\_llpo}, every real number
+$x$ satisfies $x \le 0 \lor 0 \le x$. Apply this to
+$x = \mathrm{bellAsymmetry}(\alpha)$.
+
+In \Lean{}: \texttt{exact llpo\_real\_of\_llpo hllpo
+(bellAsymmetry alpha)}.
+\end{proof}
+
+\begin{lstlisting}[caption={Forward direction (PartB/Forward.lean).}]
+/-- LLPO for binary sequences implies LLPO for reals.
+    Standard result (Ishihara 2006, Bridges-Richman 1987). -/
+axiom llpo_real_of_llpo :
+  LLPO -> forall (x : Real), x <= 0 \/ 0 <= x
+
+/-- Theorem 4: LLPO implies BellSignDecision. -/
+theorem bell_sign_of_llpo (hllpo : LLPO) :
+    BellSignDecision := by
+  intro alpha _hamo
+  exact llpo_real_of_llpo hllpo (bellAsymmetry alpha)
+\end{lstlisting}
+
+\subsection{Backward: BellSignDecision \texorpdfstring{$\Rightarrow$}{=>} LLPO (Novel)}
+\label{sec:backward}
+
+This is the novel direction: the Bell sign decision oracle implies
+$\LLPO$.
+
+\begin{theorem}[BellSignDecision $\Rightarrow$ LLPO]
+\label{thm:backward} \leanok{}
+If BellSignDecision holds, then $\LLPO$ holds.
+\end{theorem}
+
+\begin{proof}
+Let $\alpha : \NN \to \{0,1\}$ be an arbitrary binary sequence with
+$\mathrm{AtMostOne}(\alpha)$. We must show:
+$(\forall n,\; \alpha(2n) = 0) \;\vee\;
+(\forall n,\; \alpha(2n+1) = 0)$.
+
+\smallskip\noindent
+\textbf{Step 1: Apply the oracle.} Apply BellSignDecision to $\alpha$
+(with its $\mathrm{AtMostOne}$ witness) to obtain:
+\[
+  \mathrm{bellAsymmetry}(\alpha) \le 0 \;\;\vee\;\;
+  0 \le \mathrm{bellAsymmetry}(\alpha).
+\]
+
+\smallskip\noindent
+\textbf{Step 2: Translate.} By
+\Cref{lem:nonpos,lem:nonneg}:
+\begin{itemize}
+  \item $\mathrm{bellAsymmetry}(\alpha) \le 0 \;\Rightarrow\;
+    \forall n,\; \alpha(2n) = 0$.
+  \item $0 \le \mathrm{bellAsymmetry}(\alpha) \;\Rightarrow\;
+    \forall n,\; \alpha(2n+1) = 0$.
+\end{itemize}
+In both cases, we obtain the $\LLPO$ disjunction for $\alpha$.
+\end{proof}
+
+\begin{lstlisting}[caption={Backward direction (PartB/Backward.lean).}]
+/-- Theorem 5 (Novel): BellSignDecision implies LLPO. -/
+theorem llpo_of_bell_sign
+    (hbs : forall (alpha : Nat -> Bool),
+      AtMostOne alpha ->
+      bellAsymmetry alpha <= 0 \/
+        0 <= bellAsymmetry alpha) :
+    LLPO := by
+  intro alpha hamo
+  rcases hbs alpha hamo with hle | hge
+  . exact Or.inl
+      (bellAsymmetry_nonpos_implies_even_false
+        alpha hamo hle)
+  . exact Or.inr
+      (bellAsymmetry_nonneg_implies_odd_false
+        alpha hamo hge)
+\end{lstlisting}
+
+\subsection{Main Equivalence}\label{sec:main-equiv}
+
+\begin{theorem}[LLPO $\leftrightarrow$ BellSignDecision]
+\label{thm:main} \leanok{}
+Over $\BISH$, the Bell sign decision is equivalent to $\LLPO$:
+\[
+  \LLPO \;\longleftrightarrow\;
+  \mathrm{BellSignDecision}.
+\]
+\end{theorem}
+
+\begin{proof}
+Compose \Cref{thm:forward,thm:backward}:
+\[
+  \LLPO
+  \;\xrightarrow{\text{Thm~\ref{thm:forward}}}\;
+  \mathrm{BellSignDecision}
+  \;\xrightarrow{\text{Thm~\ref{thm:backward}}}\;
+  \LLPO.
+\]
+In \Lean{}: \texttt{llpo\_iff\_bell\_sign :=
+$\langle$bell\_sign\_of\_llpo,
+llpo\_of\_bell\_sign$\rangle$}.
+\end{proof}
+
+\begin{lstlisting}[caption={Main equivalence (PartB/PartB\_Main.lean).}]
+/-- Theorem 6: LLPO <-> BellSignDecision. -/
+theorem llpo_iff_bell_sign :
+    LLPO <-> BellSignDecision :=
+  <bell_sign_of_llpo, llpo_of_bell_sign>
+\end{lstlisting}
+
+\begin{remark}[Axiom certificate]\label{rem:llpo-cert}
+\texttt{\#print axioms llpo\_iff\_bell\_sign} shows
+\texttt{[propext, Classical.choice, Quot.sound,
+llpo\_real\_of\_llpo]}. Exactly one custom axiom:
+\texttt{llpo\_real\_of\_llpo}. No \texttt{wlpo\_real\_of\_wlpo}.
+No \texttt{bmc\_iff\_lpo}. This certifies that the Bell sign decision
+costs exactly $\LLPO$---not $\WLPO$, not $\LPO$.
+\end{remark}
+
+
+% ====================================================================
+\section{The Stratification Theorem}\label{sec:stratification}
+% ====================================================================
+
+Bell's theorem exhibits three distinct levels of the constructive
+hierarchy:
+
+\begin{center}
+\begin{tabular}{@{}clll@{}}
+\toprule
+\textbf{Level} & \textbf{Assertion} & \textbf{CRM Cost} &
+  \textbf{Mechanism} \\
+\midrule
+1 & $\CHSH$ bound, $\neg\mathrm{LHV}$
+  & $\BISH$ & 16-case analysis \\
+2 & Bell sign decision (disjunction)
+  & $\LLPO$ & Sign decidability on $\RR$ \\
+3 & Hierarchy ($\WLPO \Rightarrow \LLPO$)
+  & $\WLPO \Rightarrow \LLPO$ & Strict separation \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{theorem}[Stratification]\label{thm:stratification}
+\leanok{}
+Bell's theorem stratifies the constructive hierarchy:
+\begin{enumerate}
+  \item The $\CHSH$ bound and $\neg\mathrm{LHV}$ are $\BISH$ (no
+    custom axioms).
+  \item The Bell sign decision is equivalent to $\LLPO$ (uses
+    \texttt{llpo\_real\_of\_llpo}).
+  \item The hierarchy $\WLPO \Rightarrow \LLPO$ is proved from first
+    principles (no custom axioms).
+\end{enumerate}
+Moreover, $\BISH \subsetneq \LLPO \subsetneq \WLPO$, so the three
+levels are strictly separated.
+\end{theorem}
+
+\begin{proof}
+Items~(1) and~(2) are
+\Cref{thm:chsh-bound,thm:quantum-violation,thm:neg-lhv,thm:main}.
+Item~(3) is \texttt{wlpo\_implies\_llpo}, proved from first principles.
+The strict separations $\BISH \subsetneq \LLPO$ and
+$\LLPO \subsetneq \WLPO$ are standard~\citep{BR87,BV06,Ishihara06}:
+$\LLPO$ is not derivable from $\BISH$, and $\WLPO$ is strictly
+stronger than $\LLPO$.
+\end{proof}
+
+\begin{lstlisting}[caption={Stratification (Main/Stratification.lean).}]
+/-- The three-level stratification of Bell's theorem. -/
+theorem bell_stratification :
+    (forall (m : LHVAssignment), |chshExpr m| <= 2) /\
+    (LLPO <-> BellSignDecision) /\
+    (WLPO -> LLPO) :=
+  <chsh_abs_bound, llpo_iff_bell_sign, wlpo_implies_llpo>
+\end{lstlisting}
+
+
+% ====================================================================
+\section{Updated Calibration Table}\label{sec:calibration}
+% ====================================================================
+
+The calibration table for the constructive reverse mathematics
+series, updated with Paper~21:
+
+\begin{center}
+\small
+\begin{tabular}{@{}clllc@{}}
+\toprule
+\textbf{Paper} & \textbf{Physical System} &
+  \textbf{Observable / Assertion} & \textbf{CRM Level} &
+  \textbf{Key Axiom} \\
+\midrule
+2  & Bidual gap ($\ell^1$)
+   & Gap witness $J - \kappa$
+   & $\equiv \WLPO$ & WLPO \\
+6  & Heisenberg uncertainty
+   & $\Delta A \cdot \Delta B \ge \tfrac{1}{2}|\langle[A,B]\rangle|$
+   & $\BISH$ & None \\
+7  & Reflexive Banach ($S_1(H)$)
+   & Non-reflexivity witness
+   & $\equiv \WLPO$ & WLPO \\
+8  & 1D Ising model
+   & Thermodynamic limit $f_\infty$
+   & $\equiv \LPO$ & BMC \\
+15 & Noether conservation
+   & Global energy $E = \lim E_N$
+   & $\equiv \LPO$ & BMC \\
+19 & WKB tunneling
+   & Turning points (TPP)
+   & $\equiv \LLPO$ & IVT \\
+19 & WKB tunneling
+   & Full semiclassical
+   & $\equiv \LPO$ & IVT+BMC \\
+20 & 1D Ising model
+   & Phase classification
+   & $\equiv \WLPO$ & wlpo\_real \\
+\rowcolor{yellow!20}
+\textbf{21} & \textbf{Bell / CHSH}
+   & \textbf{Sign of Bell asymmetry}
+   & $\equiv \LLPO$ & \textbf{llpo\_real} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Paper~21 contributes the \textbf{first $\LLPO$ calibration in quantum
+foundations}. The pattern of the constructive hierarchy is now
+populated at every level:
+\begin{itemize}
+  \item $\BISH$: Heisenberg uncertainty (Paper~6), $\CHSH$ bound
+    (Paper~21, Part~A).
+  \item $\LLPO$: WKB turning points (Paper~19), Bell sign decision
+    (Paper~21).
+  \item $\WLPO$: Bidual gap (Paper~2), reflexive Banach (Paper~7),
+    Ising phase classification (Paper~20).
+  \item $\LPO$: Ising free energy (Paper~8), Noether conservation
+    (Paper~15), WKB full semiclassical (Paper~19).
+\end{itemize}
+
+
+% ====================================================================
+\section{Lean~4 Formalization}\label{sec:lean}
+% ====================================================================
+
+\subsection{Module Structure}\label{sec:modules}
+
+The formalization consists of 14~files organized in four directories:
+
+\begin{center}
+\begin{tabular}{@{}llr@{}}
+\toprule
+\textbf{Module} & \textbf{Content} & \textbf{Lines} \\
+\midrule
+\texttt{Defs/LLPO.lean}
+  & LLPO, LPO, WLPO, hierarchy & 105 \\
+\texttt{Defs/CHSH.lean}
+  & LHVAssignment, chshExpr, $S_Q$ & 47 \\
+\texttt{Defs/EncodedAsymmetry.lean}
+  & Even/odd fields, Bell asymmetry & 184 \\
+\texttt{PartA/CHSHBound.lean}
+  & 16-case CHSH bound & 28 \\
+\texttt{PartA/QuantumViolation.lean}
+  & $S_Q = 2\sqrt{2} > 2$ & 24 \\
+\texttt{PartA/BellNegation.lean}
+  & $\neg\mathrm{LHV}$ & 22 \\
+\texttt{PartA/PartA\_Main.lean}
+  & Part~A summary and audit & 26 \\
+\texttt{PartB/SignIff.lean}
+  & Sign-iff lemmas & 114 \\
+\texttt{PartB/Forward.lean}
+  & LLPO $\Rightarrow$ BellSignDecision & 30 \\
+\texttt{PartB/Backward.lean}
+  & BellSignDecision $\Rightarrow$ LLPO & 38 \\
+\texttt{PartB/PartB\_Main.lean}
+  & Main equivalence & 29 \\
+\texttt{Main/Stratification.lean}
+  & Three-level result & 34 \\
+\texttt{Main/AxiomAudit.lean}
+  & Comprehensive audit & 63 \\
+\texttt{Main.lean}
+  & Root imports & 7 \\
+\midrule
+\textbf{Total} & & \textbf{751} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Dependency graph:
+\begin{verbatim}
+LLPO <-- CHSH
+  |
+  +-- EncodedAsymmetry <-- SignIff <-- Backward
+  |                   |
+  |                   +-- Forward
+  |
+  +-- CHSHBound <-- QuantumViolation <-- BellNegation
+  |                                        |
+  |                                     PartA_Main
+  |
+  +-- Forward + Backward --> PartB_Main
+  |
+  +-- Stratification <-- AxiomAudit <-- Main
+\end{verbatim}
+
+\subsection{Design Decisions}\label{sec:design}
+
+\paragraph{Bell asymmetry via geometric series.}
+The Bell asymmetry is defined as the difference of two geometric
+series indexed by even and odd positions, rather than as a single
+interleaved series. This design makes the sign-iff lemmas clean:
+nonpositivity (resp.\ nonnegativity) of the difference directly
+implies vanishing of the even (resp.\ odd) field, because
+$\mathrm{AtMostOne}$ forces the other field to zero.
+
+\paragraph{Single interface axiom.}
+Only one CRM equivalence is axiomatized:
+\begin{itemize}
+  \item \texttt{llpo\_real\_of\_llpo : LLPO $\to$ $\forall x : \RR$,
+    $x \le 0 \lor 0 \le x$} \citep{Ishihara06,BR87}.
+\end{itemize}
+The axiom is used only in the forward direction (\Cref{thm:forward}).
+The backward direction (\Cref{thm:backward}) uses no custom axioms,
+making the reverse reduction fully constructive.
+
+\paragraph{Bool-valued sequences.}
+Sequences are typed $\NN \to \mathrm{Bool}$ (not $\NN \to \{0,1\}$),
+matching \Lean{}'s native Boolean type. This avoids cast coercions
+and simplifies the case analysis.
+
+\paragraph{Self-contained bundle.}
+Paper~21 is a standalone Lake package that re-declares $\LLPO$,
+$\WLPO$, and $\LPO$ locally. The hierarchy proofs
+$\LPO \Rightarrow \WLPO \Rightarrow \LLPO$ are proved from first
+principles with no custom axioms.
+
+\subsection{Axiom Audit}\label{sec:axiom-audit}
+
+\begin{center}
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Theorem} & \textbf{Custom Axioms} &
+  \textbf{Infrastructure} & \textbf{Tier} \\
+\midrule
+\texttt{chsh\_bound}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & $\BISH$ \\
+\texttt{chsh\_abs\_bound}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & $\BISH$ \\
+\texttt{S\_quantum\_gt\_two}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & $\BISH$ \\
+\texttt{neg\_lhv}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & $\BISH$ \\
+\texttt{bell\_sign\_of\_llpo}
+  & \texttt{llpo\_real\_of\_llpo}
+  & propext, Classical.choice, Quot.sound
+  & $\LLPO$ \\
+\texttt{llpo\_of\_bell\_sign}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & --- (hypothesis) \\
+\texttt{llpo\_iff\_bell\_sign}
+  & \texttt{llpo\_real\_of\_llpo}
+  & propext, Classical.choice, Quot.sound
+  & $\LLPO$ \\
+\texttt{bell\_stratification}
+  & \texttt{llpo\_real\_of\_llpo}
+  & propext, Classical.choice, Quot.sound
+  & $\LLPO$ \\
+\texttt{lpo\_implies\_wlpo}
+  & None
+  & propext
+  & Pure logic \\
+\texttt{wlpo\_implies\_llpo}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & Pure logic \\
+\texttt{evenField\_eq\_zero\_iff}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & $\BISH$ \\
+\texttt{oddField\_eq\_zero\_iff}
+  & None
+  & propext, Classical.choice, Quot.sound
+  & $\BISH$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{lstlisting}[caption={Axiom audit (Main/AxiomAudit.lean, selected).}]
+-- Part A (BISH):
+#print axioms chsh_bound
+-- [propext, Classical.choice, Quot.sound]
+
+#print axioms S_quantum_gt_two
+-- [propext, Classical.choice, Quot.sound]
+
+#print axioms neg_lhv
+-- [propext, Classical.choice, Quot.sound]
+
+-- Part B (LLPO):
+#print axioms bell_sign_of_llpo
+-- [propext, Classical.choice, Quot.sound,
+--  llpo_real_of_llpo]
+
+-- Backward (no custom axioms!):
+#print axioms llpo_of_bell_sign
+-- [propext, Classical.choice, Quot.sound]
+
+-- Main equivalence:
+#print axioms llpo_iff_bell_sign
+-- [propext, Classical.choice, Quot.sound,
+--  llpo_real_of_llpo]
+
+-- Hierarchy (pure logic):
+#print axioms lpo_implies_wlpo
+-- [propext]
+
+#print axioms wlpo_implies_llpo
+-- [propext, Classical.choice, Quot.sound]
+\end{lstlisting}
+
+\subsection{CRM Compliance Protocol}\label{sec:crm-compliance}
+
+The two-part structure is confirmed by machine:
+\begin{itemize}
+  \item Part~A theorems have \textbf{no custom axioms}---pure $\BISH$.
+  \item Part~B forward depends on \textbf{exactly one} custom axiom
+    (\texttt{llpo\_real\_of\_llpo})---$\LLPO$ level.
+  \item Part~B backward has \textbf{no custom axioms}---the reduction
+    from BellSignDecision to $\LLPO$ is fully constructive.
+  \item The encoded asymmetry lemmas have \textbf{no custom
+    axioms}---the encoding is $\BISH$.
+  \item Hierarchy proofs ($\LPO \Rightarrow \WLPO \Rightarrow \LLPO$)
+    have \textbf{no custom axioms}---sorry-free, pure $\BISH$.
+  \item \texttt{Classical.choice} in all results is a \Mathlib{}
+    infrastructure artifact from \texttt{Real.instField},
+    \texttt{Real.sqrt}, and \texttt{tsum}. The mathematical content
+    of these proofs is constructive.
+\end{itemize}
+
+
+% ====================================================================
+\section{Discussion}\label{sec:discussion}
+% ====================================================================
+
+\subsection{What the LLPO Calibration Means for Bell's Theorem}
+\label{sec:bell-meaning}
+
+The central conceptual contribution of this paper is the measurement
+of the \textbf{constructive cost of disjunction} in Bell's theorem.
+The logical structure of Bell nonlocality has two parts:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Step} & \textbf{Statement} & \textbf{CRM Cost} \\
+\midrule
+Negation & Local realism is refuted & $\BISH$ \\
+Disjunction & The nonlocality favors one party & $\LLPO$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The negation is essentially free: 16 cases show $|S| \le 2$, yet
+quantum mechanics gives $S > 2$. This is a finite contradiction,
+fully constructive.
+
+The disjunctive step---from ``refuted'' to ``the violation leans
+Alice-side or Bob-side''---is \emph{not} free. It costs $\LLPO$.
+Physicists routinely make this step without noting its logical weight.
+Our result makes the cost precise: deciding the sign of the Bell
+asymmetry is equivalent to deciding $x \le 0 \lor 0 \le x$ for an
+arbitrary real number, which is exactly $\LLPO$.
+
+This is profound in the following sense: the step from negation to
+disjunction is the weakest possible nontrivial step in the
+constructive hierarchy. $\LLPO$ is the mildest omniscience principle,
+sitting just above $\BISH$. The disjunctive interpretation of Bell's
+theorem requires the absolute minimum of non-constructive reasoning
+beyond pure computation.
+
+\subsection{LLPO as the Sign-Decision Principle}
+\label{sec:llpo-sign}
+
+The mechanism connecting the Bell sign decision to $\LLPO$ is the
+\emph{real-valued sign decidability}: the ability to decide
+$x \le 0 \lor 0 \le x$ for a real number $x$. This is a standard
+equivalent of $\LLPO$~\citep{Ishihara06,BR87}.
+
+In the Bell context, the real number is the Bell asymmetry
+$\mathrm{bellAsymmetry}(\alpha)$, which encodes the imbalance between
+even-indexed and odd-indexed contributions. The sign of this
+asymmetry---whether Alice-side or Bob-side contributions
+dominate---is a physically meaningful instance of the $\LLPO$
+sign decision.
+
+The pattern is general: whenever a physical quantity can be expressed
+as a difference of two non-negative series indexed by parity, the
+sign decision is an $\LLPO$ assertion. Paper~19 (WKB turning points)
+exhibited the same pattern with the turning-point asymmetry.
+Paper~21 adds a second instance from a completely different domain
+of physics.
+
+\subsection{Why the Sign Route, Not the Bipartition}
+\label{sec:why-sign}
+
+A natural first instinct is to decompose Bell nonlocality into a
+direct binary disjunction: either \emph{locality} fails, or
+\emph{realism} fails---or, in the CHSH setting, either Alice's
+measurements or Bob's measurements are responsible for the
+violation. Such a partition would give a disjunction of exactly the
+shape that $\LLPO$ governs. But this route fails, and its failure
+is structurally informative.
+
+Entanglement is a genuinely \emph{joint} property of the composite
+system $\mathcal{H}_A \otimes \mathcal{H}_B$. There is no
+constructive procedure to decompose a CHSH violation into one
+party's contribution versus the other's: the correlation
+$\langle A_i B_j \rangle$ is a property of the entangled state, not
+of either subsystem alone. Any attempt to attribute the violation to
+Alice or Bob individually smuggles in a factorisation assumption
+that is precisely what Bell's theorem refutes.
+
+The sign-decision route sidesteps this obstacle entirely. Instead of
+asking \emph{which party} the nonlocality belongs to, it asks
+\emph{which direction does a parametric asymmetry lean}---a weaker
+question that does not require decomposing the joint correlation.
+The encoded Bell asymmetry $\mathrm{bellAsymmetry}(\alpha) =
+\mathrm{evenField}(\alpha) - \mathrm{oddField}(\alpha)$ is a
+single real number, and deciding its sign ($\le 0$ or $\ge 0$) has
+exactly the logical shape of $\LLPO$. The equivalence goes through
+because the sign question is logically \emph{just weak enough}: it
+asks for a disjunction without requiring the stronger decomposition
+that the bipartition demands.
+
+The failure of the bipartition approach thus reflects a genuine
+feature of Bell nonlocality---its resistance to local
+attribution---while the success of the sign route shows that the
+\emph{disjunctive} content of Bell's theorem can still be captured
+at the $\LLPO$ level, provided one asks the right question.
+
+\subsection{Limitations}\label{sec:limitations}
+
+\begin{enumerate}
+  \item \textbf{Encoded asymmetry, not literal locality vs.\ realism.}
+    Our $\mathrm{BellSignDecision}$ is about the sign of an encoded
+    asymmetry between even-indexed and odd-indexed contributions,
+    not about the literal distinction between locality failure and
+    realism failure. The encoding is a mathematical proxy that
+    captures the disjunctive structure of Bell's conclusion, but it
+    does not directly formalize the philosophical distinction between
+    locality and realism.
+
+  \item \textbf{Classical.choice in \Mathlib{}.} The appearance of
+    \texttt{Classical.choice} in $\BISH$ results is a \Mathlib{}
+    infrastructure artifact, not mathematical content. This is the
+    same situation as in all previous papers in the series.
+
+  \item \textbf{Single axiom.} The interface axiom
+    \texttt{llpo\_real\_of\_llpo} is standard~\citep{Ishihara06,BR87}
+    but not yet formalized in \Mathlib{} from first principles. The
+    backward direction (\Cref{thm:backward}) requires no axiom,
+    making it fully constructive.
+
+  \item \textbf{No experimental data.} The formalization works with
+    the theoretical quantum prediction $S_Q = 2\sqrt{2}$, not with
+    experimental data. The experimental violation~\citep{Aspect82}
+    would introduce measurement uncertainties not treated here.
+\end{enumerate}
+
+
+% ====================================================================
+\section{Conclusion}\label{sec:conclusion}
+% ====================================================================
+
+The disjunctive interpretation of Bell's theorem---deciding whether
+the Bell asymmetry leans ``Alice-side'' or ``Bob-side''---is
+equivalent to the Lesser Limited Principle of Omniscience ($\LLPO$).
+This is the first CRM calibration of a quantum foundations result at
+the $\LLPO$ level.
+
+The result establishes a three-level stratification within Bell's
+theorem:
+\begin{itemize}
+  \item $\BISH$: The $\CHSH$ bound, the Tsirelson violation, and the
+    negation of LHV models.
+  \item $\LLPO$: The disjunctive conclusion---deciding the sign of
+    the Bell asymmetry.
+  \item $\WLPO \Rightarrow \LLPO$: The hierarchy, confirming that
+    $\LLPO$ sits strictly below $\WLPO$.
+\end{itemize}
+
+The key insight is that the step from negation (``local realism is
+refuted'') to disjunction (``the nonlocality favors one party'') has
+a measurable constructive cost: exactly $\LLPO$, the weakest
+nontrivial omniscience principle. This cost is the absolute minimum
+of non-constructive reasoning above pure computation.
+
+The calibration table now covers physical instantiations at every
+level of the constructive hierarchy: $\BISH$ (Heisenberg, $\CHSH$
+bound), $\LLPO$ (WKB turning points, Bell sign decision), $\WLPO$
+(bidual gap, reflexive Banach, Ising phase classification), and
+$\LPO$ (Ising free energy, Noether conservation, WKB semiclassical).
+The Bell sign decision joins WKB turning points as the second
+$\LLPO$ entry, and the first from quantum foundations.
+
+
+% ====================================================================
+\section*{AI-Assisted Methodology}\label{sec:ai}
+% ====================================================================
+
+This formalization was developed using \textbf{Claude Opus~4.6}
+(Anthropic, 2026) via the \textbf{Claude Code} command-line
+interface, following the same human--AI workflow as previous papers
+in the series~\cite{Lee26-P2,Lee26-P7,Lee26-P8,Lee26-P15,Lee26-P19,Lee26-P20}.
+
+The author is a medical professional, not a domain expert in
+constructive mathematics or mathematical physics. The mathematical
+content of this paper was developed with extensive AI assistance.
+The human author specified the research direction and high-level
+goals, reviewed all mathematical claims for plausibility, and
+directed the formalization strategy. Claude Opus~4.6 explored the
+\Mathlib{} codebase, generated \Lean{} proof terms, handled
+debugging, and assisted with paper writing. Final verification
+was by \texttt{lake build} (0~errors, 0~warnings, 0~sorries).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Component} & \textbf{Human} &
+  \textbf{AI (Claude Opus 4.6)} \\
+\midrule
+Research question          & \checkmark & \\
+Physical setup (Bell/CHSH) & \checkmark & \\
+CRM calibration strategy   & \checkmark & \\
+\Lean{} implementation     & & \checkmark \\
+Proof strategies           & collaborative & collaborative \\
+\LaTeX{} writeup           & & \checkmark \\
+Review and editing         & \checkmark & \\
+\bottomrule
+\end{tabular}
+\caption{Division of labor between human and AI.}
+\label{tab:division}
+\end{table}
+
+
+% ====================================================================
+\section*{Reproducibility}
+% ====================================================================
+
+\begin{mdframed}[backgroundcolor=gray!10]
+\textbf{Reproducibility Box}
+\begin{itemize}
+\item \textbf{Repository}:
+  \url{https://github.com/paul-c-k-lee/FoundationRelativity}
+\item \textbf{Path}: \texttt{paper~21/P21\_BellLLPO/}
+\item \textbf{Build}: \texttt{lake exe cache get \&\& lake build}
+  (0~errors, 0~sorry)
+\item \textbf{Lean toolchain}:
+  \texttt{leanprover/lean4:v4.28.0-rc1}
+\item \textbf{Interface axiom}:
+  \texttt{llpo\_real\_of\_llpo}
+  (LLPO $\to$ $\forall x : \RR$, $x \le 0 \lor 0 \le x$;
+  \cite{Ishihara06,BR87})
+\item \textbf{Axiom profile (Theorem~1, chsh\_bound)}:
+  \texttt{[propext, Classical.choice, Quot.sound]}
+\item \textbf{Axiom profile (Theorem~2, S\_quantum\_gt\_two)}:
+  \texttt{[propext, Classical.choice, Quot.sound]}
+\item \textbf{Axiom profile (Theorem~3, neg\_lhv)}:
+  \texttt{[propext, Classical.choice, Quot.sound]}
+\item \textbf{Axiom profile (Theorem~4, forward)}:
+  \texttt{[propext, Classical.choice, Quot.sound,
+  llpo\_real\_of\_llpo]}
+\item \textbf{Axiom profile (Theorem~5, backward)}:
+  \texttt{[propext, Classical.choice, Quot.sound]}
+\item \textbf{Axiom profile (Theorem~6, main equiv)}:
+  \texttt{[propext, Classical.choice, Quot.sound,
+  llpo\_real\_of\_llpo]}
+\item \textbf{Axiom profile (Theorem~7, stratification)}:
+  \texttt{[propext, Classical.choice, Quot.sound,
+  llpo\_real\_of\_llpo]}
+\item \textbf{Total}: 14~files, 751~lines, 0~sorry
+\item \textbf{Zenodo DOI}:
+  \href{https://doi.org/10.5281/zenodo.18603251}{10.5281/zenodo.18603251}
+\end{itemize}
+\end{mdframed}
+
+
+% ====================================================================
+\section*{Acknowledgments}
+% ====================================================================
+
+The \Lean{} formalization was developed using Claude Opus~4.6
+(Anthropic, 2026) via the Claude Code CLI tool. We thank the
+\Mathlib{} community for maintaining the comprehensive library
+of formalized mathematics that made this work possible.
+
+
+% ====================================================================
+% Bibliography
+% ====================================================================
+\bibliographystyle{plainnat}
+\bibliography{paper21_references}
+
+\end{document}

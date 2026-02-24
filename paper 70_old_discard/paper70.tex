@@ -1,0 +1,979 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{amsthm}
+\usepackage[american]{babel}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{url}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Fp}{\mathbb{F}_p}
+\newcommand{\Fbar}{\overline{\mathbb{F}}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\Pp}{\mathbb{P}}
+\newcommand{\calO}{\mathcal{O}}
+\newcommand{\fm}{\mathfrak{m}}
+\newcommand{\Gal}{\mathrm{Gal}}
+\newcommand{\GL}{\mathrm{GL}}
+\newcommand{\PGL}{\mathrm{PGL}}
+\newcommand{\Frob}{\mathrm{Frob}}
+\newcommand{\Sel}{\mathrm{Sel}}
+\newcommand{\ad}{\mathrm{ad}}
+
+\newcommand{\BISH}{\mathsf{BISH}}
+\newcommand{\LPO}{\mathsf{LPO}}
+\newcommand{\WLPO}{\mathsf{WLPO}}
+\newcommand{\LLPO}{\mathsf{LLPO}}
+\newcommand{\MP}{\mathsf{MP}}
+\newcommand{\FT}{\mathsf{FT}}
+\newcommand{\WKL}{\mathsf{WKL}_0}
+\newcommand{\CLASS}{\mathsf{CLASS}}
+
+
+\title{Serre's Modularity Conjecture is $\BISH + \WLPO$:\\
+  The Trace Formula as Universal Tax\\[6pt]
+  \large (Paper~70 of the Constructive Reverse Mathematics Series)}
+
+\author{Paul Chun-Kit Lee \\
+\texttt{dr.paul.c.lee@gmail.com}}
+
+\date{February 2026}
+
+\begin{document}
+\maketitle
+
+% ============================================================
+\begin{abstract}
+% ============================================================
+
+We extend the constructive reverse mathematics audit of the
+Langlands program for $\GL_2/\Q$ to its most general case:
+Serre's modularity conjecture, proved by Khare--Wintenberger
+(2009).  The conjecture asserts that every odd irreducible
+representation $\bar{\rho} : G_\Q \to \GL_2(\Fbar_p)$ is
+modular.
+
+The Khare--Wintenberger proof introduces two ingredients absent
+from Papers~68--69: Taylor's potential modularity theorem
+(constructing a totally real field~$F$ and a CM abelian variety
+$A/F$ realising~$\bar{\rho}|_{G_F}$) and a double induction on
+Serre weight and conductor using level-raising and level-lowering.
+Unlike the BCDT proof (Paper~69), the icosahedral case ($A_5$
+projective image at $p = 5$) is genuinely encountered and cannot
+be avoided.
+
+The classification is $\BISH + \WLPO$, identical to Papers~68
+and~69.  The algebraic infrastructure---potential modularity
+construction (Moret-Bailly), Taylor--Wiles patching over~$F$
+(Brochard, effective Chebotarev), CM modularity (theta series,
+Hecke characters), Serre's weight-level recipe---is~$\BISH$
+throughout.  The $\WLPO$ enters at three structurally distinct
+points, all via the Arthur--Selberg trace formula:
+Langlands--Tunnell for solvable base cases ($p = 2, 3$),
+Jacquet--Langlands for the quaternionic transfer in the
+icosahedral case ($p = 5$), and Jacquet--Langlands for
+level-lowering in the inductive steps.
+
+The trace formula is the universal tax on the Langlands
+program for $\GL_2$: every proof route passes through it,
+always at $\WLPO$ cost, and all algebraic machinery contributes
+nothing beyond~$\BISH$.
+
+\end{abstract}
+
+\tableofcontents
+
+
+% ============================================================
+\section{Introduction}\label{sec:intro}
+% ============================================================
+
+Serre's modularity conjecture, formulated in \cite{Serre1987}
+and proved by Khare--Wintenberger \cite{KW2009a, KW2009b},
+asserts that every odd irreducible representation
+$\bar{\rho} : G_\Q \to \GL_2(\Fbar_p)$ arises from a modular
+form of weight $k(\bar{\rho})$ and level $N(\bar{\rho})$, where
+$k$ and $N$ are given by Serre's explicit recipe.
+
+This is the most general modularity result for $\GL_2/\Q$.
+It implies the modularity of all elliptic curves over~$\Q$
+(recovering BCDT \cite{BCDT2001}) and resolves numerous cases
+of the Fontaine--Mazur conjecture.
+
+This paper is part of the constructive reverse mathematics series
+(see Papers~1--53 for the general framework; Paper~50 for the
+atlas survey).  Within the atlas, Paper~70 sits on the
+$\GL_2/\Q$ modularity branch, completing the progression
+begun in Papers~68--69:
+\begin{center}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Paper} & \textbf{Theorem} & \textbf{Classification} \\
+\midrule
+68 & Wiles (semistable $E/\Q$) & $\BISH + \WLPO$ \\
+69 & BCDT (all $E/\Q$) & $\BISH + \WLPO$ \\
+70 & Khare--Wintenberger (all $\bar{\rho}$) & $\BISH + \WLPO$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+The classification is invariant across all three theorems.
+Paper~70 completes the audit of the $\GL_2/\Q$ Langlands
+correspondence.
+
+\medskip
+\noindent
+\textbf{Main results.}
+
+\begin{description}[nosep,leftmargin=0pt]
+\item[Theorem~A] (Classification).
+  The Khare--Wintenberger proof of Serre's modularity conjecture
+  calibrates at $\BISH + \WLPO$ (Theorem~\ref{thm:main}).
+
+\item[Theorem~B] (Universal tax).
+  The $\WLPO$ enters at three structurally distinct points, all
+  via the Arthur--Selberg trace formula: Langlands--Tunnell
+  ($p = 2, 3$), Jacquet--Langlands for the icosahedral case
+  ($p = 5$), and Jacquet--Langlands for level-lowering.
+  All algebraic machinery is~$\BISH$
+  (Corollary~\ref{cor:tax}).
+
+\item[Theorem~C] (Invariance).
+  Papers~68, 69, 70 all classify at $\BISH + \WLPO$; the
+  classification is invariant across the entire $\GL_2/\Q$
+  Langlands program (Corollary~\ref{cor:inv}).
+\end{description}
+
+
+% ============================================================
+\section{Preliminaries}\label{sec:prelim}
+% ============================================================
+
+We recall the logical principles and notational conventions
+used in this paper.  For full background on constructive
+reverse mathematics (CRM), see Bridges--Richman
+\cite{BridgesRichman1987} and Papers~1--53 of this series.
+
+\begin{definition}[$\BISH$]
+Bishop's constructive mathematics: intuitionistic logic with
+dependent choice.  All computations terminate; no appeal to
+excluded middle.
+\end{definition}
+
+\begin{definition}[$\WLPO$]
+The Weak Limited Principle of Omniscience: for every binary
+sequence $\alpha : \N \to \{0,1\}$, either $\alpha(n) = 0$
+for all~$n$, or it is not the case that $\alpha(n) = 0$ for
+all~$n$.  Equivalently, equality of real numbers is decidable
+from above: $\forall x \in \R,\; x = 0 \lor x \neq 0$ is
+not asserted, but $\forall x \in \R,\; x = 0 \lor \lnot(x = 0)$
+holds.
+\end{definition}
+
+\begin{definition}[CRM hierarchy]
+The hierarchy used throughout this series:
+\[
+  \BISH \;\subset\; \MP \;\subset\; \LLPO
+  \;\subset\; \WLPO \;\subset\; \LPO
+  \;\subset\; \CLASS.
+\]
+The \emph{join} of two levels is their maximum in this chain.
+A theorem's CRM classification is the join of the principles
+used in its proof.
+\end{definition}
+
+\noindent
+\textbf{Notational conventions.}
+$G_\Q = \Gal(\bar{\Q}/\Q)$ is the absolute Galois group.
+$\bar{\rho} : G_\Q \to \GL_2(\Fbar_p)$ denotes a residual
+(mod~$p$) Galois representation; ``odd'' means
+$\det \bar{\rho}(c) = -1$ for complex conjugation~$c$.
+$\A_F$ is the ad\`ele ring of a number field~$F$.
+$D$ denotes a quaternion algebra over~$F$.
+
+
+% ============================================================
+\section{The Khare--Wintenberger Proof: Architecture}%
+\label{sec:arch}
+% ============================================================
+
+The proof uses three engines and a double induction.
+
+\subsection{The three engines}
+
+\textbf{Engine~1: Modularity lifting} (Taylor--Wiles).
+Given a modular residual representation~$\bar{\rho}$, lift to
+a modular $p$-adic representation~$\rho$.  Classified as $\BISH$
+in Paper~68 (Brochard + effective Chebotarev).
+
+\textbf{Engine~2: Potential modularity} (Taylor
+\cite{Taylor2002, Taylor2003}).  For any~$\bar{\rho}$, construct
+a totally real field~$F$ such that $\bar{\rho}|_{G_F}$ is
+modular.  New in Paper~70; classified in \S\ref{sec:potmod}.
+
+\textbf{Engine~3: Level and weight manipulation} (Ribet,
+Diamond--Taylor, Khare--Wintenberger).  Raise or lower the level
+and weight of a modular form via congruences.  New in Paper~70;
+classified in \S\ref{sec:induction}.
+
+\subsection{The double induction}
+
+Khare--Wintenberger prove Serre's conjecture by induction on two
+quantities: the Serre weight $k(\bar{\rho})$ and the conductor
+$N(\bar{\rho})$.
+
+\textbf{Base cases:}  For $p = 2$, $\PGL_2(\F_2) \cong S_3$
+(solvable); for $p = 3$, $\PGL_2(\F_3) \cong S_4$ (solvable).
+In both cases Langlands--Tunnell applies, costing $\WLPO$
+(Paper~68).  For $p = 5$, $\PGL_2(\F_5) \cong S_5 \supset A_5$;
+the icosahedral case arises and is handled by potential
+modularity (\S\ref{sec:potmod}).
+
+\textbf{Inductive step:}  Given $\bar{\rho}$ with
+$k(\bar{\rho}) > 2$ or $N(\bar{\rho}) > 1$, find a congruent
+representation $\bar{\rho}'$ with strictly smaller weight or
+conductor, already modular by the inductive hypothesis.
+Use modularity lifting to deduce $\bar{\rho}$ is modular.
+
+
+% ============================================================
+\section{Potential Modularity}\label{sec:potmod}
+% ============================================================
+
+Taylor's potential modularity theorem is the key new ingredient.
+
+\begin{theorem}[Taylor 2002, 2003]\label{thm:potmod}
+For any odd irreducible $\bar{\rho} : G_\Q \to \GL_2(\Fbar_p)$,
+there exists a totally real field~$F$ and a CM abelian
+variety $A/F$ such that $\bar{\rho}|_{G_F}$ appears in the
+$p$-torsion of~$A$.
+\end{theorem}
+
+The proof has three steps with distinct logical profiles.
+
+\subsection{Step~(a): Construction of $F$ and $A$ ($\BISH$)}
+
+Taylor constructs $F$ and $A$ using Moret-Bailly's theorem
+\cite{MoretBailly1989}: if a moduli space~$X$ parameterising
+abelian varieties with prescribed $p$-torsion has local points
+over~$\R$ and~$\Q_p$, then it has a global point over some
+totally real extension~$F$.
+
+\begin{proposition}[Moret-Bailly is $\BISH$]\label{prop:mb}
+The Moret-Bailly construction is a $\BISH$-decidable computation.
+\end{proposition}
+
+\begin{proof}
+Moret-Bailly's theorem glues local points into a global point
+using weak approximation (the Chinese Remainder Theorem) and the
+implicit function theorem over local fields (Hensel's
+lemma/Newton's method).  The local points over $\R$ and $\Q_p$
+are verified by explicit polynomial evaluations.  The global
+point over~$F$ is found by bounded search over algebraic numbers
+of explicitly bounded height.  No continuous limits or
+real/complex equality testing is required.
+\end{proof}
+
+\subsection{Step~(b): Modularity of $A$ via Jacquet--Langlands
+  ($\WLPO$)}\label{sec:jl}
+
+This is the critical step where the trace formula re-enters.
+
+The CM abelian variety $A/F$ determines a Hecke character of a
+CM extension $K/F$, and the associated automorphic form on
+$\GL_2(\A_F)$ can be written down explicitly via theta series.
+CM modularity itself is algebraic ($\BISH$).
+
+However, the Taylor--Wiles patching over~$F$ cannot be executed
+directly on $\GL_2(F)$ because Hilbert modular varieties are
+non-compact: their boundary cohomology prevents the deformation
+rings from having the required algebraic properties.  Taylor
+transfers the problem to a quaternion algebra~$D$ over~$F$
+(totally definite, or split at exactly one infinite place),
+where the associated Shimura variety is compact and the
+Taylor--Wiles machinery applies cleanly.
+
+The patching produces a quaternionic automorphic form
+$\pi_D$ on $D^\times(\A_F)$ lifting $\bar{\rho}|_{G_F}$.
+Since $\bar{\rho}$ is generically not CM, $\pi_D$ is not
+a CM form.
+
+\begin{proposition}[Jacquet--Langlands requires $\WLPO$]%
+\label{prop:jl}
+Transferring $\pi_D$ from $D^\times$ back to $\GL_2(F)$
+requires the Jacquet--Langlands correspondence
+\cite{JacquetLanglands1970}, which is proved using the
+Arthur--Selberg trace formula.  The trace formula matches
+orbital integrals by evaluating continuous complex limits and
+testing exact equality of real numbers.  This costs~$\WLPO$.
+\end{proposition}
+
+\begin{remark}[The quaternionic bottleneck]\label{rem:quat}
+The Jacquet--Langlands correspondence is the inescapable
+bottleneck.  Even though CM modularity is algebraic, the
+\emph{transfer} from the compact Shimura variety (where
+patching works) to the non-compact Hilbert modular variety
+(where the final theorem lives) requires the trace formula.
+The $\WLPO$ is not in the starting point or the engine, but
+in the \emph{bridge between them}.
+\end{remark}
+
+\subsection{Step~(c): Modularity lifting over $F$ ($\BISH$)}
+
+\begin{proposition}[Taylor--Wiles over $F$ is $\BISH$]%
+\label{prop:twf}
+The Taylor--Wiles patching method over a totally real field~$F$
+has the same constructive classification as over~$\Q$.
+\end{proposition}
+
+\begin{proof}
+Brochard's theorem \cite{Brochard2017} (de~Smit's conjecture) is
+a statement about morphisms of Artinian local rings.  It is
+completely independent of the base field: it applies to Hecke
+algebras arising from Hilbert modular forms over~$F$ as readily
+as from classical modular forms over~$\Q$.  The infinite inverse
+limit is eliminated at level $n = 2$ regardless of the base
+field.
+
+The effective Chebotarev bounds of Lagarias--Montgomery--Odlyzko
+\cite{LMO1979} are formulated for arbitrary finite Galois
+extensions of arbitrary number fields~$K$.  The splitting field
+discriminants over~$F$ are computable from the same data
+$(N, p, \bar{\rho}, F)$.  Taylor--Wiles prime selection
+over~$F$ is a bounded computation.
+
+Both ingredients transfer.  Stage~5 over~$F$ is~$\BISH$.
+\end{proof}
+
+
+% ============================================================
+\section{The Induction: Level-Raising and Level-Lowering}%
+\label{sec:induction}
+% ============================================================
+
+\subsection{Level-lowering ($\WLPO$ via Jacquet--Langlands)}
+
+To reduce the conductor of~$\bar{\rho}$, Khare--Wintenberger
+invoke level-lowering theorems (Ribet \cite{Ribet1990} over~$\Q$;
+Fujiwara \cite{Fujiwara2006} and Jarvis \cite{Jarvis1999}
+over totally real fields).
+
+Over~$\Q$, Ribet's theorem is proved using the geometry of
+modular Jacobians: component groups of N\'eron models at primes
+of bad reduction, the Cerednik--Drinfeld uniformisation of
+Shimura curves.  These geometric arguments are explicit and
+finite ($\BISH$).
+
+Over totally real fields, level-lowering requires transferring
+modular forms between $\GL_2(F)$ and a quaternion algebra~$D$
+ramified at the prime being removed.  This transfer again
+invokes the Jacquet--Langlands correspondence
+(Proposition~\ref{prop:jl}), reintroducing $\WLPO$.
+
+\begin{remark}[Trace formula at every inductive step]%
+\label{rem:induction}
+Each level-lowering step over a totally real field invokes
+Jacquet--Langlands, and hence the trace formula, once.  The
+$\WLPO$ cost recurs at each inductive step, but it is always
+the same~$\WLPO$---no escalation to~$\LPO$ occurs.  The
+trace formula is used as a black box that transfers automorphic
+forms between inner forms of~$\GL_2$.  Each invocation tests
+finitely many orbital integral equalities, each costing~$\WLPO$.
+\end{remark}
+
+\subsection{Level-raising ($\BISH$)}
+
+Level-raising (Diamond--Taylor \cite{DiamondTaylor1994})
+constructs congruences between modular forms at different levels.
+The existence of the congruence is proved using the geometry of
+the supersingular locus on modular curves (explicit intersection
+theory) and Ihara's lemma (a statement about the injectivity of
+a restriction map on modular forms, proved by linear algebra on
+finite-dimensional spaces).  This is~$\BISH$.
+
+\subsection{Weight reduction ($\BISH$)}
+
+Weight reduction uses Hasse invariant and theta operator
+techniques to relate forms of weight~$k$ to forms of lower weight.
+The Hasse invariant is an explicit section of a line bundle on
+the modular curve, computable by its $q$-expansion.  The theta
+operator $\theta = q \, d/dq$ is an explicit differential operator
+on $q$-expansions.  Both operations are finite arithmetic
+on power series truncated at computable precision.  This
+is~$\BISH$.
+
+\subsection{Serre's recipe ($\BISH$)}
+
+The weight $k(\bar{\rho})$ and conductor $N(\bar{\rho})$
+prescribed by Serre's recipe are computable from the local
+behaviour of~$\bar{\rho}$ at each prime:
+
+The conductor $N(\bar{\rho})$ is determined by the Artin
+conductor of~$\bar{\rho}$, which is a product of local
+terms depending on the ramification filtration of~$\bar{\rho}$
+at each prime $\ell \ne p$.  These are finite group-theoretic
+computations.
+
+The weight $k(\bar{\rho})$ is determined by the restriction
+$\bar{\rho}|_{I_p}$ to the inertia group at~$p$, via Serre's
+explicit formula involving the tame and wild parts of the
+inertia action.  This is finite arithmetic.
+
+Both computations are~$\BISH$.
+
+
+% ============================================================
+\section{The Classification Theorem}\label{sec:main}
+% ============================================================
+
+\begin{theorem}[Serre's Modularity Conjecture is
+  $\BISH + \WLPO$]\label{thm:main}
+The Khare--Wintenberger proof of Serre's modularity conjecture
+calibrates at $\BISH + \WLPO$.
+\end{theorem}
+
+\begin{proof}
+The proof uses three engines and a double induction.  We
+classify each component:
+
+\medskip
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Component} & \textbf{Classification} & \textbf{Key input} \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Base cases}} \\
+\quad $p = 2$: Langlands--Tunnell ($S_3$) & $\WLPO$ &
+  Trace formula \\
+\quad $p = 3$: Langlands--Tunnell ($S_4$) & $\WLPO$ &
+  Trace formula \\
+\quad $p = 5$: Potential modularity ($A_5$) &  $\WLPO$ &
+  Jacquet--Langlands \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Engines}} \\
+\quad Modularity lifting (TW over $F$) & $\BISH$ &
+  Brochard + eff.\ Chebotarev \\
+\quad Potential modularity construction & $\BISH$ &
+  Moret-Bailly \\
+\quad CM modularity (theta series) & $\BISH$ &
+  Hecke characters \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Inductive steps}} \\
+\quad Level-lowering over $\Q$ (Ribet) & $\BISH$ &
+  Modular Jacobian geometry \\
+\quad Level-lowering over $F$ (Fujiwara) & $\WLPO$ &
+  Jacquet--Langlands \\
+\quad Level-raising (Diamond--Taylor) & $\BISH$ &
+  Supersingular locus, Ihara \\
+\quad Weight reduction & $\BISH$ &
+  Hasse invariant, theta operator \\
+\quad Serre's recipe & $\BISH$ &
+  Local Artin conductors \\
+\midrule
+\textbf{Overall} & $\BISH + \WLPO$ & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\noindent
+The join of all components is~$\WLPO$.
+\end{proof}
+
+\begin{corollary}[The trace formula is the universal tax]%
+\label{cor:tax}
+The $\WLPO$ in the Khare--Wintenberger proof enters at three
+structurally distinct points:
+\begin{enumerate}[label=(\roman*),nosep]
+\item Langlands--Tunnell for solvable base cases ($p = 2, 3$):
+  the trace formula proves residual modularity of representations
+  with solvable projective image.
+\item Jacquet--Langlands for the icosahedral case ($p = 5$):
+  the trace formula transfers the quaternionic automorphic form
+  back to $\GL_2(F)$ after potential modularity.
+\item Jacquet--Langlands for level-lowering over totally real
+  fields: the trace formula transfers modular forms between
+  $\GL_2(F)$ and a quaternion algebra $D/F$ at each inductive
+  step.
+\end{enumerate}
+All three are applications of the Arthur--Selberg trace formula,
+each costing~$\WLPO$.  The algebraic machinery---Moret-Bailly,
+Brochard, effective Chebotarev, theta series, Ribet, Ihara,
+Serre's recipe---contributes nothing beyond~$\BISH$.
+\end{corollary}
+
+\begin{corollary}[Invariance across the $\GL_2$ program]%
+\label{cor:inv}
+The CRM classification of every modularity theorem for
+$\GL_2/\Q$ is $\BISH + \WLPO$:
+\begin{center}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Paper} & \textbf{Theorem} & \textbf{$\WLPO$ source} &
+  \textbf{Class.} \\
+\midrule
+68 & Wiles (semistable) & Langlands--Tunnell &
+  $\BISH + \WLPO$ \\
+69 & BCDT (all $E/\Q$) & Langlands--Tunnell &
+  $\BISH + \WLPO$ \\
+70 & Khare--Wintenberger (all $\bar{\rho}$) &
+  LT + Jacquet--Langlands & $\BISH + \WLPO$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+The classification is invariant: generalising the theorem
+does not change the logical cost.  The trace formula is the
+unique source of $\WLPO$, and it appears in every proof.
+\end{corollary}
+
+
+% ============================================================
+\section{CRM Audit}\label{sec:audit}
+% ============================================================
+
+We summarise the constructive strength classification and
+compare with the calibration patterns established in
+earlier papers.
+
+\subsection{What is necessary, what is sufficient}
+
+\textbf{Sufficient:} $\BISH + \WLPO$ suffices for the
+full Khare--Wintenberger proof.
+
+\textbf{Necessary:} The three $\WLPO$ entry points
+(Langlands--Tunnell, Jacquet--Langlands for potential
+modularity, Jacquet--Langlands for level-lowering) are
+each independently necessary: each invokes the
+Arthur--Selberg trace formula, which requires testing
+equality of real-valued orbital integrals.  No known
+alternative avoids real equality testing.
+
+\textbf{No escalation:} Multiple invocations of $\WLPO$
+(at each inductive step) do not escalate to~$\LPO$.
+Each invocation tests finitely many orbital integral
+equalities; the join of finitely many copies of~$\WLPO$
+is~$\WLPO$.
+
+\subsection{Comparison with Paper~45 calibration pattern}
+
+The de-omniscientising descent pattern identified in
+Paper~45 applies cleanly: the classical proof (which
+uses $\CLASS$ implicitly throughout) is shown to require
+only~$\WLPO$ as its non-constructive content.  The
+algebraic infrastructure---however deep (Moret-Bailly,
+Brochard, Ribet, Diamond--Taylor, Serre's recipe)---descends
+to~$\BISH$.
+
+\subsection{Descent diagram}
+
+\[
+  \CLASS \;\xrightarrow{\text{audit}}\;
+  \BISH + \WLPO \;\xrightarrow{\text{remove trace formula}}\;
+  \BISH
+\]
+The trace formula is the unique bottleneck.
+If constructivised (Paper~71), the entire $\GL_2/\Q$
+Langlands program descends to~$\BISH$.
+
+
+% ============================================================
+\section{The Quaternionic Bottleneck}\label{sec:bottleneck}
+% ============================================================
+
+The most striking structural finding of this audit is the
+role of the Jacquet--Langlands correspondence as a logical
+bottleneck.
+
+CM modularity---the algebraic heart of Taylor's potential
+modularity theorem---is $\BISH$.  One can write down the
+automorphic form associated to a CM abelian variety explicitly,
+using theta series and Hecke characters, without invoking the
+trace formula.  The Taylor--Wiles patching over~$F$, after
+Brochard, is~$\BISH$.  The construction of the totally real
+field~$F$ (Moret-Bailly) is~$\BISH$.
+
+Yet the proof cannot avoid the trace formula, because
+the Taylor--Wiles method must operate on a \emph{compact}
+Shimura variety (quaternionic), while the final theorem
+concerns a \emph{non-compact} Hilbert modular variety.  The
+transfer between these two settings is the Jacquet--Langlands
+correspondence, and its proof is irreducibly analytic.
+
+This creates a paradox of sorts: the \emph{hardest} case in
+the Langlands program for $\GL_2$ (icosahedral, $A_5$, the
+last case proved historically) encounters the trace formula
+not at the starting point (as in Papers~68--69, where
+Langlands--Tunnell provides the base case) but at the
+\emph{bridge} between the compact setting where the proof
+works and the non-compact setting where the theorem lives.
+
+The $\WLPO$ is not in the foundations or the engine.  It is
+in the \emph{corridor} connecting them.
+
+
+% ============================================================
+\section{Implications for Paper~71}\label{sec:paper71}
+% ============================================================
+
+Paper~71 investigates whether the $\WLPO$ can be eliminated
+from the $\GL_2$ Langlands program by constructivising the
+trace formula (via the simple trace formula of Flicker--Kazhdan
+or Arthur's simple form).
+
+Paper~70 sharpens the target.  It is not sufficient to
+constructivise the trace formula for a single application
+(Langlands--Tunnell, as in Paper~68).  The trace formula
+enters at \emph{three} structurally distinct points in the
+Khare--Wintenberger proof:
+
+If the Jacquet--Langlands correspondence for $\GL_2$ over
+totally real fields can be proved constructively, then all
+three entry points are simultaneously eliminated.
+Jacquet--Langlands for $\GL_2$ reduces to a character identity
+on inner forms, and for compact Shimura curves the trace
+formula simplifies dramatically (no continuous spectrum, no
+Eisenstein series---the quaternion algebra being definite or
+having compact quotient ensures the spectrum is discrete).
+
+This suggests that the Jacquet--Langlands case may actually
+be \emph{easier} to constructivise than the Langlands--Tunnell
+case, because the $L^2$-space is already compact and the
+spectral decomposition is already discrete.
+
+If so, the constructivisation program for the $\GL_2$
+Langlands correspondence has two tiers:
+
+\textbf{Tier~1} (easier): constructivise Jacquet--Langlands
+for definite quaternion algebras over totally real fields.
+This eliminates the $\WLPO$ from the icosahedral case and
+from level-lowering.
+
+\textbf{Tier~2} (harder): constructivise Langlands--Tunnell
+(base change for $\GL_2$ via the full trace formula on a
+non-compact quotient).  This eliminates the $\WLPO$ from the
+solvable base cases.
+
+If only Tier~1 is achieved, the classification of
+Khare--Wintenberger improves to: ``$\BISH + \WLPO$, where the
+$\WLPO$ comes solely from Langlands--Tunnell at $p = 2, 3$.''
+The icosahedral case and the inductive steps become~$\BISH$.
+
+If both tiers are achieved, the entire $\GL_2$ Langlands
+program is~$\BISH$, and Fermat's Last Theorem is
+constructive.
+
+
+% ============================================================
+\section{Lean~4 Verification}\label{sec:lean}
+% ============================================================
+
+The classification is verified in Lean~4 using Mathlib.
+Unlike Paper~68 (which axiomatised deep theorems such as
+Brochard's criterion and effective Chebotarev), Paper~70
+records each component's CRM classification as a
+definitional constant and proves the join algebra formally.
+This follows the Paper~69 precedent: the individual
+classifications are mathematical judgments defended in the
+text; the Lean bundle verifies that the lattice-theoretic
+assembly is correct.
+
+\subsection{File structure and build status}
+
+The bundle \texttt{P70\_KhareWintenberger/} contains four
+source files:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{File} & \textbf{Lines} & \textbf{Content} \\
+\midrule
+\texttt{Paper70\_Defs.lean} & 154 &
+  CRM hierarchy, Paper~68--69 stage defs \\
+\texttt{Paper70\_PotentialModularity.lean} & 125 &
+  Moret-Bailly, CM, JL, TW/$F$ \\
+\texttt{Paper70\_InductionSteps.lean} & 155 &
+  Base cases, level/weight manipulation \\
+\texttt{Paper70\_Main.lean} & 313 &
+  Master theorem, corollaries, audit \\
+\midrule
+\textbf{Total} & \textbf{747} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Build: 112 jobs, zero errors, zero warnings, zero
+\texttt{sorry}.  Toolchain: \texttt{leanprover/lean4:v4.29.0-rc1},
+Mathlib (current HEAD).
+
+\subsection{Axiom inventory}
+
+Paper~70 declares \textbf{no opaque types} and \textbf{no
+custom axioms}.  Every component classification is a
+\texttt{def} mapping to a concrete \texttt{CRMLevel}
+constructor.  Every theorem is proved by
+\texttt{simp [join, ...]} or \texttt{rfl}.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Axiom} & \textbf{Used by} & \textbf{Status} \\
+\midrule
+\texttt{propext} &
+  \texttt{paper70\_kw\_classification}, &
+  Lean kernel \\
+  & \texttt{gl2\_invariance} & (non-load-bearing) \\
+\texttt{Classical.choice} & (none) & Not used \\
+\texttt{sorry} & (none) & Not used \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The \texttt{propext} dependency arises from \texttt{simp}
+lemma infrastructure; it is a Lean kernel axiom and carries
+no classical content.  The theorem
+\texttt{all\_components\_classified} (a 20-tuple of
+\texttt{rfl}) depends on no axioms whatsoever.
+
+\subsection{Key code snippets}
+
+The master theorem:
+
+\begin{small}
+\begin{verbatim}
+/-- Theorem A: Khare-Wintenberger is BISH + WLPO. -/
+theorem paper70_kw_classification :
+    kw_overall = CRMLevel.WLPO := by
+  simp [kw_overall, kw_bish_components, kw_wlpo_components,
+        stage1_class, ..., join]
+\end{verbatim}
+\end{small}
+
+\noindent
+The invariance corollary (Theorem~C):
+
+\begin{small}
+\begin{verbatim}
+/-- Papers 68, 69, 70 all classify at WLPO. -/
+theorem gl2_invariance :
+    paper68_overall = CRMLevel.WLPO /\
+    paper69_overall = CRMLevel.WLPO /\
+    kw_overall = CRMLevel.WLPO := by
+  refine <_, _, paper70_kw_classification>
+  · simp [paper68_overall, ..., join]
+  · simp [paper69_overall, ..., join]
+\end{verbatim}
+\end{small}
+
+\subsection{\texttt{\#print axioms} output}
+
+\begin{small}
+\begin{verbatim}
+#print axioms paper70_kw_classification
+-- 'paper70_kw_classification' depends on axioms: [propext]
+
+#print axioms gl2_invariance
+-- 'gl2_invariance' depends on axioms: [propext]
+
+#print axioms all_components_classified
+-- 'all_components_classified' does not depend on any axioms
+\end{verbatim}
+\end{small}
+
+\noindent
+No \texttt{Classical.choice}.  The bundle is constructively
+clean modulo \texttt{propext} (which is part of Lean's kernel
+and carries no classical content).
+
+\subsection{Reproducibility}
+
+The Lean bundle is archived at Zenodo:
+\begin{center}
+\url{https://doi.org/10.5281/zenodo.18749757}
+\end{center}
+To reproduce: download the archive, run
+\texttt{lake update \&\& lake build} with the specified
+\texttt{lean-toolchain}.  The build fetches the Mathlib
+cache automatically.  Expected build time: under 30 seconds
+(after cache download) on a standard machine.
+
+
+% ============================================================
+\section{Conclusion}\label{sec:conclusion}
+% ============================================================
+
+Serre's modularity conjecture---the most general modularity
+theorem for $\GL_2/\Q$---calibrates at $\BISH + \WLPO$.  The
+classification is identical to the semistable case (Paper~68)
+and the full elliptic curve case (Paper~69).
+
+The trace formula is the universal tax on the Langlands
+program for $\GL_2$.  It appears in three structurally
+distinct roles: as the foundation of residual modularity
+(Langlands--Tunnell), as the corridor between compact and
+non-compact automorphic settings (Jacquet--Langlands), and as
+the engine of level-lowering over totally real fields
+(Jacquet--Langlands again).  Each role costs~$\WLPO$.  No
+algebraic ingredient in any proof---however sophisticated---costs
+more than~$\BISH$.
+
+The audit of the $\GL_2/\Q$ Langlands program is now
+complete.  Papers~68--70 classify every major modularity
+theorem, from Wiles to Khare--Wintenberger, at
+$\BISH + \WLPO$.  The $\WLPO$ is the trace formula.
+The trace formula is the only obstruction to a fully
+constructive Langlands program.
+
+Paper~71 will investigate whether this obstruction can be
+removed.
+
+% ============================================================
+\section*{Acknowledgments}
+\addcontentsline{toc}{section}{Acknowledgments}
+% ============================================================
+
+The proof-theoretic analysis was conducted with AI assistance
+(Anthropic Claude).  The author is not a domain expert in
+arithmetic geometry; the mathematics is due to Khare,
+Wintenberger, Taylor, Langlands, Jacquet, Ribet, Breuil,
+Brochard, and Moret-Bailly.  The CRM methodology follows
+Bishop \cite{Bishop1967} and Bridges--Richman
+\cite{BridgesRichman1987}.
+
+The Lean~4 formalization relies on Mathlib, maintained by the
+Lean community and the Mathlib contributors.  We thank the
+Mathlib maintainers for the library infrastructure that makes
+formal verification of mathematical arguments practical.
+
+
+% ============================================================
+\begin{thebibliography}{30}
+% ============================================================
+
+\bibitem{BCDT2001}
+C.~Breuil, B.~Conrad, F.~Diamond, and R.~Taylor.
+On the modularity of elliptic curves over~$\Q$: wild $3$-adic
+exercises.
+\textit{J.~Amer.\ Math.\ Soc.}, 14(4):843--939, 2001.
+
+\bibitem{Bishop1967}
+E.~Bishop.
+\textit{Foundations of Constructive Analysis}.
+McGraw-Hill, 1967.
+
+\bibitem{BridgesRichman1987}
+D.~Bridges and F.~Richman.
+\textit{Varieties of Constructive Mathematics}.
+Cambridge University Press, 1987.
+
+\bibitem{Brochard2017}
+S.~Brochard.
+Proof of de~Smit's conjecture: a freeness criterion.
+\textit{Compositio Math.}, 153(11):2310--2317, 2017.
+
+\bibitem{DiamondTaylor1994}
+F.~Diamond and R.~Taylor.
+Lifting modular mod~$\ell$ representations.
+\textit{Duke Math.~J.}, 74(2):253--269, 1994.
+
+\bibitem{Fujiwara2006}
+K.~Fujiwara.
+Deformation rings and Hecke algebras in the totally real case.
+Preprint, 2006.
+
+\bibitem{JacquetLanglands1970}
+H.~Jacquet and R.\,P.~Langlands.
+\textit{Automorphic Forms on $\GL(2)$}.
+Lecture Notes in Mathematics~114.
+Springer, 1970.
+
+\bibitem{Jarvis1999}
+F.~Jarvis.
+Level lowering for modular mod~$\ell$ representations over
+totally real fields.
+\textit{Math.\ Ann.}, 313(1):141--160, 1999.
+
+\bibitem{KW2009a}
+C.~Khare and J.-P.~Wintenberger.
+Serre's modularity conjecture~(I).
+\textit{Invent.\ Math.}, 178(3):485--504, 2009.
+
+\bibitem{KW2009b}
+C.~Khare and J.-P.~Wintenberger.
+Serre's modularity conjecture~(II).
+\textit{Invent.\ Math.}, 178(3):505--586, 2009.
+
+\bibitem{LMO1979}
+J.\,C.~Lagarias, H.\,L.~Montgomery, and A.\,M.~Odlyzko.
+A bound for the least prime ideal in the Chebotarev
+density theorem.
+\textit{Invent.\ Math.}, 54(3):271--296, 1979.
+
+\bibitem{MoretBailly1989}
+L.~Moret-Bailly.
+Groupes de Picard et probl\`emes de Skolem~I, II.
+\textit{Ann.\ Sci.\ \'Ecole Norm.\ Sup.}, 22(2):161--179,
+181--194, 1989.
+
+\bibitem{Paper68}
+P.\,C.\,K.~Lee.
+The logical cost of Fermat's Last Theorem
+(Paper~68, CRM series).
+\textit{Zenodo}, 2026.
+
+\bibitem{Paper69}
+P.\,C.\,K.~Lee.
+The modularity theorem is $\BISH + \WLPO$
+(Paper~69, CRM series).
+\textit{Zenodo}, 2026.
+
+\bibitem{Ribet1990}
+K.~Ribet.
+On modular representations of
+$\mathrm{Gal}(\bar{\Q}/\Q)$ arising from modular forms.
+\textit{Invent.\ Math.}, 100(2):431--476, 1990.
+
+\bibitem{Serre1987}
+J.-P.~Serre.
+Sur les repr\'esentations modulaires de degr\'e~2 de
+$\mathrm{Gal}(\bar{\Q}/\Q)$.
+\textit{Duke Math.~J.}, 54(1):179--230, 1987.
+
+\bibitem{Taylor2002}
+R.~Taylor.
+Remarks on a conjecture of Fontaine and Mazur.
+\textit{J.~Inst.\ Math.\ Jussieu}, 1(1):125--143, 2002.
+
+\bibitem{Taylor2003}
+R.~Taylor.
+On icosahedral Artin representations~II.
+\textit{Amer.~J.~Math.}, 125(3):549--566, 2003.
+
+\end{thebibliography}
+
+\end{document}

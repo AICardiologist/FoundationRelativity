@@ -1,0 +1,10 @@
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:8901:6: failed to synthesize
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:8916:33: unsolved goals
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:8933:6: Tactic `simp` failed with a nested error:
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:8955:4: (deterministic) timeout at `«tactic execution»`, maximum number of heartbeats (200000) has been reached
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:8998:2: (deterministic) timeout at `«tactic execution»`, maximum number of heartbeats (200000) has been reached
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9502:15: Type mismatch
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9703:4: Type mismatch
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9717:6: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9786:65: unsolved goals
+error: Papers/P5_GeneralRelativity/GR/Riemann.lean:9897:57: unsolved goals

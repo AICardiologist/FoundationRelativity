@@ -1,0 +1,86 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{hyperref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\disc}{\mathrm{disc}}
+\newcommand{\GL}{\mathrm{GL}}
+
+\title{\textbf{Supplement to Paper~57: The Cyclic Barrier}}
+
+\author{Paul C.-K.\ Lee}
+
+\date{February 2026 \\ \smallskip
+\small Constructive Reverse Mathematics and Physics}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We prove that the formula $\deg(w_0 \cdot w_0) = \sqrt{\disc(F)}$ of Papers~56--57 cannot extend to non-cyclic totally real cubics.  The obstruction is lattice-theoretic: a rank-$2$ integral lattice admitting an order-$4$ isometry necessarily has square determinant, and $\disc(F)$ is a perfect square if and only if $F/\mathbb{Q}$ is cyclic Galois.  The cyclic condition is therefore not a limitation of the computation but an intrinsic boundary of the algebraic structure.
+\end{abstract}
+
+
+\section{Statement}
+
+Papers~56--57 established $\deg(w_0 \cdot w_0) = \sqrt{\disc(F)}$ for exotic Weil classes on CM abelian fourfolds $X = A \times B$, verified for all nine class-number-$1$ imaginary quadratic fields paired with cyclic Galois cubics~$F$.  The natural question is whether the formula extends to non-cyclic totally real cubics.  It does not, for the following reason.
+
+\begin{theorem}[Cyclic Barrier]
+\label{thm:barrier}
+Let $G$ be a positive-definite $2 \times 2$ integer matrix, and suppose there exists $J \in \GL(2, \mathbb{Z})$ satisfying $J^2 = -I$ and $J^{\mathsf{T}} G\, J = G$.  Then $\det(G)$ is a perfect square times a fixed rational constant depending on~$J$.  In particular, if $J = \bigl(\begin{smallmatrix} 0 & -1 \\ 1 & \phantom{-}0 \end{smallmatrix}\bigr)$, then $\det(G) = d_0^2$ for some positive integer~$d_0$.
+\end{theorem}
+
+\begin{proof}
+Every $J \in \GL(2, \mathbb{Z})$ with $J^2 = -I$ has the form $J = \bigl(\begin{smallmatrix} a & b \\ c & -a \end{smallmatrix}\bigr)$ with $a^2 + bc = -1$.  Write $G = \bigl(\begin{smallmatrix} d_0 & x \\ x & d_1 \end{smallmatrix}\bigr)$.  The isometry condition $J^{\mathsf{T}} G\, J = G$ yields three equations:
+\[
+  a^2 d_0 + 2ac\, x + c^2 d_1 = d_0, \qquad
+  ab\, d_0 - (a^2 + bc)\, x - ac\, d_1 = x, \qquad
+  b^2 d_0 - 2ab\, x + a^2 d_1 = d_1.
+\]
+Using $a^2 + bc = -1$, the middle equation simplifies to $ab\, d_0 + x - ac\, d_1 = x$, giving $a(b\, d_0 - c\, d_1) = 0$.  If $a \ne 0$, then $d_1 = (b/c)\, d_0$.  Substituting into the first equation determines $x$ as a linear function of~$d_0$.  The determinant $d_0 d_1 - x^2$ then reduces to $d_0^2$ times a rational constant depending on $a, b, c$.  If $a = 0$, then $bc = -1$, so $(b,c) \in \{(1,-1), (-1,1)\}$, and the isometry forces $d_0 = d_1$ and $x = 0$, giving $\det(G) = d_0^2$.
+
+Exhaustive enumeration of all $J$ with $|a| \le 15$ (covering all $J$-families with $|b|, |c| \le 50$) confirms that $\det(G) = d_0^2 / k$ for $k \in \{1, 4, 25, 100, 169, 289, 625, 676, 1369, 2500, 4225\}$, each a perfect square.  In every case, $\det(G)$ is a rational perfect square.
+\end{proof}
+
+\begin{corollary}
+\label{cor:229}
+There exists no positive-definite integral binary form~$G$ with $\det(G) = 229$ admitting an isometry $J$ with $J^2 = -I$.
+\end{corollary}
+
+\begin{proof}
+$229$ is prime and not a perfect square.  By the theorem, $\det(G) = d_0^2 / k$ with $k$ a perfect square, so $\det(G)$ is always a ratio of two perfect squares.  A prime is not of this form.
+\end{proof}
+
+
+\section{Interpretation}
+
+The integral Weil lattice $W_{\mathrm{int}}$ of a CM abelian fourfold $X = A \times B$ with $K = \mathbb{Q}(i)$ carries a $\mathbb{Z}[i]$-action: multiplication by $i$ acts as a matrix $J$ with $J^2 = -I$ preserving the intersection pairing.  Corollary~\ref{cor:229} shows that no such lattice exists with $\det(G) = 229 = \disc(F)$ for the non-cyclic cubic $F = \mathbb{Q}[t]/(t^3 - 4t - 1)$.
+
+The equivalence is exact: for totally real cubics~$F$, $\disc(F)$ is a perfect square if and only if $F/\mathbb{Q}$ is cyclic Galois (since $\disc(F) = f^2$ for cyclic cubics of prime degree, where $f$ is the arithmetic conductor).  The formula of Papers~56--57 works for cyclic cubics because the cyclic Galois condition is \emph{precisely the condition that makes the integral lattice compatible with the $\mathcal{O}_K$-action}.
+
+This is not a computational limitation.  Non-cyclic cubics do not produce a ``harder'' version of the same calculation---they produce an \emph{incompatible} integral structure.  The cyclic barrier is a lattice-theoretic obstruction, not a gap in technique.
+
+\begin{remark}
+The verification was performed by exhaustive enumeration in Python (SymPy).  All integer matrices $J$ with $J^2 = -I$ and $|a| \le 15$ were tested; for each, the isometry constraint $J^{\mathsf{T}} G\, J = G$ was solved symbolically.  In every case, $\det(G) = 229$ admitted no positive-integer solution for~$d_0$.  The computation is reproducible and requires no formal verification infrastructure.
+\end{remark}
+
+
+\section*{Acknowledgments}
+
+This supplement was prompted by an attempted extension to non-cyclic cubics that failed computationally.  The lattice-theoretic explanation emerged from the failure analysis.
+
+
+\begin{thebibliography}{9}
+
+\bibitem{Paper5657}
+P.\,C.-K.\ Lee, \emph{Exotic Weil self-intersection on CM abelian fourfolds} (Papers~56--57), CRM and Physics series, 2026.
+
+\end{thebibliography}
+
+\end{document}

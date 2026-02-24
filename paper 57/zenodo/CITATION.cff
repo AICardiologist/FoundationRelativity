@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+- family-names: "Lee"
+  given-names: "Paul Chun-Kit"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+  affiliation: "New York University"
+title: "The Complete Class-Number-1 Landscape for Exotic Weil Self-Intersection: All Nine Imaginary Quadratic Fields with h_K = 1 (Paper 57, Constructive Reverse Mathematics Series)"
+version: "1.0.0"
+date-released: 2026-02-21
+abstract: >-
+  Paper 57 of the Constructive Reverse Mathematics and Arithmetic Geometry
+  series. Extends Paper 56 to all nine class-number-1 imaginary quadratic
+  fields (Baker-Heegner-Stark: d in {1,2,3,7,11,19,43,67,163}). For each
+  field, computes trace matrix, verifies discriminant via native_decide,
+  derives Weil class degree via the cyclic conductor theorem, and assembles
+  the full 9-row pattern table. Formalized in Lean 4 over Mathlib (~918
+  active lines, 1 principled axiom, 0 sorry).
+keywords:
+  - "class number 1"
+  - "Baker-Heegner-Stark"
+  - "exotic Weil class"
+  - "self-intersection"
+  - "CM abelian fourfold"
+  - "imaginary quadratic field"
+  - "Lean 4"
+  - "Mathlib"
+  - "constructive reverse mathematics"
+  - "arithmetic geometry"
+license: Apache-2.0

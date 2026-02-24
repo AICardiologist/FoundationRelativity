@@ -112,7 +112,7 @@
 \begin{document}
 
 \begin{abstract}
-We show, over Bishop-style constructive mathematics (BISH), that detecting a bidual gap (non-surjectivity of the canonical embedding from a Banach space into its bidual) has exactly the strength of the Weak Limited Principle of Omniscience (WLPO). We provide a complete Lean 4 formalization of the equivalence. Beyond the equivalence, we develop constructive finite-dimensional surrogates via Cesàro means and formalize a ``Stone window'' that identifies idempotents in the quotient of bounded sequences by the sequences converging to zero with almost-equality classes of subsets of the natural numbers. Methodologically, we isolate a Prop-level kernel for the ``gap implies WLPO'' direction and a robust treatment of conditional suprema for partial sums. The main equivalence builds without errors; three WLPO-conditional lemmas remain in an optional module about completeness of certain dual spaces and do not affect the main result.
+We show, over Bishop-style constructive mathematics (BISH), that detecting a bidual gap (non-surjectivity of the canonical embedding from a Banach space into its bidual) has exactly the strength of the Weak Limited Principle of Omniscience (WLPO). We provide a complete Lean 4 formalization of the equivalence. Beyond the equivalence, we develop constructive finite-dimensional surrogates via Cesàro means and include, in an appendix, a Stone window sketch identifying idempotents in the quotient of bounded sequences by the sequences converging to zero with almost-equality classes of subsets of the natural numbers; this sketch is not formalized in Lean. Methodologically, we isolate a Prop-level kernel for the ``gap implies WLPO'' direction and a robust treatment of conditional suprema for partial sums. The main equivalence builds without errors; three WLPO-conditional lemmas remain in an optional module about completeness of certain dual spaces and do not affect the main result.
 \end{abstract}
 
 \maketitle
@@ -235,7 +235,7 @@ Use $\WLPO$ to separate $\cnull$ from its complement in $\linf$:
 Assuming $\WLPO$, the quotient $\linf/\cnull$ is nontrivial and carries a Boolean algebra of idempotents with rich structure.
 \end{thm}
 
-This connects naturally with the ``Stone window'' theorem in Section~\ref{sec:stone}.
+This connects naturally with the Stone window sketch in Appendix~\ref{app:stone}.
 
 % ===========================================================
 \section{Constructive Algorithms: Finite Approximations}
@@ -280,7 +280,7 @@ Encode a $\WLPO$ instance $\alpha$ by $v^\alpha\in\linf$; in a simple restricted
 Our Lean 4 formalization contains about 4{,}500 lines of verified code.
 \begin{itemize}
 \item \textbf{Bidirectional proof:} both Gap $\Rightarrow$ $\WLPO$ and $\WLPO$ $\Rightarrow$ Gap.
-\item \textbf{Auxiliaries:} near-constructive development of $(\cnull)^*\cong \ell^1$ and the Stone window.
+\item \textbf{Auxiliaries:} near-constructive development of $(\cnull)^*\cong \ell^1$; a Stone window sketch appears in Appendix~\ref{app:stone} (not formalized in Lean).
 \item \textbf{Axioms:}
 \begin{lstlisting}[language=Lean,numbers=none]
 #print axioms gap_equiv_wlpo
@@ -365,32 +365,6 @@ theorem gap_equiv_wlpo : BidualGapStrong.{0} ↔ WLPO := by
     -- construct gap from HasWLPO instance
     exact construct_gap_from_wlpo hwlpo
 \end{lstlisting}
-
-% ===========================================================
-\section{Stone Window: The Boolean Algebra Connection}\label{sec:stone}
-% ===========================================================
-
-We relate logic and analysis via a concrete Boolean algebra in the quotient.
-
-\subsection{Almost-equality and idempotents}
-
-\begin{defi}[Almost equality]
-For $A,B\subseteq\N$, write $A\sim B$ if the symmetric difference $A\triangle B$ is finite.
-\end{defi}
-
-\begin{thm}[Stone window]\label{thm:stone}\leanok
-The map $\Phi:\mathcal{P}(\N)/{\sim}\to \mathrm{Idem}(\linf/\cnull)$ given by $[A]\mapsto [\chi_A]$ is a Boolean algebra isomorphism.
-\end{thm}
-
-\begin{proof}[Proof sketch]
-(1) $[\chi_A]=[\chi_B]$ iff $\chi_A-\chi_B\in \cnull$, i.e.\ $A\sim B$.  
-(2) Boolean operations are respected.  
-(3) Every idempotent is equivalent (mod $\cnull$) to an indicator via thresholding at $1/2$.
-\end{proof}
-
-\begin{cor}[Finite distributive lattices]\leanok
-Every finite distributive lattice embeds into $\mathrm{Idem}(\linf/\cnull)$.
-\end{cor}
 
 % ===========================================================
 \section{Significance and Conclusion}
@@ -506,7 +480,34 @@ private lemma tsum_eq_csSup_sum_of_nonneg
     exact sum_le_tsum s (fun i _ => h0 i) hs
 \end{lstlisting}
 
-\subsection{Stone window core}\label{app:stone-window}
+\appendix
+
+\section{Stone Window (Sketch)}\label{app:stone}
+
+This appendix records a sketch of the Stone window correspondence. It is independent
+of the main WLPO $\leftrightarrow$ gap equivalence and is not formalized in Lean.
+
+\subsection{Almost-equality and idempotents}
+
+\begin{defi}[Almost equality]
+For $A,B\subseteq\N$, write $A\sim B$ if the symmetric difference $A\triangle B$ is finite.
+\end{defi}
+
+\begin{thm}[Stone window]\label{thm:stone}\leanpartial
+The map $\Phi:\mathcal{P}(\N)/{\sim}\to \mathrm{Idem}(\linf/\cnull)$ given by $[A]\mapsto [\chi_A]$ is a Boolean algebra isomorphism.
+\end{thm}
+
+\begin{proof}[Proof sketch]
+(1) $[\chi_A]=[\chi_B]$ iff $\chi_A-\chi_B\in \cnull$, i.e.\ $A\sim B$.  
+(2) Boolean operations are respected.  
+(3) Every idempotent is equivalent (mod $\cnull$) to an indicator via thresholding at $1/2$.
+\end{proof}
+
+\begin{cor}[Finite distributive lattices]\leanpartial
+Every finite distributive lattice embeds into $\mathrm{Idem}(\linf/\cnull)$.
+\end{cor}
+
+\subsection{Lean sketch}
 
 \begin{lstlisting}[caption={Core sketches for Stone window}]
 /-- Boolean algebra at infinity -/

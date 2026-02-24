@@ -1,0 +1,71 @@
+Paper 62 — Zenodo upload metadata
+
+
+Title:
+The Hodge Level Boundary: Archimedean Decidability for Mixed Motives (Paper 62, Constructive Reverse Mathematics Series)
+
+Upload type: Publication > Preprint
+
+Publication date: 2026-02-22
+
+Authors:
+Lee, Paul Chun-Kit  |  New York University
+
+DOI: 10.5281/zenodo.18736965
+
+Description:
+Paper 62 (merged with original Paper 63) of the Constructive Reverse Mathematics series.
+
+MAIN RESULT: The sharp boundary between Markov's Principle (MP) and the Limited Principle of Omniscience (LPO) for decidability of Ext^1(Q(0), M) in the category of mixed motives is determined by a single invariant: the Hodge level l of the motive M.
+
+- l <= 1 (e.g., elliptic curves, cubic threefolds): the intermediate Jacobian J^p is an abelian variety, the Northcott property transfers via the Abel-Jacobi isomorphism, and decidability requires at most MP.
+- l >= 2 (e.g., quintic Calabi-Yau threefolds): J^p is a non-algebraic complex torus, the Northcott property fails structurally, and decidability escalates to LPO.
+
+There is no intermediate condition ("weak Northcott") that prevents this escalation: each degree-d slice of the graded cycle space is BISH-decidable, but quantifying over all degrees requires LPO. The proof is an explicit constructive reduction.
+
+Combined with Papers 59-61, the full Decidable Polarized Tannakian (DPT) hierarchy for mixed motives is governed by three invariants: analytic rank r, Hodge level l, and effective Lang constant c. As a consequence, cycle groups on Calabi-Yau threefolds — the compactification spaces of string theory — are structurally LPO, beyond any search procedure.
+
+This paper merges the results of original Papers 62 (Northcott boundary) and 63 (intermediate Jacobian obstruction). Two Lean 4 formalization bundles are included: P62_NorthcottLPO (7 files, 954 lines) and P62_HodgeLevelBoundary (10 files, 1367 lines). Both compile with 0 errors, 0 warnings, and 0 sorry.
+
+Access right: Open Access
+
+License: Creative Commons Attribution 4.0 International (CC-BY-4.0)
+
+Version: 2.0.0
+
+Language: English
+
+Keywords (one per line):
+Northcott property
+Hodge level
+mixed motives
+Ext^1
+Abel-Jacobi map
+intermediate Jacobian
+LPO
+Markov's Principle
+BISH
+constructive reverse mathematics
+Lean 4
+formal verification
+abelian variety
+Calabi-Yau threefold
+cubic threefold
+Clemens-Griffiths
+Mumford
+Baker's theorem
+arithmetic geometry
+string theory
+flux vacua
+D-brane charges
+
+Subjects:
+Mathematical logic and foundations
+Algebraic geometry
+
+Related identifiers:
+DOI 10.5281/zenodo.17054050  |  relation: isPartOf  |  type: publication
+(parent series DOI)
+
+Additional notes:
+AI-assisted writing using Claude (Anthropic, Opus 4.6) under human direction. All mathematical content specified by the author. Two Lean 4 formalization bundles included (17 files, 2321 lines total). Three axioms for classical results (Neron-Tate, Mumford, Baker); all other theorems fully proved. This is version 2.0.0 — a merge of original Papers 62 and 63 into a single paper.

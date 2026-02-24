@@ -1,0 +1,80 @@
+ZENODO UPLOAD METADATA -- Paper 42
+====================================
+
+TITLE:
+The Worst Prediction in Physics Is Not a Prediction: Axiom Calibration of the Cosmological Constant Problem (Paper 42, Constructive Reverse Mathematics Series)
+
+DOI:
+10.5281/zenodo.18654789
+
+AUTHORS:
+Paul Chun-Kit Lee (dr.paul.c.lee@gmail.com)
+
+DESCRIPTION:
+Paper 42 in the Constructive Reverse Mathematics (CRM) of Mathematical Physics series. This paper applies the axiom calibration framework to the cosmological constant problem -- the alleged 10^120 discrepancy between quantum field theory's "prediction" of vacuum energy and the observed value. The problem decomposes into three logically distinct claims with different constructive status.
+
+Claim I (Dissolved): The 10^120 ultraviolet discrepancy is a regulator-dependent artifact. The unregularized vacuum energy does not converge to a real number at any level of the constructive hierarchy. Different regularization schemes (cutoff, dimensional, zeta-function) produce different finite values. A regulator-dependent quantity has no empirical content within the framework. The CRM analysis provides a formal, machine-checked expression of the post-naturalness position articulated by Martin (2012), Bianchi-Rovelli (2010), and Hossenfelder (2019): the 10^120 is a property of a calculational choice, not of quantum field theory.
+
+Claim II (Reclassified): The "naturalness" argument is a Bayesian prior, not a mathematical derivation. The Hollands-Wald axioms prove that the cosmological constant is a free parameter of the renormalized theory. Naturalness resides outside the BISH/LPO deductive hierarchy.
+
+Claim III (Identified, LPO): The genuine constraint is the 55-decimal-place cancellation between the bare cosmological constant and the electroweak/QCD vacuum condensates. Computing the exact interacting condensates requires the thermodynamic limit (Fekete's subadditive lemma, Paper 29), showing that LPO suffices for the fine-tuning equation. The residual fine-tuning is an LPO equality -- logically mundane, at the same level as every thermodynamic limit in physics.
+
+The Casimir effect proves the scaffolding diagnostic works: energy differences are BISH-computable and experimentally verified; absolute vacuum energies are regulator-dependent and physically meaningless.
+
+Main formalized results:
+- vacuum_energy_divergent: Unregularized vacuum energy is unbounded (BISH)
+- prediction_regulator_dependent: Two valid schemes yield different values (BISH)
+- lambda_free_parameter: Wald ambiguity -- Lambda is a free parameter (BISH)
+- casimir_bish: Casimir energy difference has computable Cauchy modulus (BISH)
+- condensate_lpo: Exact interacting condensate exists given LPO (LPO)
+- rg_running_bish: Perturbative RG running via Picard-Lindelof (BISH)
+- fine_tuning_lpo: Fine-tuning equation holds given LPO (LPO)
+- cc_calibration: 7-part assembly theorem (BISH + LPO)
+- cc_master: Master theorem with full axiom audit
+
+Axiom profile (#print axioms cc_master): 11 physics bridge axioms + 1 CRM axiom (bmc_from_subadditive = Fekete equiv LPO, Paper 29) + 3 Lean infrastructure (propext, Classical.choice, Quot.sound). Zero sorry. Zero warnings.
+
+Technical details:
+- Lean 4: leanprover/lean4:v4.28.0-rc1
+- Mathlib4 (pinned via lake-manifest.json)
+- Build: cd P42_CosmologicalConstant && lake build
+- Status: 0 errors, 0 warnings, 0 sorry
+- Size: 10 modules, ~830 lines
+
+KEYWORDS:
+cosmological constant problem
+vacuum energy
+regulator dependence
+scaffolding diagnostic
+Casimir effect
+Hollands-Wald renormalization
+naturalness
+fine-tuning
+renormalization group
+thermodynamic limit
+Fekete's subadditive lemma
+constructive reverse mathematics
+BISH
+LPO
+Lean 4
+Mathlib
+formal verification
+constructive mathematics
+quantum field theory
+Picard-Lindelof theorem
+
+COPYRIGHT STATEMENT:
+Copyright 2026 Paul Chun-Kit Lee. Code licensed under Apache License 2.0. Paper licensed under Creative Commons Attribution 4.0 International (CC-BY 4.0).
+
+RESOURCE TYPE:
+Software / Dataset
+
+VERSION:
+v1.0
+
+RELATED IDENTIFIERS:
+Paper 29 (Fekete equiv LPO): https://doi.org/10.5281/zenodo.18632776
+Paper 33 (QCD confinement): https://doi.org/10.5281/zenodo.18649369
+Paper 39 (Thermodynamic stratification): https://doi.org/10.5281/zenodo.18652966
+Paper 40 (Defending BISH+LPO): https://doi.org/10.5281/zenodo.18654773
+Paper 41 (AdS/CFT): https://doi.org/10.5281/zenodo.18654780

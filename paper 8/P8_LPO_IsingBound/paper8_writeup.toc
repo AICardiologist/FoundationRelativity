@@ -1,0 +1,36 @@
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
+\contentsline {section}{\numberline {2}Preliminaries}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Constructive Frameworks}{3}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}The 1D Ising Model}{4}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}The Free Energy Function $g(J)$}{5}{subsection.2.3}%
+\contentsline {section}{\numberline {3}Part A: BISH Dispensability}{5}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Free Energy Decomposition}{5}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}The Error Bound}{6}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Constructive $N_0$ Witness}{6}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}The Dispensability Theorem}{7}{subsection.3.4}%
+\contentsline {section}{\numberline {4}Part B: LPO Calibration}{7}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Forward Direction: LPO $\Rightarrow $ BMC}{7}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}The Encoding}{7}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}The Two Regimes}{8}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}The Decision Procedure}{8}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}The Equivalence Theorem}{9}{subsection.4.5}%
+\contentsline {section}{\numberline {5}Discussion}{9}{section.5}%
+\contentsline {subsection}{\numberline {5.1}The Dispensability--Calibration Conjunction}{9}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}The Constructive Reverse Mathematics Programme}{9}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Relation to the Phase-Transition Debate}{10}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}The Encoding Objection}{10}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Limitations and Future Directions}{11}{subsection.5.5}%
+\contentsline {section}{\numberline {6}Lean 4 Formalization}{11}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Module Structure}{11}{subsection.6.1}%
+\contentsline {paragraph}{Part A: BISH dispensability (730 lines, 10 modules).}{11}{table.1}%
+\contentsline {paragraph}{Part B: LPO calibration (644 lines, 8 modules).}{11}{table.2}%
+\contentsline {subsection}{\numberline {6.2}Core Definitions}{11}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Main Theorem: Dispensability}{13}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}Main Theorem: BMC $\to $ LPO}{13}{subsection.6.4}%
+\contentsline {subsection}{\numberline {6.5}Equivalence and Axiom Audit}{14}{subsection.6.5}%
+\contentsline {subsection}{\numberline {6.6}Design Decisions}{14}{subsection.6.6}%
+\contentsline {paragraph}{Direct eigenvalue definition of $Z_N$.}{14}{section*.5}%
+\contentsline {paragraph}{The \texttt {bmc\_of\_lpo} axiom.}{14}{section*.6}%
+\contentsline {subsection}{\numberline {6.7}AI-Assisted Methodology}{14}{subsection.6.7}%
+\contentsline {subsection}{\numberline {6.8}Reproducibility}{15}{subsection.6.8}%
+\contentsline {section}{\numberline {A}Elementary Inequalities}{15}{appendix.A}%

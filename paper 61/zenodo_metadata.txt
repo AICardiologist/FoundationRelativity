@@ -1,0 +1,74 @@
+============================================================
+ZENODO UPLOAD METADATA — Paper 61
+============================================================
+
+TITLE:
+Lang's Conjecture as the MP → BISH Gate: The Decidability Hierarchy for Mixed Motives (Lean 4 Formalization). (Paper 61, Constructive Reverse Mathematics Series)
+
+AUTHORS:
+Lee, Paul C.-K.
+
+DESCRIPTION / ABSTRACT:
+Paper 59/60 established that the decidability of Ext^1(Q(0), M) for motives with the Northcott property is stratified by analytic rank: BISH for r ≤ 1, MP for r ≥ 2. We prove that an effective Lang Height Lower Bound Conjecture is the precise gate converting the rank ≥ 2 regime from MP to BISH, via inversion of Minkowski's Second Theorem. The implication is strict: BISH-decidability does not imply Lang, because constructive computability imposes no constraint on the geometric decay rate of minimal heights. We verify the forward direction explicitly for X_0(389) (rank 2). For motives lacking the Northcott property (K3 surfaces, higher K-theory), we prove the decidability requirement escalates from MP to LPO: verifying lattice completeness over an infinite bounded-height cycle space requires universal quantification equivalent to the Limited Principle of Omniscience. The full hierarchy is: BISH ⊊ MP ⊊ LPO, with Lang's conjecture gating MP → BISH and the Northcott property gating LPO → MP.
+
+All theorems are formally verified in Lean 4 with Mathlib. Zero sorry. Zero custom axioms beyond Mathlib infrastructure and one open-conjecture axiom (UniformLang) used only for Theorem E.
+
+This archive contains the complete Lean 4 source code, compiled PDF, and LaTeX source.
+
+UPLOAD TYPE:
+Software
+
+PUBLICATION DATE:
+2026-02-22
+
+KEYWORDS:
+constructive mathematics
+reverse mathematics
+formal verification
+Lean 4
+Mathlib
+decidability
+Lang's conjecture
+Mordell-Weil lattice
+Minkowski's theorem
+Northcott property
+Limited Principle of Omniscience (LPO)
+Markov's Principle (MP)
+BISH
+mixed motives
+L-functions
+abelian varieties
+
+LICENSE:
+MIT License
+
+PROGRAMMING LANGUAGE:
+Lean 4
+
+RELATED IDENTIFIERS:
+(Add DOIs of Papers 50–60 from the series once published)
+Is supplement to: Paper 61 (this paper)
+Is part of: Constructive Reverse Mathematics and Physics series
+
+SUBJECTS:
+Mathematics — Number Theory
+Mathematics — Logic and Foundations
+Computer Science — Logic in Computer Science
+
+COMMUNITIES:
+(If applicable: lean4-mathlib, constructive-mathematics)
+
+NOTES:
+- Paper 61 in the "Constructive Reverse Mathematics and Physics" series
+- Lean 4 v4.29.0-rc1 with Mathlib
+- Build: `lake exe cache get && lake build`
+- 0 errors, 0 warnings, 0 sorry
+- 9 Lean source files across 5 modules
+- Axiom profile: propext, Quot.sound, Classical.choice (Mathlib infrastructure), UniformLang (open conjecture, Theorem E only)
+
+FILE TO UPLOAD:
+paper61_zenodo.zip (245 KB)
+
+============================================================
+END METADATA
+============================================================

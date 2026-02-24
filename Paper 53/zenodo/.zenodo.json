@@ -1,0 +1,70 @@
+{
+  "title": "The CM Decidability Oracle: Verified Computation from Elliptic Curves to the Fourfold Boundary (Paper 53, Constructive Reverse Mathematics Series)",
+  "description": "<p>Paper 53 of the Constructive Reverse Mathematics series. We exhibit a verified decision procedure for numerical equivalence on products of the 13 CM elliptic curves over <b>Q</b> with class number 1, implemented in Lean 4 with zero <code>sorry</code> keywords.</p>\n<p><strong>Theorem A</strong> (CM Decidability Oracle): For each of the 13 CM discriminants, the function decide_D is a correct and terminating decision procedure for numerical equivalence on CH<sup>1</sup>(E_D &times; E_D). Depends on one principled axiom (<code>decider_correct</code>).</p>\n<p><strong>Theorem B</strong> (DPT Certificates): For each of the 13 CM discriminants, all three DPT axioms are computationally verified: decidable equality, algebraic spectrum, and Archimedean polarization (Rosati positive-definiteness via Sylvester&rsquo;s criterion).</p>\n<p><strong>Theorem C</strong> (Fourfold Boundary Computation): For Milne&rsquo;s CM abelian fourfold with Hermitian form H = diag(1,&minus;1,&minus;1,1) over <b>Q</b>(&radic;&minus;3), the self-intersection of the exotic Weil class is deg(w &middot; w) = 7 &gt; 0, confirming the Hodge&ndash;Riemann bilinear relations. <em>This computation depends on no custom axioms&mdash;it is pure verified arithmetic.</em></p>\n<p><strong>Theorem D</strong> (DPT Decidability Boundary): The DPT framework identifies dimension 4 as its decidability boundary for abelian varieties.</p>\n<p>The Lean 4 / Mathlib formalization comprises 15 source files (~1,597 lines), compiles with zero errors, zero warnings, and zero <code>sorry</code>. Code is distributed exclusively via this Zenodo record.</p>",
+  "upload_type": "software",
+  "publication_date": "2026-02-20",
+  "creators": [
+    {
+      "name": "Lee, Paul Chun-Kit",
+      "affiliation": "New York University",
+      "orcid": "0000-0000-0000-0000"
+    }
+  ],
+  "access_right": "open",
+  "license": "Apache-2.0",
+  "keywords": [
+    "constructive reverse mathematics",
+    "CM elliptic curves",
+    "numerical equivalence",
+    "Standard Conjecture D",
+    "DPT framework",
+    "Decidable Polarized Tannakian",
+    "Weil classes",
+    "abelian fourfolds",
+    "Hodge-Riemann bilinear relations",
+    "Hermitian forms",
+    "van Geemen",
+    "Milne fourfold",
+    "Lefschetz ring",
+    "BISH",
+    "formal verification",
+    "Lean 4",
+    "Mathlib",
+    "algebraic geometry",
+    "constructive mathematics"
+  ],
+  "subjects": [
+    {
+      "term": "Mathematical logic and foundations",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85082397",
+      "scheme": "url"
+    },
+    {
+      "term": "Algebraic geometry",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85003438",
+      "scheme": "url"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "relation": "isPartOf",
+      "identifier": "10.5281/zenodo.17054050",
+      "resource_type": "software",
+      "scheme": "doi"
+    }
+  ],
+  "version": "1.0.0",
+  "language": "eng",
+  "notes": "AI-assisted formalization using Claude (Anthropic, Opus 4.6) for Lean 4 code generation under human direction. All mathematical content specified by the author; every theorem verified by the Lean 4 type checker. Built with Lean 4 v4.29.0-rc1 and Mathlib. Reproducible via 'lake build' (zero errors, zero sorry). Code available exclusively on Zenodo (not hosted on GitHub).",
+  "references": [
+    "Lieberman, D.I. (1968). Numerical and homological equivalence of algebraic cycles on Hodge manifolds. Amer. J. Math., 90:366-374.",
+    "Fulton, W. (1998). Intersection Theory. Springer, 2nd edition.",
+    "Milne, J.S. (2001). The Tate conjecture for certain abelian varieties over finite fields. Acta Arith., 100:135-166.",
+    "Schoen, C. (1988). Hodge classes on self-products of a variety with an automorphism. Comp. Math., 65:3-32.",
+    "van Geemen, B. (1994). An introduction to the Hodge conjecture for abelian varieties. Lecture Notes in Math. 1594, 233-252.",
+    "van Geemen, B. (2022). Weil classes and decomposable abelian fourfolds. SIGMA, 18:097.",
+    "Grothendieck, A. (1969). Standard conjectures on algebraic cycles. Algebraic Geometry (Bombay), 193-199.",
+    "Bridges, D. and Richman, F. (1987). Varieties of Constructive Mathematics. Cambridge University Press.",
+    "Agugliaro, A. (2025). Non-liftable exotic Tate classes on abelian varieties over finite fields. arXiv:2510.21562."
+  ]
+}

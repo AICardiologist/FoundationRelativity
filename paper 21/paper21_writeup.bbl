@@ -1,0 +1,84 @@
+\begin{thebibliography}{15}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Aspect et~al.(1982)Aspect, Dalibard, and Roger]{Aspect82}
+Alain Aspect, Jean Dalibard, and G{\'e}rard Roger.
+\newblock Experimental test of {Bell}'s inequalities using time-varying analyzers.
+\newblock \emph{Physical Review Letters}, 49\penalty0 (25):\penalty0 1804--1807, 1982.
+
+\bibitem[Bell(1964)]{Bell64}
+John~S. Bell.
+\newblock On the {Einstein}--{Podolsky}--{Rosen} paradox.
+\newblock \emph{Physics Physique Fizika}, 1\penalty0 (3):\penalty0 195--200, 1964.
+
+\bibitem[Bishop(1967)]{Bishop67}
+Errett Bishop.
+\newblock \emph{Foundations of Constructive Analysis}.
+\newblock McGraw-Hill, New York, 1967.
+
+\bibitem[Bridges and Richman(1987)]{BR87}
+Douglas~S. Bridges and Fred Richman.
+\newblock \emph{Varieties of Constructive Mathematics}, volume~97 of \emph{London Mathematical Society Lecture Note Series}.
+\newblock Cambridge University Press, 1987.
+
+\bibitem[Bridges and V{\^\i}{\c{t}}{\u{a}}(2006)]{BV06}
+Douglas~S. Bridges and Luminita~Simona V{\^\i}{\c{t}}{\u{a}}.
+\newblock \emph{Techniques of Constructive Analysis}.
+\newblock Universitext. Springer, New York, 2006.
+
+\bibitem[Clauser et~al.(1969)Clauser, Horne, Shimony, and Holt]{CHSH69}
+John~F. Clauser, Michael~A. Horne, Abner Shimony, and Richard~A. Holt.
+\newblock Proposed experiment to test local hidden-variable theories.
+\newblock \emph{Physical Review Letters}, 23\penalty0 (15):\penalty0 880--884, 1969.
+
+\bibitem[Diener(2020)]{Diener20}
+Hannes Diener.
+\newblock Constructive reverse mathematics.
+\newblock arXiv:1804.05495, 2020.
+\newblock Updated version.
+
+\bibitem[Ishihara(2006)]{Ishihara06}
+Hajime Ishihara.
+\newblock Reverse mathematics in {Bishop}'s constructive mathematics.
+\newblock \emph{Philosophia Scientiae}, Cahier sp{\'e}cial\penalty0 (6):\penalty0 43--59, 2006.
+
+\bibitem[Lee(2026{\natexlab{a}})]{Lee26-P15}
+Paul C.-K. Lee.
+\newblock {Noether}'s theorem and the logical cost of global conservation laws.
+\newblock Preprint, 2026. Paper~15 in the constructive reverse mathematics series, 2026{\natexlab{a}}.
+
+\bibitem[Lee(2026{\natexlab{b}})]{Lee26-P19}
+Paul C.-K. Lee.
+\newblock The logical cost of quantum tunneling: {LLPO} and {WKB} turning points.
+\newblock Preprint, 2026. Paper~19 in the constructive reverse mathematics series, 2026{\natexlab{b}}.
+
+\bibitem[Lee(2026{\natexlab{c}})]{Lee26-P2}
+Paul C.-K. Lee.
+\newblock {WLPO} equivalence of the bidual gap in $\ell^1$: a {Lean}~4 formalization.
+\newblock Preprint, 2026. Paper~2 in the constructive reverse mathematics series, 2026{\natexlab{c}}.
+
+\bibitem[Lee(2026{\natexlab{d}})]{Lee26-P20}
+Paul C.-K. Lee.
+\newblock Observable-dependent logical cost: {WLPO} and {1D} {Ising} magnetization phase classification.
+\newblock Preprint, 2026. Paper~20 in the constructive reverse mathematics series, 2026{\natexlab{d}}.
+
+\bibitem[Lee(2026{\natexlab{e}})]{Lee26-P7}
+Paul C.-K. Lee.
+\newblock Non-reflexivity of $s_1(h)$ implies {WLPO}: a {Lean}~4 formalization.
+\newblock Preprint, 2026. Paper~7 in the constructive reverse mathematics series, 2026{\natexlab{e}}.
+
+\bibitem[Lee(2026{\natexlab{f}})]{Lee26-P8}
+Paul C.-K. Lee.
+\newblock The logical cost of the thermodynamic limit: {LPO}-equivalence and {BISH}-dispensability for the {1D} {Ising} free energy.
+\newblock Preprint, 2026. Paper~8 in the constructive reverse mathematics series, 2026{\natexlab{f}}.
+
+\bibitem[Tsirelson(1980)]{Tsirelson80}
+Boris~S. Tsirelson.
+\newblock Quantum generalizations of {Bell}'s inequality.
+\newblock \emph{Letters in Mathematical Physics}, 4\penalty0 (2):\penalty0 93--100, 1980.
+
+\end{thebibliography}

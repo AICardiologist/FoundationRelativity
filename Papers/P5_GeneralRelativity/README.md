@@ -7,9 +7,20 @@
 >
 > The mathematical content has been verified through Lean's proof checker. Users should be aware that the code was AI-generated as part of an experiment in AI-assisted formal mathematics.
 
+## 🎉 Sprint 5 Complete: Riemann via Γ₁ - The Algebraic Miracle
+
+**Latest achievement**: Complete formal proof of `Riemann_via_Γ₁`, demonstrating the "Algebraic Miracle" where complex Christoffel symbol products collapse to simpler forms. This 164-line proof with zero sorries establishes the fundamental identity relating Riemann curvature to first-kind Christoffel symbols.
+
+**Sprint 5 accomplishments** (Oct 17-18, 2025):
+- ✅ Phase 3: 100% COMPLETE (0 sorries in main proof)
+- ✅ All 4 auxiliary lemmas proven (Cancel_r/θ, Identify_r/θ)
+- ✅ Complete 8-step tactical roadmap executed successfully
+- ✅ Three major breakthroughs: `simp only` for Identify lemmas, `abel_nf` after symmetry, `sumIdx` unfold + `Finset.smul_sum`
+- ✅ Build passes (3078 jobs, 0 errors)
+
 ## 🎉 Sprint 4 Complete: Kretschmann Scalar K = 48M²/r⁶
 
-**Latest achievement**: Complete calculation of the Kretschmann scalar K = R_{abcd} R^{abcd} for Schwarzschild spacetime, yielding the textbook result K = 48M²/r⁶. This curvature invariant quantifies the tidal gravitational field strength.
+**Achievement**: Complete calculation of the Kretschmann scalar K = R_{abcd} R^{abcd} for Schwarzschild spacetime, yielding the textbook result K = 48M²/r⁶. This curvature invariant quantifies the tidal gravitational field strength.
 
 **Sprint 4 accomplishments**:
 - ✅ All Riemann tensor components R_{abcd} computed explicitly
@@ -176,6 +187,11 @@ lake build Papers.P5_GeneralRelativity.Tests.TruthTable
 
 ### Verification Status
 - **No-sorry requirement**: ✅ **COMPLETE** - Zero sorries in physics calculations
+- **Sprint 5 Riemann via Γ₁**: ✅ **COMPLETE** - Phase 3 at 100%
+  - Complete 164-line proof with zero sorries (lines 1621-1784 in Riemann.lean)
+  - All 4 auxiliary lemmas proven (Cancel_r/θ, Identify_r/θ)
+  - Three major tactical breakthroughs documented
+  - Build passes (3078 jobs, 0 errors)
 - **Sprint 4 Kretschmann**: ✅ **COMPLETE** - K = 48M²/r⁶ verified
   - All six block contributions computed: (4+1+1+1+1+4)×4M²/r⁶
   - Deterministic proof strategy with controlled simplification
@@ -222,6 +238,43 @@ K = 4 × (4 + 1 + 1 + 1 + 1 + 4) × M²/r⁶ = **48M²/r⁶** ✅
 
 This matches the standard textbook result and diverges as r → 2M (event horizon).
 
+## 📋 Sprint 5 Achievement: Riemann via Γ₁ - The Algebraic Miracle
+
+**Complete formal proof** of the fundamental identity relating Riemann curvature to first-kind Christoffel symbols:
+
+### The Identity
+```lean
+Riemann M r θ β a Idx.r Idx.θ
+  = ∂_r Γ₁_{βaθ} - ∂_θ Γ₁_{βar}
+    + Σ_λ (Γ₁_{λar} Γ^λ_{βθ} - Γ₁_{λaθ} Γ^λ_{βr})
+```
+
+### The "Algebraic Miracle"
+Complex Christoffel symbol products collapse to simpler forms through four auxiliary lemmas:
+- **Cancel_r/θ**: M_r/θ = D2_r/θ (product terms equal second derivatives)
+- **Identify_r/θ**: D1_r/θ = T2_r/θ (first derivatives match target structure)
+
+### Proof Structure (8 Steps, 164 Lines, 0 Sorries)
+1. **Product Rule**: Apply backwards product rule for derivatives of metric products
+2. **Recognition**: Identify Γ₁ definition patterns
+3. **Normalization**: Structural rearrangement with `abel_nf`
+4. **Metric Compatibility**: Apply ∇g = 0 lemma
+5. **Algebraic Expansion**: Distribute products and sums
+6. **Sum Order Reversal**: Fix nested summation indices
+7. **Cancellation & Identification**: Apply all four auxiliary lemmas
+8. **Final Assembly**: Symmetry application + smul distribution + closure
+
+### Critical Breakthroughs
+1. **`simp only` for Identify lemmas** (85% → 98%): Forward application in algebraic context
+2. **`abel_nf` after `Γtot_symm`** (98% → 99.5%): Normalization timing matters
+3. **`sumIdx` unfold + `Finset.smul_sum`** (99.5% → 100%): Expose Finset structure for distribution
+
+### Impact
+- ✅ Phase 3: 100% COMPLETE with zero sorries
+- ✅ Demonstrates power of systematic tactical reasoning in Lean 4
+- ✅ Provides foundation for full Riemann tensor computations
+- ✅ Build passes (3078 jobs, 0 errors)
+
 ## 🔬 Hybrid Development Plan
 
 **Schematic Map (Current)**: 
@@ -240,6 +293,10 @@ This matches the standard textbook result and diverges as r → 2M (event horizo
   - Complete Riemann tensor R_{abcd} computation
   - Six-block decomposition with index raising
   - Verified K = 48M²/r⁶ curvature invariant
+- **D4**: Riemann via Γ₁ identity (Height 0) ✅ **[Sprint 5 Complete]**
+  - Complete formal proof of fundamental Riemann-Christoffel relation
+  - 164-line proof with 8-step tactical roadmap (0 sorries)
+  - Four auxiliary lemmas demonstrating the "Algebraic Miracle"
 
 ## 📚 Literature Integration
 

@@ -1,0 +1,345 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsthm,amssymb,mathtools}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{array}
+
+%% ---- Theorem environments ----
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+%% ---- Macros ----
+\newcommand{\BISH}{\mathrm{BISH}}
+\newcommand{\LPO}{\mathrm{LPO}}
+\newcommand{\DPT}{\mathrm{DPT}}
+\newcommand{\Nm}{\mathrm{Nm}}
+\newcommand{\Tr}{\mathrm{Tr}}
+\newcommand{\Hom}{\mathrm{Hom}}
+\newcommand{\CH}{\mathrm{CH}}
+\newcommand{\NS}{\mathrm{NS}}
+\newcommand{\Qbar}{\overline{\mathbb{Q}}}
+\newcommand{\disc}{\mathrm{disc}}
+\newcommand{\Ros}{\mathrm{Ros}}
+\newcommand{\HR}{\mathrm{HR}}
+\newcommand{\Lef}{\mathcal{L}}
+\newcommand{\Gal}{\mathrm{Gal}}
+\newcommand{\Cl}{\mathrm{Cl}}
+
+
+\title{\textbf{Paper~58: Exotic Weil Self-Intersections \\
+Beyond the Cyclic Barrier} \\[6pt]
+\large The Galois Diagonality Theorem and Non-Cyclic Weil Lattices}
+
+\author{Paul C.-K.\ Lee}
+
+\date{February 2026 \\ \smallskip
+\small Constructive Reverse Mathematics and Physics, Paper~58}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Papers~56--57 computed $\deg(w_0 \cdot w_0) = \sqrt{\disc(F)}$ for all nine class-number-$1$ imaginary quadratic fields, where $F$ is a cyclic Galois cubic and $w_0$ is the primitive exotic Weil class on a CM abelian fourfold of Weil type.  We identify the structural reason: the Schoen--Milne discriminant equation $\det(G) = \disc(F)$ is exact, and the $\mathbb{Z}/3\mathbb{Z}$ Galois symmetry forces the Gram matrix~$G$ to be diagonal, yielding $d_0^2 = \disc(F)$.
+
+We then investigate the \emph{non-cyclic} regime.  For a totally real cubic $F$ with Galois group~$S_3$, the discriminant equation $\det(G) = \disc(F)$ survives, but the Galois diagonality breaks.  The Gram matrix becomes a generic reduced binary quadratic form with $d_0 d_1 - x^2 = \disc(F)$.  For the simplest non-cyclic example ($F = \mathbb{Q}[t]/(t^3 - 4t - 1)$, $\disc(F) = 229$), we enumerate all ten reduced forms, verify algebraicity via the Schoen criterion ($229 = 15^2 + 2^2$), and identify the cyclic/non-cyclic boundary as the natural limit of the Paper~56--57 formula.  All arithmetic is machine-verified in Lean~4.
+\end{abstract}
+
+
+%% ===================================================================
+\section{Introduction}
+\label{sec:intro}
+%% ===================================================================
+
+\subsection{The Paper 56--57 formula and its scope}
+
+Papers~56--57 established the formula
+\begin{equation}
+\label{eq:main-formula}
+  \deg(w_0 \cdot w_0) \;=\; \sqrt{\disc(F)}
+\end{equation}
+for the self-intersection of the primitive integral exotic Weil class on a CM abelian fourfold $X = A \times B$ of Weil type, verified for all nine class-number-$1$ imaginary quadratic fields $K$ paired with cyclic Galois cubics~$F$.  The nine values---$7, 9, 13, 19, 37, 61, 79, 97, 163$---were machine-checked in Lean~4.
+
+The derivation relied on two inputs: the Schoen--Milne discriminant equation $\det(G) = \disc(F)$ relating the Gram matrix determinant to the field discriminant, and the observation that the Gram matrix is diagonal ($G = \bigl(\begin{smallmatrix} d_0 & 0 \\ 0 & d_0 \end{smallmatrix}\bigr)$), forcing $d_0^2 = \disc(F)$.
+
+This paper asks: \emph{why} is the Gram matrix diagonal, and \emph{what happens} when it is not?
+
+\subsection{Summary of results}
+
+We prove:
+
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Galois Diagonality Theorem} (\S\ref{sec:galois-diag}): When $F/\mathbb{Q}$ is cyclic Galois with group $\mathbb{Z}/3\mathbb{Z}$, the Galois action on the integral Weil lattice $W_{\mathrm{int}}$ forces the Gram matrix to be diagonal.  This is the structural reason behind equation~\eqref{eq:main-formula}.
+
+\item \textbf{Non-cyclic structure} (\S\ref{sec:noncyclic}): When $F$ has Galois group~$S_3$ (non-cyclic), the diagonality breaks.  The discriminant equation $\det(G) = \disc(F)$ still holds, but the Gram matrix is a generic reduced positive-definite binary quadratic form.  The self-intersection $d_0$ is the minimal diagonal entry, satisfying $d_0 < \sqrt{\disc(F)}$.
+
+\item \textbf{Algebraicity} (\S\ref{sec:algebraicity}): For $\disc(F) = 229$ and $K = \mathbb{Q}(i)$, the Schoen criterion is satisfied ($229 = 15^2 + 2^2$ is a norm in~$\mathbb{Q}(i)$).  The exotic Weil class is algebraic and the Hodge conjecture holds for this fourfold.
+
+\item \textbf{Cyclic barrier} (\S\ref{sec:barrier}): The formula $d_0 = \sqrt{\disc(F)}$ holds if and only if the Gram matrix is diagonal, which is forced by the cyclic Galois structure.  The cyclic/non-cyclic boundary in the landscape of totally real cubics is the natural limit of the formula.
+\end{enumerate}
+
+
+%% ===================================================================
+\section{The Galois Diagonality Theorem}
+\label{sec:galois-diag}
+%% ===================================================================
+
+\subsection{Setup}
+
+Let $X = A \times B$ be a Weil-type CM abelian fourfold as in Paper~56, with $K$ imaginary quadratic ($h_K = 1$), $F$ a totally real cubic, $A$ a CM threefold with CM by~$\mathcal{O}_E$ ($E = FK$) of signature~$(1,2)$, and $B$ a CM elliptic curve with CM by~$\mathcal{O}_K$ of signature~$(1,0)$.  Let $W_{\mathrm{int}} = W(A,B) \cap H^4(X, \mathbb{Z})$ be the integral Weil lattice, a rank-$2$ $\mathbb{Z}$-module with Gram matrix
+\[
+  G = \begin{pmatrix} d_0 & x \\ x & d_1 \end{pmatrix}, \qquad \det(G) = d_0 d_1 - x^2 = \disc(F).
+\]
+
+\subsection{The cyclic case}
+
+\begin{theorem}[Galois Diagonality]
+\label{thm:galois-diag}
+Suppose $F/\mathbb{Q}$ is a cyclic Galois extension with $\Gal(F/\mathbb{Q}) \cong \mathbb{Z}/3\mathbb{Z}$.  Then in an appropriate $\mathbb{Z}$-basis of~$W_{\mathrm{int}}$, the Gram matrix is diagonal:
+\[
+  G = \begin{pmatrix} d_0 & 0 \\ 0 & d_0 \end{pmatrix}.
+\]
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Let $\sigma$ be the generator of $\Gal(F/\mathbb{Q})$.  Then $\sigma$ acts on $X$ by a geometric automorphism (through its action on the CM type of~$A$), inducing a pullback $\sigma^*$ on $H^4(X, \mathbb{Z})$ that preserves~$W_{\mathrm{int}}$.
+
+On $W_{\mathrm{int}} \otimes_{\mathbb{Z}} \mathbb{C}$, the eigenvalues of~$\sigma^*$ are the primitive cube roots of unity $\zeta_3, \zeta_3^2$.  The two eigenspaces are $1$-dimensional and complex conjugate.  The associated real orthogonal decomposition yields a $\mathbb{Z}$-basis $\{e_1, e_2\}$ in which $B(e_1, e_2) = 0$ (by the trace relations of the regular representation of~$\mathbb{Z}/3\mathbb{Z}$) and $B(e_1, e_1) = B(e_2, e_2)$ (by the isometry property $B(\sigma^* v, \sigma^* w) = B(v,w)$ and the transitivity of the Galois action on the eigenspaces).
+\end{proof}
+
+\begin{corollary}
+\label{cor:cyclic-formula}
+For cyclic Galois cubics, $d_0^2 = \det(G) = \disc(F)$, and therefore $d_0 = \sqrt{\disc(F)}$.  Since $\disc(F) = f^2$ for cyclic cubics (where $f$ is the arithmetic conductor), $d_0 = f$.
+\end{corollary}
+
+\begin{proof}
+For cyclic extensions of prime degree~$\ell$ over~$\mathbb{Q}$, $\disc(F) = f^{\ell - 1}$.  For $\ell = 3$, $\disc(F) = f^2$.  The corollary follows from Theorem~\ref{thm:galois-diag} and the Schoen--Milne equation.
+\end{proof}
+
+\subsection{The non-cyclic case}
+
+When $\Gal(\overline{F}/\mathbb{Q}) \cong S_3$ (the splitting field of~$F$ has Galois group~$S_3$ over~$\mathbb{Q}$, and $F$ itself is not Galois), there is no order-$3$ automorphism of~$X$ that preserves~$W_{\mathrm{int}}$.  The Galois symmetry argument fails, and the Gram matrix need not be diagonal.
+
+\begin{proposition}
+\label{prop:noncyclic}
+For non-cyclic totally real cubics~$F$, the integral Weil lattice $W_{\mathrm{int}}$ has Gram matrix
+\[
+  G = \begin{pmatrix} d_0 & x \\ x & d_1 \end{pmatrix}
+\]
+with $\det(G) = d_0 d_1 - x^2 = \disc(F)$ and $x \ne 0$ generically.  The self-intersection $d_0 \ne \sqrt{\disc(F)}$ whenever $\disc(F)$ is not a perfect square.
+\end{proposition}
+
+
+%% ===================================================================
+\section{The Non-Cyclic Case: $\disc(F) = 229$}
+\label{sec:noncyclic}
+%% ===================================================================
+
+\subsection{The field}
+
+Take $F = \mathbb{Q}[t]/(t^3 - 4t - 1)$.  This is a totally real cubic with discriminant $\disc(F) = 229$ (a prime) and Galois group~$S_3$.  The three real roots are approximately $2.115$, $-0.254$, and $-1.861$.
+
+\subsection{Reduced forms of determinant $229$}
+
+By Gauss--Minkowski reduction, a positive-definite binary quadratic form $G = \bigl(\begin{smallmatrix} d_0 & x \\ x & d_1 \end{smallmatrix}\bigr)$ with $\det(G) = 229$ has $d_0 \le \lfloor \sqrt{4 \cdot 229 / 3} \rfloor = 17$.
+
+Exhaustive enumeration yields ten reduced forms:
+
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+$d_0$ & $x$ & $d_1$ & $\det(G)$ & Status \\
+\midrule
+1 & 0 & 229 & 229 & reduced \\
+2 & 1 & 115 & 229 & reduced \\
+5 & 1 & 46 & 229 & reduced \\
+5 & $-1$ & 46 & 229 & reduced \\
+7 & 3 & 34 & 229 & reduced \\
+7 & $-3$ & 34 & 229 & reduced \\
+10 & 1 & 23 & 229 & reduced \\
+10 & $-1$ & 23 & 229 & reduced \\
+14 & 3 & 17 & 229 & reduced \\
+14 & $-3$ & 17 & 229 & reduced \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The possible values of the self-intersection are $d_0 \in \{1, 2, 5, 7, 10, 14\}$.  The specific value realized by the Weil lattice of the CM fourfold built from $F$ and $K = \mathbb{Q}(i)$ depends on the period matrix and integral structure of the specific variety.  Determining the exact $d_0$ requires explicit computation of the CM periods---an open problem for this paper.
+
+
+%% ===================================================================
+\section{Algebraicity via Schoen Criterion}
+\label{sec:algebraicity}
+%% ===================================================================
+
+\begin{theorem}
+\label{thm:schoen-229}
+The exotic Weil Hodge class on the fourfold built from $F = \mathbb{Q}[t]/(t^3 - 4t - 1)$ and $K = \mathbb{Q}(i)$ is algebraic.
+\end{theorem}
+
+\begin{proof}
+The Schoen criterion~\cite{Schoen1998} requires $\disc(F)$ to be representable as a norm from~$K$.  For $K = \mathbb{Q}(i)$, this means $\disc(F) = a^2 + b^2$ for some $a, b \in \mathbb{Z}$.  Since $229 \equiv 1 \pmod{4}$, the prime $229$ splits in~$\mathbb{Z}[i]$, and explicitly $229 = 15^2 + 2^2$.
+\end{proof}
+
+\begin{corollary}
+The Hodge conjecture holds for codimension-$2$ classes on this fourfold.  Every Hodge class in $H^4(X, \mathbb{Q}) \cap H^{2,2}(X)$ is algebraic.
+\end{corollary}
+
+
+%% ===================================================================
+\section{The Cyclic Barrier}
+\label{sec:barrier}
+%% ===================================================================
+
+\subsection{When the formula holds}
+
+The formula $\deg(w_0 \cdot w_0) = \sqrt{\disc(F)}$ requires two conditions:
+
+\begin{enumerate}[label=(\alph*)]
+\item \textbf{Exact discriminant equation:} $\det(G) = \disc(F)$.  This is the Schoen--Milne theorem and holds universally for principally polarized Weil-type CM fourfolds.
+
+\item \textbf{Diagonal Gram matrix:} $G = \bigl(\begin{smallmatrix} d_0 & 0 \\ 0 & d_0 \end{smallmatrix}\bigr)$.  This is forced by the $\mathbb{Z}/3\mathbb{Z}$ Galois symmetry when $F$ is a cyclic Galois cubic.
+\end{enumerate}
+
+Condition~(b) fails for non-cyclic cubics.  The formula $d_0 = \sqrt{\disc(F)}$ is therefore a \emph{cyclic Galois phenomenon}, not a universal identity.
+
+\subsection{The barrier as structure theorem}
+
+For cyclic Galois cubics, $\disc(F) = f^2$ where $f$ is the conductor, and $d_0 = f$.  The conductor $f$ simultaneously measures:
+
+\begin{enumerate}[label=(\roman*)]
+\item The ramification of the cyclic extension $F/\mathbb{Q}$ (number theory).
+\item The discriminant of the trace matrix of~$F$ (algebra): $\disc(F) = f^2$.
+\item The self-intersection of the exotic Weil class (geometry): $d_0 = f$.
+\item The determinant of the Gram matrix (topology): $\det(G) = f^2$.
+\end{enumerate}
+
+This four-way coincidence is a consequence of the Galois diagonality theorem combined with the conductor--discriminant formula for cyclic cubics.  For non-cyclic cubics, the four quantities decouple: $\disc(F)$ need not be a perfect square, $d_0 \ne \sqrt{\disc(F)}$, and the Gram matrix is non-diagonal.
+
+
+%% ===================================================================
+\section{Lean Formalization}
+\label{sec:lean}
+%% ===================================================================
+
+\subsection{Architecture}
+
+Paper~58 is formalized as a single file \texttt{Paper58/NonCyclicWeil.lean}, importing the restored Module~9 of Paper~56.  The formalization verifies all arithmetic in the reduced form enumeration, the Schoen criterion, and the non-squareness of~$229$.
+
+\subsection{Module summary}
+
+\begin{center}
+\begin{tabular}{lrrl}
+\toprule
+\textbf{Component} & \textbf{Lines} & \textbf{Axioms} & \textbf{Tactic} \\
+\midrule
+Reduced form determinants ($\times 10$) & 20 & 0 & \texttt{norm\_num} \\
+Schoen criterion: $229 = 15^2 + 2^2$ & 5 & 0 & \texttt{norm\_num} \\
+Non-squareness: $229 \ne n^2$ & 10 & 0 & \texttt{interval\_cases + omega} \\
+Gauss--Minkowski bound & 15 & 0 & \texttt{omega} \\
+Completeness of enumeration & 30 & 0 & \texttt{interval\_cases + omega} \\
+Non-diagonality axiom & 5 & 1 & principled \\
+Schoen algebraicity axiom & 5 & 1 & principled \\
+\midrule
+\textbf{Total Paper~58} & $\sim$300 & \textbf{2} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+All arithmetic verifications compile with zero \texttt{sorry}.  The two principled axioms encode the geometric content (non-diagonality for $S_3$ cubics) and the algebraicity theorem (Schoen's criterion implies the Hodge conjecture).
+
+\subsection{Combined programme}
+
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Paper} & \textbf{Lines} & \textbf{Axioms} & \textbf{False axioms} \\
+\midrule
+Paper~54 (Bloch--Kato) & 1,141 & 7 & 0 \\
+Paper~55 (K3/Kuga-Satake) & 1,172 & 9 & 0 \\
+Paper~56 (Exotic Weil, restored) & $\sim$1,400 & 11 & 0 \\
+Paper~57 (Complete landscape) & $\sim$1,400 & 1 & 0 \\
+Paper~58 (Beyond cyclic barrier) & $\sim$300 & 2 & 0 \\
+\midrule
+\textbf{Total} & $\sim$5,400 & \textbf{30} & \textbf{0} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+%% ===================================================================
+\section{Correction History}
+\label{sec:correction}
+%% ===================================================================
+
+During the development of Papers~56--58, the discriminant equation $\det(G) = \disc(F)$ was briefly and erroneously ``corrected'' to a weaker mod-norms equivalence.  The correction was based on a false analysis of the non-square discriminant case: the appearance of an irrational self-intersection $\sqrt{229}$ was interpreted as evidence that the equation was only approximate.  The actual resolution is that the Gram matrix is non-diagonal for non-cyclic cubics, so $d_0^2 \ne \det(G)$ in those cases---the discriminant equation $\det(G) = \disc(F)$ is exact throughout.
+
+The machine-verified arithmetic (nine self-intersection values, all trace matrix determinants) was correct during all three versions of Module~9.  The error was in the human analysis of the axiomatic bridge between the Gram matrix and the discriminant, not in any computation.  This experience illustrates the value of machine verification as an anchor: the Lean code was right when the mathematical reasoning was temporarily wrong.
+
+
+%% ===================================================================
+\section{Open Questions}
+\label{sec:open}
+%% ===================================================================
+
+\begin{enumerate}[label=\textbf{Q\arabic*.}]
+\item \textbf{Which reduced form is realized for $\disc(F) = 229$?}  The CM period matrix of the specific abelian threefold determines the integral structure of~$W_{\mathrm{int}}$.  Computing this requires explicit CM period computation (e.g., in Magma or SageMath).  The six possible values $d_0 \in \{1, 2, 5, 7, 10, 14\}$ await determination.
+
+\item \textbf{Realization of forms.}  For a given determinant~$D$, which reduced binary quadratic forms arise as Gram matrices of Weil lattices?  Is every form realized by some CM fourfold, or do the CM constraints select a proper subset?
+
+\item \textbf{Extension to $h_K > 1$.}  When $h_K > 1$, the integral Weil lattice may be a projective (non-free) $\mathcal{O}_K$-module.  The Steinitz class introduces a new invariant.  The Gram matrix analysis requires modification.
+
+\item \textbf{The conductor as Langlands bridge.}  For cyclic Galois cubics, $d_0 = f$ where $f$ is the conductor.  The conductor appears on the automorphic side (measuring ramification of $L$-functions) and on the motivic side (measuring self-intersection of exotic cycles).  Is this numerical coincidence explained by Langlands functoriality?
+\end{enumerate}
+
+
+%% ===================================================================
+\section*{Acknowledgments}
+%% ===================================================================
+
+The Lean formalization agent compiled correct code from the beginning; we apologize for the unnecessary revision cycle.  This paper and the correction history would not exist without machine verification serving as a fixed point against which human error could be detected and corrected.
+
+
+%% ===================================================================
+\begin{thebibliography}{99}
+%% ===================================================================
+
+\bibitem{Anderson1993}
+G.~Anderson, \emph{Cyclotomy and a result of Weil}, Advances in Math.\ \textbf{98} (1993), 198--225.
+
+\bibitem{Milne1999}
+J.\,S.\ Milne, \emph{Lefschetz classes on abelian varieties}, Duke Math.\ J.\ \textbf{96} (1999), no.~3, 639--675.
+
+\bibitem{Schoen1988}
+C.~Schoen, \emph{Hodge classes on self-products of a variety with an automorphism}, Compositio Math.\ \textbf{65} (1988), 3--32.
+
+\bibitem{Schoen1998}
+C.~Schoen, \emph{An integral analog of the variational Hodge conjecture}, Annals of Math.\ \textbf{148} (1998), 899--921.
+
+\bibitem{Washington1997}
+L.\,C.\ Washington, \emph{Introduction to Cyclotomic Fields}, 2nd ed., Springer GTM~\textbf{83}, 1997.
+
+\bibitem{vanGeemen2005}
+B.~van Geemen, \emph{Half twists of Hodge structures of CM-type}, J.~Math.\ Soc.\ Japan \textbf{53} (2001), 813--833.
+
+\bibitem{PaperDPT}
+P.\,C.-K.\ Lee, \emph{DPT axioms for pure motives} (Paper~50), CRM and Physics series, 2025--2026.
+
+\bibitem{Paper5657}
+P.\,C.-K.\ Lee, \emph{Exotic Weil class self-intersection on CM abelian fourfolds} (Papers~56--57), CRM and Physics series, 2026.
+
+\end{thebibliography}
+
+\end{document}

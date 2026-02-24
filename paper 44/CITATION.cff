@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+- family-names: "Lee"
+  given-names: "Paul Chun-Kit"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+  affiliation: "New York University"
+title: "The Measurement Problem Dissolved: Constructive Stratification of Quantum Interpretations (Paper 44)"
+version: "1.0.0"
+doi: 10.5281/zenodo.18671162
+date-released: 2026-02-17
+url: "https://github.com/AICardiologist/FoundationRelativity"
+repository-code: "https://github.com/AICardiologist/FoundationRelativity"
+abstract: >-
+  A Lean 4 / Mathlib formalization applying constructive reverse mathematics
+  (CRM) to the measurement problem of quantum mechanics. Shows that Copenhagen
+  calibrates at WLPO, Many-Worlds at DC (Dependent Choice), and Bohmian
+  mechanics at LPO — three provably distinct positions in the constructive
+  hierarchy. The measurement problem is not one problem but three. Includes
+  10 files, ~1,100 lines, zero build errors, and three sorry-free calibration
+  directions.
+keywords:
+  - "constructive reverse mathematics"
+  - "measurement problem"
+  - "quantum mechanics"
+  - "quantum interpretations"
+  - "Copenhagen interpretation"
+  - "Many-Worlds interpretation"
+  - "Bohmian mechanics"
+  - "WLPO"
+  - "LPO"
+  - "Dependent Choice"
+  - "axiom calibration"
+  - "formal verification"
+  - "Lean 4"
+  - "Mathlib"
+license: Apache-2.0

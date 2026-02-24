@@ -1,0 +1,108 @@
+ZENODO UPLOAD METADATA — Paper 14
+==================================
+
+TITLE
+-----
+The Measurement Problem as a Logical Artefact: Constructive Calibration of Quantum Decoherence (Paper 14 — Lean 4 Formalization)
+
+
+AUTHORS
+-------
+Paul Chun-Kit Lee (New York University)
+
+
+DESCRIPTION
+-----------
+Paper 14 in the Constructive Reverse Mathematics of Physics series.
+
+This deposit contains the complete Lean 4 + Mathlib formalization of quantum decoherence calibrated against constructive omniscience principles, together with the accompanying paper (LaTeX source and compiled PDF).
+
+
+MAIN RESULTS
+
+Part A — BISH content (constructive, no omniscience):
+
+  * decoherence_epsilon_bound: For any epsilon > 0 and interaction angle
+    0 < theta < pi, there exists an explicitly computable N_0 such that
+    the quantum coherence c(N) < epsilon for all N >= N_0.
+
+  * coherence_eq_geometric: The coherence decays geometrically:
+    c(N) = ||rho_01|| * |cos(theta/2)|^N.
+
+  * decoherenceMap_eq_physical: The explicit decoherence formula equals
+    the physical definition Phi(rho) = Tr_E[U(theta) (rho (x) |0><0|) U^dag(theta)],
+    verified by brute-force 4x4 matrix computation.
+
+Part B — LPO equivalence:
+
+  * exact_decoherence_iff_LPO: The assertion "every bounded antitone
+    sequence converges exactly" is equivalent to the Limited Principle
+    of Omniscience (LPO).
+
+  * abc_iff_bmc: Antitone Bounded Convergence <-> (monotone) Bounded
+    Monotone Convergence, via sign-flip (fully proved, no axioms).
+
+
+THREE DOMAINS, ONE LOGICAL STRUCTURE
+
+This is the third physical domain producing the BMC <-> LPO pattern:
+
+  Domain                    Bounded Monotone Sequence   LPO Content
+  -------------------------------------------------------------------------
+  Statistical Mechanics (P8)   Free energy f_N          f_inf exists exactly
+  General Relativity (P13)     Radial coordinate r(tau) r -> 0 exactly
+  Quantum Measurement (P14)    Coherence c(N)           c -> 0 exactly (collapse)
+
+
+AXIOM CERTIFICATE
+
+  * BISH theorems: [propext, Classical.choice, Quot.sound] — standard
+    Mathlib infrastructure only. No omniscience principles.
+
+  * LPO theorems: Above plus bmc_of_lpo, lpo_of_bmc (axiomatized,
+    citing Bridges-Vita 2006 and Paper 8).
+
+  * Sign-flip lemma (abc_iff_bmc): Fully proved, no custom axioms.
+
+
+TECHNICAL DETAILS
+
+  * Lean 4: leanprover/lean4:v4.28.0-rc1
+  * Mathlib4: commit 7091f0f601d5aaea565d2304c1a290cc8af03e18
+  * Build: cd P14_Decoherence && lake exe cache get && lake build
+  * Status: 0 errors, 0 sorry
+
+
+PACKAGE CONTENTS
+
+  P14_Decoherence/           Self-contained Lean 4 package (9 source files, 805 lines)
+  paper14_writeup.tex        LaTeX source
+  paper14_writeup.pdf        Compiled paper (13 pages)
+  README.md                  Build instructions and file manifest
+
+
+KEYWORDS
+--------
+constructive mathematics, reverse mathematics, quantum decoherence,
+measurement problem, Lean 4, Mathlib, formal verification, LPO,
+bounded monotone convergence, density matrix
+
+
+LICENSE
+-------
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+
+RELATED IDENTIFIERS
+--------------------
+Paper 8 (1D Ising / LPO): https://doi.org/10.5281/zenodo.15043592
+
+
+RESOURCE TYPE
+-------------
+Software / Dataset
+
+
+VERSION
+-------
+v1.0

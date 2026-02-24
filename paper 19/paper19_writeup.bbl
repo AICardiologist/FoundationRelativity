@@ -1,0 +1,99 @@
+\begin{thebibliography}{18}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Bishop(1967)]{Bishop67}
+Errett Bishop.
+\newblock \emph{Foundations of Constructive Analysis}.
+\newblock McGraw-Hill, New York, 1967.
+
+\bibitem[Bridges(1989)]{Bridges89}
+Douglas~S. Bridges.
+\newblock A general constructive intermediate value theorem.
+\newblock \emph{Zeitschrift f{\"u}r mathematische Logik und Grundlagen der Mathematik}, 35\penalty0 (5):\penalty0 433--435, 1989.
+
+\bibitem[Bridges and Richman(1987)]{BR87}
+Douglas~S. Bridges and Fred Richman.
+\newblock \emph{Varieties of Constructive Mathematics}, volume~97 of \emph{London Mathematical Society Lecture Note Series}.
+\newblock Cambridge University Press, 1987.
+
+\bibitem[Bridges and V{\^\i}{\c{t}}{\u{a}}(2006)]{BV06}
+Douglas~S. Bridges and Luminita~Simona V{\^\i}{\c{t}}{\u{a}}.
+\newblock \emph{Techniques of Constructive Analysis}.
+\newblock Universitext. Springer, New York, 2006.
+
+\bibitem[Brillouin(1926)]{Brillouin26}
+L{\'e}on Brillouin.
+\newblock {La m{\'e}canique ondulatoire de Schr{\"o}dinger; une m{\'e}thode g{\'e}n{\'e}rale de r{\'e}solution par approximations successives}.
+\newblock \emph{Comptes Rendus de l'Acad{\'e}mie des Sciences}, 183:\penalty0 24--26, 1926.
+
+\bibitem[Diener(2020)]{Diener20}
+Hannes Diener.
+\newblock Constructive reverse mathematics.
+\newblock arXiv:1804.05495, 2020.
+\newblock Updated version.
+
+\bibitem[Gamow(1928)]{Gamow28}
+George Gamow.
+\newblock {Zur Quantentheorie des Atomkernes}.
+\newblock \emph{Zeitschrift f{\"u}r Physik}, 51\penalty0 (3--4):\penalty0 204--212, 1928.
+
+\bibitem[Griffiths and Schroeter(2018)]{Griffiths18}
+David~J. Griffiths and Darrell~F. Schroeter.
+\newblock \emph{Introduction to Quantum Mechanics}.
+\newblock Cambridge University Press, 3rd edition, 2018.
+
+\bibitem[Gurney and Condon(1928)]{GurneyCondon28}
+Ronald~W. Gurney and Edward~U. Condon.
+\newblock Wave mechanics and radioactive disintegration.
+\newblock \emph{Nature}, 122:\penalty0 439, 1928.
+
+\bibitem[Gurney and Condon(1929)]{GurneyCondon29}
+Ronald~W. Gurney and Edward~U. Condon.
+\newblock Quantum mechanics and radioactive disintegration.
+\newblock \emph{Physical Review}, 33\penalty0 (2):\penalty0 127--140, 1929.
+
+\bibitem[Ishihara(1990)]{Ishihara90}
+Hajime Ishihara.
+\newblock An omniscience principle, the {K}{\"o}nig lemma and the {Hahn}--{Banach} theorem.
+\newblock \emph{Zeitschrift f{\"u}r mathematische Logik und Grundlagen der Mathematik}, 36\penalty0 (3):\penalty0 237--240, 1990.
+
+\bibitem[Ishihara(2006)]{Ishihara06}
+Hajime Ishihara.
+\newblock Reverse mathematics in {Bishop}'s constructive mathematics.
+\newblock \emph{Philosophia Scientiae}, Cahier sp{\'e}cial\penalty0 (6):\penalty0 43--59, 2006.
+
+\bibitem[Kramers(1926)]{Kramers26}
+Hendrik~Anthony Kramers.
+\newblock {Wellenmechanik und halbzahlige Quantisierung}.
+\newblock \emph{Zeitschrift f{\"u}r Physik}, 39\penalty0 (10--11):\penalty0 828--840, 1926.
+
+\bibitem[Lee(2026{\natexlab{a}})]{Lee26-P15}
+Paul C.-K. Lee.
+\newblock {Noether}'s theorem and the logical cost of global conservation laws.
+\newblock Preprint, 2026. Paper~15 in the constructive reverse mathematics series, 2026{\natexlab{a}}.
+
+\bibitem[Lee(2026{\natexlab{b}})]{Lee26-P2}
+Paul C.-K. Lee.
+\newblock {WLPO} equivalence of the bidual gap in $\ell^1$: a {Lean}~4 formalization.
+\newblock Preprint, 2026. Paper~2 in the constructive reverse mathematics series, 2026{\natexlab{b}}.
+
+\bibitem[Lee(2026{\natexlab{c}})]{Lee26-P7}
+Paul C.-K. Lee.
+\newblock Non-reflexivity of $s_1(h)$ implies {WLPO}: a {Lean}~4 formalization.
+\newblock Preprint, 2026. Paper~7 in the constructive reverse mathematics series, 2026{\natexlab{c}}.
+
+\bibitem[Lee(2026{\natexlab{d}})]{Lee26-P8}
+Paul C.-K. Lee.
+\newblock The logical cost of the thermodynamic limit: {LPO}-equivalence and {BISH}-dispensability for the {1D} {Ising} free energy.
+\newblock Preprint, 2026. Paper~8 in the constructive reverse mathematics series, 2026{\natexlab{d}}.
+
+\bibitem[Wentzel(1926)]{Wentzel26}
+Gregor Wentzel.
+\newblock {Eine Verallgemeinerung der Quantenbedingungen f{\"u}r die Zwecke der Wellenmechanik}.
+\newblock \emph{Zeitschrift f{\"u}r Physik}, 38\penalty0 (6--7):\penalty0 518--529, 1926.
+
+\end{thebibliography}

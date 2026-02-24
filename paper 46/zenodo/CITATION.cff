@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+- family-names: "Lee"
+  given-names: "Paul Chun-Kit"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+  affiliation: "New York University"
+title: "The Tate Conjecture and LPO: Galois-Invariance, Cycle Verification, and Standard Conjecture D as a Decidability Axiom (Paper 46, Constructive Reverse Mathematics Series)"
+version: "1.0.0"
+doi: 10.5281/zenodo.18682285
+date-released: 2026-02-18
+url: "https://doi.org/10.5281/zenodo.18682285"
+abstract: >-
+  Paper 46 of the Constructive Reverse Mathematics series. We apply CRM to
+  calibrate the logical strength of the Tate Conjecture for smooth projective
+  varieties over finite fields. T1: Galois-invariance is equivalent to LPO.
+  T2: numerical equivalence is decidable in BISH via integer arithmetic.
+  T3: the Poincare pairing cannot be anisotropic in dimension >= 5.
+  T4: Standard Conjecture D is the decidability axiom that de-omniscientizes
+  the motivic category's morphism spaces. Formalized in Lean 4 over Mathlib
+  (771 lines, zero errors, zero sorry).
+keywords:
+  - "constructive reverse mathematics"
+  - "Tate Conjecture"
+  - "LPO"
+  - "Standard Conjecture D"
+  - "algebraic cycles"
+  - "de-omniscientizing descent"
+  - "formal verification"
+  - "Lean 4"
+  - "Mathlib"
+  - "arithmetic geometry"
+license: Apache-2.0

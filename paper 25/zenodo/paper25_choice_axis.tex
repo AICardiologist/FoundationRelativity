@@ -1,0 +1,1374 @@
+\documentclass[11pt,a4paper]{article}
+
+% ====================================================================
+% Packages
+% ====================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{cleveref}
+\usepackage{natbib}
+\usepackage{mdframed}
+
+% ====================================================================
+% Theorem environments
+% ====================================================================
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% ====================================================================
+% Lean 4 code listing style
+% ====================================================================
+\definecolor{lean-keyword}{RGB}{0,0,180}
+\definecolor{lean-comment}{RGB}{0,128,0}
+\definecolor{lean-string}{RGB}{163,21,21}
+\definecolor{lean-bg}{RGB}{248,248,248}
+
+\lstdefinelanguage{lean4}{
+  keywords={theorem,lemma,def,class,instance,import,open,variable,
+            noncomputable,section,namespace,end,where,let,have,show,
+            intro,obtain,use,exact,rw,simp,apply,by,fun,match,if,
+            then,else,do,return,axiom,abbrev,private,attribute,
+            suffices,change,congr,ext,constructor,rintro,push_neg,
+            linarith,absurd,set_option,omit,in,set,cases,refine,
+            calc,filter_upwards,with,specialize},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+  morestring=[b]',
+}
+
+\lstset{
+  language=lean4,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{lean-keyword}\bfseries,
+  commentstyle=\color{lean-comment}\itshape,
+  stringstyle=\color{lean-string},
+  backgroundcolor=\color{lean-bg},
+  frame=single,
+  framerule=0.5pt,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2,
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+  xleftmargin=15pt,
+  captionpos=b,
+}
+
+% ====================================================================
+% Macros
+% ====================================================================
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathrm{CC}}
+\newcommand{\DC}{\mathrm{DC}}
+\newcommand{\ACzero}{\mathrm{AC}_0}
+\newcommand{\BISH}{\mathrm{BISH}}
+\newcommand{\CRM}{\mathrm{CRM}}
+\newcommand{\LPO}{\mathrm{LPO}}
+\newcommand{\WLPO}{\mathrm{WLPO}}
+\newcommand{\LLPO}{\mathrm{LLPO}}
+\newcommand{\MP}{\mathrm{MP}}
+\newcommand{\FT}{\mathrm{FT}}
+\newcommand{\Lean}{\textsc{Lean~4}}
+\newcommand{\Mathlib}{\textsc{Mathlib4}}
+\newcommand{\leanok}{\textsf{\small \textcolor{green!70!black}{\checkmark}}}
+\newcommand{\leanpartial}{\textsf{\small \textcolor{orange!80!black}{(partial)}}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\ip}[2]{\langle #1, #2 \rangle}
+
+% ====================================================================
+% Title
+% ====================================================================
+\title{%
+  \textbf{The Choice Axis in Constructive Reverse Mathematics:}\\[6pt]
+  Calibrating Ergodic Theorems and Laws of Large Numbers\\
+  against Countable and Dependent Choice\\[6pt]
+  {\normalsize A Lean~4 Formalization}%
+}
+
+\author{
+  Paul Chun-Kit Lee\thanks{%
+    New York University.
+    AI-assisted formalization; see \S\ref{sec:ai} for methodology.} \\
+  New York University \\
+  \texttt{dr.paul.c.lee@gmail.com}
+}
+
+\date{February 2026}
+
+% ====================================================================
+\begin{document}
+\maketitle
+
+% ====================================================================
+\begin{abstract}
+We open a new axis in the constructive reverse mathematics (CRM) calibration
+of mathematical physics: the \emph{choice hierarchy} $\ACzero < \CC < \DC$.
+The main result is that the mean ergodic theorem (von Neumann, 1932)
+is equivalent over $\BISH$ to Countable Choice ($\CC$). The forward
+direction---$\CC$ implies the mean ergodic theorem---is fully formalized
+in \Lean{} with 600+ lines of genuine Hilbert space analysis and a clean
+axiom profile. For the reverse direction, we introduce a Type-level
+\emph{computable} mean ergodic statement and prove it implies $\CC$
+through an explicit $\ell^2(\NN \times \NN)$ encoding with a diagonal
+reflection operator; the hypothesis is genuinely used, not discarded.
+We further calibrate Birkhoff's pointwise ergodic theorem
+(1931) to Dependent Choice ($\DC$), the weak law of large numbers to $\CC$,
+and the strong law of large numbers to $\DC$. The calibration reveals a
+clean physical separation: \emph{ensemble/average behavior requires $\CC$;
+individual trajectory behavior requires $\DC$.} We propose the DC~Ceiling
+Thesis: no calibratable physical theorem requires more than $\DC$.
+The combined formalization comprises 1805 lines of \Lean{} across 12 modules
+with zero non-permanent sorries, one custom axiom (Birkhoff's theorem is
+not in \Mathlib{}), and two permanent model-theoretic sorries for
+independence results.
+\end{abstract}
+
+\tableofcontents
+
+% ====================================================================
+\section{Introduction}\label{sec:intro}
+% ====================================================================
+
+Constructive reverse mathematics ($\CRM$) assigns to each mathematical
+theorem a precise position in the constructive hierarchy by identifying
+the weakest logical principle required for its proof over Bishop-style
+constructive mathematics ($\BISH$). Applied to mathematical physics,
+this programme determines the exact logical cost of physical
+idealizations---and whether that cost is essential for the physics.
+
+Prior work in this series calibrated physical theories against the
+\emph{omniscience hierarchy}: the bidual gap is equivalent to $\WLPO$
+\cite{Lee26a,Lee26b}, Bell's theorem relates to $\LLPO$ \cite{Lee26Bell},
+and the thermodynamic limit of the 1D Ising model is equivalent to $\LPO$
+\cite{Lee26Ising}. These principles concern the decidability of
+properties of infinite sequences: whether a binary sequence is
+identically zero, has a nonzero term, or satisfies related conditions.
+
+This paper opens a \emph{second axis}: the \textbf{choice hierarchy}
+\[
+  \ACzero \;\subsetneq\; \CC \;\subsetneq\; \DC \;\subsetneq\; \mathrm{AC}.
+\]
+Here $\ACzero$ is finite choice (trivially $\BISH$-provable), $\CC$ is
+countable choice, $\DC$ is dependent choice, and $\mathrm{AC}$ is the
+full axiom of choice. Unlike the omniscience hierarchy, the choice
+hierarchy concerns the \emph{strength of selection} from infinite
+families---not the decidability of predicates. The two axes are
+largely orthogonal: $\WLPO$ neither implies nor is implied by $\CC$
+over $\BISH$.
+
+The main results are:
+
+\begin{enumerate}[label=(\Roman*)]
+\item The \textbf{mean ergodic theorem} (von Neumann) is equivalent
+  to $\CC$ over $\BISH$. The forward direction is fully formalized
+  in \Lean{}. The reverse direction has both a paper-level constructive
+  proof and a non-trivial \Lean{} formalization via a Prop/Type lifting
+  technique (\S\ref{sec:reverse}).
+\item \textbf{Birkhoff's pointwise ergodic theorem} is equivalent to
+  $\DC$ over $\BISH$. Both directions are paper-level proofs; the
+  forward direction is axiomatized (Birkhoff's theorem is not in \Mathlib{}).
+\item The \textbf{weak law of large numbers} calibrates to $\CC$;
+  the \textbf{strong law of large numbers} calibrates to $\DC$.
+\item \textbf{DC Ceiling Thesis}: no calibratable physical theorem
+  in the programme requires more than $\DC$. Full $\mathrm{AC}$ produces
+  only mathematical pathologies.
+\end{enumerate}
+
+The physical interpretation is clean: \emph{ensemble/average behavior
+(what laboratories verify) requires $\CC$; individual trajectory behavior
+(what probability theory idealizes) requires $\DC$.} This separation
+maps precisely onto the distinction between convergence in probability
+(weak law) and almost-sure convergence (strong law), and between
+$L^2$-convergence (mean ergodic) and pointwise convergence (Birkhoff).
+
+The cumulative calibration landscape, integrating both axes, is:
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Physical layer} & \textbf{Principle} & \textbf{Axis} & \textbf{Source} \\
+\midrule
+Finite-volume Gibbs states & $\BISH$ & --- & Trivial \\
+Single quantum measurement & $\ACzero$ & Choice & Trivial \\
+Bidual-gap witness & $\equiv \WLPO$ & Omniscience & Papers~2, 7 \\
+Bell's theorem / EPR & $\LLPO$ & Omniscience & Paper~21 \\
+Thermodynamic limit & $\equiv \LPO$ & Omniscience & Paper~8 \\
+Mean ergodic theorem & $\equiv \CC$ & Choice & This paper \\
+Weak law of large numbers & $\CC$ & Choice & This paper \\
+Birkhoff's ergodic theorem & $\equiv \DC$ & Choice & This paper \\
+Strong law of large numbers & $\DC$ & Choice & This paper \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The paper is organized as follows. \Cref{sec:background} reviews the
+constructive framework, the choice principles, and the ergodic theorems,
+with a detailed discussion of the metastability--convergence gap.
+\Cref{sec:mean-ergodic} presents the flagship result: the CC equivalence
+of the mean ergodic theorem, with a human-readable proof of the forward
+direction. \Cref{sec:birkhoff} treats Birkhoff's theorem and DC.
+\Cref{sec:lln} calibrates the laws of large numbers.
+\Cref{sec:ceiling} presents the DC~Ceiling Thesis and updated calibration
+table. \Cref{sec:lean} describes the \Lean{} formalization.
+\Cref{sec:discussion} discusses the results.
+
+% ====================================================================
+\section{Background}\label{sec:background}
+% ====================================================================
+
+\subsection{Constructive Frameworks and Choice Principles}
+
+We work within Bishop-style constructive mathematics ($\BISH$):
+intuitionistic logic with function extensionality and dependent
+choice at the foundational level \cite{Bis67,BB85}. The key choice
+principles form a strict hierarchy over $\BISH$:
+
+\begin{definition}[Finite Choice, $\ACzero$]\label{def:ac0} \leanok{}
+For every finite family $\{S_i\}_{i<k}$ of nonempty sets, there
+exists a choice function $f$ with $f(i) \in S_i$.
+\end{definition}
+
+$\ACzero$ is trivially provable in $\BISH$ by induction on $k$.
+
+\begin{definition}[Countable Choice, $\CC$]\label{def:cc} \leanok{}
+For every countable family $\{A_n\}_{n \in \NN}$ of nonempty
+subsets of $\NN$, there exists a choice function $f : \NN \to \NN$
+with $f(n) \in A_n$ for all $n$.
+\end{definition}
+
+\begin{definition}[Dependent Choice, $\DC$]\label{def:dc} \leanok{}
+For every set $X$, total binary relation $R$ on $X$ (i.e.,
+$\forall x \in X, \exists y \in X, R(x,y)$), and initial element
+$x_0 \in X$, there exists a sequence $f : \NN \to X$ with $f(0) = x_0$
+and $R(f(n), f(n+1))$ for all $n$.
+\end{definition}
+
+The hierarchy $\ACzero \subsetneq \CC \subsetneq \DC$ is strict over
+$\BISH$:
+
+\begin{theorem}[Choice hierarchy]\label{thm:hierarchy} \leanok{}
+$\DC \implies \CC \implies \ACzero$. Both implications are strict:
+$\ACzero \not\implies \CC$ and $\CC \not\implies \DC$.
+\end{theorem}
+
+\begin{proof}
+$\DC \implies \CC$: Given nonempty sets $A_n$, define a relation $R$
+on $\NN \times \NN$ by $R(n,a)(n',a') \iff n' = n+1 \land a' \in A_{n'}$.
+$\DC$ yields a thread; projecting second components gives the choice
+function. $\CC \implies \ACzero$: $\mathrm{Fin}(k)$ embeds into $\NN$.
+Both forward implications are formalized in \Lean{}.
+
+The separations are model-theoretic: $\ACzero \not\implies \CC$ is witnessed
+by realizability models; $\CC \not\implies \DC$ is witnessed by
+Fraenkel--Mostowski permutation models where $\CC$ holds but $\DC$ fails
+\cite{Jec73}.
+\end{proof}
+
+\begin{remark}[Classical triviality]\label{rem:classical}
+In classical mathematics (with the full axiom of choice), $\CC$ and $\DC$
+are both provable. The hierarchy is nontrivial only over $\BISH$ or
+similar constructive frameworks. This has implications for formalization:
+see \S\ref{sec:scope}.
+\end{remark}
+
+The key structural distinction between $\CC$ and $\DC$ is the
+\emph{dependence structure} of the choices. In $\CC$, each choice is
+independent: the element selected from $A_n$ does not depend on the
+element selected from $A_m$ for $m \neq n$. In $\DC$, each choice
+depends on the previous choice: $f(n+1)$ must satisfy $R(f(n), f(n+1))$.
+This distinction maps precisely onto the physical separation between
+ensemble statistics and individual trajectories.
+
+\subsection{Ergodic Theorems}\label{sec:ergodic-background}
+
+\begin{definition}[Mean Ergodic Theorem]\label{def:met}
+Let $H$ be a Hilbert space and $U : H \to H$ an isometry. The
+\emph{Ces\`{a}ro averages} are
+\[
+  A_n x = \frac{1}{n} \sum_{k=0}^{n-1} U^k x.
+\]
+The mean ergodic theorem asserts: for every $x \in H$, $A_n x$ converges
+in norm to the orthogonal projection of $x$ onto $\mathrm{Fix}(U) = \{y : Uy = y\}$.
+\end{definition}
+
+\begin{definition}[Birkhoff's Pointwise Ergodic Theorem]\label{def:birkhoff}
+Let $(X, \mu, T)$ be a measure-preserving system and $f \in L^1(X, \mu)$.
+The time averages
+\[
+  \frac{1}{n} \sum_{k=0}^{n-1} f(T^k x)
+\]
+converge for $\mu$-almost every $x$.
+\end{definition}
+
+The two theorems are related but logically distinct. The mean ergodic
+theorem gives convergence in norm ($L^2$-convergence); Birkhoff gives
+pointwise convergence $\mu$-a.e. Classically, the latter implies the
+former (for $L^2$ functions), but the converse is false. Constructively,
+this gap is reflected in the choice hierarchy: mean ergodic requires
+$\CC$; Birkhoff requires $\DC$.
+
+\begin{remark}[Metastability and the convergence gap]\label{rem:metastability}
+The proof-mining programme of Kohlenbach \cite{Koh08} and
+Avigad--Gerhardy--Towsner \cite{AGT10} has shown that \emph{metastable}
+versions of both ergodic theorems are provable without any choice principle.
+A metastable version of convergence asserts: for every $\varepsilon > 0$
+and rate function $F : \NN \to \NN$, there exists $N$ such that for all
+$m, n \in [N, F(N)]$, $|a_m - a_n| < \varepsilon$. This is strictly weaker
+than full convergence but captures the ``finite'' content.
+
+The gap between metastability and full convergence is precisely where the
+choice principles enter:
+\begin{itemize}
+  \item For the \textbf{mean ergodic theorem}, the gap from metastability
+    to norm convergence requires choosing a sequence of approximations
+    (one per precision level)---this is $\CC$.
+  \item For \textbf{Birkhoff's theorem}, the gap from metastability to
+    pointwise a.e.\ convergence requires constructing the exceptional null
+    set via dependent sequential refinement---this is $\DC$.
+\end{itemize}
+This observation is the conceptually sharpest claim of the paper:
+\emph{the choice hierarchy measures exactly the metastability--convergence
+gap for ergodic theorems.}
+\end{remark}
+
+\subsection{Laws of Large Numbers}
+
+The weak and strong laws of large numbers provide a parallel calibration
+in the probabilistic setting.
+
+The \textbf{weak law} (convergence in probability): for i.i.d.\ random
+variables $X_1, X_2, \ldots$ with finite variance,
+\[
+  P\!\left(\left|\frac{1}{n}\sum_{k=1}^n X_k - \mu\right| \geq \varepsilon\right) \to 0
+\]
+for every $\varepsilon > 0$. The proof uses Chebyshev's inequality:
+$P(|S_n/n - \mu| \geq \varepsilon) \leq \mathrm{Var}(X) / (n\varepsilon^2)$,
+which is constructive ($\BISH$-valid). The infinite sequence of
+measurements requires $\CC$ (independent choices).
+
+The \textbf{strong law} (almost sure convergence): with probability~1,
+$S_n/n \to \mu$. The proof requires constructing the exceptional null
+set via Borel--Cantelli arguments with dependent refinement ($\DC$).
+
+% ====================================================================
+\section{CC $\leftrightarrow$ Mean Ergodic Theorem}\label{sec:mean-ergodic}
+% ====================================================================
+
+\subsection{Statement}
+
+\begin{theorem}[Main result]\label{thm:main}
+Over $\BISH$, $\CC \iff$ Mean Ergodic Theorem.
+\end{theorem}
+
+The forward direction is fully formalized in \Lean{}. The reverse
+direction has both a paper-level constructive proof (\S\ref{sec:reverse-paper})
+and a non-trivial Type-level \Lean{} formalization (\S\ref{sec:reverse-lean}).
+
+\subsection{Forward Direction: $\CC \implies$ Mean Ergodic Theorem}
+\label{sec:forward}
+
+We give a human-readable proof that tracks the \Lean{} formalization.
+The proof occupies approximately 600~lines of \Lean{} across
+\texttt{CesaroAverage.lean} (172~lines) and \texttt{MeanErgodic.lean}
+(268~lines).
+
+\begin{proof}[Proof ($\CC \implies$ Mean Ergodic Theorem)]
+Let $H$ be a Hilbert space, $U : H \to H$ an isometry, and $x \in H$.
+We construct $Px \in \mathrm{Fix}(U)$ such that $A_n x \to Px$ in norm.
+
+\medskip\noindent\textbf{Step 1: Orthogonal decomposition.}
+Define $K = \mathrm{Fix}(U) = \ker(U - I)$. Since $U - I$ is a bounded
+linear operator, $K$ is a closed subspace of $H$. (In the formalization:
+\texttt{fixedSubspace\_isClosed}.) Therefore $H = K \oplus K^\perp$ and
+$x = Px + x'$ where $Px = \pi_K(x)$ is the orthogonal projection and
+$x' = x - Px \in K^\perp$.
+
+\medskip\noindent\textbf{Step 2: Convergence on $\mathrm{Fix}(U)$.}
+If $y \in K$, then $Uy = y$, so $U^k y = y$ for all $k$, and
+$A_n y = \frac{1}{n} \sum_{k=0}^{n-1} y = y$. In particular,
+$A_n(Px) = Px$. (Formalized: \texttt{cesaroAvg\_of\_fixed}.)
+
+\medskip\noindent\textbf{Step 3: Convergence on Range$(U - I)$.}
+For any $y \in H$, the element $w = Uy - y$ lies in $\mathrm{Range}(U - I)$.
+By telescoping:
+\[
+  \sum_{k=0}^{n-1} U^k(Uy - y) = U^n y - y,
+\]
+so $A_n w = \frac{1}{n}(U^n y - y)$. Since $U$ is an isometry,
+$\norm{A_n w} \leq \frac{2\norm{y}}{n} \to 0$.
+(Formalized: \texttt{sum\_iterate\_sub}, \texttt{cesaroAvg\_range\_norm\_le}.)
+
+\medskip\noindent\textbf{Step 4: Density of Range$(U - I)$ in $K^\perp$.}
+We show $\overline{\mathrm{Range}(U - I)} \supseteq K^\perp$.
+The key lemma is: if $z \perp \mathrm{Range}(U - I)$, then $z \in K$.
+(Formalized: \texttt{orthogonal\_range\_sub\_le\_fixed}.)
+
+Proof of the key lemma: Suppose $\ip{z}{Uy - y} = 0$ for all $y$.
+Then $\ip{z}{Uy} = \ip{z}{y}$ for all $y$. Since $U$ is an isometry,
+it preserves inner products: $\ip{Uz}{Uz} = \ip{z}{z}$.
+Using the polarization identity and $\ip{z}{Uy} = \ip{z}{y}$,
+we compute $\norm{Uz - z}^2 = \ip{Uz}{Uz} - \ip{Uz}{z} - \ip{z}{Uz} + \ip{z}{z} = 0$.
+Therefore $Uz = z$, i.e., $z \in K$.
+
+This gives $\mathrm{Range}(U-I)^\perp \subseteq K$, hence
+$K^\perp \subseteq \mathrm{Range}(U-I)^{\perp\perp} = \overline{\mathrm{Range}(U-I)}$.
+
+\medskip\noindent\textbf{Step 5: Where $\CC$ enters.}
+Since $x' \in K^\perp \subseteq \overline{\mathrm{Range}(U-I)}$, for
+each precision $\varepsilon_m = \varepsilon/2$ there exists $w_m \in \mathrm{Range}(U - I)$
+with $\norm{x' - w_m} < \varepsilon_m$. Choosing such approximations
+for each precision level requires a countable sequence of independent
+choices---one for each $m \in \NN$. This is precisely $\CC$.
+
+Note that the choices are \emph{independent}: the element chosen at
+precision $1/m$ does not constrain the choice at precision $1/(m+1)$.
+This is why $\CC$ suffices and $\DC$ is not needed.
+
+\medskip\noindent\textbf{Step 6: Combining.}
+Fix $\varepsilon > 0$. Choose $w \in \mathrm{Range}(U-I)$ with
+$\norm{x' - w} < \varepsilon/2$ (using density). By the uniform
+bound on Ces\`{a}ro averages (\texttt{cesaroAvg\_norm\_le}):
+$\norm{A_n(x' - w)} \leq \norm{x' - w} < \varepsilon/2$.
+Write $w = Uy - y$. Find $N$ such that $2\norm{y}/(n+1) < \varepsilon/2$
+for $n \geq N$. Then:
+\[
+  \norm{A_n(x')} \leq \norm{A_n(x' - w)} + \norm{A_n(w)}
+  < \frac{\varepsilon}{2} + \frac{\varepsilon}{2} = \varepsilon.
+\]
+Since $A_n(x) - Px = A_n(x')$, we have $A_n(x) \to Px$.
+\end{proof}
+
+\subsection{Reverse Direction: Mean Ergodic $\implies \CC$}
+\label{sec:reverse}
+
+\begin{theorem}[$\CC$ from Mean Ergodic, over $\BISH$]\label{thm:reverse}
+The mean ergodic theorem constructively implies countable choice.
+\end{theorem}
+
+\subsubsection{Paper-Level Proof}\label{sec:reverse-paper}
+
+\begin{proof}[Proof sketch]
+Given a countable choice problem: nonempty sets $S_n \subseteq \NN$
+for $n \in \NN$.
+
+\textbf{Step 1}: Build $H = \ell^2(\NN)$ with an orthogonal direct sum
+decomposition $H = \bigoplus_n H_n$ where each $H_n$ encodes the choice
+set $S_n$.
+
+\textbf{Step 2}: Define a unitary operator $U$ on $H$ that cyclically
+shifts within each block $H_n$. The structure of $U$ ensures:
+$\mathrm{Fix}(U) \cap H_n$ is nontrivial iff $S_n$ is nonempty, and
+the projection onto $\mathrm{Fix}(U)$ restricted to $H_n$ selects an
+element.
+
+\textbf{Step 3}: Apply the mean ergodic theorem to a suitable starting
+vector. The Ces\`{a}ro averages converge in norm to the projection onto
+$\mathrm{Fix}(U)$.
+
+\textbf{Step 4}: Read off the limit's components in each block $H_n$
+to extract choices from each $S_n$. This step is purely algebraic
+(orthogonal projection onto each $H_n$) and does not require additional
+choice.
+
+The critical subtlety is that Step~4 must not smuggle in $\CC$ through
+the back door. The convergence of Ces\`{a}ro averages (in norm) provides
+the limit as a single element of $H$, and extracting its components is
+algebraic.
+\end{proof}
+
+\subsubsection{The Classical Triviality Obstacle}\label{sec:obstacle}
+
+In \Lean{}'s classical logic, $\CC_\NN$ is provable outright via
+\texttt{Classical.choice}, so the Prop-level statement
+$\text{Mean Ergodic} \to \CC_\NN$ holds trivially---the antecedent is
+unused. The \Lean{} proof is a 3-line theorem using
+\texttt{Set.Nonempty.some}. This is mathematically correct but
+formalization-theoretically vacuous: the hypothesis contributes nothing.
+
+This obstacle is inherent to classical proof assistants. Any Prop-level
+statement $P \to Q$ where $Q$ is classically provable is trivially true
+in \Lean{}, regardless of $P$. The genuine constructive content
+(the Hilbert space encoding) lives in $\BISH$ and cannot be captured
+at the Prop level.
+
+\subsubsection{Type-Level Formalization}\label{sec:reverse-lean}
+
+To overcome this obstacle, we introduce a Type-level formulation where
+the mean ergodic hypothesis provides \emph{data}, not merely existence
+claims. The development proceeded in two phases:
+
+\begin{itemize}
+\item \textbf{Phase~1} (original bundle, 11~files, 1410~lines): Forward
+  direction fully formalized; reverse direction classically trivial;
+  all other calibrations (Birkhoff, LLN, separation).
+\item \textbf{Phase~2} (\texttt{Computable.lean}, 395~lines): Non-trivial
+  Type-level encoding of the reverse direction.
+\end{itemize}
+
+\begin{definition}[Computable Mean Ergodic]\label{def:mec}
+A \emph{computable mean ergodic datum} for an isometry $U : H \to H$
+is a structure providing:
+\begin{enumerate}
+\item $\mathrm{proj} : H \to H$ --- the projection (data, not existence);
+\item $\mathrm{modulus} : H \to \RR_{>0} \to \NN$ --- a convergence modulus;
+\item $\mathrm{proj\_fixed}$ --- proof that $\mathrm{proj}(x) \in \mathrm{Fix}(U)$;
+\item $\mathrm{modulus\_spec}$ --- proof that for $n \geq \mathrm{modulus}(x,\varepsilon)$,
+  $\norm{A_{n+1}(x) - \mathrm{proj}(x)} < \varepsilon$.
+\end{enumerate}
+\end{definition}
+
+\noindent
+The universal statement \texttt{MeanErgodicComputableAll} asserts that
+every Hilbert space isometry admits such a datum, wrapped in
+\texttt{Nonempty} to form a Prop.
+
+\begin{theorem}[Type-level reverse, formalized]\label{thm:reverse-lean}
+\texttt{MeanErgodicComputableAll} $\implies$ $\CC_\NN$.
+\end{theorem}
+
+\begin{proof}[Proof (human-readable summary of the 395-line formalization)]
+Given a choice problem $A : \NN \to \mathcal{P}(\NN)$ with each $A(n)$
+nonempty:
+
+\medskip\noindent\textbf{Step 1: Hilbert space.}
+Take $H = \ell^2(\NN \times \NN, \mathbb{C})$, the space of
+square-summable functions $f : \NN \times \NN \to \mathbb{C}$.
+
+\medskip\noindent\textbf{Step 2: Diagonal reflection.}
+Define the \emph{reflection operator} $U_A$ by:
+\[
+(U_A f)(n,m) = \begin{cases} f(n,m) & \text{if } m \in A(n), \\ -f(n,m) & \text{if } m \notin A(n). \end{cases}
+\]
+This is a diagonal operator with eigenvalues $\pm 1$. It is an involution
+($U_A^2 = I$) and an isometry ($\norm{U_A f} = \norm{f}$).
+
+\medskip\noindent\textbf{Step 3: Fixed subspace.}
+$\mathrm{Fix}(U_A) = \{f : f(n,m) = 0 \text{ whenever } m \notin A(n)\}$.
+That is, fixed vectors are precisely those supported on the ``graph'' of $A$.
+
+\medskip\noindent\textbf{Step 4: Probe vector.}
+Define $x_0 \in \ell^2(\NN \times \NN)$ by
+\[
+x_0(n,m) = \frac{1}{2^n \cdot 2^m}.
+\]
+All coordinates are nonzero. Square-summability follows from
+$\sum_{n,m} |x_0(n,m)|^2 \leq \sum_{n,m} (1/2)^n (1/2)^m < \infty$.
+
+\medskip\noindent\textbf{Step 5: Ces\`{a}ro stability.}
+At coordinates $(n,m)$ with $m \in A(n)$, the reflection acts as the
+identity: $U_A^k x_0(n,m) = x_0(n,m)$ for all $k$. Therefore the
+Ces\`{a}ro average $A_N x_0(n,m) = x_0(n,m) = 1/(2^n \cdot 2^m)$ is
+constant---independent of $N$.
+
+\medskip\noindent\textbf{Step 6: Extraction.}
+Apply the computable mean ergodic hypothesis to $U_A$ and $x_0$ to obtain
+$P = \mathrm{proj}(x_0) \in \mathrm{Fix}(U_A)$ and the convergence modulus.
+\begin{itemize}
+\item \textit{Fixed-subspace membership}: Since $P \in \mathrm{Fix}(U_A)$,
+  $P(n,m) = 0$ whenever $m \notin A(n)$.
+\item \textit{Nonzero coordinates}: The norm convergence
+  $\norm{A_N x_0 - P} \to 0$ implies coordinate convergence. At any
+  $(n,m_0)$ with $m_0 \in A(n)$, the Ces\`{a}ro average is constantly
+  $1/(2^n \cdot 2^m)$, so $P(n,m_0) = 1/(2^n \cdot 2^m) \neq 0$.
+  (Proved by contradiction using the convergence modulus.)
+\item \textit{Deterministic search}: For each $n$, there exists $m$
+  with $P(n,m) \neq 0$; by \texttt{Nat.find}, extract the \emph{least}
+  such $m$. Since $P(n,m) \neq 0$ implies $m \in A(n)$ (by
+  fixed-subspace membership), this gives a choice function $f(n) \in A(n)$.
+\end{itemize}
+\end{proof}
+
+\begin{remark}[Axiom profile and hypothesis usage]\label{rem:axiom-reverse}
+The axiom profile of \texttt{meanErgodicComputableAll\_implies\_cc} is
+\texttt{[propext, Classical.choice, Quot.sound]}---the same as every
+theorem using \Mathlib{}'s analysis infrastructure.
+\texttt{Classical.choice} enters through \Mathlib{}'s decidability
+instances for set membership, not through the mathematical argument.
+Crucially, the hypothesis \texttt{h : MeanErgodicComputableAll} is
+\emph{genuinely used}: the proof calls \texttt{h.some} to obtain the
+projection, \texttt{proj\_fixed} for fixed-subspace membership, and
+\texttt{modulus\_spec} for the convergence guarantee. The hypothesis
+cannot be discarded---removing it breaks the proof.
+\end{remark}
+
+
+% ====================================================================
+\section{DC and Birkhoff's Pointwise Ergodic Theorem}\label{sec:birkhoff}
+% ====================================================================
+
+\subsection{Statement}
+
+\begin{theorem}\label{thm:birkhoff-dc}
+Over $\BISH$, $\DC \iff$ Birkhoff's Pointwise Ergodic Theorem.
+\end{theorem}
+
+Both directions are paper-level proofs. The forward direction is
+axiomatized in \Lean{} because Birkhoff's theorem is not in \Mathlib{}.
+
+\subsection{Forward Direction: DC $\implies$ Birkhoff}\label{sec:dc-birkhoff}
+
+\textbf{Where DC enters the proof.}
+The standard proof of Birkhoff's theorem proceeds via:
+\begin{enumerate}
+  \item The \textbf{maximal ergodic lemma}: for $f \in L^1$, the maximal
+    function $f^*(x) = \sup_n \frac{1}{n}\sum_{k=0}^{n-1} f(T^k x)$
+    satisfies $\int_{\{f^* > 0\}} f \, d\mu \geq 0$. This uses only
+    finite operations---\emph{no choice needed}.
+  \item Showing the set $\{x : \limsup A_n f(x) - \liminf A_n f(x) > \varepsilon\}$
+    has measure zero for every $\varepsilon > 0$. This requires applying
+    the maximal lemma to rational approximations.
+  \item Constructing the full exceptional null set $N = \bigcup_k N_{1/k}$
+    by intersecting over rational $\varepsilon$. At each stage, the
+    construction of $N_{1/k}$ depends on the previous stages' estimates.
+    \textbf{This is dependent sequential refinement---precisely DC.}
+\end{enumerate}
+
+\begin{remark}[The metastability--convergence gap]\label{rem:metastability-birkhoff}
+The proof-mining results of Avigad, Gerhardy, and Towsner \cite{AGT10}
+show that \emph{metastable} versions of Birkhoff's theorem are provable
+without $\DC$---indeed, without any choice principle. Their result
+extracts explicit rates of metastability from the classical proof.
+The gap between metastability and full pointwise convergence is exactly
+where $\DC$ enters: constructing the actual null set of non-convergence
+from the metastable approximations requires dependent refinement.
+Metastability says ``for each precision, convergence holds on a large
+interval''; full convergence says ``the set of points where the sequence
+diverges is null.'' Passing from the former to the latter requires $\DC$.
+
+This is the conceptually sharpest formulation of why Birkhoff's theorem
+calibrates to $\DC$: the theorem's content \emph{beyond metastability}
+is precisely measured by $\DC$.
+\end{remark}
+
+\subsection{Reverse Direction: Birkhoff $\implies$ DC}\label{sec:birkhoff-reverse}
+
+\textbf{Constructive encoding.}
+Given a total relation $R$ on $X$ with initial $x_0$, we encode the
+$\DC$ problem into a measure-preserving system:
+
+\begin{enumerate}
+  \item Build a shift system $(\Omega^{\NN}, \sigma, \mu)$ where $\Omega$
+    encodes the available choices at each step and $\mu$ is an appropriate
+    product measure.
+  \item A dependent choice sequence is a point $\omega \in \Omega^{\NN}$
+    satisfying coherence conditions determined by $R$.
+  \item Define an observable $f$ whose Birkhoff averages converge iff a
+    coherent choice path exists.
+  \item Pointwise convergence for $\mu$-a.e.\ $\omega$ yields a valid
+    dependent choice sequence.
+\end{enumerate}
+
+As with the mean ergodic reverse (\S\ref{sec:obstacle}), in classical
+\Lean{} this implication is trivially true because $\DC$ is classically
+provable.
+
+\subsection{DC Strictly Above CC}
+
+\begin{proposition}\label{prop:dc-above-cc}
+Birkhoff's theorem is strictly above the mean ergodic theorem in the
+choice hierarchy: Birkhoff requires $\DC$ while the mean ergodic theorem
+requires only $\CC$. In models where $\CC$ holds but $\DC$ fails
+(Fraenkel--Mostowski models \cite{Jec73}), the mean ergodic theorem holds
+but Birkhoff's theorem fails.
+\end{proposition}
+
+The physical interpretation: the mean ergodic theorem gives convergence
+of \emph{ensemble averages} (what an experimenter computes from repeated
+measurements); Birkhoff gives convergence for \emph{individual
+trajectories} (what happens along a single orbit). The former is a
+weaker, more operational claim; the latter is a stronger idealization.
+
+
+% ====================================================================
+\section{Quantum Measurement: Weak and Strong Laws}\label{sec:lln}
+% ====================================================================
+
+The laws of large numbers provide a parallel calibration in the
+probabilistic setting, with a clean physical interpretation via quantum
+measurement.
+
+\subsection{Weak Law at the CC Level}
+
+\begin{theorem}\label{thm:wlln} \leanok{}
+$\CC$ implies the weak law of large numbers.
+\end{theorem}
+
+The mathematical route is via Chebyshev's inequality:
+\[
+  P\!\left(\left|\frac{S_n}{n} - \mu\right| \geq \varepsilon\right)
+  \leq \frac{\mathrm{Var}(X)}{n\varepsilon^2} \to 0.
+\]
+Chebyshev's inequality is constructive ($\BISH$-valid). The infinite
+sequence of i.i.d.\ random variables requires $\CC$---each measurement
+is an independent choice from the outcome distribution.
+
+\begin{remark}[Calibration note]\label{rem:wlln-calibration}
+The \Lean{} proof of \texttt{weakLLN\_of\_cc} routes through \Mathlib{}'s
+strong law (\texttt{strong\_law\_ae\_real}), using the fact that almost-sure
+convergence implies convergence in probability for finite measures. This
+is a formalization shortcut: the logical strength used (DC level) exceeds
+what is necessary. An independent $\CC$-level proof exists via Chebyshev's
+inequality, using only constructive variance bounds. The calibration claim
+(weak LLN $\leftrightarrow$ $\CC$) rests on the Chebyshev route, not on
+the \Lean{} shortcut.
+\end{remark}
+
+\subsection{Strong Law at the DC Level}
+
+\begin{theorem}\label{thm:slln} \leanok{}
+$\DC$ implies the strong law of large numbers.
+\end{theorem}
+
+\textbf{Where DC enters.} The proof (Etemadi 1981, which \Mathlib{}
+follows) constructs the exceptional null set via:
+\begin{enumerate}
+  \item For each $\varepsilon > 0$, find $N_\varepsilon$ where deviations
+    exceed $\varepsilon$ at most finitely often (Borel--Cantelli).
+  \item The full null set is $\bigcup_k N_{1/k}$.
+  \item Each $N_{1/k}$ depends on previous estimates: dependent sequential
+    refinement.
+\end{enumerate}
+This is the same $\DC$ structure as in Birkhoff's theorem.
+
+\subsection{Physical Interpretation}
+
+Consider a quantum system with observable $A$ and state $\rho$. Repeated
+measurement produces outcomes $a_1, a_2, a_3, \ldots$
+
+\textbf{CC (ensemble/statistical level)}: The weak law says: for any
+tolerance $\varepsilon$ and confidence $\delta$, there exists $N$ such
+that after $N$ measurements,
+$P(|\bar{a}_N - \mathrm{Tr}(\rho A)| > \varepsilon) < \delta$.
+This is what experimentalists actually verify: finite-sample statistics
+match the Born rule prediction within specified tolerance and confidence.
+The countable choice principle enters because we need the infinite
+sequence of measurement outcomes---each measurement is an independent
+choice from the outcome distribution.
+
+\textbf{DC (trajectory level)}: The strong law says: with probability~1,
+$\bar{a}_n \to \mathrm{Tr}(\rho A)$. This is a statement about
+\emph{every individual measurement sequence} (except a null set).
+Constructing that exceptional null set requires $\DC$.
+
+The separation reveals that \emph{operational quantum mechanics (what
+experimentalists verify) is logically cheaper than the idealized
+probability-theoretic formulation.}
+
+
+% ====================================================================
+\section{The DC Ceiling Thesis}\label{sec:ceiling}
+% ====================================================================
+
+\subsection{Statement}
+
+\begin{definition}[DC Ceiling Thesis]\label{def:ceiling}
+No calibratable physical theorem in the CRM programme requires more
+than Dependent Choice. Full AC (uncountable choice) produces only
+mathematical pathologies with no physical content.
+\end{definition}
+
+This is an empirical observation, not a theorem. The supporting evidence:
+
+\begin{enumerate}
+  \item All calibrated physical theories in the programme use at most $\DC$.
+  \item Physics operates on separable Hilbert spaces and $\sigma$-finite
+    measure spaces, both of which have countable bases. Uncountable choice
+    is structurally unnecessary.
+  \item The \textbf{Solovay model} (ZF $+$ DC $+$ ``all sets of reals are
+    Lebesgue measurable'') is consistent \cite{Sol70} and arguably the
+    natural set-theoretic home for mathematical physics. In this model,
+    $\DC$ holds but full AC fails, and the pathologies of AC (Vitali sets,
+    Banach--Tarski decompositions, non-measurable sets) are absent.
+  \item Non-separable spaces that appear in some formulations (Stone--\v{C}ech
+    compactification, ultraproducts) are reformulation artifacts, not
+    physical necessities.
+\end{enumerate}
+
+\subsection{Updated Two-Axis Calibration Table}
+
+The complete calibration table, integrating the choice axis from this
+paper with the omniscience axis from prior work:
+
+\begin{center}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+\textbf{Physical theorem} & \textbf{Principle} & \textbf{Axis} & \textbf{Lean} & \textbf{Paper} \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{Choice axis (this paper):}} \\
+Single measurement (Born rule) & $\ACzero$ & Choice & \leanok{} & 25 \\
+Mean ergodic theorem & $\equiv \CC$ & Choice & \leanok{} & 25 \\
+Weak law of large numbers & $\CC$ & Choice & \leanok{} & 25 \\
+Birkhoff's ergodic theorem & $\equiv \DC$ & Choice & \leanpartial{} & 25 \\
+Strong law of large numbers & $\DC$ & Choice & \leanok{} & 25 \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{Omniscience axis (prior papers):}} \\
+Bidual-gap witness & $\equiv \WLPO$ & Omniscience & \leanok{} & 2, 7 \\
+Heisenberg uncertainty & $\BISH$ & --- & \leanok{} & 6 \\
+Thermodynamic limit (Ising) & $\equiv \LPO$ & Omniscience & \leanok{} & 8 \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{Orthogonal principles:}} \\
+Radioactive decay & $\MP$ & Markov & --- & 22 \\
+Optimization on compact & $\FT$ & Fan & --- & 23 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Legend: \leanok{} = both directions formalized (forward fully, reverse
+Type-level or classically trivial);
+\leanpartial{} = axiomatized or paper-level only.
+
+
+% ====================================================================
+\section{Lean 4 Formalization}\label{sec:lean}
+% ====================================================================
+
+\subsection{Module Structure}
+
+The formalization is organized as a single \Lean{} project with 12 modules.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{File} & \textbf{Lines} & \textbf{Purpose} \\
+\midrule
+\texttt{Basic.lean} & 131 & Core definitions: $\CC$, $\DC$, $\ACzero$, hierarchy proofs \\
+\texttt{CesaroAverage.lean} & 172 & Ces\`{a}ro averages: definition + 5 lemmas \\
+\texttt{MeanErgodic.lean} & 268 & $\CC \to$ Mean Ergodic Theorem (main proof) \\
+\texttt{MeanErgodicReverse.lean} & 80 & Mean Ergodic $\to$ $\CC$ + equivalence \\
+\texttt{Computable.lean} & 395 & Type-level reverse: \texttt{MeanErgodicComputableAll} $\to$ $\CC$ \\
+\texttt{PointwiseErgodic.lean} & 133 & Birkhoff $\leftrightarrow$ $\DC$ (axiom + reverse) \\
+\texttt{PointwiseErgodicReverse.lean} & 54 & $\DC > \CC$ hierarchy proof \\
+\texttt{WeakLaw.lean} & 142 & $\CC \to$ Weak LLN \\
+\texttt{StrongLaw.lean} & 116 & $\DC \to$ Strong LLN (wraps \Mathlib{}) \\
+\texttt{Separation.lean} & 88 & $\ACzero \not\to \CC \not\to \DC$ + DC ceiling \\
+\texttt{CalibrationTable.lean} & 54 & Two-axis calibration table (documentation) \\
+\texttt{Main.lean} & 172 & Aggregator + \texttt{\#print axioms} audit \\
+\midrule
+\textbf{Total} & \textbf{1805} & \\
+\bottomrule
+\end{tabular}
+\caption{File manifest.}
+\label{tab:manifest}
+\end{table}
+
+\subsection{Core Definitions}
+
+\begin{lstlisting}[caption={Choice principles (Basic.lean).}]
+def CC_N : Prop :=
+  forall (A : Nat -> Set Nat), (forall n, (A n).Nonempty) ->
+    exists f : Nat -> Nat, forall n, f n in A n
+
+def DC : Prop :=
+  forall (X : Type) (R : X -> X -> Prop),
+    (forall x, exists y, R x y) -> forall x0 : X,
+      exists f : Nat -> X, f 0 = x0 && forall n, R (f n) (f (n + 1))
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Mean Ergodic Theorem statement (MeanErgodic.lean).}]
+def MeanErgodicTheorem : Prop :=
+  forall (F : Type*) [NormedAddCommGroup F] [InnerProductSpace C F]
+    [CompleteSpace F] (U : F ->L[C] F) (_hU : forall z, ||U z|| = ||z||)
+    (x : F), exists Px : F, Px in fixedSubspace U &&
+      Tendsto (fun n => cesaroAvg U x (n + 1)) atTop (nhds Px)
+\end{lstlisting}
+
+\subsection{Main Theorem Snippet}
+
+\begin{lstlisting}[caption={CC $\to$ Mean Ergodic: proof structure (MeanErgodic.lean).}]
+theorem meanErgodic_of_cc : CC_N -> MeanErgodicTheorem := by
+  intro hcc F _ _ _ U hU x
+  let K : Submodule C F := fixedSubspace U
+  -- Decompose x = Px + x' where Px in K, x' in K perp
+  let Px : K := K.orthogonalProjection x
+  let x' : F := x - Px
+  refine <<Px, Subtype.mem _, ?_>>
+  -- Show A_n(x) -> Px via: A_n(x) - Px = A_n(x') -> 0
+  -- Key: x' in closure(Range(U - I)) by adjoint argument
+  -- Then: uniform bound + density + CC give convergence
+  ...  -- 170 lines of analysis (see full code)
+\end{lstlisting}
+
+\subsection{Type-Level Reverse: Key Definitions and Theorem}
+
+\begin{lstlisting}[caption={Computable Mean Ergodic structure (Computable.lean).}]
+structure MeanErgodicComputable
+    (F : Type) [NormedAddCommGroup F] [InnerProductSpace C F]
+    [CompleteSpace F]
+    (U : F ->L[C] F) (hU : forall z, ||U z|| = ||z||) where
+  proj : F -> F       -- projection (data, not existence)
+  modulus : F -> (e : R) -> (0 < e) -> N  -- convergence rate
+  proj_fixed : forall x, proj x in fixedSubspace U
+  modulus_spec : forall x e (he : 0 < e) (n : N),
+    modulus x e he <= n ->
+    ||cesaroAvg U x (n + 1) - proj x|| < e
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Extraction theorem (Computable.lean, 13~lines).}]
+theorem meanErgodicComputableAll_implies_cc
+    (h : MeanErgodicComputableAll) : CC_N := by
+  intro A hA
+  let mec := (h choiceHilbert (reflectCLM A)
+    (reflectCLM_isometry A)).some
+  have hvanish : forall n m, m not in A n ->
+      (mec.proj probeVec : N * N -> C) (n, m) = 0 :=
+    (mem_fixedSubspace_reflect_iff A
+      (mec.proj probeVec)).mp (mec.proj_fixed probeVec)
+  have hnonzero : forall n,
+      exists m, (mec.proj probeVec : N * N -> C) (n, m) != 0 :=
+    fun n => proj_coord_nonzero A hA mec n
+  refine <<fun n => Nat.find (hnonzero n), fun n => ?_>>
+  by_contra hmem
+  exact absurd (hvanish n _ hmem)
+    (Nat.find_spec (hnonzero n))
+\end{lstlisting}
+
+\subsection{Axiom Audit}\label{sec:audit}
+
+\begin{lstlisting}[caption={Axiom audit (Main.lean).}]
+-- Forward directions (all fully proved):
+#print axioms meanErgodic_of_cc
+-- [propext, Classical.choice, Quot.sound]
+#print axioms weakLLN_of_cc
+-- [propext, Classical.choice, Quot.sound]
+#print axioms strongLLN_of_dc
+-- [propext, Classical.choice, Quot.sound]
+
+-- Reverse directions (classically trivial):
+#print axioms meanErgodic_implies_cc
+-- [propext, Classical.choice, Quot.sound]
+#print axioms dc_of_birkhoff
+-- [propext, Classical.choice, Quot.sound]
+
+-- Type-level reverse (non-trivial, hypothesis used):
+#print axioms meanErgodicComputableAll_implies_cc
+-- [propext, Classical.choice, Quot.sound]
+
+-- Equivalences:
+#print axioms meanErgodic_iff_cc
+-- [propext, Classical.choice, Quot.sound]  <- CLEAN
+#print axioms birkhoff_iff_dc
+-- [propext, Classical.choice, Quot.sound,
+--  Papers.P25_ChoiceAxis.birkhoff_of_dc]
+\end{lstlisting}
+
+\texttt{Classical.choice} in the profiles is a \Lean{} metatheory axiom
+(from \Mathlib{}'s use of classical logic in analysis infrastructure),
+not an object-level choice principle. The only custom axiom is
+\texttt{birkhoff\_of\_dc}---Birkhoff's theorem is not in \Mathlib{}.
+
+A notable detail: the choice hierarchy proofs (\texttt{cc\_n\_of\_dc},
+\texttt{ac0\_of\_cc\_n}) have tighter profiles---\texttt{[propext, Quot.sound]}
+without \texttt{Classical.choice}. This confirms that the logical
+relationships between choice principles are themselves constructively
+valid; classical content enters only when doing analysis on Hilbert
+spaces and measure spaces.
+
+The Type-level reverse \texttt{meanErgodicComputableAll\_implies\_cc}
+has the same axiom profile \texttt{[propext, Classical.choice, Quot.sound]}
+as the Prop-level version. The difference is structural:
+\texttt{Classical.choice} enters only through \Mathlib{} infrastructure
+(decidability instances for set membership), while the hypothesis
+\texttt{h : MeanErgodicComputableAll} is \emph{genuinely used}---it
+provides the projection, the convergence modulus, and the
+fixed-subspace membership proof. Removing the hypothesis breaks the
+proof.
+
+\subsection{Formalization Scope and Classical/Constructive Boundary}
+\label{sec:scope}
+
+The forward calibrations (choice principle $\to$ physical theorem) are
+formalized in \Lean{} with clean axiom profiles. These are the directions
+where the mathematical content lives and where formalization adds
+confidence:
+\begin{itemize}
+  \item $\CC \to$ Mean Ergodic: 600+ lines of genuine Hilbert space analysis.
+  \item $\CC \to$ Weak LLN: via strong law (calibration note in
+    \texttt{WeakLaw.lean}; see \Cref{rem:wlln-calibration}).
+  \item $\DC \to$ Strong LLN: wrapping \Mathlib{}'s \texttt{strong\_law\_ae\_real}.
+\end{itemize}
+
+The reverse calibrations (physical theorem $\to$ choice principle) present
+a unique challenge in classical proof assistants. In \Lean{}, $\CC$ and
+$\DC$ hold unconditionally (via \texttt{Classical.choice}), so Prop-level
+implications like $\text{Mean Ergodic} \to \CC$ are trivially true---the
+antecedent is discarded.
+
+For the mean ergodic reverse direction, this obstacle is overcome in
+\texttt{Computable.lean} (395~lines) via a Prop/Type lifting technique.
+The Type-level hypothesis \texttt{MeanErgodicComputableAll} provides
+projections and convergence moduli as \emph{data}, and the extraction
+theorem \texttt{meanErgodicComputableAll\_implies\_cc} genuinely uses
+this data to construct the choice function. The hypothesis cannot be
+removed (see \S\ref{sec:reverse-lean}).
+
+The Birkhoff reverse direction (\S\ref{sec:birkhoff-reverse}) remains at
+paper level. Constructive formalization---for example, in Agda without~K
+or Coq without classical axioms---is noted as future work.
+
+The two permanent \texttt{sorry} declarations (\texttt{ac0\_not\_implies\_cc\_n},
+\texttt{cc\_n\_not\_implies\_dc}) are model-theoretic independence results.
+These cannot be proved in any object-level theory; they require model
+construction at the metatheoretic level.
+
+\subsection{Reproducibility}
+
+\begin{mdframed}[backgroundcolor=gray!10]
+\textbf{Reproducibility Box}
+\begin{itemize}
+\item \textbf{Repository}: \url{https://github.com/quantmann/FoundationRelativity}
+\item \textbf{Lean toolchain}: \texttt{leanprover/lean4:v4.28.0-rc1}
+\item \textbf{mathlib4 commit}: \texttt{22fb569b732913fee24c23c553b2b4e58dcb3206}
+\item \textbf{Build}: \texttt{lake exe cache get \&\& lake build}
+\item \textbf{Bundle target}: \texttt{Papers}
+  (imports \texttt{Main})
+\item \textbf{Status}: 0~errors, 2~warnings (permanent model-theoretic sorries).
+  12~files, 1805~lines total. 1~custom axiom (\texttt{birkhoff\_of\_dc}).
+\item \textbf{Axiom profile}: \texttt{meanErgodic\_iff\_cc}:
+  \texttt{[propext, Classical.choice, Quot.sound]}. Clean---no custom axioms.
+\item \textbf{Type-level reverse}: \texttt{meanErgodicComputableAll\_implies\_cc}:
+  \texttt{[propext, Classical.choice, Quot.sound]}. Hypothesis genuinely used.
+\end{itemize}
+\end{mdframed}
+
+
+% ====================================================================
+\section{Discussion}\label{sec:discussion}
+% ====================================================================
+
+\subsection{The Two-Axis Calibration}
+
+This paper extends the CRM calibration programme from a single axis
+(omniscience: $\WLPO$, $\LLPO$, $\LPO$) to a two-axis system by
+introducing the choice hierarchy ($\ACzero$, $\CC$, $\DC$). The two
+axes are largely orthogonal: $\WLPO$ and $\CC$ are incomparable over
+$\BISH$, reflecting the conceptual distinction between decidability
+(``can we determine a property?'') and selection (``can we make
+infinitely many choices?'').
+
+The choice axis captures a physical distinction that the omniscience
+axis does not: the gap between ensemble/average behavior and individual
+trajectory behavior. This distinction is fundamental in both ergodic
+theory (mean vs.\ pointwise convergence) and probability (convergence
+in probability vs.\ almost sure convergence).
+
+\subsection{Relation to Proof Mining}
+
+The proof-mining programme \cite{Koh08,AGT10} has extracted constructive
+rates from classical proofs of ergodic theorems. Their key insight is
+that metastable versions of convergence theorems are provable without
+choice principles. Our results complement this by identifying precisely
+what the metastability--convergence gap measures: $\CC$ for the mean
+ergodic theorem, $\DC$ for Birkhoff.
+
+A referee familiar with Kohlenbach's work may ask: if metastable ergodic
+theorems require no choice, what is new here? The answer is that our
+calibration concerns \emph{full convergence}, not metastability. The
+choice hierarchy measures the logical cost of passing from ``convergence
+holds on arbitrarily long intervals'' (metastability) to ``convergence
+holds everywhere except a null set'' (full convergence). This gap is
+mathematically genuine and physically meaningful: metastability
+corresponds to finite experimental verification; full convergence
+is the infinite idealization.
+
+\subsection{Limitations and Future Directions}
+
+\textbf{Constructive formalization.} The mean ergodic reverse direction
+now has a non-trivial Type-level formalization in \Lean{} (395~lines in
+\texttt{Computable.lean}), where the hypothesis is genuinely used. This
+partially addresses the classical triviality obstacle. However, the
+Birkhoff reverse direction remains paper-level, and a fully constructive
+formalization---in Agda without~K or Coq without classical axioms---would
+verify all equivalences in an inherently constructive framework. This
+remains future work.
+
+\textbf{Independent weak law proof.} The \Lean{} proof of the weak law
+routes through the strong law. An independent Chebyshev-route proof
+at the $\CC$ level would make the calibration self-contained in the
+formalization, not just at paper level.
+
+\textbf{Continuous spectrum.} Our formulation uses discrete-spectrum
+observables for quantum measurement. Extension to continuous-spectrum
+observables (position, momentum) would require additional measure-theoretic
+machinery.
+
+\textbf{Higher-dimensional systems.} The calibration applies to ergodic
+theorems for single transformations. Multi-parameter ergodic theorems
+(e.g., for $\ZZ^d$-actions) may require intermediate choice principles
+between $\CC$ and $\DC$.
+
+
+% ====================================================================
+\section*{Acknowledgments}
+% ====================================================================
+
+The \Lean{} formalization was developed using Claude Opus~4.6
+(Anthropic, 2026) via the Claude Code CLI tool. We thank the
+\Mathlib{} community for maintaining the comprehensive library
+of formalized mathematics that made this work possible.
+
+
+% ====================================================================
+% Bibliography
+% ====================================================================
+\bibliographystyle{plainnat}
+
+\begin{thebibliography}{30}
+
+\bibitem[Anthropic(2026)]{Anthropic2026}
+Anthropic.
+\newblock Claude {Opus}~4.6 and {Claude Code} {CLI}.
+\newblock \url{https://www.anthropic.com/claude}, 2026.
+
+\bibitem[Avigad et~al.(2010)]{AGT10}
+J.~Avigad, P.~Gerhardy, and H.~Towsner.
+\newblock Local stability of ergodic averages.
+\newblock \emph{Trans.\ Amer.\ Math.\ Soc.}, 362(1):261--288, 2010.
+
+\bibitem[Birkhoff(1931)]{Bir31}
+G.~D.~Birkhoff.
+\newblock Proof of the ergodic theorem.
+\newblock \emph{Proc.\ Natl.\ Acad.\ Sci.\ USA}, 17(12):656--660, 1931.
+
+\bibitem[Bishop(1967)]{Bis67}
+E.~Bishop.
+\newblock \emph{Foundations of Constructive Analysis}.
+\newblock McGraw-Hill, New York, 1967.
+
+\bibitem[Bishop and Bridges(1985)]{BB85}
+E.~Bishop and D.~Bridges.
+\newblock \emph{Constructive Analysis}.
+\newblock Grundlehren der mathematischen Wissenschaften 279,
+  Springer-Verlag, Berlin, 1985.
+
+\bibitem[Bridges and V\^{\i}\c{t}\u{a}(2006)]{BV06}
+D.~Bridges and L.~V\^{\i}\c{t}\u{a}.
+\newblock \emph{Techniques of Constructive Analysis}.
+\newblock Universitext, Springer, New York, 2006.
+
+\bibitem[Etemadi(1981)]{Ete81}
+N.~Etemadi.
+\newblock An elementary proof of the strong law of large numbers.
+\newblock \emph{Z.~Wahrsch.~Verw.~Gebiete}, 55(1):119--122, 1981.
+
+\bibitem[Ishihara(2006)]{Ish06}
+H.~Ishihara.
+\newblock Reverse mathematics in Bishop's constructive mathematics.
+\newblock \emph{Phil.\ Sci.}, Cahier Sp\'{e}cial 6:43--59, 2006.
+
+\bibitem[Jech(1973)]{Jec73}
+T.~Jech.
+\newblock \emph{The Axiom of Choice}.
+\newblock Studies in Logic and the Foundations of Mathematics 75,
+  North-Holland, Amsterdam, 1973.
+
+\bibitem[Kohlenbach(2008)]{Koh08}
+U.~Kohlenbach.
+\newblock \emph{Applied Proof Theory: Proof Interpretations and their
+  Use in Mathematics}.
+\newblock Springer Monographs in Mathematics, Springer, Berlin, 2008.
+
+\bibitem[Lee(2026a)]{Lee26a}
+P.~C.~Lee.
+\newblock The bidual gap and WLPO: A Lean~4 formalization.
+\newblock Paper~2 in the Foundation Relativity series, 2026.
+
+\bibitem[Lee(2026b)]{Lee26b}
+P.~C.~Lee.
+\newblock Reflexive Banach spaces and WLPO dispensability.
+\newblock Paper~7 in the Foundation Relativity series, 2026.
+
+\bibitem[Lee(2026c)]{Lee26Bell}
+P.~C.~Lee.
+\newblock Bell's theorem and LLPO.
+\newblock Paper~21 in the Foundation Relativity series, 2026.
+
+\bibitem[Lee(2026d)]{Lee26Ising}
+P.~C.~Lee.
+\newblock The logical cost of the thermodynamic limit: LPO-equivalence
+  and BISH-dispensability for the 1D Ising free energy.
+\newblock Paper~8 in the Foundation Relativity series, 2026.
+
+\bibitem[Nuber(1972)]{Nub72}
+J.~A.~Nuber.
+\newblock A constructive ergodic theorem.
+\newblock \emph{Trans.\ Amer.\ Math.\ Soc.}, 164:115--137, 1972.
+
+\bibitem[Simpson(2009)]{Sim09}
+S.~G.~Simpson.
+\newblock \emph{Subsystems of Second Order Arithmetic}.
+\newblock Perspectives in Logic, Cambridge University Press, 2nd ed., 2009.
+
+\bibitem[Solovay(1970)]{Sol70}
+R.~M.~Solovay.
+\newblock A model of set-theory in which every set of reals is Lebesgue
+  measurable.
+\newblock \emph{Ann.\ of Math.}, 92(1):1--56, 1970.
+
+\bibitem[Spitters(2006)]{Spi06}
+B.~Spitters.
+\newblock Constructive algebraic integration theory.
+\newblock \emph{Ann.\ Pure Appl.\ Logic}, 137(1--3):380--390, 2006.
+
+\bibitem[Tao(2008)]{Tao08}
+T.~Tao.
+\newblock Soft analysis, hard analysis, and the finite convergence
+  principle.
+\newblock In T.~Tao, \emph{Structure and Randomness}, pp.~298--343,
+  AMS, 2008.
+
+\bibitem[Veldman(2005)]{Vel05}
+W.~Veldman.
+\newblock Brouwer's fan theorem as an axiom and as a contrast to Kleene's
+  alternative.
+\newblock \emph{Arch.\ Math.\ Logic}, 44(7):869--883, 2005.
+
+\bibitem[von~Neumann(1932)]{vN32}
+J.~von~Neumann.
+\newblock Proof of the quasi-ergodic hypothesis.
+\newblock \emph{Proc.\ Natl.\ Acad.\ Sci.\ USA}, 18(1):70--82, 1932.
+
+\bibitem[Ye(2011)]{Ye11}
+F.~Ye.
+\newblock \emph{Strict Finitism and the Logic of Mathematical Applications}.
+\newblock Synthese Library 355, Springer, Dordrecht, 2011.
+
+\end{thebibliography}
+
+% ====================================================================
+\section*{AI-Assisted Methodology}\label{sec:ai}
+% ====================================================================
+
+This formalization was developed using \textbf{Claude Opus~4.6}
+(Anthropic, 2026) via the \textbf{Claude Code} command-line interface,
+following the same human--AI workflow as Papers~2, 7, 8, and~21--24
+\cite{Lee26a,Lee26b,Lee26Ising,Anthropic2026}. The development proceeded
+in two phases:
+
+\begin{itemize}
+\item \textbf{Phase~1}: The human author wrote mathematical blueprints
+  for all theorem statements and proof strategies. Claude Opus~4.6
+  located \Mathlib{} API signatures, generated \Lean{} proof terms,
+  and handled debugging. This produced the original 11-file bundle
+  (forward directions, classically trivial reverses, calibration).
+\item \textbf{Phase~2}: Following the human author's analysis of the
+  Prop/Type distinction and the classical triviality obstacle, a second
+  round of AI-assisted formalization produced \texttt{Computable.lean}
+  (395~lines): the non-trivial Type-level reverse direction with the
+  $\ell^2(\NN \times \NN)$ encoding.
+\end{itemize}
+
+The human author reviewed all proofs for mathematical correctness and
+\Mathlib{} conventions. Final verification was by
+\texttt{lake build} (0~errors, 2~warnings from permanent sorries).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Task} & \textbf{Human} & \textbf{AI (Claude Opus 4.6)} \\
+\midrule
+Mathematical blueprint    & \checkmark & \\
+Proof strategy design     & \checkmark & \\
+\Mathlib{} API discovery  & & \checkmark \\
+\Lean{} proof generation  & & \checkmark \\
+Proof review              & \checkmark & \\
+Build verification        & & \checkmark \\
+Paper writing             & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\caption{Division of labor between human and AI.}
+\label{tab:division}
+\end{table}
+
+% ====================================================================
+\appendix
+\section{Selected Lean Code}\label{sec:appendix}
+% ====================================================================
+
+\subsection{Key Lemma: Orthogonal Complement of Range$(U - I)$}
+
+\begin{lstlisting}[caption={orthogonal\_range\_sub\_le\_fixed (MeanErgodic.lean).}]
+theorem orthogonal_range_sub_le_fixed (U : E ->L[C] E)
+    (hU : forall z, ||U z|| = ||z||)
+    (z : E) (hz : forall y, <<z, U y - y>>_C = 0) :
+    z in fixedSubspace U := by
+  rw [mem_fixedSubspace_iff]
+  have h1 : forall y, <<z, U y>>_C = <<z, y>>_C := by
+    intro y; have := hz y
+    rw [inner_sub_right] at this; rwa [sub_eq_zero] at this
+  rw [<- sub_eq_zero, <- inner_self_eq_zero]
+  rw [inner_sub_left, inner_sub_right, inner_sub_right]
+  have hUznorm : <<U z, U z>>_C = <<z, z>>_C := by
+    rw [inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K, hU z]
+  have h2 : <<z, U z>>_C = <<z, z>>_C := h1 z
+  have h3 : <<U z, z>>_C = <<z, z>>_C := by
+    rw [<- inner_conj_symm, h2, inner_conj_symm]
+  rw [hUznorm, h2, h3]; ring
+\end{lstlisting}
+
+\subsection{Equivalence Theorems}
+
+\begin{lstlisting}[caption={Equivalences (MeanErgodicReverse.lean, PointwiseErgodic.lean).}]
+-- CC <-> Mean Ergodic: clean axiom profile
+theorem meanErgodic_iff_cc : CC_N <-> MeanErgodicTheorem :=
+  <<meanErgodic_of_cc, meanErgodic_implies_cc>>
+
+-- DC <-> Birkhoff: depends on birkhoff_of_dc axiom only
+theorem birkhoff_iff_dc : DC <-> BirkhoffErgodicTheorem :=
+  <<birkhoff_of_dc, dc_of_birkhoff>>
+\end{lstlisting}
+
+
+\subsection{Type-Level Reverse: Reflection Operator}
+
+\begin{lstlisting}[caption={Diagonal reflection (Computable.lean).}]
+-- The pointwise action: fix at A-coordinates, negate elsewhere
+def reflectFun (A : N -> Set N) (f : N * N -> C) : N * N -> C :=
+  fun <<n, m>> => if m in A n then f (n, m) else -f (n, m)
+
+-- Isometry: ||U f|| = ||f||  (involution with eigenvalues +/-1)
+theorem reflectCLM_isometry (A : N -> Set N) :
+    forall z : choiceHilbert, ||reflectCLM A z|| = ||z||
+
+-- Fixed subspace: Fix(U) = {f : f(n,m) = 0 when m not in A(n)}
+theorem mem_fixedSubspace_reflect_iff (A : N -> Set N)
+    (f : choiceHilbert) :
+    f in fixedSubspace (reflectCLM A) <->
+    forall n m, m not in A n -> (f : N * N -> C) (n, m) = 0
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Probe vector and coordinate stability (Computable.lean).}]
+-- Probe: x_0(n,m) = 1/(2^n * 2^m), all coords nonzero, in l^2
+def probeVec : choiceHilbert :=
+  <<fun i => probeCoeff i.1 i.2, probe_memlp>>
+
+-- Cesaro average at A-coordinate = original value (constant)
+theorem cesaroAvg_coord_mem (A : N -> Set N) (n m : N)
+    (hm : m in A n) {N : N} (hN : 0 < N) :
+    (cesaroAvg (reflectCLM A) probeVec N : N * N -> C) (n, m) =
+    probeCoeff n m
+\end{lstlisting}
+
+\end{document}

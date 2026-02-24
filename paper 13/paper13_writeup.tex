@@ -1,0 +1,1143 @@
+\documentclass[11pt,a4paper]{article}
+
+% ====================================================================
+% Packages
+% ====================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{cleveref}
+\usepackage{natbib}
+\usepackage{mdframed}
+
+% ====================================================================
+% Theorem environments
+% ====================================================================
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% ====================================================================
+% Lean 4 code listing style
+% ====================================================================
+\definecolor{lean-keyword}{RGB}{0,0,180}
+\definecolor{lean-comment}{RGB}{0,128,0}
+\definecolor{lean-string}{RGB}{163,21,21}
+\definecolor{lean-bg}{RGB}{248,248,248}
+
+\lstdefinelanguage{lean4}{
+  keywords={theorem,lemma,def,class,instance,import,open,variable,
+            noncomputable,section,namespace,end,where,let,have,show,
+            intro,obtain,use,exact,rw,simp,apply,by,fun,match,if,
+            then,else,do,return,axiom,abbrev,private,attribute,
+            suffices,change,congr,ext,constructor,rintro,push_neg,
+            linarith,absurd,set_option,omit,in,set,cases,structure,
+            refine,unfold,rcases},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+  morestring=[b]',
+}
+
+\lstset{
+  language=lean4,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{lean-keyword}\bfseries,
+  commentstyle=\color{lean-comment}\itshape,
+  stringstyle=\color{lean-string},
+  backgroundcolor=\color{lean-bg},
+  frame=single,
+  framerule=0.5pt,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2,
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+  xleftmargin=15pt,
+  captionpos=b,
+}
+
+% ====================================================================
+% Macros
+% ====================================================================
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\LPO}{\mathrm{LPO}}
+\newcommand{\WLPO}{\mathrm{WLPO}}
+\newcommand{\LLPO}{\mathrm{LLPO}}
+\newcommand{\BMC}{\mathrm{BMC}}
+\newcommand{\BISH}{\mathrm{BISH}}
+\newcommand{\Lean}{\textsc{Lean~4}}
+\newcommand{\Mathlib}{\textsc{Mathlib4}}
+\newcommand{\leanok}{\textsf{\small \textcolor{green!70!black}{\checkmark}}}
+\newcommand{\leanpartial}{\textsf{\small \textcolor{orange!80!black}{(partial)}}}
+
+% ====================================================================
+% Title
+% ====================================================================
+\title{%
+  \textbf{The Event Horizon as a Logical Boundary:}\\[6pt]
+  Schwarzschild Interior Geodesic Incompleteness\\
+  and LPO in Lean~4\\[6pt]
+  {\normalsize Paper~13 in the Constructive Reverse Mathematics Series}%
+}
+
+\author{
+  Paul Chun-Kit Lee\thanks{%
+    New York University.
+    AI-assisted formalization; see \S\ref{sec:ai} for methodology.
+    The author is a medical professional, not a domain expert in
+    constructive mathematics or general relativity; mathematical
+    content was developed with extensive AI assistance.} \\
+  New York University \\
+  \texttt{dr.paul.c.lee@gmail.com}
+}
+
+\date{February 2026}
+
+% ====================================================================
+\begin{document}
+\maketitle
+
+% ====================================================================
+\begin{abstract}
+We formalize in \Lean{} a decomposition of Schwarzschild interior
+physics into constructive content layers.
+%
+The explicit cycloid geodesic $r(\eta) = M(1 + \cos\eta)$ reaches
+$r = 0$ at proper time $\tau^* = \pi M$ constructively; the
+Kretschmann scalar $K = 48M^2/r^6$ is constructively computable
+for any $r > 0$; and for any $\varepsilon > 0$, there exists an
+explicit $\eta$ with $r(\eta) < \varepsilon$. All of this is
+$\BISH$ (Height~0).
+%
+The abstract principle that \emph{every} bounded monotone decreasing
+sequence in $[0, 2M)$ converges to a definite real limit---the
+completed-limit formulation of geodesic incompleteness---is
+equivalent to the Limited Principle of Omniscience ($\LPO$).
+%
+The event horizon at $r = 2M$ thus demarcates not only the causal
+boundary from which light cannot escape, but a logical boundary:
+the exterior geometry (Paper~1) and the interior's finite-time
+physics are $\BISH$, while the singularity assertion as a
+completed-limit principle requires exactly $\LPO$.
+%
+The formalization comprises 1{,}021 lines across 8~modules with
+zero \texttt{sorry} statements. One interface assumption
+(\texttt{bmc\_of\_lpo}, the Bridges--V\^{\i}\c{t}\u{a} equivalence
+imported from Paper~8) is axiomatized with citation.
+The \texttt{Classical.choice} in the axiom profile arises from
+\Mathlib{} infrastructure; the constructive calibration is
+established by proof-content analysis (see \S\ref{sec:certification}
+and Paper~10).
+\end{abstract}
+
+\tableofcontents
+
+% ====================================================================
+\section{Introduction}\label{sec:intro}
+% ====================================================================
+
+\subsection{Physical Context}\label{sec:physical}
+
+The Schwarzschild solution describes the geometry of a non-rotating,
+uncharged black hole of mass $M$. The event horizon at $r = 2M$ is
+the boundary of the region from which future-directed causal curves
+can reach infinity. Inside the horizon, the radial coordinate $r$
+becomes timelike: the metric component $g_{rr}$ changes sign, and a
+freely falling observer necessarily moves toward decreasing~$r$.
+The observer reaches the curvature singularity at $r = 0$ in finite
+proper time.
+
+This ``geodesic incompleteness''---the fact that timelike geodesics
+terminate at the singularity---is the physical content that the
+Penrose singularity theorem~\cite{Pen65} generalizes to arbitrary
+spacetimes satisfying energy conditions. For the Schwarzschild
+interior, the explicit solution is available: a radially infalling
+particle dropped from rest at the horizon follows the cycloid
+\begin{equation}\label{eq:cycloid}
+  r(\eta) = M(1 + \cos\eta), \qquad
+  \tau(\eta) = M(\eta + \sin\eta), \qquad
+  \eta \in [0, \pi],
+\end{equation}
+reaching $r = 0$ at proper time $\tau^* = \pi M$.
+
+\subsection{The CRM Question}\label{sec:crm-question}
+
+From the standpoint of constructive reverse mathematics (CRM), the
+question is: what is the logical cost of asserting geodesic
+incompleteness?
+
+The answer turns out to be more subtle than a single classification.
+It decomposes into two layers:
+\begin{itemize}
+  \item The \textbf{specific} cycloid geodesic reaching $r = 0$ is
+    constructively computable ($\BISH$). The endpoint is given by
+    explicit trigonometric evaluation:
+    $r(\pi) = M(1 + \cos\pi) = 0$.
+  \item The \textbf{abstract principle} that every bounded monotone
+    decreasing sequence in the interior converges to a definite real
+    limit---the completed-limit formulation that underlies the general
+    assertion of geodesic incompleteness---is equivalent to $\LPO$.
+\end{itemize}
+
+This decomposition mirrors Paper~8's treatment of the 1D Ising
+model~\cite{Lee26-P8}, where finite-size bounds are $\BISH$ but the
+thermodynamic limit (a completed-limit assertion about the free
+energy sequence) costs $\LPO$.
+
+\subsection{Contributions}\label{sec:contributions}
+
+\begin{enumerate}
+  \item Machine-verified proof that
+    \texttt{SchwarzschildInteriorGeodesicIncompleteness} $\leftrightarrow$
+    $\LPO$ (1{,}021 lines of \Lean{}, zero \texttt{sorry}).
+  \item Explicit $\BISH$ content: cycloid computability, Kretschmann
+    scalar divergence, constructive approaching of the
+    singularity---all Height~0.
+  \item The event horizon as a logical boundary: the first result
+    calibrating a general-relativistic singularity assertion in the
+    constructive hierarchy.
+  \item Connection to Paper~8 via $\BMC \leftrightarrow \LPO$,
+    extending the dispensability--calibration pattern from statistical
+    mechanics to gravitation.
+\end{enumerate}
+
+\subsection{Related Work}\label{sec:related}
+
+Paper~1~\cite{Lee26-P1} established that the Schwarzschild
+\emph{exterior} geometry---metric components, Christoffel symbols,
+Riemann tensor, Ricci flatness, Kretschmann scalar---is $\BISH$
+(Height~0). Paper~8~\cite{Lee26-P8} proved that bounded monotone
+convergence, instantiated through the 1D Ising free energy, is
+equivalent to $\LPO$. The equivalence $\BMC \leftrightarrow \LPO$
+itself is due to Bridges and V\^{\i}\c{t}\u{a}~\cite{BV06}
+(Theorem~2.1.5).
+
+To our knowledge, no prior work applies constructive reverse
+mathematics to general-relativistic singularities. Echenim and
+Mhalla~\cite{EM24} formalized the CHSH inequality in Isabelle/HOL,
+but in a classical setting without constructive analysis.
+
+
+% ====================================================================
+\section{Mathematical Content}\label{sec:math}
+% ====================================================================
+
+\subsection{The Schwarzschild Interior}\label{sec:interior}
+
+The Schwarzschild metric in standard coordinates is
+\[
+  ds^2 = -f(M,r)\,dt^2 + f(M,r)^{-1}\,dr^2 + r^2\,d\Omega^2,
+  \qquad f(M,r) = 1 - \frac{2M}{r}.
+\]
+For $r > 2M$ (exterior), $f > 0$ and $t$ is timelike. For
+$0 < r < 2M$ (interior), $f < 0$: the roles of $t$ and $r$ swap,
+making $r$ a timelike coordinate and $t$ a spacelike coordinate.
+This signature flip means that a freely falling observer in the
+interior cannot remain at constant~$r$; the radial coordinate
+necessarily decreases.
+
+\begin{definition}[Interior domain]\label{def:interior} \leanok{}
+The \emph{interior domain} is the set of pairs $(M, r)$ satisfying
+$M > 0$, $r > 0$, and $r < 2M$. Equivalently, $f(M,r) < 0$.
+\end{definition}
+
+\subsection{The Cycloid Geodesic ($\BISH$)}\label{sec:cycloid}
+
+For a particle dropped from rest at the event horizon with specific
+energy $E = 1$, the radial geodesic equation has the closed-form
+cycloid solution~\eqref{eq:cycloid}. This explicit parametrization
+avoids formalizing ODE existence or uniqueness theory.
+
+\begin{theorem}[Cycloid properties]\label{thm:cycloid} \leanok{}
+For $M > 0$ and $\eta \in [0, \pi]$:
+\begin{enumerate}[label=(\alph*)]
+  \item $r(0) = 2M$ (starts at the horizon) and
+    $r(\pi) = 0$ (reaches the singularity).
+  \item $\tau(0) = 0$ and $\tau(\pi) = \pi M$ (finite proper time).
+  \item $r$ is strictly decreasing on $[0, \pi]$:
+    $r'(\eta) = -M\sin\eta < 0$ for $\eta \in (0, \pi)$.
+  \item $\tau$ is strictly increasing on $[0, \pi]$:
+    $\tau'(\eta) = M(1 + \cos\eta) > 0$ for $\eta \in (0, \pi)$.
+  \item For $\eta \in (0, \pi)$: $0 < r(\eta) < 2M$ (lies in the
+    interior).
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+All properties follow from direct computation using standard
+trigonometric identities. Part~(a): $r(0) = M(1+1) = 2M$ and
+$r(\pi) = M(1+(-1)) = 0$. Part~(b): $\tau(0) = M(0+0) = 0$ and
+$\tau(\pi) = M(\pi+0) = \pi M$. Part~(c): the derivative
+$r'(\eta) = -M\sin\eta$ is negative for $\eta \in (0,\pi)$ since
+$\sin\eta > 0$ on this interval. Part~(d): $\tau'(\eta) =
+M(1+\cos\eta) > 0$ since $\cos\eta > -1$ for
+$\eta \in (0, \pi)$. Part~(e): $\cos\eta \in (-1, 1)$ for
+$\eta \in (0, \pi)$, so $r(\eta) = M(1+\cos\eta) \in (0, 2M)$.
+\end{proof}
+
+\begin{theorem}[Constructive approaching]\label{thm:approaching} \leanok{}
+For any $M > 0$ and $\varepsilon > 0$, there exists
+$\eta \in (0, \pi)$ such that $r(\eta) < \varepsilon$.
+\end{theorem}
+
+\begin{proof}
+Since $r$ is continuous and $r(\pi) = 0$, by continuity at $\pi$,
+for any $\varepsilon > 0$ there exists $\delta > 0$ such that
+$|r(\eta) - 0| < \varepsilon$ whenever $|\eta - \pi| < \delta$.
+Choosing $\eta_0 = \pi - \min(\delta/2, \pi/2) \in (0, \pi)$ gives
+$r(\eta_0) < \varepsilon$.
+\end{proof}
+
+\begin{remark}[BISH status]\label{rem:bish}
+All results in this subsection are $\BISH$ (Height~0). The cycloid
+is an explicit computable function; no omniscience principle is
+needed. In particular, \emph{reaching the singularity along the
+specific cycloid is constructive}. The LPO cost arises elsewhere.
+\end{remark}
+
+\subsection{The Completed-Limit Formulation}\label{sec:completed}
+
+The key insight is to formulate geodesic incompleteness not as a
+statement about the specific cycloid solution, but as a universal
+principle about all infalling trajectories.
+
+\begin{definition}[Schwarzschild Interior Geodesic Incompleteness]
+\label{def:incompleteness} \leanok{}
+\emph{SchwarzschildInteriorGeodesicIncompleteness} is the
+assertion: for every $M > 0$ and every sequence $a : \NN \to \RR$
+satisfying
+\begin{enumerate}[label=(\roman*)]
+  \item $a$ is antitone (non-increasing),
+  \item $a(n) \geq 0$ for all $n$,
+  \item $a(0) < 2M$,
+\end{enumerate}
+there exists $L \in \RR$ such that $a$ converges to $L$: for every
+$\varepsilon > 0$, there exists $N_0$ with $|a(N) - L| < \varepsilon$
+for all $N \geq N_0$.
+\end{definition}
+
+This is the universally quantified completed-limit assertion. It
+says: any monotone bounded sequence in the interior has a definite
+limit. This captures the logical content of ``every radially
+infalling trajectory has a definite endpoint.''
+
+\begin{remark}[On the formulation]\label{rem:formulation}
+In classical general relativity, geodesic incompleteness \emph{is} a
+completed-limit assertion about monotone sequences. The radial
+coordinate along any infalling timelike geodesic is a monotone
+decreasing function of proper time, bounded below by~$0$. The
+assertion ``the spacetime is geodesically incomplete'' means these
+sequences converge to definite limits.
+
+Our formalization strips away the differential geometry---we do not
+formalize the Lorentzian metric, parallel transport, or the geodesic
+equation as an ODE---and isolates the exact logical content: bounded
+monotone convergence for decreasing sequences in $[0, 2M)$.
+This extraction of logical content from physical assertion is the
+standard methodology of constructive reverse mathematics.
+\end{remark}
+
+\begin{theorem}[Main Theorem]\label{thm:main} \leanok{}
+\[
+  \textit{SchwarzschildInteriorGeodesicIncompleteness}
+  \;\;\longleftrightarrow\;\; \LPO.
+\]
+\end{theorem}
+
+\subsection{Forward Direction: Incompleteness $\Rightarrow$ LPO}
+\label{sec:forward}
+
+Given an arbitrary binary sequence $\alpha : \NN \to \{0,1\}$, we
+construct a monotone bounded sequence whose limit encodes whether
+$\alpha$ is identically zero or has a true term.
+
+\begin{definition}[Geodesic coupling]\label{def:coupling} \leanok{}
+Fix $M > 0$. Define
+\[
+  a(n) := \texttt{geodesicCoupling}\;\alpha\;M\;0\;n
+  = \begin{cases}
+    M & \text{if } \texttt{runMax}\;\alpha\;n = \texttt{false}, \\
+    0 & \text{if } \texttt{runMax}\;\alpha\;n = \texttt{true},
+  \end{cases}
+\]
+where $\texttt{runMax}\;\alpha\;n = \max(\alpha(0), \ldots, \alpha(n))$.
+\end{definition}
+
+This sequence takes values in $\{M, 0\}$ and is antitone (it can
+only jump from $M$ to $0$, never back). It is non-negative, and
+$a(0) \leq M < 2M$, so it satisfies the hypotheses of
+\Cref{def:incompleteness}.
+
+\begin{proof}[Proof of the forward direction]
+Fix $M = 1$ (any $M > 0$ works). Apply
+\textit{SchwarzschildInteriorGeodesicIncompleteness} to the coupling
+sequence $a$ to obtain a limit~$L$. Let $N_1$ be the convergence
+index for $\varepsilon = M/2$, so $|a(N_1) - L| < M/2$.
+
+\medskip\noindent\textbf{Case split on}
+$\texttt{runMax}\;\alpha\;N_1$ (a Bool, so definitionally
+decidable---no real-number comparison needed):
+
+\smallskip\noindent\textbf{Case $\texttt{runMax}\;\alpha\;N_1 =
+\texttt{true}$:} There exists $k \leq N_1$ with
+$\alpha(k) = \texttt{true}$. We have $\exists n, \alpha(n) =
+\texttt{true}$.
+
+\smallskip\noindent\textbf{Case $\texttt{runMax}\;\alpha\;N_1 =
+\texttt{false}$:} Then $a(N_1) = M$. Suppose for contradiction that
+$\exists n_0, \alpha(n_0) = \texttt{true}$. Then the sequence is
+eventually~$0$, so $L = 0$. But $|M - 0| = M$, while the
+convergence modulus gives $|a(N_1) - L| < M/2$, yielding $M < M/2$,
+a contradiction. Therefore $\forall n, \alpha(n) = \texttt{false}$.
+
+\medskip\noindent
+In both cases, we have decided: either
+$\forall n, \alpha(n) = \texttt{false}$ or
+$\exists n, \alpha(n) = \texttt{true}$. This is $\LPO$.
+\end{proof}
+
+The gap $\delta = M - 0 = M > 0$ between the two possible limit
+values ($M$ when $\alpha \equiv \texttt{false}$, and $0$ when
+$\exists n, \alpha(n) = \texttt{true}$) serves as the
+``decision amplifier.''
+
+\subsection{Reverse Direction: LPO $\Rightarrow$ Incompleteness}
+\label{sec:reverse}
+
+\begin{proof}[Proof of the reverse direction]
+$\LPO$ implies $\BMC$ by the Bridges--V\^{\i}\c{t}\u{a}
+equivalence~\cite{BV06} (axiomatized as \texttt{bmc\_of\_lpo}
+from Paper~8).
+
+Given an antitone sequence $a$ with $a(n) \geq 0$ and
+$a(0) < 2M$, define $b(n) = -a(n)$. Then $b$ is monotone
+(non-decreasing) and bounded above by~$0$. By $\BMC$, $b$
+converges to some limit $L_{\mathrm{neg}}$. Then $a$ converges
+to $-L_{\mathrm{neg}}$.
+\end{proof}
+
+\subsection{The Honest Decomposition}\label{sec:decomposition}
+
+The paper does \emph{not} claim ``computing the cycloid endpoint
+costs $\LPO$.'' The cycloid is $\BISH$. The paper claims:
+
+\begin{center}
+\begin{tabular}{@{}llp{5cm}@{}}
+\toprule
+\textbf{Content} & \textbf{Principle} & \textbf{Certification} \\
+\midrule
+Cycloid $r(\pi) = 0$ & $\BISH$ & Height~0 (machine-verified) \\
+Cycloid approaching: $\forall\varepsilon > 0,\;\exists\eta,\;
+  r(\eta) < \varepsilon$ & $\BISH$ & Height~0 (machine-verified) \\
+Kretschmann $K = 48M^2/r^6$ computable & $\BISH$ &
+  Height~0 (machine-verified) \\
+``Every antitone bounded sequence in $[0,2M)$ has a limit'' &
+  $\LPO$ & $\leftrightarrow$ equivalence (machine-verified) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The event horizon separates the $\BISH$ exterior (Paper~1) from the
+interior where the \emph{general completed-limit principle} costs
+$\LPO$. The specific solution is constructive; the universal
+assertion is not.
+
+
+% ====================================================================
+\section{Lean Formalization}\label{sec:lean}
+% ====================================================================
+
+\subsection{Architecture}\label{sec:architecture}
+
+The formalization is organized as a single \Lean{} project with
+8~modules:
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{Module} & \textbf{Lines} & \textbf{Content} \\
+\midrule
+\texttt{Basic.lean}          & 168 & LPO, BMC, Interior,
+  \texttt{runMax} + lemmas \\
+\texttt{RadialGeodesic.lean} & 250 & Cycloid parametrization,
+  monotonicity, approaching \\
+\texttt{Incompleteness.lean} & 167 &
+  \texttt{SchwarzschildInteriorGeodesicIncompleteness} + coupling \\
+\texttt{LPO\_Forward.lean}   & 91  & $\to$ direction via gap
+  encoding \\
+\texttt{LPO\_Reverse.lean}   & 57  & $\leftarrow$ direction via
+  BMC \\
+\texttt{BISH\_Content.lean}  & 128 & Kretschmann scalar, cycloid
+  computability \\
+\texttt{Certificates.lean}   & 85  & \texttt{\#print axioms} audit \\
+\texttt{Main.lean}           & 75  & Assembly \\
+\midrule
+\textbf{Total}               & \textbf{1{,}021} & \\
+\bottomrule
+\end{tabular}
+\caption{Module structure of Paper~13.}
+\label{tab:modules}
+\end{table}
+
+\subsection{Key Design Decisions}\label{sec:design}
+
+\paragraph{Cycloid-first approach.}
+Rather than formalizing the geodesic equation as an ODE (which would
+require Lean ODE infrastructure that does not yet exist in
+\Mathlib{}), we work with the closed-form cycloid solution directly.
+Monotonicity, boundedness, and convergence properties follow from
+explicit trigonometric identities. This is a pragmatic choice:
+the cycloid is the physically relevant solution for $E = 1$, and
+its properties are all that the forward direction requires.
+
+\paragraph{Abstract incompleteness.}
+\texttt{SchwarzschildInteriorGeodesicIncompleteness} quantifies over
+\emph{all} antitone non-negative sequences starting below $2M$, not
+over solutions of the geodesic equation. This is the correct level
+of abstraction for CRM: the logical content is the completed-limit
+principle, and the geodesic equation is the physical motivation for
+why such sequences arise. The Brouwerian counterexample
+(\texttt{geodesicCoupling}) is not a geodesic---it is a valid
+element of the domain of the universally quantified proposition.
+This is standard CRM methodology.
+
+\paragraph{BMC import.}
+The \texttt{bmc\_of\_lpo} axiom imports the Bridges--V\^{\i}\c{t}\u{a}
+equivalence~\cite{BV06} from Paper~8. This is the same interface
+assumption used in Paper~8 and documented in the series methodology
+(Paper~10).
+
+\subsection{Core Definitions}\label{sec:core-defs}
+
+\begin{lstlisting}[caption={Core definitions (Basic.lean, excerpts).}]
+/-- Limited Principle of Omniscience. -/
+def LPO : Prop :=
+  forall (a : Nat -> Bool),
+    (forall n, a n = false) ||| (exists n, a n = true)
+
+/-- Bounded Monotone Convergence. -/
+def BMC : Prop :=
+  forall (a : Nat -> Real) (M : Real),
+    Monotone a -> (forall n, a n <= M) ->
+    exists L : Real, forall e : Real, 0 < e ->
+      exists N0 : Nat, forall N : Nat,
+        N0 <= N -> |a N - L| < e
+
+/-- LPO implies BMC [Bridges-Vita 2006]. -/
+axiom bmc_of_lpo : LPO -> BMC
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Interior domain and Schwarzschild factor (Basic.lean).}]
+/-- Schwarzschild factor f(M, r) = 1 - 2M/r. -/
+noncomputable def f (M r : Real) : Real := 1 - 2 * M / r
+
+/-- Interior domain: 0 < r < 2M, M > 0. -/
+structure Interior (M r : Real) : Prop where
+  mass_pos : M > 0
+  r_pos : r > 0
+  r_inside : r < 2 * M
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Cycloid definitions (RadialGeodesic.lean).}]
+noncomputable def r_cycloid (M n : Real) : Real :=
+  M * (1 + cos n)
+
+noncomputable def t_cycloid (M n : Real) : Real :=
+  M * (n + sin n)
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Geodesic incompleteness and coupling (Incompleteness.lean).}]
+def SchwarzschildInteriorGeodesicIncompleteness : Prop :=
+  forall (M : Real), M > 0 ->
+  forall (a : Nat -> Real),
+    Antitone a ->
+    (forall n, 0 <= a n) ->
+    a 0 < 2 * M ->
+    exists L : Real,
+      forall e > 0, exists N0 : Nat,
+        forall N >= N0, |a N - L| < e
+
+noncomputable def geodesicCoupling
+    (a : Nat -> Bool) (v0 v1 : Real) (n : Nat) : Real :=
+  if runMax a n then v1 else v0
+\end{lstlisting}
+
+\subsection{Main Theorems}\label{sec:main-thms}
+
+\begin{lstlisting}[caption={Forward direction (LPO\_Forward.lean, complete).}]
+theorem geodesic_incompleteness_implies_lpo
+    (hGI : SchwarzschildInteriorGeodesicIncompleteness) :
+    LPO := by
+  intro a
+  set M : Real := 1
+  have hM : M > 0 := one_pos
+  set a := geodesicCoupling a M 0 with ha_def
+  have h_anti : Antitone a :=
+    geodesicCoupling_antitone a (le_of_lt hM)
+  have h_nn : forall n, 0 <= a n :=
+    geodesicCoupling_nonneg a (le_of_lt hM) (le_refl 0)
+  have h_a0 : a 0 < 2 * M := by
+    have := geodesicCoupling_le a (le_of_lt hM) 0; linarith
+  obtain <<L, hL>> := hGI M hM a h_anti h_nn h_a0
+  obtain <<N1, hN1>> := hL (M / 2) (by linarith)
+  have hN1_self := hN1 N1 (le_refl _)
+  cases hm : runMax a N1
+  . -- runMax = false: prove all n, a n = false
+    left
+    apply bool_not_exists_implies_all_false
+    intro <<n0, hn0>>
+    have hL_val := limit_of_exists_true a M 0 hL hn0
+    have haN1 : a N1 = M := by
+      simp only [ha_def, geodesicCoupling, hm,
+        Bool.false_eq_true, reduce_ite]
+    rw [haN1, hL_val] at hN1_self
+    simp at hN1_self
+    rw [abs_of_pos hM] at hN1_self
+    linarith
+  . -- runMax = true: extract witness
+    right
+    obtain <<k, _, hk>> :=
+      runMax_witness a (show runMax a N1 = true from hm)
+    exact <<k, hk>>
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Reverse direction (LPO\_Reverse.lean, complete).}]
+theorem lpo_implies_geodesic_incompleteness (hLPO : LPO) :
+    SchwarzschildInteriorGeodesicIncompleteness := by
+  intro M _hM a ha hnn _ha0
+  have hBMC := bmc_of_lpo hLPO
+  have hMono : Monotone (fun n => -a n) :=
+    fun m n hmn => by simp only [neg_le_neg_iff]; exact ha hmn
+  have hBound : forall n, (fun n => -a n) n <= 0 :=
+    fun n => by simp only [neg_nonpos]; exact hnn n
+  obtain <<L_neg, hL>> :=
+    hBMC (fun n => -a n) 0 hMono hBound
+  refine <<-L_neg, fun e he => ?_>>
+  obtain <<N0, hN0>> := hL e he
+  exact <<N0, fun N hN => by
+    have := hN0 N hN
+    rwa [show a N - (-L_neg) = -((-a N) - L_neg)
+      from by ring, abs_neg]>>
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Main theorem assembly (Main.lean).}]
+theorem schwarzschild_interior_geodesic_incompleteness_iff_LPO :
+    SchwarzschildInteriorGeodesicIncompleteness <-> LPO :=
+  <<geodesic_incompleteness_implies_lpo,
+   lpo_implies_geodesic_incompleteness>>
+\end{lstlisting}
+
+\subsection{Axiom Audit}\label{sec:axioms}
+
+The \texttt{Certificates.lean} module audits the axiom profile of
+each theorem via \texttt{\#print axioms}:
+
+\begin{lstlisting}[caption={Axiom audit (Certificates.lean, selected).}]
+#print axioms
+  schwarzschild_interior_geodesic_incompleteness_iff_LPO
+-- [propext, Classical.choice, Quot.sound, bmc_of_lpo]
+
+#print axioms r_cycloid_at_pi
+-- [propext, Classical.choice, Quot.sound]
+
+#print axioms bish_content_complete
+-- [propext, Classical.choice, Quot.sound]
+\end{lstlisting}
+
+\noindent
+The \texttt{Classical.choice} appearing in the $\BISH$ results
+(cycloid, Kretschmann) arises from \Mathlib{}'s real number
+infrastructure---specifically, the construction of $\RR$ via
+Cauchy completion, which pervasively uses \texttt{Classical.choice}
+as a metatheoretic convenience. The mathematical content of these
+proofs is constructive: they involve only explicit trigonometric
+computation on computable real numbers. The constructive calibration
+is established by proof-content analysis, following the methodology
+described in Paper~10.
+
+
+% ====================================================================
+\section{The Event Horizon as a Logical Boundary}\label{sec:boundary}
+% ====================================================================
+
+\subsection{The Causal Boundary}\label{sec:causal}
+
+In classical GR, the event horizon at $r = 2M$ is the boundary of
+the causal past of future null infinity~$\mathcal{I}^+$. Light
+signals emitted from $r < 2M$ cannot reach distant observers. This
+is a statement about the global causal structure of the
+Schwarzschild spacetime: future-directed null geodesics from the
+interior are trapped.
+
+\subsection{The Logical Boundary}\label{sec:logical}
+
+Our result reveals a second boundary coinciding with the event horizon:
+
+\medskip\noindent\textbf{Exterior ($r > 2M$):} Paper~1 establishes
+that the Schwarzschild geometry---metric components, Christoffel
+symbols, Riemann tensor, Ricci flatness, Kretschmann
+scalar---is $\BISH$. No omniscience principle is needed.
+
+\medskip\noindent\textbf{Interior ($0 < r < 2M$):} The finite-time
+physics remains $\BISH$ (cycloid computability, curvature divergence).
+But the \emph{completed assertion} that every bounded monotone
+trajectory in the interior converges to a definite limit---the
+general singularity assertion---costs $\LPO$.
+
+\medskip\noindent
+The horizon thus demarcates not only what can communicate with
+infinity, but what can be asserted without surveying an infinite set.
+
+\subsection{Connection to Paper~8}\label{sec:paper8}
+
+The pattern is identical to the 1D Ising model:
+
+\begin{center}
+\begin{tabular}{@{}p{3.2cm}p{4.5cm}p{4.5cm}@{}}
+\toprule
+& \textbf{Paper~8 (Ising)} & \textbf{Paper~13 (Schwarzschild)} \\
+\midrule
+$\BISH$ content & Finite-size partition function &
+  Cycloid geodesic, Kretschmann scalar \\
+$\LPO$ content & Thermodynamic limit (free energy convergence) &
+  Geodesic incompleteness (completed limit) \\
+Physical interpretation & Phase transitions require idealization &
+  Singularities require idealization \\
+Encoding technique & Coupling constant modulation &
+  Sequence coupling (\texttt{geodesicCoupling}) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Both cases instantiate the same principle: completed infinite limits
+in physics cost $\LPO$, but the finite approximations that carry
+empirical content are $\BISH$.
+
+\subsection{What This Does NOT Claim}\label{sec:not-claim}
+
+This paper does not claim that ``reaching the singularity costs
+$\LPO$'' in any operational sense. A freely falling observer
+following the cycloid geodesic computes $r(\tau)$ constructively at
+every finite proper time, and the limit $r \to 0$ is constructively
+approachable (for any $\varepsilon$, we can find $\eta$ with
+$r(\eta) < \varepsilon$). The $\LPO$ cost attaches to the
+\emph{universally quantified completeness principle}---the assertion
+that every bounded monotone trajectory in the interior converges to
+a definite limit---not to any particular trajectory.
+
+The physical content is this: classical GR's assertion of geodesic
+incompleteness, when formulated as a completed-limit principle over
+all infalling trajectories, carries the same logical cost ($\LPO$)
+as the thermodynamic limit in statistical mechanics. Both are
+instances of bounded monotone convergence applied to physically
+motivated monotone sequences.
+
+The Brouwerian counterexample (\texttt{geodesicCoupling}) is not
+a geodesic---it is a valid element of the domain of the universally
+quantified proposition. This is standard CRM methodology: the
+counterexample demonstrates that the universal principle carries
+$\LPO$ strength, while specific instances (the cycloid) are
+constructive.
+
+
+% ====================================================================
+\section{Discussion}\label{sec:discussion}
+% ====================================================================
+
+\subsection{The Calibration Table}\label{sec:calibration}
+
+Paper~13 adds new rows to the programme's calibration landscape:
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Physical layer} & \textbf{Principle} & \textbf{Status} &
+\textbf{Source} \\
+\midrule
+Finite-volume Gibbs states & $\BISH$ & Calibrated & Trivial \\
+Finite-size approximations (Ising) & $\BISH$ & Calibrated &
+  Paper~8 \\
+Schwarzschild exterior & $\BISH$ & Calibrated & Paper~1 \\
+Interior finite-time physics & $\BISH$ & Calibrated & Paper~13 \\
+Bidual-gap witness ($S_1(H)$) & $\equiv \WLPO$ & Calibrated &
+  Papers~2, 7 \\
+Tsirelson bound (CHSH $\leq 2\sqrt{2}$) & $\BISH$ & Calibrated &
+  Paper~11 \\
+Bell state entropy ($\log 2$) & $\BISH$ & Calibrated &
+  Paper~11 \\
+Partial trace (qubit systems) & $\BISH$ & Calibrated &
+  Paper~11 \\
+Thermodynamic limit (Ising) & $\equiv \LPO$ & Calibrated &
+  Paper~8 \\
+Geodesic incompleteness & $\equiv \LPO$ & Calibrated &
+  Paper~13 \\
+Spectral gap decidability & Undecidable & Established &
+  Cubitt et al.\ \cite{CPW15} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The pattern strengthens: all $\LPO$ costs arise from completed
+infinite limits, all finite-time and finite-size physics is $\BISH$.
+
+\subsection{The Encoding Objection}\label{sec:encoding}
+
+A natural objection is that the encoding of binary sequences into
+coupling sequences---and the subsequent application of the
+completeness principle---is merely bounded monotone convergence in
+disguise. The encoded sequence
+$a(n) \in \{M, 0\}$ is a $\{0,1\}$-valued monotone sequence
+composed with a scaling, and the decision procedure is the abstract
+$\BMC \to \LPO$ proof applied to this specific class.
+
+This objection is mathematically correct and interpretively
+irrelevant. The abstract equivalence $\BMC \leftrightarrow \LPO$ is
+known from~\cite{BV06}. The contribution of this paper is not a new
+theorem in abstract constructive reverse mathematics but a verified
+observation that $\BMC$, when applied to bounded monotone sequences
+in $[0, 2M)$, \emph{is} the completed-limit content of geodesic
+incompleteness. The formalization makes explicit what the
+mathematical prose leaves implicit: the encoding is $\BISH$-valid,
+the gap $\delta = M > 0$ is constructively positive, and the witness
+extraction works without hidden omniscience. The \Lean{} axiom audit
+confirms this.
+
+This is the same methodological move as Paper~8, where the abstract
+$\BMC \leftrightarrow \LPO$ equivalence was known and the
+contribution was the specific physical instantiation and machine
+verification.
+
+\subsection{Methodological Limitations}\label{sec:limitations}
+
+We are frank about the scope and limitations of this result:
+
+\begin{enumerate}
+  \item \textbf{Classical.choice is a Mathlib infrastructure artifact.}
+    The \texttt{Classical.choice} appearing in the axiom profile of
+    $\BISH$ results (cycloid properties, Kretschmann scalar) arises
+    from \Mathlib{}'s pervasive use of classical logic in its real
+    number library, not from the mathematical content of the proofs.
+    The proof-content analysis methodology for handling this is
+    described in Paper~10.
+
+  \item \textbf{The formalization abstracts from the geodesic ODE.}
+    We do not formalize the Lorentzian metric, Christoffel symbols,
+    parallel transport, or the geodesic equation as an ODE. The
+    cycloid solution is used directly as an explicit function. This
+    means our formalization does not verify that the cycloid actually
+    solves the radial geodesic equation---only that it has the
+    algebraic and analytic properties (monotonicity, boundedness,
+    endpoint values) claimed. The physical interpretation relies on
+    standard textbook results connecting the cycloid to the geodesic
+    equation.
+
+  \item \textbf{The LPO cost is on the universal principle, not any
+    specific geodesic.} The cycloid reaching $r = 0$ is
+    constructive. The formalization proves this explicitly
+    (\texttt{r\_cycloid\_at\_pi}). The $\LPO$ cost attaches to the
+    assertion that \emph{every} bounded monotone sequence in the
+    interior converges---a universal principle that subsumes but is
+    not identical to any particular geodesic.
+
+  \item \textbf{\texttt{SchwarzschildInteriorGeodesicIncompleteness}
+    is BMC for a specific class of sequences.} The ``geodesic
+    incompleteness'' interpretation is physical motivation, not a
+    formal derivation from the Einstein equations. The formalization
+    establishes an equivalence between a specific instance of BMC
+    (antitone sequences in $[0, 2M)$) and LPO. Whether this
+    particular instance captures the full logical content of
+    geodesic incompleteness in a more complete formalization of GR
+    is an open question.
+
+  \item \textbf{No Penrose theorem is formalized.}
+    The Penrose singularity theorem~\cite{Pen65} generalizes geodesic
+    incompleteness from Schwarzschild to arbitrary spacetimes with
+    trapped surfaces and energy conditions. Formalizing this would
+    require massive infrastructure (global hyperbolicity, trapped
+    surfaces, energy conditions) far beyond our current scope.
+
+  \item \textbf{Scope is limited to Schwarzschild.}
+    The result applies to the non-rotating, uncharged (Schwarzschild)
+    case only. Extensions to Kerr (rotating) or Reissner--Nordstr\"om
+    (charged) black holes would require additional analysis.
+\end{enumerate}
+
+\subsection{Open Problems}\label{sec:open}
+
+\begin{enumerate}
+  \item \textbf{Penrose theorem calibration.} Does the full Penrose
+    singularity theorem, including trapped surface and energy
+    condition hypotheses, calibrate above $\LPO$? Our result
+    suggests this is likely: the completed-limit content is the same,
+    and additional hypotheses may introduce further costs.
+
+  \item \textbf{Cosmic censorship.} Weak cosmic censorship
+    (singularities hidden behind horizons) involves a universal
+    quantifier over all generic initial data sets. What is its
+    logical cost?
+
+  \item \textbf{Hawking radiation.} The quantum process by which
+    black holes evaporate involves the thermodynamic limit (infinite
+    number of field modes). Does the Hawking temperature calculation
+    inherit the $\LPO$ cost, or is it dispensable via
+    finite-mode approximation?
+\end{enumerate}
+
+
+% ====================================================================
+\section{Certification Methodology}\label{sec:certification}
+% ====================================================================
+
+\subsection{Axiom Profile}\label{sec:axiom-profile}
+
+All theorems carry \texttt{[propext, Classical.choice, Quot.sound]}
+from \Mathlib{}, plus \texttt{bmc\_of\_lpo} for the reverse
+direction. The $\BISH$ results (cycloid, Kretschmann) have
+\texttt{Classical.choice} from \Mathlib{} infrastructure only.
+
+\subsection{Certification Level}\label{sec:cert-level}
+
+Paper~13 contains two certification levels in the series terminology
+(Paper~10):
+\begin{itemize}
+  \item The $\BISH$ content is finite-dimensional, explicit
+    computation---constructively valid by inspection.
+  \item The $\LPO$ equivalence uses \texttt{bmc\_of\_lpo}
+    intentionally (this \emph{is} the classical content).
+  \item No minimal artifact is planned: the logical
+    structure---$\BMC \leftrightarrow \LPO$ instantiated on
+    $[0, 2M)$---is simple enough that the full artifact suffices.
+\end{itemize}
+
+\subsection{The \texttt{bmc\_of\_lpo} Axiom}\label{sec:bmc-axiom}
+
+The equivalence $\BMC \leftrightarrow \LPO$ is due to Bridges and
+V\^{\i}\c{t}\u{a}~\cite{BV06}. It is axiomatized in Paper~13
+rather than re-proved because:
+\begin{itemize}
+  \item Paper~8 already uses the same axiom.
+  \item The Bridges--V\^{\i}\c{t}\u{a} proof is standard and
+    uncontroversial.
+  \item Re-proving it would add approximately 200 lines of \Lean{}
+    for zero epistemic gain.
+\end{itemize}
+The axiom is conservative: it introduces no new logical content
+beyond what $\LPO$ already provides.
+
+
+% ====================================================================
+\section{AI-Assisted Methodology}\label{sec:ai}
+% ====================================================================
+
+This formalization was developed using \textbf{Claude Opus~4.6}
+(Anthropic, 2026) via the \textbf{Claude Code} command-line
+interface, following the same human--AI workflow as Papers~2, 7,
+and~8~\cite{Lee26-P2,Lee26-P7,Lee26-P8,Anthropic2026}.
+
+The author is a medical professional, not a domain expert in
+constructive mathematics or general relativity. The mathematical
+content of this paper---the connection between geodesic
+incompleteness and BMC, the choice of cycloid parametrization, the
+encoding strategy---was developed with extensive AI assistance. The
+human author specified the research direction and high-level goals,
+reviewed all mathematical claims for plausibility, and directed the
+formalization strategy. Claude Opus~4.6 explored the \Mathlib{}
+codebase, generated \Lean{} proof terms, handled debugging against
+\Mathlib{} v4.28, and assisted with paper writing. Final
+verification was by \texttt{lake build} (0~errors, 0~warnings,
+0~sorries).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Task} & \textbf{Human} & \textbf{AI (Claude Opus 4.6)} \\
+\midrule
+Research direction       & \checkmark & \\
+Mathematical blueprint   & \checkmark & \checkmark \\
+Proof strategy design    & \checkmark & \checkmark \\
+\Mathlib{} API discovery & & \checkmark \\
+\Lean{} proof generation & & \checkmark \\
+Proof review             & \checkmark & \\
+Build verification       & & \checkmark \\
+Paper writing            & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\caption{Division of labor between human and AI.}
+\label{tab:division}
+\end{table}
+
+
+% ====================================================================
+\section*{Reproducibility}
+% ====================================================================
+
+\begin{mdframed}[backgroundcolor=gray!10]
+\textbf{Reproducibility Box}
+\begin{itemize}
+\item \textbf{Repository}:
+  \url{https://github.com/AICardiologist/FoundationRelativity}
+\item \textbf{Path}: \texttt{Papers/P13\_EventHorizon/}
+\item \textbf{Build}: \texttt{lake exe cache get \&\& lake build}
+  (3{,}100 jobs, 0~errors, 0~sorry)
+\item \textbf{Lean toolchain}:
+  \texttt{leanprover/lean4:v4.28.0-rc1}
+\item \textbf{Interface axiom}: \texttt{bmc\_of\_lpo}
+  (Bridges--V\^{\i}\c{t}\u{a}, imported from Paper~8)
+\item \textbf{Axiom audit}: \texttt{Certificates.lean}
+\item \textbf{Axiom profile (main theorem)}:
+  \texttt{[propext, Classical.choice, Quot.sound, bmc\_of\_lpo]}
+\item \textbf{Axiom profile (BISH content)}:
+  \texttt{[propext, Classical.choice, Quot.sound]}
+  (Mathlib infra only)
+\item \textbf{Total}: 8~files, 1{,}021~lines, 0~sorry
+\item \textbf{Zenodo DOI}: 10.5281/zenodo.18529007
+\end{itemize}
+\end{mdframed}
+
+
+% ====================================================================
+\section*{Acknowledgments}
+% ====================================================================
+
+The \Lean{} formalization was developed using Claude Opus~4.6
+(Anthropic, 2026) via the Claude Code CLI tool. We thank the
+\Mathlib{} community for maintaining the comprehensive library
+of formalized mathematics that made this work possible.
+
+
+% ====================================================================
+% Bibliography
+% ====================================================================
+\bibliographystyle{plainnat}
+
+\begin{thebibliography}{30}
+
+\bibitem[Anthropic(2026)]{Anthropic2026}
+Anthropic.
+\newblock Claude {Opus}~4.6 and {Claude Code} {CLI}.
+\newblock \url{https://www.anthropic.com/claude}, 2026.
+
+\bibitem[Bridges and V{\^\i}{\c{t}}{\u{a}}(2006)]{BV06}
+D.~S.~Bridges and L.~S.~V{\^\i}{\c{t}}{\u{a}}.
+\newblock \emph{Techniques of Constructive Analysis}.
+\newblock Universitext. Springer, New York, 2006.
+
+\bibitem[Cubitt et~al.(2015)]{CPW15}
+T.~S.~Cubitt, D.~Perez-Garcia, and M.~M.~Wolf.
+\newblock Undecidability of the spectral gap.
+\newblock \emph{Nature}, 528:207--211, 2015.
+
+\bibitem[{de Moura} et~al.(2021)]{deMoura2021}
+L.~{de Moura}, S.~Kong, J.~Avigad, F.~{van Doorn}, and M.~{von Raumer}.
+\newblock The {Lean} theorem prover (system description).
+\newblock In \emph{CADE-25}, LNAI 9195, pages 378--388. Springer, 2015.
+\newblock Lean~4: \url{https://lean-lang.org/}, 2021--present.
+
+\bibitem[Echenim and Mhalla(2024)]{EM24}
+M.~Echenim and M.~Mhalla.
+\newblock Formalising the CHSH inequality in {Isabelle/HOL}.
+\newblock In \emph{ITP 2024}, 2024.
+
+\bibitem[Hawking and Ellis(1973)]{HE73}
+S.~W.~Hawking and G.~F.~R.~Ellis.
+\newblock \emph{The Large Scale Structure of Space-Time}.
+\newblock Cambridge University Press, 1973.
+
+\bibitem[Lee(2026a)]{Lee26-P1}
+P.~C.-K.~Lee.
+\newblock Schwarzschild exterior curvature verification in {Lean}~4.
+\newblock Preprint, 2026. Paper~1 in the constructive reverse
+  mathematics series.
+
+\bibitem[Lee(2026b)]{Lee26-P2}
+P.~C.-K.~Lee.
+\newblock {WLPO} equivalence of the bidual gap in $\ell^1$: a {Lean}~4
+  formalization.
+\newblock Preprint, 2026. Paper~2 in the constructive reverse
+  mathematics series.
+
+\bibitem[Lee(2026c)]{Lee26-P7}
+P.~C.-K.~Lee.
+\newblock Non-reflexivity of $S_1(H)$ implies {WLPO}: a {Lean}~4
+  formalization.
+\newblock Preprint, 2026. Paper~7 in the constructive reverse
+  mathematics series.
+
+\bibitem[Lee(2026d)]{Lee26-P8}
+P.~C.-K.~Lee.
+\newblock The logical cost of the thermodynamic limit: {LPO}-equivalence
+  and {BISH}-dispensability for the {1D} {Ising} free energy.
+\newblock Preprint, 2026. Paper~8 in the constructive reverse
+  mathematics series.
+
+\bibitem[Lee(2026e)]{Lee26-P10}
+P.~C.-K.~Lee.
+\newblock The logical geography of mathematical physics: constructive
+  calibration from density matrices to the event horizon.
+\newblock Preprint, 2026. Zenodo DOI: 10.5281/zenodo.18527877.
+  Paper~10 in the constructive reverse mathematics series.
+
+\bibitem[Lee(2026f)]{Lee26-P11}
+P.~C.-K.~Lee.
+\newblock Constructive entanglement: {CHSH}, {Tsirelson} bound, and {Bell}
+  state entropy at {BISH}.
+\newblock Preprint, 2026. Zenodo DOI: 10.5281/zenodo.18527676.
+  Paper~11 in the constructive reverse mathematics series.
+
+\bibitem[Lee(2026g)]{Lee26-P12}
+P.~C.-K.~Lee.
+\newblock The map and the territory: a constructive history of mathematical
+  physics.
+\newblock Preprint, 2026. Zenodo DOI: 10.5281/zenodo.18529007.
+  Paper~12 in the constructive reverse mathematics series.
+
+\bibitem[{Mathlib Community}(2020--)]{Mathlib2020}
+{Mathlib Community}.
+\newblock \emph{Mathlib}: the math library for {Lean}.
+\newblock \url{https://leanprover-community.github.io/mathlib4_docs/},
+  2020--present.
+
+\bibitem[Penrose(1965)]{Pen65}
+R.~Penrose.
+\newblock Gravitational collapse and space-time singularities.
+\newblock \emph{Physical Review Letters}, 14:57--59, 1965.
+
+\bibitem[Schwarzschild(1916)]{Sch16}
+K.~Schwarzschild.
+\newblock {\"U}ber das {G}ravitationsfeld eines {M}assenpunktes nach
+  der {E}insteinschen {T}heorie.
+\newblock \emph{Sitzungsberichte der K\"oniglich Preussischen Akademie
+  der Wissenschaften}, pages 189--196, 1916.
+
+\bibitem[Wald(1984)]{Wal84}
+R.~M.~Wald.
+\newblock \emph{General Relativity}.
+\newblock University of Chicago Press, 1984.
+
+\end{thebibliography}
+
+\end{document}

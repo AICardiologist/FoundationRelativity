@@ -1,0 +1,64 @@
+{
+  "title": "Class Number Correction for Exotic Weil Classes on CM Abelian Fourfolds (Paper 58, Constructive Reverse Mathematics Series)",
+  "description": "<p>Paper 58 of the Constructive Reverse Mathematics and Arithmetic Geometry series. Papers 56&ndash;57 established the formula h = f for the Hermitian self-intersection of exotic Weil classes on CM abelian fourfolds, where f is the conductor and h_K = 1. This paper extends to quadratic imaginary fields with class number h_K &gt; 1.</p>\n<p>The corrected formula is h &middot; Nm(a) = f, where a is the Steinitz class of the integral Weil lattice, uniquely determined by a decidable norm condition. The topological volume det(G) = f&sup2; |&Delta;_K| is an absolute geometric invariant; the class group redistributes it between the Hermitian metric h and the lattice density Nm(a).</p>\n<p>Test field: K = Q(&radic;(&minus;5)), h_K = 2, |&Delta;_K| = 20. Verified for all nine conductors from Papers 56&ndash;57: 4 split (f = 7, 9, 61, 163), 5 inert. Steinitz class forced by mod-5 infinite descent. All Gram matrix determinants verified by native_decide.</p>\n<p>CRM classification: BISH. The Lean 4 / Mathlib formalization comprises 6 source files (~805 lines), zero errors, zero warnings, zero sorry, zero custom axioms. The corrected formula is a proof obligation (structure field) verified per-instance by native_decide.</p>\n<p>Code is distributed exclusively via this Zenodo record.</p>",
+  "upload_type": "software",
+  "publication_date": "2026-02-21",
+  "creators": [
+    {
+      "name": "Lee, Paul Chun-Kit",
+      "affiliation": "New York University",
+      "orcid": "0000-0000-0000-0000"
+    }
+  ],
+  "access_right": "open",
+  "license": "Apache-2.0",
+  "keywords": [
+    "constructive reverse mathematics",
+    "class number",
+    "exotic Weil class",
+    "self-intersection",
+    "CM abelian fourfold",
+    "Steinitz class",
+    "norm obstruction",
+    "Gram matrix",
+    "imaginary quadratic field",
+    "conductor",
+    "discriminant",
+    "arithmetic geometry",
+    "formal verification",
+    "Lean 4",
+    "Mathlib",
+    "constructive mathematics"
+  ],
+  "subjects": [
+    {
+      "term": "Mathematical logic and foundations",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85082397",
+      "scheme": "url"
+    },
+    {
+      "term": "Algebraic geometry",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85003438",
+      "scheme": "url"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "relation": "isPartOf",
+      "identifier": "10.5281/zenodo.17054050",
+      "resource_type": "software",
+      "scheme": "doi"
+    }
+  ],
+  "version": "2.0.0",
+  "language": "eng",
+  "notes": "AI-assisted formalization using Claude (Anthropic, Opus 4.6) for Lean 4 code generation under human direction. All mathematical content specified by the author; every theorem verified by the Lean 4 type checker. Built with Lean 4 v4.29.0-rc1 and Mathlib. Reproducible via 'lake build' (zero errors, zero sorry). Code available exclusively on Zenodo (not hosted on GitHub).",
+  "references": [
+    "Milne, J.S. (1999). Lefschetz classes on abelian varieties. Duke Math. J. 96, 639-675.",
+    "Shimura, G. (1963). On analytic families of polarized abelian varieties and automorphic functions. Ann. of Math. 78, 149-192.",
+    "Schoen, C. (1988). Hodge classes on self-products of a variety with an automorphism. Compositio Math. 65, 3-32.",
+    "Baker, A. (1966). Linear forms in the logarithms of algebraic numbers. Mathematika 13, 204-216.",
+    "Stark, H.M. (1967). A complete determination of the complex quadratic fields of class-number one. Michigan Math. J. 14, 1-27.",
+    "Bishop, E. and Bridges, D. (1985). Constructive Analysis. Springer."
+  ]
+}

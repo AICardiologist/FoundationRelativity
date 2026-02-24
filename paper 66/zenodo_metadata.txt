@@ -1,0 +1,84 @@
+ZENODO DEPOSIT METADATA — Paper 66
+====================================
+
+Title:
+Form-Class Resolution for Non-Cyclic Totally Real Cubics: The Trace-Zero Lattice Invariant (Paper 66 of the Constructive Reverse Mathematics Series)
+
+Authors:
+Lee, Paul Chun-Kit (New York University, Brooklyn, NY)
+
+DOI:
+10.5281/zenodo.18745722
+
+Publication Date:
+2026-02-23
+
+Resource Type:
+Publication / Preprint
+
+License:
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Keywords:
+constructive reverse mathematics, binary quadratic forms, trace-zero sublattice, totally real cubic fields, GL2(Z) form class, Weil lattice, Gram matrix, number theory, constructive mathematics, BISH, exotic Weil class, quadratic resolvent, Artin conductor, computational number theory
+
+Related Identifiers:
+- Is supplement to: Paper 65, "Self-Intersection Patterns Beyond Cyclic Cubics" (CRM Series)
+- Is part of: Constructive Reverse Mathematics Series, Papers 1-66
+- References: Papers 50-53 (Atlas of Exotic Weil Classes), Papers 56-58 (Weil lattice Gram matrices)
+
+Description:
+This deposit contains the paper, computation scripts, dataset, and figures for Paper 66 of the Constructive Reverse Mathematics (CRM) series.
+
+SCIENTIFIC CONTENT
+
+For a totally real cubic number field F over Q, the trace-zero sublattice Lambda_0 = {x in O_F : Tr_{F/Q}(x) = 0} is a rank-2 positive-definite Z-lattice equipped with the trace pairing. Its Gram matrix G satisfies the determinant identity det(G) = 3 * disc(F), and its GL_2(Z)-equivalence class is a well-defined arithmetic invariant of F. This invariant resolves the form-class question left open by Paper 65 for non-cyclic (S_3 Galois group) cubic fields.
+
+The paper establishes four results:
+
+Theorem A (Determinant Identity): For any totally real cubic F with a monogenic integral basis (index [O_F : Z[alpha]] = 1), the integer Gram matrix of the trace-zero sublattice satisfies det(G) = 3 * disc(F). The proof proceeds via the Schur complement of the 3x3 trace matrix projected orthogonal to the Lefschetz component (the constant function 1), with the factor of 3 arising from the change-of-basis determinant between the rational Schur complement basis and the integral kernel basis.
+
+Theorem B (Cyclic Reduction): For cyclic cubics of conductor f, the trace-zero form reduces to 2f * (1, 1, 1), the hexagonal form x^2 + xy + y^2 scaled by 2f. This is forced by the Z/3Z Galois action on Lambda_0, which acts via the standard 2-dimensional representation and constrains the Gram matrix to be a scalar multiple of the unique invariant form.
+
+Theorem C (Non-Cyclic Uniqueness): Among the 51 non-cyclic totally real cubics with disc(F) <= 2000 and monogenic integral basis found by polynomial enumeration, all reduced trace-zero forms are pairwise distinct. The map from field discriminant to form class is injective on this dataset.
+
+Observation D (No Simpler Predictor): The trace-zero form is never the principal form of its discriminant (0/51 cases). The form content g = gcd(a, b, c) does not follow a universal formula in disc(F) or the resolvent decomposition. No closed-form predictor simpler than the full trace-zero lattice construction was found.
+
+CONTEXT IN THE CRM SERIES
+
+Paper 66 is a companion to Paper 65, which established the scalar identity h * Nm(A) = f for 1,220 pairs of imaginary quadratic fields K and cyclic totally real cubics F with zero exceptions, but showed this identity fails for all 216 non-cyclic cubics tested (Theorem C of Paper 65). The present paper identifies the correct non-cyclic generalization: the scalar h is replaced by the full GL_2(Z) form class of the trace-zero sublattice, which captures the "F-side" of the Weil lattice invariant without requiring CM theory, period matrices, or the imaginary quadratic field K.
+
+The relationship to the Weil lattice is: det(G_Weil) = disc(F) * |Delta_K| while det(G_{Lambda_0}) = 3 * disc(F), differing by a factor of 3/|Delta_K|. The trace-zero form is the F-intrinsic component; the full Weil lattice additionally involves the O_K-module structure and polarization from the imaginary quadratic field K.
+
+CONSTRUCTIVE MATHEMATICS CONTENT
+
+All results are proved in BISH (Bishop-style constructive mathematics). The trace-zero sublattice is computed by solving a linear Diophantine equation (the trace condition 3u + S_1 v + S_2 w = 0) over Z, and the Gauss reduction algorithm for binary quadratic forms is fully constructive. No appeal is made to LPO (Limited Principle of Omniscience), WLPO, Markov's Principle, or the Fan Theorem. The only decision procedure used is divisibility testing in Z, which is decidable.
+
+COMPUTATIONAL METHOD
+
+The computation enumerates all monic irreducible polynomials x^3 + px^2 + qx + r with |p| <= 5, |q| <= 12, |r| <= 12, retaining those with non-square discriminant <= 2000 and passing the validation criterion det(G) = 3 * disc(F). Power sums are computed from Newton's identities (exact integer arithmetic, no floating point). The integral kernel basis of Lambda_0 is found by parametric case analysis on S_1 mod 3 and S_2 mod 3, and the Gram matrix is evaluated from the trace pairing. The dataset covers 51 of an estimated 130-150 non-cyclic totally real cubic fields in this discriminant range; the remainder require larger polynomial coefficients or have non-monogenic rings of integers.
+
+Runtime: approximately 30 seconds (Python 3.9, SymPy 1.14, Apple M-series).
+
+DEPOSIT CONTENTS
+
+paper66.pdf          — Compiled paper (15 pages)
+paper66.tex          — LaTeX source
+p66_compute_v2.py    — Main computation script (Python 3.9 + SymPy 1.14)
+p66_results.csv      — Complete dataset: 51 cubics with all invariants
+p66_form_analysis.png     — Plot: form entries vs discriminant
+p66_det_verification.png  — Plot: det(G) = 3*disc(F) verification
+README.md            — Documentation and reproduction instructions
+
+SOFTWARE REQUIREMENTS
+
+Python >= 3.9, SymPy >= 1.14, NumPy >= 1.26, Matplotlib >= 3.9
+
+To reproduce: python3 p66_compute_v2.py
+To compile paper: pdflatex paper66.tex (two passes)
+
+NOTES
+
+This paper was produced with AI assistance (Anthropic Claude) for computation and manuscript preparation. The author is not a domain expert in algebraic number theory; all claims are supported by exact computation or explicit proof.
+
+No Lean 4 formalization is included. The results are computational, verified by exact symbolic arithmetic over Z. A Lean 4 formalization of the determinant identity would require formalizing trace forms and Schur complements over Z-lattices, which is beyond the current scope of the Mathlib library.

@@ -1,0 +1,89 @@
+% ====================================================================
+% NEW FIGURE: The Gödel sequence as proof search (for Paper 26, §5)
+% Insert after Definition 5.1 (the Gödel sequence definition),
+% before Theorem 5.2 (refutable => null).
+% ====================================================================
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  >=Stealth,
+  seqcell/.style={minimum width=8mm, minimum height=8mm, draw, inner sep=0pt,
+               font=\small\ttfamily, anchor=center},
+  label/.style={font=\footnotesize, anchor=south},
+  timeline/.style={thick, ->},
+]
+
+% === Title ===
+\node[font=\small\itshape, anchor=west] at (-1.0, 3.8)
+  {Fix $\varphi$ with G\"odel number $g$.  At each step $k$ on row $g$:};
+
+% === Timeline arrow ===
+\draw[timeline] (-0.5, 2.5) -- (10.5, 2.5) node[right, font=\small] {$k$};
+
+% === Step labels ===
+\foreach \x/\lab in {0/0, 1/1, 2/2, 3/3, 4/{p_0}, 5/{p_0\!+\!1}, 6/{p_0\!+\!2}, 7/{\cdots}} {
+  \node[label] at (1.3*\x + 0.2, 2.7) {$\lab$};
+}
+
+% === Question at each step ===
+\node[font=\footnotesize, anchor=west, text=black!70] at (-1.0, 1.6)
+  {Question at step $k$:};
+\node[font=\footnotesize, anchor=west, text=black!70] at (2.5, 1.6)
+  {``Does any proof code $p \leq k$ refute $\varphi$?''};
+
+% === Consistent outcome (top) ===
+\node[font=\small\bfseries, text=blue!70!black, anchor=west] at (-1.0, 0.6)
+  {If $\varphi$ consistent:};
+
+\foreach \x/\v in {0/1, 1/1, 2/1, 3/1, 4/1, 5/1, 6/1} {
+  \node[seqcell, fill=blue!15] at (1.3*\x + 0.2, 0.0) {\v};
+}
+\node[font=\small] at (9.5, 0.0) {$\cdots$};
+\node[font=\footnotesize, anchor=west, text=blue!60!black] at (10.2, 0.0)
+  {never stops};
+
+\node[font=\footnotesize, text=blue!60!black, anchor=west] at (-1.0, -0.6)
+  {No refutation ever found $\;\Rightarrow\;$ all 1s on row $g$
+   $\;\Rightarrow\;$ $v^\varphi \notin c_0$
+   $\;\Rightarrow\;$ $[\Phi] \neq [0]$};
+
+% === Refutable outcome (bottom) ===
+\node[font=\small\bfseries, text=red!70!black, anchor=west] at (-1.0, -1.8)
+  {If $\varphi$ refutable:};
+
+\foreach \x/\v/\col in {0/1/red!15, 1/1/red!15, 2/1/red!15, 3/1/red!15,
+                         4/0/gray!15, 5/0/gray!15, 6/0/gray!15} {
+  \node[seqcell, fill=\col] at (1.3*\x + 0.2, -2.4) {\v};
+}
+\node[font=\small] at (9.5, -2.4) {$\cdots$};
+\node[font=\footnotesize, anchor=west, text=red!60!black] at (10.2, -2.4)
+  {all 0s};
+
+% === Refutation marker ===
+\draw[thick, red!70!black, ->] (5.4, -1.5) -- (5.4, -1.95);
+\node[font=\scriptsize, text=red!70!black, anchor=south] at (5.4, -1.4)
+  {refutation found};
+
+\node[font=\footnotesize, text=red!60!black, anchor=west] at (-1.0, -3.1)
+  {Refutation proof $p_0$ found at step $p_0$
+   $\;\Rightarrow\;$ eventually all 0s
+   $\;\Rightarrow\;$ $v^\varphi \in c_0$
+   $\;\Rightarrow\;$ $[\Phi] = [0]$};
+
+% === WLPO annotation ===
+\draw[thick, decorate, decoration={brace, amplitude=6pt, mirror, raise=4pt}]
+  (-0.6, -3.6) -- (10.4, -3.6);
+\node[font=\small, anchor=north] at (4.9, -4.1)
+  {``Will this sequence ever become all 0s?''  $=$ WLPO};
+
+\end{tikzpicture}
+\caption{The G\"odel sequence as a proof-search process.  At each step $k$,
+bounded proof search checks whether any code $p \leq k$ refutes~$\varphi$.
+If $\varphi$ is consistent, no refutation is ever found and the sequence
+stays at~1 on row~$g$ indefinitely.  If $\varphi$ is refutable, the
+sequence drops to~0 once the refutation proof code $p_0$ is reached.
+The question ``does this sequence eventually vanish?''\ is precisely
+$\WLPO$.}
+\label{fig:proof-search}
+\end{figure}

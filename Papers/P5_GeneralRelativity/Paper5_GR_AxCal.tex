@@ -259,6 +259,11 @@ Global hyperbolicity yields compact diamond sets; equicontinuity gives Ascoli--A
 \item \textbf{Vacuum verification:} Explicit proof that all diagonal Ricci components vanish: $R_{tt} = R_{rr} = R_{\theta\theta} = R_{\varphi\varphi} = 0$.
 \end{enumerate}
 
+\paragraph{Domain of validity: the exterior chart.}
+We work on the open exterior chart $U = \{(t,r,\theta,\varphi) \mid r > 2M,\, 0 < \theta < \pi\}$ in Schwarzschild coordinates. On $U$, the metric components, Christoffel symbols, and hence the Riemann tensor are smooth; we compute all components $R^\rho{}_{\sigma\mu\nu}$ there. Points where these coordinates are singular---the event horizon $r = 2M$ and the coordinate poles $\theta \in \{0,\pi\}$---are outside $U$ and require either a second angular chart or a horizon-regular chart (e.g., Eddington--Finkelstein or Kruskal--Szekeres coordinates) if one wishes to make statements at those points. Our theorem is \emph{local} and makes no such global claims.
+
+This scoped approach is standard mathematical practice: curvature is a local object, and differential geometry texts routinely compute $\Gamma$ and $R$ on an open set where coordinates are regular before addressing coordinate singularities or global structure separately~\cite{Wald1984,HawkingEllis1973,MTW1973}. Limiting our formalization to the exterior region is not a weakness but reflects the textbook workflow: establish results where the chart is valid, then---if the goal warrants it---extend via atlases, transition maps, or alternative coordinate systems. A theorem about an open set is a perfectly good theorem, and our Lean implementation mirrors this standard by explicitly bundling the domain hypothesis (\texttt{Exterior M r θ}) and proving all results under that predicate.
+
 \subsection{Sprint 4 Milestone: Kretschmann Scalar $K = 48M^2/r^6$}
 \textbf{Achievement:} Complete calculation of the Kretschmann curvature invariant $K = R_{abcd}R^{abcd}$ for the Schwarzschild spacetime, yielding the standard textbook result $K = 48M^2/r^6$. This scalar invariant quantifies the tidal gravitational field strength and diverges at the singularity. The implementation includes:
 \begin{enumerate}
@@ -557,6 +562,11 @@ R.~M.~Wald.
 S.~W.~Hawking and G.~F.~R.~Ellis.
 \newblock {\em The Large Scale Structure of Space-Time}.
 \newblock Cambridge University Press, 1973.
+
+\bibitem{MTW1973}
+C.~W.~Misner, K.~S.~Thorne, and J.~A.~Wheeler.
+\newblock {\em Gravitation}.
+\newblock W.~H.~Freeman, 1973.
 
 \bibitem{ChoquetBruhat2009}
 Y.~Choquet--Bruhat.

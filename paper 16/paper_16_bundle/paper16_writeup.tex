@@ -1,0 +1,820 @@
+\documentclass[11pt,a4paper]{article}
+
+% ====================================================================
+% Packages
+% ====================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{cleveref}
+\usepackage{natbib}
+\usepackage{mdframed}
+
+% ====================================================================
+% Theorem environments
+% ====================================================================
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% ====================================================================
+% Lean 4 code listing style
+% ====================================================================
+\definecolor{lean-keyword}{RGB}{0,0,180}
+\definecolor{lean-comment}{RGB}{0,128,0}
+\definecolor{lean-string}{RGB}{163,21,21}
+\definecolor{lean-bg}{RGB}{248,248,248}
+
+\lstdefinelanguage{lean4}{
+  keywords={theorem,lemma,def,class,instance,import,open,variable,
+            noncomputable,section,namespace,end,where,let,have,show,
+            intro,obtain,use,exact,rw,simp,apply,by,fun,match,if,
+            then,else,do,return,axiom,abbrev,private,attribute,
+            suffices,change,congr,ext,constructor,rintro,push_neg,
+            linarith,absurd,set_option,omit,in,set,cases,structure,
+            refine,unfold,rcases,calc,all_goals,first,try,ring,
+            positivity,induction,nlinarith,conv_lhs,conv_rhs,
+            simp_rw,trans,exact_mod_cast,div_le_div_of_nonneg_right},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+  morestring=[b]',
+}
+
+\lstset{
+  language=lean4,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{lean-keyword}\bfseries,
+  commentstyle=\color{lean-comment}\itshape,
+  stringstyle=\color{lean-string},
+  backgroundcolor=\color{lean-bg},
+  frame=single,
+  framerule=0.5pt,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2,
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+  xleftmargin=15pt,
+  captionpos=b,
+}
+
+% ====================================================================
+% Macros
+% ====================================================================
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\LPO}{\mathrm{LPO}}
+\newcommand{\WLPO}{\mathrm{WLPO}}
+\newcommand{\BMC}{\mathrm{BMC}}
+\newcommand{\DCw}{\mathrm{DC}_\omega}
+\newcommand{\BISH}{\mathrm{BISH}}
+\newcommand{\SLLN}{\mathrm{SLLN}}
+\newcommand{\Lean}{\textsc{Lean~4}}
+\newcommand{\Mathlib}{\textsc{Mathlib4}}
+\newcommand{\leanok}{\textsf{\small \textcolor{green!70!black}{\checkmark}}}
+\newcommand{\ip}[2]{\langle #1, #2 \rangle}
+
+% ====================================================================
+% Title
+% ====================================================================
+\title{%
+  \textbf{The Born Rule as a Logical Artefact}\\[6pt]
+  {\normalsize Technical Note~16 in the Constructive Calibration Programme}%
+}
+
+\author{
+  Paul Chun-Kit Lee\thanks{%
+    New York University.
+    AI-assisted formalization; see \S\ref{sec:lean} for methodology.
+    The author is a medical professional, not a domain expert in
+    constructive mathematics or mathematical physics; mathematical
+    content was developed with extensive AI assistance.} \\
+  New York University \\
+  \texttt{dr.paul.c.lee@gmail.com}
+}
+
+\date{February 2026}
+
+% ====================================================================
+\begin{document}
+\maketitle
+
+% ====================================================================
+\begin{abstract}
+We observe that the Born rule splits across the constructive hierarchy in
+a manner consistent with the general pattern of the calibration programme.
+The single-trial probability $p_i = \|P_i\psi\|^2$, the expectation value,
+variance, and Chebyshev bound (weak law of large numbers) are all provable
+in Bishop's constructive mathematics ($\BISH$)---unsurprisingly, since they
+are finite-dimensional linear algebra and real arithmetic.
+The frequentist assertion---that relative frequencies converge almost
+surely to the Born probabilities---requires Dependent Choice over $\NN$ ($\DCw$),
+a fact well known in constructive probability theory.
+
+Our contribution is not mathematical novelty but programme completeness:
+this note fills the $\DCw$ axis of the calibration table (Paper~10)
+with physical content from quantum measurement statistics, complementing
+the $\LPO$ entries from statistical mechanics (Paper~8), general relativity
+(Paper~13), decoherence (Paper~14), and conservation laws (Paper~15).
+All $\BISH$ results are formalised in \Lean{} with machine-checked proofs
+(564~lines, zero \texttt{sorry}).  The $\DCw$ layer is axiomatised
+following established series methodology; a full constructive proof
+of the strong law with explicit $\DCw$ tracking remains open.
+\end{abstract}
+
+\tableofcontents
+
+% ====================================================================
+\section{Introduction}\label{sec:intro}
+% ====================================================================
+
+\subsection{Physical Context}
+
+The Born rule is the bridge between quantum geometry and laboratory data.
+Given a normalized state $\psi \in \CC^d$ and an observable $A$ with
+spectral decomposition $A = \sum_i \lambda_i P_i$, the rule asserts:
+the probability of measuring eigenvalue~$\lambda_i$ is
+\[
+  p_i \;=\; \|P_i \psi\|^2 \;=\; \mathrm{Re}\,\ip{\psi}{P_i\psi}.
+\]
+Every prediction of quantum mechanics flows from this postulate.
+
+\subsection{The Question}
+
+The Born rule admits two readings with different logical content.
+If ``probability $p_i$'' means ``the squared norm of the
+projected state''---a single computation on one finite-dimensional
+vector---then the Born rule is a statement of finite-dimensional linear
+algebra, and its constructive status is immediate.  If it means ``the long-run relative frequency in infinitely
+many repeated measurements converges almost surely to $p_i$''---the
+frequentist interpretation---then it is a statement about infinite
+sequences, requiring countable product spaces and almost-sure convergence.
+
+This note records the logical cost of each reading.  The result is
+expected---constructive probabilists have understood the role of
+Dependent Choice in the strong law since at least Bishop and
+Bridges~\citep{BishopBridges1985}---but its explicit placement in
+the calibration table has not previously been formalised.
+
+\subsection{Summary of Results}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Layer} & \textbf{Physical content} & \textbf{Logical cost} \\
+\midrule
+Single-trial probability & $p_i = \|P_i\psi\|^2 \in [0,1]$ & $\BISH$ \\
+Expectation, variance & $\ip{\psi}{A\psi} \in \RR$, $\mathrm{Var} \geq 0$ & $\BISH$ \\
+Chebyshev bound (weak law) & $\Pr(|\mathrm{freq} - p| > \varepsilon) \leq 1/(4N\varepsilon^2)$ & $\BISH$ \\
+Relative frequency sums & $\sum_i \mathrm{freq}_N(i) = 1$ & $\BISH$ \\
+Strong law (SLLN) & $\mathrm{freq}_N \to p$ almost surely & $\DCw$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The weak law row deserves emphasis: the Chebyshev bound gives an
+explicit, computable error estimate $\Pr(|\mathrm{freq} - p| > \varepsilon) \leq 1/(4N\varepsilon^2)$
+that shrinks as $1/N$.  This is what experimentalists actually use,
+and it is fully constructive.
+
+\subsection{Programme Context}
+
+This note extends the calibration table along the $\DCw$ axis,
+complementing existing entries:
+\begin{itemize}[nosep]
+\item Paper~4: approximate spectral membership is $\BISH$, exact membership costs~MP.
+\item Paper~6: preparation uncertainty is $\BISH$, measurement uncertainty costs~$\DCw$.
+\item Paper~14: finite-time decoherence bounds are $\BISH$, exact collapse costs~$\LPO$.
+\item Paper~15: local energy conservation is $\BISH$, global energy existence costs~$\LPO$.
+\item \textbf{Paper~16 (this):} finite-sample frequency bounds are $\BISH$, exact
+      frequentist convergence costs~$\DCw$.
+\end{itemize}
+Papers~6 and~16 together populate the $\DCw$ axis with two independent
+physical instances (measurement uncertainty and measurement statistics),
+paralleling the multiple $\LPO$ entries on the omniscience spine.
+
+% ====================================================================
+\section{Background}\label{sec:background}
+% ====================================================================
+
+\subsection{Constructive Foundations}
+
+We work within Bishop's constructive mathematics ($\BISH$): intuitionistic logic
+plus dependent choice restricted to finite operations.  $\BISH$ admits all of
+classical analysis that can be carried out without appeal to excluded middle or
+uncountable choice.
+
+\begin{definition}[Dependent Choice over~$\NN$]
+$\DCw$ asserts: for any type~$\alpha$, any total relation $R : \alpha \to \alpha \to \mathrm{Prop}$,
+and any starting point $a_0 : \alpha$, if $\forall a, \exists b, R(a,b)$, then there
+exists a function $f : \NN \to \alpha$ with $f(0) = a_0$ and $R(f(n), f(n+1))$ for all~$n$.
+\end{definition}
+
+$\DCw$ is strictly weaker than the full axiom of choice but strictly stronger than
+countable choice.  It is the standard choice principle for constructing infinite
+sequences from local extension data---precisely what the strong law of large numbers
+requires.
+
+\subsection{Certification Methodology (Paper~10)}\label{sec:methodology}
+
+Our diagnostic for calibrating a physical theorem $T$ against the constructive
+hierarchy is:
+\begin{enumerate}[nosep]
+\item Formalise $T$ in \Lean{} with \Mathlib{}.
+\item Run \texttt{\#print axioms T}.
+\item If the axiom closure contains only \texttt{propext}, \texttt{Classical.choice},
+      \texttt{Quot.sound} (Mathlib infrastructure), classify $T$ as $\BISH$.
+\item If the axiom closure additionally contains a custom axiom such as
+      \texttt{dc\_omega\_holds}, classify $T$ at the corresponding level ($\DCw$).
+\end{enumerate}
+
+The appearance of \texttt{Classical.choice} in $\BISH$ theorems is an artefact of
+Mathlib's type-class infrastructure (the \texttt{Fintype} instance for \texttt{Fin~d},
+the field structure on~$\RR$), not a mathematical use of excluded middle.
+This is the Paper~10 methodology, validated across all papers in the series.
+
+% ====================================================================
+\section{Setup: Finite-Dimensional Quantum Measurement}\label{sec:setup}
+% ====================================================================
+
+We work in finite dimensions throughout.  Fix:
+\begin{itemize}[nosep]
+\item $H = \CC^d$ (finite-dimensional Hilbert space, $d \geq 1$).
+\item $\psi \in H$ with $\|\psi\|^2 = 1$ (normalized state).
+\item $A : H \to H$ a Hermitian operator (observable).
+\item Spectral decomposition: $A = \sum_i \lambda_i P_i$ where each $P_i$ is an
+      orthogonal projection ($P_i^2 = P_i$, $P_i^\dagger = P_i$) and
+      $\sum_i P_i = I$.
+\end{itemize}
+
+\begin{definition}[Complex inner product]\label{def:cdot}
+For $\psi, \varphi : \mathrm{Fin}\,d \to \CC$, define
+\[
+  \ip{\psi}{\varphi} \;:=\; \sum_{i=0}^{d-1} \overline{\psi_i}\,\varphi_i.
+\]
+\end{definition}
+
+\begin{definition}[Born probability]\label{def:born}
+$p_i := \mathrm{Re}\,\ip{\psi}{P_i\psi}$.
+For a projection $P_i$ with $P_i^2 = P_i$ and $P_i^\dagger = P_i$, this equals $\|P_i\psi\|^2$.
+\end{definition}
+
+\begin{definition}[Spectral decomposition]\label{def:spectral}
+In \Lean{}:
+\begin{lstlisting}[caption={SpectralDecomp structure (Defs.lean)}]
+structure SpectralDecomp (d : N) where
+  eigenvalues  : Fin d -> R
+  projections  : Fin d -> Matrix (Fin d) (Fin d) C
+  is_projection : forall i, projections i * projections i = projections i
+  is_hermitian  : forall i, (projections i).conjTranspose = projections i
+  is_orthogonal : forall i j, i != j -> projections i * projections j = 0
+  is_complete   : sum i, projections i = 1
+\end{lstlisting}
+\end{definition}
+
+% ====================================================================
+\section{BISH Content: Theorems 1--5}\label{sec:bish}
+% ====================================================================
+
+\subsection{Theorem 1: Born Probability Distribution}\label{sec:born}
+
+\begin{theorem}[Born probability is $\BISH$]\label{thm:born}
+For any normalized state $\psi$ and spectral decomposition $\{P_i\}$:
+\begin{enumerate}[nosep]
+\item $0 \leq p_i$ for each~$i$ \hfill (\texttt{born\_prob\_nonneg})
+\item $\sum_i p_i = 1$ \hfill (\texttt{born\_prob\_sum\_one})
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\textbf{Non-negativity.}  Since $P_i^2 = P_i$ and $P_i^\dagger = P_i$:
+\[
+  \ip{\psi}{P_i\psi} = \ip{\psi}{P_i(P_i\psi)} = \ip{P_i\psi}{P_i\psi} = \|P_i\psi\|^2 \geq 0.
+\]
+The first equality uses $P_i^2 = P_i$.  The second uses $P_i^\dagger = P_i$
+(the Hermitian swap lemma: $\ip{u}{Pv} = \ip{Pu}{v}$ for $P^\dagger = P$).
+The inequality is $\BISH$: a sum of $|\cdot|^2$ terms.
+
+\textbf{Sum to one.}  By linearity of the inner product in the second argument:
+\[
+  \sum_i \ip{\psi}{P_i\psi} = \ip{\psi}{\Bigl(\sum_i P_i\Bigr)\psi}
+  = \ip{\psi}{I\psi} = \ip{\psi}{\psi} = \|\psi\|^2 = 1.
+\]
+Every step is a finite sum or matrix operation.  $\BISH$.
+\end{proof}
+
+\begin{lstlisting}[caption={Born probability proofs (BornProbability.lean, excerpt)}]
+theorem born_prob_nonneg {d : N} (psi : Fin d -> C)
+    (spec : SpectralDecomp d) (i : Fin d) :
+    0 <= bornProb psi spec i := by
+  unfold bornProb
+  suffices h : (cdot psi ((spec.projections i).mulVec psi)).re =
+    cnorm_sq ((spec.projections i).mulVec psi) from
+    h |> cnorm_sq_nonneg _
+  unfold cnorm_sq; congr 1
+  set Pi := spec.projections i
+  have hP2 : Pi.mulVec (Pi.mulVec psi) = Pi.mulVec psi := by
+    rw [Matrix.mulVec_mulVec, spec.is_projection i]
+  conv_lhs => rw [show Pi.mulVec psi =
+    Pi.mulVec (Pi.mulVec psi) from hP2.symm]
+  exact hermitian_cdot_swap psi (Pi.mulVec psi) Pi (spec.is_hermitian i)
+\end{lstlisting}
+
+\subsection{Theorem 2: Expectation Value is Real}\label{sec:expectation}
+
+\begin{theorem}[Expectation is $\BISH$]\label{thm:expectation}
+For Hermitian $A$ ($A^\dagger = A$), the expectation value
+$\ip{\psi}{A\psi}$ is real: $\mathrm{Im}\,\ip{\psi}{A\psi} = 0$.
+\end{theorem}
+
+\begin{proof}
+By the Hermitian swap lemma, $\ip{\psi}{A\psi} = \ip{A\psi}{\psi}$.
+By conjugate symmetry of the inner product,
+$\ip{A\psi}{\psi} = \overline{\ip{\psi}{A\psi}}$.
+So $z = \bar{z}$, which implies $\mathrm{Im}(z) = 0$.
+All operations are finite sums.  $\BISH$.
+\end{proof}
+
+\begin{lstlisting}[caption={Expectation reality (Expectation.lean)}]
+theorem expectation_real {d : N} (psi : Fin d -> C)
+    (A : Matrix (Fin d) (Fin d) C) (hA : A.conjTranspose = A) :
+    (expectationValue psi A).im = 0 := by
+  unfold expectationValue
+  have h1 : cdot psi (A.mulVec psi) = cdot (A.mulVec psi) psi :=
+    hermitian_cdot_swap psi psi A hA
+  have h2 : cdot (A.mulVec psi) psi =
+    starRingEnd C (cdot psi (A.mulVec psi)) :=
+    cdot_hermitian (A.mulVec psi) psi
+  have h3 := h1.trans h2  -- z = conj(z)
+  have h4 := Complex.ext_iff.mp h3
+  simp only [Complex.conj_re, Complex.conj_im] at h4
+  linarith [h4.2]
+\end{lstlisting}
+
+\subsection{Theorem 3: Variance is Non-negative}\label{sec:variance}
+
+\begin{theorem}[Variance is $\BISH$]\label{thm:variance}
+For any Hermitian $A$ and complex~$\mu$,
+$\|(A - \mu I)\psi\|^2 \geq 0$.
+\end{theorem}
+
+\begin{proof}
+Immediate: the squared norm of any vector is non-negative.
+$\BISH$.
+\end{proof}
+
+\begin{lstlisting}[caption={Variance non-negativity (Variance.lean)}]
+theorem variance_nonneg {d : N} (psi : Fin d -> C)
+    (A : Matrix (Fin d) (Fin d) C) (mu : C) :
+    0 <= cnorm_sq ((A - mu * (1 : Matrix (Fin d) (Fin d) C)).mulVec psi) :=
+  cnorm_sq_nonneg _
+\end{lstlisting}
+
+\subsection{Theorem 4: Relative Frequency Bounds}\label{sec:relfreq}
+
+\begin{theorem}[Relative frequency is $\BISH$]\label{thm:relfreq}
+For $N$ measurement outcomes $x_1, \ldots, x_N \in \{1, \ldots, d\}$,
+the relative frequency $\mathrm{freq}_N(i) = \#\{j : x_j = i\}/N$ satisfies:
+\begin{enumerate}[nosep]
+\item $0 \leq \mathrm{freq}_N(i)$ \hfill (\texttt{relative\_freq\_nonneg})
+\item $\mathrm{freq}_N(i) \leq 1$ \hfill (\texttt{relative\_freq\_le\_one})
+\item $\sum_i \mathrm{freq}_N(i) = 1$ \hfill (\texttt{relative\_freq\_sum})
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Non-negativity: the count is $\geq 0$ and $N > 0$.
+Upper bound: the count $\leq N$.
+Sum to one: the counts partition $\{1, \ldots, N\}$, so $\sum \mathrm{count}_i = N$.
+Dividing by $N$ gives~1.  All operations are finite counting.  $\BISH$.
+\end{proof}
+
+\subsection{Theorem 5: Chebyshev Bound (Weak Law)}\label{sec:chebyshev}
+
+\begin{theorem}[Chebyshev bound is $\BISH$]\label{thm:chebyshev}
+For a Bernoulli process with parameter $p \in [0,1]$, $N$ trials,
+and tolerance $\varepsilon > 0$:
+\[
+  \frac{p(1-p)}{N\varepsilon^2} \;\leq\; \frac{1}{4N\varepsilon^2}.
+\]
+\end{theorem}
+
+\begin{proof}
+\textbf{Step 1.} The Bernoulli variance bound: $p(1-p) \leq 1/4$
+for $p \in [0,1]$.  Proof: $(1/2 - p)^2 \geq 0$ implies
+$1/4 - p + p^2 \geq 0$, so $p(1-p) \leq 1/4$.
+
+\textbf{Step 2.} Since $N > 0$ and $\varepsilon > 0$, we have
+$N\varepsilon^2 > 0$.  Dividing the inequality $p(1-p) \leq 1/4$
+by $N\varepsilon^2$ preserves the direction:
+\[
+  \frac{p(1-p)}{N\varepsilon^2} \leq \frac{1/4}{N\varepsilon^2}
+  = \frac{1}{4N\varepsilon^2}.
+\]
+All operations are finite real arithmetic.  $\BISH$.
+\end{proof}
+
+\begin{lstlisting}[caption={Chebyshev bound (WeakLaw.lean)}]
+theorem bernoulli_variance_bound (p : R) (_hp : 0 <= p) (_hp1 : p <= 1) :
+    p * (1 - p) <= 1 / 4 := by
+  nlinarith [sq_nonneg (1 / 2 - p)]
+
+theorem chebyshev_bernoulli_bound (p : R) (hp : 0 <= p) (hp1 : p <= 1)
+    (N : Nat) (hN : 0 < N) (eps : R) (heps : 0 < eps) :
+    p * (1 - p) / (N * eps ^ 2) <= 1 / (4 * N * eps ^ 2) := by
+  have hvar := bernoulli_variance_bound p hp hp1
+  calc p * (1 - p) / (N * eps ^ 2)
+      <= (1 / 4) / (N * eps ^ 2) := by
+        apply div_le_div_of_nonneg_right hvar (by positivity)
+    _ = 1 / (4 * N * eps ^ 2) := by ring
+\end{lstlisting}
+
+\textbf{Physical interpretation.}  After $N = 10{,}000$ measurements,
+the probability that the observed frequency deviates from the Born
+probability by more than $0.01$ is at most $1/(4 \times 10^4 \times 10^{-4}) = 0.25$.
+After $N = 10^6$ measurements with the same tolerance, the bound drops
+to $0.0025$.  The bound is explicit, computable, and shrinks as $1/N$.
+No physicist needs more than this.
+
+% ====================================================================
+\section{DC Content: Strong Law of Large Numbers}\label{sec:dc}
+% ====================================================================
+
+\subsection{Theorem 6: The Strong Law Requires $\DCw$}\label{sec:slln}
+
+\begin{theorem}[Strong law requires $\DCw$]\label{thm:slln}
+The assertion ``for almost every infinite sequence of independent Born-rule
+measurements, $\mathrm{freq}_N(\lambda_i) \to p_i$ as $N \to \infty$''
+requires Dependent Choice over~$\NN$.
+\end{theorem}
+
+The standard proof of the strong law uses $\DCw$ at three points:
+
+\begin{enumerate}
+\item \textbf{Product space construction.}  The countable product probability
+space $(\Omega, \mathcal{F}, P) = \prod_n \mathrm{Bernoulli}(p)$ requires
+DC at each extension step: given the finite product up to stage~$n$,
+extend consistently to stage $n+1$.
+
+\item \textbf{Borel--Cantelli.}  The lemma $\sum P(E_k) < \infty \implies
+P(\limsup E_k) = 0$ manipulates the events $E_k = \{|\text{freq}_k - p| > \varepsilon\}$
+through a countable intersection of countable unions, requiring DC to
+select witnesses at each stage.
+
+\item \textbf{Almost-sure convergence.}  Extracting convergent behaviour
+from $\omega \in \Omega$ --- proving the Cauchy criterion for a specific
+outcome sequence --- requires dependent choices along the sequence.
+\end{enumerate}
+
+In the formalisation, $\DCw$ is introduced as an axiom and the SLLN is
+axiomatized as a consequence:
+
+\begin{lstlisting}[caption={DC axiom and SLLN (DCAxiom.lean + StrongLaw.lean)}]
+def DC_omega : Prop :=
+  forall (alpha : Type) (R : alpha -> alpha -> Prop) (a0 : alpha),
+    (forall a, exists b, R a b) ->
+    exists f : Nat -> alpha, f 0 = a0 /\ forall n, R (f n) (f (n + 1))
+
+axiom dc_omega_holds : DC_omega
+axiom slln_of_dc : DC_omega -> SLLN
+
+theorem frequentist_convergence : SLLN :=
+  slln_of_dc dc_omega_holds
+\end{lstlisting}
+
+% ====================================================================
+\section{Pattern Consistency}\label{sec:sign}
+% ====================================================================
+
+The weak-law/strong-law split instantiates the programme's recurring pattern:
+finite approximations are $\BISH$, completed limits have measurable cost.
+The specific mechanism differs from the $\LPO$ entries.
+In Papers~8 and~15, bounded monotone convergence drives the cost; the
+partial sums are non-negative and increasing, and asserting their limit
+exists is equivalent to $\LPO$.  Here, the cost arises from a different
+source: the product-space construction and almost-sure convergence machinery
+of the strong law, which require $\DCw$ for the sequential extension of
+probability measures.
+
+The pattern is uniform in structure (finite = $\BISH$, infinite = non-$\BISH$)
+but heterogeneous in mechanism ($\BMC$ for deterministic limits, $\DCw$ for
+probabilistic limits).  This heterogeneity is itself informative: it shows
+that the calibration table's axes are genuinely independent, not artefacts
+of a single underlying phenomenon.
+
+% ====================================================================
+\section{Programme Integration}\label{sec:domains}
+% ====================================================================
+
+Paper~16 extends the calibration table along the $\DCw$ axis:
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{Domain} & \textbf{Paper} & \textbf{BISH Content} & \textbf{Non-BISH Content} \\
+\midrule
+Stat.\ Mech. & P8 & Finite-volume free energy & $f_\infty$ exists ($\LPO$) \\
+Gen.\ Rel. & P13 & Radial coordinate bounds & $r \to 0$ exactly ($\LPO$) \\
+Quantum Meas. & P14 & Finite-time decoherence & Exact collapse ($\LPO$) \\
+Conservation & P15 & Local conservation (Noether) & Global energy ($\LPO$) \\
+\textbf{Born Rule} & \textbf{P16} & \textbf{Probability, weak law} & \textbf{SLLN ($\DCw$)} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Paper~16 is the first entry in the series where the non-constructive content
+lands at $\DCw$ rather than $\LPO$.  This is expected: the strong law of
+large numbers is a convergence theorem for \emph{random} sequences (requiring
+product measure), not for \emph{deterministic} bounded monotone sequences
+(which connect to $\LPO$ via $\BMC$).
+
+We note that the Born rule is not a new physical domain---it is quantum
+mechanics, already covered by Papers~4, 6, 11, and~14.  What is new is
+the \emph{aspect}: measurement statistics rather than spectral theory,
+entanglement, or decoherence.  The $\DCw$ cost arises from the
+probabilistic infrastructure (product spaces, almost-sure convergence),
+not from quantum structure per se.
+
+% ====================================================================
+\section{Lean Formalisation}\label{sec:lean}
+% ====================================================================
+
+\subsection{Module Structure}
+
+The formalisation comprises 564~lines across 9~files:
+
+\begin{center}
+\begin{tabular}{lrl}
+\toprule
+\textbf{File} & \textbf{Lines} & \textbf{Role} \\
+\midrule
+\texttt{Defs.lean}            &  86 & Core definitions \\
+\texttt{BornProbability.lean} & 127 & Theorems 1: Born probability (BISH) \\
+\texttt{Expectation.lean}     &  37 & Theorem 2: Expectation reality (BISH) \\
+\texttt{Variance.lean}        &  29 & Theorem 3: Variance non-negativity (BISH) \\
+\texttt{RelativeFreq.lean}    &  67 & Theorem 4: Frequency bounds (BISH) \\
+\texttt{WeakLaw.lean}         &  47 & Theorem 5: Chebyshev bound (BISH) \\
+\texttt{DCAxiom.lean}         &  31 & $\DCw$ definition + axiom \\
+\texttt{StrongLaw.lean}       &  51 & Theorem 6: SLLN requires $\DCw$ \\
+\texttt{Main.lean}            &  89 & Assembly + axiom audit \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Design Decisions}
+
+\begin{enumerate}
+\item \textbf{Custom inner product.}  We define \texttt{cdot} as
+      $\sum_i \overline{\psi_i}\,\varphi_i$ on \texttt{Fin~d $\to$ $\CC$},
+      bypassing \Mathlib{}'s \texttt{InnerProductSpace} infrastructure.
+      This avoids the \texttt{Classical.choice} contamination from
+      \texttt{EuclideanSpace} instances while keeping all matrix operations
+      available.
+
+\item \textbf{Spectral decomposition as structure.}  The \texttt{SpectralDecomp}
+      structure bundles eigenvalues, projections, and their algebraic properties
+      (idempotence, Hermiticity, orthogonality, completeness).  The spectral
+      theorem itself is not proved---it is a hypothesis of the Born rule.
+
+\item \textbf{$\DCw$ as axiom.}  Following the \texttt{bmc\_of\_lpo} pattern
+      from Papers~14--15, we introduce \texttt{dc\_omega\_holds : DC\_omega}
+      as an axiom and \texttt{slln\_of\_dc : DC\_omega $\to$ SLLN} as a
+      second axiom.  The \texttt{\#print axioms} audit then cleanly separates
+      $\BISH$ from $\DCw$ theorems.
+
+\item \textbf{SLLN axiomatized.}  The full proof of the strong law of large
+      numbers is a substantial result in measure theory.  We axiomatize it
+      and verify that its axiom closure contains exactly
+      \texttt{dc\_omega\_holds} + \texttt{slln\_of\_dc}, confirming the
+      $\DCw$ dependency.
+\end{enumerate}
+
+\subsection{Axiom Certificate}\label{sec:axioms}
+
+The build output confirms clean separation:
+
+\begin{mdframed}[backgroundcolor=lean-bg]
+\begin{verbatim}
+-- BISH theorems:
+'born_prob_nonneg' depends on: [propext, Classical.choice, Quot.sound]
+'born_prob_sum_one' depends on: [propext, Classical.choice, Quot.sound]
+'expectation_real'  depends on: [propext, Classical.choice, Quot.sound]
+'variance_nonneg'   depends on: [propext, Classical.choice, Quot.sound]
+'bernoulli_variance_bound' depends on: [propext, Classical.choice, Quot.sound]
+'chebyshev_bernoulli_bound' depends on: [propext, Classical.choice, Quot.sound]
+'relative_freq_nonneg' depends on: [propext, Classical.choice, Quot.sound]
+'relative_freq_le_one' depends on: [propext, Classical.choice, Quot.sound]
+'relative_freq_sum'    depends on: [propext, Classical.choice, Quot.sound]
+'cnorm_sq_nonneg'      depends on: [propext, Classical.choice, Quot.sound]
+
+-- DC theorem:
+'frequentist_convergence' depends on:
+  [propext, Classical.choice, Quot.sound,
+   Papers.P16.dc_omega_holds, Papers.P16.slln_of_dc]
+\end{verbatim}
+\end{mdframed}
+
+All $\BISH$ theorems have axiom closure $\{\texttt{propext}, \texttt{Classical.choice},
+\texttt{Quot.sound}\}$---standard \Mathlib{} infrastructure with no custom axioms.
+The $\DCw$ theorem additionally contains \texttt{dc\_omega\_holds} and
+\texttt{slln\_of\_dc}.
+
+\subsection{AI-Assisted Methodology}\label{sec:ai}
+
+The formalisation was developed with AI assistance (Claude, Anthropic).
+The author verified all mathematical content and the AI generated \Lean{} proof
+scripts.  All proofs were machine-checked by the \Lean{} kernel---no trust is
+placed in the AI's correctness, only in the formal verification.
+
+% ====================================================================
+\section{Discussion}\label{sec:discussion}
+% ====================================================================
+
+\subsection{Quantum Geometry vs.\ Quantum Statistics}
+
+The Born rule separates into two physical contents:
+\begin{itemize}[nosep]
+\item \textbf{Quantum geometry ($\BISH$):}  the state $\psi$ determines a probability
+      distribution over outcomes.  This is a fact about one vector in one
+      finite-dimensional space.  No measurements needed.
+\item \textbf{Quantum statistics ($\DCw$):}  repeated measurements of identically
+      prepared systems yield frequencies converging to the geometric distribution.
+      This requires constructing infinite product spaces and proving convergence.
+\end{itemize}
+
+The experimentalist who runs $10{,}000$ measurements and checks that frequencies
+match Born probabilities within error bars is working in $\BISH$.  The textbook
+that asserts ``in the limit of infinitely many measurements, the frequency equals
+the probability'' is asserting $\DCw$.
+
+\subsection{Comparison with Paper~14}
+
+Paper~14 calibrated the quantum measurement problem (decoherence) against $\LPO$.
+Paper~16 calibrates the Born rule against $\DCw$.  The two results are complementary:
+\begin{itemize}[nosep]
+\item Paper~14: the \emph{mechanism} of measurement (decoherence) $\to$ $\LPO$.
+\item Paper~16: the \emph{statistics} of measurement (Born probabilities) $\to$ $\DCw$.
+\end{itemize}
+Different aspects of quantum measurement land at different levels of the
+constructive hierarchy.
+
+\subsection{Limitations and Open Problems}
+
+\begin{enumerate}
+\item \textbf{No new equivalence.}  Unlike Papers~2, 8, and~13, which prove
+      biconditional equivalences ($T \equiv P$ over $\BISH$), this note
+      establishes only that $\DCw$ is sufficient for the SLLN.  The reverse
+      direction ($\SLLN \implies \DCw$) is not formalised.  A full calibration
+      would require proving that the strong law \emph{cannot} be obtained from
+      weaker principles (e.g., countable choice without dependence).
+
+\item \textbf{SLLN axiomatised.}  The strong law is introduced as an axiom
+      (\texttt{slln\_of\_dc}), not derived from measure theory.  A complete
+      formalisation of the constructive SLLN with explicit $\DCw$ tracking
+      in Lean~4 would be a substantial independent contribution.
+
+\item \textbf{BISH content is unsurprising.}  The constructive status of
+      Theorems~1--5 follows immediately from their being finite-dimensional
+      linear algebra and real arithmetic.  The formalisation verifies correctness
+      but does not reveal hidden non-constructive dependencies---there are none
+      to reveal.
+
+\item \textbf{Classical.choice artefact.}  Per the Paper~10 methodology (\S\ref{sec:methodology}),
+      \texttt{Classical.choice} in the $\BISH$ theorems is an artefact of
+      \Mathlib{}'s typeclass infrastructure, not a mathematical use of excluded middle.
+\end{enumerate}
+
+% ====================================================================
+\section{Conclusion}\label{sec:conclusion}
+% ====================================================================
+
+The Born rule decomposes along the constructive hierarchy: single-trial
+probability, expectation, variance, and finite-sample error bounds are
+$\BISH$; exact frequentist convergence requires $\DCw$.  Neither half
+of this observation is mathematically surprising.  The contribution is
+to the calibration programme: the $\DCw$ axis now has explicit physical
+content from quantum measurement statistics, and the pattern---physics
+as practised is constructive, physics as idealised has measurable logical
+cost---extends to yet another aspect of quantum mechanics.
+
+The main open problem is sharpness: is $\DCw$ \emph{necessary} for the
+strong law, or does a weaker principle suffice?  A constructive proof of
+SLLN~$\equiv$~$\DCw$ over $\BISH$ would convert this note's upper bound
+into an exact calibration.
+
+\vspace{1em}
+\begin{mdframed}
+\textbf{Reproducibility.}  All source code, compiled PDF, and build
+instructions are archived at
+\href{https://doi.org/10.5281/zenodo.18575377}{Zenodo DOI:~10.5281/zenodo.18575377}.
+\Lean{} version: \texttt{leanprover/lean4:v4.28.0-rc1}.
+\Mathlib{} commit: \texttt{7091f0f6}.
+Build: \texttt{lake exe cache get \&\& lake build} (1662~jobs, 0~errors, 0~\texttt{sorry}).
+\end{mdframed}
+
+% ====================================================================
+% Bibliography
+% ====================================================================
+\bibliographystyle{plainnat}
+
+\begin{thebibliography}{25}
+
+\bibitem[Bishop and Bridges(1985)]{BishopBridges1985}
+E.~Bishop and D.~Bridges.
+\newblock \emph{Constructive Analysis}.
+\newblock Springer, 1985.
+
+\bibitem[Born(1926)]{Born1926}
+M.~Born.
+\newblock Zur Quantenmechanik der Sto{\ss}vorg{\"a}nge.
+\newblock \emph{Zeitschrift f{\"u}r Physik}, 37:863--867, 1926.
+
+\bibitem[Bridges(1979)]{Bridges1979}
+D.~Bridges.
+\newblock \emph{Constructive Functional Analysis}.
+\newblock Pitman, 1979.
+
+\bibitem[Bridges and V{\^i}{\c{t}}{\u{a}}(2006)]{BridgesVita2006}
+D.~Bridges and L.~V{\^i}{\c{t}}{\u{a}}.
+\newblock \emph{Techniques of Constructive Analysis}.
+\newblock Springer, 2006.
+
+\bibitem[de~Moura et~al.(2021)]{deMoura2021}
+L.~de~Moura, S.~Ullrich, et~al.
+\newblock The {L}ean 4 theorem prover and programming language.
+\newblock In \emph{CADE-28}, LNAI 12699, 2021.
+
+\bibitem[Dirac(1930)]{Dirac1930}
+P.~A.~M.~Dirac.
+\newblock \emph{The Principles of Quantum Mechanics}.
+\newblock Oxford University Press, 1930.
+
+\bibitem[Ishihara(2006)]{Ishihara2006}
+H.~Ishihara.
+\newblock Reverse mathematics in {B}ishop's constructive mathematics.
+\newblock \emph{Philosophia Mathematica}, 14(2):195--218, 2006.
+
+\bibitem[Lee(2025a)]{Lee2025a}
+P.~C.~K.~Lee.
+\newblock Paper~8: The {I}sing model and {LPO} dispensability.
+\newblock Zenodo, 2025.
+\newblock \href{https://doi.org/10.5281/zenodo.15043592}{10.5281/zenodo.15043592}.
+
+\bibitem[Lee(2025b)]{Lee2025b}
+P.~C.~K.~Lee.
+\newblock Paper~10: {CRM} methodology for {M}athlib formalizations.
+\newblock Zenodo, 2025.
+
+\bibitem[Lee(2026a)]{Lee2026a}
+P.~C.~K.~Lee.
+\newblock Paper~14: Quantum decoherence and {LPO}.
+\newblock Zenodo, 2026.
+\newblock \href{https://doi.org/10.5281/zenodo.18569068}{10.5281/zenodo.18569068}.
+
+\bibitem[Lee(2026b)]{Lee2026b}
+P.~C.~K.~Lee.
+\newblock Paper~15: {N}oether's theorem and global conservation laws.
+\newblock Zenodo, 2026.
+\newblock \href{https://doi.org/10.5281/zenodo.18572494}{10.5281/zenodo.18572494}.
+
+\bibitem[Lo{\`e}ve(1977)]{Loeve1977}
+M.~Lo{\`e}ve.
+\newblock \emph{Probability Theory I}.
+\newblock Springer, 4th edition, 1977.
+
+\bibitem[Mathlib(2024)]{Mathlib2024}
+The Mathlib Community.
+\newblock \texttt{mathlib4}: The math library for {L}ean 4.
+\newblock \url{https://github.com/leanprover-community/mathlib4}, 2024.
+
+\bibitem[Nielsen and Chuang(2010)]{NielsenChuang2010}
+M.~A.~Nielsen and I.~L.~Chuang.
+\newblock \emph{Quantum Computation and Quantum Information}.
+\newblock Cambridge University Press, 10th anniversary edition, 2010.
+
+\bibitem[von Neumann(1932)]{vonNeumann1932}
+J.~von Neumann.
+\newblock \emph{Mathematische Grundlagen der Quantenmechanik}.
+\newblock Springer, 1932.
+
+\end{thebibliography}
+
+\end{document}

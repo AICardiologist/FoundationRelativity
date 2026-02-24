@@ -1,0 +1,1651 @@
+\documentclass[12pt,a4paper]{article}
+
+%% ── packages ──────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+% \usepackage{lmodern} % not available in this environment
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathrsfs}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage[margin=1.1in]{geometry}
+\usepackage{tikz-cd}
+\usepackage{cleveref}
+
+%% ── theorem environments ─────────────────────────────────
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+\theoremstyle{remark}
+\newtheorem*{notation}{Notation}
+\newtheorem*{convention}{Convention}
+
+%% ── macros ───────────────────────────────────────────────
+\newcommand{\BISH}{\mathrm{BISH}}
+\newcommand{\MP}{\mathrm{MP}}
+\newcommand{\LPO}{\mathrm{LPO}}
+\newcommand{\CLASS}{\mathrm{CLASS}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\Adeles}{\mathbb{A}}
+\newcommand{\HH}{\mathbb{H}}
+\newcommand{\Sha}{\text{\cyrshort{Sh}}}  % Sha — if cyrillic unavailable, use:
+\renewcommand{\Sha}{\mathrm{III}}
+\newcommand{\Gal}{\mathrm{Gal}}
+\newcommand{\Frob}{\mathrm{Frob}}
+\newcommand{\Tr}{\mathrm{Tr}}
+\newcommand{\CRM}{\mathrm{CRM}}
+
+%% ── title ────────────────────────────────────────────────
+\title{%
+  \textbf{The Decidability Conduit}\\[6pt]
+  \large Why Physics and Number Theory Share \\
+  a Logical Architecture: CRM Signatures \\
+  Across the Langlands Correspondence}
+
+\author{
+  Paul Chun-Kit Lee\\
+  \small CRM Programme, Papers 1--52\\
+  \small \texttt{[affiliation]}
+}
+
+\date{February 2026}
+
+%% ═════════════════════════════════════════════════════════
+\begin{document}
+\maketitle
+
+%% ── abstract ─────────────────────────────────────────────
+\begin{abstract}
+Over the past five years, the Constructive Reverse Mathematics (CRM)
+programme has calibrated the logical complexity of physical theories
+(Papers~1--42) and the central conjectures of arithmetic geometry
+(Papers~45--50).  Both domains exhibit the same logical architecture:
+a base of Bishop-style constructive mathematics ($\BISH$), a single
+non-constructive principle ($\LPO$: the Limited Principle of
+Omniscience) for operations on complete fields, and positive-definiteness
+at the Archimedean place as the universal descent mechanism converting
+$\LPO$-level spectral data to $\BISH$-level algebraic data.  Universal
+conjectures in both fields---the spectral gap in physics, the Standard
+Conjectures in arithmetic geometry---live at the same level of the
+arithmetic hierarchy ($\Pi^0_2$).
+
+The Langlands correspondence asserts that the motivic side (algebraic
+geometry) and the automorphic side (spectral theory on adelic groups)
+carry the same arithmetic data.  We show that this correspondence
+preserves CRM signatures: each of the three motivic axioms
+(decidable morphisms, algebraic spectrum, Archimedean polarization)
+transfers to a substantive theorem on the automorphic side
+(Strong Multiplicity One, Shimura algebraicity, Petersson
+positive-definiteness).
+
+A critical asymmetry emerges.  The automorphic side is
+CRM-incomplete for eigenvalue bounds: the Petersson inner product
+yields only the trivial unitary bound, not the sharp Ramanujan
+bound.  Deligne's proof of the Ramanujan conjecture for holomorphic
+modular forms works by \emph{crossing the Langlands bridge} to the
+motivic side, where rigid intersection geometry over finite fields
+enforces $\BISH$-level bounds.  The correspondence is therefore
+not merely a transfer of data but a \emph{mandatory decidability
+conduit}: the automorphic side requires the motivic side's
+constructive axioms to bound its own spectrum.
+
+We identify the Selberg trace formula as a de-omniscientizing descent
+equation (spectral side: $\LPO$; geometric side: $\BISH$),
+mathematically identical to the Gutzwiller trace formula in quantum
+chaos.  Three spectral gap problems---the Hamiltonian spectral gap
+(physics), the Selberg eigenvalue conjecture (automorphic), and
+finiteness of the Shafarevich--Tate group (arithmetic)---are shown
+to be $\Sigma^0_2$ statements with identical logical structure.
+
+This is the final paper of the CRM programme.  The arc runs from
+the Schwarzschild metric (Paper~1) to the Langlands correspondence
+(Paper~52), through a single diagnostic question: what does each
+mathematical structure \emph{need}?
+\end{abstract}
+
+\tableofcontents
+
+%% ══════════════════════════════════════════════════════════
+\section{Introduction}\label{sec:intro}
+%% ══════════════════════════════════════════════════════════
+
+\subsection{The Diagnostic Question}
+
+Constructive Reverse Mathematics asks, for each theorem~$T$:
+\emph{which non-constructive principles are logically equivalent
+to~$T$?}  The standard hierarchy is
+\[
+  \BISH \;\subset\; \MP \;\subset\; \mathrm{LLPO}
+    \;\subset\; \LPO \;\subset\; \CLASS,
+\]
+where $\BISH$ (Bishop's constructive mathematics) uses no
+non-constructive principles, $\MP$ (Markov's Principle) allows
+unbounded search, $\LPO$ (the Limited Principle of Omniscience)
+allows deciding whether an infinite binary sequence contains a~1,
+and $\CLASS$ is full classical logic.  See \cite{Bridges-Richman}
+for the standard reference.
+
+In classical reverse mathematics \cite{Simpson}, theorems of
+second-order arithmetic are calibrated against five subsystems of
+analysis.  CRM performs the analogous calibration for constructive
+logic, with the crucial difference that the hierarchy measures
+\emph{computational content}: $\BISH$ means ``every computation
+terminates,'' $\MP$ means ``unbounded search may be required,''
+and $\LPO$ means ``testing whether an infinite limit equals zero
+requires a non-computable oracle.''
+
+\subsection{What the Physics Programme Found}
+
+Papers~1--42 calibrated the logical cost of physical theories
+from general relativity to quantum field theory.  The result was
+unexpectedly uniform:
+
+\begin{quotation}
+\emph{Every empirically accessible physical theory requires at most
+$\BISH + \LPO$.  The spectral gap problem reaches $\LPO'$
+($\Pi^0_2$ in the arithmetic hierarchy).  Positive-definiteness of
+the Hilbert-space inner product is the universal mechanism converting
+$\LPO$ to $\BISH$.}
+\end{quotation}
+
+The $\LPO$ cost arises wherever physics evaluates an infinite
+limit: thermodynamic limits, path integrals, geodesic completeness.
+The $\BISH$ rescue arises wherever physics extracts a finite
+prediction: energy eigenvalues, scattering cross-sections,
+measurable expectation values.  The conversion mechanism is the
+positive-definite inner product $\langle\psi|\varphi\rangle$,
+which permits division (a $\BISH$ operation on a space where
+zero-testing would otherwise require $\LPO$).
+
+Paper~39 found the ceiling.  The Cubitt--Perez-Garcia--Wolf
+spectral gap undecidability result \cite{CPW} lives at $\Pi^0_2$:
+one level above $\LPO$ in the arithmetic hierarchy.  It asks a
+universal question (for all lattice sizes~$N$) about an
+$\LPO$-level predicate (the energy gap).  The universal
+quantification is what pushes it beyond decidability.
+
+\subsection{What the Motivic Programme Found}
+
+Papers~45--50 turned the same instrument on arithmetic geometry.
+Five central conjectures were calibrated: the Weight-Monodromy
+Conjecture (Paper~45, formally verified in Lean~4 with zero
+sorries), the Tate Conjecture (Paper~46), the Fontaine--Mazur
+Conjecture (Paper~47), the Birch and Swinnerton-Dyer Conjecture
+(Paper~48), and the Hodge Conjecture (Paper~49).
+
+The result was again uniform.  Every conjecture exhibited the same
+pattern, which we call \emph{de-omniscientizing descent}: continuous
+homological or analytic data over a complete field (requiring $\LPO$
+for zero-testing) secretly descends to discrete algebraic data over
+$\QQ$ (decidable in $\BISH$ or $\BISH + \MP$).
+
+Paper~50 \cite{P50} crystallized this pattern into a characterization
+of Grothendieck's motive.  We summarize the key findings for readers
+coming from physics (\S\ref{sec:p50-summary}), after first fixing the
+formal framework (\S\ref{sec:metatheory}).
+
+%% ══════════════════════════════════════════════════════════
+\section{Metatheory: Formal CRM Signatures}\label{sec:metatheory}
+%% ══════════════════════════════════════════════════════════
+
+A reviewer of an earlier draft correctly observed that the claims of
+this paper require a formal notion of ``CRM signature'' and
+``preserves'' that can be checked as theorems rather than read as
+compelling analogies.  This section provides the formal framework.
+We work in Bishop's constructive mathematics ($\BISH$) as
+formalized in Lean~4 against the Mathlib library, following
+\cite{Bridges-Richman}.
+
+\subsection{The CRM Signature of a Mathematical Structure}
+
+\begin{definition}[CRM Signature]\label{def:crm-sig}
+Let $\mathcal{S}$ be a mathematical structure involving operations
+on elements of a complete valued field $k$ (such as $\RR$,
+$\QQ_\ell$, or $\QQ_p$).  The \emph{CRM signature} of
+$\mathcal{S}$ is the tuple
+\[
+  \CRM(\mathcal{S}) \;=\; (Z, I, P) \;\in\;
+  \{\BISH, \MP, \LPO\}^3
+\]
+where:
+\begin{enumerate}[label=(\roman*),nosep]
+  \item $Z$ (Zero-testing): the minimal principle required to decide
+    $x = 0$ for elements $x$ in the morphism/function spaces of
+    $\mathcal{S}$.
+  \item $I$ (Integrality): the minimal principle required to
+    verify that characteristic polynomials of endomorphisms have
+    integer coefficients.
+  \item $P$ (Polarization): the minimal principle required to
+    establish a positive-definite bilinear form on the
+    endomorphism algebra tensored with~$\RR$.
+\end{enumerate}
+Each component is assigned by the following decision procedure:
+$\BISH$ if the operation can be performed by a terminating
+algorithm with no oracle; $\MP$ if the operation reduces to an
+unbounded existential search $\exists n\; P(n)$ where $P$ is
+decidable; $\LPO$ if the operation requires deciding
+$\exists n\; (\alpha(n) = 1)$ for an arbitrary binary sequence
+$\alpha$.
+\end{definition}
+
+\begin{remark}
+The assignment of CRM levels is made precise by exhibiting
+Weihrauch reductions \cite{BrattkaGherardi} or, equivalently,
+by constructing Lean~4 terms that witness the computation given
+the relevant oracle.  In the Lean formalization, $\BISH$
+corresponds to a \texttt{Decidable} instance with no axioms
+beyond Mathlib; $\MP$ corresponds to requiring a
+\texttt{Classical.choice} on a $\Sigma^0_1$ predicate; $\LPO$
+corresponds to requiring \texttt{Classical.em} (or equivalently,
+a decision procedure for the halting of binary sequences).
+\end{remark}
+
+\subsection{Formal Equivalences}
+
+The following are the flagship equivalences that ground the
+dictionary.  Each is stated in a form that is formalizable
+in the base theory $\BISH$ (or $\BISH$ + named axiom).
+
+\begin{theorem}[Zero-Testing Equivalence for $\QQ_\ell$]\label{thm:zero-test}
+Let $V$ be a finite-dimensional $\QQ_\ell$-vector space equipped
+with a $\QQ$-structure $V_\QQ \subset V$.
+\begin{enumerate}[label=\textup{(\alph*)},nosep]
+  \item Deciding $v = 0$ for arbitrary $v \in V$ is equivalent to
+    $\LPO$ over $\BISH$.
+  \item Deciding $v = 0$ for $v \in V_\QQ$ is $\BISH$-computable
+    (no additional axiom).
+  \item Grothendieck's Standard Conjecture~D, restricted to a
+    given variety~$X$, asserts that the natural map
+    $\mathrm{Hom}_{\mathrm{num}}(X) \to
+    \mathrm{Hom}_{\mathrm{hom}}(X)$
+    is an isomorphism.  This is equivalent to:
+    zero-testing in $\mathrm{Hom}_{\mathrm{hom}}$
+    ($\LPO$-level) reduces to zero-testing in
+    $\mathrm{Hom}_{\mathrm{num}}$ ($\BISH$-level).
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Part (a): $\QQ_\ell$ is the completion of $\QQ$ at $\ell$.
+An element $x \in \QQ_\ell$ is a Cauchy sequence of rationals.
+Deciding $x = 0$ requires determining whether all terms
+eventually vanish---this is $\LPO$ (deciding
+$\forall n\, |x_n| < 2^{-n}$ for the Cauchy representatives).
+The equivalence with $\LPO$ is classical in constructive
+analysis; see \cite[Prop.~1.2]{Bridges-Richman}.
+
+Part (b): $V_\QQ$ has a basis over $\QQ$.  Coordinates are
+rationals.  Deciding $v = 0$ is checking finitely many rational
+equalities, each decidable by the Euclidean algorithm.
+
+Part (c): Conjecture~D provides a $\QQ$-rational basis for
+$\mathrm{Hom}_{\mathrm{hom}}$ via numerical equivalence classes.
+Intersection numbers are integers.  The reduction
+$\LPO \to \BISH$ is given by: compute the integer intersection
+pairing, check if it is zero.  Conversely, if such a reduction
+exists, it provides the isomorphism.
+\end{proof}
+
+\begin{theorem}[Integrality Equivalence]\label{thm:integrality}
+Let $\varphi$ be an endomorphism of an object in a
+$\QQ$-linear abelian category.
+\begin{enumerate}[label=\textup{(\alph*)},nosep]
+  \item On the motivic side: $\varphi = \Frob_p$ acting on
+    $H^i_\ell(X)$ has characteristic polynomial in $\ZZ[t]$
+    (Weil).  Verifying integrality of the coefficients is
+    $\BISH$ (integer arithmetic on the coefficients of $P(t)$).
+  \item On the automorphic side: $a_p(f)$ for a Hecke eigenform
+    $f$ is an algebraic integer.  Verifying this requires the
+    Eichler--Shimura isomorphism (for $\mathrm{GL}_2$) or
+    Clozel's purity theorem.  Once established, the verification
+    is $\BISH$ (computing in a number field).
+  \item The Langlands correspondence sends (a) to (b):
+    $a_p(\pi_M) = \Tr(\Frob_p \mid M)$.  Integrality on both
+    sides is $\BISH$, and the correspondence preserves this level.
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}[Polarization Equivalence]\label{thm:polarization}
+\begin{enumerate}[label=\textup{(\alph*)},nosep]
+  \item On the motivic side: the Rosati involution on
+    $\mathrm{End}(A) \otimes \RR$ yields a positive-definite form
+    because $u(\RR) = 1$.  Constructing this form is $\BISH$
+    (finite-dimensional linear algebra over $\QQ$ embedded in
+    $\RR$).  The form fails to be positive-definite over $\QQ_p$
+    because $u(\QQ_p) = 4$.
+  \item On the automorphic side: the Petersson inner product on
+    $S_k(\Gamma)$ is positive-definite.  For the finite-dimensional
+    space of cusp forms of fixed weight and level, computing the
+    Petersson norm is $\BISH$ (numerical integration on a
+    fundamental domain with known bounds).
+  \item Both positive-definite forms arise at the Archimedean
+    place, both from $u(\RR) = 1$, and both are $\BISH$-computable
+    on finite-dimensional subspaces.  Both fail $p$-adically.
+\end{enumerate}
+\end{theorem}
+
+\subsection{The Ramanujan Separation Theorem}
+
+The reviewers' challenge to produce a formal separation has a
+decisive answer.  We do not need a constructive realizability
+model: the separation exists in classical mathematics.
+
+\begin{definition}[CRM-Completeness for Eigenvalue Bounds]
+\label{def:crm-complete}
+A triple of CRM axioms $(Z, I, P)$ is \emph{CRM-complete for
+eigenvalue bounds} if, working in $\BISH$ augmented by these
+axioms, one can derive: for every endomorphism $\varphi$ with
+$P(\varphi, \varphi) = q^w \cdot P(\mathrm{id}, \mathrm{id})$,
+the eigenvalues of $\varphi$ satisfy $|\alpha| = q^{w/2}$.
+\end{definition}
+
+The motivic axioms are CRM-complete for eigenvalue bounds
+(Paper~50, Theorem~A).
+
+\begin{theorem}[Automorphic CRM Incompleteness]
+\label{thm:separation}
+The automorphic CRM axioms $\mathrm{A1}$ (Strong Multiplicity
+One) $+$ $\mathrm{A2}$ (Shimura algebraicity) $+$ $\mathrm{A3}$
+(Petersson positive-definiteness) do not imply the
+Ramanujan--Petersson bound.
+\end{theorem}
+
+\begin{proof}
+We give two arguments: an abstract local separation
+(\ref{thm:separation}.a) and a classical global witness
+(\ref{thm:separation}.b).
+
+\medskip\noindent\textbf{(a) Local separation (abstract model).}
+Take weight $k = 2$ and prime $p = 5$.  The Ramanujan bound
+requires $|a_5| \leq 2\sqrt{5} \approx 4.472$.  The unitary
+(complementary series) bound for $\mathrm{GL}_2(\QQ_5)$ allows
+$|a_5| < 5 + 1 = 6$.  The integer $a_5 = 5$ lies in the gap
+$(4.472, 6)$.
+
+The normalized Satake equation $5^{1/2}(5^s + 5^{-s}) = 5$ gives
+$s \approx -0.298$.  Since $|s| < 1/2$, this parametrizes a
+representation in the complementary series: unitary ($\mathrm{A3}$
+satisfied), with Hecke eigenvalue $5 \in \ZZ$ ($\mathrm{A2}$
+satisfied), and one-dimensional eigenspace ($\mathrm{A1}$
+satisfiable in any synthetic universe).  But $5 > 2\sqrt{5}$,
+so Ramanujan fails.
+
+By the soundness of first-order logic, since a model of the
+premises exists in which the conclusion is false, the premises
+do not entail the conclusion.
+
+\medskip\noindent\textbf{(b) Global witness: Saito--Kurokawa
+lifts on $\mathrm{Sp}_4$.}
+A reviewer may object that part~(a) constructs a local
+representation, not a global automorphic representation.
+Global objects satisfy additional constraints (being
+subquotients of $L^2$, satisfying functional equations,
+possessing analytic conductors).
+
+Saito--Kurokawa lifts \cite{PiatetskiShapiro-SK} are genuine
+cuspidal automorphic representations of $\mathrm{Sp}_4(\Adeles)$
+satisfying every global constraint:
+\begin{itemize}[nosep]
+  \item $\mathrm{A1}$: Multiplicity one holds for
+    Saito--Kurokawa packets (Arthur's classification
+    \cite{Arthur}).
+  \item $\mathrm{A2}$: They are functorial lifts from classical
+    modular forms on $\mathrm{GL}_2$; their Hecke eigenvalues
+    are explicitly algebraic integers.
+  \item $\mathrm{A3}$: They are square-integrable cuspidal
+    Siegel modular forms; local components are unitary.
+\end{itemize}
+However, Saito--Kurokawa lifts are CAP representations (Cuspidal
+Associated to Parabolic).  Their unramified local components at
+almost all primes lie in the non-tempered complementary series,
+strictly violating the generalized Ramanujan bound for
+$\mathrm{Sp}_4$.
+
+If $\mathrm{A1} + \mathrm{A2} + \mathrm{A3}$ implied the
+Ramanujan bound for all reductive groups, the implication would
+apply to $\mathrm{Sp}_4$ and contradict the existence of
+Saito--Kurokawa lifts---objects in classical mathematics.
+Therefore $\mathrm{A1} + \mathrm{A2} + \mathrm{A3}
+\not\vdash \text{Ramanujan}$.
+\end{proof}
+
+\begin{remark}[The CAP subtlety]\label{rem:cap}
+The refined Ramanujan conjecture for $\mathrm{GL}_n$ restricts
+attention to representations that are not CAP---i.e., not
+functorial lifts from proper Levi subgroups.  The CRM axioms
+$\mathrm{A1}$--$\mathrm{A3}$ cannot distinguish CAP from
+non-CAP representations.  Making this distinction requires
+\emph{functoriality}---the ability to test whether $\pi$ is a
+lift from a smaller group.  This is precisely the missing axiom
+identified below.
+\end{remark}
+
+\begin{proposition}[The Missing Axiom]\label{prop:missing-axiom}
+The automorphic recovery of the Ramanujan bound requires:
+\[
+  \textbf{A4 (Symmetric Power Functoriality):}\quad
+  \mathrm{Sym}^m(\pi) \;\text{is automorphic for all}\;
+  m \in \mathbb{N}.
+\]
+If $\pi_p$ is in the complementary series with parameter $s > 0$,
+then $\mathrm{Sym}^m(\pi)_p$ has parameter $m \cdot s$.
+Axiom $\mathrm{A3}$ (unitarity) applied to $\mathrm{Sym}^m(\pi)$
+requires $m \cdot s < 1/2$.  Since this must hold for all $m$,
+it forces $s = 0$: the tempered (Ramanujan) bound.
+\end{proposition}
+
+\begin{remark}[Structural interpretation]
+The motivic side proves the sharp bound from a single
+finite-dimensional axiom (the Rosati equation on
+$\mathrm{End}(A) \otimes \RR$).  The automorphic side requires
+an \emph{infinite axiom schema}: unitarity of $\mathrm{Sym}^m(\pi)$
+for all $m$.  The motive is a rigid finite-dimensional object that
+bounds the spectrum in one step.  The automorphic form is a
+flexible infinite-dimensional object that requires the entire
+hierarchy of multi-particle interactions (symmetric powers) to
+achieve the same bound.  The Langlands correspondence transfers
+the finite-dimensional rigidity to the infinite-dimensional side,
+collapsing the infinite schema into a single geometric argument.
+\end{remark}
+
+\subsection{Formal Status of the $\Pi^0_2$ Classifications}
+
+\begin{proposition}[Arithmetic Complexity---Formal Version]
+\label{prop:pi2-formal}
+Working in the language of second-order arithmetic:
+\begin{enumerate}[label=\textup{(\alph*)},nosep]
+  \item Standard Conjecture~D (for a fixed field $k$) has the
+    form $\forall X\;\forall Z\;(\Phi(X,Z) \to \Psi(X,Z))$
+    where $\Phi$ (``$Z$ is homologically trivial'') is
+    $\Pi^0_1$ (requires $\LPO$ to evaluate the $\ell$-adic
+    pairing) and $\Psi$ (``$Z$ is numerically trivial'') is
+    $\Delta^0_0$ (integer intersection number is zero).  The
+    implication $\Phi \to \Psi$ is $\Sigma^0_1$ for fixed
+    $(X,Z)$.  The universal quantification makes the full
+    conjecture $\Pi^0_2$.
+  \item Finiteness of $\Sha(E/\QQ)$ has the form
+    $\exists B\;\forall x\;(x \in \Sha \to |x| \leq B)$.
+    Each instance $x \in \Sha$ is determined by local
+    solvability at all primes ($\Pi^0_1$).  The existential
+    bound makes this $\Sigma^0_2$.
+  \item The Selberg eigenvalue conjecture has the form
+    $\forall N\;(\lambda_1(\Gamma_0(N)\backslash\HH) \geq
+    \tfrac14)$.  Each $\lambda_1(N)$ is the infimum of a
+    spectral quantity ($\Pi^0_1$).  The universal quantification
+    makes the conjecture $\Pi^0_2$.
+\end{enumerate}
+\end{proposition}
+
+\begin{remark}
+The classification requires specifying the arithmetization:
+which G\"odel numbering encodes varieties, elliptic curves, and
+hyperbolic surfaces.  For algebraic varieties over $\QQ$ and
+congruence subgroups $\Gamma_0(N)$, standard arithmetizations
+exist.  The classifications above hold for any reasonable
+arithmetization.  A fully rigorous treatment would fix a specific
+encoding and verify the quantifier counts; this is deferred to
+the Lean formalization.
+\end{remark}
+
+\subsection{What This Section Achieves}
+
+With these definitions and formal statements:
+
+\begin{enumerate}[nosep]
+  \item $\CRM(\mathcal{S})$ is a well-defined tuple, not a
+    metaphor.
+  \item ``Preservation'' means: for corresponding structures
+    $\mathcal{S}$ (motivic) and $\mathcal{T}$ (automorphic),
+    $\CRM(\mathcal{S}) = \CRM(\mathcal{T})$ componentwise.
+    Theorems~\ref{thm:zero-test}--\ref{thm:polarization} verify
+    this for each component.
+  \item The Ramanujan asymmetry is a \textbf{theorem}
+    (Theorem~\ref{thm:separation}): the automorphic axioms
+    are provably incomplete for eigenvalue bounds, witnessed
+    by Saito--Kurokawa lifts on $\mathrm{Sp}_4$.
+  \item The missing axiom is identified: symmetric power
+    functoriality (Proposition~\ref{prop:missing-axiom}).
+  \item The $\Pi^0_2$ classifications are stated with explicit
+    quantifier structure.  The deferred step (arithmetization)
+    is identified.
+\end{enumerate}
+
+\begin{remark}[On the term ``decidability conduit'']
+\label{rem:conduit}
+The phrase ``decidability conduit''---used in the title and
+throughout this paper---rests on two formal results and one
+interpretation.
+
+The formal results: (i)~CRM signatures match across the
+correspondence (Theorem~\ref{thm:matching});
+(ii)~the automorphic axioms are provably incomplete for
+eigenvalue bounds, while the motivic axioms are complete
+(Theorems~\ref{thm:separation} and~\ref{thm:asymmetry}).
+
+The interpretation: the correspondence \emph{exists because}
+the automorphic side needs the motivic side's rigidity.  This
+causal claim goes beyond the formal results.  It could be
+weakened to: ``the correspondence \emph{functions as} a conduit
+regardless of why it exists.''  Even in this weaker reading, the
+formal content is substantive: one side is provably stronger
+than the other for eigenvalue bounds, and the correspondence
+transfers this strength.
+
+The interpretation would be falsified by a purely automorphic
+proof of Ramanujan that avoids both the motivic bridge and the
+infinite symmetric power schema.  No such proof is known, but
+its impossibility is not proved.
+\end{remark}
+
+The rest of the paper uses these formal definitions.  Where a
+claim goes beyond what the formal framework proves, we say so.
+
+%% ══════════════════════════════════════════════════════════
+\section{Paper 50 for Physicists}\label{sec:p50-summary}
+%% ══════════════════════════════════════════════════════════
+
+\subsection{The Problem of Zero-Testing}
+
+In physics, you never test whether a real number equals zero exactly.
+You measure it to finite precision and check whether $|x| < \epsilon$.
+This works because your observables are backed by positive-definite
+structures (norms, inner products) that make approximate equality
+sufficient.
+
+In number theory, exact zero-testing is essential.  The question
+``is this cohomology class the zero class?'' requires an exact
+answer.  Over complete fields ($\RR$, $\CC$, $\QQ_p$, $\QQ_\ell$),
+this is an $\LPO$-level operation: you cannot decide in finite
+time whether an infinite Cauchy sequence converges to zero.
+
+The five motivic conjectures all assert that this $\LPO$-level
+zero-testing is secretly unnecessary.  Each claims that
+continuous cohomological data (requiring $\LPO$) descends
+to algebraic data (decidable in $\BISH$).  The mechanism is the
+same as in physics: a positive-definite inner product that makes
+division legitimate.
+
+\subsection{Why the Archimedean Place is Special}
+
+The inner product that rescues $\LPO$ is positive-definite only at
+the Archimedean place (over $\RR$).  The reason is a single number:
+the \emph{$u$-invariant} of the field.  The $u$-invariant $u(k)$
+is the maximum dimension of an anisotropic quadratic form over~$k$.
+
+Over $\RR$: $u(\RR) = 1$.  Every form of dimension $\geq 2$ has
+a nontrivial zero.  Positive-definite forms exist in every
+dimension.  The Rosati involution on the endomorphism algebra of
+an abelian variety always yields a positive-definite form.
+
+Over $\QQ_p$: $u(\QQ_p) = 4$.  Forms of dimension $\geq 5$
+always have nontrivial zeroes, but in dimensions $\leq 4$,
+anisotropic forms exist.  Positive-definite forms do not exist in
+dimension $\geq 5$.  The Rosati-type argument fails.
+
+A physicist recognizes this asymmetry: it is the reason the
+Euclidean path integral (over $\RR$, positive-definite metric)
+converges nicely while the Lorentzian path integral requires
+analytic continuation.  The mathematical root is the same:
+$u(\RR) = 1$.
+
+\subsection{The Three-Axiom Characterization}
+
+Paper~50 proposes that the category of numerical motives is the
+initial object in the $2$-category of \emph{Decidable Polarized
+Tannakian categories}.  The three axioms are:
+
+\begin{enumerate}[label=\textbf{Axiom \arabic*},leftmargin=*]
+  \item \textbf{DecidableEq on Hom.}  Morphism spaces have
+    decidable equality.  (Zero-testing terminates.)
+  \item \textbf{IsIntegral on End.}  Eigenvalues of endomorphisms
+    are algebraic integers.  (The spectrum is algebraic.)
+  \item \textbf{InnerProductSpace on $\mathrm{End} \otimes \RR$.}
+    The Archimedean realization carries a positive-definite form.
+    (Division is legitimate.)
+\end{enumerate}
+
+These are logical axioms, not geometric ones.  They say: morphisms
+are decidable, eigenvalues are algebraic, and the real inner
+product is positive-definite.  A physicist would recognize them as:
+discreteness of the spectrum, quantization, and unitarity.
+
+\subsection{What Follows from Three Axioms}
+
+\textbf{Theorem A (Weil RH).}  The Riemann Hypothesis for varieties
+over $\FF_q$ follows from the three axioms.  The proof is four steps:
+Axiom~2 gives algebraic eigenvalues; Axiom~3 gives a positive-definite
+form; the Rosati condition gives $\langle \Frob \cdot x,
+\Frob \cdot x\rangle = q^w \langle x, x\rangle$; division by
+$\langle x, x\rangle > 0$ (Axiom~3) gives $|\alpha|^2 = q^w$.
+
+\textbf{Theorem B (Honda--Tate Inhabitant).}  The axioms are
+satisfiable.  Over $\FF_p$, the motive of a CM elliptic curve
+inhabits the type: rational skeleton $\QQ^2$, Frobenius matrix
+$\bigl(\begin{smallmatrix} 0 & -p \\ 1 & a \end{smallmatrix}\bigr)$,
+Rosati form with determinant $4p - a^2 > 0$ (the Hasse bound from
+1933).
+
+\textbf{Theorem C (Conjecture D as Decidability).}
+Grothendieck's Standard Conjecture~D---homological equivalence
+equals numerical equivalence---is equivalent to Axiom~1.  It
+asserts that $\LPO$-dependent homological zero-testing descends to
+$\BISH$-decidable integer intersection numbers.
+
+\textbf{Theorem D (Dual Hierarchy).}  The major conjectures of
+arithmetic geometry (Conjecture~D, Hodge, finiteness of
+$\Sha$) live at $\Pi^0_2$ in the arithmetic hierarchy---the same
+level as the physics spectral gap.  The motive acts as a
+$(-1)$-shift operator: it accepts a $\Pi^0_2$ axiom (Conjecture~D)
+and delivers $\Sigma^0_2 \to \Sigma^0_1$ descent on instances.
+
+\textbf{Theorem E (CM Decidability).}  For CM elliptic curves
+over $\QQ$, the motivic subcategory is unconditionally
+$\BISH$-decidable.  Three theorems---Damerell (1970), Lefschetz
+$(1,1)$ (1924), and Matsusaka---simultaneously eliminate $\LPO$,
+$\MP$, and the Fontaine--Mazur obstruction.  No conjectures
+assumed.
+
+\subsection{The Link to This Paper}
+
+The physics programme found $\BISH + \LPO$ with
+positive-definiteness as the universal rescue.  The motivic
+programme found $\BISH + \LPO + \MP$ with the \emph{same}
+positive-definiteness as the rescue.  Both programmes found
+$\Pi^0_2$ as the ceiling for universal statements.
+
+The Langlands programme asserts that the motivic side and the
+automorphic side (spectral theory on adelic groups---essentially
+physics) carry the same data.  This paper asks: does the
+correspondence preserve CRM signatures?
+
+%% ══════════════════════════════════════════════════════════
+\section{The Three-Column Dictionary}\label{sec:dictionary}
+%% ══════════════════════════════════════════════════════════
+
+The CRM programme has independently measured three domains.  We
+now display their logical signatures side by side.
+
+\subsection{Axiom 1: Decidable Morphisms}
+
+On the \textbf{motivic side}, Standard Conjecture~D asserts that
+homological equivalence $=$ numerical equivalence.  Homological
+equivalence requires zero-testing in $\QQ_\ell$-cohomology
+($\LPO$).  Numerical equivalence requires integer intersection
+numbers ($\BISH$).  Conjecture~D asserts they agree:
+$\mathrm{DecidableEq}$ on $\mathrm{Hom}_{\mathrm{num}}$.
+
+On the \textbf{automorphic side}, Strong Multiplicity One
+(Shalika \cite{Shalika}, Piatetski-Shapiro \cite{PS}) asserts
+that a cuspidal automorphic representation of $\mathrm{GL}_n$
+is determined by its Hecke eigenvalues at almost all primes.
+This makes multiplicity spaces at most one-dimensional:
+$\mathrm{DecidableEq}$ on automorphic multiplicities.
+
+On the \textbf{physics side}, the analogue is spectral
+discreteness: the Hamiltonian has isolated eigenvalues, making
+energy levels distinguishable (decidable).
+
+\subsection{Axiom 2: Algebraic Spectrum}
+
+On the \textbf{motivic side}, Frobenius eigenvalues are algebraic
+integers---Weil numbers satisfying $P(t) \in \ZZ[t]$.
+
+On the \textbf{automorphic side}, Hecke eigenvalues of normalized
+cuspidal eigenforms are algebraic integers.  This requires the
+Eichler--Shimura isomorphism (for $\mathrm{GL}_2$) or Clozel's
+purity theorems \cite{Clozel} (general case), connecting analytic
+Fourier coefficients to Betti cohomology of Shimura varieties.
+The descent from analytic complex numbers to algebraic integers is
+exactly $\LPO \to \BISH$.
+
+On the \textbf{physics side}, the analogue is quantized eigenvalues:
+discrete spectra taking values in algebraic expressions of physical
+constants.
+
+\subsection{Axiom 3: Archimedean Polarization}
+
+On the \textbf{motivic side}, the Rosati involution on
+$\mathrm{End}(A) \otimes \RR$ defines a positive-definite form
+$\langle f, g\rangle = \Tr(f \cdot g^\dagger)$.
+Positive-definiteness holds because $u(\RR) = 1$.
+
+On the \textbf{automorphic side}, the Petersson inner product
+\[
+  \langle f, g \rangle \;=\;
+  \int_{\Gamma_0(N)\backslash\HH}
+    f(z)\,\overline{g(z)}\,y^k\,
+    \frac{dx\,dy}{y^2}
+\]
+is positive-definite on cusp forms.  This is an $L^2$-integral of
+a norm over a fundamental domain---positive-definiteness from the
+Archimedean topology of $\RR$.
+
+On the \textbf{physics side}, the Hilbert space inner product
+$\langle\psi|\varphi\rangle$ is positive-definite by axiom
+(Dirac--von Neumann).
+
+All three positive-definite forms arise at the Archimedean place.
+All three fail $p$-adically: there is no translation-invariant
+Haar measure on $\QQ_p$ taking values in $\RR_{>0}$ that
+produces a canonical positive-definite metric.  The obstruction is
+$u(\QQ_p) = 4$ in every case.
+
+\subsection{Summary Table}
+
+\begin{table}[h]
+\centering
+\small
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{CRM Feature} & \textbf{Motivic} & \textbf{Automorphic} & \textbf{Physics} \\
+\midrule
+Axiom 1 & Conj.~D & Strong Mult.~One & Spectral discreteness \\
+Axiom 2 & Weil numbers & Shimura algebraicity & Quantized eigenvalues \\
+Axiom 3 & Rosati form & Petersson i.p. & Hilbert space i.p. \\
+Descent & Algebraic & Eichler--Shimura & Measurement \\
+Shift operator & Motive ($-1$) & Trace formula & [none known] \\
+Spectral gap & $\Sha$ finite & Selberg $\lambda_1 \geq \tfrac14$ & Cubitt et al. \\
+\;($\Sigma^0_2$) & ($\exists B\;\forall x$) & ($\exists\lambda\;\forall N$) & ($\exists\Delta\;\forall N$) \\
+$\MP$ residual & Cycle search & \textbf{[incomplete]} & BPS state search \\
+$\Pi^0_2$ axiom & Conj.~D & Ramanujan conj. & Gap universality \\
+\bottomrule
+\end{tabular}
+\caption{CRM signatures across three domains.  The blank entry
+  in the $\MP$ row of the automorphic column is the asymmetry
+  identified in \S\ref{sec:ramanujan}.}
+\label{tab:dictionary}
+\end{table}
+
+\begin{theorem}[CRM Signature Matching]\label{thm:matching}
+Assuming the global Langlands correspondence for $\mathrm{GL}_n$
+over $\QQ$, the CRM signatures of an algebraic cuspidal automorphic
+representation $\pi$ and its associated motive $M_\pi$ match at
+every place:
+\begin{enumerate}[label=\textup{(\alph*)},nosep]
+  \item $\mathrm{DecidableEq}$ on $\mathrm{Hom}_{\mathrm{num}}(M,N)$
+    $\longleftrightarrow$ Strong Multiplicity One for $\pi$;
+  \item $\mathrm{IsIntegral}(\Frob_p \mid M)$
+    $\longleftrightarrow$ algebraicity of $a_p(\pi)$
+    (Shimura);
+  \item positive-definiteness of Rosati on $M$
+    $\longleftrightarrow$ positive-definiteness of Petersson
+    on $\pi$.
+\end{enumerate}
+For $\mathrm{GL}_2$ over $\QQ$, the result is unconditional
+(via the modularity theorem of Wiles, Taylor--Wiles, and BCDT).
+\end{theorem}
+
+%% ══════════════════════════════════════════════════════════
+\section{The Ramanujan Asymmetry}\label{sec:ramanujan}
+%% ══════════════════════════════════════════════════════════
+
+The three-column dictionary reveals a critical asymmetry.  The
+motivic and physics columns are CRM-complete: their three axioms
+suffice to derive sharp eigenvalue bounds.  The automorphic column
+is not.
+
+\subsection{The Motivic Proof of the Weil RH}
+
+On the motivic side, the sharp eigenvalue bound follows from the
+three CRM axioms (Paper~50, Theorem~A):
+
+\begin{enumerate}[nosep]
+  \item Axiom~2: $\Frob$ has algebraic-integer eigenvalues.
+    Characteristic polynomial $P(t) \in \ZZ[t]$.
+  \item Axiom~3: Rosati form $\langle\cdot,\cdot\rangle$
+    positive-definite.
+  \item Rosati condition:
+    $\langle \Frob \cdot x, \Frob \cdot x\rangle
+      = q^w \langle x, x\rangle$.
+  \item Division: $\langle x, x\rangle > 0$ by Axiom~3, so
+    $|\Frob|^2 = q^w$, giving $|\alpha| = q^{w/2}$.
+\end{enumerate}
+
+The bound is sharp because the positive-definite form acts on a
+finite-dimensional $\QQ$-vector space where algebraic structure
+forces rigidity.
+
+\subsection{The Automorphic Failure}
+
+On the automorphic side, the Petersson inner product makes local
+representations unitary.  For an unramified principal series
+representation at~$p$, unitarity gives only the trivial bound:
+\[
+  |a_p(f)| \;\leq\; p^{(k-1)/2}\,(p^{1/2} + p^{-1/2}).
+\]
+This exceeds the Ramanujan bound $|a_p(f)| \leq 2p^{(k-1)/2}$
+by the factor $(p^{1/2} + p^{-1/2})/2 > 1$ for every finite~$p$.
+
+Purely analytic methods improve this, but never achieve the sharp bound:
+\begin{itemize}[nosep]
+  \item Rankin--Selberg: off by $p^{1/4}$.
+  \item Kim--Sarnak (2003): off by $p^{7/64}$.
+\end{itemize}
+No improvement has been achieved in over twenty years.
+
+The automorphic positive-definiteness (Petersson) acts on the
+infinite-dimensional space $L^2(\Gamma\backslash\HH)$, where
+local components retain room to fluctuate.  The motivic
+positive-definiteness (Rosati) acts on a \emph{finite-dimensional}
+$\QQ$-vector space where algebraic integrality forces rigidity.
+The CRM diagnosis: the automorphic Axiom~3 is too weak.
+
+\subsection{Deligne's Bridge Crossing}
+
+Deligne \cite{Deligne-Weil} proved the Ramanujan conjecture for
+holomorphic modular forms of weight $k \geq 2$ by leaving the
+automorphic side entirely:
+
+\begin{enumerate}[nosep]
+  \item Construct the $\ell$-adic Galois representation
+    $\rho_f : \Gal(\overline{\QQ}/\QQ) \to \mathrm{GL}_2(\QQ_\ell)$
+    attached to $f$ (Eichler--Shimura for $k=2$, Deligne for
+    general $k$).
+  \item Show $\rho_f$ appears in the \'etale cohomology of a
+    variety over $\FF_p$ (the Kuga--Sato variety).
+  \item Apply the Weil conjectures (proved by Deligne)
+    to obtain $|\alpha_p| = p^{(k-1)/2}$.
+\end{enumerate}
+
+Step~3 is the motivic CRM argument: integrality + Rosati
+positive-definiteness $\Rightarrow$ sharp eigenvalue bound.
+Deligne could not prove Ramanujan automorphically.  He
+\emph{had to cross the bridge}.
+
+\begin{theorem}[Ramanujan Asymmetry]\label{thm:asymmetry}
+The automorphic side of the Langlands correspondence is
+CRM-incomplete for eigenvalue bounds:
+\begin{enumerate}[label=\textup{(\alph*)},nosep]
+  \item The motivic CRM axioms suffice to derive
+    $|\alpha| = q^{w/2}$ (Weil RH).
+  \item The automorphic CRM axioms $\mathrm{A1} + \mathrm{A2}
+    + \mathrm{A3}$ do \textbf{not} suffice to derive the
+    Ramanujan bound (Theorem~\ref{thm:separation}).
+  \item The Langlands correspondence acts as a conduit through
+    which $\BISH$-level bounds flow from the motivic side to
+    the automorphic side (Deligne's proof strategy; see
+    Remark~\ref{rem:conduit} for the epistemic status of
+    ``conduit'').
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Part~(a) is Paper~50, Theorem~A.  Part~(b) is
+Theorem~\ref{thm:separation}: Saito--Kurokawa lifts on
+$\mathrm{Sp}_4$ are classical cuspidal automorphic
+representations satisfying $\mathrm{A1} + \mathrm{A2} +
+\mathrm{A3}$ while violating the generalized Ramanujan bound.
+Part~(c) is Deligne's proof of Ramanujan for holomorphic
+modular forms \cite{Deligne-Weil}, which works by constructing
+$\ell$-adic Galois representations (crossing to the motivic
+side) and applying the Weil conjectures.
+\end{proof}
+
+\subsection{The Maass Form Prediction}
+
+\begin{conjecture}[Maass Form Obstruction]\label{conj:maass}
+The Ramanujan conjecture for Maass forms on $\mathrm{GL}_2$
+cannot be proved by purely automorphic methods.
+\end{conjecture}
+
+\emph{Evidence.}  Maass forms correspond to representations
+with Archimedean component in the principal series of
+$\mathrm{SL}_2(\RR)$, not the discrete series.  No geometric
+motive is known to produce these representations.  Without the
+motivic side, the $\BISH$-level Rosati bounds are unavailable.
+The Kim--Sarnak bound remains the best result after two decades.
+
+\emph{CRM interpretation.}  The automorphic side lacks the rigid
+finite-dimensional algebraic structure that enforces sharp bounds.
+For Maass forms, the Langlands bridge has not been built, so the
+bounds cannot cross.
+
+\emph{Testable prediction.}  Any proof of Ramanujan for Maass
+forms must either (a)~construct a geometric motive (building the
+bridge), or (b)~discover a fundamentally new descent mechanism
+replacing motivic $\BISH$ bounds.
+
+%% ══════════════════════════════════════════════════════════
+\section{The Trace Formula as Descent Equation}\label{sec:STF}
+%% ══════════════════════════════════════════════════════════
+
+\subsection{The Selberg Trace Formula}
+
+For $\Gamma$ a cocompact Fuchsian group, the Selberg trace
+formula equates:
+\[
+  \underbrace{\sum_j h(r_j)}_{\text{Spectral (LPO)}}
+  \;=\;
+  \underbrace{\frac{\mathrm{Area}(\Gamma\backslash\HH)}{4\pi}
+    \int_{-\infty}^{\infty} h(r)\,r\tanh(\pi r)\,dr
+    \;+\; \sum_{\{\gamma\}} \frac{\log N(\gamma_0)}{N(\gamma)^{1/2} - N(\gamma)^{-1/2}}\,
+    g(\log N(\gamma))
+    \;+\; \cdots}_{\text{Geometric (BISH)}}
+\]
+
+The \textbf{spectral side} involves eigenvalues $\lambda_j =
+\tfrac14 + r_j^2$ of the Laplacian on
+$L^2(\Gamma\backslash\HH)$---the spectrum of an operator on an
+infinite-dimensional space.  CRM cost: $\LPO$.
+
+The \textbf{geometric side} involves norms $N(\gamma)$ of
+hyperbolic conjugacy classes---discrete algebraic quantities
+computable from matrix entries.  For arithmetic groups, these
+reduce to solutions of Pell's equation and class numbers.  CRM
+cost: $\BISH$.
+
+The trace formula is a \emph{de-omniscientizing descent equation}.
+It compiles $\LPO$-level spectral data into $\BISH$-level
+geometric data.
+
+\subsection{The Gutzwiller Identification}
+
+The Selberg trace formula is mathematically identical to the
+Gutzwiller trace formula in quantum chaos \cite{Gutzwiller}:
+\[
+  Z(t) \;=\; \Tr(e^{-t\Delta})
+  \;=\; \underbrace{\sum_{\text{quantum}} e^{-t\lambda_j}}_{\LPO}
+  \;=\; \underbrace{\sum_{\text{classical}} A_\gamma\,
+    e^{-L_\gamma^2/4t}}_{\BISH}
+\]
+where $L_\gamma$ are lengths of classical periodic orbits
+(closed geodesics) and $A_\gamma$ are stability amplitudes.
+
+For arithmetic surfaces $\Gamma\backslash\HH$, the identification
+is exact.  The quantum partition function (physics, $\LPO$) equals
+the classical orbit sum (geometry, $\BISH$).  The trace formula
+\emph{is} the descent.
+
+This means the automorphic side of the Langlands correspondence is
+literally a quantum mechanical system.  The Hecke operators at each
+prime are the transfer matrices at each lattice site.  The Casimir
+operator at infinity is the Hamiltonian.  The spectral decomposition
+of $L^2(G(\QQ)\backslash G(\Adeles))$ is the diagonalization of the
+quantum Hamiltonian.
+
+\subsection{Arthur's Generalization}
+
+Arthur's trace formula generalizes Selberg to arbitrary reductive
+groups $G$ over $\QQ$:
+\[
+  I_{\mathrm{spectral}}(f) \;=\; I_{\mathrm{geometric}}(f).
+\]
+The spectral side sums over automorphic representations ($\LPO$).
+The geometric side sums over conjugacy classes with orbital
+integrals ($\BISH$ for the discrete terms).  For non-cocompact
+groups, truncation operators introduce complexity approaching
+$\LPO$, but the fundamental $\LPO \leftrightarrow \BISH$
+dictionary remains the conceptual engine.
+
+Every automorphy lifting theorem---Taylor--Wiles, Calegari--Geraghty---
+ultimately rests on a trace formula comparison that converts
+$\LPO$-level spectral identities into $\BISH$-level geometric
+identities.
+
+%% ══════════════════════════════════════════════════════════
+\section{Three Spectral Gaps}\label{sec:gaps}
+%% ══════════════════════════════════════════════════════════
+
+Three spectral gap problems in three domains, all $\Sigma^0_2$:
+
+\begin{enumerate}[label=(\roman*),nosep]
+  \item \textbf{Physics} (Cubitt--Perez-Garcia--Wolf, 2015
+    \cite{CPW}).  For a family of local Hamiltonians
+    $\{H_N\}$: $\exists\,\Delta > 0\;\forall N:\;
+    \mathrm{gap}(H_N) \geq \Delta$.  Proved undecidable.
+
+  \item \textbf{Automorphic} (Selberg Eigenvalue Conjecture, 1965).
+    For congruence subgroups $\Gamma_0(N)$:
+    $\forall N:\; \lambda_1(\Gamma_0(N)\backslash\HH) \geq
+    \tfrac{1}{4}$.  Open.  Best bound:
+    $\lambda_1 \geq 975/4096 \approx 0.238$ (Kim--Sarnak).
+
+  \item \textbf{Arithmetic} (Finiteness of $\Sha$).  For an
+    elliptic curve $E/\QQ$:
+    $\exists\,B\;\forall\text{ torsors}\; x \in \Sha(E):\;
+    |x| \leq B$.  Proved in many cases (Kolyvagin, for
+    analytic rank $\leq 1$).
+\end{enumerate}
+
+All three ask the same logical question: does a local quantity,
+computable at each finite stage, admit a global bound that persists
+uniformly?  Local gaps can shrink (physics), local eigenvalues can
+approach $\tfrac{1}{4}$ (automorphic), and local torsors can grow
+(arithmetic)---all without computable rate.  The universal
+quantification over $\LPO$-level predicates pushes all three to
+$\Sigma^0_2$.
+
+\begin{theorem}[Three Spectral Gaps]\label{thm:gaps}
+The Hamiltonian spectral gap, the Selberg eigenvalue conjecture,
+and finiteness of $\Sha$ are all $\Sigma^0_2$ statements in the
+arithmetic hierarchy, with identical logical structure:
+$\exists\,\text{bound}\;\forall\,\text{instances}\;
+(\LPO\text{-level predicate})$.
+\end{theorem}
+
+These are connected by explicit constructions.  Lubotzky,
+Phillips, and Sarnak \cite{LPS} used the Ramanujan conjecture
+to construct optimal expander graphs (Ramanujan graphs), literally
+mapping the automorphic spectral gap to a combinatorial/physical
+network spectral gap.
+
+%% ══════════════════════════════════════════════════════════
+\section{The CM Base Case}\label{sec:CM}
+%% ══════════════════════════════════════════════════════════
+
+For CM elliptic curves over $\QQ$, CRM signatures match perfectly
+on both sides of the Langlands correspondence.
+
+\textbf{Motivic side} (Paper~50, Theorem~E):
+\begin{itemize}[nosep]
+  \item $\LPO$ eliminated by Damerell's theorem:
+    $L(E,1)/\Omega \in \QQ$.
+  \item Fontaine--Mazur eliminated by the 13 Heegner numbers
+    (finite table lookup).
+  \item $\MP$ eliminated by Lefschetz $(1,1)$: Hodge classes on
+    products of elliptic curves are divisors, parameterized by
+    Hermitian matrices over $\QQ(\sqrt{d})$.
+\end{itemize}
+Overall: $\BISH$.
+
+\textbf{Automorphic side:}
+\begin{itemize}[nosep]
+  \item Hecke characters: finite sums over ideal class groups
+    ($\BISH$).
+  \item $L$-value: Kronecker limit formula + Chowla--Selberg
+    give explicit algebraic evaluation ($\BISH$).
+  \item Multiplicity: CM forms have explicit eigenvalues
+    determined by the CM type ($\BISH$).
+\end{itemize}
+Overall: $\BISH$.
+
+Both sides drop simultaneously.  The motivic Damerell theorem
+and the automorphic Kronecker limit formula are different
+expressions of the same CM rationality.
+
+\subsection{The Langlands Progression}\label{subsec:progression}
+
+The historical development of the Langlands programme tracks the
+CRM hierarchy.  The CM base case illuminates why.
+
+\textbf{1920s--1960s: CM cases.}  Hecke, Deuring, Shimura--Taniyama.
+CRM: $\BISH$ on both sides.  Every computation terminates.  Proved
+first not because they were ``easier'' in a vague sense, but because
+no non-constructive principles are required.
+
+\textbf{1995--2001: Elliptic curves over $\QQ$.}  Wiles,
+Taylor--Wiles, BCDT.  CRM: $\BISH + \MP$.  Modularity lifting
+requires searching over Galois deformation spaces---bounded but
+nontrivial existential quantifiers.  Taylor--Wiles patching is a
+technique for forcing $\MP$-type searches to terminate.
+
+\textbf{2010s--present: Automorphy over totally real fields.}
+Calegari--Geraghty, the 10-author theorem.  CRM: $\BISH + \MP +$
+fragments of $\LPO$.  $p$-adic Hodge theory and perfectoid spaces
+manage $\LPO$-level zero-testing through algebraic surrogates.
+
+Each generation climbs one level of the logical hierarchy and
+requires correspondingly heavier machinery.
+
+%% ══════════════════════════════════════════════════════════
+\section{The Physics Link}\label{sec:physics}
+%% ══════════════════════════════════════════════════════════
+
+\subsection{Quantum Mechanics and Automorphic Forms}
+
+The identification is not metaphorical.  The automorphic side of
+the Langlands correspondence is a quantum mechanical system:
+
+\begin{itemize}[nosep]
+  \item The Hilbert space is
+    $L^2(G(\QQ)\backslash G(\Adeles))$.
+  \item The Hamiltonian is the Casimir operator (at infinity)
+    plus Hecke operators (at each prime).
+  \item The spectral decomposition is the classification of
+    automorphic representations.
+  \item The trace formula (Selberg/Arthur) is the partition
+    function $Z = \Tr(e^{-\beta H})$.
+\end{itemize}
+
+The Gutzwiller trace formula in quantum chaos is the Selberg
+trace formula on arithmetic surfaces.  This is a mathematical
+theorem, not an analogy.
+
+\subsection{The Motive as Classical Mechanics}
+
+If the automorphic side is quantum mechanics, the motivic side
+is classical mechanics.  The motive provides the algebraic data
+($\BISH$): finite-dimensional skeleton, algebraic eigenvalues,
+intersection numbers.  The automorphic side provides the spectral
+data ($\LPO$): infinite-dimensional Hilbert space, continuous
+spectrum, analytic $L$-functions.
+
+The Langlands correspondence is the quantum-classical
+correspondence of arithmetic geometry.  The trace formula equates
+the quantum side (spectral, $\LPO$) with the classical side
+(geometric, $\BISH$).
+
+\subsection{The BPS Analogue of Markov's Principle}
+
+The motivic side retains an $\MP$ residual: finding algebraic
+cycle witnesses for Hodge classes requires unbounded Diophantine
+search.
+
+The physics analogue is the search for BPS states.  In quantum
+field theory, topological index theorems guarantee a topological
+sector with a zero-mode exists ($\LPO$-level assertion).  Finding
+the explicit microscopic configuration---the classical soliton,
+the instanton, the localized field---requires an unbounded
+nonlinear search through field space ($\MP$).
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+& \textbf{Motivic} & \textbf{Physics} \\
+\midrule
+Existence & $\exists Z$: $\mathrm{cl}(Z) = \alpha$ & $\exists\varphi$: $E(\varphi) = |Q|$ \\
+Guarantee & Index theory / Hodge theory & Topological index \\
+Search type & Diophantine ($\MP$) & Nonlinear PDE ($\MP$) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The extra $\MP$ that arithmetic geometry appeared to have over
+physics---physics has it too, in the BPS search.
+
+\subsection{The Unified Picture}
+
+\begin{center}
+\begin{tikzcd}[column sep=large, row sep=large]
+  \text{Physics (quantum)} \arrow[r, "\text{Gutzwiller}", leftrightarrow]
+    \arrow[d, "\text{descent}"']
+  & \text{Automorphic (spectral)} \arrow[r, "\text{Langlands}", leftrightarrow]
+    \arrow[d, "\text{descent}"]
+  & \text{Motivic (classical)} \arrow[d, "\text{descent}"] \\
+  \LPO \arrow[r, equal] & \LPO \arrow[r, "\text{bridge}"] & \BISH + \MP
+\end{tikzcd}
+\end{center}
+
+The trace formula descends the physics/automorphic side from $\LPO$
+to $\BISH$.  The Langlands correspondence connects the automorphic
+side to the motivic side.  The motivic CRM axioms descend the
+motivic side from $\LPO$ to $\BISH + \MP$.  Archimedean
+polarization ($u(\RR) = 1$) descends $\MP$ to $\BISH$ in favorable
+cases (CM, BSD rank $\leq 1$).
+
+All three descents use the same mechanism: positive-definiteness
+at the Archimedean place.  All three face the same ceiling:
+$\Pi^0_2/\Sigma^0_2$ for universal statements.  All three retain
+the same residual: $\MP$ (cycle search / BPS search).
+
+%% ══════════════════════════════════════════════════════════
+\section{Why the Correspondence Exists: A Diagnosis}\label{sec:why}
+%% ══════════════════════════════════════════════════════════
+
+The following is an \emph{interpretive argument}, not a theorem.
+We state it because it organizes the formal results of the
+preceding sections into a coherent picture, and because it
+generates testable predictions (Conjecture~\ref{conj:maass}).
+See Remark~\ref{rem:conduit} for the precise epistemic status.
+
+The standard view of the Langlands correspondence is that it is a
+profound, unexpected connection between number theory and harmonic
+analysis.  The CRM framework suggests a different reading.
+
+Both the motivic and automorphic sides face the same logical
+problem: extract finite, decidable information ($\BISH$) from
+infinite, continuous structures ($\LPO$).  The solution space for
+this problem is severely constrained.  Positive-definiteness at the
+Archimedean place ($u(\RR) = 1$) is the unique mechanism.  Both
+sides discovered it independently---the Rosati involution on one
+side, the Petersson inner product on the other---because there is
+nothing else to discover.
+
+But the two implementations are not equivalent.  The motivic
+implementation (Rosati on finite-dimensional $\QQ$-vector spaces)
+is rigid: it enforces sharp eigenvalue bounds ($\BISH$).  The
+automorphic implementation (Petersson on infinite-dimensional $L^2$
+spaces) is flexible: it enforces only the trivial unitary bound.
+
+The correspondence exists because the automorphic side
+\emph{needs} the motivic side's rigidity.  It is not a coincidence
+or a miracle.  It is forced by a logical asymmetry: the two sides
+solve the same problem ($\LPO \to \BISH$ descent via
+positive-definiteness), but the motivic solution is strictly
+stronger.  The correspondence is the conduit through which the
+stronger solution flows.
+
+This explains Deligne's strategy for proving Ramanujan: he could
+not stay on the automorphic side because the automorphic side
+doesn't have sharp bounds.  It explains why Ramanujan for Maass
+forms is open: the conduit hasn't been built.  And it explains
+the historical progression of Langlands (\S\ref{subsec:progression}):
+each generation builds more of the conduit, transferring more
+$\BISH$-level structure from the motivic side.
+
+%% ══════════════════════════════════════════════════════════
+\section{Comparison with Existing Frameworks}\label{sec:comparison}
+%% ══════════════════════════════════════════════════════════
+
+\subsection{Other Frameworks within Arithmetic Geometry}
+
+\textbf{Geometric Langlands} (Frenkel, Ben-Zvi, Nadler).
+Over function fields, both sides are algebraic ($\BISH$), and
+signatures match trivially.  The geometric Langlands programme
+provides additional evidence for CRM preservation but is
+orthogonal in method.
+
+\textbf{Condensed Mathematics} (Scholze, Clausen).
+Provides new foundations handling $p$-adic and Archimedean phenomena
+uniformly.  The CRM framework predicts that condensed methods
+provide a new descent mechanism.  Whether they can prove Ramanujan
+automorphically---bypassing the motivic side---is identified as
+structurally significant by our framework.  A positive answer would
+weaken the ``conduit'' interpretation; a negative answer would
+strengthen it.
+
+\textbf{The Fundamental Lemma} (Ng\^o, Fields Medal 2010).
+In CRM terms, the fundamental lemma is the verification that the
+$\BISH$ sides of two trace formulas (for two different groups)
+agree.  It is a decidability matching at the geometric level---
+ensuring that the descent equations for two groups produce
+compatible $\BISH$ data.
+
+\subsection{Proposed Physics--Langlands Connections}
+
+Several proposals have linked the Langlands programme to physics.
+We compare them to the CRM approach, noting that they address
+different aspects of the relationship and are not mutually
+exclusive.
+
+\textbf{Gauge-Theoretic Langlands} (Kapustin--Witten \cite{KapustinWitten}).
+Kapustin and Witten showed that the geometric Langlands
+correspondence can be derived from $S$-duality of $\mathcal{N}=4$
+super-Yang--Mills theory compactified on a Riemann surface.
+Electric--magnetic duality exchanges the two sides of the
+correspondence.  This is the deepest and most influential
+physics--Langlands link to date.
+
+\emph{Comparison.}  Kapustin--Witten works over function fields
+(the geometric setting) and derives the correspondence from a
+specific physical duality.  The CRM approach works over number
+fields and does not derive the correspondence---it measures the
+logical signatures on both sides and observes that they match.
+The two approaches are complementary: Kapustin--Witten explains
+\emph{how} the correspondence arises (via $S$-duality);
+the CRM approach asks \emph{what logical structure} the
+correspondence preserves (decidability signatures).  Neither
+subsumes the other.  One advantage of the CRM approach is that it
+applies to the arithmetic setting (over $\QQ$), where
+Kapustin--Witten does not directly operate.  One advantage of
+Kapustin--Witten is that it produces the correspondence as a
+theorem (in the geometric setting), whereas the CRM approach
+takes the correspondence as input and studies its properties.
+
+\textbf{Conformal Field Theory and Langlands}
+(Feigin--Frenkel \cite{FeiginFrenkel}, Frenkel \cite{Frenkel-lectures}).
+Frenkel's programme connects the Langlands correspondence to
+conformal field theory through the theory of vertex algebras and
+the Feigin--Frenkel isomorphism (critical-level representations
+of affine Kac--Moody algebras).  The geometric Langlands
+correspondence is interpreted as a statement about $\mathcal{D}$-modules
+on the moduli stack of $G$-bundles, related to conformal blocks.
+
+\emph{Comparison.}  The CFT approach provides rich structural
+content---the local Langlands correspondence at each place is
+related to representations of loop groups, and the global
+correspondence to conformal blocks on Riemann surfaces.  The CRM
+approach is structurally thinner: it does not use the internal
+geometry of representation theory but only the logical complexity
+of the computations involved.  The CFT approach explains why
+specific representation-theoretic structures appear; the CRM
+approach explains why positive-definiteness and algebraic spectra
+appear on both sides.  They address different ``why'' questions.
+
+\textbf{Arithmetic Quantum Field Theory}
+(Minhyong Kim \cite{KimArithmetic}).
+Kim has proposed that Diophantine geometry should be understood
+through an analogy with gauge theory: the fundamental group of a
+variety plays the role of the gauge group, and rational points
+are ``flat connections'' or ``instantons.''  This is part of a
+broader programme connecting the \'etale fundamental group to
+path-integral-like constructions.
+
+\emph{Comparison.}  Kim's approach is genuinely arithmetic (works
+over $\QQ$) and aims to produce Diophantine results (finiteness
+of rational points) from gauge-theoretic structures.  The CRM
+approach does not aim for Diophantine results but measures
+logical complexity.  An interesting intersection: Kim's ``arithmetic
+Chern--Simons theory'' involves integrals over $p$-adic spaces
+that the CRM framework would classify as $\LPO$-level operations.
+Whether Kim's gauge-theoretic structures provide descent mechanisms
+in the CRM sense is an open question.
+
+\textbf{Topological Quantum Computation and Langlands}
+(Freed--Hopkins--Teleman \cite{FHT}).
+Freed, Hopkins, and Teleman relate the Verlinde ring (from
+topological field theory) to the representation ring of the loop
+group, and hence to Langlands duality via the Satake isomorphism.
+This connects 3-dimensional topological field theory to the
+Langlands dual group.
+
+\emph{Comparison.}  The TFT approach operates at the categorical
+level (functors between bordism categories) and produces the
+Langlands dual group from physical duality.  The CRM approach
+operates at the logical level (decidability of computations) and
+does not produce the dual group.  Again, the approaches are
+complementary.
+
+\subsection{What the CRM Approach Adds}
+
+The proposals above share a common strategy: they identify a
+\emph{specific physical theory} (gauge theory, CFT, TFT,
+arithmetic QFT) whose mathematical structure mirrors or produces
+some aspect of the Langlands correspondence.  The CRM approach
+takes a different path.  It does not identify a specific physical
+theory.  Instead, it identifies a \emph{logical constraint} that
+applies to any theory---physical or mathematical---operating on
+data over complete fields.
+
+The constraint is: extracting decidable information from continuous
+structures requires positive-definiteness at the Archimedean place
+($u(\RR) = 1$), and this mechanism is unique.  Any domain facing
+this constraint---quantum mechanics, automorphic spectral theory,
+motivic cohomology---will develop the same logical architecture
+($\BISH + \LPO$, positive-definite descent, $\Pi^0_2$ ceiling).
+
+This gives the CRM approach a feature the other proposals lack:
+it explains why \emph{multiple} physical theories connect to the
+Langlands programme, rather than just one.  Kapustin--Witten uses
+$\mathcal{N}=4$ SYM.  Frenkel uses CFT.  Freed--Hopkins--Teleman
+uses TFT.  Kim uses gauge theory.  From the CRM perspective, these
+are all instances of the same logical architecture manifesting in
+different physical settings.  The architecture is forced by the
+decidability constraint, not by the specific physics.
+
+We do not claim this perspective is superior to the others.  It is
+orthogonal.  The gauge-theoretic approaches produce structural
+results (dualities, correspondences, functors) that the CRM
+approach cannot.  The CRM approach produces a diagnostic
+(CRM signatures, the Ramanujan asymmetry, the Langlands
+progression) that the gauge-theoretic approaches do not address.
+We believe the CRM perspective has merit because it identifies a
+common logical root beneath the multiplicity of physical
+connections, and because it generates a testable prediction
+(Conjecture~\ref{conj:maass}) that the other approaches do not.
+
+\subsection{The Separation Theorem in Context}
+
+The separation result (Theorem~\ref{thm:separation}) resolves the
+open problem identified by early reviewers of this paper.  It
+proves that the automorphic CRM axioms are logically incomplete
+for eigenvalue bounds.  The proof uses Saito--Kurokawa lifts on
+$\mathrm{Sp}_4$---classical mathematical objects, not abstract
+model-theoretic constructions.
+
+The identification of symmetric power functoriality as the missing
+axiom (Proposition~\ref{prop:missing-axiom}) reveals the precise
+logical gap:  the motivic side bounds the spectrum via one
+finite-dimensional argument (the Rosati equation on
+$\mathrm{End}(A) \otimes \RR$), while the automorphic side
+requires an \emph{infinite axiom schema} ($\mathrm{Sym}^m$ is
+automorphic and unitary for all $m$).  The Langlands correspondence
+collapses this infinite schema into the single geometric argument
+by transporting the problem to the motivic side.
+
+This result places the CRM framework on firmer ground than
+the competing proposals reviewed above: it is the only framework
+that produces a formal separation theorem distinguishing the
+logical strength of the two sides of the Langlands
+correspondence.
+
+%% ══════════════════════════════════════════════════════════
+\section{Status of Claims}\label{sec:status}
+%% ══════════════════════════════════════════════════════════
+
+We are explicit about the logical status of every claim.
+
+\begin{table}[h]
+\centering
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Claim} & \textbf{Status} & \textbf{Depends on} \\
+\midrule
+CRM signature (Def.~\ref{def:crm-sig}) & Formal definition & $\BISH$ base theory \\
+Zero-testing equiv.\ (\ref{thm:zero-test}) & Theorem & Constructive analysis \\
+Integrality equiv.\ (\ref{thm:integrality}) & Theorem & Weil + Eichler--Shimura \\
+Polarization equiv.\ (\ref{thm:polarization}) & Theorem & $u$-invariant theory \\
+Signature matching (\ref{thm:matching}) & Theorem (conditional) & Langlands for $\mathrm{GL}_n$ \\
+\quad For $\mathrm{GL}_2/\QQ$ & Theorem (unconditional) & Wiles + BCDT \\
+Ramanujan asymmetry (\ref{thm:asymmetry}) & & \\
+\quad Part (a): motivic bound & Theorem & Paper~50, Thm~A \\
+\quad Part (b): automorphic incompleteness & \textbf{Theorem} & Saito--Kurokawa (\ref{thm:separation}) \\
+\quad Part (c): conduit interpretation & Diagnosis & Remark~\ref{rem:conduit} \\
+Three spectral gaps (\ref{thm:gaps}) & Theorem & Arithmetic hierarchy \\
+$\Pi^0_2$ classifications (\ref{prop:pi2-formal}) & Theorem (mod arithmetization) & Quantifier analysis \\
+Trace formula as descent & Observation & New CRM interpretation \\
+CM verification & Theorem (unconditional) & Paper~50 + Chowla--Selberg \\
+Langlands progression & Observation & Author's CRM analysis \\
+Maass form prediction (\ref{conj:maass}) & Conjecture & Testable \\
+Gutzwiller = Selberg & Theorem & Classical \\
+BPS $\sim$ cycle search & Observation & Structural analogy \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%% ══════════════════════════════════════════════════════════
+\section{Conclusion}\label{sec:conclusion}
+%% ══════════════════════════════════════════════════════════
+
+\subsection{Summary}
+
+The CRM programme has measured the logical complexity of physics,
+arithmetic geometry, and the Langlands correspondence.  The three
+domains share one logical architecture: $\BISH$ at the
+computational base, $\LPO$ for continuous operations,
+positive-definiteness at the Archimedean place as the unique
+descent mechanism, $\Pi^0_2/\Sigma^0_2$ for universal conjectures,
+and $\MP$ as the residual search problem.
+
+The Langlands correspondence preserves this architecture.  The
+automorphic side is CRM-incomplete for eigenvalue bounds.  The
+motivic side provides the missing $\BISH$ structure.  The
+correspondence is a decidability conduit.
+
+\subsection{The Arc}
+
+Paper~1 asked: what does the Schwarzschild metric need?
+Paper~52 answers: it needs the same thing the Langlands
+correspondence needs.  Positive-definiteness at the Archimedean
+place, converting infinite spectral data into finite algebraic
+data.
+
+The logical architecture of physics and arithmetic geometry is one
+architecture because there is only one mechanism for extracting
+decidable information from continuous structures, and both fields
+discovered it independently.  The Langlands correspondence is the
+formal expression of the fact that both discoveries are the same
+discovery.
+
+\subsection{Future Directions}
+
+\begin{enumerate}[nosep]
+  \item \textbf{Symmetric power functoriality as A4.}
+    Formalize the argument that $\mathrm{Sym}^m$ functoriality
+    for all $m$ (Proposition~\ref{prop:missing-axiom}) is the
+    minimal additional axiom recovering Ramanujan from the
+    automorphic side.  Determine whether any finite subset of
+    symmetric powers suffices.
+  \item \textbf{Arithmetization.}  Fix a G\"odel encoding of
+    algebraic varieties over $\QQ$ and congruence subgroups, and
+    verify the $\Pi^0_2$ classifications of
+    Proposition~\ref{prop:pi2-formal} against this encoding.
+  \item Formalize the CRM cost of Taylor--Wiles patching (verify
+    the $\BISH + \MP$ classification).
+  \item Formalize the CRM cost of perfectoid methods (verify the
+    $\LPO$ classification).
+  \item Determine whether condensed mathematics provides an
+    automorphic descent mechanism capable of proving Ramanujan
+    without crossing to the motivic side.
+  \item Calibrate the geometric Langlands correspondence to verify
+    trivial $\BISH$ matching over function fields.
+  \item Lean~4 formalization of CRM signature preservation
+    (Theorem~\ref{thm:matching}) for $\mathrm{GL}_2/\QQ$.
+\end{enumerate}
+
+\subsection{End of Programme}
+
+This is the final paper.  The CRM programme began with the Ising
+model (Paper~8, 2021) and ends with the Langlands correspondence
+(Paper~52, 2026).  Fifty-two papers calibrating the logical
+complexity of physics and mathematics.  The instrument works.
+The map is drawn.  What remains is for others to use the
+instrument and extend the map.
+
+%% ── references ───────────────────────────────────────────
+\begin{thebibliography}{99}
+
+\bibitem{Bridges-Richman}
+D.~Bridges and F.~Richman,
+\emph{Varieties of Constructive Mathematics},
+London Mathematical Society Lecture Note Series 97,
+Cambridge University Press, 1987.
+
+\bibitem{Simpson}
+S.~G.~Simpson,
+\emph{Subsystems of Second Order Arithmetic},
+2nd ed., Cambridge University Press, 2009.
+
+\bibitem{CPW}
+T.~S.~Cubitt, D.~Perez-Garcia, and M.~M.~Wolf,
+``Undecidability of the spectral gap,''
+\emph{Nature} \textbf{528} (2015), 207--211.
+
+\bibitem{BrattkaGherardi}
+V.~Brattka and G.~Gherardi,
+``Weihrauch degrees, omniscience principles, and weak computability,''
+\emph{J.\ Symbolic Logic} \textbf{76} (2011), 143--176.
+
+\bibitem{Deligne-Weil}
+P.~Deligne,
+``La conjecture de Weil.~I,''
+\emph{Publ.\ Math.\ IH\'ES} \textbf{43} (1974), 273--307.
+
+\bibitem{KimSarnak}
+H.~H.~Kim, ``Functoriality for the exterior square of $\mathrm{GL}_4$
+and the symmetric fourth of $\mathrm{GL}_2$,'' with appendix by
+P.~Sarnak, \emph{J.\ Amer.\ Math.\ Soc.} \textbf{16} (2003), 139--183.
+
+\bibitem{Shalika}
+J.~A.~Shalika,
+``The multiplicity one theorem for $\mathrm{GL}_n$,''
+\emph{Ann.\ of Math.} \textbf{100} (1974), 171--193.
+
+\bibitem{PS}
+I.~I.~Piatetski-Shapiro,
+``Multiplicity one theorems,''
+\emph{Proc.\ Sympos.\ Pure Math.} \textbf{33}, Part~1 (1979), 209--212.
+
+\bibitem{Clozel}
+L.~Clozel,
+``Motifs et formes automorphes: applications du principe de
+fonctorialit\'e,''
+\emph{Automorphic Forms, Shimura Varieties, and $L$-functions},
+Academic Press, 1990, 77--159.
+
+\bibitem{Gutzwiller}
+M.~C.~Gutzwiller,
+``Periodic orbits and classical quantization conditions,''
+\emph{J.\ Math.\ Phys.} \textbf{12} (1971), 343--358.
+
+\bibitem{LPS}
+A.~Lubotzky, R.~Phillips, and P.~Sarnak,
+``Ramanujan graphs,''
+\emph{Combinatorica} \textbf{8} (1988), 261--277.
+
+\bibitem{P50}
+P.~C.~K.~Lee,
+``Three axioms for the motive: a decidability characterization of
+Grothendieck's universal cohomology,''
+CRM Programme Paper~50, 2026.
+
+\bibitem{Wiles}
+A.~Wiles,
+``Modular elliptic curves and Fermat's last theorem,''
+\emph{Ann.\ of Math.} \textbf{141} (1995), 443--551.
+
+\bibitem{Damerell}
+R.~M.~Damerell,
+``$L$-functions of elliptic curves with complex multiplication, I--II,''
+\emph{Acta Arith.} \textbf{17}--\textbf{19} (1970--1971).
+
+\bibitem{Selberg}
+A.~Selberg,
+``Harmonic analysis and discontinuous groups in weakly symmetric
+Riemannian spaces with applications to Dirichlet series,''
+\emph{J.\ Indian Math.\ Soc.} \textbf{20} (1956), 47--87.
+
+\bibitem{Arthur}
+J.~Arthur,
+\emph{The Endoscopic Classification of Representations: Orthogonal
+and Symplectic Groups},
+AMS Colloquium Publications 61, 2013.
+
+\bibitem{Ngo}
+B.~C.~Ng\^o,
+``Le lemme fondamental pour les alg\`ebres de Lie,''
+\emph{Publ.\ Math.\ IH\'ES} \textbf{111} (2010), 1--169.
+
+\bibitem{PiatetskiShapiro-SK}
+I.~I.~Piatetski-Shapiro,
+``On the Saito--Kurokawa lifting,''
+\emph{Invent.\ Math.} \textbf{71} (1983), 309--338.
+
+\bibitem{KapustinWitten}
+A.~Kapustin and E.~Witten,
+``Electric-magnetic duality and the geometric Langlands program,''
+\emph{Commun.\ Number Theory Phys.} \textbf{1} (2007), 1--236.
+\texttt{arXiv:hep-th/0604151}.
+
+\bibitem{FeiginFrenkel}
+B.~Feigin and E.~Frenkel,
+``Affine Kac--Moody algebras at the critical level and
+Gelfand--Dikii algebras,''
+\emph{Int.\ J.\ Mod.\ Phys.~A} \textbf{7}, Suppl.~1A (1992), 197--215.
+
+\bibitem{Frenkel-lectures}
+E.~Frenkel,
+\emph{Langlands Correspondence for Loop Groups},
+Cambridge Studies in Advanced Mathematics 103,
+Cambridge University Press, 2007.
+
+\bibitem{KimArithmetic}
+M.~Kim,
+``Arithmetic Chern--Simons theory I,''
+\emph{Commun.\ Number Theory Phys.} \textbf{9} (2015), 1--29.
+
+\bibitem{FHT}
+D.~S.~Freed, M.~J.~Hopkins, and C.~Teleman,
+``Loop groups and twisted $K$-theory I,''
+\emph{J.~Topol.} \textbf{4} (2011), 737--798.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,666 @@
+\documentclass[11pt]{article}
+
+% -------------------------------------------------
+% Preamble
+% -------------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{mdframed}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Lean 4 syntax highlighting (matching Paper 7/8 style)
+\definecolor{lean-keyword}{RGB}{0,0,180}
+\definecolor{lean-comment}{RGB}{0,128,0}
+\definecolor{lean-string}{RGB}{163,21,21}
+\lstdefinelanguage{lean4}{
+  morekeywords={theorem,def,lemma,variable,import,open,namespace,end,
+    noncomputable,section,abbrev,structure,where,by,have,set,rw,simp,
+    exact,linarith,nlinarith,ring,intro,unfold,apply,show,calc,fun,
+    let,if,then,else,match,with,do,return,sorry,axiom,class,instance,
+    Type,Prop,Sort,Nat,Int,Real},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]{"},
+}
+\lstset{
+  language=lean4,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{lean-keyword}\bfseries,
+  commentstyle=\color{lean-comment}\itshape,
+  stringstyle=\color{lean-string},
+  columns=fullflexible,
+  frame=single,
+  breaklines=true,
+  keepspaces=true,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+}
+
+% -------------------------------------------------
+% Macros
+% -------------------------------------------------
+\newcommand{\WLPO}{\mathsf{WLPO}}
+\newcommand{\LPO}{\mathsf{LPO}}
+\newcommand{\FT}{\mathsf{FT}}
+\newcommand{\DCw}{\mathsf{DC}_{\omega}}
+\newcommand{\BISH}{\mathsf{BISH}}
+\newcommand{\CRM}{\mathsf{CRM}}
+\newcommand{\Lean}{\textsc{Lean}}
+\newcommand{\Mathlib}{\textsc{Mathlib}}
+
+% Physics/math macros
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Hil}{\mathcal{H}}
+\newcommand{\ip}[2]{\langle #1, #2 \rangle}
+\newcommand{\E}[1]{\langle #1 \rangle}
+\newcommand{\comm}[2]{[#1, #2]}
+\newcommand{\acomm}[2]{\{#1, #2\}}
+\newcommand{\stddev}{\sigma}
+\newcommand{\absC}[1]{\left| #1 \right|}
+\newcommand{\abssq}[1]{\absC{#1}^{2}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\Var}{\mathrm{Var}}
+
+% Lean shortcut
+\newcommand{\lean}[1]{\texttt{#1}}
+
+% Theorem environments
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% -------------------------------------------------
+% Title
+% -------------------------------------------------
+\title{Constructive Reverse Mathematics for the Heisenberg
+Uncertainty Principle (Paper 6, v2):\\
+Robertson--Schr\"odinger and Schr\"odinger Inequalities\\
+over Mathlib}
+\author{Paul Chun--Kit Lee\\
+\texttt{dr.paul.c.lee@gmail.com}\\
+New York University, NY}
+\date{February 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We formalize the Robertson--Schr\"odinger and Schr\"odinger uncertainty
+inequalities in \Lean~4 using Mathlib's \texttt{InnerProductSpace} API,
+within the framework of Constructive Reverse Mathematics (CRM).
+Both preparation-uncertainty inequalities are proved at Height~0
+(fully constructive) using Cauchy--Schwarz, centered-vector decomposition,
+and elementary complex-number identities---all drawn from Mathlib with
+zero custom axioms.  Measurement uncertainty, which requires constructing
+infinite measurement histories, is calibrated at $\DCw$-height: the
+logical cost of sequential quantum experiments is precisely Dependent
+Choice over~$\omega$.
+
+This is a second edition.
+Version~1 used the Axiom Calibration (AxCal)
+framework with 71 custom axioms and $\sim$960 lines of mathlib-free
+Lean~4.  Version~2 replaces all custom axioms with Mathlib proofs,
+reducing the codebase to $\sim$420 lines with zero sorry, zero custom
+axioms, and full CRM transparency.
+\end{abstract}
+
+\begin{mdframed}[backgroundcolor=yellow, linewidth=0pt]
+\textbf{IMPORTANT DISCLAIMER}
+
+\textbf{A Case Study: Using Multi-AI Agents to Tackle Formal Mathematics}
+
+This entire Lean 4 formalization project was produced by multi-AI agents working under human direction. All proofs, definitions, and mathematical structures in this repository were AI-generated. This represents a case study in using multi-AI agent systems to tackle complex formal mathematics problems with human guidance on project direction.
+\end{mdframed}
+
+\tableofcontents
+
+% ===========================================================
+\section{Introduction}
+% ===========================================================
+
+Heisenberg's uncertainty principle intertwines two conceptually distinct
+phenomena: the geometric constraints imposed by quantum state preparation,
+and the disturbance effects arising from sequential measurements.
+Using Constructive Reverse Mathematics (CRM), we separate these concerns
+and measure their logical complexity.
+
+We prove that preparation uncertainty---embodied in the
+Robertson--Schr\"odinger inequality and its Schr\"odinger
+strengthening---requires no choice principles beyond basic constructive
+analysis.  Both results are established at Height~0
+through division-free squared inequalities, mechanized in
+\Lean~4 over \Mathlib's \texttt{InnerProductSpace} API.
+
+Measurement uncertainty, by contrast, demands the logical strength of
+Dependent Choice on $\omega$ ($\DCw$) to construct infinite measurement
+histories.  This reveals why sequential quantum experiments carry a
+fundamentally different logical cost than geometric state properties.
+
+\paragraph{What changed in v2.}
+Version~1~\cite{Paper6v1} used the Axiom Calibration (AxCal) framework:
+a mathlib-free approach where all mathematical prerequisites (complex
+numbers, inner products, operator algebra) were axiomatized as
+Prop-level signatures.  While this isolated the logical dependencies
+cleanly, it required 71 custom axioms and $\sim$960 lines of code.
+
+Version~2 replaces AxCal with CRM over \Mathlib.  Every axiom from v1
+is now discharged by a \Mathlib\ proof.  The result is a shorter,
+more trustworthy formalization:
+\begin{itemize}
+  \item \textbf{71 custom axioms $\to$ 0} custom axioms.
+  \item \textbf{$\sim$960 lines $\to$ $\sim$420 lines} (4 source files).
+  \item \textbf{Zero sorry}, zero \texttt{Axiom} declarations.
+  \item All mathematical prerequisites verified by \Mathlib.
+\end{itemize}
+
+\paragraph{Organization.}
+Section~\ref{sec:related} surveys prior work.
+Sections~\ref{sec:definitions}--\ref{sec:Schrodinger} develop the
+mathematical core: geometric uncertainty bounds proven constructively.
+Section~\ref{sec:measurement-DC} analyzes measurement uncertainty and
+its reliance on $\DCw$.
+Section~\ref{sec:implications} discusses foundational implications.
+Section~\ref{sec:formalization} describes the formalization architecture.
+Section~\ref{sec:reproducibility} provides full reproducibility
+information.
+
+\paragraph{Scope \& Dependencies.}
+Our base theory is $\BISH$.  The preparation-uncertainty results
+(Robertson--Schr\"odinger and Schr\"odinger) are fully constructive
+(Height~0).  Measurement-uncertainty results are stated conditionally
+on $\DCw$ and calibrated at Height~$\leq 1$.  All mathematical
+prerequisites come from \Mathlib's \texttt{InnerProductSpace},
+\texttt{ContinuousLinearMap}, and \texttt{Complex} libraries.
+
+% ===========================================================
+\section{Background and Related Work}
+\label{sec:related}
+% ===========================================================
+
+\paragraph{Historical development.}
+Robertson~\cite{Robertson1929} first proved the uncertainty relation
+for state variances, showing that
+$\stddev_A \stddev_B \geq \frac{1}{2}|\E{\comm{A}{B}}|$ for any
+quantum state.  Schr\"odinger~\cite{Schrodinger1930} strengthened this
+by adding an anti-commutator term.  These ``preparation uncertainty''
+relations capture geometric constraints inherent in quantum states,
+independent of any measurement process.
+
+Measurement-disturbance uncertainty emerged later as experimenters
+recognized that sequential measurements introduce additional statistical
+correlations.  Ozawa~\cite{Ozawa2003} and others~\cite{BuschLahtiWerner2014}
+developed frameworks that distinguish preparation uncertainty from
+measurement-induced disturbance, though typically without explicit
+attention to their different logical foundations.
+
+\paragraph{Formalization landscape.}
+Formal verification of quantum mechanics has proceeded along several
+tracks.  Circuit-based approaches~\cite{QWIRE2017} focus on quantum
+computing, while program verification frameworks~\cite{Ying2016} address
+quantum algorithms.  Our approach works directly with
+infinite-dimensional Hilbert space operators over \Mathlib, explicitly
+tracking logical dependencies through CRM.
+
+\paragraph{Constructive analysis context.}
+The systematic study of which classical principles are needed for
+mathematical theorems has deep roots~\cite{BishopBridges,BridgesRichman}.
+Our analysis reveals that Heisenberg uncertainty splits cleanly:
+geometric aspects require only basic constructive reasoning, while
+measurement aspects demand infinitary choice.
+
+% ===========================================================
+\section{Definitions and Bridge Lemmas}
+\label{sec:definitions}
+% ===========================================================
+
+We work in a complex Hilbert space $E$ with inner product
+$\ip{\cdot}{\cdot}$ and norm $\norm{\cdot}$, formalized using
+\Mathlib's \texttt{InnerProductSpace~$\C$~E} typeclass.
+Bounded operators are \texttt{ContinuousLinearMap} ($E \to_L[\C] E$).
+
+\begin{definition}[Operator algebra]
+For bounded linear operators $A, B : E \to_L[\C] E$:
+\begin{itemize}
+  \item \textbf{Self-adjointness:} $A$ is self-adjoint iff $A^\dagger = A$.
+    \hfill\lean{IsSelfAdjoint}
+  \item \textbf{Expectation:} $\E{A}_\psi := \ip{\psi}{A\psi}$.
+    \hfill\lean{expect}
+  \item \textbf{Centered vector:} $\Delta A(\psi) := A\psi - \E{A}_\psi \cdot \psi$.
+    \hfill\lean{centered}
+  \item \textbf{Variance:} $\Var_\psi(A) := \norm{\Delta A(\psi)}^2$.
+    \hfill\lean{var}
+  \item \textbf{Commutator:} $\comm{A}{B} := AB - BA$.
+    \hfill\lean{comm}
+  \item \textbf{Anticommutator:} $\acomm{A}{B} := AB + BA$.
+    \hfill\lean{acomm}
+\end{itemize}
+\end{definition}
+
+The constructive proofs use the following bridge lemmas, all proved
+from \Mathlib:
+
+\begin{description}
+  \item[Variance identity.] $\Var_\psi(A) = \norm{\Delta A(\psi)}^2$.
+    \hfill\lean{var\_nonneg}
+  \item[Centered inner product.]
+    $\ip{\Delta A(\psi)}{\Delta B(\psi)} = \ip{A\psi}{B\psi}
+    - \E{A}_\psi \cdot \E{B}_\psi$.
+    \hfill\lean{inner\_centered\_eq}
+  \item[Skew identity.]
+    $\E{\comm{A}{B}}_\psi = z - \bar{z}$ where
+    $z = \ip{\Delta A(\psi)}{\Delta B(\psi)}$.
+    \hfill\lean{expect\_comm\_eq\_sub\_conj}
+  \item[Symmetric identity.]
+    $\E{\acomm{A}{B}}_\psi - 2\E{A}_\psi\E{B}_\psi = z + \bar{z}$.
+    \hfill\lean{expect\_acomm\_centered}
+  \item[Complex norm identity.]
+    $\abssq{z-\bar z} + \abssq{z+\bar z} = 4\abssq{z}$.
+    \hfill\lean{norm\_sq\_skew\_sym\_sum}
+  \item[Cauchy--Schwarz (squared).]
+    $\abssq{\ip{x}{y}} \le \norm{x}^2\norm{y}^2$.
+    \hfill\lean{cauchy\_schwarz\_sq}
+\end{description}
+
+\begin{remark}[Why squared form?]
+Working in squared form with explicit factor $4$ eliminates division
+and square roots from the constructive proof core.  The familiar form
+$\stddev_A \stddev_B \geq \frac{1}{2}|\E{\comm{A}{B}}|$ can be
+recovered by taking square roots and dividing by $2$, but these
+operations lie outside our constructive framework.
+\end{remark}
+
+% ===========================================================
+\section{Robertson--Schr\"odinger Inequality}
+\label{sec:RS}
+% ===========================================================
+
+\begin{theorem}[Robertson--Schr\"odinger, division-free squared form]
+\label{thm:RS-squared}
+Let $A,B$ be self-adjoint and $\psi$ normalized.  Then
+\[
+  \abssq{\E{\comm{A}{B}}_\psi} \;\le\; 4\,\Var_\psi(A)\,\Var_\psi(B).
+\]
+\emph{Lean anchor:}
+\lean{Papers.P6\_Heisenberg.robertson\_schrodinger}.
+\end{theorem}
+
+\begin{proof}
+Set $z := \ip{\Delta A(\psi)}{\Delta B(\psi)}$.  The bridge lemma
+\lean{expect\_comm\_eq\_sub\_conj} shows that
+$\E{\comm{A}{B}}_\psi = z - \bar{z}$.
+
+The complex norm inequality gives
+$\abssq{z - \bar z} \le 4\abssq{z}$, while Cauchy--Schwarz provides
+\[
+\abssq{z} = \abssq{\ip{\Delta A(\psi)}{\Delta B(\psi)}}
+\leq \norm{\Delta A(\psi)}^2 \norm{\Delta B(\psi)}^2.
+\]
+The variance identity connects these norms to statistical variances:
+$\norm{\Delta A(\psi)}^2 = \Var_\psi(A)$.
+
+Chaining:
+\(
+\abssq{\E{\comm{A}{B}}_\psi}
+= \abssq{z-\bar z}
+\le 4\abssq{z}
+\le 4\norm{\Delta A(\psi)}^2 \norm{\Delta B(\psi)}^2
+= 4\,\Var_\psi(A)\,\Var_\psi(B).
+\)
+\end{proof}
+
+% ===========================================================
+\section{Schr\"odinger Strengthening}
+\label{sec:Schrodinger}
+% ===========================================================
+
+\begin{theorem}[Schr\"odinger inequality, constructive squared form]
+\label{thm:Schrodinger-squared}
+Let $A,B$ be self-adjoint and $\psi$ normalized.  Then
+\[
+  \abssq{\E{\comm{A}{B}}_\psi}
+  \;+\;
+  \abssq{\E{\acomm{\Delta A}{\Delta B}}_\psi}
+  \;\le\; 4\,\Var_\psi(A)\,\Var_\psi(B).
+\]
+\emph{Lean anchor:}
+\lean{Papers.P6\_Heisenberg.schrodinger}.
+\end{theorem}
+
+\begin{proof}
+Again set $z := \ip{\Delta A(\psi)}{\Delta B(\psi)}$.  The bridge
+lemmas give both skew and symmetric combinations:
+\[
+\E{\comm{A}{B}}_\psi = z - \bar{z}, \qquad
+\E{\acomm{\Delta A}{\Delta B}}_\psi = z + \bar{z}.
+\]
+The exact complex identity gives
+\[
+\abssq{z - \bar{z}} + \abssq{z + \bar{z}} = 4\abssq{z}.
+\]
+Applying Cauchy--Schwarz and the variance identity as in the Robertson
+proof gives $\abssq{z} \leq \Var_\psi(A)\Var_\psi(B)$.  Multiplying
+by $4$ yields the bound.
+
+The geometric insight: we capture \emph{both} the skew and symmetric
+correlations between the observables' fluctuations, not just the skew
+part as in the Robertson bound.
+\end{proof}
+
+% ===========================================================
+\section{Measurement Uncertainty and $\DCw$}
+\label{sec:measurement-DC}
+% ===========================================================
+
+The sequential (disturbance) viewpoint models an experiment producing
+an infinite history of dependent outcomes.  Let $H_{\mathrm{fin}}$ be
+the type of finite histories.  Define a \emph{serial} relation $R$ by
+extending a history by one admissible measurement step.
+
+\begin{definition}[Dependent Choice over $\omega$]
+\label{def:DCw}
+$\DCw$ is the principle: for any type $X$, total relation $R$ on $X$,
+and seed $x_0$, there exists a sequence $f : \mathbb{N} \to X$ with
+$f(0) = x_0$ and $R(f(n), f(n+1))$ for all~$n$.
+\emph{Lean anchor:} \lean{Papers.P6\_Heisenberg.DC$\omega$}.
+\end{definition}
+
+\begin{theorem}[Measurement uncertainty requires $\DCw$]
+\label{thm:measurement}
+The construction of an infinite measurement history from a state
+preparation procedure requires $\DCw$.
+\emph{Lean anchor:}
+\lean{Papers.P6\_Heisenberg.measurement\_uncertainty\_requires\_dc$\omega$}.
+\end{theorem}
+
+\begin{remark}
+The $\DCw$ cost reflects extraction of a definite infinite classical
+sample path from a process with history-dependent choices.  This
+separates the geometric (Height~0) content of preparation uncertainty
+from the choice-centric content of sequential measurement.
+\end{remark}
+
+% ===========================================================
+\section{Implications and Interpretation}
+\label{sec:implications}
+% ===========================================================
+
+\paragraph{The geometry/choice distinction.}
+Our results show that Robertson--Schr\"odinger bounds emerge purely from
+Hilbert space geometry and require no choice principles.  The
+mathematical ``content'' lies entirely in the interplay between inner
+products, complex arithmetic, and Cauchy--Schwarz.
+
+Measurement uncertainty analysis inherently involves infinite
+constructions.  The step from finite to infinite measurement histories
+requires Dependent Choice---a logical cost that cannot be avoided.
+
+\paragraph{Constructive quantum mechanics.}
+Quantum mechanics splits naturally into ``constructive-friendly'' and
+``choice-dependent'' components.  The fundamental geometric
+structure---inner products, observables, expectation values, variance
+bounds---operates constructively.  Classical reasoning becomes necessary
+only when modeling infinite sampling procedures.
+
+\paragraph{v1 $\to$ v2 upgrade.}
+The transition from AxCal (v1) to CRM over \Mathlib\ (v2)
+demonstrates that the same mathematical content can be expressed with
+dramatically fewer assumptions when a mature proof library is
+available.  The 71 custom axioms in v1 were not logically necessary;
+they were engineering compromises to avoid the complexity of building
+on \Mathlib.  Version~2 eliminates this technical debt while
+preserving identical theorem statements.
+
+% ===========================================================
+\section{Calibration Summary}
+\label{sec:calibration}
+% ===========================================================
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Label} & \textbf{Claim} & \textbf{CRM Height} & \textbf{Readout} \\
+\midrule
+RS & Preparation uncertainty (squared) & Height 0 &
+Hilbert-space geometry, fully constructive \\
+Schr\"odinger & Two-term strengthening (squared) & Height 0 &
+Adds symmetric term via centered anti-commutator \\
+Measurement & Sequential measurement stream & $\leq \DCw$ &
+Infinite dependent choices via $\DCw$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ===========================================================
+\section{Formalization Architecture}
+\label{sec:formalization}
+% ===========================================================
+
+The formalization comprises 4 \Lean~4 source files totaling
+$\sim$420~lines, all building on \Mathlib's \texttt{InnerProductSpace}
+API.
+
+\paragraph{Module structure.}
+\begin{center}
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{File} & \textbf{Lines} & \textbf{Content} \\
+\midrule
+\texttt{Basic.lean} & 193 &
+Operator definitions, self-adjointness, expectation, variance, \\
+& & centered vectors, commutator/anticommutator, bridge lemmas \\
+\texttt{RobertsonSchrodinger.lean} & 133 &
+Robertson--Schr\"odinger and Schr\"odinger theorems, \\
+& & complex norm lemmas, Cauchy--Schwarz squared \\
+\texttt{MeasurementUncertainty.lean} & 46 &
+$\DCw$ definition, measurement history type, \\
+& & measurement uncertainty theorem \\
+\texttt{Main.lean} & 35 &
+Aggregator, \texttt{\#print axioms} smoke tests \\
+\midrule
+\textbf{Total} & \textbf{407} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Key proof strategies.}
+\begin{enumerate}
+  \item \textbf{Centered inner product decomposition.}
+    The pivotal lemma \lean{inner\_centered\_eq} shows that
+    $\ip{\Delta A(\psi)}{\Delta B(\psi)} = \ip{A\psi}{B\psi}
+    - \E{A}_\psi \E{B}_\psi$.
+    This decomposition makes everything else fall out via \texttt{ring}.
+
+  \item \textbf{Self-adjointness as conjugation invariance.}
+    For self-adjoint $A$: $\overline{\E{A}_\psi} = \E{A}_\psi$.
+    This key fact (\lean{expect\_conj\_eq\_of\_selfAdj}) enables the
+    commutator and anticommutator bridges.
+
+  \item \textbf{Component-wise complex arithmetic.}
+    The complex norm lemmas use \texttt{Complex.normSq\_apply} to
+    reduce $\norm{z}^2$ to $\mathrm{re}(z)^2 + \mathrm{im}(z)^2$,
+    then \texttt{nlinarith} closes the arithmetic.
+
+  \item \textbf{Division-free squared form.}
+    Both RS and Schr\"odinger use squared form with explicit factor $4$,
+    eliminating division and square roots from the proof core.
+\end{enumerate}
+
+\paragraph{Axiom profile.}
+All theorems report
+\texttt{[propext, Classical.choice, Quot.sound]} via
+\texttt{\#print axioms}.  The \texttt{Classical.choice}
+appearance is a \Mathlib\ infrastructure artifact:
+\texttt{InnerProductSpace} and \texttt{ContinuousLinearMap.adjoint}
+use it transitively through the Riesz representation theorem and
+norm completions.  The mathematical content of our proofs is
+constructive (Cauchy--Schwarz + algebraic identities).  No custom
+axioms, no \texttt{sorry}, no \texttt{Axiom} declarations.
+
+The measurement uncertainty theorem
+(\lean{measurement\_uncertainty\_requires\_dc$\omega$}) has
+\emph{no axiom dependencies whatsoever}---it is purely definitional.
+
+\paragraph{Lean-to-LaTeX symbol reference.}
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Lean symbol} & \textbf{Paper notation} \\
+\midrule
+\verb|@inner C E _ psi (A psi)| & $\ip{\psi}{A\psi}$ \\
+\verb|expect A psi| & $\E{A}_\psi$ \\
+\verb|var A psi| & $\Var_\psi(A)$ \\
+\verb|centered A psi| & $\Delta A(\psi)$ \\
+\verb|comm A B| & $\comm{A}{B}$ \\
+\verb|acomm A B| & $\acomm{A}{B}$ \\
+\verb|robertson_schrodinger| & Theorem~\ref{thm:RS-squared} \\
+\verb|schrodinger| & Theorem~\ref{thm:Schrodinger-squared} \\
+\verb|measurement_uncertainty_requires_dcw| & Theorem~\ref{thm:measurement} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ===========================================================
+\section{Reproducibility}
+\label{sec:reproducibility}
+% ===========================================================
+
+\begin{mdframed}[backgroundcolor=gray!10]
+\textbf{Reproducibility Box}
+\begin{itemize}
+\item \textbf{Repository}: \url{https://github.com/quantmann/FoundationRelativity}
+\item \textbf{LaTeX source \& PDF}: \url{https://doi.org/10.5281/zenodo.18519836}
+\item \textbf{Lean toolchain}: \texttt{leanprover/lean4:v4.28.0-rc1}
+\item \textbf{mathlib4 commit}: \texttt{2d9b14086f3a61c13a5546ab27cb8b91c0d76734}
+\item \textbf{Build}: \texttt{lake exe cache get \&\& lake build}
+\item \textbf{Bundle target}: \texttt{Papers}
+  (imports \texttt{Main})
+\item \textbf{Status}: 0~errors, 0~warnings, 0~sorries.
+  4~files, $\sim$420~lines total.
+\item \textbf{Axiom profile}:\\
+  \texttt{robertson\_schrodinger}:
+  \texttt{[propext, Classical.choice,}\\
+  \texttt{Quot.sound]}.\\
+  \texttt{schrodinger}:
+  \texttt{[propext, Classical.choice, Quot.sound]}.\\
+  \texttt{measurement\_uncertainty\_requires\_dc$\omega$}:
+  does not depend on any axioms.
+\end{itemize}
+\end{mdframed}
+
+% ===========================================================
+\section*{Acknowledgments}
+% ===========================================================
+
+The \Lean{} formalization was developed using Claude Opus~4.6
+(Anthropic, 2026) via the Claude Code CLI tool.  We thank the
+\Mathlib{} community for maintaining the comprehensive library
+of formalized mathematics that made this work possible.
+
+% -------------------------------------------------
+% Bibliography
+% -------------------------------------------------
+\bibliographystyle{abbrv}
+\begin{thebibliography}{99}
+
+\bibitem{Paper6v1}
+P.~C.-K.~Lee.
+\newblock Axiom Calibration for the Heisenberg Uncertainty Principle
+(Paper~6, v1).
+\newblock 2025.
+\newblock \url{https://zenodo.org/records/17068179}
+
+\bibitem{Paper2}
+P.~C.-K.~Lee.
+\newblock WLPO Equivalence of the Bidual Gap in $\ell^1$:
+A Lean~4 Formalization (Paper~2).
+\newblock 2026.
+
+\bibitem{Paper7}
+P.~C.-K.~Lee.
+\newblock The Physical Bidual Gap and Banach Space Non-Reflexivity:
+A Lean~4 Formalization of WLPO via Trace-Class Operators (Paper~7).
+\newblock 2026.
+\newblock DOI:~\href{https://doi.org/10.5281/zenodo.18509795}{10.5281/zenodo.18509795}
+
+\bibitem{Paper8}
+P.~C.-K.~Lee.
+\newblock The Logical Cost of the Thermodynamic Limit:
+LPO-Equivalence and BISH-Dispensability for the 1D Ising Free Energy
+(Paper~8).
+\newblock 2026.
+\newblock DOI:~\href{https://doi.org/10.5281/zenodo.18516813}{10.5281/zenodo.18516813}
+
+\bibitem{BishopBridges}
+E.~Bishop and D.~S.~Bridges.
+\newblock \emph{Constructive Analysis}.
+\newblock Springer, 1985.
+
+\bibitem{BridgesRichman}
+D.~S.~Bridges and F.~Richman.
+\newblock \emph{Varieties of Constructive Mathematics}.
+\newblock Cambridge University Press, 1987.
+
+\bibitem{Heisenberg1927}
+W.~Heisenberg.
+\newblock \"Uber den anschaulichen Inhalt der quantentheoretischen
+Kinematik und Mechanik.
+\newblock \emph{Z.\ Phys.}, 43:172--198, 1927.
+
+\bibitem{Robertson1929}
+H.~P.~Robertson.
+\newblock The Uncertainty Principle.
+\newblock \emph{Phys.\ Rev.}, 34:163--164, 1929.
+
+\bibitem{Schrodinger1930}
+E.~Schr\"odinger.
+\newblock Zum Heisenbergschen Unsch\"arfeprinzip.
+\newblock \emph{Sitzungsber.\ Preuss.\ Akad.\ Wiss.}, Phys.-Math.\ Kl.,
+19:296--303, 1930.
+
+\bibitem{Ozawa2003}
+M.~Ozawa.
+\newblock Universally valid reformulation of the Heisenberg uncertainty
+principle on noise and disturbance in measurement.
+\newblock \emph{Phys.\ Rev.\ A}, 2003.
+
+\bibitem{BuschLahtiWerner2014}
+P.~Busch, P.~Lahti, and R.~F.~Werner.
+\newblock Colloquium: Quantum root-mean-square error and measurement
+uncertainty relations.
+\newblock \emph{Rev.\ Mod.\ Phys.}, 86:1261--1281, 2014.
+
+\bibitem{QWIRE2017}
+J.~Paykin, R.~Rand, and S.~Zdancewic.
+\newblock QWIRE: A Formalized Quantum Circuit Language.
+\newblock In \emph{POPL}, 2017.
+
+\bibitem{Ying2016}
+M.~Ying.
+\newblock \emph{Foundations of Quantum Programming}.
+\newblock Morgan Kaufmann, 2016.
+
+\end{thebibliography}
+
+\end{document}

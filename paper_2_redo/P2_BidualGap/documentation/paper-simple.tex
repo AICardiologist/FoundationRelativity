@@ -1,0 +1,78 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{url}
+
+\title{WLPO $\Leftrightarrow$ Bidual Gap: A Constructive Equivalence in Lean 4}
+\author{Paul Chun-Kit Lee}
+\date{September 2025}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We formalize in Lean 4 the constructive equivalence between the Weak Limited Principle of Omniscience (WLPO) and the existence of a Banach space with a bidual gap. This work demonstrates axiom calibration: mathematical pathologies that are guaranteed under classical foundations become equivalent to constructive choice principles.
+
+\textbf{Reproducible artifact}: DOI: \texttt{10.5281/zenodo.13356587}
+\end{abstract}
+
+\section{Introduction}
+
+The relationship between constructive mathematics and functional analysis reveals surprising connections between logical principles and analytical pathologies. We prove:
+
+\begin{theorem}
+WLPO $\Leftrightarrow$ $\exists X$ Banach space such that the canonical embedding $J: X \to X^{**}$ is not surjective.
+\end{theorem}
+
+\section{Main Results}
+
+\subsection{Forward Direction: Gap $\Rightarrow$ WLPO}
+
+Given a Banach space $X$ with bidual gap witness $y \in X^{**} \setminus J(X)$, we construct a decision procedure for WLPO using the uniform gap $\delta = \|y\|/2$.
+
+\subsection{Reverse Direction: WLPO $\Rightarrow$ Gap}
+
+Under WLPO, we explicitly construct $G \in c_0^{**}$ by $G(f) = \sum_n f(e_n)$ where $\{e_n\}$ is the standard basis. This functional cannot be represented by any element of $c_0$.
+
+\section{Lean 4 Formalization}
+
+Our formalization achieves:
+\begin{itemize}
+\item Complete dual isometry $(c_0 \to \mathbb{R}) \cong_{\ell_i} \ell^1$ with 3 WLPO sorries
+\item Zero-sorry Option-B architecture for modular gap construction
+\item CI-verified axiom hygiene with fortress protection
+\end{itemize}
+
+\section{Reproducibility}
+
+The complete Lean 4 formalization is available at:
+\begin{itemize}
+\item Repository: \url{https://github.com/AICardiologist/FoundationRelativity}
+\item Release tag: \texttt{p2-minimal-v0.1}
+\item DOI: \texttt{10.5281/zenodo.13356587}
+\end{itemize}
+
+Build instructions:
+\begin{verbatim}
+git clone https://github.com/AICardiologist/FoundationRelativity
+cd FoundationRelativity
+git checkout p2-minimal-v0.1
+lake build Papers.P2_BidualGap.P2_Minimal
+\end{verbatim}
+
+\section{Conclusion}
+
+This work demonstrates that the existence of non-reflexive Banach spaces, a phenomenon guaranteed classically, becomes constructively equivalent to WLPO. This exemplifies axiom calibration: mathematical truths that depend critically on the underlying logical framework.
+
+\bibliographystyle{plain}
+\begin{thebibliography}{1}
+
+\bibitem{ishihara2006}
+H. Ishihara. Weak K\"{o}nig's lemma implies Brouwer's fan theorem: A direct proof. \textit{Notre Dame J. Formal Logic}, 47(2):249--252, 2006.
+
+\bibitem{bridges2007}
+D. Bridges and F. Richman. \textit{Varieties of Constructive Mathematics}. Cambridge University Press, 2007.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+- family-names: "Lee"
+  given-names: "Paul Chun-Kit"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+  affiliation: "New York University"
+title: "The Bloch-Kato Calibration — Out-of-Sample Test of the DPT Framework (Paper 54, Constructive Reverse Mathematics Series)"
+version: "1.0.0"
+date-released: 2026-02-21
+abstract: >-
+  Paper 54 of the Constructive Reverse Mathematics series. First out-of-sample
+  test of the DPT framework, calibrating the Bloch-Kato conjecture against DPT
+  axioms. Theorem A: LPO isolation for zero-testing. Theorem B: Axiom 2 realized
+  by Deligne Weil I. Theorem C: Axiom 3 partial (Hodge-Riemann unconditional,
+  Beilinson conditional). Theorem D: Axiom 1 fails for mixed motives. Theorem E:
+  p-adic Tamagawa obstruction. Theorem F: descent diagram with fracture points.
+  Formalized in Lean 4 over Mathlib (1,139 lines, 8 modules, 7 principled axioms,
+  zero sorry gaps).
+keywords:
+  - "constructive reverse mathematics"
+  - "Bloch-Kato conjecture"
+  - "DPT framework"
+  - "LPO"
+  - "p-adic obstruction"
+  - "Tamagawa numbers"
+  - "Deligne Weil I"
+  - "formal verification"
+  - "Lean 4"
+  - "Mathlib"
+  - "arithmetic geometry"
+license: Apache-2.0

@@ -1,0 +1,45 @@
+\contentsline {section}{\numberline {1}Introduction}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}The Last Gate}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}What DC Buys}{3}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Main Result}{3}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}Structure of the Argument}{4}{subsection.1.4}%
+\contentsline {subsection}{\numberline {1.5}Relation to Papers~29 and~30}{4}{subsection.1.5}%
+\contentsline {section}{\numberline {2}Preliminaries}{4}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Choice Principles}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Formal Definitions in \textsc {Lean~4}{}}{4}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Convergence Topologies}{5}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Laws of Large Numbers}{6}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Ergodic Theorems}{6}{subsection.2.5}%
+\contentsline {section}{\numberline {3}Case 1: The Strong Law of Large Numbers}{7}{section.3}%
+\contentsline {subsection}{\numberline {3.1}The Chebyshev Bound (Pure $\mathrm {BISH}$)}{7}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}WLLN Empirical Sufficiency}{7}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}The SLLN Gap Is Empirically Void}{8}{subsection.3.3}%
+\contentsline {section}{\numberline {4}Case 2: Ergodic Theory}{9}{section.4}%
+\contentsline {subsection}{\numberline {4.1}MET Implies Empirical Bounds}{9}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}MET Provides All Empirical Predictions}{9}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}The Birkhoff Gap Is Empirically Void}{10}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Physical Argument: Thermodynamic Equilibrium}{10}{subsection.4.4}%
+\contentsline {section}{\numberline {5}Case 3: The Quantifier Swap}{11}{section.5}%
+\contentsline {subsection}{\numberline {5.1}The Precise Content of $\mathrm {DC}$}{11}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Why the Swap Is Empirically Void}{11}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}The Epistemological Boundary}{12}{subsection.5.3}%
+\contentsline {section}{\numberline {6}Master Theorem}{12}{section.6}%
+\contentsline {subsection}{\numberline {6.1}BISH+LPO Empirical Completeness}{13}{subsection.6.1}%
+\contentsline {section}{\numberline {7}CRM Audit}{13}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Axiom Profile}{13}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Classical.choice in the Infrastructure}{14}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Certification Levels}{14}{subsection.7.3}%
+\contentsline {section}{\numberline {8}Code Architecture}{15}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Module Dependency Graph}{15}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Line Counts}{15}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}Key Design Decisions}{15}{subsection.8.3}%
+\contentsline {section}{\numberline {9}Reproducibility}{16}{section.9}%
+\contentsline {section}{\numberline {10}Discussion}{16}{section.10}%
+\contentsline {subsection}{\numberline {10.1}BISH+LPO: The Complete Constitution}{16}{subsection.10.1}%
+\contentsline {subsection}{\numberline {10.2}The Three-Paper Arc}{17}{subsection.10.2}%
+\contentsline {subsection}{\numberline {10.3}What This Means for a Working Physicist}{17}{subsection.10.3}%
+\contentsline {subsection}{\numberline {10.4}What the Universe Computes}{17}{subsection.10.4}%
+\contentsline {subsection}{\numberline {10.5}Philosophical Implications}{18}{subsection.10.5}%
+\contentsline {subsection}{\numberline {10.6}Epistemic Humility and Open Problems}{18}{subsection.10.6}%
+\contentsline {section}{\numberline {11}Conclusion}{18}{section.11}%
+\contentsline {section}{\numberline {12}AI-Assisted Methodology}{19}{section.12}%

@@ -1,0 +1,1293 @@
+\documentclass[11pt,a4paper]{article}
+
+% ====================================================================
+% Packages
+% ====================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{cleveref}
+\usepackage{natbib}
+\usepackage{mdframed}
+
+% ====================================================================
+% Theorem environments
+% ====================================================================
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% ====================================================================
+% Lean 4 code listing style
+% ====================================================================
+\definecolor{lean-keyword}{RGB}{0,0,180}
+\definecolor{lean-comment}{RGB}{0,128,0}
+\definecolor{lean-string}{RGB}{163,21,21}
+\definecolor{lean-bg}{RGB}{248,248,248}
+
+\lstdefinelanguage{lean4}{
+  keywords={theorem,lemma,def,class,instance,import,open,variable,
+            noncomputable,section,namespace,end,where,let,have,show,
+            intro,obtain,use,exact,rw,simp,apply,by,fun,match,if,
+            then,else,do,return,axiom,abbrev,private,attribute,
+            suffices,change,congr,ext,constructor,rintro,push_neg,
+            linarith,absurd,set_option,omit,in,set,cases,structure,
+            refine,unfold,rcases,calc,all_goals,first,try,ring,
+            positivity,induction},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+  morestring=[b]',
+}
+
+\lstset{
+  language=lean4,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{lean-keyword}\bfseries,
+  commentstyle=\color{lean-comment}\itshape,
+  stringstyle=\color{lean-string},
+  backgroundcolor=\color{lean-bg},
+  frame=single,
+  framerule=0.5pt,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2,
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+  xleftmargin=15pt,
+  captionpos=b,
+}
+
+% ====================================================================
+% Macros
+% ====================================================================
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\LPO}{\mathrm{LPO}}
+\newcommand{\WLPO}{\mathrm{WLPO}}
+\newcommand{\BMC}{\mathrm{BMC}}
+\newcommand{\NPSC}{\mathrm{NPSC}}
+\newcommand{\BISH}{\mathrm{BISH}}
+\newcommand{\Lean}{\textsc{Lean~4}}
+\newcommand{\Mathlib}{\textsc{Mathlib4}}
+\newcommand{\leanok}{\textsf{\small \textcolor{green!70!black}{\checkmark}}}
+
+% ====================================================================
+% Title
+% ====================================================================
+\title{%
+  \textbf{Noether's Theorem and the Logical Cost of Global Conservation Laws}\\[6pt]
+  {\normalsize Paper~15 in the Constructive Reverse Mathematics Series}%
+}
+
+\author{
+  Paul Chun-Kit Lee\thanks{%
+    New York University.
+    AI-assisted formalization; see \S\ref{sec:ai} for methodology.
+    The author is a medical professional, not a domain expert in
+    constructive mathematics or mathematical physics; mathematical
+    content was developed with extensive AI assistance.} \\
+  New York University \\
+  \texttt{dr.paul.c.lee@gmail.com}
+}
+
+\date{February 2026}
+
+% ====================================================================
+\begin{document}
+\maketitle
+
+% ====================================================================
+\begin{abstract}
+Noether's theorem---that every continuous symmetry of the action
+yields a conserved current---is the most fundamental structural
+principle in physics. We show it splits cleanly across the
+constructive hierarchy. The local conservation law
+($\partial_\mu J^\mu = 0$) is an algebraic identity provable
+in Bishop's constructive mathematics ($\BISH$). The finite-volume
+conserved charge is a computable real number ($\BISH$). The global
+conserved charge---the assertion that the total energy of an
+infinite system exists as a definite real number---is equivalent
+to the Limited Principle of Omniscience ($\LPO$) via Bounded
+Monotone Convergence ($\BMC$), precisely when the conserved
+density is non-negative (as for energy, via the weak energy
+condition). All results are formalised in \Lean{} with
+machine-checked proofs (520~lines, zero \texttt{sorry}).
+This constitutes a fourth independent domain---after statistical
+mechanics, general relativity, and quantum decoherence---exhibiting
+the same $\BISH$/$\LPO$ boundary at bounded monotone convergence,
+and the first to calibrate a \emph{structural law} rather than a
+physical prediction.
+\end{abstract}
+
+\vspace{1em}
+\begin{center}
+\textit{Dedicated to Mimi, my wife.}
+\end{center}
+\vspace{0.5em}
+\begin{flushright}
+\textit{Soli Deo gloria}
+\end{flushright}
+\vspace{1em}
+
+\tableofcontents
+
+% ====================================================================
+\section{Introduction}\label{sec:intro}
+% ====================================================================
+
+\subsection{Physical Context}\label{sec:physical}
+
+In 1918, Emmy Noether proved that every continuous symmetry of the
+action functional yields a conserved current~\cite{Noether1918}.
+The theorem generates conservation of energy (time translation),
+momentum (space translation), angular momentum (rotation), electric
+charge ($U(1)$ gauge), and every other conservation law in the
+Standard Model. It is, in the words of Lederman and Hill, among
+the most important results guiding the development of modern
+physics~\cite{Byers1998}.
+
+This paper addresses a precise question: \textbf{What is the
+logical cost of Noether's theorem?} More specifically: does the
+theorem, or its consequences, require non-constructive principles?
+
+\subsection{The Answer}\label{sec:answer}
+
+The answer decomposes into two layers:
+\begin{itemize}
+  \item The \textbf{local conservation law}---the algebraic
+    identity $\partial_\mu J^\mu = 0$ following from the
+    equations of motion---is $\BISH$ (Height~0). It is a
+    finite algebraic manipulation of sums over finitely many
+    lattice sites. No omniscience principle is needed.
+  \item The \textbf{global conserved charge}---the assertion
+    that the total energy $E = \lim_{N\to\infty} E_N$ exists
+    as a definite real number for every bounded field
+    configuration with non-negative energy density---is
+    equivalent to $\LPO$.
+\end{itemize}
+
+The mechanism is the same as in the three preceding domains:
+the partial energies $E_N = \sum_{i<N} \varepsilon_i$ form a
+bounded monotone sequence (bounded by hypothesis, monotone
+because each $\varepsilon_i \ge 0$). Asserting the completed
+limit is $\BMC$, which is $\LPO$.
+
+\subsection{Programme Context}\label{sec:context}
+
+This is the fourth independent domain in a programme of
+constructive calibration of mathematical physics. The previous
+three domains are:
+\begin{itemize}
+  \item \textbf{Statistical mechanics} (Paper~8)~\cite{Lee26-P8}:
+    The 1D~Ising free energy $f_N$ is $\BISH$; the thermodynamic
+    limit $f_\infty = \lim f_N$ is $\LPO$ via $\BMC$.
+  \item \textbf{General relativity} (Paper~13)~\cite{Lee26-P13}:
+    Finite geodesic computations in the Schwarzschild interior
+    are $\BISH$; the assertion $r(\tau) \to 0$ (geodesic
+    incompleteness) is $\LPO$ via $\BMC$.
+  \item \textbf{Quantum mechanics} (Paper~14)~\cite{Lee26-P14}:
+    Finite-step decoherence bounds are $\BISH$; exact decoherence
+    (the assertion that coherence converges to a definite limit)
+    is $\LPO$ via $\BMC$.
+\end{itemize}
+
+All four domains produce bounded monotone sequences whose
+completed limits cost exactly $\LPO$. The physics differs
+completely---partition functions, geodesic equations, density
+matrices, energy densities---but the logical structure is
+identical.
+
+\subsection{What Makes Paper~15 Different}\label{sec:different}
+
+Papers~8, 13, and~14 calibrate \emph{predictions}: quantities
+physicists compute and compare to experiment (free energy values,
+singularity formation, measurement outcomes). Paper~15 calibrates
+a \emph{structural law}---the principle that symmetries generate
+conservation laws. The local form of this law (the algebraic
+content of Noether's theorem) is constructive. The global form
+(total charge exists) is the idealisation. This is the first result
+in the programme to calibrate a structural principle rather than a
+physical prediction.
+
+
+% ====================================================================
+\section{Background}\label{sec:background}
+% ====================================================================
+
+\subsection{Constructive Reverse Mathematics}\label{sec:crm-bg}
+
+Constructive reverse mathematics (CRM) classifies mathematical
+theorems by the weakest omniscience principle needed to prove
+them~\cite{Bishop67,BV06,Ishihara06}. Bishop's constructive
+mathematics ($\BISH$) avoids all omniscience principles; every
+existential claim comes with a computable witness.
+
+The key principles for this paper are:
+\begin{itemize}
+  \item \textbf{LPO} (Limited Principle of Omniscience): For every
+    binary sequence $\alpha : \NN \to \{0,1\}$, either all terms
+    are zero or some term is one. Equivalent to: every bounded
+    monotone sequence of reals converges ($\BMC$). The equivalence
+    is due to Bridges and V\^{\i}\c{t}\u{a}~\cite{BV06}
+    (Theorem~2.1.5).
+  \item \textbf{BMC} (Bounded Monotone Convergence): Every
+    monotone sequence bounded above has a limit.
+  \item \textbf{NPSC} (Nonnegative Partial Sum Convergence): Every
+    bounded sequence of partial sums of non-negative terms converges.
+    A new abstraction introduced in this paper, equivalent to $\BMC$
+    and hence to $\LPO$. This is the abstract framework connecting
+    energy partial sums to the omniscience hierarchy.
+\end{itemize}
+
+\subsection{The Diagnostic}\label{sec:diagnostic}
+
+When a physical theorem asserts the existence of a completed
+infinite limit (thermodynamic limit, singularity, decoherence,
+global charge), the diagnostic is: check whether the underlying
+sequence is bounded and monotone. If yes, the assertion costs
+exactly $\LPO$. If the sequence has a computable modulus of
+convergence, the limit is $\BISH$ and $\LPO$ is not needed. The
+programme identifies physical theorems where the modulus is
+naturally absent---where the logical cost is an intrinsic feature
+of the physics, not an artefact of a particular proof strategy.
+
+
+% ====================================================================
+\section{The Physics: Noether's Theorem on the Lattice}
+\label{sec:physics}
+% ====================================================================
+
+\subsection{The Model}\label{sec:model}
+
+We work with a real scalar field on a 1D lattice with periodic
+boundary conditions. The lattice has $N$ sites, with field values
+$\varphi_i \in \RR$ and conjugate momenta $\pi_i \in \RR$ at each
+site $i \in \mathrm{Fin}\;N$.
+
+The lattice Lagrangian is:
+\begin{equation}\label{eq:lagrangian}
+  L_N = \sum_{i=0}^{N-1} \left[
+    \tfrac{1}{2}\pi_i^2
+    - \tfrac{1}{2}(\varphi_{i+1} - \varphi_i)^2
+    - V(\varphi_i)
+  \right],
+\end{equation}
+with $V(\varphi) \ge 0$ (non-negative potential) and periodic
+boundary conditions: $\varphi_N = \varphi_0$.
+
+The equations of motion (discrete Euler--Lagrange) are:
+\begin{equation}\label{eq:eom}
+  \dot{\varphi}_i = \pi_i, \qquad
+  \dot{\pi}_i = \Delta_d \varphi_i - V'(\varphi_i),
+\end{equation}
+where $\Delta_d \varphi_i = \varphi_{i+1} - 2\varphi_i +
+\varphi_{i-1}$ is the discrete Laplacian.
+
+The conserved energy (from time-translation invariance) is:
+\begin{equation}\label{eq:energy}
+  E_N = \sum_{i=0}^{N-1} \left[
+    \tfrac{1}{2}\pi_i^2
+    + \tfrac{1}{2}(\varphi_{i+1} - \varphi_i)^2
+    + V(\varphi_i)
+  \right].
+\end{equation}
+Every term in $E_N$ is non-negative: $\tfrac{1}{2}\pi_i^2 \ge 0$
+(kinetic), $\tfrac{1}{2}(\Delta\varphi_i)^2 \ge 0$ (gradient),
+$V(\varphi_i) \ge 0$ (potential). This positivity is the critical
+property.
+
+\subsection{Why the Lattice}\label{sec:lattice}
+
+We work on the lattice rather than in the continuum for three
+reasons:
+\begin{enumerate}
+  \item \textbf{Physical honesty.} Lattice field theory is how
+    physics is actually computed (lattice QCD, lattice gauge
+    theory~\cite{Creutz1983}). The continuum limit is itself an
+    idealisation whose logical cost could be separately calibrated.
+  \item \textbf{Lean practicality.} Everything is finite sums
+    over $\mathrm{Fin}\;N$. No Sobolev spaces, no distributions,
+    no functional analysis infrastructure.
+  \item \textbf{Structural completeness.} The lattice model
+    captures all three levels of the hierarchy: local conservation
+    (algebraic identity), finite-volume energy (computable), and
+    infinite-volume energy ($\BMC$).
+\end{enumerate}
+
+The mathematical theory of discrete Noether theorems is developed
+in Skopenkov~\cite{Skopenkov2023}.
+
+\subsection{The Sign Observation}\label{sec:sign-obs}
+
+The logical cost of a global conservation law depends on whether
+the conserved density is positive definite:
+\begin{itemize}
+  \item \textbf{Energy density} ($T^{00}$): Sum of squares plus
+    non-negative potential. Always $\ge 0$. Partial energies $E_R$
+    are monotone increasing in $R$. $\to$ $\BMC$ $\to$ $\LPO$.
+  \item \textbf{Charge density} ($J^0$): Signed (positive for
+    particles, negative for antiparticles). Partial charges $Q_R$
+    oscillate as $R$ grows. $\to$ Conditional convergence, does
+    not fit $\BMC$.
+\end{itemize}
+
+This parallels the weak energy condition in general relativity:
+$T_{ab}v^a v^b \ge 0$ for all timelike $v^a$~\cite{Witten1981,
+Kontou2020}. The positivity of energy density is a physical
+assumption. The programme shows this assumption is precisely what
+makes the infinite-volume limit cost $\LPO$ rather than something
+else.
+
+
+% ====================================================================
+\section{Finite Noether at BISH}\label{sec:bish}
+% ====================================================================
+
+\subsection{The Conservation Identity}\label{sec:conservation}
+
+\begin{theorem}[Energy conservation---Noether's theorem]
+\label{thm:noether} \leanok{}
+For any field configuration $(\varphi, \pi)$ on an $N$-site
+lattice ($N \ge 2$) with periodic boundary conditions, and any
+potential $V$, the total rate of energy change vanishes
+identically:
+\[
+  \sum_{i=0}^{N-1} \Bigl[
+    \pi_i \cdot (\Delta_d\varphi_i - V'(\varphi_i))
+    + (\varphi_{i+1} - \varphi_i)(\pi_{i+1} - \pi_i)
+    + V'(\varphi_i) \cdot \pi_i
+  \Bigr] = 0.
+\]
+\end{theorem}
+
+\begin{proof}
+We compute $\tfrac{dE_N}{dt}$ by substituting the equations of
+motion~\eqref{eq:eom} into the time derivative of
+$E_N$~\eqref{eq:energy}. Each summand receives three
+contributions: from the kinetic term
+$\pi_i \cdot \dot{\pi}_i = \pi_i(\Delta_d\varphi_i - V'(\varphi_i))$,
+from the gradient term
+$(\varphi_{i+1} - \varphi_i)(\dot{\varphi}_{i+1} - \dot{\varphi}_i)
+= (\varphi_{i+1} - \varphi_i)(\pi_{i+1} - \pi_i)$,
+and from the potential term
+$V'(\varphi_i)\dot{\varphi}_i = V'(\varphi_i)\pi_i$.
+
+The first step is algebraic simplification. The $V'(\varphi_i)\pi_i$
+terms from the kinetic and potential contributions cancel, leaving:
+\[
+  \text{summand}_i =
+  \bigl(\varphi_{i+1}\pi_{i+1} - \varphi_i\pi_i\bigr)
+  + \bigl(\pi_i \cdot \varphi_{i-1} - \varphi_i \cdot \pi_{i+1}\bigr).
+\]
+This identity is verified by \texttt{ring} in \Lean{} after
+expanding the discrete Laplacian.
+
+The sum of the first group is a telescoping sum:
+$\sum_i (\varphi_{i+1}\pi_{i+1} - \varphi_i\pi_i) = 0$
+under periodic boundary conditions. This follows from
+\textbf{shift invariance of periodic sums} (\Cref{lem:shift}):
+$\sum_i f(\mathrm{next}(i)) = \sum_i f(i)$.
+
+For the second group, we reindex the sum
+$\sum_i \pi_i \cdot \varphi_{i-1}$ using the substitution
+$i \mapsto \mathrm{next}(j)$, giving
+$\sum_j \pi_{\mathrm{next}(j)} \cdot
+\varphi_{\mathrm{prev}(\mathrm{next}(j))}
+= \sum_j \pi_{\mathrm{next}(j)} \cdot \varphi_j$,
+where we used the inverse relationship
+$\mathrm{prev} \circ \mathrm{next} = \mathrm{id}$.
+Then by commutativity:
+$\sum_j \pi_{\mathrm{next}(j)} \cdot \varphi_j
+= \sum_j \varphi_j \cdot \pi_{\mathrm{next}(j)}$,
+which equals $\sum_i \varphi_i \cdot \pi_{i+1}$.
+The two terms cancel, giving $\sum_i (\text{second group})_i = 0$.
+
+Since both groups sum to zero, $dE_N/dt = 0$.
+\end{proof}
+
+\begin{lemma}[Shift invariance of periodic sums]
+\label{lem:shift} \leanok{}
+For any $f : \mathrm{Fin}\;N \to \RR$ and $N > 0$:
+\[
+  \sum_{i \in \mathrm{Fin}\;N} f(\mathrm{next}(i))
+  = \sum_{i \in \mathrm{Fin}\;N} f(i).
+\]
+\end{lemma}
+
+\begin{proof}
+The function $\mathrm{next} : \mathrm{Fin}\;N \to
+\mathrm{Fin}\;N$ defined by $i \mapsto (i+1) \bmod N$ is a
+bijection. Its inverse is $\mathrm{prev} : i \mapsto
+(i + N - 1) \bmod N$. Bijectivity is established by proving the
+inverse relationships $\mathrm{next} \circ \mathrm{prev} =
+\mathrm{id}$ and $\mathrm{prev} \circ \mathrm{next} =
+\mathrm{id}$ via case analysis on modular arithmetic. The result
+then follows from \Mathlib{}'s
+\texttt{Fintype.sum\_bijective}.
+\end{proof}
+
+\begin{remark}[Logical status]\label{rem:bish-noether}
+Every step in the proof of \Cref{thm:noether} is finite
+arithmetic over $\mathrm{Fin}\;N$. The telescoping uses periodic
+boundary conditions (a finite sum with wrapping indices). No
+limits, no compactness, no choice. The \Lean{}
+\texttt{\#print axioms} output shows only \texttt{propext},
+\texttt{Classical.choice} (from \Mathlib{} infrastructure for
+\texttt{Fin.fintype} and \texttt{Real.instField}), and
+\texttt{Quot.sound}. No omniscience principles.
+\end{remark}
+
+\subsection{Non-negativity of Energy Density}\label{sec:nonneg}
+
+\begin{theorem}[Energy density is non-negative]
+\label{thm:nonneg} \leanok{}
+If $V(\varphi) \ge 0$ for all $\varphi$, then each term in $E_N$
+is non-negative:
+\[
+  \varepsilon_i =
+  \tfrac{1}{2}\pi_i^2
+  + \tfrac{1}{2}(\varphi_{i+1} - \varphi_i)^2
+  + V(\varphi_i) \ge 0.
+\]
+\end{theorem}
+
+\begin{proof}
+The kinetic term $\tfrac{1}{2}\pi_i^2 \ge 0$ is a square divided
+by a positive constant. The gradient term
+$\tfrac{1}{2}(\varphi_{i+1} - \varphi_i)^2 \ge 0$ likewise. The
+potential term $V(\varphi_i) \ge 0$ by hypothesis. The sum of
+non-negative reals is non-negative. In \Lean{}, the proof uses
+\texttt{positivity} for the squared terms and the hypothesis
+\texttt{hV} for the potential.
+\end{proof}
+
+\subsection{Monotonicity of Partial Energies}\label{sec:monotone}
+
+\begin{theorem}[Partial energy is monotone]
+\label{thm:mono} \leanok{}
+For a field on the infinite lattice $\NN$, the partial energy
+$E_N = \sum_{i=0}^{N-1} \varepsilon_i$ is monotone increasing in
+$N$ when $V \ge 0$.
+\end{theorem}
+
+\begin{proof}
+$E_{N+1} = E_N + \varepsilon_N \ge E_N$ since
+$\varepsilon_N \ge 0$ by \Cref{thm:nonneg}. The \Lean{} proof
+applies \texttt{monotone\_nat\_of\_le\_succ} with the recurrence
+\texttt{partialEnergy\_succ}.
+\end{proof}
+
+
+% ====================================================================
+\section{Global Energy and LPO}\label{sec:lpo}
+% ====================================================================
+
+\subsection{The Abstract Framework: NPSC}\label{sec:npsc}
+
+\begin{definition}[NPSC]\label{def:npsc} \leanok{}
+\emph{Nonnegative Partial Sum Convergence} ($\NPSC$): for every
+sequence $d : \NN \to \RR$ with $d_n \ge 0$ for all $n$, if the
+partial sums $\sum_{i<N} d_i$ are bounded, then they converge to a
+definite limit.
+\end{definition}
+
+\begin{theorem}[$\NPSC \leftrightarrow \BMC$]
+\label{thm:npsc-bmc} \leanok{}
+Nonnegative Partial Sum Convergence is equivalent to Bounded
+Monotone Convergence.
+\end{theorem}
+
+\begin{proof}
+\textbf{($\NPSC \Rightarrow \BMC$):}
+Given a monotone sequence $a : \NN \to \RR$ bounded above by $M$,
+define $d_n = a_{n+1} - a_n \ge 0$ (by monotonicity). The partial
+sums telescope:
+\[
+  \sum_{i<N} d_i = a_N - a_0,
+\]
+which is bounded above by $M - a_0$. By $\NPSC$, the partial sums
+converge to some $L_d$. Therefore $a_N = (\sum_{i<N} d_i) + a_0$
+converges to $L_d + a_0$.
+
+The telescoping identity is proved by induction on $N$. The base
+case is trivial ($\sum_{i<0} d_i = 0 = a_0 - a_0$). The inductive
+step uses \texttt{Finset.sum\_range\_succ}.
+
+\smallskip\noindent
+\textbf{($\BMC \Rightarrow \NPSC$):}
+Given $d : \NN \to \RR$ with $d_n \ge 0$ and bounded partial sums,
+the sequence $S_N = \sum_{i<N} d_i$ is monotone (adding a
+non-negative term cannot decrease the sum) and bounded. $\BMC$
+gives convergence directly.
+\end{proof}
+
+\begin{remark}[Logical status]\label{rem:npsc-bish}
+The equivalence $\NPSC \leftrightarrow \BMC$ is fully proved in
+\Lean{} with \emph{no custom axioms}. The
+\texttt{\#print axioms npsc\_iff\_bmc} output shows only
+\texttt{[propext, Classical.choice, Quot.sound]}---standard
+\Mathlib{} infrastructure. This is the same pattern as Paper~14's
+\texttt{abc\_iff\_bmc}: the abstract equivalence is pure $\BISH$.
+\end{remark}
+
+\begin{theorem}[$\NPSC \leftrightarrow \LPO$]
+\label{thm:npsc-lpo} \leanok{}
+\[
+  \NPSC \;\;\longleftrightarrow\;\; \LPO.
+\]
+\end{theorem}
+
+\begin{proof}
+Compose $\NPSC \leftrightarrow \BMC$ (\Cref{thm:npsc-bmc}) with
+$\BMC \leftrightarrow \LPO$ (Bridges--V\^{\i}\c{t}\u{a}~\cite{BV06}).
+In \Lean{}: \texttt{npsc\_iff\_bmc} composed with
+\texttt{lpo\_iff\_bmc.symm}.
+\end{proof}
+
+\subsection{The Headline Result}\label{sec:headline}
+
+\begin{theorem}[Global energy existence $\leftrightarrow$ LPO]
+\label{thm:main} \leanok{}
+The assertion ``for every bounded field configuration with
+$V \ge 0$, the total energy
+$E = \lim_{N\to\infty} E_N$ exists'' is equivalent to $\LPO$:
+\[
+  \Bigl(\forall V, \varphi, \pi, M.\;
+  V \ge 0 \to
+  (\forall N,\; E_N \le M) \to
+  \exists E.\; E_N \to E \Bigr)
+  \;\;\longleftrightarrow\;\; \LPO.
+\]
+\end{theorem}
+
+\begin{proof}
+\textbf{(Forward: Global energy $\Rightarrow$ $\LPO$.)}
+Suppose the global energy assertion holds. We show $\NPSC$ holds
+(and hence $\LPO$, by \Cref{thm:npsc-lpo}).
+
+Given $d : \NN \to \RR$ with $d_n \ge 0$ and bounded partial sums,
+we encode $d$ into a lattice field configuration as follows. Set
+$V = 0$ (zero potential, which is $\ge 0$), $\varphi = 0$
+(zero field), and
+$\pi_i = \sqrt{2 \cdot d_i}$. Then the energy density at site $i$
+reduces to
+\[
+  \varepsilon_i = \tfrac{1}{2}\pi_i^2 + 0 + 0
+  = \tfrac{1}{2} \cdot 2d_i = d_i,
+\]
+where we used $(\sqrt{x})^2 = x$ for $x \ge 0$. Therefore
+$E_N = \sum_{i<N} d_i$, and the boundedness hypothesis carries
+over. The global energy assertion gives convergence.
+
+\smallskip\noindent
+\textbf{(Reverse: $\LPO$ $\Rightarrow$ Global energy.)}
+$\LPO \Rightarrow \BMC$ (by the Bridges--V\^{\i}\c{t}\u{a}
+equivalence). The partial energy sequence is monotone
+(\Cref{thm:mono}) and bounded by hypothesis. $\BMC$ gives
+convergence.
+\end{proof}
+
+\subsection{Axiom Certificate}\label{sec:axiom-cert}
+
+The \Lean{} \texttt{\#print axioms} output for
+\texttt{global\_energy\_iff\_LPO} shows:
+\texttt{[propext, Classical.choice, Quot.sound, bmc\_of\_lpo,
+lpo\_of\_bmc]}. The only custom axioms are the two interface
+assumptions for the Bridges--V\^{\i}\c{t}\u{a} equivalence,
+cited from~\cite{BV06} and Paper~8~\cite{Lee26-P8}.
+
+The abstract framework (\texttt{npsc\_iff\_bmc}) is pure
+$\BISH$---no custom axioms.
+
+
+% ====================================================================
+\section{The Sign Trap: Why Charge Doesn't Work}\label{sec:sign}
+% ====================================================================
+
+The conservation identity (\Cref{thm:noether}) holds for
+\emph{any} conserved current, not just energy. But the $\LPO$
+equivalence (\Cref{thm:main}) depends critically on the positivity
+of the conserved density. For signed densities, the argument fails.
+
+For a complex scalar field with $U(1)$ symmetry, the conserved
+charge density is
+\[
+  J^0 = i(\varphi^* \dot{\varphi}
+  - \dot{\varphi}^* \varphi),
+\]
+which is signed: positive for particles, negative for
+antiparticles. The partial charge
+$Q_R = \sum_{i=0}^{R-1} J^0_i$ is \emph{not} monotone. Adding
+more sites can increase or decrease $Q_R$ depending on the charge
+distribution.
+
+The convergence of $Q_R$ as $R \to \infty$ is a conditional
+convergence problem, not a monotone convergence problem. It does
+not map to $\BMC$. Asserting convergence requires either:
+\begin{itemize}
+  \item Explicit decay rates (collapsing to $\BISH$), or
+  \item Stronger principles than $\LPO$ (e.g., Bolzano--Weierstrass
+    for subsequences).
+\end{itemize}
+
+The lesson is that the constructive calibration depends not just
+on the theorem (Noether) but on the \emph{physical content} of
+the conserved quantity. Positivity (the weak energy condition) is
+what makes the $\BMC$ pattern available. The sign structure of the
+density is logically significant.
+
+This is analogous to the distinction in Paper~14 between
+uniform-angle decoherence (geometric decay, $\BISH$) and
+variable-angle decoherence (general monotone, $\LPO$). The
+specific model determines where in the hierarchy the result lands.
+
+
+% ====================================================================
+\section{Domain Invariance}\label{sec:invariance}
+% ====================================================================
+
+\subsection{The Four-Domain Table}\label{sec:table}
+
+Paper~15 is the fourth physical domain producing the
+$\BMC \leftrightarrow \LPO$ pattern:
+
+\begin{center}
+\begin{tabular}{@{}p{2.5cm}p{1.0cm}p{3.0cm}p{2.0cm}p{3.3cm}@{}}
+\toprule
+\textbf{Domain} & \textbf{Paper} &
+  \textbf{Bounded Monotone Seq.} & \textbf{BISH Content} &
+  \textbf{LPO Content} \\
+\midrule
+Stat.\ Mech. & 8 & Free energy $f_N$ &
+  $f_N$ computed & $f_\infty = \lim f_N$ \\
+Gen.\ Rel. & 13 & Radial coord.\ $r(\tau)$ &
+  $r(\tau)$ to $\varepsilon$ & $r(\tau) \to 0$ \\
+Quantum Meas. & 14 & Coherence $c(N)$ &
+  $c(N) < \varepsilon$ & $c(N) \to 0$ (collapse) \\
+\textbf{Conserv.\ Laws} & \textbf{15} &
+  \textbf{Partial energy $E_N$} &
+  \textbf{$dE/dt = 0$, $E_N$} &
+  \textbf{$E = \lim E_N$} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{What Domain Invariance Means}\label{sec:meaning}
+
+Four independent physical domains. Different physics:
+Paper~8 uses partition functions and Boltzmann weights;
+Paper~13 uses geodesic equations and the Schwarzschild metric;
+Paper~14 uses density matrices and partial trace;
+Paper~15 uses Lagrangians, symmetry flows, and energy densities.
+
+Same logical structure: bounded monotone sequence, finite
+truncations at $\BISH$, completed limit at $\LPO$. Same abstract
+equivalence ($\BMC \leftrightarrow \LPO$) instantiated in each
+domain.
+
+One instance is a result. Two is a pattern. Three is evidence.
+Four begins to look like a structural feature of how physical
+theories relate to mathematical frameworks.
+
+\subsection{What Paper~15 Adds}\label{sec:adds}
+
+Paper~15 is qualitatively different from the other three.
+Papers~8, 13, and~14 calibrate \emph{predictions}---quantities
+physicists compute and compare to experiment. Paper~15 calibrates
+a \emph{principle}---the structural law that symmetries generate
+conservation laws.
+
+The local form (Noether's algebraic identity) is constructive.
+The global form (total charge exists) is the idealisation. This
+means: \textbf{the architecture of physical law is constructive.}
+The idealisation enters not in the law itself but in the totality
+assertion---the claim that the conserved quantity exists as a
+definite number summed over all of space. This is a statement about
+formalism, not nature. No finite experiment distinguishes
+``total energy $= E$'' from ``partial energy $E_N$ agrees with $E$
+to within $\varepsilon$ for all $N$ we can probe.''
+
+\subsection{Full Calibration Table}\label{sec:calibration}
+
+The calibration table for the full series, updated with Paper~15:
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Physical layer} & \textbf{Principle} & \textbf{Status} &
+\textbf{Source} \\
+\midrule
+Finite-volume Gibbs states & $\BISH$ & Calibrated & Trivial \\
+Finite-size approximations (Ising) & $\BISH$ & Calibrated &
+  Paper~8 \\
+Schwarzschild exterior & $\BISH$ & Calibrated & Paper~1 \\
+Interior finite-time physics & $\BISH$ & Calibrated & Paper~13 \\
+Tsirelson bound (CHSH $\le 2\sqrt{2}$) & $\BISH$ & Calibrated &
+  Paper~11 \\
+Bell state entropy ($\log 2$) & $\BISH$ & Calibrated &
+  Paper~11 \\
+Finite-step decoherence & $\BISH$ & Calibrated & Paper~14 \\
+\textbf{Local conservation ($dE/dt = 0$)} & \textbf{BISH} &
+  \textbf{Calibrated} & \textbf{Paper~15} \\
+Bidual-gap witness ($S_1(H)$) & $\equiv \WLPO$ & Calibrated &
+  Papers~2, 7 \\
+Thermodynamic limit (Ising) & $\equiv \LPO$ & Calibrated &
+  Paper~8 \\
+Geodesic incompleteness & $\equiv \LPO$ & Calibrated &
+  Paper~13 \\
+Exact decoherence (collapse) & $\equiv \LPO$ & Calibrated &
+  Paper~14 \\
+\textbf{Global energy existence} & $\equiv$ \textbf{LPO} &
+  \textbf{Calibrated} & \textbf{Paper~15} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The pattern is consistent: all $\LPO$ costs arise from completed
+infinite limits; all finite-time and finite-size physics is $\BISH$.
+
+
+% ====================================================================
+\section{Lean Formalisation}\label{sec:lean}
+% ====================================================================
+
+\subsection{Module Structure}\label{sec:modules}
+
+The formalisation is organized as a single \Lean{} project with
+6~modules:
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{Module} & \textbf{Lines} & \textbf{Content} \\
+\midrule
+\texttt{Defs.lean}              & 157 & Lattice field types,
+  energy density, fnext/fprev, non-negativity \\
+\texttt{LocalConservation.lean} & 190 & Periodic BC shift lemmas,
+  Noether's theorem ($dE/dt = 0$) \\
+\texttt{Monotonicity.lean}      &  68 & Partial energy recurrence,
+  monotonicity, non-negativity \\
+\texttt{LPO\_BMC.lean}          &  57 & LPO, BMC definitions,
+  axiomatised equivalence \\
+\texttt{GlobalEnergy.lean}      & 200 & NPSC framework,
+  npsc\_iff\_bmc, encoding, headline LPO theorem \\
+\texttt{Main.lean}              & 100 & Assembly +
+  \texttt{\#print axioms} audit \\
+\midrule
+\textbf{Total}                  & \textbf{$\sim$520} & \\
+\bottomrule
+\end{tabular}
+\caption{Module structure of Paper~15.}
+\label{tab:modules}
+\end{table}
+
+\subsection{Key Design Decisions}\label{sec:design}
+
+\paragraph{Periodic boundary conditions via explicit index wrapping.}
+The lattice uses $\mathrm{Fin}\;N$ indices with explicit wrapping
+functions \texttt{fnext} ($i \mapsto (i+1) \bmod N$) and
+\texttt{fprev} ($i \mapsto (i+N-1) \bmod N$). These are proved to
+be mutual inverses via explicit modular arithmetic:
+\texttt{fnext\_fprev} and \texttt{fprev\_fnext}. Bijectivity then
+follows from the inverse relationships, which is cleaner than
+direct injectivity/surjectivity proofs involving nested modular
+arithmetic.
+
+\paragraph{Dual lattice models.}
+The formalisation uses two complementary lattice models: a finite
+lattice with periodic boundary conditions ($\mathrm{Fin}\;N$) for
+the conservation identity, and an infinite lattice ($\NN$) with
+open boundary conditions for the partial energy and $\LPO$
+equivalence. The finite lattice captures the algebraic content of
+Noether's theorem; the infinite lattice captures the passage to
+the global limit.
+
+\paragraph{Standalone package.}
+Paper~15 is a self-contained Lake package. It cannot import
+Paper~8 or~14 as Lake dependencies, so $\LPO$, $\BMC$, and the
+equivalence are re-defined. The
+$\BMC \leftrightarrow \LPO$ equivalence is axiomatised with
+citation.
+
+\subsection{Core Definitions}\label{sec:core-defs}
+
+\begin{lstlisting}[caption={Lattice state and energy density (Defs.lean, excerpt).}]
+/-- A state of the lattice scalar field. -/
+structure LatticeState (N : Nat) where
+  phi : Fin N -> Real
+  pi  : Momenta N
+
+/-- Next site index with periodic BC. -/
+def fnext (hN : 0 < N) (i : Fin N) : Fin N :=
+  <<(i.val + 1) % N, Nat.mod_lt _ hN>>
+
+/-- Energy density at site i. -/
+def energyDensity (V : Real -> Real) (hN : 0 < N)
+    (s : LatticeState N) (i : Fin N) : Real :=
+  kineticDensity s i + gradientDensity hN s i
+    + potentialDensity V s i
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Noether's theorem (LocalConservation.lean, excerpt).}]
+/-- The total rate of energy change expression. -/
+def totalEnergyRate (hN : 0 < N)
+    (phi pi : Fin N -> Real) (V' : Real -> Real) :=
+  sum i : Fin N,
+    (pi i * (discreteLaplacian hN phi i - V' (phi i))
+     + (phi (fnext hN i) - phi i) *
+       (pi (fnext hN i) - pi i)
+     + V' (phi i) * pi i)
+
+/-- Noether's theorem: energy is conserved. -/
+theorem noether_conservation (hN : 2 <= N)
+    (phi pi : Fin N -> Real) (V' : Real -> Real) :
+    totalEnergyRate (by omega) phi pi V' = 0
+\end{lstlisting}
+
+\begin{lstlisting}[caption={NPSC and headline theorem (GlobalEnergy.lean, excerpt).}]
+/-- Nonnegative Partial Sum Convergence. -/
+def NPSC : Prop :=
+  forall (d : Nat -> Real), (forall n, 0 <= d n) ->
+    (exists M, forall N,
+      sum i in Finset.range N, d i <= M) ->
+    exists L, forall e, 0 < e -> exists N0,
+      forall N, N0 <= N ->
+        |sum i in Finset.range N, d i - L| < e
+
+/-- NPSC <-> BMC (pure BISH, no omniscience). -/
+theorem npsc_iff_bmc : NPSC <-> BMC
+
+/-- Global energy existence <-> LPO. -/
+theorem global_energy_iff_LPO :
+    (forall V, (forall x, 0 <= V x) ->
+      forall phi pi M,
+        (forall N, partialEnergy V phi pi N <= M) ->
+      exists E, forall e, 0 < e -> exists N0,
+        forall N, N0 <= N ->
+          |partialEnergy V phi pi N - E| < e)
+    <-> LPO
+\end{lstlisting}
+
+\subsection{Axiom Audit}\label{sec:axioms}
+
+The \texttt{Main.lean} module audits the axiom profile of each
+theorem:
+
+\begin{lstlisting}[caption={Axiom audit (Main.lean, selected).}]
+-- Part A (BISH):
+#print axioms noether_conservation
+-- [propext, Classical.choice, Quot.sound]
+
+#print axioms energyDensity_nonneg
+-- [propext, Classical.choice, Quot.sound]
+
+#print axioms partialEnergy_mono
+-- [propext, Classical.choice, Quot.sound]
+
+-- Part B (LPO equivalence):
+#print axioms npsc_iff_bmc
+-- [propext, Classical.choice, Quot.sound]
+-- (no custom axioms!)
+
+#print axioms global_energy_iff_LPO
+-- [propext, Classical.choice, Quot.sound,
+--  bmc_of_lpo, lpo_of_bmc]
+\end{lstlisting}
+
+\noindent
+The \texttt{Classical.choice} appearing in the $\BISH$ results
+arises from \Mathlib{}'s real number infrastructure---specifically,
+\texttt{Fin.fintype} (for finite sums) and
+\texttt{Real.instField} (for real arithmetic). The mathematical
+content of these proofs is constructive: they involve only
+explicit finite-sum manipulation and algebraic identities.
+The constructive calibration is established by proof-content
+analysis, following the methodology described in
+Paper~10~\cite{Lee26-P10}.
+
+\subsection{CRM Audit}\label{sec:crm-audit}
+
+The formalisation passes the CRM standard established in
+Papers~8, 13, and~14:
+\begin{itemize}
+  \item Clean stratification: Part~A never touches $\LPO$ axioms.
+  \item Only declared axioms are \texttt{bmc\_of\_lpo} and
+    \texttt{lpo\_of\_bmc}, properly cited.
+  \item Abstract framework (\texttt{npsc\_iff\_bmc}) is pure
+    $\BISH$.
+  \item \texttt{by\_cases} in the inverse proofs uses decidable
+    $\NN$ equality (\texttt{instDecidableEqNat}, zero axioms),
+    not \texttt{Classical.em}.
+  \item \texttt{Nat.eq\_or\_lt\_of\_le} and
+    \texttt{Nat.succ\_le\_of\_lt} are axiom-free.
+  \item No \texttt{Classical.em}, no
+    \texttt{Classical.byContradiction}, no \texttt{decide} on
+    propositions anywhere in the source code.
+\end{itemize}
+
+
+% ====================================================================
+\section{Discussion}\label{sec:discussion}
+% ====================================================================
+
+\subsection{The Local/Global Distinction}\label{sec:local-global}
+
+The result sharpens the local/global distinction in physics. Local
+conservation ($\partial_\mu J^\mu = 0$) is the empirical
+content---it determines what happens in any finite region. Global
+conservation (total charge exists) is the totalising assertion---it
+sums over all of space.
+
+The constructive hierarchy reveals these are logically different
+claims. The local law is algebraic ($\BISH$). The global assertion
+is infinitary ($\LPO$). Physicists routinely treat them as
+equivalent (``conservation of energy''), but the programme shows
+they have different logical costs.
+
+This has implications for quantum gravity, where the definition of
+total energy is notoriously problematic (no local energy density
+for the gravitational field; see Witten~\cite{Witten1981} for the
+positive energy theorem). The programme suggests this difficulty
+is not an accident---total energy is an $\LPO$-level assertion,
+and it becomes harder to formulate precisely in regimes where the
+positive-definiteness of $T^{00}$ is not guaranteed.
+
+\subsection{Why Four Domains Matter}\label{sec:four}
+
+The accumulation of four independent domains all producing
+$\BMC \leftrightarrow \LPO$ at the boundary between finite physics
+and infinite formalism suggests this is a structural feature, not a
+coincidence. There is no obvious physical reason why Ising
+partition functions, Schwarzschild geodesics, decoherence
+coherence, and energy densities should share logical structure.
+They describe completely different phenomena.
+
+The common feature is that all four involve sequences of finite
+computations ($\BISH$) whose completed limits ($\LPO$) are
+physically meaningful but experimentally indistinguishable from
+sufficiently close finite approximations. The programme has not
+proved this is universal---there may be physical theorems whose
+logical cost is different (e.g., dependent choice rather than
+$\LPO$, as in the strong law of large numbers). But four
+independent data points sharing the same boundary is suggestive.
+
+\subsection{Limitations}\label{sec:limitations}
+
+\begin{enumerate}
+  \item \textbf{Lattice model.} We work on a lattice, not in the
+    continuum. The continuum limit is itself an idealisation whose
+    logical cost could be separately calibrated. We expect it to
+    introduce additional non-constructive content (function spaces,
+    compactness), but this is not formalised here.
+
+  \item \textbf{Encoding is abstract.} The reverse direction
+    (global energy $\Rightarrow$ $\LPO$) uses an encoding that
+    maps arbitrary bounded monotone sequences to lattice field
+    configurations. The resulting configurations (zero field, zero
+    gradient, $\pi_i = \sqrt{2d_i}$) may not correspond to any
+    realistic physical system. This is standard in reverse
+    mathematics---the encoding in Paper~8 similarly produces
+    non-physical Ising configurations.
+
+  \item \textbf{Energy only.} The result applies cleanly only to
+    positive-definite conserved densities (energy, probability,
+    number density). Signed densities (electric charge) do not
+    fit the $\BMC$ pattern (\Cref{sec:sign}). A complete
+    calibration of all Standard Model conservation laws would
+    require separate analysis for each type of charge.
+
+  \item \textbf{Classical.choice is a \Mathlib{} infrastructure
+    artifact.} The proof-content analysis methodology for handling
+    this is described in Paper~10~\cite{Lee26-P10}.
+\end{enumerate}
+
+
+% ====================================================================
+\section{Conclusion}\label{sec:conclusion}
+% ====================================================================
+
+Noether's theorem splits across the constructive hierarchy. The
+local conservation law---the algebraic content of the theorem---is
+$\BISH$. The global conserved charge---the assertion that total
+energy exists---is $\LPO$, equivalent to bounded monotone
+convergence.
+
+This is the fourth independent domain in which the $\BISH$/$\LPO$
+boundary falls at exactly the same place: the passage from finite
+computation to completed infinite limit. Four domains (statistical
+mechanics, general relativity, quantum measurement, conservation
+laws) with completely different physics, all producing bounded
+monotone sequences whose completed limits cost $\LPO$.
+
+The result calibrates not just a physical prediction but a
+structural principle. The architecture of physical law---the
+connection between symmetry and conservation---is constructive.
+The idealisation enters through the totality assertion, not
+through the law itself.
+
+
+% ====================================================================
+\section*{AI-Assisted Methodology}\label{sec:ai}
+% ====================================================================
+
+This formalization was developed using \textbf{Claude Opus~4.6}
+(Anthropic, 2026) via the \textbf{Claude Code} command-line
+interface, following the same human--AI workflow as Papers~2, 7,
+8, 13, and~14~\cite{Lee26-P2,Lee26-P7,Lee26-P8,Lee26-P13,
+Lee26-P14,Anthropic2026}.
+
+The author is a medical professional, not a domain expert in
+constructive mathematics or mathematical physics. The mathematical
+content of this paper was developed with extensive AI assistance.
+The human author specified the research direction and high-level
+goals, reviewed all mathematical claims for plausibility, and
+directed the formalisation strategy. Claude Opus~4.6 explored the
+\Mathlib{} codebase, generated \Lean{} proof terms, handled
+debugging, and assisted with paper writing. Final verification
+was by \texttt{lake build} (0~errors, 0~warnings, 0~sorries).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Task} & \textbf{Human} & \textbf{AI (Claude Opus 4.6)} \\
+\midrule
+Research direction       & \checkmark & \\
+Mathematical blueprint   & \checkmark & \checkmark \\
+Proof strategy design    & \checkmark & \checkmark \\
+\Mathlib{} API discovery & & \checkmark \\
+\Lean{} proof generation & & \checkmark \\
+Proof review             & \checkmark & \\
+Build verification       & & \checkmark \\
+Paper writing            & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\caption{Division of labor between human and AI.}
+\label{tab:division}
+\end{table}
+
+
+% ====================================================================
+\section*{Reproducibility}
+% ====================================================================
+
+\begin{mdframed}[backgroundcolor=gray!10]
+\textbf{Reproducibility Box}
+\begin{itemize}
+\item \textbf{Repository}:
+  \url{https://github.com/AICardiologist/FoundationRelativity}
+\item \textbf{Path}: \texttt{Papers/P15\_Noether/}
+\item \textbf{Build}: \texttt{lake exe cache get \&\& lake build}
+  (1{,}955 jobs, 0~errors, 0~sorry)
+\item \textbf{Lean toolchain}:
+  \texttt{leanprover/lean4:v4.28.0-rc1}
+\item \textbf{Mathlib version}: commit \texttt{7091f0f6}
+\item \textbf{Interface axioms}: \texttt{bmc\_of\_lpo}
+  (Bridges--V\^{\i}\c{t}\u{a}~\cite{BV06}),
+  \texttt{lpo\_of\_bmc} (Paper~8~\cite{Lee26-P8})
+\item \textbf{Axiom audit}: \texttt{Main.lean}
+\item \textbf{Axiom profile (main theorem)}:
+  \texttt{[propext, Classical.choice, Quot.sound,
+  bmc\_of\_lpo, lpo\_of\_bmc]}
+\item \textbf{Axiom profile (BISH content)}:
+  \texttt{[propext, Classical.choice, Quot.sound]}
+  (Mathlib infra only)
+\item \textbf{Axiom profile (npsc\_iff\_bmc)}:
+  \texttt{[propext, Classical.choice, Quot.sound]}
+  (no custom axioms)
+\item \textbf{Total}: 6~files, $\sim$520~lines, 0~sorry
+\item \textbf{Zenodo DOI}: \href{https://doi.org/10.5281/zenodo.18572494}{10.5281/zenodo.18572494}
+\end{itemize}
+\end{mdframed}
+
+
+% ====================================================================
+\section*{Acknowledgments}
+% ====================================================================
+
+The \Lean{} formalization was developed using Claude Opus~4.6
+(Anthropic, 2026) via the Claude Code CLI tool. We thank the
+\Mathlib{} community for maintaining the comprehensive library
+of formalised mathematics that made this work possible.
+
+
+% ====================================================================
+% Bibliography
+% ====================================================================
+\bibliographystyle{plainnat}
+
+\begin{thebibliography}{30}
+
+\bibitem[Anthropic(2026)]{Anthropic2026}
+Anthropic.
+\newblock Claude {Opus}~4.6 and {Claude Code} {CLI}.
+\newblock \url{https://www.anthropic.com/claude}, 2026.
+
+\bibitem[Ba{\~n}ados and Reyes(2016)]{Banados2016}
+M.~Ba{\~n}ados and I.~A.~Reyes.
+\newblock A short review on {Noether}'s theorems, gauge symmetries and
+  boundary terms, for students.
+\newblock arXiv:1601.03616, 2016.
+
+\bibitem[Bishop(1967)]{Bishop67}
+E.~Bishop.
+\newblock \emph{Foundations of Constructive Analysis}.
+\newblock McGraw-Hill, New York, 1967.
+
+\bibitem[Bishop and Bridges(1985)]{BB85}
+E.~Bishop and D.~S.~Bridges.
+\newblock \emph{Constructive Analysis}.
+\newblock Grundlehren der mathematischen Wissenschaften 279. Springer, 1985.
+
+\bibitem[Bridges and Richman(1987)]{BR87}
+D.~S.~Bridges and F.~Richman.
+\newblock \emph{Varieties of Constructive Mathematics}.
+\newblock London Mathematical Society Lecture Note Series 97.
+  Cambridge University Press, 1987.
+
+\bibitem[Bridges and V{\^\i}{\c{t}}{\u{a}}(2006)]{BV06}
+D.~S.~Bridges and L.~S.~V{\^\i}{\c{t}}{\u{a}}.
+\newblock \emph{Techniques of Constructive Analysis}.
+\newblock Universitext. Springer, New York, 2006.
+
+\bibitem[Byers(1998)]{Byers1998}
+N.~Byers.
+\newblock {E.~Noether}'s discovery of the deep connection between symmetries
+  and conservation laws.
+\newblock arXiv:physics/9807044, 1998.
+
+\bibitem[Creutz(1983)]{Creutz1983}
+M.~Creutz.
+\newblock \emph{Quarks, Gluons and Lattices}.
+\newblock Cambridge University Press, 1983.
+
+\bibitem[{de Moura} et~al.(2015)]{deMoura2021}
+L.~{de Moura}, S.~Kong, J.~Avigad, F.~{van Doorn}, and M.~{von Raumer}.
+\newblock The {Lean} theorem prover (system description).
+\newblock In \emph{CADE-25}, LNAI 9195, pages 378--388. Springer, 2015.
+\newblock Lean~4: \url{https://lean-lang.org/}, 2021--present.
+
+\bibitem[Diener(2018)]{Diener2018}
+H.~Diener.
+\newblock Constructive reverse mathematics.
+\newblock arXiv:1804.05495, 2018.
+
+\bibitem[Ishihara(2006)]{Ishihara06}
+H.~Ishihara.
+\newblock Reverse mathematics in {Bishop}'s constructive mathematics.
+\newblock \emph{Philosophia Scientiae}, Cahier sp\'ecial 6:43--59, 2006.
+
+\bibitem[Ishihara and Nemoto(2019)]{IN2019}
+H.~Ishihara and T.~Nemoto.
+\newblock The monotone completeness theorem in constructive reverse
+  mathematics.
+\newblock In \emph{Mathesis Universalis, Computability and Proof},
+  Synthese Library 412, Springer, 2019.
+
+\bibitem[Kontou and Sanders(2020)]{Kontou2020}
+E.-A.~Kontou and K.~Sanders.
+\newblock Energy conditions in general relativity and quantum field theory.
+\newblock \emph{Classical and Quantum Gravity}, 37:193001, 2020.
+\newblock arXiv:2003.01815.
+
+\bibitem[Kosmann-Schwarzbach(2011)]{KS2011}
+Y.~Kosmann-Schwarzbach.
+\newblock \emph{The Noether Theorems: Invariance and Conservation Laws
+  in the Twentieth Century}.
+\newblock Springer, 2011.
+
+\bibitem[Lee(2026a)]{Lee26-P2}
+P.~C.-K.~Lee.
+\newblock {WLPO} equivalence of the bidual gap in $\ell^1$: a {Lean}~4
+  formalization.
+\newblock Preprint, 2026. Paper~2 in the constructive reverse
+  mathematics series.
+
+\bibitem[Lee(2026b)]{Lee26-P7}
+P.~C.-K.~Lee.
+\newblock Non-reflexivity of $S_1(H)$ implies {WLPO}: a {Lean}~4
+  formalization.
+\newblock Preprint, 2026. Paper~7 in the constructive reverse
+  mathematics series.
+
+\bibitem[Lee(2026c)]{Lee26-P8}
+P.~C.-K.~Lee.
+\newblock The logical cost of the thermodynamic limit: {LPO}-equivalence
+  and {BISH}-dispensability for the {1D} {Ising} free energy.
+\newblock Preprint, 2026. Paper~8 in the constructive reverse
+  mathematics series.
+
+\bibitem[Lee(2026d)]{Lee26-P10}
+P.~C.-K.~Lee.
+\newblock The logical geography of mathematical physics: constructive
+  calibration from density matrices to the event horizon.
+\newblock Preprint, 2026. Zenodo DOI: 10.5281/zenodo.18527877.
+  Paper~10 in the constructive reverse mathematics series.
+
+\bibitem[Lee(2026e)]{Lee26-P13}
+P.~C.-K.~Lee.
+\newblock The event horizon as a logical boundary: {Schwarzschild} interior
+  geodesic incompleteness and {LPO} in {Lean}~4.
+\newblock Preprint, 2026. Paper~13 in the constructive reverse
+  mathematics series.
+
+\bibitem[Lee(2026f)]{Lee26-P14}
+P.~C.-K.~Lee.
+\newblock The measurement problem as a logical artefact: constructive
+  calibration of quantum decoherence.
+\newblock Preprint, 2026. Zenodo DOI: 10.5281/zenodo.18569068.
+  Paper~14 in the constructive reverse mathematics series.
+
+\bibitem[Mandelkern(1988)]{Mandelkern1988}
+M.~Mandelkern.
+\newblock Limited omniscience and the {Bolzano}--{Weierstrass} principle.
+\newblock \emph{Bulletin of the London Mathematical Society}, 20:319--320,
+  1988.
+
+\bibitem[{Mathlib Community}(2020--)]{Mathlib2020}
+{Mathlib Community}.
+\newblock \emph{Mathlib}: the math library for {Lean}.
+\newblock \url{https://leanprover-community.github.io/mathlib4_docs/},
+  2020--present.
+
+\bibitem[Noether(1918)]{Noether1918}
+E.~Noether.
+\newblock Invariante {Variationsprobleme}.
+\newblock \emph{Nachrichten von der K\"oniglichen Gesellschaft der
+  Wissenschaften zu G\"ottingen, Mathematisch-physikalische Klasse},
+  pages 235--257, 1918.
+
+\bibitem[Skopenkov(2023)]{Skopenkov2023}
+M.~Skopenkov.
+\newblock Discrete field theory: symmetries and conservation laws.
+\newblock \emph{Mathematical Physics, Analysis and Geometry}, 26:19, 2023.
+\newblock arXiv:1709.04788.
+
+\bibitem[Witten(1981)]{Witten1981}
+E.~Witten.
+\newblock A new proof of the positive energy theorem.
+\newblock \emph{Communications in Mathematical Physics}, 80:381--402, 1981.
+
+\end{thebibliography}
+
+\end{document}

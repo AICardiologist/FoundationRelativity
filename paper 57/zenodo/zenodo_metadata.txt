@@ -1,0 +1,38 @@
+ZENODO UPLOAD METADATA — Paper 57
+===================================
+
+DOI: 10.5281/zenodo.18735172
+VERSION: 4.0.0
+
+TITLE:
+Exotic Weil Self-Intersection Across All Nine Heegner Fields (Paper 57, Constructive Reverse Mathematics and Arithmetic Geometry Series)
+
+UPLOAD TYPE: Software
+
+PUBLICATION DATE: 2026-02-21
+
+AUTHORS:
+Lee, Paul Chun-Kit — New York University
+
+LICENSE: Apache-2.0
+
+DESCRIPTION:
+Paper 57 of the Constructive Reverse Mathematics and Arithmetic Geometry series. We complete the exotic Weil self-intersection computation of Paper 56 across all nine imaginary quadratic fields with class number 1 (Baker-Heegner-Stark). For each field K = Q(sqrt(-d)), d in {1, 2, 3, 7, 11, 19, 43, 67, 163}, we pair K with a cyclic Galois totally real cubic F and compute the self-intersection degree of the primitive exotic Weil class on the resulting CM abelian fourfold.
+
+The formula deg(w_0 . w_0) = sqrt(disc(F)) is verified in all nine cases:
+d=1: deg=9 | d=2: deg=19 | d=3: deg=7 | d=7: deg=13 | d=11: deg=37 | d=19: deg=61 | d=43: deg=79 | d=67: deg=163 | d=163: deg=97
+
+The degree sequence consists of prime conductors with a single exception (9 = 3^2). The number 163 -- the largest Heegner number -- appears both as a d-value (yielding degree 97) and as a degree value (from d = 67). By Baker-Heegner-Stark, no further class-number-1 examples exist; the theorem's natural domain is exhausted.
+
+Lean 4 / Mathlib formalization: 3 modules, ~918 lines, 1 principled axiom (weil_class_degree_eq_conductor), zero sorry gaps. All nine 3x3 determinants verified by native_decide over Q.
+
+Code is distributed exclusively via this Zenodo record.
+
+KEYWORDS:
+exotic Weil class, self-intersection, CM abelian fourfold, field discriminant, Heegner number, class number 1, Baker-Heegner-Stark, cyclic cubic conductor, Lean 4, formal verification, constructive reverse mathematics, arithmetic geometry
+
+RELATED IDENTIFIER:
+isPartOf — DOI: 10.5281/zenodo.17054050
+
+NOTES:
+AI-assisted formalization using Claude (Anthropic, Opus 4.6) for Lean 4 code generation under human direction. All mathematical content specified by the author; every theorem verified by the Lean 4 type checker. Built with Lean 4 v4.29.0-rc1 and Mathlib. Reproducible via 'lake build'. Code available exclusively on Zenodo (not hosted on GitHub).

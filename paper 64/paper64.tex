@@ -1,0 +1,803 @@
+\documentclass[11pt,a4paper]{article}
+
+% ---- Packages ----
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathrsfs}
+\usepackage{enumerate}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage[margin=1in]{geometry}
+\usepackage{xcolor}
+
+% ---- Theorem environments ----
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+% ---- Notation ----
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Qp}{\mathbb{Q}_p}
+\newcommand{\Zp}{\mathbb{Z}_p}
+\newcommand{\vp}{v_p}
+\newcommand{\NM}{N_M}
+\newcommand{\BISH}{\mathsf{BISH}}
+\newcommand{\LPO}{\mathsf{LPO}}
+\newcommand{\LLPO}{\mathsf{LLPO}}
+\newcommand{\MP}{\mathsf{MP}}
+\newcommand{\WLPO}{\mathsf{WLPO}}
+\newcommand{\CLASS}{\mathsf{CLASS}}
+
+\begin{document}
+
+% ====================================================================
+% TITLE
+% ====================================================================
+
+\title{%
+  Uniform $p$-Adic Decidability for Elliptic Curves:\\
+  Computational Evidence and Proof\\[6pt]
+  \large (Paper 64 of the Constructive Reverse Mathematics Series)
+}
+\author{Paul Chun-Kit Lee}
+\date{February 2026}
+\maketitle
+
+% ====================================================================
+% ABSTRACT
+% ====================================================================
+
+\begin{abstract}
+Paper~59 of this series established that the crystalline precision bound
+$\NM = \vp(\#E(\F_p))$ for an elliptic curve $E/\Q$ at a prime $p$
+of good reduction is $\BISH$-computable.
+This paper determines the \emph{uniform} bound: we prove
+$\NM \le 2$ for all $(E, p)$, with $\NM = 2$ only possible at
+$p = 2$, and $\NM \le 1$ for every $p \ge 3$.
+For $p \ge 5$, equality $\NM = 1$ holds if and only if $E$ is anomalous
+at~$p$ (i.e., $a_p = 1$).
+The proof is a short argument from the Hasse bound $|a_p| \le 2\sqrt{p}$.
+We verify the theorem computationally on 1{,}812 elliptic curves across
+15 primes, covering 23{,}454 $(E, p)$~pairs, and confirm that $\NM$
+does not correlate with rank, torsion structure, or CM status.
+
+The principal consequence is that $p$-adic crystalline decidability for
+elliptic curves requires at most two digits of $p$-adic precision at
+$p = 2$ and at most one digit everywhere else.
+The $p$-adic side of the decidability problem is thus \emph{uniformly
+trivial}, contrasting sharply with the Archimedean side, where rank
+creates genuine stratification (Papers~59, 61).
+This asymmetry---$p$-adic uniform, Archimedean stratified---is a
+clean structural result with implications for the mixed-motive
+decidability program.
+\end{abstract}
+
+% ====================================================================
+% 1. INTRODUCTION
+% ====================================================================
+
+\section{Introduction}
+
+\subsection{Context}
+
+The Constructive Reverse Mathematics (CRM) program~\cite{P1,P50}
+calibrates theorems of mainstream mathematics against the logical
+hierarchy
+\[
+  \BISH \;\subset\; \BISH{+}\MP \;\subset\; \BISH{+}\LLPO
+  \;\subset\; \BISH{+}\WLPO \;\subset\; \BISH{+}\LPO
+  \;\subset\; \CLASS,
+\]
+where $\BISH$ denotes Bishop's constructive mathematics~\cite{BB85},
+and $\LPO$, $\WLPO$, $\LLPO$, $\MP$ are the limited principle of
+omniscience, the weak limited principle of omniscience, the lesser
+limited principle of omniscience, and Markov's principle,
+respectively.
+
+Paper~59~\cite{P59} in this series proved that for an elliptic curve
+$E/\Q$ and a prime $p$ of good reduction, the $p$-adic precision
+needed to decide whether the associated Galois representation is
+crystalline is
+\begin{equation}\label{eq:NM-def}
+  \NM = \vp(\#E(\F_p)) = \vp(p + 1 - a_p),
+\end{equation}
+where $a_p$ is the Frobenius trace and $\#E(\F_p) = p + 1 - a_p$
+is the number of $\F_p$-rational points on the reduced curve.
+Paper~59 showed that $\NM$ is $\BISH$-computable for each individual
+$(E, p)$ pair.
+
+\subsection{Main results}
+
+This paper asks: \emph{what is the uniform behavior of $\NM$
+across all elliptic curves and primes?}  The answer is surprisingly
+clean.
+
+\begin{theorem}[Uniform $p$-adic precision bound]\label{thm:main}
+For any elliptic curve $E/\Q$ and any prime $p$ of good reduction:
+\begin{enumerate}[\upshape(i)]
+  \item $\NM \le 2$, with $\NM = 2$ only possible at $p = 2$.
+  \item For $p \ge 3$: $\NM \le 1$.
+  \item For $p \ge 5$: $\NM = 1$ if and only if $E$ is anomalous
+    at $p$ (i.e., $a_p = 1$, equivalently $\#E(\F_p) = p$).
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}[Rank independence]\label{thm:rank-indep}
+The bound $\NM \le 2$ is independent of the rank of $E$.
+In particular, there is no $p$-adic analogue of the Archimedean
+rank obstruction identified in Paper~59: the $p$-adic precision
+bound does not increase with rank.
+\end{theorem}
+
+\begin{theorem}[Constructive consequence]\label{thm:crm}
+Crystalline decidability for elliptic curves over $\Q$ is uniformly
+$\BISH$-decidable: at every prime $p$ of good reduction, a
+computation in $\Z/p^2\Z$ (or $\Z/p\Z$ for $p \ge 3$) suffices
+to determine $\NM$ and hence to decide crystalline equivalence.
+No omniscience principle is required.
+\end{theorem}
+
+\subsection{Relationship to the series}
+
+This paper belongs to the arithmetic geometry strand of the CRM
+program.  Paper~50~\cite{P50} established the DPT (Decidable Polarized
+Tannakian) framework; Papers~51--53~\cite{P51,P52,P53}
+tested it on BSD, Birch--Swinnerton-Dyer, and Bloch--Kato conjectures;
+Paper~59~\cite{P59} proved individual $\BISH$-computability of $\NM$;
+Papers~61--62~\cite{P61,P62} address the Archimedean side
+(Lang's conjecture, Hodge level boundary).
+Paper~64 completes the $p$-adic side by showing that \emph{no
+family-level complication arises}: the bound is uniform, and the
+$p$-adic decidability problem is trivially solved for all elliptic
+curves simultaneously.
+
+% ====================================================================
+% 2. PRELIMINARIES
+% ====================================================================
+
+\section{Preliminaries}
+
+\begin{definition}[$p$-adic valuation]
+For a prime $p$ and a nonzero integer $n$, the \emph{$p$-adic
+valuation} $\vp(n)$ is the largest exponent $k \ge 0$ such that
+$p^k \mid n$.  We set $\vp(0) = +\infty$.
+\end{definition}
+
+\begin{definition}[Frobenius trace and point count]
+Let $E/\Q$ be an elliptic curve and $p$ a prime of good reduction.
+The \emph{Frobenius trace} $a_p \in \Z$ is defined by
+\[
+  \#E(\F_p) = p + 1 - a_p.
+\]
+\end{definition}
+
+\begin{definition}[Hasse bound {\cite{Hasse33,Silverman09}}]
+For any elliptic curve $E/\Q$ and any prime $p$ of good reduction,
+\begin{equation}\label{eq:hasse}
+  |a_p| \le 2\sqrt{p}.
+\end{equation}
+\end{definition}
+
+\begin{definition}[Crystalline precision bound]
+The \emph{crystalline precision bound} for $(E, p)$ is
+\[
+  \NM = \vp(\#E(\F_p)) = \vp(p + 1 - a_p).
+\]
+\end{definition}
+
+\begin{definition}[Anomalous prime]
+A prime $p$ of good reduction for $E$ is \emph{anomalous} if
+$a_p = 1$, equivalently $\#E(\F_p) = p$.  In this case
+$\NM = \vp(p) = 1$.
+\end{definition}
+
+\begin{definition}[Logical principles {\cite{BB85,BR87}}]
+We work in Bishop's constructive mathematics ($\BISH$) unless
+otherwise stated.  The relevant omniscience principles are:
+\begin{itemize}
+  \item $\LPO$: For every binary sequence $(a_n)$, either
+    $\exists n\, (a_n = 1)$ or $\forall n\, (a_n = 0)$.
+  \item $\MP$: For every binary sequence $(a_n)$, if it is
+    impossible that $\forall n\, (a_n = 0)$, then
+    $\exists n\, (a_n = 1)$.
+  \item $\BISH$: No omniscience principle assumed.
+\end{itemize}
+\end{definition}
+
+% ====================================================================
+% 3. MAIN RESULTS
+% ====================================================================
+
+\section{Main Results}
+
+\subsection{The uniform bound}
+
+\begin{proof}[Proof of \Cref{thm:main}]
+We establish $\NM \le 2$ with the stated refinements by case
+analysis on~$p$.
+
+\medskip\noindent
+\textbf{Case $p \ge 5$.}\quad
+The Hasse bound~\eqref{eq:hasse} gives $|a_p| \le 2\sqrt{p}$.
+For $p \ge 5$, we have $2\sqrt{p} < p$ (since $4p < p^2$ iff $p > 4$),
+so $|a_p| < p$.
+
+Suppose for contradiction that $\NM \ge 2$, i.e.,
+$p^2 \mid (p + 1 - a_p)$.
+Then $a_p \equiv p + 1 \pmod{p^2}$, i.e.,
+$a_p \equiv 1 \pmod{p}$.
+Since $|a_p| < p$, the only integer satisfying
+$a_p \equiv 1 \pmod{p}$ and $|a_p| < p$ is $a_p = 1$.
+But then $p + 1 - a_p = p$, and $\vp(p) = 1 < 2$, contradicting
+$\NM \ge 2$.
+
+Therefore $\NM \le 1$ for all $p \ge 5$.
+
+Equality $\NM = 1$ requires $p \mid (p + 1 - a_p)$, i.e.,
+$a_p \equiv 1 \pmod{p}$.  Again $|a_p| < p$ forces $a_p = 1$,
+which is the anomalous condition.
+
+\medskip\noindent
+\textbf{Case $p = 3$.}\quad
+The Hasse bound gives $|a_3| \le 2\sqrt{3} \approx 3.46$, so
+$a_3 \in \{-3, -2, -1, 0, 1, 2, 3\}$.
+The point count $\#E(\F_3) = 4 - a_3$ ranges over $\{1, 2, 3, 4, 5, 6, 7\}$.
+
+We compute $\vp[3]$ for each possible point count:
+\begin{center}
+\begin{tabular}{ccccccc}
+\toprule
+$\#E(\F_3)$ & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\
+\midrule
+$v_3$ & 0 & 0 & 1 & 0 & 0 & 1 & 0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+The maximum is $\vp[3](\#E(\F_3)) = 1$, achieved at
+$\#E(\F_3) \in \{3, 6\}$.
+Note that $\#E(\F_3) = 9$ would give $\NM = 2$, but $9 > 7$,
+so this is excluded by the Hasse bound.
+
+\medskip\noindent
+\textbf{Case $p = 2$.}\quad
+The Hasse bound gives $|a_2| \le 2\sqrt{2} \approx 2.83$, so
+$a_2 \in \{-2, -1, 0, 1, 2\}$.
+The point count $\#E(\F_2) = 3 - a_2$ ranges over $\{1, 2, 3, 4, 5\}$.
+
+\begin{center}
+\begin{tabular}{cccccc}
+\toprule
+$a_2$ & $-2$ & $-1$ & $0$ & $1$ & $2$ \\
+\midrule
+$\#E(\F_2)$ & 5 & 4 & 3 & 2 & 1 \\
+$v_2(\#E(\F_2))$ & 0 & 2 & 0 & 1 & 0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+The maximum is $v_2(4) = 2$, achieved when $a_2 = -1$.
+Since $8 > 5$, $\NM \ge 3$ is impossible.
+\end{proof}
+
+\subsection{Rank independence}
+
+\begin{proof}[Proof of \Cref{thm:rank-indep}]
+The bound in \Cref{thm:main} depends only on the Hasse
+bound~\eqref{eq:hasse}, which constrains $a_p$ independently
+of the rank of~$E$.  The rank of $E$ over $\Q$ affects the
+global arithmetic (the $L$-function, the Mordell--Weil group)
+but not the local Frobenius trace at any individual prime.
+
+Concretely, the Hasse bound $|a_p| \le 2\sqrt{p}$ holds for
+all elliptic curves over $\Q$ at all primes of good reduction,
+regardless of rank.  Since our proof uses nothing beyond this
+bound, the result is rank-independent.
+\end{proof}
+
+\begin{remark}
+The rank independence of $\NM$ contrasts sharply with the
+Archimedean side.  Paper~59~\cite{P59} showed that the
+Archimedean precision needed for decidability is sensitive to rank:
+rank~$\ge 2$ curves require qualitatively different treatment
+(Markov's principle is needed in the absence of a Lang-type bound).
+Paper~61 explores this further, showing that Lang's conjecture
+is the precise gate from $\MP$ to $\BISH$ for the rank obstruction.
+
+The $p$-adic side, by contrast, is uniformly trivial.  This
+asymmetry---$p$-adic uniform, Archimedean stratified---is a
+structural feature of the decidability landscape for elliptic
+curves.
+\end{remark}
+
+\subsection{Constructive consequence}
+
+\begin{proof}[Proof of \Cref{thm:crm}]
+By \Cref{thm:main}, $\NM \le 2$ for all $(E, p)$.
+Given a Weierstrass equation for $E$ and a prime $p$ of good
+reduction, the computation of $\NM$ proceeds as follows:
+\begin{enumerate}[(1)]
+  \item Reduce the equation modulo $p$ to obtain $E/\F_p$.
+  \item Count $\#E(\F_p) = p + 1 - a_p$ by enumerating all
+    $x \in \F_p$ and checking whether $x^3 + \cdots$ is a
+    quadratic residue.  This is a finite computation in $\BISH$.
+  \item Compute $\NM = \vp(\#E(\F_p))$ by repeated trial
+    division by $p$.  This is also a finite computation.
+  \item Since $\NM \le 2$, the result is determined by the
+    value of $\#E(\F_p) \bmod p^2$ (or just $\bmod p$ for
+    $p \ge 3$).  No infinite-precision computation or omniscience
+    principle is needed.
+\end{enumerate}
+All steps are effective and require no appeal to $\LPO$, $\MP$,
+or any other omniscience principle.
+\end{proof}
+
+% ====================================================================
+% 4. COMPUTATIONAL VERIFICATION
+% ====================================================================
+
+\section{Computational Verification}
+
+\subsection{Dataset}
+
+We computed $\NM$ for a dataset of 1{,}812 elliptic curves,
+comprising:
+\begin{itemize}
+  \item 136 named curves from Cremona's tables with conductor
+    $\le 1{,}000$ (including curves of rank $0, 1, 2,$ and~$3$,
+    various torsion groups, and CM discriminants);
+  \item 1{,}676 curves obtained by systematic enumeration of short
+    Weierstrass forms $y^2 = x^3 + Ax + B$ with
+    $|A|, |B| \le 20$ and nonzero discriminant.
+\end{itemize}
+
+For each curve, we computed $a_p$ by direct point-counting
+modulo $p$ for all 15 primes $p \le 47$ of good reduction,
+yielding 23{,}454 $(E, p)$~pairs.
+
+\subsection{Results}
+
+\subsubsection{Global boundedness}
+
+The global maximum of $\NM$ across all 23{,}454 computed pairs
+is~$\mathbf{2}$, achieved at $p = 2$ (e.g., curve \texttt{15.a1}
+with $a_2 = -1$, $\#E(\F_2) = 4$, $v_2(4) = 2$).
+
+The distribution of $\max_p \NM$ per curve is:
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+$\max_p \NM$ & Curves & Percentage \\
+\midrule
+0 & 922 & 50.9\% \\
+1 & 870 & 48.0\% \\
+2 & 20  & 1.1\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Confirmation of $\NM \le 1$ for $p \ge 5$}
+
+Among all 23{,}454 computed pairs, \textbf{zero} have $\NM \ge 2$
+with $p \ge 5$.  Similarly, zero pairs have $\NM \ge 2$ with
+$p = 3$.  All 20 instances of $\NM = 2$ occur at $p = 2$,
+confirming \Cref{thm:main} empirically.
+
+\subsubsection{Small prime analysis}
+
+\begin{center}
+\begin{tabular}{lrrrrr}
+\toprule
+$p$ & $\NM = 0$ & $\NM = 1$ & $\NM = 2$ & $\NM \ge 3$ & Max $\NM$ \\
+\midrule
+2 & 41 & 9 & 20 & 0 & 2 \\
+3 & 1{,}209 & 36 & 0 & 0 & 1 \\
+5 & 1{,}228 & 223 & 0 & 0 & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Rank correlation}
+
+\begin{center}
+\begin{tabular}{lrrl}
+\toprule
+Rank & Curves & Mean $\max_p \NM$ & Max $\max_p \NM$ \\
+\midrule
+0 & 111 & 0.802 & 2 \\
+1 & 18  & 1.222 & 2 \\
+2 & 6   & 0.667 & 1 \\
+3 & 1   & 1.000 & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+No systematic dependence of $\NM$ on rank is observed.  The slight
+variation in means is attributable to small sample sizes for
+rank~$\ge 2$.  The maximum $\NM$ value does not increase with rank.
+
+\subsubsection{CM vs.\ non-CM}
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Type & Curves & Mean $\max_p \NM$ \\
+\midrule
+CM & 18 & 0.278 \\
+Non-CM & 1{,}794 & 0.504 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+CM curves show a slightly lower mean $\NM$, consistent with the
+equidistribution of $a_p$ on a circle (rather than Sato--Tate)
+making $a_p = 1$ less likely.  This does not affect the uniform
+bound.
+
+\subsubsection{Anomalous primes}
+
+We found 1{,}119 anomalous $(E, p)$ pairs (where $a_p = 1$),
+with a mean of $0.62$ anomalous primes per curve.
+
+\subsection{Hasse bound comparison}
+
+\Cref{fig:hasse} compares the theoretical maximum $\NM$
+(computed from the Hasse bound by exhaustive search over allowed
+$a_p$ values) with the empirical maximum observed in our dataset.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{p64_hasse_bound_comparison.png}
+\caption{Theoretical (Hasse bound) vs.\ empirical max $\NM$ by
+prime.  The theoretical bound is $\NM = 2$ at $p = 2$ and
+$\NM = 1$ for all $p \ge 3$.  Empirical data matches the
+theoretical bound exactly.}
+\label{fig:hasse}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{p64_histogram_max_NM.png}
+\caption{Distribution of $\max_p \NM$ across all 1{,}812 curves.
+Over half have $\max_p \NM = 0$ (i.e., $p \nmid \#E(\F_p)$ for
+all primes tested), and 99\% have $\max_p \NM \le 1$.}
+\label{fig:histogram}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{p64_small_primes.png}
+\caption{Distribution of $\NM$ at small primes $p = 2, 3, 5$.
+At $p = 2$, $\NM$ reaches 2; at $p = 3$ and $p = 5$,
+$\NM \le 1$.}
+\label{fig:small}
+\end{figure}
+
+
+% ====================================================================
+% 5. CRM AUDIT
+% ====================================================================
+
+\section{CRM Audit}
+
+\subsection{Constructive strength classification}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Result & Strength & Principles used \\
+\midrule
+\Cref{thm:main} (uniform bound) & $\BISH$ & None (Hasse bound + arithmetic) \\
+\Cref{thm:rank-indep} (rank independence) & $\BISH$ & None \\
+\Cref{thm:crm} (constructive decidability) & $\BISH$ & None \\
+Point counting algorithm & $\BISH$ & Finite enumeration \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Descent pattern}
+
+This paper completes a clean descent on the $p$-adic side of the
+decidability problem:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Paper & Result & Strength \\
+\midrule
+Paper 59 & $\NM$ is computable per $(E,p)$ & $\BISH$ \\
+Paper 64 (this) & $\NM \le 2$ uniformly & $\BISH$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+No omniscience principle is needed at any stage.  The $p$-adic
+side requires only finite computation in bounded precision,
+placing it firmly in $\BISH$.
+
+\subsection{Comparison with Archimedean side}
+
+The Archimedean decidability picture is more complex:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Side & Uniform bound? & Strength \\
+\midrule
+$p$-adic (this paper) & Yes ($\NM \le 2$) & $\BISH$ \\
+Archimedean, rank 0--1 (Paper 59) & $\BISH$-decidable & $\BISH$ \\
+Archimedean, rank $\ge 2$ (Papers 59, 61) & Needs Lang bound & $\BISH{+}\MP$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The asymmetry is structural: the $p$-adic side is uniformly
+trivial because the Hasse bound imposes a rigid constraint on
+$a_p$, while the Archimedean side involves unbounded quantities
+(rational points, heights) that create genuine logical
+stratification.
+
+% ====================================================================
+% 6. FORMAL VERIFICATION
+% ====================================================================
+
+\section{Reproducibility}
+
+This paper is a computational paper; no Lean formalization is
+included.  The proof of \Cref{thm:main} is a short combinatorial
+argument from the Hasse bound (integer arithmetic only) and does
+not require machine verification.
+
+All computational results are fully reproducible from the
+following artifacts, deposited on Zenodo:
+\begin{itemize}
+  \item Python computation script: \texttt{p64\_compute.py}
+  \item Full $(E, p, \NM)$ table: \texttt{p64\_N\_M\_table.csv}
+    (23{,}454 rows)
+  \item Per-curve summary: \texttt{p64\_curve\_summary.csv}
+    (1{,}812 rows)
+  \item Per-prime summary: \texttt{p64\_prime\_summary.csv}
+  \item Hasse bound analysis: \texttt{p64\_hasse\_analysis.csv}
+  \item Zenodo DOI: \texttt{10.5281/zenodo.18737090}
+\end{itemize}
+
+The script requires only Python~3 with \texttt{matplotlib} and
+\texttt{numpy}; no SageMath or external database access is needed.
+Point counting is performed by direct enumeration modulo~$p$.
+
+% ====================================================================
+% 7. DISCUSSION
+% ====================================================================
+
+\section{Discussion}
+
+\subsection{The $p$-adic/Archimedean asymmetry}
+
+The central finding of this paper is that the $p$-adic precision
+bound $\NM$ is uniformly bounded by~2 (and by~1 for $p \ge 3$),
+independently of the elliptic curve.  This stands in stark contrast
+to the Archimedean side, where the decidability problem is sensitive
+to rank and requires progressively stronger logical principles for
+higher-rank curves.
+
+This asymmetry has a clean explanation.  On the $p$-adic side, the
+Hasse bound $|a_p| \le 2\sqrt{p}$ is a \emph{hard constraint} on the
+Frobenius trace, and the point count $\#E(\F_p) = p + 1 - a_p$ is
+tightly controlled: it lies in the interval
+$[p + 1 - 2\sqrt{p}, \; p + 1 + 2\sqrt{p}]$, which for $p \ge 5$
+does not contain any multiple of $p^2$.
+
+On the Archimedean side, the relevant quantities (generators of the
+Mordell--Weil group, N\'eron--Tate heights, regulators) are
+\emph{unbounded} and grow with rank.  No analogue of the Hasse bound
+constrains them, and their computation involves potentially unbounded
+search---precisely the situation where omniscience principles become
+relevant.
+
+\subsection{Implications for the mixed-motive program}
+
+Papers~50--53 established the DPT framework for calibrating conjectures
+in arithmetic geometry against the constructive hierarchy.  The uniform
+tameness of $\NM$ for elliptic curves suggests that $p$-adic
+decidability may be uniformly tame for a broader class of motives.
+
+The natural next question is: does $\NM = \vp(\#\mathcal{M}(\F_p))$
+remain bounded for abelian surfaces, threefolds, or higher-dimensional
+motives?  For weight-2 motives (which include elliptic curves), the
+Hasse--Weil bound $|a_p| \le 2p^{(w-1)/2}$ with $w = 2$ gives
+$|a_p| \le 2\sqrt{p}$, and our argument goes through.  For higher
+weight, the bound $|a_p| \le 2p^{(w-1)/2}$ grows with $p$, and the
+analysis becomes more delicate.
+
+\subsection{Anomalous primes and uniformity}
+
+The only obstruction to $\NM = 0$ for $p \ge 5$ is the anomalous
+condition $a_p = 1$.  By Elkies~\cite{Elkies87}, every elliptic
+curve over $\Q$ has infinitely many supersingular primes ($a_p = 0$),
+and it is expected (but not proved in general) that anomalous primes
+are also infinite in number for non-CM curves.
+
+The distribution of anomalous primes---and hence the distribution
+of $\NM = 1$ events---is governed by the Sato--Tate distribution
+(for non-CM curves) or the equidistribution on a circle
+(for CM curves).  In either case, the \emph{density} of anomalous
+primes is zero (since $a_p = 1$ is a measure-zero event in the
+limiting distribution), but their \emph{count} is expected to be
+infinite.
+
+\subsection{Independence from the three governing invariants}
+
+The CRM Programme Roadmap identifies three invariants that govern
+the decidability landscape for mixed motives: the rank~$r$, the
+Hodge level~$\ell$, and the effective Lang constant~$c(A)$.
+On the Archimedean side, these invariants create genuine
+stratification---rank determines whether $\MP$ suffices or
+$\LPO$ is required (Papers~59, 61), and Hodge level governs the
+$\MP$/$\LPO$ boundary (Paper~62).
+
+On the $p$-adic side, $\NM$ is independent of all three.  The
+bound $\NM \le 2$ depends only on the Hasse constraint on $a_p$,
+which is insensitive to rank, Hodge level, and Lang constants.
+This makes the $p$-adic precision bound a \emph{universal constant}
+of the decidability program rather than a variable tied to the
+motive's arithmetic complexity.
+
+\subsection{Open questions}
+
+\begin{enumerate}[(1)]
+  \item \textbf{Higher-dimensional motives:} Is $\NM$ uniformly
+    bounded for abelian surfaces?  For $K3$ surfaces?  For
+    arbitrary motives of fixed weight?
+  \item \textbf{Quantitative anomalous prime counting:} For a
+    given elliptic curve, what is the asymptotic density of
+    primes with $\NM = 1$?
+  \item \textbf{Function field analogue:} Does the uniform bound
+    carry over to elliptic curves over function fields $\F_q(t)$?
+\end{enumerate}
+
+% ====================================================================
+% 8. CONCLUSION
+% ====================================================================
+
+\section{Conclusion}
+
+We have proved that the crystalline precision bound $\NM =
+\vp(\#E(\F_p))$ satisfies $\NM \le 2$ for all elliptic curves
+$E/\Q$ and all primes $p$ of good reduction, with $\NM = 2$
+achievable only at $p = 2$.  For $p \ge 5$, $\NM \le 1$ with
+equality if and only if the curve is anomalous at~$p$.  The proof
+is a short application of the Hasse bound, verified computationally
+on 1{,}812 curves across 23{,}454 $(E, p)$~pairs.
+
+The constructive consequence is that $p$-adic crystalline
+decidability for elliptic curves is uniformly $\BISH$-decidable,
+requiring no omniscience principle.  This completes the $p$-adic
+side of the decidability problem initiated in Paper~59, and
+highlights a clean structural asymmetry: the $p$-adic side is
+uniformly trivial, while the Archimedean side exhibits genuine
+logical stratification tied to rank.
+
+\paragraph{Scope of contribution.}
+\Cref{thm:main} is a new observation, proved rigorously and
+verified computationally.  The CRM calibration (\Cref{thm:crm})
+is a direct consequence.  The computation is original.  The Hasse
+bound itself is classical (Hasse, 1933).
+
+% ====================================================================
+% ACKNOWLEDGMENTS
+% ====================================================================
+
+\section*{Acknowledgments}
+
+This paper was prepared with AI assistance (Claude, Anthropic)
+for computation, code generation, and drafting.  The author is not
+a domain expert in arithmetic geometry; the mathematical content
+has been verified computationally and by formal argument, but has
+not undergone independent peer review.
+
+The Constructive Reverse Mathematics program builds on the
+foundational work of Errett Bishop and the constructive mathematics
+community.  We thank the Mathlib contributors for the Lean~4
+formalization infrastructure.
+
+% ====================================================================
+% REFERENCES
+% ====================================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{BB85}
+E.~Bishop and D.~Bridges,
+\emph{Constructive Analysis},
+Springer, 1985.
+
+\bibitem{BR87}
+D.~Bridges and F.~Richman,
+\emph{Varieties of Constructive Mathematics},
+London Math.\ Soc.\ Lecture Notes 97, Cambridge Univ.\ Press, 1987.
+
+\bibitem{Cremona97}
+J.~E.~Cremona,
+\emph{Algorithms for Modular Elliptic Curves},
+2nd ed., Cambridge Univ.\ Press, 1997.
+
+\bibitem{Elkies87}
+N.~D.~Elkies,
+``The existence of infinitely many supersingular primes for every
+elliptic curve over $\mathbb{Q}$,''
+\emph{Invent.\ Math.}\ \textbf{89} (1987), 561--567.
+
+\bibitem{Hasse33}
+H.~Hasse,
+``Beweis des Analogons der Riemannschen Vermutung f\"ur die
+Artinschen und F.K.\ Schmidtschen Kongruenzzetafunktionen in
+gewissen elliptischen F\"allen,''
+\emph{Nachr.\ Ges.\ Wiss.\ G\"ottingen} (1933), 253--262.
+
+\bibitem{LMFDB}
+The LMFDB Collaboration,
+\emph{The L-functions and Modular Forms DataBase},
+\url{https://www.lmfdb.org}, 2024.
+
+\bibitem{Silverman09}
+J.~H.~Silverman,
+\emph{The Arithmetic of Elliptic Curves},
+2nd ed., Springer GTM 106, 2009.
+
+\bibitem{P1}
+P.~C.-K.~Lee,
+``Paper~1: Constructive Reverse Mathematics for Physics---Overview,''
+CRM Series, 2025.
+
+\bibitem{P50}
+P.~C.-K.~Lee,
+``Paper~50: The DPT Framework---Decidable Polarized Tannakian
+Categories,''
+CRM Series, 2025.
+
+\bibitem{P51}
+P.~C.-K.~Lee,
+``Paper~51: BSD and the DPT Framework,''
+CRM Series, 2025.
+
+\bibitem{P52}
+P.~C.-K.~Lee,
+``Paper~52: Bloch--Kato Selmer Groups under DPT,''
+CRM Series, 2025.
+
+\bibitem{P53}
+P.~C.-K.~Lee,
+``Paper~53: QCD Confinement and the DPT Lens,''
+CRM Series, 2026.
+
+\bibitem{P59}
+P.~C.-K.~Lee,
+``Paper~59: De Rham Decidability---$p$-Adic Precision for
+Crystalline Equivalence,''
+CRM Series, 2026.
+
+\bibitem{P61}
+P.~C.-K.~Lee,
+``Paper~61: Lang's Conjecture as the MP$\to$BISH Gate,''
+CRM Series, 2026.
+
+\bibitem{P62}
+P.~C.-K.~Lee,
+``Paper~62: The Hodge Level Boundary,''
+CRM Series, 2026.
+
+\end{thebibliography}
+
+\end{document}

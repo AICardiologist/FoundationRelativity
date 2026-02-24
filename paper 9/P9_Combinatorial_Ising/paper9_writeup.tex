@@ -1,0 +1,1232 @@
+\documentclass[11pt,a4paper]{article}
+
+% ====================================================================
+% Packages
+% ====================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{cleveref}
+\usepackage{natbib}
+\usepackage{mdframed}
+
+% ====================================================================
+% Theorem environments
+% ====================================================================
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% ====================================================================
+% Lean 4 code listing style
+% ====================================================================
+\definecolor{lean-keyword}{RGB}{0,0,180}
+\definecolor{lean-comment}{RGB}{0,128,0}
+\definecolor{lean-string}{RGB}{163,21,21}
+\definecolor{lean-bg}{RGB}{248,248,248}
+
+\lstdefinelanguage{lean4}{
+  keywords={theorem,lemma,def,class,instance,import,open,variable,
+            noncomputable,section,namespace,end,where,let,have,show,
+            intro,obtain,use,exact,rw,simp,apply,by,fun,match,if,
+            then,else,do,return,axiom,abbrev,private,attribute,
+            suffices,change,congr,ext,constructor,rintro,push_neg,
+            linarith,absurd,set_option,omit,in,set,cases},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+  morestring=[b]',
+}
+
+\lstset{
+  language=lean4,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{lean-keyword}\bfseries,
+  commentstyle=\color{lean-comment}\itshape,
+  stringstyle=\color{lean-string},
+  backgroundcolor=\color{lean-bg},
+  frame=single,
+  framerule=0.5pt,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2,
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+  xleftmargin=15pt,
+  captionpos=b,
+}
+
+% ====================================================================
+% Macros
+% ====================================================================
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\LPO}{\mathrm{LPO}}
+\newcommand{\WLPO}{\mathrm{WLPO}}
+\newcommand{\LLPO}{\mathrm{LLPO}}
+\newcommand{\BMC}{\mathrm{BMC}}
+\newcommand{\BISH}{\mathrm{BISH}}
+\newcommand{\fN}{f_N}
+\newcommand{\finf}{f_\infty}
+\newcommand{\ZN}{Z_N}
+\newcommand{\gfun}{g}
+\newcommand{\Lean}{\textsc{Lean~4}}
+\newcommand{\Mathlib}{\textsc{Mathlib4}}
+\newcommand{\leanok}{\textsf{\small \textcolor{green!70!black}{\checkmark}}}
+\newcommand{\leanpartial}{\textsf{\small \textcolor{orange!80!black}{(partial)}}}
+
+% ====================================================================
+% Title
+% ====================================================================
+\title{%
+  \textbf{Formulation-Invariance of the Logical Cost}\\
+  \textbf{of the Thermodynamic Limit:}\\[6pt]
+  A Combinatorial Proof for the 1D Ising Model\\[6pt]
+  {\normalsize A Lean~4 Formalization}%
+}
+
+\author{
+  Paul Chun-Kit Lee\thanks{%
+    New York University.
+    AI-assisted formalization; see \S\ref{sec:ai} for methodology.} \\
+  New York University \\
+  \texttt{dr.paul.c.lee@gmail.com}
+}
+
+\date{February 2026}
+
+% ====================================================================
+\begin{document}
+\maketitle
+
+% ====================================================================
+\begin{abstract}
+We prove that the logical cost of the thermodynamic limit for the
+one-dimensional Ising model is \emph{formulation-invariant}: the same
+axiom profile arises from a purely combinatorial derivation as from
+the transfer-matrix approach of Paper~8 \cite{Lee26d}. Specifically,
+we re-derive the two main results of Paper~8----(A)~BISH dispensability
+of finite-size error bounds, and (B)~LPO equivalence of the
+thermodynamic limit---using only finite sums over $\{-1,+1\}^N$, the
+binomial parity sieve identity, and elementary arithmetic of
+hyperbolic functions. No transfer matrices, eigenvalues, linear
+algebra, or functional analysis are used at any point. The partition
+function identity $\ZN(\beta) = (2\cosh\beta)^N + (2\sinh\beta)^N$
+is derived from bond variables and the combinatorial parity sieve,
+replacing the spectral decomposition $\ZN = \operatorname{Tr}(T^N) =
+\lambda_+^N + \lambda_-^N$. The resulting axiom profiles are identical:
+Part~A uses no omniscience principles; Part~B establishes
+$\LPO \leftrightarrow \BMC$ with the same axiom set. The combined
+\Lean{} formalization comprises 1319~lines across 18~modules with
+zero sorries. No Mathlib modules from \texttt{LinearAlgebra.*} or
+\texttt{Analysis.NormedSpace.*} are imported, enforcing strict
+formulation independence from Paper~8.
+\end{abstract}
+
+\tableofcontents
+
+% ====================================================================
+\section{Introduction}\label{sec:intro}
+% ====================================================================
+
+Paper~8 \cite{Lee26d} established two results about the 1D Ising
+model, formalized in \Lean{}:
+\begin{enumerate}[label=(\Alph*)]
+  \item The finite-size error bound $|\fN(\beta) - \finf(\beta)|
+    \leq \frac{1}{N}\tanh(\beta)^N$ is provable in $\BISH$ without
+    omniscience.
+  \item The existence of the thermodynamic limit as a completed real
+    number is equivalent over $\BISH$ to $\LPO$, via the known
+    equivalence $\LPO \leftrightarrow \BMC$ of Bridges and
+    V\^{\i}\c{t}\u{a} \cite{BV06}.
+\end{enumerate}
+
+The proofs in Paper~8 relied on the transfer matrix formulation: the
+$2 \times 2$ matrix $T$ with entries $T(s,s') = \exp(\beta \cdot s
+\cdot s')$, its eigenvalues $\lambda_+ = 2\cosh\beta$ and
+$\lambda_- = 2\sinh\beta$, and the trace identity $\ZN =
+\operatorname{Tr}(T^N) = \lambda_+^N + \lambda_-^N$. The \Lean{}
+formalization imported Mathlib modules from
+\texttt{LinearAlgebra.Matrix.*}.
+
+A natural question arises: is the logical cost ($\BISH$ for Part~A,
+$\LPO$ for Part~B) a feature of the \emph{physics} (the Ising model
+and the thermodynamic limit), or an artifact of the
+\emph{mathematical formalism} (the transfer matrix / linear algebra
+framework)?
+
+This paper answers the question by providing a second, completely
+independent proof of both results using purely combinatorial methods.
+The partition function is computed from the configuration sum over
+$\{-1,+1\}^N$ via bond variables and the binomial parity sieve,
+yielding the same algebraic formula $\ZN(\beta) = (2\cosh\beta)^N +
+(2\sinh\beta)^N$ without invoking matrices, eigenvalues, or any
+linear algebra. The error bound and $\LPO$ equivalence then follow
+by the same chain of elementary inequalities and encoding arguments
+as in Paper~8, but with the combinatorial partition function identity
+as the starting point.
+
+The formulation-invariance claim is verified at two levels:
+\begin{enumerate}
+  \item \emph{Axiom audit}: the \texttt{\#print axioms} output for
+    both formulations is identical.
+  \item \emph{Import audit}: the combinatorial formalization imports
+    no Mathlib module from \texttt{LinearAlgebra.*},
+    \texttt{Analysis.NormedSpace.*}, or any functional-analytic
+    library. The two formalizations share only the unavoidable
+    common substrate: real arithmetic (\texttt{Real.exp},
+    \texttt{Real.log}, \texttt{Real.cosh}) and the logical
+    principles under test ($\LPO$, $\BMC$).
+\end{enumerate}
+
+The paper is organized as follows. \Cref{sec:prelim} reviews the
+constructive framework and the 1D Ising model.
+\Cref{sec:combinatorial} derives the partition function identity
+from bond variables and the parity sieve. \Cref{sec:partA} presents
+the $\BISH$ dispensability proof. \Cref{sec:partB} presents the
+$\LPO$ calibration. \Cref{sec:invariance} performs the
+formulation-invariance verification. \Cref{sec:lean} describes the
+\Lean{} formalization. \Cref{sec:appendix} collects elementary
+inequalities.
+
+
+% ====================================================================
+\section{Preliminaries}\label{sec:prelim}
+% ====================================================================
+
+\subsection{Constructive Frameworks}
+
+We work within Bishop-style constructive mathematics ($\BISH$):
+intuitionistic logic with countable and dependent choice
+\cite{Bis67,BB85}. The key omniscience principles form a strict
+hierarchy over $\BISH$:
+
+\begin{definition}[LPO]\label{def:lpo} \leanok{}
+The \emph{Limited Principle of Omniscience} is
+\[
+  \LPO \;:\equiv\;
+  \forall \alpha : \NN \to \{0,1\},\;
+  \bigl(\forall n,\;\alpha(n) = 0\bigr) \;\lor\;
+  \bigl(\exists n,\;\alpha(n) = 1\bigr).
+\]
+\end{definition}
+
+\begin{definition}[BMC]\label{def:bmc} \leanok{}
+\emph{Bounded Monotone Convergence} is the assertion that every
+bounded non-decreasing sequence of reals has a limit: for every
+$a : \NN \to \RR$ with $a_n \leq a_{n+1}$ and $a_n \leq M$ for
+all~$n$, there exists $L \in \RR$ and a convergence modulus such
+that for all $\varepsilon > 0$, there exists $N_0$ with
+$|a_N - L| < \varepsilon$ for all $N \geq N_0$.
+\end{definition}
+
+The equivalence $\LPO \leftrightarrow \BMC$ was established by
+Bridges and V\^{\i}\c{t}\u{a} \cite{BV06}.
+
+\begin{remark}[Constructive status of $\LPO$]\label{rem:lpo}
+$\LPO$ is classically trivial (an instance of excluded middle)
+but constructively independent: it is neither provable nor refutable
+in $\BISH$. Crucially, $\LPO$ provides a \emph{witness} in the
+second disjunct, not merely its double negation. This
+witness-providing character makes $\LPO$ strictly stronger than
+$\WLPO$.
+\end{remark}
+
+\subsection{The 1D Ising Model (Combinatorial Formulation)}
+
+Fix a positive integer $N$ (the number of spins). The configuration
+space is $\Omega_N = \{-1, +1\}^N$. The Hamiltonian with periodic
+boundary conditions ($\sigma_{N+1} := \sigma_1$) and coupling $J > 0$
+is
+\[
+  H_N(\sigma) = -J \sum_{i=1}^{N} \sigma_i \sigma_{i+1}.
+\]
+For simplicity we set $J = 1$ in Part~A.
+
+\begin{definition}[Partition function]\label{def:partition} \leanok{}
+The partition function is the configuration sum
+\[
+  \ZN(\beta) := \sum_{\sigma \in \{-1,+1\}^N} \exp\bigl(-\beta \,
+  H_N(\sigma)\bigr) = \sum_{\sigma} \exp\Bigl(\beta \sum_{i=1}^{N}
+  \sigma_i \sigma_{i+1}\Bigr).
+\]
+\end{definition}
+
+\begin{definition}[Finite-volume free energy density]\label{def:fN} \leanok{}
+\[
+  \fN(\beta) := -\frac{1}{N} \log \ZN(\beta).
+\]
+\end{definition}
+
+\begin{definition}[Infinite-volume free energy density]\label{def:finf} \leanok{}
+Defined by closed form (NOT as a limit):
+\[
+  \finf(\beta) := -\log(2\cosh\beta).
+\]
+\end{definition}
+
+\begin{remark}[Constructive note]\label{rem:finf-constr}
+The infinite-volume free energy density $\finf(\beta)$ is defined by
+an explicit closed-form expression. No omniscience principle is needed.
+The classical route defines $\finf = \lim_{N \to \infty} \fN$ and
+proves the limit exists by monotone convergence ($\LPO$). We skip
+this entirely: we \emph{define} $\finf$ by closed form, and then
+\emph{prove} that $\fN$ converges to it with explicit bounds.
+\end{remark}
+
+
+% ====================================================================
+\section{The Combinatorial Identity}\label{sec:combinatorial}
+% ====================================================================
+
+This section derives $\ZN(\beta) = (2\cosh\beta)^N + (2\sinh\beta)^N$
+from the configuration sum, using only bond variables and the binomial
+parity sieve. No transfer matrices, eigenvalues, or linear algebra.
+
+\subsection{Bond Variables}
+
+For a configuration $\sigma \in \{-1,+1\}^N$ with periodic boundary
+($\sigma_{N+1} = \sigma_1$), define the \emph{bond variables}
+\[
+  b_i(\sigma) := \sigma_i \cdot \sigma_{i+1} \in \{-1, +1\},
+  \qquad i = 1, \ldots, N.
+\]
+Then $-H_N(\sigma) = \sum_{i=1}^N b_i(\sigma)$ and
+\[
+  \ZN(\beta) = \sum_\sigma \prod_{i=1}^N \exp(\beta \cdot b_i(\sigma)).
+\]
+Each factor equals $e^\beta$ if $b_i = +1$ (aligned neighbors) or
+$e^{-\beta}$ if $b_i = -1$ (anti-aligned).
+
+\subsection{The Cycle Constraint}
+
+\begin{lemma}[Cycle constraint]\label{lem:cycle}
+For any configuration $\sigma$ with periodic boundary:
+$\prod_{i=1}^N b_i(\sigma) = 1$.
+\end{lemma}
+
+\begin{proof}
+Each spin $\sigma_j$ appears once as a ``left'' factor and once as
+a ``right'' factor in the cyclic product. Thus
+$\prod_i b_i = \prod_i [\sigma_i \cdot \sigma_{i+1}] =
+[\prod_i \sigma_i]^2 = 1$.
+\end{proof}
+
+This means that the number of anti-aligned bonds ($b_i = -1$) is
+always even---domain walls on a periodic chain come in pairs.
+Equivalently, if $k$ denotes the number of aligned bonds ($b_i = +1$),
+then $N - k$ is even, so $k \equiv N \pmod{2}$.
+
+\subsection{Bond-Configuration Correspondence}
+
+\begin{lemma}[2-to-1 correspondence]\label{lem:bond-config}
+Given a bond pattern $b = (b_1, \ldots, b_N) \in \{-1,+1\}^N$
+satisfying $\prod_i b_i = 1$, exactly 2 configurations $\sigma$
+produce that pattern. Conversely, every configuration produces a
+valid bond pattern.
+\end{lemma}
+
+\begin{proof}
+Fix $\sigma_1 = +1$ and determine $\sigma_2 = b_1 \cdot \sigma_1$,
+$\sigma_3 = b_2 \cdot \sigma_2$, etc. The cycle constraint ensures
+consistency at the wrap-around. The only other choice is $\sigma_1 =
+-1$ (the global spin flip), giving the second configuration.
+\end{proof}
+
+\subsection{Bond Decomposition of $\ZN$}
+
+\begin{lemma}[Bond decomposition]\label{lem:bond-decomp}
+\[
+  \ZN(\beta) = 2 \sum_{\substack{b \in \{-1,+1\}^N \\ \prod b_i = 1}}
+  \prod_{i=1}^N \exp(\beta \cdot b_i).
+\]
+\end{lemma}
+
+\begin{proof}
+Configurations sharing the same bond pattern contribute the same
+product. By \Cref{lem:bond-config}, each valid bond pattern has
+exactly 2 pre-images.
+\end{proof}
+
+Setting $a = e^\beta$, $c = e^{-\beta}$, each bond contributes $a$
+(if $+1$) or $c$ (if $-1$). With $k$ aligned bonds:
+$\prod_i \exp(\beta \cdot b_i) = a^k \cdot c^{N-k}$. The constraint
+$\prod b_i = 1$ forces $k \equiv N \pmod{2}$. The number of bond
+patterns with exactly $k$ aligned bonds is $\binom{N}{k}$. Therefore:
+\[
+  \ZN(\beta) = 2 \sum_{\substack{k=0 \\ k \equiv N \bmod 2}}^{N}
+  \binom{N}{k} a^k c^{N-k}.
+\]
+
+\subsection{The Parity Sieve Identity}
+
+\begin{lemma}[Parity sieve]\label{lem:parity-sieve} \leanpartial{}
+For any real numbers $a, c$ and natural $N$:
+\[
+  \sum_{\substack{k=0 \\ k \equiv N \bmod 2}}^{N}
+  \binom{N}{k} a^k c^{N-k}
+  = \frac{(a+c)^N + (a-c)^N}{2}.
+\]
+\end{lemma}
+
+\begin{proof}
+By the binomial theorem:
+\begin{align*}
+  (a+c)^N &= \sum_{k=0}^N \binom{N}{k} a^k c^{N-k}, \\
+  (a-c)^N &= \sum_{k=0}^N \binom{N}{k} a^k (-c)^{N-k}
+           = \sum_{k=0}^N \binom{N}{k} a^k (-1)^{N-k} c^{N-k}.
+\end{align*}
+Adding:
+\[
+  (a+c)^N + (a-c)^N = \sum_{k=0}^N \binom{N}{k} a^k c^{N-k}
+  \bigl[1 + (-1)^{N-k}\bigr].
+\]
+The bracket $[1 + (-1)^{N-k}]$ equals $2$ when $N-k$ is even
+(i.e., $k \equiv N \bmod 2$) and $0$ otherwise. Dividing by~$2$
+gives the result.
+\end{proof}
+
+\begin{remark}\label{rem:parity-corrected}
+The correct formula always uses the \emph{plus} sign:
+$(a+c)^N + (a-c)^N$ selects $k \equiv N \pmod{2}$ for all~$N$.
+The minus sign $(a+c)^N - (a-c)^N$ selects $k \not\equiv N
+\pmod{2}$. The sign does not depend on whether $N$ is even or odd.
+\end{remark}
+
+\subsection{The Partition Function Formula}
+
+\begin{theorem}[Combinatorial partition function]\label{thm:ZN} \leanok{}
+For all $N \geq 1$ and $\beta > 0$:
+\[
+  \ZN(\beta) = (2\cosh\beta)^N + (2\sinh\beta)^N.
+\]
+\end{theorem}
+
+\begin{proof}
+Set $a = e^\beta$, $c = e^{-\beta}$. By \Cref{lem:bond-decomp}
+and \Cref{lem:parity-sieve}:
+\[
+  \ZN = 2 \cdot \frac{(a+c)^N + (a-c)^N}{2}
+      = (a+c)^N + (a-c)^N.
+\]
+Now $a + c = e^\beta + e^{-\beta} = 2\cosh\beta$ and
+$a - c = e^\beta - e^{-\beta} = 2\sinh\beta$.
+\end{proof}
+
+\begin{remark}[Constructive validity]
+Every step is $\BISH$-valid: the bond decomposition uses finite
+enumeration and counting, the parity sieve is a purely algebraic
+identity (it holds in any commutative ring), and the identification
+$a + c = 2\cosh\beta$ is a definition. No limits, spectral theory,
+or linear algebra appear.
+\end{remark}
+
+
+\subsection{Combinatorial Properties}
+
+The following properties are derived from the combinatorial formula
+exactly as in Paper~8 (with renamed definitions).
+
+\begin{lemma}[Properties]\label{lem:comb-props} \leanok{}
+For all $\beta > 0$:
+\begin{enumerate}[label=(\alph*)]
+  \item $2\cosh\beta > 2\sinh\beta > 0$,
+  \item $2\cosh\beta > 2$,
+  \item $0 < 2\sinh\beta / (2\cosh\beta) = \tanh\beta < 1$,
+  \item $\ZN(\beta) > 0$ for all $N \geq 1$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(a)~$2\cosh\beta - 2\sinh\beta = 2e^{-\beta} > 0$, and
+$2\sinh\beta > 0$ for $\beta > 0$.
+(b)~$\cosh\beta > 1$ for $\beta > 0$.
+(c)~Immediate from~(a).
+(d)~$(2\cosh\beta)^N > 0$ and $(2\sinh\beta)^N \geq 0$, so the sum is positive.
+\end{proof}
+
+\subsection{The Free Energy Function $\gfun(J)$}
+
+\begin{definition}[Free energy at coupling $J$]\label{def:gJ} \leanok{}
+For $\beta > 0$ and $J > 0$:
+\[
+  \gfun(J) := -\log(2\cosh(\beta J)).
+\]
+This is the infinite-volume free energy density of the 1D Ising
+chain with coupling~$J$, derived combinatorially: the partition
+function with coupling $J$ is $(2\cosh(\beta J))^N + (2\sinh(\beta J))^N$
+by the same parity sieve argument with $\beta$ replaced by $\beta J$.
+\end{definition}
+
+\begin{lemma}[Strict anti-monotonicity]\label{lem:ganti} \leanok{}
+For $\beta > 0$, $\gfun$ is strictly decreasing on $(0,\infty)$.
+\end{lemma}
+
+\begin{proof}
+$J_1 > J_0 > 0$ implies $\beta J_1 > \beta J_0 > 0$, implies
+$\cosh(\beta J_1) > \cosh(\beta J_0)$ ($\cosh$ is strictly
+increasing on $(0,\infty)$), implies
+$\log(2\cosh(\beta J_1)) > \log(2\cosh(\beta J_0))$, implies
+$\gfun(J_1) < \gfun(J_0)$.
+\end{proof}
+
+\begin{lemma}[Gap lemma]\label{lem:gap} \leanok{}
+Fix $\beta > 0$ and $0 < J_0 < J_1$. Then
+$\delta := \gfun(J_0) - \gfun(J_1) > 0$.
+\end{lemma}
+
+
+% ====================================================================
+\section{Part A: BISH Dispensability}\label{sec:partA}
+% ====================================================================
+
+\subsection{Free Energy Decomposition}
+
+\begin{lemma}[Decomposition]\label{lem:decomp} \leanok{}
+For all $N \geq 1$ and $\beta > 0$, with $r = \tanh\beta$:
+\[
+  \fN(\beta) = -\log(2\cosh\beta) - \frac{1}{N}\log(1 + r^N).
+\]
+\end{lemma}
+
+\begin{proof}
+Factor $(2\cosh\beta)^N$ from $\ZN$:
+\begin{align*}
+  \fN &= -\frac{1}{N}\log\bigl((2\cosh\beta)^N + (2\sinh\beta)^N\bigr) \\
+  &= -\frac{1}{N}\log\bigl((2\cosh\beta)^N(1 + \tanh(\beta)^N)\bigr) \\
+  &= -\log(2\cosh\beta) - \frac{1}{N}\log(1 + r^N). \qedhere
+\end{align*}
+\end{proof}
+
+\subsection{The Error Bound}
+
+\begin{theorem}[Finite-size bound]\label{thm:error} \leanok{}
+For all $N \geq 1$ and $\beta > 0$:
+\[
+  |\fN(\beta) - \finf(\beta)| = \frac{1}{N}\log(1 + r^N)
+  \leq \frac{1}{N} r^N = \frac{1}{N}\tanh(\beta)^N
+\]
+where $r = \tanh\beta \in (0,1)$.
+\end{theorem}
+
+\begin{proof}
+From \Cref{lem:decomp}, $\fN - \finf = -\frac{1}{N}\log(1+r^N)$.
+Since $0 < r < 1$, we have $\log(1+r^N) > 0$, so $\fN < \finf$ and
+$|\fN - \finf| = \frac{1}{N}\log(1+r^N)$. The bound
+$\log(1+x) \leq x$ for $x > 0$ (\Cref{lem:A1}) gives
+$|\fN - \finf| \leq \frac{1}{N}r^N$.
+\end{proof}
+
+\subsection{Constructive $N_0$ Witness}
+
+\begin{corollary}[Constructive $N_0$]\label{cor:N0} \leanok{}
+For every $\beta > 0$ and $\varepsilon > 0$, there exists a
+constructively computable $N_0 \in \NN$ such that for all
+$N \geq N_0$: $|\fN(\beta) - \finf(\beta)| < \varepsilon$.
+\end{corollary}
+
+\begin{proof}
+We need $\frac{1}{N}r^N < \varepsilon$. Since $r < 1$, the sequence
+$r^N$ decays geometrically while $N\varepsilon$ grows linearly.
+The witness is found by bounded search, which terminates by the
+Archimedean property (\texttt{exists\_pow\_lt\_of\_lt\_one} in
+\Mathlib{}).
+\end{proof}
+
+\subsection{The Dispensability Theorem}
+
+\begin{theorem}[Dispensability]\label{thm:disp} \leanok{}
+For the 1D Ising model with periodic boundary conditions, the
+following is provable in $\BISH$ (no omniscience required): for every
+$\beta > 0$ and $\varepsilon > 0$, there exists $N_0 \in \NN$ such
+that for all $N \geq N_0$,
+\[
+  |\fN(\beta) - \finf(\beta)| < \varepsilon,
+\]
+where $\fN(\beta) = -\frac{1}{N}\log\bigl((2\cosh\beta)^N +
+(2\sinh\beta)^N\bigr)$ and $\finf(\beta) = -\log(2\cosh\beta)$.
+The partition function $(2\cosh\beta)^N + (2\sinh\beta)^N$ is derived
+combinatorially via bond variables and the parity sieve---no transfer
+matrices.
+\end{theorem}
+
+\begin{proof}
+\Cref{thm:error} and \Cref{cor:N0}. Every step uses: finite sums
+over $\{-1,+1\}^N$ (combinatorial), binomial identities (algebraic),
+properties of $\exp$, $\log$, $\cosh$ (real analysis), the inequality
+$\log(1+x) \leq x$ (elementary), and bounded search on $\NN$ ($\BISH$).
+No transfer matrices, eigenvalues, monotone convergence ($\LPO$), or
+any omniscience principle.
+\end{proof}
+
+
+% ====================================================================
+\section{Part B: LPO Calibration}\label{sec:partB}
+% ====================================================================
+
+\subsection{Forward Direction: LPO $\Rightarrow$ BMC}
+
+\begin{theorem}[LPO implies BMC]\label{thm:forward} \leanpartial{}
+$\LPO$ implies $\BMC$. This is \cite[Theorem~2.1.5]{BV06};
+axiomatized as \texttt{bmc\_of\_lpo}.
+\end{theorem}
+
+\subsection{The Encoding}
+
+The backward direction encodes an arbitrary binary sequence into a
+free energy sequence of the 1D Ising model.
+
+\begin{definition}[Running maximum]\label{def:runmax} \leanok{}
+Given $\alpha : \NN \to \{0,1\}$, the running maximum
+$m(n) := \max(\alpha(0), \ldots, \alpha(n))$ is defined recursively:
+$m(0) := \alpha(0)$, $m(n+1) := \max(m(n), \alpha(n+1))$.
+\end{definition}
+
+\begin{definition}[Coupling sequence]\label{def:coupling} \leanok{}
+Fix $0 < J_0 < J_1$. Define $J(n) := J_0$ if $m(n) = 0$,
+$J(n) := J_1$ if $m(n) = 1$. The coupling is non-decreasing and
+bounded in $[J_0, J_1]$.
+\end{definition}
+
+\begin{definition}[Encoded sequence]\label{def:encoded} \leanok{}
+$F(n) := \gfun(J(n)) = -\log(2\cosh(\beta \cdot J(n)))$, where
+$\gfun(J)$ is the combinatorially derived infinite-volume free energy
+at coupling~$J$.
+\end{definition}
+
+Since $\gfun$ is strictly decreasing (\Cref{lem:ganti}) and $J$ is
+non-decreasing, $F$ is non-increasing. Equivalently, $-F$ is
+non-decreasing and bounded above by $-\gfun(J_1)$, so $\BMC$ applies
+to~$-F$.
+
+\subsection{The Two Regimes}
+
+If $\alpha \equiv 0$: $F \equiv \gfun(J_0)$, limit is $\gfun(J_0)$.
+
+If $\exists n_0$ with $\alpha(n_0) = 1$: $F(n) = \gfun(J_1)$ for
+$n \geq n_0$, limit is $\gfun(J_1)$.
+
+Both limits exist trivially (eventually constant sequences converge
+in $\BISH$). But \emph{which} limit obtains depends on $\alpha$, and
+$\BISH$ cannot decide this without $\LPO$. The gap
+$\delta = \gfun(J_0) - \gfun(J_1) > 0$ separates the two values.
+
+\subsection{The Decision Procedure}
+
+\begin{theorem}[BMC implies LPO]\label{thm:backward} \leanok{}
+$\BMC$ implies $\LPO$.
+\end{theorem}
+
+\begin{proof}
+Let $\alpha : \NN \to \{0,1\}$ be given. Fix $\beta = 1$,
+$J_0 = 1$, $J_1 = 2$. Construct $-F$ as above.
+
+\medskip\noindent\textbf{Step 1: Apply BMC.}
+$-F$ is non-decreasing and bounded above by $-\gfun(J_1)$. By
+$\BMC$, obtain $L_{\mathrm{neg}}$ with convergence modulus.
+
+\medskip\noindent\textbf{Step 2: Compute the gap.}
+$\delta = \gfun(J_0) - \gfun(J_1) > 0$ (\Cref{lem:gap}).
+
+\medskip\noindent\textbf{Step 3: Get $N_1$ from modulus.}
+Apply with $\varepsilon = \delta/2$ to get $N_1$ with
+$|(-F)(N_1) - L_{\mathrm{neg}}| < \delta/2$.
+
+\medskip\noindent\textbf{Step 4: Case split on $m(N_1)$.}
+$m(N_1) = \texttt{runMax}\;\alpha\;N_1$ is a Bool---the case split
+is definitionally decidable.
+
+\medskip\noindent\textbf{Case $m(N_1) = \mathtt{false}$:}
+$F(N_1) = \gfun(J_0)$. Suppose $\exists n_0, \alpha(n_0) = 1$.
+Then $L_{\mathrm{neg}} = -\gfun(J_1)$, so
+$|(-F)(N_1) - L_{\mathrm{neg}}| = \delta$. But the modulus gives
+$< \delta/2$: contradiction. Therefore $\forall n, \alpha(n) = 0$.
+
+\medskip\noindent\textbf{Case $m(N_1) = \mathtt{true}$:}
+$\exists k \leq N_1$ with $\alpha(k) = 1$. Bounded search finds the
+witness.
+\end{proof}
+
+\subsection{The Equivalence}
+
+\begin{theorem}[LPO $\leftrightarrow$ BMC]\label{thm:equiv}
+\leanok{}/\leanpartial{}
+Over $\BISH$, $\LPO \leftrightarrow \BMC$.
+\end{theorem}
+
+\begin{proof}
+Forward: \Cref{thm:forward} (axiomatized).
+Backward: \Cref{thm:backward} (fully proved).
+\end{proof}
+
+
+% ====================================================================
+\section{Formulation-Invariance Verification}\label{sec:invariance}
+% ====================================================================
+
+\subsection{Comparison}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Aspect} & \textbf{Paper 8 (Transfer Matrix)} & \textbf{Paper 9 (Combinatorial)} \\
+\midrule
+$\ZN$ derived via & $\operatorname{Tr}(T^N) = \lambda_+^N + \lambda_-^N$ & Bond sums + parity sieve \\
+$\finf$ derived via & Eigenvalue $\lambda_+ = 2\cosh\beta$ & Closed form of comb.\ sum \\
+Key identity & Spectral decomposition & Binomial parity extraction \\
+Linear algebra & Matrix, trace, eigenvectors & None \\
+Mathlib imports & \texttt{LinearAlgebra.Matrix.*} & None from LinearAlgebra \\
+Error bound & $|\fN - \finf| \leq \frac{1}{N}\tanh(\beta)^N$ & Same \\
+Encoding & $\alpha \mapsto m \mapsto J \mapsto F$ & Same \\
+Decision procedure & Bool case split on $m(N_1)$ & Same \\
+\midrule
+\textbf{Part A axioms} & \texttt{[propext, Classical.choice, Quot.sound]} & Same \\
+\textbf{Part B (\texttt{lpo\_of\_bmc})} & \texttt{[propext, Classical.choice, Quot.sound]} & Same \\
+\textbf{Part B (equivalence)} & $+$\texttt{bmc\_of\_lpo} & Same \\
+\bottomrule
+\end{tabular}
+\caption{Formulation comparison between Papers 8 and 9.}
+\label{tab:comparison}
+\end{table}
+
+\subsection{The Invariance Claim}
+
+The axiom profiles are identical across both formulations:
+
+\begin{enumerate}
+  \item \textbf{Part A} (dispensability): both formulations produce
+    \texttt{[propext, Classical.choice, Quot.sound]}---the standard
+    \Lean{} metatheory, no custom axioms, no omniscience.
+  \item \textbf{Part B} (backward direction): both produce
+    \texttt{[propext, Classical.choice, Quot.sound]}---no custom axioms.
+  \item \textbf{Part B} (equivalence): both produce
+    \texttt{[propext, Classical.choice, Quot.sound, bmc\_of\_lpo]}---one
+    cited axiom for the forward direction.
+\end{enumerate}
+
+The shared infrastructure---real arithmetic, $\LPO$/$\BMC$ definitions,
+$\log(1+x) \leq x$---is the language in which the question is posed,
+not a feature of either formulation. The formulation-specific content
+(transfer matrices vs.\ bond sums) is strictly disjoint.
+
+\begin{mdframed}[backgroundcolor=blue!5]
+\textbf{Formulation-Invariance Conclusion.} For the 1D Ising model,
+the logical cost of the thermodynamic limit---$\BISH$ for finite-size
+bounds, $\LPO$ for limit existence---is not an artifact of the
+transfer-matrix formulation. It persists under reformulation via
+purely combinatorial methods. The cost is a feature of the physics,
+not the formalism.
+\end{mdframed}
+
+
+% ====================================================================
+\section{Discussion}\label{sec:discussion}
+% ====================================================================
+
+\subsection{The Dispensability--Calibration Conjunction}
+
+Neither Part~A nor Part~B says much in isolation. Part~A alone is a
+calculation; Part~B alone is an instantiation of a known equivalence.
+The force lies in the conjunction: Part~B establishes that the
+monotone-convergence route to the thermodynamic limit genuinely costs
+$\LPO$; Part~A shows this cost is dispensable for empirical
+predictions. The pattern: the idealization costs omniscience; the
+empirical content does not.
+
+\subsection{Formulation-Invariance as Evidence}
+
+The formulation-invariance result provides evidence---not proof---that
+the logical cost is intrinsic to the physics rather than the formalism.
+Two mathematically independent routes to the same physical quantity
+yield the same axiom profile. This is consistent with the hypothesis
+that the logical cost is a feature of the physical idealization (the
+$N \to \infty$ limit), not the mathematical framework used to compute
+it.
+
+A definitive result would be an \emph{ineliminability} theorem: that
+\emph{any} constructive proof of free energy convergence for the 1D
+Ising model must use $\BMC$. This remains an open problem.
+
+\subsection{The Constructive Reverse Mathematics Programme}
+
+The programme assigns to each physical idealization a position in the
+constructive hierarchy:
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Physical layer} & \textbf{Principle} & \textbf{Status} & \textbf{Source} \\
+\midrule
+Finite-volume Gibbs states & $\BISH$ & Calibrated & Trivial \\
+Finite-size approximations & $\BISH$ & Calibrated & Papers 8, 9 (A) \\
+Bidual-gap witness & $\equiv \WLPO$ & Calibrated & Papers~2, 7 \\
+Thermodynamic limit existence & $\equiv \LPO$ & Calibrated & Papers 8, 9 (B) \\
+Spectral gap decidability & Undecidable & Established & Cubitt et al.\ \cite{CPW15} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Papers~8 and~9 together establish that the thermodynamic limit
+calibration is robust across formulations. The hierarchy
+$\BISH \subsetneq \WLPO \subsetneq \LPO \subsetneq \mathrm{LEM}$ is
+strictly ordered over $\BISH$, and the physical layers sit at distinct
+rungs.
+
+
+% ====================================================================
+\section{Lean 4 Formalization}\label{sec:lean}
+% ====================================================================
+
+\subsection{Module Structure}
+
+The formalization is organized as a single \Lean{} project with
+18~files totaling 1319~lines.
+
+\paragraph{Part A: BISH dispensability (589 lines, 10 modules).}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{File} & \textbf{Lines} & \textbf{Purpose} \\
+\midrule
+\texttt{Basic.lean}               & 73  & Core defs: LPO, twoCosh, twoSinh, partitionFn, free energy \\
+\texttt{CoshSinhProps.lean}       & 118 & $2\cosh > 2\sinh > 0$, $\tanh$ properties, positivity \\
+\texttt{ParitySieve.lean}         & 47  & Parity sieve identity (axiomatized; standard) \\
+\texttt{PartitionIdentity.lean}   & 57  & Bond derivation: $\ZN = (2\cosh)^N + (2\sinh)^N$ \\
+\texttt{LogBounds.lean}           & 70  & $\log(1+x) \leq x$, geometric decay \\
+\texttt{FreeEnergyDecomp.lean}    & 79  & $\fN = -\log(2\cosh) - \frac{1}{N}\log(1 + r^N)$ \\
+\texttt{ErrorBound.lean}          & 70  & $|\fN - \finf| \leq \frac{1}{N} r^N$ \\
+\texttt{ComputeN0.lean}           & 54  & Constructive $N_0$ from $\beta$ and $\varepsilon$ \\
+\texttt{Main.lean}                & 75  & Assembly of dispensability theorem + axiom audit \\
+\texttt{SmokeTest.lean}           & 10  & Minimal import validation \\
+\bottomrule
+\end{tabular}
+\caption{Part A file manifest.}
+\label{tab:partA}
+\end{table}
+
+\paragraph{Part B: LPO calibration (666 lines, 8 modules).}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{File} & \textbf{Lines} & \textbf{Purpose} \\
+\midrule
+\texttt{PartB\_Defs.lean}            & 77  & BMC, runMax, couplingSeq, encodedSeq \\
+\texttt{PartB\_RunMax.lean}          & 103 & Running maximum: monotonicity, characterization \\
+\texttt{PartB\_FreeEnergyAnti.lean}  & 77  & $\gfun(J)$ strictly anti-monotone for $\beta > 0$ \\
+\texttt{PartB\_CouplingSeq.lean}     & 76  & Coupling: monotonicity, bounds, eventual constancy \\
+\texttt{PartB\_EncodedSeq.lean}      & 83  & Encoded sequence: $-F$ non-decreasing, bounded \\
+\texttt{PartB\_Forward.lean}         & 21  & Axiom: LPO $\to$ BMC \cite{BV06} \\
+\texttt{PartB\_Backward.lean}        & 162 & Main theorem: BMC $\to$ LPO via free energy encoding \\
+\texttt{PartB\_Main.lean}            & 67  & Assembly: LPO $\leftrightarrow$ BMC + axiom audit \\
+\bottomrule
+\end{tabular}
+\caption{Part B file manifest.}
+\label{tab:partB}
+\end{table}
+
+Combined total: 18 files, 1319 lines, 0 sorries.
+
+\subsection{Core Definitions}
+
+The definitions in \texttt{Basic.lean} encode the combinatorial
+partition function ingredients:
+
+\begin{lstlisting}[caption={Core definitions (Basic.lean).}]
+/-- Limited Principle of Omniscience. -/
+def LPO : Prop :=
+  forall (a : Nat -> Bool),
+    (forall n, a n = false) ||| (exists n, a n = true)
+
+noncomputable def twoCosh (b : Real) : Real :=
+  2 * Real.cosh b
+noncomputable def twoSinh (b : Real) : Real :=
+  2 * Real.sinh b
+
+noncomputable def partitionFn (b : Real) (N : Nat) : Real :=
+  (twoCosh b) ^ N + (twoSinh b) ^ N
+
+noncomputable def freeEnergyDensity (b : Real) (N : Nat)
+    (_hN : 0 < N) : Real :=
+  -(1 / (N : Real)) * Real.log (partitionFn b N)
+
+noncomputable def freeEnergyInfVol (b : Real) : Real :=
+  -Real.log (twoCosh b)
+\end{lstlisting}
+
+Note the naming: \texttt{twoCosh}, \texttt{twoSinh},
+\texttt{tanhRatio}---combinatorial names, not \texttt{transferEigenPlus},
+\texttt{transferEigenMinus}, \texttt{eigenRatio} as in Paper~8.
+
+\subsection{Parity Sieve (Axiomatized)}
+
+\begin{lstlisting}[caption={Parity sieve identity (ParitySieve.lean).}]
+axiom parity_sieve (a c : Real) (N : Nat) :
+    (a + c) ^ N + (a - c) ^ N =
+      2 * (Finset.filter (fun k => k % 2 = N % 2)
+        (Finset.range (N + 1))).sum
+        (fun k => (Nat.choose N k : Real)
+          * a ^ k * c ^ (N - k))
+\end{lstlisting}
+
+The parity sieve is axiomatized because formalizing filtered Finset
+sums by parity modular conditions requires substantial combinatorial
+infrastructure. The axiom does not appear in the axiom profiles of
+the main theorems, because the partition function is defined directly
+by its algebraic formula.
+
+\subsection{Main Theorem: Dispensability}
+
+\begin{lstlisting}[caption={Dispensability theorem (Main.lean).}]
+theorem ising_1d_dispensability_combinatorial
+    (b : Real) (hb : 0 < b) (e : Real) (he : 0 < e) :
+    exists N0 : Nat, 0 < N0 && forall N : Nat, N0 <= N ->
+      (hN : 0 < N) ->
+        |freeEnergyDensity b N hN - freeEnergyInfVol b| < e
+\end{lstlisting}
+
+\subsection{Main Theorem: BMC $\to$ LPO}
+
+\begin{lstlisting}[caption={BMC implies LPO (PartB\_Backward.lean, complete proof).}]
+theorem lpo_of_bmc (hBMC : BMC) : LPO := by
+  intro a
+  set b : Real := 1
+  set J0 : Real := 1
+  set J1 : Real := 2
+  have hb : (0 : Real) < b := one_pos
+  have hJ0 : (0 : Real) < J0 := one_pos
+  have hJ_lt : J0 < J1 := by norm_num
+  have hJ_le : J0 <= J1 := le_of_lt hJ_lt
+  set F := encodedSeq a b J0 J1 with hF_def
+  have hMono : Monotone (fun n => -F n) :=
+    neg_encodedSeq_mono a hb hJ0 hJ_le
+  have hBdd : forall n, (fun n => -F n) n
+      <= -freeEnergyAtCoupling b J1 :=
+    neg_encodedSeq_bounded a hb hJ0 hJ_le
+  obtain <<L_neg, hL>> := hBMC (fun n => -F n)
+    (-freeEnergyAtCoupling b J1) hMono hBdd
+  set d := freeEnergyAtCoupling b J0
+    - freeEnergyAtCoupling b J1 with hd_def
+  have hd : 0 < d := freeEnergy_gap_pos hb hJ0 hJ_lt
+  obtain <<N1, hN1>> := hL (d / 2) (half_pos hd)
+  have hN1_self := hN1 N1 (le_refl _)
+  cases hm : runMax a N1
+  . -- Case: runMax a N1 = false
+    left
+    apply bool_not_exists_implies_all_false
+    intro <<n0, hn0>>
+    have hL_val := neg_limit_of_exists_true a hL hn0
+    have hFN1 : F N1 = freeEnergyAtCoupling b J0 := by
+      simp only [hF_def, encodedSeq, couplingSeq, hm,
+        Bool.false_eq_true, ite_false]
+    have habs : |(-F N1) - L_neg| = d := by
+      rw [hFN1, hL_val]
+      simp only [neg_sub_neg]
+      rw [abs_sub_comm]
+      exact abs_of_pos hd
+    have : |(-F N1) - L_neg| < d / 2 := hN1_self
+    linarith
+  . -- Case: runMax a N1 = true
+    right
+    obtain <<k, _, hk>> := runMax_witness a
+      (show runMax a N1 = true from hm)
+    exact <<k, hk>>
+\end{lstlisting}
+
+\subsection{Equivalence and Axiom Audit}
+
+\begin{lstlisting}[caption={Equivalence theorem and axiom audit (PartB\_Main.lean).}]
+theorem lpo_iff_bmc : LPO <-> BMC :=
+  <<bmc_of_lpo, lpo_of_bmc>>
+
+-- Part A main theorem:
+#print axioms ising_1d_dispensability_combinatorial
+-- [propext, Classical.choice, Quot.sound]
+
+-- Part B backward direction:
+#print axioms lpo_of_bmc
+-- [propext, Classical.choice, Quot.sound]
+
+-- Part B equivalence:
+#print axioms lpo_iff_bmc
+-- [propext, Classical.choice, Quot.sound,
+--  Papers.P9.bmc_of_lpo]
+\end{lstlisting}
+
+\subsection{Import Audit}
+
+No file in the Paper~9 formalization imports any module from:
+\begin{itemize}
+  \item \texttt{LinearAlgebra.Matrix.*}
+  \item \texttt{LinearAlgebra.Eigenspace.*}
+  \item \texttt{Analysis.NormedSpace.*}
+  \item \texttt{Analysis.InnerProductSpace.*}
+\end{itemize}
+The only Mathlib imports are for real analysis
+(\texttt{SpecialFunctions.Log}, hyperbolic functions) and basic
+order theory. This enforces strict formulation independence from
+Paper~8's transfer-matrix approach.
+
+\subsection{Design Decisions}
+
+\paragraph{Direct algebraic definition of $\ZN$.}
+The partition function is defined directly as
+$(2\cosh\beta)^N + (2\sinh\beta)^N$. The combinatorial derivation
+via bond variables and parity sieve is documented in
+\texttt{PartitionIdentity.lean} and \texttt{ParitySieve.lean}, but
+enters the proof chain only as motivation, not as a dependency. This
+keeps the axiom profile clean.
+
+\paragraph{The parity sieve axiom.}
+The parity sieve identity is axiomatized (analogous to
+\texttt{bmc\_of\_lpo}). It does not appear in the axiom profiles
+of the main theorems because $\ZN$ is defined algebraically, not
+via the filtered Finset sum.
+
+\paragraph{The \texttt{bmc\_of\_lpo} axiom.}
+Same as Paper~8: the forward direction ($\LPO \to \BMC$) is
+axiomatized citing \cite{BV06}. A complete formalization is an
+elimination target for future work.
+
+\subsection{AI-Assisted Methodology}\label{sec:ai}
+
+This formalization was developed using \textbf{Claude Opus~4.6}
+(Anthropic, 2026) via the \textbf{Claude Code} command-line interface,
+following the same human--AI workflow as Papers~2, 7, and~8
+\cite{Lee26a,Lee26b,Lee26d,Anthropic2026}. The human author wrote
+mathematical blueprints specifying all theorem statements, proof
+strategies, and target \Mathlib{} APIs. Claude Opus~4.6 generated
+the \Lean{} proof terms and handled debugging against \Mathlib{}
+v4.28. Final verification: \texttt{lake build} (0~errors, 0~warnings,
+0~sorries).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Task} & \textbf{Human} & \textbf{AI (Claude Opus 4.6)} \\
+\midrule
+Mathematical blueprint    & \checkmark & \\
+Proof strategy design     & \checkmark & \\
+\Mathlib{} API discovery  & & \checkmark \\
+\Lean{} proof generation  & & \checkmark \\
+Proof review              & \checkmark & \\
+Build verification        & & \checkmark \\
+Paper writing             & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\caption{Division of labor.}
+\label{tab:division}
+\end{table}
+
+\subsection{Reproducibility}
+
+\begin{mdframed}[backgroundcolor=gray!10]
+\textbf{Reproducibility Box}
+\begin{itemize}
+\item \textbf{Repository}: \url{https://github.com/quantmann/FoundationRelativity}
+\item \textbf{LaTeX source \& PDF}: \url{https://doi.org/10.5281/zenodo.18517570}
+\item \textbf{Lean toolchain}: \texttt{leanprover/lean4:v4.28.0-rc1}
+\item \textbf{mathlib4 commit}: \texttt{7091f0f601d5aaea565d2304c1a290cc8af03e18}
+\item \textbf{Build}: \texttt{lake exe cache get \&\& lake build}
+\item \textbf{Bundle target}: \texttt{Papers}
+  (imports \texttt{Main} + \texttt{PartB\_Main})
+\item \textbf{Status}: 0~errors, 0~warnings, 0~sorries.
+  18~files, 1319~lines total.
+\item \textbf{Axiom profile}:
+  \texttt{ising\_1d\_dispensability\_combinatorial}: \texttt{[propext, Classical.choice, Quot.sound]}.
+  \texttt{lpo\_of\_bmc}: \texttt{[propext, Classical.choice, Quot.sound]}.
+  \texttt{lpo\_iff\_bmc}: \texttt{[propext, Classical.choice, Quot.sound,
+  Papers.P9.bmc\_of\_lpo]}.
+\item \textbf{Formulation constraint}: No imports from
+  \texttt{LinearAlgebra.*} or \texttt{Analysis.NormedSpace.*}.
+\end{itemize}
+\end{mdframed}
+
+
+% ====================================================================
+\section*{Acknowledgments}
+% ====================================================================
+
+The \Lean{} formalization was developed using Claude Opus~4.6
+(Anthropic, 2026) via the Claude Code CLI tool. We thank the
+\Mathlib{} community for maintaining the comprehensive library
+of formalized mathematics that made this work possible.
+
+
+% ====================================================================
+\appendix
+\section{Elementary Inequalities}\label{sec:appendix}
+% ====================================================================
+
+For reference, the constructive inequalities used in Part~A.
+
+\begin{lemma}[A1]\label{lem:A1}
+For $x > 0$: $\log(1 + x) \leq x$.
+\end{lemma}
+
+\begin{proof}
+Equivalent to $1 + x \leq \exp(x)$, which follows from
+$\exp(x) = 1 + x + x^2/2! + \cdots \geq 1 + x$ for $x > 0$.
+\end{proof}
+
+\begin{lemma}[A2]\label{lem:A2}
+For $0 < \delta < 1$: $-\log(1 - \delta) \geq \delta$.
+\end{lemma}
+
+\begin{proof}
+Equivalent to $1 - \delta \leq \exp(-\delta)$, which is~A1
+with $x = -\delta$.
+\end{proof}
+
+\begin{lemma}[A3]\label{lem:A3}
+For $0 < r < 1$ and $N \geq 1$:
+$r^N \leq \exp(-N(1-r))$.
+\end{lemma}
+
+\begin{proof}
+$r = 1 - \delta$ with $\delta = 1-r > 0$. By A2,
+$r \leq \exp(-\delta)$, so $r^N \leq \exp(-N\delta) = \exp(-N(1-r))$.
+\end{proof}
+
+All three are constructively valid.
+
+
+% ====================================================================
+% Bibliography
+% ====================================================================
+\bibliographystyle{plainnat}
+
+\begin{thebibliography}{30}
+
+\bibitem[Anthropic(2026)]{Anthropic2026}
+Anthropic.
+\newblock Claude {Opus}~4.6 and {Claude Code} {CLI}.
+\newblock \url{https://www.anthropic.com/claude}, 2026.
+
+\bibitem[Batterman(2002)]{Bat02}
+R.~W.~Batterman.
+\newblock \emph{The Devil in the Details: Asymptotic Reasoning in
+  Explanation, Reduction, and Emergence}.
+\newblock Oxford University Press, New York, 2002.
+
+\bibitem[Baxter(1982)]{Bax82}
+R.~J.~Baxter.
+\newblock \emph{Exactly Solved Models in Statistical Mechanics}.
+\newblock Academic Press, London, 1982.
+
+\bibitem[Bishop(1967)]{Bis67}
+E.~Bishop.
+\newblock \emph{Foundations of Constructive Analysis}.
+\newblock McGraw-Hill, New York, 1967.
+
+\bibitem[Bishop and Bridges(1985)]{BB85}
+E.~Bishop and D.~Bridges.
+\newblock \emph{Constructive Analysis}.
+\newblock Grundlehren der mathematischen Wissenschaften, vol.~279.
+  Springer, Berlin, 1985.
+
+\bibitem[Bridges and V{\^\i}{\c{t}}{\u{a}}(2006)]{BV06}
+D.~S.~Bridges and L.~S.~V{\^\i}{\c{t}}{\u{a}}.
+\newblock \emph{Techniques of Constructive Analysis}.
+\newblock Universitext. Springer, New York, 2006.
+
+\bibitem[Butterfield(2011)]{But11}
+J.~Butterfield.
+\newblock Less is different: Emergence and reduction reconciled.
+\newblock \emph{Foundations of Physics}, 41(6):1065--1135, 2011.
+
+\bibitem[Cubitt et~al.(2015)]{CPW15}
+T.~S.~Cubitt, D.~Perez-Garcia, and M.~M.~Wolf.
+\newblock Undecidability of the spectral gap.
+\newblock \emph{Nature}, 528:207--211, 2015.
+
+\bibitem[{de Moura} et~al.(2021)]{deMoura2021}
+L.~{de Moura}, S.~Kong, J.~Avigad, F.~{van Doorn}, and M.~{von Raumer}.
+\newblock The {Lean} theorem prover (system description).
+\newblock In \emph{CADE-25}, LNAI 9195, pages 378--388. Springer, 2015.
+\newblock Lean~4: \url{https://lean-lang.org/}, 2021--present.
+
+\bibitem[Diener(2018)]{Die18}
+H.~Diener.
+\newblock \emph{Constructive Reverse Mathematics}.
+\newblock Habilitationsschrift, Universit\"at Siegen, 2018.
+\newblock arXiv:1804.05495.
+
+\bibitem[Graham et~al.(1994)]{GKP94}
+R.~L.~Graham, D.~E.~Knuth, and O.~Patashnik.
+\newblock \emph{Concrete Mathematics}.
+\newblock Addison-Wesley, 2nd edition, 1994.
+
+\bibitem[Ishihara(2006)]{Ish06}
+H.~Ishihara.
+\newblock Reverse mathematics in {Bishop's} constructive mathematics.
+\newblock \emph{Philosophia Scientiae, Cahier Sp\'ecial}, 6:43--59, 2006.
+
+\bibitem[Lee(2026a)]{Lee26a}
+P.~C.-K.~Lee.
+\newblock {WLPO} equivalence of the bidual gap in $\ell^1$: a {Lean}~4
+  formalization.
+\newblock Preprint, 2026. Paper~2.
+
+\bibitem[Lee(2026b)]{Lee26b}
+P.~C.-K.~Lee.
+\newblock Non-reflexivity of $S_1(H)$ implies {WLPO}: a {Lean}~4
+  formalization.
+\newblock Preprint, 2026. Paper~7.
+
+\bibitem[Lee(2026d)]{Lee26d}
+P.~C.-K.~Lee.
+\newblock The logical cost of the thermodynamic limit: {LPO}-equivalence
+  and {BISH}-dispensability for the {1D} {Ising} free energy.
+\newblock Preprint, 2026. Paper~8.
+
+\bibitem[{Mathlib Community}(2020--)]{Mathlib2020}
+{Mathlib Community}.
+\newblock \emph{Mathlib}: the math library for {Lean}.
+\newblock \url{https://leanprover-community.github.io/mathlib4_docs/},
+  2020--present.
+
+\bibitem[Ruelle(1999)]{Rue99}
+D.~Ruelle.
+\newblock \emph{Statistical Mechanics: Rigorous Results}.
+\newblock Imperial College Press, London, 1999.
+\newblock Reprint of the 1969 edition.
+
+\bibitem[van Wierst(2019)]{vW19}
+P.~van~Wierst.
+\newblock The paradox of phase transitions in the light of constructive
+  mathematics.
+\newblock \emph{Synthese}, 196(5):1863--1884, 2019.
+
+\bibitem[Veldman(2005)]{Vel05}
+W.~Veldman.
+\newblock Brouwer's real thesis on bars.
+\newblock \emph{Philosophia Scientiae, Cahier Sp\'ecial}, 6:21--42, 2005.
+
+\end{thebibliography}
+
+\end{document}

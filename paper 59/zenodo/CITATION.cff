@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+- family-names: "Lee"
+  given-names: "Paul Chun-Kit"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+  affiliation: "New York University"
+title: "De Rham Decidability — The p-adic Precision Bound (Paper 59, Constructive Reverse Mathematics Series)"
+version: "1.0.0"
+date-released: 2026-02-21
+abstract: >-
+  Paper 59 of the Constructive Reverse Mathematics series. We formalize the
+  p-adic precision bound N_M = v_p(det(1 - phi)) = v_p(1 - a_p + p) =
+  v_p(#E(F_p)) for elliptic curves with good reduction. The Hasse bound
+  implies #E(F_p) >= 1. Verified for 24 entries across 4 curves: 4 anomalous
+  (N_M >= 1), 20 generic (N_M = 0). Max N_M = 2. "Axiom 5" is a theorem
+  for geometric representations. Formalized in Lean 4 over Mathlib
+  (762 lines, zero errors, zero sorry, zero custom axioms).
+keywords:
+  - "constructive reverse mathematics"
+  - "p-adic precision bound"
+  - "de Rham decidability"
+  - "elliptic curves"
+  - "Hasse bound"
+  - "anomalous primes"
+  - "formal verification"
+  - "Lean 4"
+  - "Mathlib"
+  - "arithmetic geometry"
+license: Apache-2.0

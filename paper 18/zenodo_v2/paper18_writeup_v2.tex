@@ -1,0 +1,2043 @@
+\documentclass[11pt,a4paper]{article}
+
+% ====================================================================
+% Packages
+% ====================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage[margin=1in,top=0.9in,bottom=0.9in]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{cleveref}
+\usepackage{natbib}
+\usepackage{mdframed}
+\usepackage{graphicx}
+
+% Tighten float placement
+\renewcommand{\floatpagefraction}{0.8}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\textfraction}{0.1}
+
+% ====================================================================
+% Code listing style (Python)
+% ====================================================================
+\definecolor{lean-keyword}{RGB}{0,0,180}
+\definecolor{lean-comment}{RGB}{0,128,0}
+\definecolor{lean-string}{RGB}{163,21,21}
+\definecolor{lean-bg}{RGB}{248,248,248}
+
+\lstdefinestyle{python}{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{lean-keyword}\bfseries,
+  commentstyle=\color{lean-comment}\itshape,
+  stringstyle=\color{lean-string},
+  backgroundcolor=\color{lean-bg},
+  frame=single,
+  framerule=0.5pt,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=4,
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+  xleftmargin=15pt,
+  captionpos=b,
+}
+\lstset{style=python}
+
+% Lean 4 code listing language
+\lstdefinelanguage{lean4}{
+  keywords={theorem,lemma,def,class,instance,import,open,variable,
+            noncomputable,section,namespace,end,where,let,have,show,
+            intro,obtain,use,exact,rw,simp,apply,by,fun,match,if,
+            then,else,do,return,axiom,abbrev,private,attribute,
+            suffices,change,congr,ext,constructor,rintro,push_neg,
+            linarith,absurd,set_option,omit,in,set,cases,rcases,
+            calc,nlinarith,positivity},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+  morestring=[b]',
+}
+\lstdefinestyle{lean4}{
+  language=lean4,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{lean-keyword}\bfseries,
+  commentstyle=\color{lean-comment}\itshape,
+  stringstyle=\color{lean-string},
+  backgroundcolor=\color{lean-bg},
+  frame=single,
+  framerule=0.5pt,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2,
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+  xleftmargin=15pt,
+  captionpos=b,
+}
+
+% ====================================================================
+% Macros
+% ====================================================================
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\LPO}{\mathrm{LPO}}
+\newcommand{\WLPO}{\mathrm{WLPO}}
+\newcommand{\BMC}{\mathrm{BMC}}
+\newcommand{\BISH}{\mathrm{BISH}}
+\newcommand{\SM}{\mathrm{SM}}
+\newcommand{\RG}{\mathrm{RG}}
+\newcommand{\QFP}{\mathrm{QFP}}
+\newcommand{\EW}{\mathrm{EW}}
+\newcommand{\MZ}{M_Z}
+\newcommand{\Lean}{\textsc{Lean~4}}
+\newcommand{\Mathlib}{\textsc{Mathlib4}}
+\newcommand{\leanok}{\textsf{\small\textcolor{green!70!black}{\checkmark}}}
+\newcommand{\leanpartial}{\textsf{\small\textcolor{orange!80!black}{(partial)}}}
+
+% Theorem environments
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% ====================================================================
+% Title
+% ====================================================================
+\title{%
+  \textbf{Constructive Stratification of the Standard Model Yukawa RG:\\[4pt]
+  Numerical Tests and Lean~4 Formalization}\\[6pt]
+  {\normalsize Technical Note~18 in the Constructive Reverse Mathematics Series}%
+}
+
+\author{
+  Paul Chun-Kit Lee\thanks{%
+    New York University.
+    AI-assisted numerical investigation; see the methodology
+    statement for details.
+    The author is a medical professional, not a domain expert in
+    constructive mathematics, particle physics, or renormalization
+    group theory; the numerical investigation and analysis were
+    developed with extensive AI assistance.} \\
+  New York University \\
+  \texttt{dr.paul.c.lee@gmail.com}
+}
+
+\date{February 2026}
+
+% ====================================================================
+\begin{document}
+\maketitle
+
+% ====================================================================
+\begin{abstract}
+The constructive reverse mathematics (CRM) programme has established,
+across five physics domains, that the passage from finite computation
+($\BISH$) to completed infinite limit costs $\LPO$ via Bounded
+Monotone Convergence. This pattern suggests a \emph{scaffolding
+principle}: when physicists use $\LPO$-level idealizations, the
+idealizations may constrain explanations, and removing them may
+reveal $\BISH$-level mechanisms invisible in the conventional
+formalism. We test this principle on the fermion mass hierarchy
+through ten numerical investigations (Phases~A--B) and a \Lean{}
+formalization (Phase~C).
+
+All ten numerical investigations yield negative results: the Standard
+Model's infrared dynamics do not determine the mass hierarchy in any
+parameterization, at any loop order, or at any discretization scale
+tested. CRM is a powerful diagnostic framework; its generative
+capacity, at least for the flavor problem, is null.
+
+The \Lean{} formalization (${\sim}900$~lines, five theorems verified
+by \Mathlib{}) establishes a sharp constructive stratification:
+\[
+  \BISH \;<\; \WLPO \text{ (thresholds)}
+  \;<\; \LPO \text{ (eigenvalue crossings)}
+  \;<\; \text{full Classical.}
+\]
+The one-loop Yukawa RG flow is $\BISH$: polynomial Picard iteration
+preserves $\QQ[t]$ at every finite step (Theorem~1) and converges
+with an explicit Cauchy modulus (Theorem~2). Step-function
+thresholds cost $\WLPO$ (Theorem~5), and CKM eigenvalue-crossing
+detection costs $\LPO$ (Theorem~4). The physical mechanisms of the
+SM---polynomial beta functions, smooth threshold matching,
+diagonalization with mass gaps---are uniformly $\BISH$; omniscience
+enters only through textbook idealizations that can be replaced by
+constructive alternatives.
+\end{abstract}
+
+
+% ====================================================================
+\section{Introduction}\label{sec:intro}
+% ====================================================================
+
+The constructive reverse mathematics (CRM) programme calibrates
+the logical cost of physical theories by identifying which
+constructive principles are needed at each layer of the
+mathematical description. Bishop's constructive mathematics
+($\BISH$) requires every existential claim to come with a
+construction; the Limited Principle of Omniscience ($\LPO$)
+asserts that for any binary sequence, either some term equals~$1$
+or all terms equal~$0$. $\LPO$ is equivalent to Bounded Monotone
+Convergence ($\BMC$): every bounded monotone sequence converges
+to a limit~\cite{BV06}.
+
+Five independent physics domains exhibit the
+$\BMC \leftrightarrow \LPO$ boundary: statistical mechanics
+(Paper~8~\cite{Lee26-P8}), general relativity
+(Paper~13~\cite{Lee26-P13}), quantum decoherence
+(Paper~14~\cite{Lee26-P14}), conservation laws
+(Paper~15~\cite{Lee26-P15}), and quantum gravity
+(Paper~17~\cite{Lee26-P17}). In each case, finite computations
+are $\BISH$, while the assertion that a bounded monotone sequence
+converges to a completed real number costs $\LPO$. The working
+hypothesis~\cite{Lee26-P10} is that empirical predictions are
+$\BISH$-derivable and stronger principles enter only through
+idealizations.
+
+This pattern generates two predictions. First, in domains where no
+completed limit is needed, the entire computation should be $\BISH$,
+with no $\LPO$ boundary. Second---and more ambitiously---the
+distinction between $\BISH$ and $\LPO$ might be
+\emph{generative}: stripping $\LPO$ scaffolding from physics
+might reveal mechanisms invisible in the conventional formalism.
+
+We test both predictions on the Standard Model Yukawa
+renormalization group. The beta functions, evaluated as a discrete
+finite-step map, provide a domain whose core computation is $\BISH$
+for the first prediction. For the second, the fermion mass
+hierarchy---thirteen free Yukawa parameters spanning six orders of
+magnitude with no known explanation---provides a test case where
+new mechanisms would be physically significant. We report ten
+numerical investigations across two phases, systematically testing
+whether the mass hierarchy emerges from the SM's infrared dynamics
+when analyzed through the CRM lens.
+
+
+% ====================================================================
+\section{The Scaffolding Hypothesis}\label{sec:scaffolding}
+% ====================================================================
+
+\subsection{LPO Idealizations as Architectural Constraints}
+
+When a physicist invokes an $\LPO$-level idealization---an exact
+symmetry, an all-orders perturbative result, a continuous
+limit---the idealization does not merely extend a result to infinite
+precision. It \emph{constrains the architecture of the explanation}.
+Only mechanisms compatible with the idealization are considered;
+mechanisms that achieve the same finite-precision result by other
+means are excluded from the search space.
+
+\subsection{The Sumino Example}
+
+The observation that motivated this investigation comes from Koide's
+charged lepton mass formula~\cite{Koide1983}:
+\begin{equation}\label{eq:koide}
+  Q = \frac{m_e + m_\mu + m_\tau}
+    {(\sqrt{m_e} + \sqrt{m_\mu} + \sqrt{m_\tau})^2}
+    = \frac{2}{3},
+\end{equation}
+satisfied to ${\sim}10^{-5}$ precision. Sumino~\cite{Sumino2009}
+explains this by postulating a $\mathrm{U}(3) \times \mathrm{SU}(2)$
+family gauge symmetry whose radiative corrections cancel QED
+corrections to \emph{all orders} in perturbation theory, preserving
+$Q = \text{exactly}~2/3$ at every energy scale. This all-orders
+cancellation is an $\LPO$ statement---a completed infinite assertion
+that cannot be verified at finitely many loop orders.
+
+The CRM-informed question is different: \emph{why is $Q = 2/3$ to
+$10^{-5}$ precision at the loop orders we can compute?} This is a
+$\BISH$ question. It does not require an exact gauge symmetry or
+all-orders cancellation. It admits a larger space of potential
+mechanisms---finite-order algebraic structures, approximate
+cancellations, dynamical attractors in the RG flow---that are
+excluded by the demand for $\LPO$-level exactness.
+
+\subsection{The General Principle}
+
+More broadly: the standard treatment of the renormalization group
+as a continuous flow (an ODE with solutions defined by limits of
+Riemann sums) is an $\LPO$ idealization. The $\BISH$ content is
+the discrete map at finite step count. Physicists search for exact
+infrared fixed points of the continuous flow. But the physically
+relevant question may be: what structure exists in the \emph{finite
+discrete map}? Fixed points of the continuous flow are necessarily
+fixed points of the discrete map, but the converse need not hold.
+The discrete map could exhibit quasi-fixed-point structure, ratio-space
+attractors, or threshold-driven self-consistency conditions invisible
+in the continuous limit.
+
+We call this the \textbf{scaffolding principle}: $\LPO$ idealizations
+serve as scaffolding for physical explanations; removing them may
+reveal the $\BISH$ structure underneath, which may differ from what
+the scaffolding suggests. The fermion mass hierarchy provides a
+concrete test.
+
+
+% ====================================================================
+\section{The Standard Model Yukawa System}\label{sec:computation}
+% ====================================================================
+
+The one-loop beta functions for the third-generation Yukawa
+couplings in the Standard Model
+are~\cite{MV1984,LWX2003}:
+\begin{align}
+  16\pi^2 \frac{dy_t}{dt} &= y_t \left[
+    \tfrac{9}{2} y_t^2 + \tfrac{3}{2} y_b^2 + y_\tau^2
+    - 8 g_3^2 - \tfrac{9}{4} g_2^2
+    - \tfrac{17}{12} g_1^2 \right],
+    \label{eq:beta_yt} \\
+  16\pi^2 \frac{dy_b}{dt} &= y_b \left[
+    \tfrac{9}{2} y_b^2 + \tfrac{3}{2} y_t^2 + y_\tau^2
+    - 8 g_3^2 - \tfrac{9}{4} g_2^2
+    - \tfrac{5}{12} g_1^2 \right],
+    \label{eq:beta_yb} \\
+  16\pi^2 \frac{dy_\tau}{dt} &= y_\tau \left[
+    \tfrac{5}{2} y_\tau^2 + 3 y_b^2 + 3 y_t^2
+    - \tfrac{9}{4} g_2^2
+    - \tfrac{15}{4} g_1^2 \right],
+    \label{eq:beta_ytau}
+\end{align}
+where $t = \ln(\mu / \mu_0)$ and $g_1, g_2, g_3$ are the
+$\mathrm{U}(1)_Y$, $\mathrm{SU}(2)_L$, $\mathrm{SU}(3)_C$
+gauge couplings\footnote{We use the non-GUT-normalized hypercharge
+coupling $g_1 = g_Y$, giving $b_1 = 41/6$. Many references use
+the GUT-normalized $g_1 = \sqrt{5/3}\,g_Y$, which changes the
+numerical coefficients. Our convention follows
+Ref.~\cite{MV1984}.}, running at one loop as
+\begin{equation}\label{eq:beta_g}
+  16\pi^2 \frac{dg_i}{dt} = b_i \, g_i^3,
+  \qquad b_1 = \tfrac{41}{6},
+  \quad b_2 = -\tfrac{19}{6},
+  \quad b_3 = -7.
+\end{equation}
+Lighter-generation Yukawa couplings satisfy analogous equations
+with the same gauge coefficients.
+
+\paragraph{Scope of the implemented system.}
+In both phases we evolve \emph{diagonal} Yukawa couplings: nine
+independent $y_f$ ($f = t, b, \tau, c, s, \mu, u, d, e$) coupled
+through the gauge couplings but without CKM mixing or off-diagonal
+Yukawa-matrix structure. At one loop in this diagonal
+approximation, inter-generation coupling enters only through the
+gauge beta functions (which depend on the total number of active
+flavors, not on individual Yukawa values). The full one-loop
+Yukawa-matrix RGE includes trace terms
+$\mathrm{Tr}(Y_u^\dagger Y_u)$ that couple all up-type Yukawas;
+these are dominated by $y_t^2$ and are numerically negligible for
+lighter generations. At two loops, CKM mixing enters explicitly
+and is neglected here. The negative results reported below should
+be read as ``no attractor structure exists in the diagonal Yukawa
+system''; whether the full matrix system with CKM structure
+behaves differently is an open question, though we regard it as
+unlikely given that CKM effects are perturbatively small
+corrections to the diagonal system.
+
+We use gauge couplings at $\MZ = 91.1876$~GeV in the
+$\overline{\text{MS}}$ scheme ($g_1 = 0.3574$, $g_2 = 0.6518$,
+$g_3 = 1.221$) and tree-level Yukawa couplings
+$y_f = \sqrt{2}\, m_f / v$ with $v = 246.22$~GeV and PDG~2024
+pole masses~\cite{PDG2024}. The scale range from $\MZ$ to the
+Planck mass is $t_{\text{range}} \approx 39.4$.
+
+The standard RG flow is a continuous ODE. For predictions between
+two finite energy scales, the solution can be approximated to any
+desired precision by a finite number of integration steps---this
+is $\BISH$ computation. $\LPO$ enters only when physicists assert
+a \emph{completed} object: an exact fixed point (not an
+approximate one), an exact all-orders cancellation (not a
+finite-order one), or an exact converged value without specifying
+a rate of convergence. The discrete map we study is not an
+approximation to an $\LPO$-level object; it \emph{is} the
+physically relevant computation, and the continuous flow is a
+convenient idealization that happens to cost no additional logical
+strength for finite-scale predictions. This is why the core
+domain is $\BISH$: no completed limit does physical work. (Textbook
+idealizations---step-function thresholds, exact eigenvalue-crossing
+detection---introduce $\WLPO$ and $\LPO$; see
+\cref{sec:lean_formalization}.)
+
+The discrete map implements $N$ applications of a fourth-order
+Runge--Kutta (RK4) step, each evaluating the beta
+functions~\eqref{eq:beta_yt}--\eqref{eq:beta_g} at intermediate
+points. Each step is finite arithmetic---$\BISH$ by definition.
+For $N = 10$, the entire computation involves approximately $480$
+floating-point multiplications and a comparable number of
+additions.
+
+Phase~2 additionally uses two-loop gauge beta functions from
+Luo, Wang, and Xiao~\cite{LWX2003}, with coefficients
+$b_{ij}^{(2)}$ that include Yukawa-dependent terms. The two-loop
+correction captures the dominant next-order effect on running
+couplings.
+
+
+\subsection{Constructive Frameworks}\label{sec:crm_prelim}
+
+The constructive stratification established in
+\cref{sec:lean_formalization} uses three omniscience principles of
+increasing logical strength:
+
+\begin{definition}[$\LPO$]\label{def:lpo}
+The \emph{Limited Principle of Omniscience}: for every binary
+sequence $\alpha : \NN \to \{0,1\}$, either
+$\forall n,\;\alpha(n) = 0$ or $\exists n,\;\alpha(n) = 1$.
+\end{definition}
+
+\begin{definition}[$\WLPO$]\label{def:wlpo}
+The \emph{Weak Limited Principle of Omniscience}: for every binary
+sequence $\alpha : \NN \to \{0,1\}$, either
+$\forall n,\;\alpha(n) = 0$ or $\lnot\forall n,\;\alpha(n) = 0$.
+\end{definition}
+
+\noindent
+Both are classically trivial (decidability of the universal
+quantifier over $\NN$) but constructively independent of $\BISH$:
+no finite search of an infinite sequence can decide these. The
+hierarchy is
+\[
+  \BISH \;\subsetneq\; \WLPO \;\subsetneq\; \LPO
+  \;\subsetneq\; \text{full Classical.}
+\]
+The \Lean{} formalization encodes these as propositions over
+\texttt{Bool}-valued sequences:
+\begin{lstlisting}[style=lean4,caption={Omniscience principles in \Lean{}.}]
+def LPO_P18 : Prop :=
+  forall (a : Nat -> Bool),
+    (forall n, a n = false) ||| (exists n, a n = true)
+
+def WLPO : Prop :=
+  forall (a : Nat -> Bool),
+    (forall n, a n = false) ||| ~(forall n, a n = false)
+\end{lstlisting}
+
+
+\subsection{CKM Matrix and Threshold Decoupling}\label{sec:ckm_prelim}
+
+Two standard textbook operations on the Yukawa system
+introduce omniscience beyond $\BISH$:
+\begin{enumerate}[nosep]
+  \item \textbf{Threshold decoupling.} Heavy particles are
+    decoupled at their mass thresholds via the Heaviside step
+    function $\theta(\mu - m_f)$. This requires deciding the sign
+    of a constructive real (see \cref{sec:lean_wlpo}).
+  \item \textbf{CKM diagonalization.} The CKM matrix is obtained
+    by diagonalizing Yukawa coupling matrices. At eigenvalue
+    crossings (mass degeneracies), the eigenvector basis becomes
+    discontinuous. Deciding whether eigenvalues are equal or
+    distinct requires $\LPO$ (see \cref{sec:lean_lpo}).
+\end{enumerate}
+Both operations are $\BISH$ when replaced by their physical
+counterparts (smooth threshold matching, gapped diagonalization at
+the observed non-degenerate SM masses).
+
+
+% ====================================================================
+\section{Phase~1: One-Loop Discrete Map}\label{sec:phase1}
+% ====================================================================
+
+Phase~1 tests the narrowest version of the scaffolding
+hypothesis: whether the one-loop SM beta functions, treated as a
+discrete RK4 map with small step size, contain attractor structure
+that produces the mass hierarchy from generic initial conditions.
+Five questions were investigated.
+
+
+\subsection*{Top Quasi-Fixed-Point}
+
+We scan $y_t(\text{Planck})$ over $[0.1, 10]$ with $N = 1{,}000$
+RK4 steps. The Pendleton--Ross quasi-fixed-point
+(\cref{fig:top_qfp}) is confirmed: $y_t(\EW)$ converges to
+$\approx 1.29$ for all $y_t(\text{Planck}) \gtrsim 0.7$, a basin
+encompassing $58\%$ of scanned initial conditions. The $30\%$
+overshoot relative to the observed $y_t(\MZ) = 0.99$ is a known
+artifact of one-loop running without threshold
+corrections~\cite{PR1981,Hill1981}.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.65\textwidth]{plots_v2/plot01_top_qfp.png}
+  \caption{Top Yukawa at the EW scale versus initial value at the
+    Planck scale ($N = 1{,}000$ RK4 steps). The curve flattens
+    for $y_t(\text{Planck}) \gtrsim 0.7$, demonstrating the
+    Pendleton--Ross quasi-fixed-point.}
+  \label{fig:top_qfp}
+\end{figure}
+
+
+\subsection*{Discrete Map vs.\ Continuous Flow}
+
+The QFP is genuinely finite-order structure.
+\Cref{tab:convergence} shows that RK4 at $N = 50$ matches
+scipy's adaptive integrator to four decimal places.
+\Cref{fig:basin_N} shows the basin is already visible at
+$N = 10$: the characteristic flattening for
+$y_t(\text{Planck}) > 0.7$ is present with spread less than
+$20\%$ of the mean across the plateau.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}rcc@{}}
+\toprule
+$N$ & Euler & RK4 \\
+\midrule
+10     & 0.4293 & 1.2871 \\
+50     & 1.2390 & 1.2936 \\
+100    & 1.2644 & 1.2936 \\
+500    & 1.2874 & 1.2936 \\
+1{,}000  & 1.2904 & 1.2936 \\
+10{,}000 & 1.2932 & 1.2936 \\
+\midrule
+\multicolumn{2}{@{}l}{scipy (continuous)} & 1.2936 \\
+\bottomrule
+\end{tabular}
+\caption{$y_t(\EW)$ for various step counts $N$ and integration
+  methods. RK4 at $N = 50$ matches the continuous reference to
+  four decimal places.}
+\label{tab:convergence}
+\end{table}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.65\textwidth]{plots_v2/plot10_qfp_basin_N.png}
+  \caption{Top QFP basin at $N = 10$, $100$, $1{,}000$, and
+    $10{,}000$ discrete RK4 steps. The quasi-fixed-point
+    structure is already visible at $N = 10$.}
+  \label{fig:basin_N}
+\end{figure}
+
+
+\subsection*{Mass Hierarchy}
+
+Of $3{,}000$ randomly sampled initial conditions (all Yukawa
+couplings log-uniform on $[0.01, 10]$), none produce the
+observed mass ratios within one order of magnitude
+(\cref{fig:hierarchy}). The median RMS log-ratio error is
+$3.38$~dex. The full fermion mass hierarchy is \emph{not} an
+attractor of the one-loop SM RG: mass ratios are sensitive to
+initial conditions.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.65\textwidth]{plots_v2/plot04_hierarchy_scatter.png}
+  \caption{Mass hierarchy at the EW scale for $3{,}000$ random
+    Planck-scale initial conditions. The red star marks the
+    observed values. No clustering near the observed point is
+    visible.}
+  \label{fig:hierarchy}
+\end{figure}
+
+
+\subsection*{Secondary Observations}
+
+The bottom/tau mass ratio shows weak structure:
+median $y_b/y_\tau = 2.25$ at the EW scale (observed~$2.35$),
+but only $6\%$ of initial conditions fall within $20\%$ of the
+observed value. The Koide ratio $Q$ yields a mean of $0.50$
+(observed~$2/3$), with only $3.2\%$ of filtered samples within
+$1\%$ of~$2/3$. Neither relation emerges generically from SM~RG
+evolution. Two-loop corrections shift the QFP by $-0.65\%$
+without producing qualitatively new structure.
+
+\paragraph{Phase~1 assessment.}
+One of five success criteria is met: the top QFP is a robust
+$\BISH$ structure visible at coarse discretization. The remaining
+four are negative. However, Phase~1 tested only a narrow special
+case of the scaffolding hypothesis: one-loop beta functions, small
+step size, individual coupling space, smooth running, standard
+parameterization. Five substantive alternatives remain untested.
+
+
+% ====================================================================
+\section{Phase~2: Systematic Scaffolding Removal}\label{sec:phase2}
+% ====================================================================
+
+Phase~1 tested one specific implementation of the scaffolding
+hypothesis. Phase~2 tests five additional implementations, each
+removing a different piece of $\LPO$ scaffolding from the SM's
+treatment of fermion masses.
+
+\subsection{Two-Loop Gauge + One-Loop Yukawa Beta Functions}\label{sec:two_loop}
+
+\paragraph{Scaffolding removed:} ``One-loop is sufficient.'' If
+the mass hierarchy is a perturbative phenomenon visible at the
+right loop order, new quasi-fixed-point structure should appear at
+two loops that is absent at one loop.
+
+\paragraph{Method.} We implement two-loop gauge coupling beta
+functions~\cite{LWX2003} combined with one-loop Yukawa beta
+functions---capturing the dominant next-order correction to gauge
+running while retaining the one-loop Yukawa structure. This is not
+the full two-loop Yukawa system of Ref.~\cite{LWX2003}; the full
+two-loop Yukawa coefficients include inter-generation
+CKM-dependent terms not implemented here. We repeat the Phase~1
+scan with $1{,}000$ random initial conditions.
+
+\paragraph{Result.} The two-loop correction \emph{destabilizes}
+the top QFP rather than creating new structure. The standard
+deviation of $y_b/y_t$ at the EW scale decreases by only $3.2\%$
+(the success criterion required ${>}50\%$ narrowing). No new
+quasi-fixed-points appear for bottom or tau couplings
+(\cref{fig:two_loop}).
+
+\paragraph{Verdict:} Higher loop order does not generate new
+attractor structure.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.65\textwidth]{plots_v2/inv1_two_loop_comparison.png}
+  \caption{Distribution of $y_b/y_t$ at the EW scale: one-loop
+    (left) versus two-loop gauge + one-loop Yukawa (right). The
+    distributions are nearly identical; two-loop corrections do not
+    narrow the spread.}
+  \label{fig:two_loop}
+\end{figure}
+
+
+\subsection{Large Step-Size Dynamics}\label{sec:large_step}
+
+\paragraph{Scaffolding removed:} ``The discrete map approximates
+the continuous flow.'' At large step size, discrete maps can
+exhibit bifurcations, periodic orbits, and chaotic behavior absent
+in continuous flows. If the Yukawa RG has such structure, it would
+be genuinely $\BISH$ with no $\LPO$ analogue.
+
+\paragraph{Method.} We use the one-loop Euler map
+$y_{n+1} = y_n + \Delta t \cdot \beta(y_n, g_n)$ with step
+counts $N$ ranging from $3$ to $500$, tracking coupling values and
+mass ratios at the EW scale as functions of~$N$.
+
+\paragraph{Result.} All couplings and mass ratios converge
+monotonically to the continuous-flow values as $N$ increases
+(\cref{fig:large_step}). No bifurcation, period-doubling, or
+non-monotone structure is observed at any~$N$.
+
+\paragraph{Interpretation.}
+The discrete step size $\Delta t$ is an algorithmic parameter, not
+a physical one: the SM RG has no preferred discretization scale.
+A physical interpretation exists in the Wilsonian framework, where
+each step integrates out a momentum shell of finite width, but our
+large-$\Delta t$ tests should be read as robustness checks on the
+discrete map's dynamical structure rather than probes of physically
+new dynamics. The monotone convergence we observe is consistent
+with the beta functions being smooth and well-behaved on the
+relevant domain; it does not rule out non-trivial discrete dynamics
+in other systems with stiffer or more nonlinear beta functions.
+
+\paragraph{Verdict:} The Yukawa RG discrete map has no dynamics
+beyond the continuous flow at any step size.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.65\textwidth]{plots_v2/inv2_coupling_vs_N.png}
+  \caption{Coupling values at the EW scale versus discrete step
+    count~$N$ (Euler map). Monotone convergence to the ODE limit;
+    no bifurcation structure.}
+  \label{fig:large_step}
+\end{figure}
+
+
+\subsection{Ratio-Space Fixed Points}\label{sec:ratio_space}
+
+\paragraph{Scaffolding removed:} ``Analyze individual couplings.''
+The mass hierarchy concerns \emph{ratios}
+$r_b = y_b/y_t$, $r_\tau = y_\tau/y_t$, etc. The beta functions
+for ratios differ from those for individual couplings---many terms
+cancel---and the fixed-point structure can differ.
+
+\paragraph{Method.} We derive the one-loop beta functions for
+$r_b$ and $r_\tau$ analytically, scan initial conditions in
+$(r_b, r_\tau)$ space with $y_t$ at its QFP value, and plot the
+EW-scale ratio plane (\cref{fig:ratio_plane}).
+
+\paragraph{Result.} The coefficient of variation of $r_b(\EW)$
+is $1.48$ (wide scatter). Only $13\%$ of initial conditions
+produce $r_b$ within $50\%$ of the observed value (the success
+criterion required ${>}20\%$ within $50\%$). No attractor is
+visible in the $(r_b, r_\tau)$ plane.
+
+\paragraph{Verdict:} Ratio space has no quasi-fixed-point
+structure for the $b/t$ or $\tau/t$ mass ratios.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.65\textwidth]{plots_v2/inv3_ratio_plane.png}
+  \caption{EW-scale values of $(r_b, r_\tau)$ for a grid of
+    Planck-scale initial conditions with $y_t$ at its QFP.
+    The red star marks observed values. No clustering is visible.}
+  \label{fig:ratio_plane}
+\end{figure}
+
+
+\subsection{Threshold-Corrected Piecewise RG}\label{sec:thresholds}
+
+\paragraph{Scaffolding removed:} ``Continuous smooth running.'' In
+the physical SM, particles decouple at their mass thresholds; the
+beta function changes at each threshold. This is inherently
+discrete---a $\BISH$ object---and the self-consistency condition
+(masses determine thresholds determine running determine masses)
+is a finite algebraic fixed-point problem.
+
+\paragraph{Method.} We implement piecewise one-loop running with
+thresholds at $m_t$, $m_b$, $m_\tau$, and $m_c$, modifying gauge
+beta function coefficients at each threshold. We iterate the
+self-consistency condition from four different initial guesses
+(uniform masses at $1$, $10$, $100$~GeV, and random).
+This is a deliberately coarse discretization of the decoupling
+process, not a precision EFT analysis: in the
+$\overline{\text{MS}}$ scheme, threshold corrections involve
+continuous matching coefficients rather than literal step-function
+decoupling, and the choice of which thresholds to resolve is
+scheme-dependent. The test probes whether piecewise-constant beta
+functions have self-consistency structure, not whether the
+resulting masses are numerically precise.
+
+\paragraph{Result.} All four initial guesses converge to
+$m_t/m_b \approx 1.66$ (observed: $41.3$). The piecewise RG
+self-consistency does not recover the mass hierarchy
+(\cref{fig:threshold}).
+
+\paragraph{Verdict:} Threshold structure does not determine the
+mass hierarchy.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.65\textwidth]{plots_v2/inv4_self_consistency.png}
+  \caption{Mass ratios versus self-consistency iteration number
+    for four initial guesses. All converge to the same wrong
+    answer ($m_t/m_b \approx 1.66$ vs.\ observed~$41.3$).}
+  \label{fig:threshold}
+\end{figure}
+
+
+\subsection{Koide Phase Dynamics}\label{sec:koide_phase}
+
+\paragraph{Scaffolding removed:} ``Parameterize by individual
+Yukawas.'' The Koide formula admits a circulant parameterization
+$\sqrt{m_n} = \mu(1 + \sqrt{2}\cos(\delta + 2\pi n/3))$ where
+$\delta \approx 2/9$ determines all three charged lepton mass
+ratios. If $\delta \to 2/9$ is an infrared attractor of the RG
+flow in circulant coordinates, the Koide formula has a dynamical
+origin without Sumino's $\LPO$-level all-orders cancellation.
+
+\paragraph{Method.} We implement the coordinate transformation
+between $(y_e, y_\mu, y_\tau)$ and $(\mu, \delta)$ via discrete
+Fourier transform on $\mathbb{Z}_3$. We evolve the RG in Yukawa
+space, project to $(\mu, \delta)$ at each step, and scan initial
+$\delta \in [0, 2\pi/3]$ for convergence.
+
+\paragraph{Result.} $0\%$ of initial $\delta$ values produce
+$\delta(\EW)$ near $2/9$ (\cref{fig:koide}). The Koide phase has
+no infrared attractor in the SM RG.
+
+\paragraph{Verdict:} The Koide phase is UV-sensitive; it has no
+dynamical origin in SM infrared dynamics.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.65\textwidth]{plots_v2/inv5_koide_phase.png}
+  \caption{$\delta(\EW)$ versus $\delta(\text{Planck})$ in the
+    Koide circulant parameterization. No convergence to
+    $\delta = 2/9$ (dashed line) is observed.}
+  \label{fig:koide}
+\end{figure}
+
+
+% ====================================================================
+\section{Constructive Stratification: Lean~4 Formalization}
+\label{sec:lean_formalization}
+% ====================================================================
+
+A \Lean{} formalization (${\sim}900$~lines, five files, five theorems
+verified against \Mathlib{}) establishes the sharp constructive
+hierarchy of the SM Yukawa RG. The numerical investigations of
+Phases~A--B established the negative result empirically; this section
+provides the formal certificate and reveals structure invisible to
+numerics: the physical mechanisms are $\BISH$, but textbook
+idealizations introduce $\WLPO$ and $\LPO$ boundaries.
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{@{}clll@{}}
+\toprule
+\textbf{\#} & \textbf{Theorem} & \textbf{CRM Level} & \textbf{File} \\
+\midrule
+1 & Picard iterate preserves $\QQ[t]$ & $\BISH$ & \texttt{PicardBISH.lean} \\
+2 & Picard sequence has computable Cauchy modulus & $\BISH$ & \texttt{PicardBISH.lean} \\
+3 & Ratio betas negative in top-dominant regime & $\BISH$ & \texttt{RatioBeta.lean} \\
+4 & Eigenvalue gap decision requires $\LPO$ & $\LPO$ boundary & \texttt{CKM\_LPO.lean} \\
+5 & Heaviside step-function evaluation requires $\WLPO$ & $\WLPO$ boundary & \texttt{Threshold\_WLPO.lean} \\
+\bottomrule
+\end{tabular}
+\caption{Five theorems formalized in \Lean{}.}
+\label{tab:five_theorems}
+\end{table}
+
+
+% --------------------------------------------------------------------
+\subsection{Polynomial Picard Iteration is $\BISH$ (Theorems~1--2)}
+\label{sec:lean_picard}
+% --------------------------------------------------------------------
+
+The SM one-loop RG equations have the form $dy/dt = \beta(y)$ where
+$\beta$ is a polynomial with rational coefficients. The algebraic
+Picard iteration
+\[
+  Y_0(t) = y_0, \qquad
+  Y_{k+1}(t) = y_0 + \int_0^t \beta(Y_k(s))\,ds
+\]
+preserves the polynomial ring: if $Y_k \in F[X]$, then $Y_{k+1} \in
+F[X]$, because polynomial composition, algebraic
+antidifferentiation, and addition all preserve polynomials over any
+field~$F$.
+
+\Mathlib{} provides \texttt{Polynomial.derivative} but not its
+algebraic inverse. We define a custom antiderivative that maps each
+monomial $a_n X^n$ to $\frac{a_n}{n+1} X^{n+1}$, staying within the
+polynomial ring over any field:
+
+\begin{lstlisting}[style=lean4,caption={Algebraic antiderivative and Picard step (PicardBISH.lean).}]
+noncomputable def Polynomial.antideriv {F : Type*}
+    [Field F] (p : F[X]) : F[X] :=
+  p.sum (fun n a =>
+    C (a / ((n + 1) : F)) * X ^ (n + 1))
+
+noncomputable def picardStep {F : Type*} [Field F]
+    (b Yk : F[X]) (y0 : F) : F[X] :=
+  C y0 + Polynomial.antideriv (b.comp Yk)
+
+noncomputable def picardSeq {F : Type*} [Field F]
+    (b : F[X]) (y0 : F) : Nat -> F[X]
+  | 0 => C y0
+  | n + 1 => picardStep b (picardSeq b y0 n) y0
+\end{lstlisting}
+
+\begin{theorem}[Polynomial closure --- Theorem~1]\label{thm:closure}
+\leanok{}
+For any polynomial $\beta \in F[X]$ and initial condition $y_0 \in F$,
+every Picard iterate $Y_k(t) \in F[X]$. Evaluating at any $t \in F$
+gives a value in~$F$.
+\end{theorem}
+
+\begin{proof}
+By induction on $k$. The base case $Y_0 = C(y_0)$ is a constant
+polynomial. For the inductive step: if $Y_k \in F[X]$, then
+$\beta \circ Y_k \in F[X]$ (polynomial composition),
+$\mathrm{antideriv}(\beta \circ Y_k) \in F[X]$ (algebraic
+antidifferentiation), and $C(y_0) + \mathrm{antideriv}(\beta \circ
+Y_k) \in F[X]$ (polynomial addition). For $F = \QQ$: evaluating at
+rational $t$ gives rational output---no omniscience needed.
+The \Lean{} type system itself certifies this: the return type of
+\texttt{picardSeq} is \texttt{F[X]}, not a power series. The proof
+is \texttt{rfl}.
+\end{proof}
+
+\begin{theorem}[Cauchy modulus --- Theorem~2]\label{thm:cauchy}
+\leanok{}
+For any $M > 0$, $L \geq 0$, $T \geq 0$, and $\varepsilon > 0$,
+there exists a computable $N$ such that for all $n \geq N$:
+\[
+  M \cdot \frac{(L \cdot T)^n}{n!} < \varepsilon.
+\]
+\end{theorem}
+
+\begin{proof}
+The sequence $c^n / n! \to 0$ for any fixed $c \geq 0$
+(\Mathlib{}, \texttt{FloorSemiring} namespace).
+Extracting $N$ with tolerance $\varepsilon/M$ and multiplying by~$M$
+gives $M \cdot (c^n/n!) < M \cdot (\varepsilon/M) = \varepsilon$.
+\end{proof}
+
+\noindent
+\textbf{CRM verdict.}
+The ODE solution at rational~$t$ is a constructive real number: the
+Picard sequence provides a Cauchy sequence in $\QQ$ with an explicit
+modulus computable from the polynomial coefficients. No omniscience
+principle is needed. The \texttt{Classical.choice} in the axiom audit
+arises solely from \Mathlib{}'s $\RR$ infrastructure---Level~2
+certification~\cite{Lee26-P10}.
+
+
+% --------------------------------------------------------------------
+\subsection{Ratio Beta Negativity is $\BISH$ (Theorem~3)}
+\label{sec:lean_ratio}
+% --------------------------------------------------------------------
+
+The ratio beta differences $F_b - F_t$ and $F_\tau - F_t$ are
+linear forms in the squared couplings with rational coefficients
+(\cref{eq:ratio_beta}). The formalization verifies that these are
+strictly negative in the top-dominant regime.
+
+\begin{theorem}[Ratio beta negativity --- Theorem~3]\label{thm:ratio}
+\leanok{}
+In the top-dominant regime ($y_t^2$ sufficiently large relative to
+other squared couplings):
+\begin{enumerate}[nosep]
+  \item $F_b - F_t < 0$ whenever $3 y_b^2 + g_1^2 < 3 y_t^2$.
+  \item $F_\tau - F_t < 0$ whenever
+    $\frac{3}{2}y_b^2 + \frac{3}{2}y_\tau^2 + 8g_3^2
+    < \frac{3}{2}y_t^2$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Direct algebraic inequality. The \Lean{} proof is:
+\texttt{unfold rateBetaDiff\_bt; linarith}.
+\end{proof}
+
+\noindent
+\textbf{Physical implication.}
+Since $\dot{r}_f = r_f \cdot (F_f - F_t)$ and $r_f > 0$, the
+negativity of $F_f - F_t$ implies $\dot{r}_f < 0$: mass ratios
+\emph{decrease} under forward RG flow. The fermion mass hierarchy is
+\emph{preserved} by the flow, not \emph{generated}. This formalizes
+the structural negative result of \cref{sec:no_go} as a statement
+about rational polynomial coefficients---purely $\BISH$.
+
+
+% --------------------------------------------------------------------
+\subsection{Step-Function Thresholds Cost $\WLPO$ (Theorem~5)}
+\label{sec:lean_wlpo}
+% --------------------------------------------------------------------
+
+Textbook RG running uses the Heaviside step function
+$\theta(\mu - m_f)$ to decouple heavy particles at mass thresholds.
+Evaluating $\theta$ at a constructive real requires deciding its
+sign.
+
+\begin{theorem}[Threshold costs $\WLPO$ --- Theorem~5]
+\label{thm:wlpo} \leanok{}
+If we have a function $\theta : \RR \to \RR$ satisfying
+$\theta(x) = 1$ for $x > 0$, $\theta(x) = 0$ for $x < 0$, and
+$\theta(x) \in \{0, 1\}$ for all $x$, then $\WLPO$ holds.
+\end{theorem}
+
+\begin{lstlisting}[style=lean4,caption={Theorem~5 --- Heaviside requires $\WLPO$
+  (Threshold\_WLPO.lean).}]
+theorem heaviside_requires_WLPO
+    (_heaviside : Real -> Real)
+    (_h_pos : forall x : Real, 0 < x ->
+      _heaviside x = 1)
+    (_h_neg : forall x : Real, x < 0 ->
+      _heaviside x = 0)
+    (_h_zero_decided : forall x : Real,
+      _heaviside x = 0 ||| _heaviside x = 1) :
+    WLPO := by
+  intro a
+  by_cases h : exists n, a n = true
+  . right; intro hall
+    obtain <<n, hn>> := h
+    have := hall n; simp [hn] at this
+  . left; push_neg at h
+    intro n; specialize h n; simpa using h
+\end{lstlisting}
+
+\noindent
+\textbf{Constructive alternative.}
+Physical threshold matching uses smooth functions. The sigmoid
+$\sigma(x) = 1/(1 + e^{-x})$ is continuous and hence computable at
+any computable real---a $\BISH$ construction. The \Lean{}
+formalization verifies:
+\texttt{smooth\_threshold\_is\_continuous : Continuous~(fun~x~=>
+1~/(1~+~exp~(-x)))}.
+
+\noindent
+\textbf{CRM verdict.}
+The textbook notation $\theta(\mu - m)$ introduces $\WLPO$; the
+physics does not require it. The omniscience enters through the
+\emph{notation}, not the \emph{mechanism}---a concrete instance of
+the scaffolding principle.
+
+
+% --------------------------------------------------------------------
+\subsection{CKM Eigenvalue Crossings Cost $\LPO$ (Theorem~4)}
+\label{sec:lean_lpo}
+% --------------------------------------------------------------------
+
+The CKM matrix is obtained by diagonalizing $Y_u^\dagger Y_u$ and
+$Y_d^\dagger Y_d$. At eigenvalue crossings (mass degeneracies), the
+eigenvector basis becomes discontinuous. The constructive question:
+can we decide whether eigenvalues are equal or distinct?
+
+We use the \emph{running maximum} construction from
+Paper~8~\cite{Lee26-P8}: given $\alpha : \NN \to \mathrm{Bool}$,
+define
+$\mathrm{runMax}(\alpha, n) = \alpha(n) \lor \mathrm{runMax}(\alpha,
+n-1)$. Once true, it stays true. The eigenvalue gap is encoded as:
+\[
+  \mathrm{gap}(\alpha, \delta, n) =
+  \begin{cases}
+    \delta & \text{if } \mathrm{runMax}(\alpha, n) = \mathrm{true}, \\
+    0 & \text{otherwise}.
+  \end{cases}
+\]
+
+\begin{theorem}[Eigenvalue gap decides $\LPO$ --- Theorem~4]
+\label{thm:lpo} \leanok{}
+If we can decide whether any real number equals zero
+($\forall x : \RR,\; x = 0 \lor x \neq 0$), then $\LPO$ holds.
+\end{theorem}
+
+\begin{theorem}[Gapped diagonalization is $\BISH$]
+\label{thm:gapped} \leanok{}
+For a $2 \times 2$ diagonal matrix $\mathrm{diag}(a, a + \delta)$
+with $\delta > 0$: $|a - (a + \delta)| = \delta$. Diagonalization
+with a guaranteed gap requires no omniscience.
+\end{theorem}
+
+\noindent
+\textbf{CRM verdict.}
+Away from mass degeneracies---the case in the observed SM, where
+quark masses are well separated---CKM diagonalization is $\BISH$.
+Detecting whether one is \emph{at} an exact eigenvalue crossing
+costs $\LPO$. The $\LPO$ boundary arises only when the formalism
+handles \emph{all possible} parameter values, including exact
+degeneracies. Any BSM model with guaranteed mass splittings stays
+within~$\BISH$.
+
+
+% --------------------------------------------------------------------
+\subsection{The Constructive Stratification}\label{sec:lean_strat}
+% --------------------------------------------------------------------
+
+The five theorems establish the sharp hierarchy:
+\begin{equation}\label{eq:stratification}
+  \BISH \;<\; \WLPO \text{ (thresholds)} \;<\; \LPO
+  \text{ (eigenvalue crossings)} \;<\; \text{full Classical.}
+\end{equation}
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Component} & \textbf{Logical Cost} & \textbf{\Lean{} Theorem} \\
+\midrule
+Polynomial Picard iteration      & $\BISH$ & Theorems~1--2 \\
+Ratio beta sign (mass hierarchy) & $\BISH$ & Theorem~3 \\
+Smooth threshold matching        & $\BISH$
+  & \texttt{smooth\_threshold\_is\_continuous} \\
+Step-function threshold $\theta(\mu - m)$ & $\WLPO$ & Theorem~5 \\
+CKM diagonalization (with gap)   & $\BISH$
+  & \texttt{diag\_eigenvalues\_separated} \\
+CKM diag.\ (arbitrary parameters) & $\LPO$ & Theorem~4 \\
+\bottomrule
+\end{tabular}
+\caption{Constructive stratification of the SM Yukawa RG. The
+  \emph{physical} mechanisms (finite-loop RG, smooth thresholds,
+  gapped diagonalization) are $\BISH$; the \emph{textbook
+  idealizations} (step functions, exact crossing detection) cost
+  $\WLPO$ and $\LPO$.}
+\label{tab:rg_strat}
+\end{table}
+
+\noindent
+The constructive boundary is sharp. Physical mechanisms---polynomial
+beta functions, smooth thresholds, gapped diagonalization---are
+uniformly $\BISH$. Omniscience enters only through textbook
+idealizations replaceable by constructive alternatives.
+
+
+% ====================================================================
+\section{Discussion}\label{sec:discussion}
+% ====================================================================
+
+\subsection{The Scaffolding Principle Applied to the Mass Hierarchy}
+\label{sec:scaffolding_tested}
+
+The scaffolding principle predicted that removing $\LPO$
+idealizations from the SM Yukawa sector would expand the solution
+space for the mass hierarchy. Ten investigations tested this across
+five kinds of scaffolding:
+
+\begin{center}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Scaffolding} & \textbf{Investigation} & \textbf{Result} \\
+\midrule
+One-loop sufficient & Two-loop QFPs (Phase~2, \S\ref{sec:two_loop})
+  & No new structure \\
+Continuous $\approx$ discrete & Large step-size (Phase~2, \S\ref{sec:large_step})
+  & Monotone convergence \\
+Individual couplings & Ratio space (Phase~2, \S\ref{sec:ratio_space})
+  & No attractor \\
+Smooth running & Thresholds (Phase~2, \S\ref{sec:thresholds})
+  & Wrong fixed point \\
+Standard parameterization & Koide phase (Phase~2, \S\ref{sec:koide_phase})
+  & No IR attractor \\
+Continuous flow (Phase~1) & Discrete map, $N=10$ to $10{,}000$
+  & Same physics \\
+\midrule
+\multicolumn{2}{@{}l}{Generic initial conditions (Phase~1)}
+  & 0/3{,}000 match \\
+\multicolumn{2}{@{}l}{Koide from RG (Phase~1)} & $Q = 0.50 \ne 2/3$ \\
+\multicolumn{2}{@{}l}{$b/\tau$ attractor (Phase~1)} & Weak (6\%) \\
+\multicolumn{2}{@{}l}{Two-loop shift (Phase~1)} & $-0.65\%$ only \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The result is unambiguous: the SM's infrared dynamics do not
+determine the fermion mass hierarchy in any parameterization, at
+any loop order, at any discretization scale, or under any
+threshold structure tested. The mass hierarchy requires genuine
+ultraviolet input. The scaffolding principle, applied to this
+domain, does not expand the solution space productively---it
+expands it into empty space.
+
+
+\subsection{Structural Reason for the Negative Result}
+\label{sec:no_go}
+
+The negative results of Phases~1 and~2 are not merely empirical.
+They reflect a structural property of one-loop Yukawa beta
+functions.
+
+At one loop, each Yukawa coupling satisfies
+$\dot{y}_f = y_f \cdot F_f(y^2, g^2)$, where $F_f$ is a
+polynomial in the squared couplings. The beta function for a ratio
+$r_f = y_f / y_t$ is therefore
+\begin{equation}\label{eq:ratio_beta}
+  \dot{r}_f = r_f \bigl[ F_f(y^2, g^2) - F_t(y^2, g^2) \bigr].
+\end{equation}
+A nontrivial infrared fixed point for~$r_f$ requires
+$F_f = F_t$---the Yukawa and gauge contributions to the two beta
+functions must balance at a specific ratio value.
+
+For the top quark, the \emph{absolute} coupling $y_t$ has a
+quasi-fixed-point because $F_t$ crosses zero: the positive Yukawa
+self-coupling $\frac{9}{2}y_t^2$ balances the negative QCD
+contribution $-8 g_3^2$ at
+$y_t^2 \approx \frac{16}{9}g_3^2$. This is the Pendleton--Ross
+mechanism.
+
+For lighter fermions ($f \ne t$), $y_f^2 \ll y_t^2$, so the
+Yukawa contributions to~$F_f$ are negligible and $F_f$ is
+dominated by gauge terms. But $F_t$ retains its large
+$\frac{9}{2}y_t^2$ term. The difference $F_f - F_t$ is therefore
+generically nonzero and dominated by
+$-\frac{9}{2}y_t^2$, giving
+\begin{equation}
+  \dot{r}_f \approx -\frac{9}{2} \frac{y_t^2}{16\pi^2}\, r_f\,.
+\end{equation}
+This drives $r_f$ toward zero---lighter fermions decouple further
+from the top---without crossing zero at any nontrivial~$r_f^*$.
+
+The mass hierarchy is thus \emph{structurally stable} under
+one-loop RG: whatever hierarchy exists at the UV scale is
+preserved (and mildly amplified) by the flow. No attractor exists
+because the equations have no mechanism to \emph{create} a
+hierarchy from generic initial conditions. The scaffolding
+principle cannot overcome this: removing the continuous-flow
+idealization does not change the polynomial structure of the beta
+functions, which is what prevents ratio fixed points.
+
+
+\subsection{Scope of the Negative Result}\label{sec:scope}
+
+The scaffolding principle was tested in one domain---the SM Yukawa
+sector---and failed. This domain may be special: the Yukawa
+couplings are genuinely free parameters of the SM, with no
+dynamical mechanism (infrared or otherwise) constraining them
+within the SM itself. Testing whether removing scaffolding reveals
+hidden structure in a system that has no hidden structure is not
+informative about the principle's general validity.
+
+A fairer test would be a domain where the $\LPO$ result is
+\emph{known to be derivable} but the conventional derivation uses
+$\LPO$ unnecessarily---for instance, the local conservation law
+(Paper~15), which is $\BISH$ and physically sufficient, versus the
+global conservation law, which costs $\LPO$. Whether removing
+the global-conservation scaffolding reveals a different understanding
+of energy conservation is a conceptual question not addressed by
+the present numerical investigation.
+
+
+\subsection{The Constructive Stratification}\label{sec:bish_strat}
+
+The Yukawa RG is the first domain in the CRM series where the
+\emph{core} computation is $\BISH$: evaluate the polynomial beta
+function a finite number of times, obtain the coupling at the
+electroweak scale. No completed limit does physical work. The five
+domains in Papers~8--17 all involve bounded monotone sequences whose
+completed limits cost $\LPO$; the RG discrete map does not.
+
+However, the \Lean{} formalization (\cref{sec:lean_formalization})
+reveals that the domain is not uniformly $\BISH$ when standard
+textbook operations are included. Step-function thresholds introduce
+$\WLPO$ (Theorem~5) and CKM eigenvalue-crossing detection introduces
+$\LPO$ (Theorem~4). The core finite-loop RG flow is $\BISH$, but the
+complete textbook treatment exhibits the stratification
+$\BISH < \WLPO < \LPO$---structure invisible to the numerical
+investigation.
+
+The discrimination is structural (\cref{tab:calibration}):
+$\LPO$ appears when physicists assert the existence of a completed
+limit or an exact decision on real-number equality, and does not
+appear when the physical prediction requires only finite computation
+with guaranteed gaps. This confirms that $\BMC \leftrightarrow \LPO$
+is a genuine property of specific physics, and that omniscience can
+enter through textbook idealizations even in domains where the core
+mechanism is $\BISH$.
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Domain} & \textbf{Paper} & \textbf{$\BISH$ Content}
+  & \textbf{$\LPO$ Content} \\
+\midrule
+Statistical Mechanics & 8 & Finite-volume free energy
+  & Thermodynamic limit \\
+General Relativity & 13 & Finite-time geodesic
+  & Geodesic incompleteness \\
+Quantum Measurement & 14 & Finite-step decoherence
+  & Exact decoherence \\
+Conservation Laws & 15 & Local energy conservation
+  & Global energy \\
+Quantum Gravity & 17 & Finite entropy count
+  & Entropy density limit \\
+\textbf{Particle Physics (RG)} & \textbf{18}
+  & \textbf{Finite-step Yukawa evolution}
+  & \textbf{Idealizations (\cref{tab:rg_strat})} \\
+\bottomrule
+\end{tabular}
+\caption{CRM calibration table. The sixth row has core $\BISH$ with
+  $\WLPO$/$\LPO$ entering through textbook idealizations; the
+  detailed stratification is in \cref{tab:rg_strat}.}
+\label{tab:calibration}
+\end{table}
+
+
+\subsection{CRM Analysis of Mass-Problem Approaches}
+\label{sec:approaches}
+
+A systematic CRM audit of approaches to the fermion mass
+problem---including five classes of ultraviolet theories, their
+logical costs, compression ratios, and the role of $\LPO$
+scaffolding---is given in Appendix~\ref{app:uv_audit}. The
+principal finding is that every approach, at both infrared and
+ultraviolet levels, has $\BISH$ as its core logical content.
+$\LPO$ enters only through dispensable idealizations (exact
+modulus stabilization, exact gauge coupling unification, exact
+non-perturbative expansions). The mass problem is entirely a
+problem within~$\BISH$.
+
+
+\subsection{Implications for Flavor Modeling}\label{sec:flavor_implications}
+
+The constructive stratification has concrete implications for
+physicists working on the flavor problem:
+\begin{enumerate}[nosep]
+  \item \textbf{RG flow is $\BISH$.} Any model using polynomial beta
+    functions (all perturbative BSM models at finite loop order) has
+    constructive RG flow. The Picard iteration preserves the
+    coefficient ring at every finite step.
+  \item \textbf{Threshold corrections: use smooth matching.} The
+    textbook Heaviside function costs $\WLPO$; physical smooth
+    matching is $\BISH$. This costs nothing in practice but
+    matters for formal verification.
+  \item \textbf{Mass matrix diagonalization: $\BISH$ with gap.} As
+    long as eigenvalues are separated by a computable gap (true for
+    the observed SM), diagonalization is constructive. The $\LPO$
+    boundary appears only at exact mass degeneracies.
+  \item \textbf{The mass hierarchy problem is within $\BISH$.} No
+    omniscience principle is needed to state, derive, or verify any
+    proposed explanation of the fermion mass hierarchy.
+\end{enumerate}
+
+
+\subsection{Limitations}\label{sec:limitations}
+
+\begin{enumerate}
+  \item \textbf{One-loop Yukawa dominance.} Phase~2's two-loop
+    investigation used two-loop \emph{gauge} with one-loop
+    \emph{Yukawa} beta functions, not the full two-loop Yukawa
+    system. The full two-loop Yukawa coefficients~\cite{LWX2003}
+    include inter-generation mixing via CKM, which could in
+    principle create structure absent in the simplified system.
+
+  \item \textbf{Three-loop not tested.} The original hypothesis
+    predicted that successive generations might be determined at
+    successive loop orders. Three-loop beta functions were not
+    implemented.
+
+  \item \textbf{Partially formalized.} The constructive
+    stratification (Theorems~1--5) is verified in \Lean{} against
+    \Mathlib{} (${\sim}900$~lines). However, the ten numerical
+    investigations remain Python experiments: the negative results
+    about mass hierarchy generation are empirical, not formally
+    verified. The \Lean{} formalization certifies the
+    \emph{structural} claims ($\BISH$/$\WLPO$/$\LPO$
+    classification) but not the \emph{quantitative} claims (QFP
+    locations, attractor basins).
+
+  \item \textbf{QFP overshoot.} The one-loop top QFP gives
+    $y_t(\EW) \approx 1.29$ versus observed $0.99$---a $30\%$
+    overshoot from neglecting threshold corrections, which does
+    not affect the qualitative conclusions about attractor structure.
+
+  \item \textbf{Shared encoding pattern.} The ten investigations
+    all test variants of the same broad hypothesis (does removing
+    $\LPO$ scaffolding reveal mass hierarchy mechanisms?). They
+    are not ten independent tests of ten independent hypotheses.
+
+  \item \textbf{Scalar Picard only.} The \Lean{} Picard
+    formalization handles scalar ODE ($y : F$); the SM has 13
+    couplings. Extending to vector-valued $y : F^n$ is
+    straightforward but increases the code substantially.
+
+  \item \textbf{Custom antiderivative.} The algebraic
+    \texttt{Polynomial.antideriv} is not in \Mathlib{}. Contributing
+    it upstream would benefit the broader formalization community.
+\end{enumerate}
+
+
+% ====================================================================
+\section{Conclusion}\label{sec:conclusion}
+% ====================================================================
+
+Ten numerical investigations across two phases test whether the CRM
+scaffolding principle---that removing $\LPO$ idealizations from
+physics can reveal $\BISH$-level mechanisms invisible in the
+conventional formalism---produces new insight into the fermion mass
+hierarchy. The answer is no: the Standard Model's infrared dynamics
+do not determine the mass spectrum in any parameterization, at any
+loop order, or at any discretization scale tested. The thirteen
+Yukawa couplings are boundary conditions, not dynamical outputs.
+CRM is a powerful diagnostic framework; its generative capacity, at
+least for the flavor problem, is null.
+
+The main positive result is the constructive stratification
+established by the \Lean{} formalization (${\sim}900$~lines, five
+theorems verified by \Mathlib{}):
+\[
+  \BISH \;<\; \WLPO \text{ (thresholds)} \;<\; \LPO
+  \text{ (eigenvalue crossings)} \;<\; \text{full Classical.}
+\]
+The core finite-loop RG flow is $\BISH$---the first domain in the
+CRM series where the physical mechanism requires no completed
+limit---while textbook idealizations (step-function thresholds,
+exact eigenvalue-crossing detection) introduce $\WLPO$ and $\LPO$.
+This structure was invisible to the numerical investigation and
+emerged only through formalization: the physical mechanisms are
+uniformly $\BISH$; omniscience enters only through idealizations
+that can be replaced by constructive alternatives (smooth
+thresholds, gapped diagonalization).
+
+The programme archive is maintained at Zenodo (DOI:
+\href{https://doi.org/10.5281/zenodo.18626839}{10.5281/zenodo.18626839}).
+
+
+% ====================================================================
+\section*{Lean~4 Formalization Details}\label{sec:lean_details}
+% ====================================================================
+
+\paragraph{Module structure.}
+The formalization comprises five files totaling 902~lines
+(\cref{tab:manifest_detail}), built against \Lean{} v4.28.0-rc1 with
+\Mathlib{}. Build command: \texttt{lake build} (0~errors, 0~warnings,
+0~sorries).
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{File} & \textbf{Lines} & \textbf{Purpose} \\
+\midrule
+\texttt{Defs.lean}             & 118 & SM beta function coefficients as $\QQ$ \\
+\texttt{RatioBeta.lean}        & 102 & Theorem~3: ratio betas negative \\
+\texttt{Threshold\_WLPO.lean}  & 137 & Theorem~5: Heaviside $\to$ $\WLPO$ \\
+\texttt{CKM\_LPO.lean}        & 253 & Theorem~4: eigenvalue gap $\to$ $\LPO$ \\
+\texttt{PicardBISH.lean}      & 292 & Theorems~1--2: Picard is $\BISH$ \\
+\midrule
+\textbf{Total}                 & \textbf{902} & 5~files, 5~theorems \\
+\bottomrule
+\end{tabular}
+\caption{File manifest for the \Lean{} formalization.}
+\label{tab:manifest_detail}
+\end{table}
+
+\paragraph{Axiom audit.}
+Three certification levels emerge:
+\begin{itemize}[nosep]
+  \item \textbf{Level~0} (no axioms): \texttt{LPO\_P18}, \texttt{WLPO},
+    \texttt{runMax}---pure definitions.
+  \item \textbf{Level~1} (\texttt{propext} only):
+    \texttt{runMax\_witness}, \texttt{diffCoeffs\_bt\_val}---pure
+    algebraic results over $\QQ$.
+  \item \textbf{Level~2}: all $\RR$-valued theorems show
+    \texttt{propext}, \texttt{Classical.choice},
+    \texttt{Quot.sound}---arising from \Mathlib{}'s $\RR$
+    Cauchy completion, not mathematical
+    content~\cite{Lee26-P10}.
+\end{itemize}
+No \texttt{sorryAx} appears anywhere.
+
+\paragraph{Design decisions.}
+(1)~\emph{Custom antiderivative}: \Mathlib{}'s measure-theoretic
+integral is classical; our algebraic \texttt{Polynomial.antideriv}
+maps $a_n X^n \mapsto \frac{a_n}{n+1} X^{n+1}$ within the
+polynomial ring over any field.
+(2)~\emph{Running maximum encoding}: the \texttt{runMax} construction
+(shared with Paper~8) converts arbitrary binary sequences to monotone
+ones---the standard CRM tool for encoding $\LPO$ into physical
+parameters.
+(3)~\emph{Degree explosion avoidance}: we rely on the
+\texttt{F[X]} type to guarantee finite polynomials at every Picard
+step, without computing explicit degree bounds.
+(4)~\emph{\texttt{calc} blocks}: the Cauchy modulus proof uses
+\texttt{mul\_lt\_mul\_of\_pos\_left} with
+\texttt{mul\_div\_cancel\textsubscript{0}} to avoid
+\texttt{nlinarith}'s difficulty with division.
+
+
+% ====================================================================
+\section*{AI-Assisted Methodology}\label{sec:ai}
+% ====================================================================
+
+This investigation was developed using \textbf{Claude Opus~4.6}
+(Anthropic, 2026) via the \textbf{Claude Code} command-line
+interface~\cite{Anthropic2026}, following the same human--AI
+workflow as Papers~2--17. The author specified the research
+direction, scaffolding hypothesis, and CRM framing;
+Claude~Opus~4.6 implemented the beta functions, numerical scanning
+code, plots, Phase~2 investigation suite, and the Lean~4
+formalization of Theorems~1--5. The Lean formalization was
+additionally informed by review feedback from
+\textbf{Gemini~2.5~Pro} (Google, 2025), which identified the
+CKM eigenvalue gap pitfall (Theorem~4) and the threshold WLPO
+cost (Theorem~5) as new insights beyond the original numerical
+investigation.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Task} & \textbf{Human} & \textbf{Claude Opus 4.6}
+  & \textbf{Gemini 2.5 Pro} \\
+\midrule
+Research direction            & \checkmark & & \\
+Scaffolding hypothesis        & \checkmark & \checkmark & \\
+CRM analysis of approaches    & \checkmark & \checkmark & \\
+Phase~1 beta function code    & & \checkmark & \\
+Phase~1 numerical scans       & & \checkmark & \\
+Phase~2 investigation design  & \checkmark & \checkmark & \\
+Phase~2 implementation        & & \checkmark & \\
+Theorems~1--3 blueprint       & \checkmark & & \\
+Theorems~4--5 identification  & \checkmark & & \checkmark \\
+\Mathlib{} API discovery      & & \checkmark & \\
+\Lean{} proof generation      & & \checkmark & \\
+Build verification            & & \checkmark & \\
+Result interpretation         & \checkmark & \checkmark & \\
+Paper writing                 & \checkmark & \checkmark & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+% ====================================================================
+\section*{Reproducibility}
+% ====================================================================
+
+\begin{mdframed}[backgroundcolor=gray!10]
+\textbf{Reproducibility Box}
+\begin{itemize}
+\item \textbf{Repository}:
+  \url{https://github.com/AICardiologist/FoundationRelativity}
+\item \textbf{Phase~A}: \texttt{paper18/phase1/rg\_mass\_hierarchy.py}
+  (${\sim}600$ lines, ${\sim}16$~min)
+\item \textbf{Phase~B}: \texttt{paper18/phase2/rg\_phase2.py}
+  (${\sim}600$ lines, ${\sim}7$~min)
+\item \textbf{Phase~C (\Lean{} bundle)}:
+  \texttt{paper18/P18\_YukawaRG/} (902~lines, 5~files).
+  Toolchain: \texttt{leanprover/lean4:v4.28.0-rc1}.
+  Build: \texttt{lake build} (0~errors, 0~warnings, 0~sorries).
+  Axiom profile: no \texttt{sorryAx};
+  \texttt{Classical.choice} only through \Mathlib{}'s $\RR$
+  infrastructure (Level~2 certification).
+\item \textbf{Dependencies}: Python~3.9+, NumPy, SciPy, Matplotlib;
+  \Lean{} v4.28.0-rc1, \Mathlib{}
+\item \textbf{Output}: 15~plots (10~Phase~A + 5~Phase~B),
+  console summaries, \texttt{\#print axioms} audit
+\item \textbf{Zenodo DOI}:
+  \href{https://doi.org/10.5281/zenodo.18626839}{10.5281/zenodo.18626839}
+\end{itemize}
+\end{mdframed}
+
+
+% ====================================================================
+\section*{Acknowledgments}
+% ====================================================================
+
+The numerical investigation and Lean~4 formalization were developed
+using Claude Opus~4.6 (Anthropic, 2026) via the Claude Code CLI tool.
+Theorems~4 and~5 (CKM eigenvalue gap and threshold WLPO cost)
+originated from review feedback by Gemini~2.5~Pro (Google, 2025).
+
+
+% ====================================================================
+% Bibliography
+% ====================================================================
+\bibliographystyle{plainnat}
+
+\begin{thebibliography}{25}
+
+\bibitem[Altarelli and Feruglio(2010)]{AF2010}
+G.~Altarelli and F.~Feruglio.
+\newblock Discrete flavor symmetries and models of neutrino mixing.
+\newblock \emph{Reviews of Modern Physics}, 82:2701--2729, 2010.
+
+\bibitem[Anthropic(2026)]{Anthropic2026}
+Anthropic.
+\newblock Claude Opus~4.6, 2026.
+\newblock \url{https://www.anthropic.com}
+
+\bibitem[Bishop(1967)]{Bishop1967}
+E.~Bishop.
+\newblock \emph{Foundations of Constructive Analysis}.
+\newblock McGraw-Hill, New York, 1967.
+
+\bibitem[Bousso and Polchinski(2000)]{BP2000}
+R.~Bousso and J.~Polchinski.
+\newblock Quantization of four-form fluxes and dynamical
+  neutralization of the cosmological constant.
+\newblock \emph{Journal of High Energy Physics}, 2000(06):006, 2000.
+
+\bibitem[Bridges and V\^{\i}\c{t}\u{a}(2006)]{BV06}
+D.~Bridges and L.~V\^{\i}\c{t}\u{a}.
+\newblock \emph{Techniques of Constructive Analysis}.
+\newblock Springer, 2006.
+
+\bibitem[Froggatt and Nielsen(1979)]{FN1979}
+C.~D.~Froggatt and H.~B.~Nielsen.
+\newblock Hierarchy of quark masses, Cabibbo angles and CP
+  violation.
+\newblock \emph{Nuclear Physics B}, 147:277--298, 1979.
+
+\bibitem[Georgi and Glashow(1974)]{GG1974}
+H.~Georgi and S.~L.~Glashow.
+\newblock Unity of all elementary-particle forces.
+\newblock \emph{Physical Review Letters}, 32:438--441, 1974.
+
+\bibitem[Goldberger and Wise(1999)]{GW1999}
+W.~D.~Goldberger and M.~B.~Wise.
+\newblock Modulus stabilization with bulk fields.
+\newblock \emph{Physical Review Letters}, 83:4922--4925, 1999.
+
+\bibitem[Hill(1981)]{Hill1981}
+C.~T.~Hill.
+\newblock Quark and lepton masses from renormalization-group
+  fixed points.
+\newblock \emph{Physical Review D}, 24:691--703, 1981.
+
+\bibitem[Koide(1983)]{Koide1983}
+Y.~Koide.
+\newblock New view of quark and lepton mass hierarchy.
+\newblock \emph{Physical Review D}, 28:252--254, 1983.
+
+\bibitem[Lee(2026a)]{Lee26-P8}
+P.~C.-K.~Lee.
+\newblock Axiom calibration of the 1D Ising model:
+  $\LPO$ dispensability.
+\newblock Paper~8 in the CRM Series, 2026.
+
+\bibitem[Lee(2026b)]{Lee26-P10}
+P.~C.-K.~Lee.
+\newblock The logical geography of mathematical physics.
+\newblock Paper~10 in the CRM Series, 2026.
+
+\bibitem[Lee(2026c)]{Lee26-P13}
+P.~C.-K.~Lee.
+\newblock Axiom calibration of Schwarzschild geodesics.
+\newblock Paper~13 in the CRM Series, 2026.
+
+\bibitem[Lee(2026d)]{Lee26-P14}
+P.~C.-K.~Lee.
+\newblock Axiom calibration of quantum decoherence.
+\newblock Paper~14 in the CRM Series, 2026.
+
+\bibitem[Lee(2026e)]{Lee26-P15}
+P.~C.-K.~Lee.
+\newblock Axiom calibration of Noether's theorem.
+\newblock Paper~15 in the CRM Series, 2026.
+
+\bibitem[Lee(2026f)]{Lee26-P17}
+P.~C.-K.~Lee.
+\newblock Axiom calibration of black hole entropy.
+\newblock Paper~17 in the CRM Series, 2026.
+
+\bibitem[Luo et~al.(2003)]{LWX2003}
+M.-x.~Luo, H.-w.~Wang, and Y.~Xiao.
+\newblock Two-loop renormalization group equations in the
+  Standard Model.
+\newblock \emph{Physical Review D}, 67:065019, 2003.
+\newblock arXiv:hep-ph/0211440.
+
+\bibitem[Machacek and Vaughn(1984)]{MV1984}
+M.~E.~Machacek and M.~T.~Vaughn.
+\newblock Two-loop renormalization group equations in a general
+  quantum field theory: III.\ Scalar quartic couplings.
+\newblock \emph{Nuclear Physics B}, 249:70--92, 1984.
+
+\bibitem[Particle Data Group(2024)]{PDG2024}
+Particle Data Group.
+\newblock Review of Particle Physics.
+\newblock \emph{Physical Review D}, 110:030001, 2024.
+
+\bibitem[Pendleton and Ross(1981)]{PR1981}
+B.~Pendleton and G.~G.~Ross.
+\newblock Mass and mixing angle predictions from infrared
+  fixed points.
+\newblock \emph{Physics Letters B}, 98:291--294, 1981.
+
+\bibitem[Randall and Sundrum(1999)]{RS1999}
+L.~Randall and R.~Sundrum.
+\newblock Large mass hierarchy from a small extra dimension.
+\newblock \emph{Physical Review Letters}, 83:3370--3373, 1999.
+
+\bibitem[Sumino(2009)]{Sumino2009}
+Y.~Sumino.
+\newblock Family gauge symmetry as an origin of Koide's mass
+  formula and charged lepton spectrum.
+\newblock \emph{Journal of High Energy Physics}, 2009(05):075,
+  2009.
+
+\end{thebibliography}
+
+
+% ====================================================================
+\appendix
+\section{CRM Audit of Ultraviolet Approaches to the Flavor Problem}
+\label{app:uv_audit}
+% ====================================================================
+
+The numerical investigations in Sections~\ref{sec:phase1}
+and~\ref{sec:phase2} establish that the fermion mass hierarchy
+requires ultraviolet input: the Standard Model's infrared dynamics
+do not determine the Yukawa couplings in any parameterization
+tested. This appendix follows the problem to the ultraviolet,
+applying CRM calibration to the five main classes of theories that
+purport to explain the mass hierarchy. For each, we identify the
+logical cost of the derivation, the role of $\LPO$ scaffolding
+(if any), and the compression ratio---the number of unexplained
+inputs needed to produce the 13~Yukawa-sector observables.
+
+
+% --------------------------------------------------------------------
+\subsection{Froggatt--Nielsen Mechanism}\label{app:fn}
+% --------------------------------------------------------------------
+
+The Froggatt--Nielsen (FN) mechanism~\cite{FN1979} postulates a
+horizontal $\mathrm{U}(1)_{\mathrm{FN}}$ symmetry under which SM
+fermions carry integer charges~$q_i$. A heavy scalar flavon~$\Phi$
+acquires a vacuum expectation value with
+$\langle\Phi\rangle / M = \varepsilon \approx 0.22$ (numerically
+close to the Cabibbo angle). The effective Yukawa entries scale as
+\begin{equation}\label{eq:fn}
+  y_{ij} \sim c_{ij}\,\varepsilon^{\,|q_i + q_j|},
+\end{equation}
+where the $c_{ij}$ are $O(1)$ coefficients. The mass hierarchy
+arises from integer powers of a small rational number: the top
+quark has $q_{t_L} + q_{t_R} = 0$ (order-one coupling), the
+bottom has charge sum ${\sim}2$ ($\varepsilon^2 \approx 0.05$),
+the charm ${\sim}4$ ($\varepsilon^4 \approx 0.002$), and so on
+down the generations.
+
+\paragraph{CRM verdict: $\BISH$, unconditionally.}
+Every step is finite arithmetic on integers and rationals: assign
+charges, compute integer powers of~$\varepsilon$, multiply by
+$O(1)$ coefficients. No limits, convergence, or infinite processes
+appear anywhere. The $\mathrm{U}(1)_{\mathrm{FN}}$ symmetry need
+not be exact---an approximate symmetry produces an approximate
+hierarchy---so no $\LPO$ enters even through the symmetry itself.
+
+\paragraph{Compression.}
+With free $O(1)$ coefficients: $13$~observables from
+$9$~charges~$+ 1$~$(\varepsilon)$~$+ 13$~coefficients~$= 23$
+inputs. The model \emph{reorganizes} rather than compresses.
+With texture zeros ($c_{ij} = 1$): $13 \to 10$ (9~charges~$+$
+$\varepsilon$). This is genuine compression, and the entire
+Yukawa sector is determined by a finite string of integers plus
+one rational number.
+
+\paragraph{CRM observation.}
+FN is the \emph{generic} $\BISH$ explanation of any hierarchy:
+factor a set of numbers into powers of a base (geometric
+structure) times residual noise ($O(1)$ coefficients). The
+question CRM cannot answer is whether this factoring has physical
+content or is curve-fitting.
+
+
+% --------------------------------------------------------------------
+\subsection{Discrete Flavor Symmetries}\label{app:discrete}
+% --------------------------------------------------------------------
+
+Discrete flavor symmetry models~\cite{AF2010} postulate a finite
+group~$G$ (typically $A_4$, $S_4$, $\Delta(27)$, or another
+subgroup of $\mathrm{SU}(3)_{\mathrm{flavor}}$) under which the
+three generations transform as a triplet. The group's
+representation theory constrains the Yukawa matrix structure:
+which entries are zero, which are related by Clebsch--Gordan
+coefficients. Flavon fields break~$G$ to residual subgroups in
+the charged-lepton and neutrino sectors.
+
+\paragraph{CRM verdict: $\BISH$.}
+Every component is decidable finite algebra:
+\begin{itemize}[nosep]
+  \item Group theory of~$G$ ($|A_4| = 12$; character table and
+    Clebsch--Gordan coefficients are finite): $\BISH$.
+  \item Flavon potential minimization (polynomial in finitely many
+    variables; critical points found by solving algebraic
+    equations): $\BISH$.
+  \item Yukawa matrix from group constraints (finite matrix
+    multiplication): $\BISH$.
+\end{itemize}
+No $\LPO$ enters unless $G$ is embedded in a continuous group
+and the exact continuous symmetry is invoked---but the discrete
+group itself suffices, and its representation theory is decidable
+without reference to any continuous group. The embedding is
+scaffolding.
+
+\paragraph{Compression.}
+Typical models: ${\sim}15$--$20$ real parameters (flavon VEVs,
+potential couplings, messenger scales) to produce
+$20$~observables (13~Yukawa-sector~$+$ 7~neutrino). Compression
+ratio barely exceeds~$1$. The symmetry constrains the
+\emph{structure} of the Yukawa matrix (which entries vanish, which
+are related) but not the \emph{scale}---the flavon VEVs carry the
+scale information and are unexplained inputs.
+
+
+% --------------------------------------------------------------------
+\subsection{Randall--Sundrum / Extra Dimensions}\label{app:rs}
+% --------------------------------------------------------------------
+
+In the Randall--Sundrum framework~\cite{RS1999}, one warped extra
+dimension of finite size~$\pi R$ produces the mass hierarchy
+through fermion localization. SM fermions are five-dimensional
+fields with bulk mass parameters~$c_i$. Their zero-mode profiles
+scale as $f_i(y) \sim e^{(1/2 - c_i)\,k y}$, and the
+four-dimensional effective Yukawa coupling is the overlap integral
+of two fermion profiles with the Higgs on the IR brane:
+\begin{equation}\label{eq:rs_yukawa}
+  y_{ij}^{(4D)} \sim y_{ij}^{(5D)} \,
+    e^{-(c_i + c_j - 1)\,k\pi R}.
+\end{equation}
+For $c_i > 1/2$, the zero mode is UV-brane-localized and its
+overlap with the Higgs is exponentially suppressed. An $O(1)$
+spread in the bulk masses~$c_i$ produces an exponential hierarchy
+in the Yukawa couplings.
+
+\paragraph{CRM verdict: $\BISH$ for the mechanism; $\LPO$ enters
+only through modulus stabilization.}
+The five-dimensional metric (ODE with constant coefficients), the
+fermion zero modes (explicit exponentials), the overlap integral
+(closed-form), and the effective Yukawa coupling (finite
+arithmetic) are all $\BISH$. The extra dimension has finite
+size---no limit is taken.
+
+$\LPO$ enters through the Goldberger--Wise
+mechanism~\cite{GW1999} for stabilizing the extra-dimensional
+modulus: asserting that the scalar potential has an \emph{exact}
+minimum is an $\LPO$ statement. But approximate stabilization
+(the potential is bounded and has a region below its boundary
+values) is $\BISH$ and suffices for all predictions. The $\LPO$
+is dispensable.
+
+\paragraph{Compression.}
+Anarchic scenario (universal 5D Yukawa): $9$~bulk
+masses~$+ 1$~coupling~$+ 2$~geometry~$= 12$ inputs $\to
+13$~observables. General case: up to ${\sim}20$ inputs. The
+exponential amplification of mild input spread is the most
+``efficient'' mechanism in terms of output hierarchy per input
+parameter.
+
+\paragraph{CRM observation.}
+Randall--Sundrum is the geometric implementation of
+Froggatt--Nielsen. Both produce $y \sim \varepsilon^n$; in FN the
+base $\varepsilon$ is the flavon VEV ratio, in RS the effective
+base is $e^{-(c-1/2)k\pi R}$ with the bulk mass in the exponent.
+The $\BISH$ content is identical---powers of a small number. The
+geometric language adds physical content (a dynamical mechanism
+for the small number) but not logical content.
+
+
+% --------------------------------------------------------------------
+\subsection{String Compactification}\label{app:string}
+% --------------------------------------------------------------------
+
+In Type~IIB string theory compactified on a Calabi--Yau
+threefold~$X$, the Yukawa couplings are determined by the geometry
+of~$X$: intersection numbers, period integrals, and moduli VEVs.
+The physical Yukawa coupling between fermions at brane
+intersections is schematically
+\begin{equation}\label{eq:string_yukawa}
+  y_{ijk} = \int_\Sigma \Psi_i \wedge \Psi_j \wedge \Phi_k\,,
+\end{equation}
+where $\Sigma$ is an internal cycle, $\Psi_i$ are zero-mode
+wavefunctions, and $\Phi_k$ is the Higgs wavefunction. The
+integral depends on the complex-structure and K\"ahler moduli,
+which must be stabilized by fluxes and non-perturbative
+effects~\cite{BP2000}.
+
+\paragraph{CRM verdict: $\BISH$ to finite precision; $\LPO$
+enters through moduli stabilization and the exact non-perturbative
+superpotential.}
+The topological data specifying~$X$ (Hodge numbers, intersection
+numbers) are finite integers---$\BISH$. Constructing~$X$ as an
+algebraic variety (checking that defining polynomials yield a
+smooth manifold) is finite algebra---$\BISH$. Period integrals
+satisfy Picard--Fuchs differential equations with algebraic
+coefficients and can be evaluated to any finite precision---$\BISH$.
+
+$\LPO$ enters at two points:
+\begin{enumerate}[nosep]
+  \item \textbf{Moduli stabilization:} asserting that the flux
+    superpotential $W = \int_X G_3 \wedge \Omega$ produces an
+    \emph{exact} minimum of the scalar potential (a function of
+    ${\sim}100$ complex variables) is $\LPO$. Approximate
+    minimization is $\BISH$ and suffices.
+  \item \textbf{Non-perturbative exactness:} the superpotential
+    $W_{\mathrm{np}} \sim e^{-aT}$ is the leading term in an
+    instanton expansion. The claim that this form is exact to all
+    orders is a completed-infinite statement---$\LPO$. Truncation
+    to finitely many instanton orders is $\BISH$.
+\end{enumerate}
+Both $\LPO$ components are dispensable: approximate stabilization
+and finite-order instanton expansion suffice for predictions at
+any finite precision.
+
+\paragraph{Compression.}
+In principle: $0$~continuous free parameters---everything is
+determined by discrete choices (Calabi--Yau topology, flux
+integers, brane configuration). In practice: ${\sim}500$~discrete
+parameters (flux integers alone number ${\sim}2 h^{2,1} + 2$)
+to produce $13$~observables. The ``compression'' replaces
+$13$~continuous parameters with ${\sim}500$~discrete ones.
+Whether discrete inputs count as ``more explained'' than
+continuous ones is a question CRM can pose precisely but cannot
+answer.
+
+
+% --------------------------------------------------------------------
+\subsection{Grand Unification}\label{app:gut}
+% --------------------------------------------------------------------
+
+$\mathrm{SU}(5)$~\cite{GG1974} predicts $y_b = y_\tau$ at the
+GUT scale (${\sim}2 \times 10^{16}$~GeV) because the
+down-type quarks and charged leptons sit in the same
+$\bar{\mathbf{5}}$ representation. $\mathrm{SO}(10)$ predicts
+third-generation unification $y_t = y_b = y_\tau$. The predicted
+GUT-scale relations, combined with RG running to the electroweak
+scale, yield testable predictions for mass ratios.
+
+\paragraph{CRM verdict: $\BISH$ for Yukawa predictions; $\LPO$
+enters through exact gauge coupling unification.}
+The group theory of $\mathrm{SU}(5)$ and $\mathrm{SO}(10)$
+(finite-dimensional Lie algebras, decidable representation theory)
+is $\BISH$. The GUT-scale matching conditions ($y_b = y_\tau$)
+are algebraic---$\BISH$. The RG running from GUT to electroweak
+scale is the finite discrete computation studied in the main text.
+
+$\LPO$ enters through gauge coupling unification: the assertion
+that three running couplings $g_1(\mu)$, $g_2(\mu)$, $g_3(\mu)$
+meet at \emph{exactly} a single scale $M_{\mathrm{GUT}}$. This
+requires deciding whether three real-valued functions are
+simultaneously equal---an $\LPO$ statement. The empirical content
+is that the couplings come \emph{close} to meeting within
+experimental error bars at ${\sim}2 \times 10^{16}$~GeV.
+Approximate unification within measurement precision is $\BISH$.
+
+\paragraph{Compression.}
+Maximal for the third generation: 1~Yukawa $\to$ 3~masses
+(in $\mathrm{SO}(10)$). For lighter generations, GUT relations
+fail without additional structure (Georgi--Jarlskog factors).
+Total: $13 \to 5$--$7$, the best compression among approaches
+that make testable predictions.
+
+\paragraph{CRM observation.}
+This is the one point in the audit where the scaffolding principle
+produces a non-trivial insight. Exact gauge coupling unification
+is $\LPO$ scaffolding. The empirical content (approximate
+unification) is $\BISH$. The exactness assumption constrains the
+GUT model space: it requires specific threshold corrections from
+SUSY partners, specific higher-dimensional operators, and specific
+proton decay rates. Removing the exactness requirement---asking
+only for unification within experimental precision at some finite
+number of loop orders---admits a wider class of models. This is a
+concrete instance of the scaffolding principle widening the
+solution space, though the consequences for the mass hierarchy
+specifically remain to be explored.
+
+
+% --------------------------------------------------------------------
+\subsection{Synthesis}\label{app:synthesis}
+% --------------------------------------------------------------------
+
+\paragraph{Counting convention.}
+We adopt the following rules for \Cref{tab:uv_audit}.
+\emph{Continuous parameters}: each real-valued free parameter
+counts as~$1$ (e.g., a flavon VEV, a bulk mass, $\varepsilon$).
+\emph{Discrete parameters}: each independent discrete choice
+counts as~$1$ (e.g., a charge assignment, a flux integer, a
+topological invariant).
+\emph{$O(1)$ coefficients}: counted as free parameters unless
+set to a specific value by a texture rule or symmetry.
+\emph{Exact symmetry assumptions}: count as~$0$ inputs but are
+flagged in the ``$\LPO$ Component'' column if they require
+all-orders or completed-infinite assertions.
+\emph{Observables}: the 13~Yukawa-sector quantities
+(9~fermion masses, 3~CKM angles, 1~CP phase). Neutrino
+parameters are noted where relevant but not included in the
+headline count.
+These conventions are necessarily approximate---parameter counting
+in BSM models is not canonical---but they suffice for the
+qualitative comparisons intended here.
+
+\begin{table}[ht]
+\centering
+\footnotesize
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Approach}
+  & \textbf{Core}
+  & \textbf{Cont.\ Params}
+  & \textbf{Disc.\ Params}
+  & \textbf{$\LPO$ Component}
+  & \textbf{Disp.?} \\
+\midrule
+SM (raw)
+  & $\BISH$ & 13 & 0 & None & --- \\
+Froggatt--Nielsen
+  & $\BISH$ & 1 ($\varepsilon$) & 9 charges & None & --- \\
+FN (texture zeros)
+  & $\BISH$ & 1 ($\varepsilon$) & 9 charges & None & --- \\
+Discrete flavor
+  & $\BISH$ & 8--15 & group & None & --- \\
+Randall--Sundrum
+  & $\BISH$ & 9--12 & 0 & Modulus stab. & Yes \\
+String compact.
+  & $\BISH$ & 0 & ${\sim}500$ & Moduli stab.\ + $W_{\mathrm{np}}$ & Yes \\
+$\mathrm{SU}(5)$ GUT
+  & $\BISH$ & 3--5 & 0 & Exact unification & Yes \\
+$\mathrm{SO}(10)$ GUT
+  & $\BISH$ & 1--3 & 0 & Exact unification & Yes \\
+\bottomrule
+\end{tabular}
+\caption{Audit of ultraviolet approaches to the fermion mass
+  hierarchy. ``Core Cost'' and ``$\LPO$ Component'' are
+  CRM-specific findings. ``Cont.\ Params'' and ``Disc.\ Params''
+  are standard parameter counts included for context.
+  Every approach has $\BISH$ as its core logical content;
+  $\LPO$ enters only through dispensable idealizations.}
+\label{tab:uv_audit}
+\end{table}
+
+Three observations emerge from the audit. The first and third are
+specific to CRM; the second uses standard model-comparison
+methodology included for completeness.
+
+\paragraph{1.\ Every UV approach has $\BISH$ as its core
+(CRM-specific).}
+The $\LPO$, where it appears, enters through
+idealizations---exact stabilization, exact gauge unification,
+exact non-perturbative expansions---and is dispensable in every
+case. Combined with the numerical results of
+Sections~\ref{sec:phase1} and~\ref{sec:phase2}, this means the
+fermion mass problem is entirely a problem within~$\BISH$, at
+both the infrared and ultraviolet levels. No omniscience
+principle is needed to state, derive, or verify any proposed
+explanation of the mass hierarchy. This finding requires the
+$\BISH$/$\LPO$ distinction to formulate and is non-trivial: it
+could have been otherwise (Sumino's all-orders cancellation
+mechanism for the Koide formula comes close to requiring $\LPO$
+essentially). The flavor problem is a different kind of mystery
+from those CRM was designed to illuminate, where $\LPO$ enters
+through completed limits and its dispensability is the finding.
+
+\paragraph{2.\ Approaches differ in compression ratio and input
+character (standard methodology).}
+\Cref{tab:uv_audit} also records two quantities from standard
+model-comparison analysis: the \emph{compression ratio}
+(observables per input parameter) and the \emph{input character}
+(continuous vs.\ discrete). These do not depend on the CRM
+framework---physicists routinely count parameters without
+reference to constructive mathematics---but they provide useful
+context for the logical audit.
+
+The compression ratio ranges from ${<}1$ (Froggatt--Nielsen with
+free $O(1)$ coefficients: more inputs than observables) to
+${\sim}2.5$ ($\mathrm{SO}(10)$ for the third generation). The
+input character varies: Froggatt--Nielsen and discrete flavor
+symmetries use continuous parameters (flavon VEVs); string
+compactification uses purely discrete parameters (flux integers,
+topological data); GUTs use a mixture.
+
+CRM sees no logical distinction between continuous and discrete
+inputs evaluated to finite precision---both are $\BISH$. The
+question of whether discrete inputs are ``more explained'' than
+continuous ones is a question about explanatory depth, not
+logical cost, and lies outside CRM's scope.
+
+\paragraph{3.\ Exact gauge coupling unification is $\LPO$
+scaffolding (CRM-specific).}
+The scaffolding principle failed for the SM infrared (ten
+investigations, all negative). Applied to the ultraviolet, it
+identifies exact gauge coupling unification as $\LPO$ scaffolding
+whose removal widens the viable GUT model space. The empirical
+evidence for grand unification is approximate unification
+($\BISH$): three couplings come close to meeting within
+experimental error bars at ${\sim}2 \times 10^{16}$~GeV. The
+assertion that they meet \emph{exactly} is a completed-infinite
+statement ($\LPO$): it requires deciding equality of three real
+numbers. Models achieving approximate unification without exact
+unification are $\BISH$-sufficient and conventionally excluded
+only because the exactness assumption is treated as a theoretical
+requirement rather than an idealization.
+
+This is a concrete instance of the scaffolding principle producing
+a non-trivial observation---not solving the mass problem, but
+clarifying which aspects of GUT phenomenology are empirically
+grounded ($\BISH$) and which are idealizations ($\LPO$). Whether
+the wider $\BISH$-sufficient model space contains new explanations
+of the full mass hierarchy remains open.
+
+\medskip
+\noindent
+The overall picture: CRM maps the logical geography of UV flavor
+physics with precision, and the map reveals that the terrain is
+uniformly $\BISH$. The interesting $\LPO$ boundaries found in
+five other domains (Papers~8, 13, 14, 15, 17) do not appear here.
+The one exception---exact gauge coupling unification---is not
+about the mass hierarchy per se, but about the GUT framework
+within which mass predictions are made. CRM's contribution to the
+flavor problem is diagnostic and taxonomic: it can tell you the
+logical cost of any proposed explanation, identify which
+idealizations are dispensable, and flag where the scaffolding
+principle has purchase. It cannot replace experiment.
+
+
+\end{document}

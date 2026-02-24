@@ -1,0 +1,70 @@
+======================================================================
+ZENODO UPLOAD METADATA — Paper 53
+======================================================================
+
+DOI: 10.5281/zenodo.18713089
+
+Title:
+  The CM Decidability Oracle: Verified Computation from Elliptic Curves to the Fourfold Boundary (Paper 53, Constructive Reverse Mathematics Series)
+
+Description:
+  Paper 53 of the Constructive Reverse Mathematics series. We exhibit a verified decision procedure for numerical equivalence on products of the 13 CM elliptic curves over Q with class number 1, implemented in Lean 4 with zero sorry keywords.
+
+  Theorem A (CM Decidability Oracle): For each of the 13 CM discriminants, the function decide_D is a correct and terminating decision procedure for numerical equivalence on CH^1(E_D x E_D).
+
+  Theorem B (DPT Certificates): For each of the 13 CM discriminants, all three DPT axioms are computationally verified: decidable equality, algebraic spectrum, and Archimedean polarization (Rosati positive-definiteness via Sylvester's criterion).
+
+  Theorem C (Fourfold Boundary Computation): For Milne's CM abelian fourfold with Hermitian form H = diag(1,-1,-1,1) over Q(sqrt(-3)), the self-intersection of the exotic Weil class is deg(w . w) = 7 > 0, confirming the Hodge-Riemann bilinear relations. This computation depends on no custom axioms — it is pure verified arithmetic.
+
+  Theorem D (DPT Decidability Boundary): The DPT framework identifies dimension 4 as its decidability boundary for abelian varieties.
+
+  The Lean 4 / Mathlib formalization comprises 15 source files (~1,597 lines), compiles with zero errors, zero warnings, and zero sorry.
+
+Upload Type: software
+
+Publication Date: 2026-02-20
+
+Keywords:
+  constructive reverse mathematics
+  CM elliptic curves
+  numerical equivalence
+  Standard Conjecture D
+  DPT framework
+  Decidable Polarized Tannakian
+  Weil classes
+  abelian fourfolds
+  Hodge-Riemann bilinear relations
+  Hermitian forms
+  van Geemen
+  Milne fourfold
+  Lefschetz ring
+  BISH
+  formal verification
+  Lean 4
+  Mathlib
+  algebraic geometry
+  constructive mathematics
+
+License: Apache License 2.0 (code), CC-BY-4.0 (paper)
+
+Copyright Notice:
+  Copyright (c) 2026 Paul Chun-Kit Lee. Code licensed under the Apache License 2.0. Paper licensed under CC-BY-4.0. To view a copy of the Apache License, visit https://www.apache.org/licenses/LICENSE-2.0. To view a copy of CC-BY-4.0, visit https://creativecommons.org/licenses/by/4.0/.
+
+Files to Upload:
+  P53_CMOracle_zenodo.zip containing:
+    README.md
+    REPRODUCIBILITY.md
+    LICENSE (Apache 2.0)
+    CITATION.cff
+    .zenodo.json
+    paper53_cm_oracle.pdf
+    paper53_cm_oracle.tex
+    P53_CMOracle/           (Lean 4 bundle, 15 source files)
+      lean-toolchain
+      lakefile.lean
+      lake-manifest.json
+      Papers.lean
+      Papers/P53_CMOracle/*.lean
+
+Notes:
+  AI-assisted formalization using Claude (Anthropic, Opus 4.6) for Lean 4 code generation under human direction. All mathematical content specified by the author; every theorem verified by the Lean 4 type checker. Built with Lean 4 v4.29.0-rc1 and Mathlib. Reproducible via 'lake build' (zero errors, zero sorry). Code available exclusively on Zenodo (not hosted on GitHub).

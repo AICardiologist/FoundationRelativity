@@ -1,0 +1,14 @@
+ZENODO UPLOAD METADATA -- Paper 38
+====================================
+
+TITLE:
+Wang Tiling and the Origin of Physical Undecidability: Berger's Theorem Is LPO (Paper 38, Constructive Reverse Mathematics Series)
+
+DESCRIPTION:
+Paper 38 in the Constructive Reverse Mathematics of Mathematical Physics series. Every undecidability result in quantum many-body physics --- from spectral gaps to phase diagrams --- descends from the undecidability of Wang tiling (Berger 1966). This paper establishes that Wang tiling itself is Turing-Weihrauch equivalent to LPO, proving that the entire genealogy of physical undecidability from Berger through Cubitt lives at a single logical stratum. The tiling decision problem and aperiodicity detection are both shown to be LPO-equivalent. The Genealogy Theorem demonstrates that all known physical undecidabilities factor through Wang tiling, and the Sigma-1-zero ceiling theorem explains why: all physical constructions reduce to halting (which is Sigma-1-zero-complete), so Wang tiling and all its descendants cost exactly LPO. No physical system yet known encodes Sigma-2-zero-complete problems (but see Paper 39). All results formalized in Lean 4 over Mathlib with zero sorry. The formalization comprises 7 Lean source files.
+
+KEYWORDS:
+Wang tiling, Berger's theorem, aperiodic tilings, halting problem, undecidability genealogy, physical computation, Sigma-1-zero, constructive reverse mathematics, LPO, Limited Principle of Omniscience, Turing-Weihrauch equivalence, spectral gap, Lean 4, Mathlib, formal verification, tiling decision problem
+
+COPYRIGHT STATEMENT:
+Copyright 2026 Paul Chun-Kit Lee. Code licensed under Apache License 2.0. Paper licensed under Creative Commons Attribution 4.0 International (CC-BY 4.0).

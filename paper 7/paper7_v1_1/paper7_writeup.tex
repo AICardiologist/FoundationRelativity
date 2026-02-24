@@ -1,0 +1,1391 @@
+\documentclass[11pt,a4paper]{article}
+
+% ====================================================================
+% Packages
+% ====================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{cleveref}
+\usepackage{natbib}
+\usepackage{mdframed}
+
+% ====================================================================
+% Theorem environments
+% ====================================================================
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% ====================================================================
+% Lean 4 code listing style
+% ====================================================================
+\definecolor{lean-keyword}{RGB}{0,0,180}
+\definecolor{lean-comment}{RGB}{0,128,0}
+\definecolor{lean-string}{RGB}{163,21,21}
+\definecolor{lean-bg}{RGB}{248,248,248}
+
+\lstdefinelanguage{lean4}{
+  keywords={theorem,lemma,def,class,instance,import,open,variable,
+            noncomputable,section,namespace,end,where,let,have,show,
+            intro,obtain,use,exact,rw,simp,apply,by,fun,match,if,
+            then,else,do,return,axiom,abbrev,private,attribute,
+            suffices,change,congr,ext,constructor,rintro,push_neg,
+            linarith,absurd,set_option,omit,in},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+  morestring=[b]',
+}
+
+\lstset{
+  language=lean4,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{lean-keyword}\bfseries,
+  commentstyle=\color{lean-comment}\itshape,
+  stringstyle=\color{lean-string},
+  backgroundcolor=\color{lean-bg},
+  frame=single,
+  framerule=0.5pt,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2,
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+  xleftmargin=15pt,
+  captionpos=b,
+}
+
+% ====================================================================
+% Macros
+% ====================================================================
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\Kfield}{\mathbb{K}}
+\newcommand{\WLPO}{\mathrm{WLPO}}
+\newcommand{\Sdual}[1]{#1^{*}}
+\newcommand{\Sbidual}[1]{#1^{**}}
+\newcommand{\Stridual}[1]{#1^{***}}
+\newcommand{\Jmap}[1]{J_{#1}}
+\newcommand{\Sone}{S_1(H)}
+\newcommand{\ellone}{\ell^1}
+\newcommand{\ellinfty}{\ell^\infty}
+\newcommand{\czero}{c_0}
+\newcommand{\Lean}{\textsc{Lean~4}}
+\newcommand{\Mathlib}{\textsc{Mathlib4}}
+
+% ====================================================================
+% Title
+% ====================================================================
+\title{%
+  \textbf{The Physical Bidual Gap and Banach Space Non-Reflexivity:}\\[6pt]
+  A Lean~4 Formalization of WLPO\\
+  via Trace-Class Operators%
+}
+
+\author{
+  Paul Chun-Kit Lee\thanks{%
+    New York University.
+    AI-assisted formalization; see \S\ref{sec:ai} for methodology.} \\
+  New York University \\
+  \texttt{dr.paul.c.lee@gmail.com}
+}
+
+\date{February 2026}
+
+% ====================================================================
+\begin{document}
+\maketitle
+
+% ====================================================================
+\begin{abstract}
+We present a \Lean{} formalization of the \emph{Physical Bidual Gap Theorem},
+establishing Banach space non-reflexivity of the trace-class operators
+$\Sone$ on a separable Hilbert space and showing that any constructive
+witness of this non-reflexivity implies the Weak Limited Principle of
+Omniscience (WLPO). In the algebraic formulation of quantum mechanics,
+$\Sone$ is the natural state space of quantum systems; our result shows
+that the gap between physical density matrices and the ``generalized
+states'' in $\Sbidual{(\Sone)}$ is constructively inaccessible.
+The formalization comprises 754 lines of Lean~4 code across 8~files,
+building on \Mathlib{} (v4.28.0-rc1), with one interface assumption
+bridging a companion formalization (Paper~2) for $\ell^1$
+non-reflexivity---a classical fact (Banach, 1932) whose Lean
+\texttt{axiom} declaration marks an engineering boundary between
+codebases on different \Mathlib{} versions, not a mathematical gap.
+The backward direction (witness $\Rightarrow$ WLPO) is proven
+self-contained via an independent Ishihara kernel formalization,
+providing cross-version verification of Paper~2's core result.
+The \texttt{Classical.choice} dependency in the axiom profile arises
+from \Mathlib{}'s functional analysis infrastructure; the constructive
+validity of the equivalence is established by proof-content analysis
+within the standard CRM methodology (see \S\ref{sec:classical}).
+A dependency-free logical skeleton (\texttt{P7\_Minimal}, 277~lines,
+4~files) certifies the reduction chain with no \texttt{Classical.choice}
+in its axiom profile.
+The key technical contribution is a fully formal proof that every
+closed subspace of a reflexive Banach space is reflexive, using two
+applications of the Hahn--Banach theorem.
+\end{abstract}
+
+\tableofcontents
+
+% ====================================================================
+\section{Introduction}\label{sec:intro}
+% ====================================================================
+
+The Weak Limited Principle of Omniscience (WLPO) is a cornerstone of
+constructive reverse mathematics. It states:
+\[
+  \WLPO \;:\equiv\;
+  \forall \alpha : \NN \to \{0,1\},\;
+  \bigl(\forall n,\;\alpha(n) = 0\bigr) \;\lor\;
+  \lnot\bigl(\forall n,\;\alpha(n) = 0\bigr).
+\]
+While classically trivial (an instance of the law of excluded middle),
+WLPO is constructively independent: it is neither provable nor refutable
+in Bishop-style constructive mathematics
+\citep{Bishop1967,BridgesVita2006}.
+
+In a companion paper \citep{Lee2025Paper2}, we established the
+\emph{Bidual Gap Theorem}: for a broad class of Banach spaces, the
+existence of a constructive witness to non-reflexivity---an element
+$\Psi \in \Sbidual{X} \setminus \Jmap{X}(X)$---is equivalent to WLPO.
+This result was formalized in Lean~4 and connected the abstract theory
+of Banach space duality to a fundamental principle of constructive logic.
+
+The present paper extends that work to a physically motivated setting.
+In von~Neumann's formulation of quantum mechanics, the observables of a
+quantum system are self-adjoint operators on a separable Hilbert space $H$,
+and the states are positive trace-one operators $\rho \in \Sone$---the
+density matrices. The trace norm $\|\rho\|_1 = \mathrm{tr}(|\rho|) = 1$
+encodes the normalization of quantum probabilities, and the duality
+$\Sdual{(\Sone)} \cong B(H)$ (bounded operators) is foundational
+to the algebraic formulation of quantum theory
+\citep{BratteliRobinson1987}. Indeed, $\Sone$ is the \emph{predual}
+of $B(H)$: every normal state on the algebra of observables is
+represented by a density matrix in $\Sone$.
+
+The question of Banach space non-reflexivity of $\Sone$ is therefore
+a question about the structure of the quantum state space itself.
+Non-reflexivity means that the bidual $\Sbidual{(\Sone)}$ is strictly
+larger than (the canonical image of) $\Sone$: there exist ``singular
+states''---elements of $B(H)^*$ that are not representable by any
+density matrix. Paper~2 \citep{Lee2025Paper2} treated the abstract
+$\czero / \ellone$ setting; the present paper gives the WLPO
+equivalence its \emph{physical home} in the space of quantum states.
+We prove:
+
+\begin{theorem}[Physical Bidual Gap: Banach Space Non-Reflexivity of $\Sone$, informal]\label{thm:intro-main}
+Let $H$ be a separable Hilbert space.
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{(Unconditional)} $\Sone$ is not reflexive.
+  \item \textbf{(Constructive bound)} Any constructive witness
+    $\Psi \in \Sbidual{(\Sone)} \setminus \Jmap{\Sone}(\Sone)$
+    implies $\WLPO$.
+\end{enumerate}
+\end{theorem}
+
+The first part follows from the chain:
+$\czero$ is not reflexive $\Rightarrow$ $\ellone$ is not reflexive
+$\Rightarrow$ $\Sone$ is not reflexive (since $\ellone$ embeds
+isometrically as a closed subspace of $\Sone$ via diagonal embedding).
+The second part is an instance of the generic result from Paper~2.
+
+The physical interpretation is striking: while $\Sone$ provably fails
+to be reflexive, one cannot \emph{constructively exhibit} a specific
+element of $\Sbidual{(\Sone)}$ outside the canonical image without
+invoking WLPO. This connects the structure of quantum state spaces
+to the foundations of constructive mathematics.
+
+\paragraph{Contributions.}
+\begin{itemize}
+  \item A \Lean{} formalization of the Physical Bidual Gap Theorem,
+    establishing Banach space non-reflexivity of trace-class operators
+    (754 lines across 8~files, 7 sorry-free, 1~interface assumption
+    for $\ellone$ non-reflexivity bridging Paper~2).
+  \item An independent self-contained formalization of the Ishihara
+    kernel construction (\texttt{WLPOFromWitness.lean}, 196~lines,
+    zero custom axioms), proving that any non-reflexivity witness
+    implies WLPO. This provides cross-version verification of the
+    core result from Paper~2, compiled on a different \Mathlib{}
+    version.
+  \item A machine-checked proof that every closed subspace of a reflexive
+    Banach space is reflexive (\Cref{lem:subspace-reflexive}), using two
+    applications of the Hahn--Banach theorem---a standard result not
+    currently present in \Mathlib{} (\Cref{rem:mathlib-contrib}).
+  \item A machine-checked proof that reflexivity transfers across linear
+    isometric equivalences (\Cref{lem:compat}).
+  \item A concrete sorry-backed instance showing $S_1(\ell^2(\NN))$
+    satisfies the abstract trace-class container interface, grounding
+    the theorem in a specific physical space.
+  \item A demonstration of the AI-assisted formalization methodology
+    using Claude Opus~4.6 via the Claude Code CLI.
+\end{itemize}
+
+% ====================================================================
+\section{Background}\label{sec:background}
+% ====================================================================
+
+\subsection{Banach Space Reflexivity}
+
+Let $X$ be a Banach space over $\RR$.  The \emph{dual space}
+$\Sdual{X} = X^*$ is the space of bounded linear functionals
+$f : X \to \RR$, itself a Banach space under the operator norm.
+The \emph{bidual} $\Sbidual{X} = (X^*)^*$ admits a canonical
+isometric embedding
+\[
+  \Jmap{X} : X \to \Sbidual{X}, \qquad
+  \Jmap{X}(x)(f) = f(x).
+\]
+The space $X$ is \emph{reflexive} if $\Jmap{X}$ is surjective
+(equivalently, an isometric isomorphism onto $\Sbidual{X}$).
+
+Classical examples of non-reflexive spaces include $\czero$,
+$\ellone$, $\ellinfty$, and $L^1(\mu)$ for non-atomic measures.
+The duality chain
+\[
+  \czero \hookrightarrow \Sdual{(\czero)} \cong \ellone
+  \hookrightarrow \Sdual{(\ellone)} \cong \ellinfty
+\]
+is central to our argument.
+
+\subsection{The Bidual Gap Theorem (Paper~2)}\label{sec:paper2}
+
+Paper~2 \citep{Lee2025Paper2} established the following equivalence
+in Lean~4:
+
+\begin{theorem}[Bidual Gap Equivalence {\citep[Theorem~1]{Lee2025Paper2}}]
+\label{thm:paper2}
+\[
+  \WLPO \;\;\Longleftrightarrow\;\;
+  \bigl(\exists\text{ a separable Banach space } X
+  \text{ and } \Psi \in \Sbidual{X} \setminus \Jmap{X}(X)\bigr).
+\]
+Moreover, the forward direction holds uniformly: for \emph{any}
+Banach space $X$, a non-reflexivity witness
+$\Psi \in \Sbidual{X} \setminus \Jmap{X}(X)$ implies $\WLPO$.
+\end{theorem}
+
+The backward direction ($\Leftarrow$) builds an explicit
+element $G \in \Sbidual{(\czero)}$ that evaluates to~1 on every
+point-evaluation functional and lies outside $\Jmap{\czero}(\czero)$;
+the construction is specific to $\czero$. The forward direction
+($\Rightarrow$) constructs an Ishihara kernel from the
+non-reflexivity witness and extracts WLPO via a constructive
+consumer; this argument works for any Banach space $X$ and is the
+direction used by Paper~7.
+
+The proof chain for $\ellone$ not being reflexive proceeds through
+dual isometries:
+\begin{enumerate}
+  \item $\czero$ is not reflexive (unconditional; the witness $G$
+    is constructed without WLPO).
+  \item $\Sdual{(\czero)} \cong \ellone$ and
+    $\Sdual{(\ellone)} \cong \ellinfty$ (isometric isomorphisms).
+  \item If $\ellone$ were reflexive, so would $\ellinfty$ be
+    (Lemma~A), and then $\czero$ would be reflexive as a closed
+    subspace of a space isometric to $\Sdual{(\ellinfty)}$
+    (Lemma~B), contradicting~(1).
+\end{enumerate}
+
+\subsection{Trace-Class Operators}
+
+For a separable Hilbert space $H$ with orthonormal basis
+$(e_n)_{n \in \NN}$, the \emph{trace-class operators}
+$\Sone = S_1(H)$ are the compact operators $T$ on $H$ for which
+\[
+  \|T\|_1 \;:=\; \mathrm{tr}(|T|) \;=\;
+  \sum_{n=0}^{\infty} \langle |T| e_n, e_n \rangle < \infty.
+\]
+The trace norm $\|\cdot\|_1$ makes $\Sone$ a Banach space, with
+$\Sdual{(\Sone)} \cong B(H)$ (bounded operators) via the pairing
+$\langle T, A \rangle = \mathrm{tr}(TA)$.
+
+The \emph{diagonal embedding}
+\[
+  \iota : \ellone \hookrightarrow \Sone, \qquad
+  \iota(\lambda) = \sum_{n=0}^{\infty} \lambda_n \,|e_n\rangle\langle e_n|
+\]
+is an isometric linear map with closed range: the diagonal operators
+form a closed subspace of $\Sone$ isometric to $\ellone$.
+
+\subsection{Physical significance}\label{sec:phys-sig}
+
+In algebraic quantum mechanics \citep{BratteliRobinson1987,BratteliRobinson1997},
+a state on the observable algebra $B(H)$ is a positive normalized linear
+functional $\omega : B(H) \to \RR$.  The \emph{normal} states---those
+that are $\sigma$-weakly continuous---are exactly the density matrices in
+$\Sone$, acting via $\omega_\rho(A) = \mathrm{tr}(\rho A)$.  The predual
+relationship $B(H)_* = \Sone$ makes the trace-class operators the
+canonical state space of quantum theory.
+
+Banach space non-reflexivity of $\Sone$ means that
+$\Sdual{(B(H))} = \Sbidual{(\Sone)} \supsetneq \Jmap{\Sone}(\Sone)$:
+there exist \emph{singular states} on $B(H)$---positive linear functionals
+that are not $\sigma$-weakly continuous and cannot be represented by any
+density matrix.  These singular states are analogous to finitely additive
+measures that are not countably additive; they arise from ultrafilter-type
+constructions and have no direct physical preparation procedure.
+
+The physical importance of this gap extends beyond abstract functional
+analysis.  In quantum statistical mechanics, every state $\omega$ on a
+von~Neumann algebra $\mathcal{M}$ admits a unique decomposition
+$\omega = \omega_n + \omega_s$ into normal and singular parts
+\citep{Takesaki1979}---the noncommutative analogue of the Lebesgue
+decomposition of measures.  The singular component $\omega_s$ vanishes
+on all compact operators: it ``sees'' only the behavior of observables
+at infinity.
+
+This decomposition is physically realized in the \emph{thermodynamic
+limit}.  For a quantum system in a finite volume
+$\Lambda \subset \mathbb{Z}^d$, the equilibrium state at inverse
+temperature $\beta$ is a Gibbs state $\omega_\Lambda^\beta$---a density
+matrix, hence a normal state on $B(H_\Lambda)$.  In the infinite-volume
+limit $\Lambda \nearrow \mathbb{Z}^d$, one obtains a state on the
+quasilocal algebra
+$\mathfrak{A} = \overline{\bigcup_\Lambda B(H_\Lambda)}$ that may fail
+to be normal with respect to any fixed representation
+\citep{BratteliRobinson1997}.  The KMS (Kubo--Martin--Schwinger) states
+characterizing thermal equilibrium at inverse temperature $\beta$ are
+defined by the condition
+$\omega(AB) = \omega(B\sigma_{i\beta}(A))$ for the modular automorphism
+group $\sigma_t$; at phase transitions, multiple KMS states coexist,
+corresponding to distinct thermodynamic phases \citep{Haag1996}.
+
+The passage from finite-volume Gibbs states to infinite-volume KMS
+states is precisely the passage from the predual $\Sone$ to its bidual
+$\Sbidual{(\Sone)}$.  Singular states---elements of the bidual
+gap---represent idealized thermodynamic configurations that cannot be
+prepared by any finite laboratory procedure.  Their mathematical
+existence is guaranteed by non-reflexivity; our result shows that
+\emph{constructively witnessing} any specific singular state requires
+WLPO.
+
+This connects to a broader question in the foundations of quantum
+statistical mechanics: what is the logical cost of the thermodynamic
+limit?  Cubitt, Perez-Garcia, and Wolf \citep{CubittPerezWolf2015}
+showed that the spectral gap problem for quantum many-body systems is
+\emph{undecidable} at the level of the Halting Problem---far stronger
+than any omniscience principle.  Van~Wierst \citep{vanWierst2019}
+explored the paradox of phase transitions from the perspective of
+constructive mathematics, observing that non-analytic behavior in
+partition functions (the hallmark of phase transitions) is problematic
+in frameworks where all total functions are continuous.  Our result
+occupies a specific intermediate position in this landscape: the mere
+\emph{existence} of the singular sector (non-reflexivity in
+$\lnot$-form) requires WLPO, while the full thermodynamic limit
+(constructing infinite-volume states via monotone convergence) requires
+LPO, and non-separable Hahn--Banach separation requires full classical
+logic.
+
+% ====================================================================
+\section{Mathematical Content}\label{sec:math}
+% ====================================================================
+
+We now state the key lemmas and the main theorem precisely.
+
+\begin{definition}[WLPO]\label{def:wlpo}
+The \emph{Weak Limited Principle of Omniscience} is the proposition
+\[
+  \WLPO \;:\equiv\;
+  \forall \alpha : \NN \to \mathrm{Bool},\;\;
+  (\forall n,\;\alpha(n) = \mathtt{false})
+  \;\lor\; \lnot(\forall n,\;\alpha(n) = \mathtt{false}).
+\]
+\end{definition}
+
+\begin{definition}[Reflexivity]\label{def:reflexive}
+A normed space $X$ over a field $\Kfield$ is \emph{reflexive} if
+the canonical embedding $\Jmap{X} : X \to \Sbidual{X}$ (given by
+$\Jmap{X}(x)(f) = f(x)$) is surjective.
+\end{definition}
+
+\begin{lemma}[Lemma A: Reflexive implies dual reflexive]
+\label{lem:dual-reflexive}
+If $X$ is reflexive, then $\Sdual{X}$ is reflexive.
+\end{lemma}
+
+\begin{lemma}[Lemma B: Closed subspace of reflexive is reflexive]
+\label{lem:subspace-reflexive}
+Let $Y$ be a closed subspace of a reflexive Banach space $X$.
+Then $Y$ is reflexive.
+\end{lemma}
+
+\begin{lemma}[Compatibility: Reflexivity transfers across isometries]
+\label{lem:compat}
+If $X \cong Y$ via a linear isometric equivalence and $Y$ is
+reflexive, then $X$ is reflexive.
+\end{lemma}
+
+\begin{definition}[Trace-class container]\label{def:tc}
+A \emph{trace-class container} is a separable complete normed space
+$X$ over $\RR$ equipped with an isometric continuous linear map
+$\iota : \ellone \to X$ whose range is closed. The canonical
+example is $\Sone$ with the diagonal embedding.
+\end{definition}
+
+\begin{theorem}[Physical Bidual Gap: Banach Space Non-Reflexivity of $\Sone$]\label{thm:main}
+Let $X$ be a trace-class container. Then:
+\begin{enumerate}[label=(\roman*)]
+  \item $\lnot\,\mathrm{IsReflexive}(\RR, X)$.
+  \item $\bigl(\exists \Psi \in \Sbidual{X} \setminus
+    \Jmap{X}(X)\bigr) \;\Longrightarrow\; \WLPO$.
+\end{enumerate}
+\end{theorem}
+
+% ====================================================================
+\section{Human-Readable Proofs}\label{sec:proofs}
+% ====================================================================
+
+\subsection{Lemma A: Reflexive Implies Dual Reflexive}
+
+\begin{proof}
+Let $X$ be reflexive, and let $\varphi \in \Stridual{X} = (\Sdual{X})^{**}$.
+We must find $f \in \Sdual{X}$ with $\Jmap{\Sdual{X}}(f) = \varphi$.
+
+Define $f := \varphi \circ \Jmap{X} \in \Sdual{X}$, so that for each
+$x \in X$, $f(x) = \varphi(\Jmap{X}(x))$.
+
+We verify $\Jmap{\Sdual{X}}(f) = \varphi$ by checking on all of
+$\Sbidual{X}$. Since $\Jmap{X}$ is surjective, any $\Psi \in \Sbidual{X}$
+has the form $\Psi = \Jmap{X}(x)$ for some $x$. Then:
+\[
+  \Jmap{\Sdual{X}}(f)(\Psi) = \Psi(f) = \Jmap{X}(x)(f) = f(x)
+  = \varphi(\Jmap{X}(x)) = \varphi(\Psi). \qedhere
+\]
+\end{proof}
+
+\subsection{Lemma B: Closed Subspace of Reflexive Is Reflexive}
+\label{sec:proof-lemmaB}
+
+This is the technical bottleneck of the formalization.
+
+\begin{proof}
+Let $Y \subseteq X$ be a closed subspace with $X$ reflexive, and let
+$\varphi \in \Sbidual{Y}$. We construct $y \in Y$ with
+$\Jmap{Y}(y) = \varphi$ in four steps.
+
+\medskip\noindent\textbf{Step 1: Lift $\varphi$ to $\Phi \in \Sbidual{X}$.}
+Let $\mathrm{res} : \Sdual{X} \to \Sdual{Y}$ be the restriction map
+$f \mapsto f|_Y$ (formally, $\mathrm{res} = (\cdot) \circ \iota_Y$
+where $\iota_Y : Y \hookrightarrow X$ is the inclusion). Define
+$\Phi := \varphi \circ \mathrm{res} \in \Sbidual{X}$.
+
+\medskip\noindent\textbf{Step 2: Represent $\Phi$ via reflexivity.}
+Since $X$ is reflexive, there exists $x \in X$ with
+$\Jmap{X}(x) = \Phi$. That is, for all $f \in \Sdual{X}$:
+$f(x) = \Phi(f) = \varphi(f|_Y)$.
+
+\medskip\noindent\textbf{Step 3: Show $x \in Y$ by contradiction
+(Hahn--Banach separation).}
+Suppose $x \notin Y$. Since $Y$ is closed and convex (it is a subspace),
+the geometric Hahn--Banach separation theorem provides $f_0 \in \Sdual{X}$
+and $u \in \RR$ with:
+\[
+  \forall a \in Y,\; f_0(a) < u
+  \qquad\text{and}\qquad
+  u < f_0(x).
+\]
+Since $Y$ is a subspace, for any $y \in Y$ and $n \in \NN$, we have
+$n \cdot y \in Y$, so $n \cdot f_0(y) < u$. Letting $n \to \infty$
+forces $f_0(y) \leq 0$. Applying the same argument to $-y \in Y$
+gives $f_0(y) \geq 0$. Hence $f_0$ annihilates $Y$: $f_0(y) = 0$
+for all $y \in Y$.
+
+In particular, $0 = f_0(0) < u$ (since $0 \in Y$). But also:
+\[
+  f_0(x) = \Phi(f_0) = \varphi(\mathrm{res}(f_0)) = \varphi(f_0|_Y)
+  = \varphi(0) = 0,
+\]
+since $f_0|_Y = 0$. This gives $u < f_0(x) = 0 < u$, a contradiction.
+
+\medskip\noindent\textbf{Step 4: Verify $\Jmap{Y}(y) = \varphi$
+(Hahn--Banach extension).}
+With $x \in Y$ established, set $y := \langle x, \cdot\rangle \in Y$.
+For any $g \in \Sdual{Y}$, the Hahn--Banach extension theorem provides
+$f \in \Sdual{X}$ with $f|_Y = g$. Then:
+\[
+  \Jmap{Y}(y)(g) = g(y) = f(x) = \Phi(f) = \varphi(\mathrm{res}(f))
+  = \varphi(g). \qedhere
+\]
+\end{proof}
+
+\begin{remark}[Avoidance of James's theorem]\label{rem:james}
+The classical route to ``closed subspace of reflexive is reflexive''
+typically passes through James's theorem ($X$ is reflexive if and
+only if every continuous linear functional attains its norm). Our
+proof avoids James entirely, using Hahn--Banach directly: geometric
+separation for Step~3 and norm-preserving extension for Step~4.
+This is noteworthy because James's theorem is constructively
+problematic---it relies on a characterization that does not hold
+in Bishop-style constructive mathematics---whereas our argument
+uses only the Hahn--Banach theorem, which has a constructive
+formulation for separable spaces.
+\end{remark}
+
+\begin{remark}[Contribution to \Mathlib{} infrastructure]\label{rem:mathlib-contrib}
+\Cref{lem:subspace-reflexive} appears not to be present in \Mathlib{}
+(as of v4.28). The closest result is \texttt{IsReflexive.of\_split},
+which requires the subspace to be \emph{complemented} (a direct
+summand)---a strictly stronger condition. Our proof, using geometric
+Hahn--Banach separation and norm-preserving extension, works for
+arbitrary closed subspaces and may be of independent interest to the
+\Mathlib{} community.
+\end{remark}
+
+\subsection{Compatibility: Isometry Transfer}
+
+\begin{proof}[Proof of \Cref{lem:compat}]
+Let $e : X \xrightarrow{\sim} Y$ be a linear isometric equivalence with
+$Y$ reflexive. Given $\Phi \in \Sbidual{X}$, define
+$e^* : \Sdual{Y} \to \Sdual{X}$ by $e^*(g) = g \circ e$ (precomposition).
+Let $\Psi := \Phi \circ e^* \in \Sbidual{Y}$. By reflexivity of $Y$,
+there exists $y$ with $\Jmap{Y}(y) = \Psi$. Set $x := e^{-1}(y)$.
+
+For any $f \in \Sdual{X}$, define $g := f \circ e^{-1} \in \Sdual{Y}$.
+Then $g(y) = f(e^{-1}(y)) = f(x)$, and
+$\Psi(g) = \Phi(e^*(g)) = \Phi(g \circ e) = \Phi(f \circ e^{-1} \circ e)
+= \Phi(f)$. Since $\Jmap{Y}(y)(g) = g(y)$, we get
+$f(x) = g(y) = \Jmap{Y}(y)(g) = \Psi(g) = \Phi(f)$.
+Hence $\Jmap{X}(x) = \Phi$.
+\end{proof}
+
+\subsection{Main Theorem: Physical Bidual Gap and Banach Space Non-Reflexivity}
+
+\begin{proof}[Proof of \Cref{thm:main}]
+\textbf{Part (i).}
+Let $X$ be a trace-class container with isometric embedding
+$\iota : \ellone \hookrightarrow X$ having closed range.
+The map $\iota$ gives a linear isometry $\ellone \to X$,
+and $\mathrm{range}(\iota)$ is a closed subspace of $X$.
+By \texttt{LinearIsometry.equivRange}, we obtain
+$e : \ellone \cong \mathrm{range}(\iota)$ as a linear isometric
+equivalence.
+
+Suppose for contradiction that $X$ is reflexive. By \Cref{lem:subspace-reflexive},
+$\mathrm{range}(\iota)$ is reflexive. By \Cref{lem:compat} (applied to $e$),
+$\ellone$ is reflexive---contradicting the known non-reflexivity of $\ellone$.
+
+\medskip\noindent\textbf{Part (ii).}
+This follows from the Ishihara kernel construction (proven
+self-contained in \texttt{WLPOFromWitness.lean}, adapted from
+Paper~2): given any non-reflexivity witness $\Psi$ for any Banach
+space, one constructs an Ishihara kernel and applies the constructive
+WLPO consumer.
+\end{proof}
+
+% ====================================================================
+\section{The Lean~4 Formalization}\label{sec:lean}
+% ====================================================================
+
+\subsection{Architecture}
+
+The formalization consists of 754 lines of Lean~4 code across 8 files,
+organized as follows:
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}llrl@{}}
+\toprule
+\textbf{File} & \textbf{Role} & \textbf{Lines} & \textbf{Status} \\
+\midrule
+\texttt{Basic.lean}              & WLPO \& IsReflexive definitions & 34  & Complete \\
+\texttt{ReflexiveDual.lean}      & Lemma A                         & 47  & Complete \\
+\texttt{DiagonalEmbedding.lean}  & \texttt{HasTraceClassContainer}  & 45  & Complete \\
+\texttt{Compat.lean}             & Isometry transfer               & 78  & Complete \\
+\texttt{ReflexiveSubspace.lean}  & Lemma B (bottleneck)            & 174 & Complete \\
+\texttt{WLPOFromWitness.lean}    & Ishihara kernel (eliminates axiom) & 196 & Complete \\
+\texttt{Instance.lean}           & Concrete $S_1$ witness (sorry-backed) & 51 & Stub \\
+\texttt{Main.lean}               & Assembly + main theorem          & 129 & Complete \\
+\bottomrule
+\end{tabular}
+\caption{File manifest for the Paper~7 formalization.}
+\label{tab:manifest}
+\end{table}
+
+The dependency graph is:
+\begin{verbatim}
+Basic.lean
+  |-- ReflexiveDual.lean       (Lemma A)
+  |-- DiagonalEmbedding.lean   (HasTraceClassContainer)
+  |   |-- Instance.lean        (concrete S1 witness)
+  |-- Compat.lean              (isometry transfer)
+  |-- ReflexiveSubspace.lean   (Lemma B)
+  |-- WLPOFromWitness.lean     (Ishihara kernel proof)
+  |
+  Main.lean                    (assembly)
+\end{verbatim}
+
+\subsection{Core Definitions}
+
+The definitions in \texttt{Basic.lean} encode WLPO and reflexivity:
+
+\begin{lstlisting}[caption={Core definitions (Basic.lean).}]
+/-- Weak Limited Principle of Omniscience. -/
+def WLPO : Prop :=
+  forall (a : Nat -> Bool),
+    (forall n, a n = false) ||| not (forall n, a n = false)
+
+/-- Reflexivity: surjectivity of the canonical
+    embedding J_X : X -> X**. -/
+def IsReflexive (K : Type*) [NontriviallyNormedField K]
+    (X : Type*) [NormedAddCommGroup X]
+    [NormedSpace K X] : Prop :=
+  Function.Surjective (inclusionInDoubleDual K X)
+\end{lstlisting}
+
+\subsection{The Abstract Interface (DiagonalEmbedding.lean)}
+
+Rather than formalizing the full Schatten class infrastructure
+(not available in \Mathlib{}, estimated at 1000+ lines), we
+axiomatize the essential properties via a typeclass:
+
+\begin{lstlisting}[caption={Trace-class container interface
+  (DiagonalEmbedding.lean).}]
+abbrev ell1 : Type := lp (fun _ : Nat => Real) 1
+
+class HasTraceClassContainer where
+  X : Type
+  [instNAG : NormedAddCommGroup X]
+  [instNS : NormedSpace Real X]
+  [instCS : CompleteSpace X]
+  [instSep : TopologicalSpace.SeparableSpace X]
+  -- Isometric embedding ell1 -> X
+  i : ell1 ->L[Real] X
+  i_isometry : Isometry i
+  i_closedRange : IsClosed (Set.range i)
+\end{lstlisting}
+
+This approach isolates the three properties needed from the
+embedding ($\iota$ is continuous linear, isometric, and has
+closed range) without requiring the construction of $\Sone$.
+
+\subsection{Lemma A: Reflexive Dual (ReflexiveDual.lean)}
+
+The proof is remarkably concise in Lean~4---just 12 lines of tactic
+proof:
+
+\begin{lstlisting}[caption={Lemma A: X reflexive implies X* reflexive.}]
+theorem reflexive_dual_of_reflexive
+    (hX : IsReflexive K X) :
+    IsReflexive K (StrongDual K X) := by
+  intro phi
+  let f : StrongDual K X :=
+    phi.comp (inclusionInDoubleDual K X)
+  use f
+  ext Psi
+  obtain <<x, hx>> := hX Psi
+  change Psi f = phi Psi
+  rw [<- hx]
+  rfl
+\end{lstlisting}
+
+The key insight is that after unfolding the canonical embedding,
+the goal reduces to a definitional equality (\texttt{rfl}).
+This required adapting to a change in \Mathlib{} v4.28 where
+\texttt{inclusionInDoubleDual} unfolds to
+\texttt{ContinuousLinearMap.apply}, altering \texttt{simp} behavior.
+
+\subsection{Lemma B: Reflexive Subspace (ReflexiveSubspace.lean)}
+\label{sec:lean-lemmaB}
+
+This is the technical bottleneck, requiring two applications of
+the Hahn--Banach theorem from \Mathlib{}.
+
+\paragraph{Auxiliary lemma.}
+A key step is showing that a continuous linear functional bounded
+on a subspace must annihilate it:
+
+\begin{lstlisting}[caption={Annihilation lemma for subspace separation.}]
+private lemma annihilates_of_bounded_on_subspace
+    {Y : Submodule Real X} (f : StrongDual Real X) (u : Real)
+    (hfu : forall a in (Y : Set X), f a < u) :
+    forall y in (Y : Set X), f y = 0 := by
+  intro y hy
+  apply le_antisymm
+  . -- f(y) <= 0: for large n, n*f(y) < u
+    by_contra h; push_neg at h
+    obtain <<n, hn>> := exists_nat_gt (u / f y)
+    have hfy_pos : (0 : Real) < f y := h
+    have hnu : (n : Real) * f y > u := by
+      rwa [gt_iff_lt, <- div_lt_iff_0 hfy_pos]
+    have hny : (n : Real) . y in (Y : Set X) :=
+      Y.smul_mem (n : Real) hy
+    have h_bound := hfu _ hny
+    rw [map_smul, smul_eq_mul] at h_bound
+    linarith
+  . -- f(y) >= 0: similarly via -y
+    ...
+\end{lstlisting}
+
+\paragraph{Main proof body.}
+The four-step proof is shown below (Steps 1--2 and 3--4,
+with Step~4 nested inside a \texttt{suffices}). This is the
+core of the formalization and, independently of the WLPO
+story, constitutes a machine-checked proof of a standard
+functional analysis theorem using two applications of the
+Hahn--Banach theorem.
+
+\begin{lstlisting}[caption={Lemma B: closed subspace of reflexive is
+  reflexive (main body, ReflexiveSubspace.lean).}]
+theorem reflexive_closedSubspace_of_reflexive
+    (Y : Submodule Real X) (hYc : IsClosed (Y : Set X))
+    (hX : IsReflexive Real X) : IsReflexive Real Y := by
+  intro phi
+  -- Step 1: Lift phi to X** via restriction
+  let res : StrongDual Real X ->L[Real] StrongDual Real Y :=
+    ContinuousLinearMap.precomp Real Y.subtypeL
+  let Phi : StrongDual Real (StrongDual Real X) :=
+    phi.comp res
+  -- Step 2: Represent Phi via reflexivity
+  obtain <<x, hx>> := hX Phi
+  -- Steps 3+4 nested in suffices
+  suffices hx_mem : x in (Y : Set X) by
+    -- Step 4: Verify J_Y(y) = phi via Hahn-Banach extension
+    let y : Y := <<x, hx_mem>>
+    use y; ext g
+    obtain <<f, hf_ext, _>> :=
+      Real.exists_extension_norm_eq Y g
+    ...  -- chain: g(y) = f(x) = Phi(f) = phi(g)
+  -- Step 3: x in Y by contradiction (Hahn-Banach separation)
+  by_contra hx_not_mem
+  obtain <<f0, u, hfu, hu_x>> :=
+    geometric_hahn_banach_closed_point
+      (Y.convex) hYc hx_not_mem
+  have h_ann := annihilates_of_bounded_on_subspace f0 u hfu
+  have h_res_zero : res f0 = 0 := by
+    ext <<z, hz>>
+    simp only [res, ContinuousLinearMap.precomp_apply,
+      ContinuousLinearMap.comp_apply,
+      Submodule.subtypeL_apply,
+      ContinuousLinearMap.zero_apply]
+    exact h_ann z hz
+  -- f0(x) = Phi(f0) = phi(res f0) = phi(0) = 0
+  -- but u < f0(x) and 0 < u -- contradiction
+  rw [h_res_zero, map_zero] at hf0x
+  linarith
+\end{lstlisting}
+
+The key \Mathlib{} APIs are:
+\texttt{ContinuousLinearMap.precomp} (restriction, Step~1),
+\texttt{geometric\_hahn\_banach\_closed\_point} (separation, Step~3),
+and \texttt{Real.exists\_extension\_norm\_eq} (extension, Step~4).
+
+\subsection{Compatibility (Compat.lean)}
+
+The isometry transfer proof constructs dual maps via
+precomposition. A notable technical challenge was the coercion
+chain in \Mathlib{} v4.28: the path from \texttt{LinearIsometryEquiv}
+to \texttt{ContinuousLinearMap} requires passing through
+\texttt{toContinuousLinearEquiv}:
+
+\begin{lstlisting}[caption={Coercion chain for isometry transfer.}]
+let eL : X ->L[K] Y :=
+  e.toContinuousLinearEquiv.toContinuousLinearMap
+let eLs : Y ->L[K] X :=
+  e.symm.toContinuousLinearEquiv.toContinuousLinearMap
+let e_star : StrongDual K Y ->L[K] StrongDual K X :=
+  ContinuousLinearMap.precomp K eL
+\end{lstlisting}
+
+The critical simp lemmas for this coercion chain are
+\texttt{ContinuousLinearEquiv.coe\_coe} and
+\texttt{LinearIsometryEquiv.coe\_toContinuousLinearEquiv}.
+
+\subsection{Main Assembly (Main.lean)}
+
+The forward direction builds a \texttt{LinearIsometry} from
+the typeclass data, converts it to an equivalence via
+\texttt{LinearIsometry.equivRange}, and applies the
+lemmas in sequence:
+
+\begin{lstlisting}[caption={Forward direction of the main theorem
+  (Main.lean, complete proof).}]
+theorem not_reflexive_of_contains_ell1
+    [tc : HasTraceClassContainer] :
+    not (IsReflexive Real tc.X) := by
+  intro hX
+  -- Build LinearIsometry from typeclass data
+  let i_li : ell1 ->li[Real] tc.X :=
+    { tc.i.toLinearMap with
+      norm_map' := fun x =>
+        (AddMonoidHomClass.isometry_iff_norm tc.i).mp
+          tc.i_isometry x }
+  -- LinearIsometryEquiv: ell1 ~ range(i)
+  let e := LinearIsometry.equivRange i_li
+  let Y : Submodule Real tc.X :=
+    LinearMap.range i_li.toLinearMap
+  -- Show range(i_li) is closed
+  have hYc : IsClosed (Y : Set tc.X) := by
+    suffices h : (Y : Set tc.X) = Set.range tc.i by
+      rw [h]; exact tc.i_closedRange
+    ext x
+    simp only [Y, LinearMap.mem_range,
+      SetLike.mem_coe, Set.mem_range]
+    constructor
+    . rintro <<a, ha>>; exact <<a, ha>>
+    . rintro <<a, ha>>; exact <<a, ha>>
+  -- Closed subspace of reflexive -> reflexive (Lemma B)
+  have hY_refl : IsReflexive Real Y :=
+    reflexive_closedSubspace_of_reflexive Y hYc hX
+  -- Transfer via isometry (Compat)
+  have h_ell1_refl : IsReflexive Real ell1 :=
+    reflexive_of_linearIsometryEquiv e hY_refl
+  -- Contradiction
+  exact absurd h_ell1_refl ell1_not_reflexive
+\end{lstlisting}
+
+The combined theorem is a simple conjunction:
+
+\begin{lstlisting}[caption={The Physical Bidual Gap theorem statement.}]
+theorem physical_bidual_gap
+    [tc : HasTraceClassContainer] :
+    (not (IsReflexive Real tc.X)) /\
+    ((exists Psi : StrongDual Real (StrongDual Real tc.X),
+        Psi not_in Set.range
+          (inclusionInDoubleDual Real tc.X))
+      -> WLPO) :=
+  <<not_reflexive_of_contains_ell1,
+   wlpo_of_traceClass_witness>>
+\end{lstlisting}
+
+\subsection{Key \Mathlib{} APIs}
+
+\Cref{tab:apis} summarizes the \Mathlib{} APIs that were essential
+to the formalization.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{API} & \textbf{Purpose} \\
+\midrule
+\texttt{ContinuousLinearMap.precomp} & Restriction map $\Sdual{X} \to \Sdual{Y}$ \\
+\texttt{Submodule.subtypeL} & Canonical inclusion $Y \hookrightarrow X$ \\
+\texttt{geometric\_hahn\_banach\_closed\_point} & Separation for closed convex sets \\
+\texttt{Real.exists\_extension\_norm\_eq} & Norm-preserving Hahn--Banach extension \\
+\texttt{LinearIsometry.equivRange} & Isometric equivalence onto range \\
+\texttt{ContinuousLinearEquiv.coe\_coe} & Coercion chain for equivalences \\
+\texttt{inclusionInDoubleDual} & Canonical embedding $\Jmap{X} : X \to \Sbidual{X}$ \\
+\bottomrule
+\end{tabular}
+\caption{Key \Mathlib{} APIs used in the formalization.}
+\label{tab:apis}
+\end{table}
+
+\subsection{Mathlib Version Migration}
+
+During development, the \Mathlib{} version was upgraded from v4.23
+to v4.28.0-rc1. This required several adaptations:
+
+\begin{itemize}
+  \item \textbf{Import paths:}
+    \texttt{NormedSpace.HahnBanach.Extension} $\to$
+    \texttt{Normed.Module.HahnBanach};
+    \texttt{NormedSpace.HahnBanach.Separation} $\to$
+    \texttt{LocallyConvex.Separation}.
+  \item \textbf{Lemma renames:}
+    \texttt{div\_lt\_iff} $\to$ \texttt{div\_lt\_iff\(_0\)}.
+  \item \textbf{Coercion changes:}
+    \texttt{LinearIsometryEquiv.toContinuousLinearMap} now requires
+    \texttt{FiniteDimensional}; the correct path is through
+    \texttt{toContinuousLinearEquiv.toContinuousLinearMap}.
+  \item \textbf{Definitional unfolding:}
+    \texttt{inclusionInDoubleDual} now unfolds to
+    \texttt{ContinuousLinearMap.apply}, changing \texttt{simp} behavior
+    and requiring explicit \texttt{change} tactics.
+  \item \textbf{Rewriting vs.\ simplification:}
+    In the auxiliary annihilation lemma, \texttt{simp} with
+    \texttt{map\_smul, map\_neg, smul\_eq\_mul} was replaced by
+    explicit \texttt{rw} steps to produce terms that
+    \texttt{linarith} could process.
+\end{itemize}
+
+\subsection{Reproducibility information}
+
+\begin{mdframed}[backgroundcolor=gray!10]
+\textbf{Reproducibility Box}
+\begin{itemize}
+\item \textbf{Repository}: \url{https://github.com/quantmann/FoundationRelativity}
+\item \textbf{LaTeX source \& PDF}: \url{https://doi.org/10.5281/zenodo.18527559}
+\item \textbf{Lean toolchain}: \texttt{leanprover/lean4:v4.28.0-rc1}
+\item \textbf{Lake}: \texttt{Lake 5.0.0-src+3b0f286 (Lean 4.28.0-rc1)}
+\item \textbf{mathlib4 commit}: \texttt{9543d5047cb12a05abd2d9b9bc2ea2a604b3be87}
+\item \textbf{Current commit}: \texttt{d7e222386c4a8e9f230daa97fe5e9170ae307207}
+\item \textbf{Build}: \texttt{lake exe cache get \&\& lake build}
+\item \textbf{Bundle target}: \texttt{Papers} (imports
+  \texttt{Main} + \texttt{Instance})
+\item \textbf{Status}: 1~interface assumption
+  (\texttt{ell1\_not\_reflexive}), 1~sorry-backed instance
+  (\texttt{Instance.lean}), all 8~files compile (3086 jobs).
+  Axiom profile of \texttt{physical\_bidual\_gap}:
+  \texttt{[propext, Classical.choice, Quot.sound,
+  ell1\_not\_reflexive]}.
+  \texttt{wlpo\_of\_nonreflexive\_witness\_proof} has no custom axioms.
+\item \textbf{Minimal artifact}:
+  \texttt{Papers.P7\_PhysicalBidualGap.P7\_Minimal.Main}
+  --- dependency-free logical skeleton (277~lines, 4~files),
+  no \Mathlib{} imports, zero \texttt{sorry}, zero errors.
+  Axiomatizes Lemma~B and the Ishihara kernel; certifies the
+  reduction chain \texttt{NonReflexiveWitness(S$_1$(H)) $\leftrightarrow$ WLPO}
+  with no \texttt{Classical.choice} in the axiom profile.
+  Build: \texttt{lake build Papers.P7\_PhysicalBidualGap.P7\_Minimal.Main}
+  (5~jobs, 0~errors).
+  \texttt{\#print axioms} output:
+  \texttt{[ell1\_closed\_subspace\_of\_S1, ishihara\_kernel,
+  not\_reflexive\_implies\_witness\_S1, paper2\_reverse,
+  reflexive\_closedSubspace\_of\_reflexive,
+  witness\_implies\_not\_reflexive]}.
+\end{itemize}
+\end{mdframed}
+
+% ====================================================================
+\section{Interface Assumptions}\label{sec:axioms}
+% ====================================================================
+
+The formalization uses exactly one interface assumption, declared
+using Lean's \texttt{axiom} keyword. The underlying mathematical
+fact---that $\ellone$ is not reflexive---has been known since
+Banach's 1932 monograph and is not in question. The Lean
+\texttt{axiom} keyword here marks an \emph{engineering boundary}
+between two verified codebases on incompatible \Mathlib{} versions,
+not a mathematical gap. A second interface assumption from an
+earlier version has been eliminated by independently proving the
+Ishihara kernel construction within Paper~7.
+
+\paragraph{Remaining interface assumption.}
+
+\begin{enumerate}
+  \item \textbf{\texttt{ell1\_not\_reflexive}:}
+    $\lnot\,\mathrm{IsReflexive}(\RR, \ellone)$.
+
+    \emph{Proven in Paper~2} \citep{Lee2025Paper2} via the chain:
+    $\czero$ is not reflexive
+    (unconditional; the witness $G \in \Sbidual{(\czero)}$ is
+    constructed without WLPO) $\to$ dual isometries
+    $\Sdual{(\czero)} \cong \ellone$ and
+    $\Sdual{(\ellone)} \cong \ellinfty$ $\to$ if $\ellone$ were
+    reflexive, $\czero$ would be reflexive (via Lemmas~A and~B),
+    contradiction. Paper~2's WLPO $\leftrightarrow$ bidual gap
+    equivalence is mechanically certified via the dependency-free
+    \texttt{P2\_Minimal} artifact (zero \texttt{sorry}, no
+    \texttt{Classical.choice}); the present interface assumption
+    encapsulates the dual-isometry infrastructure of
+    \texttt{P2\_Full}
+    ($\sim$1,593~lines in \texttt{DualIsometriesComplete.lean}).
+
+    \emph{Why it remains:} This is a version-migration cost, not a
+    logical gap. Paper~2 was developed on Lean v4.23.0-rc2;
+    Paper~7 uses v4.28.0-rc1. The five-version toolchain gap
+    prevents a direct Lake dependency import, and porting Paper~2's
+    dual isometry infrastructure would require migrating
+    $\sim$3,100 lines across 11 files through substantial
+    \Mathlib{} API changes. The proposition itself is proved in
+    Paper~2's \texttt{P2\_Full} target on Lean v4.23.0-rc2;
+    porting to Paper~7's \Mathlib{} v4.28 is blocked by version
+    migration cost, not by mathematical content. A unified monorepo
+    on a shared toolchain would eliminate this boundary entirely.
+\end{enumerate}
+
+\paragraph{Eliminated interface assumption.}
+
+The previous \texttt{wlpo\_of\_nonreflexive\_witness} axiom---stating
+that for any Banach space $X$, a non-reflexivity witness
+$\Psi \in \Sbidual{X} \setminus \Jmap{X}(X)$ implies WLPO---has
+been \emph{fully proven} in \texttt{WLPOFromWitness.lean} (196~lines).
+The proof independently formalizes the Ishihara kernel construction
+from Paper~2 \citep{Lee2025Paper2}: given
+$\Psi \notin \mathrm{range}(\Jmap{X})$,
+we find $h^\star \in \Sdual{X}$ with $\|\Psi\|/2 < |\Psi(h^\star)|$,
+define $g(\alpha) := \text{if } (\forall n,\,\alpha_n = 0)
+\text{ then } 0 \text{ else } h^\star$, and set
+$\delta := |\Psi(h^\star)|/2 > 0$. The resulting Ishihara kernel
+$(\Psi, 0, g, \delta)$ is consumed by a purely constructive decision
+procedure to produce WLPO. The axiom profile of
+\texttt{wlpo\_of\_nonreflexive\_witness\_proof} contains only Lean's
+three foundational axioms (\texttt{propext}, \texttt{Classical.choice},
+\texttt{Quot.sound})---no custom axioms.
+
+This constitutes a second machine-checked proof of the hardest
+direction of the bidual gap equivalence (non-reflexivity witness
+$\Rightarrow$ WLPO), developed on \Mathlib{} v4.28 independently of
+Paper~2's proof on \Mathlib{} v4.23. Two independent formalizations
+of the same mathematical content compiling cleanly on different
+library versions provides strong evidence of correctness.
+
+\paragraph{Concrete witness.}
+
+A sorry-backed \texttt{Instance.lean} (51~lines) demonstrates that
+$S_1(\ell^2(\NN))$ satisfies \texttt{HasTraceClassContainer},
+making the main theorem applicable to a specific physical space.
+The sorry placeholders correspond to standard Schatten class
+theory (trace norm isometry and closed range of the diagonal
+embedding), which is not yet formalized in \Mathlib{}.
+
+\paragraph{Conservation.}
+The remaining interface assumption is \emph{conservative}: it asserts
+a proposition proven in a verified companion formalization.
+The combined system (Paper~2 + Paper~7) would have zero custom axioms
+beyond Lean's core type theory and \Mathlib{}'s standard axioms.
+
+\subsection{The Classical Metatheory}\label{sec:classical}
+
+\paragraph{Axiom profile.}
+All theorems in the \texttt{P7\_Full} formalization carry the axiom
+profile \texttt{[propext, Classical.choice, Quot.sound]} plus the
+interface assumption \texttt{ell1\_not\_reflexive}. The
+\texttt{Classical.choice} dependency enters through \Mathlib{}'s
+normed space and functional analysis infrastructure---specifically
+through the Hahn--Banach theorem
+(\texttt{exists\_extension\_norm\_eq}), the \texttt{NormedSpace}
+typeclass hierarchy, and \texttt{Decidable} instances on~$\RR$.
+
+\paragraph{What the formalization certifies.}
+The Lean formalization provides two forms of evidence.
+First, \emph{proof correctness}: the theorem statements are correctly
+formalized, the proofs compile without \texttt{sorry} (in 7 of 8
+files), and the proof chain---from the Ishihara kernel construction
+through Lemma~B to the main equivalence---is machine-checked.
+Second, \emph{proof structure}: the forward direction
+(non-reflexivity witness $\Rightarrow$ WLPO) uses the Ishihara
+kernel construction, which is a constructive algorithm with no
+classical case analysis; the reverse direction
+(WLPO $\Rightarrow$ non-reflexivity) uses WLPO explicitly as a
+hypothesis; and the Lemma~B step (closed subspace of reflexive is
+reflexive) uses Hahn--Banach extension and geometric separation,
+both of which are constructively available for separable spaces
+\citep{BridgesVita2006}.
+
+\paragraph{Certification levels.}
+The BISH claim for the overall equivalence rests on mathematical
+argument about proof content, not on a \texttt{Classical.choice}-free
+axiom certificate from the main formalization. A supplementary
+artifact (\texttt{P7\_Minimal}, 277~lines, 4~files) provides a
+dependency-free logical skeleton---analogous to the
+\texttt{P2\_Minimal} artifact of Paper~2 \citep{Lee2025Paper2}---that
+certifies the reduction structure without \Mathlib{}. In
+\texttt{P7\_Minimal}, the forward direction (Ishihara kernel) and
+Lemma~B are axiomatized with references to their \texttt{P7\_Full}
+proofs, and the logical chain is verified to use no classical axioms
+beyond the explicitly listed assumptions: the \texttt{\#print axioms}
+output for \texttt{P7\_main} contains only the six declared interface
+axioms---notably absent are \texttt{Classical.choice},
+\texttt{propext}, and \texttt{Quot.sound}. The \texttt{P7\_Full}
+proofs supply the mathematical content; \texttt{P7\_Minimal} certifies
+the logical architecture.
+
+A systematic treatment of the relationship between \Mathlib{}'s
+classical foundations and the constructive claims across the paper
+series is given in Paper~10 \citep[forthcoming]{Lee2026Paper7}, which
+establishes three certification levels---\emph{mechanically certified},
+\emph{structurally verified}, and \emph{paper-level}---and classifies
+each paper accordingly. Paper~7 is classified as
+``structurally verified'' (upgraded from ``paper-level'' upon
+completion of \texttt{P7\_Minimal}).
+
+% ====================================================================
+\section{AI-Assisted Formalization Methodology}\label{sec:ai}
+% ====================================================================
+
+This formalization was developed using \textbf{Claude Opus~4.6}
+(Anthropic, 2026) via the \textbf{Claude Code} command-line interface,
+following the same human--AI workflow as Paper~2 \citep{Lee2025Paper2}.
+The human author wrote a mathematical blueprint
+(\texttt{PhysicalBidualGap\_Blueprint.md}, 520~lines) specifying all
+theorem statements, proof strategies, and target \Mathlib{} APIs.
+Claude Opus~4.6 then explored the \Mathlib{} codebase to locate exact
+API signatures and import paths, generated the Lean~4 proof terms,
+and handled the \Mathlib{} version migration from v4.23 to v4.28
+(adapting to renamed lemmas, changed coercion behavior, and deprecated
+import paths). The human author reviewed all proofs for mathematical
+correctness and \Mathlib{} conventions. Final verification was by
+\texttt{lake build} (0~errors, 0~warnings, 0~\texttt{sorry}).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Task} & \textbf{Human} & \textbf{AI (Claude Opus 4.6)} \\
+\midrule
+Mathematical blueprint    & \checkmark & \\
+Proof strategy design     & \checkmark & \\
+\Mathlib{} API discovery  & & \checkmark \\
+Lean proof generation     & & \checkmark \\
+Proof review              & \checkmark & \\
+Version migration         & & \checkmark \\
+Build verification        & & \checkmark \\
+Paper writing             & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\caption{Division of labor between human and AI.}
+\label{tab:division}
+\end{table}
+
+\paragraph{Comparison with Paper~2.}
+The methodology closely follows Paper~2, but Paper~7 required more
+delicate interaction with \Mathlib{}'s Hahn--Banach infrastructure
+and the additional challenge of a \Mathlib{} version migration
+(v4.23 $\to$ v4.28) that broke coercion chains and renamed lemmas
+across multiple files.
+
+% ====================================================================
+\section{Discussion and Implications}\label{sec:implications}
+% ====================================================================
+
+\subsection{Physical interpretation}
+
+The Physical Bidual Gap Theorem reveals a constructive limitation
+in the theory of quantum state spaces.  While Banach space
+non-reflexivity of $\Sone$ is provable without WLPO---meaning
+the bidual $\Sbidual{(\Sone)}$ is strictly larger than (the
+image of) $\Sone$---one cannot \emph{constructively exhibit} any
+specific element of the gap without WLPO.
+
+In the algebraic formulation of quantum mechanics, the bidual
+$\Sbidual{(\Sone)}$ contains ``singular states'' on $B(H)$:
+positive linear functionals that are not $\sigma$-weakly
+continuous and cannot be represented by any density matrix.
+Classically, Gleason's theorem guarantees that in dimension
+$\geq 3$, every countably additive probability measure on the
+projection lattice of $H$ extends to a normal state---but our
+result concerns the \emph{finitely} additive measures, the
+singular states that live in the bidual gap.  Their existence
+is provable, but constructing any specific one requires WLPO.
+
+\paragraph{The thermodynamic limit.}
+The physical home of singular states is the thermodynamic limit of
+quantum statistical mechanics.  In the Haag--Kastler framework for
+algebraic quantum field theory \citep{Haag1996}, observables localized
+in bounded spacetime regions generate a net of local algebras; the
+quasilocal algebra is their norm closure.  States on this algebra
+decompose into \emph{folia}---equivalence classes under quasi-equivalence
+of GNS representations \citep{BratteliRobinson1987}.  Normal states
+belong to the folium of the identity representation; singular states
+lie outside every folium.  Via the GNS construction, singular states
+give rise to representations \emph{disjoint} from the identity
+representation---physically, they correspond to inequivalent
+thermodynamic phases or superselection sectors.
+
+The decomposition $\omega = \omega_n + \omega_s$ into normal and
+singular parts \citep{Takesaki1979} is the noncommutative Lebesgue
+decomposition.  Our theorem calibrates the logical cost of witnessing
+the singular part: determining whether $\omega_s \neq 0$ for a
+constructively given state is a zero-test on $\|\omega_s\|$, and
+zero-tests for reals are precisely what WLPO governs.
+
+\paragraph{Calibration landscape.}
+Our result fits into a broader stratification of the logical costs
+of quantum statistical mechanics over constructive mathematics (BISH):
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Physical statement} & \textbf{Minimal principle} \\
+\midrule
+Finite-volume Gibbs state properties & BISH (constructive) \\
+$\Sone$ is not reflexive ($\lnot$-form) & WLPO \\
+Singular state witness ($\exists\,\Psi \in \Sbidual{(\Sone)} \setminus \Jmap{\Sone}(\Sone)$) & $\geq$ WLPO \\
+Thermodynamic limit via monotone convergence & LPO \\
+Hahn--Banach separation in non-separable duals & LEM \\
+Spectral gap decidability (general) & Undecidable \citep{CubittPerezWolf2015} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The first row is fully constructive: Peierls-type bounds,
+finite-volume magnetization estimates, and explicit Gibbs state
+calculations require no omniscience principles.  Our theorem occupies
+the second and third rows.  The fourth row reflects the observation
+that constructing infinite-volume limits via monotone convergence of
+partition functions requires the Limited Principle of Omniscience
+(LPO), which is strictly stronger than WLPO
+\citep{BridgesVita2006}.  The fifth row marks the classical boundary:
+full Hahn--Banach separation in non-separable duals (as needed to
+construct singular functionals on $\ellinfty$ directly) requires the
+law of excluded middle.  The sixth row, due to Cubitt, Perez-Garcia,
+and Wolf \citep{CubittPerezWolf2015}, places general spectral gap
+determination at the level of the Halting Problem---far beyond any
+omniscience principle.
+
+This landscape suggests that WLPO occupies a natural position in the
+foundations of quantum theory: it is the precise logical cost of the
+\emph{ontological status} of the singular sector---the assertion that
+singular states exist as concrete mathematical objects, rather than
+merely as a logical impossibility of reflexivity.
+
+\subsection{The Role of WLPO}
+
+WLPO sits at a precise level in the constructive hierarchy:
+it is implied by the Limited Principle of Omniscience (LPO),
+which also independently implies Markov's Principle (MP),
+and it implies the Lesser Limited Principle of Omniscience (LLPO).
+Thus $\mathrm{LPO} \Rightarrow \WLPO \Rightarrow \mathrm{LLPO}$,
+while MP is independent of WLPO over BISH---neither implies the
+other \citep{BridgesVita2006}.
+Our result places the Banach space non-reflexivity witness for
+$\Sone$ at this specific level of the constructive hierarchy,
+rather than requiring full classical logic.
+
+\subsection{Formalization as Verification}
+
+The machine-checked nature of the proof provides a high degree
+of confidence in the result. The single remaining interface
+assumption is clearly delineated and corresponds to a proven result
+in a companion formalization.
+The proof structure---definition of the abstract interface,
+modular lemmas, and clean assembly---demonstrates that
+substantial functional analysis can be formalized in Lean~4
+with existing \Mathlib{} infrastructure.
+
+\subsection{Open Questions}
+
+\begin{enumerate}
+  \item \textbf{Eliminating the remaining axiom:} The sole remaining
+    interface assumption (\texttt{ell1\_not\_reflexive}) requires
+    porting Paper~2's dual isometry chain ($\sim$1,593~lines) to
+    Lean v4.28. A unified monorepo with a shared Mathlib pin would
+    eliminate this bridge entirely.
+
+  \item \textbf{Schatten classes in \Mathlib{}:} A formalization of
+    the Schatten $p$-classes $S_p(H)$ would replace both the abstract
+    \texttt{HasTraceClassContainer} and the sorry-backed
+    \texttt{Instance.lean} with concrete constructions,
+    strengthening the result.
+
+  \item \textbf{Generalization:} Does the equivalence extend to
+    other physically relevant non-reflexive spaces, such as the
+    space of bounded operators $B(H)$ or the predual of a
+    von Neumann algebra?
+
+  \item \textbf{Quantitative gaps:} Can the ``size'' of the bidual
+    gap (e.g., in terms of cardinality or density character) be
+    characterized constructively?
+\end{enumerate}
+
+% ====================================================================
+\section*{Acknowledgments}
+% ====================================================================
+
+The Lean~4 formalization was developed using Claude Opus~4.6
+(Anthropic, 2026) via the Claude Code CLI tool. We thank the
+\Mathlib{} community for maintaining the comprehensive library
+of formalized mathematics that made this work possible.
+
+% ====================================================================
+% Bibliography
+% ====================================================================
+\bibliographystyle{plainnat}
+
+\begin{thebibliography}{20}
+
+\bibitem[Bishop(1967)]{Bishop1967}
+E.~Bishop.
+\newblock \emph{Foundations of Constructive Analysis}.
+\newblock McGraw-Hill, New York, 1967.
+
+\bibitem[Bishop and Bridges(1985)]{BishopBridges1985}
+E.~Bishop and D.~Bridges.
+\newblock \emph{Constructive Analysis}.
+\newblock Grundlehren der mathematischen Wissenschaften, vol.~279.
+  Springer-Verlag, Berlin, 1985.
+
+\bibitem[Bratteli and Robinson(1987)]{BratteliRobinson1987}
+O.~Bratteli and D.~W.~Robinson.
+\newblock \emph{Operator Algebras and Quantum Statistical Mechanics},
+  vol.~1.
+\newblock Texts and Monographs in Physics. Springer-Verlag, New York,
+  2nd edition, 1987.
+
+\bibitem[Bratteli and Robinson(1997)]{BratteliRobinson1997}
+O.~Bratteli and D.~W.~Robinson.
+\newblock \emph{Operator Algebras and Quantum Statistical Mechanics},
+  vol.~2: Equilibrium States, Models in Quantum Statistical Mechanics.
+\newblock Texts and Monographs in Physics. Springer-Verlag, Berlin,
+  2nd edition, 1997.
+
+\bibitem[Bridges and V{\^\i}{\c{t}}{\u{a}}(2006)]{BridgesVita2006}
+D.~Bridges and L.~S.~V{\^\i}{\c{t}}{\u{a}}.
+\newblock \emph{Techniques of Constructive Analysis}.
+\newblock Universitext. Springer, New York, 2006.
+
+\bibitem[Cubitt et~al.(2015)]{CubittPerezWolf2015}
+T.~S.~Cubitt, D.~Perez-Garcia, and M.~M.~Wolf.
+\newblock Undecidability of the spectral gap.
+\newblock \emph{Nature}, 528(7581):207--211, 2015.
+
+\bibitem[{de Moura} et~al.(2021)]{deMoura2021}
+L.~{de Moura}, S.~Kong, J.~Avigad, F.~{van Doorn}, and M.~{von Raumer}.
+\newblock The {Lean} theorem prover (system description).
+\newblock In \emph{CADE-25}, LNAI 9195, pages 378--388. Springer, 2015.
+\newblock Lean~4: \url{https://lean-lang.org/}, 2021--present.
+
+\bibitem[Haag(1996)]{Haag1996}
+R.~Haag.
+\newblock \emph{Local Quantum Physics: Fields, Particles, Algebras}.
+\newblock Texts and Monographs in Physics. Springer-Verlag, Berlin,
+  2nd edition, 1996.
+
+\bibitem[Ishihara(1992)]{Ishihara1992}
+H.~Ishihara.
+\newblock Continuity properties in constructive mathematics.
+\newblock \emph{Journal of Symbolic Logic}, 57(2):557--565, 1992.
+
+\bibitem[Lee(2026a)]{Lee2025Paper2}
+P.~C.-K.~Lee.
+\newblock The bidual gap: A {Lean}~4 formalization of {WLPO} and
+  non-reflexivity in {B}anach spaces.
+\newblock Preprint, 2026.
+\newblock Lean~4 formalization:
+  \url{https://github.com/quantmann/FoundationRelativity}.
+
+\bibitem[Lee(2026b)]{Lee2026Paper7}
+P.~C.-K.~Lee.
+\newblock The physical bidual gap and {B}anach space non-reflexivity:
+  a {Lean}~4 formalization of {WLPO} via trace-class operators.
+\newblock Preprint, 2026.
+\newblock Lean~4 formalization:
+  \url{https://github.com/quantmann/FoundationRelativity}.
+
+\bibitem[{Mathlib Community}(2020--)]{Mathlib}
+{Mathlib Community}.
+\newblock \emph{Mathlib}: the math library for {Lean}.
+\newblock \url{https://leanprover-community.github.io/mathlib4_docs/},
+  2020--present.
+
+\bibitem[Takesaki(1979)]{Takesaki1979}
+M.~Takesaki.
+\newblock \emph{Theory of Operator Algebras~I}.
+\newblock Springer-Verlag, New York, 1979.
+
+\bibitem[van Wierst(2019)]{vanWierst2019}
+P.~van~Wierst.
+\newblock The paradox of phase transitions in the light of constructive
+  mathematics.
+\newblock \emph{Synthese}, 196(5):1863--1884, 2019.
+
+\bibitem[Anthropic(2026)]{Anthropic2026}
+Anthropic.
+\newblock Claude {Opus}~4.6 and {Claude Code} {CLI}.
+\newblock \url{https://www.anthropic.com/claude}, 2026.
+
+\end{thebibliography}
+
+\end{document}

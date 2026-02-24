@@ -1,116 +1,52 @@
-# Paper 2: Reproducibility Information
+# Paper 2: Reproducibility Information (v6, 2026-02-05)
 
-## Code Archive DOI (Zenodo)
-- **v0.1**: 10.5281/zenodo.13356587
-- **v0.2**: 10.5281/zenodo.17107493
+## Paper sources
+- Main LaTeX: `documentation/paper-v6-020526.tex`
+- Completion report: `documentation/WLPO_completion_report_v3.tex`
 
-## Releases
-- **v0.1**: [p2-minimal-v0.1](https://github.com/AICardiologist/FoundationRelativity/releases/tag/p2-minimal-v0.1) - Initial release
-- **v0.2**: [p2-crm-v0.2](https://github.com/AICardiologist/FoundationRelativity/releases/tag/p2-crm-v0.2) - CRM methodology compliance update
+## Lean sources (current)
+- Curated entry point: `Current/`
+- Main Lean targets: `P2_Full.lean`, `P2_Minimal.lean`
+- Key modules: `HB/DirectDual.lean`, `HB/WLPO_to_Gap_HB.lean`, `HB/WLPO_DualBanach.lean`, `HB/SigmaEpsilon.lean`
+- OptionB minimal (standalone): `HB/OptionB/standalone/`
 
-## Build Instructions
+## Toolchains
+- Root monorepo toolchain (for P2_Full/P2_Minimal): `leanprover/lean4:v4.23.0-rc2` (from `/Users/quantmann/FoundationRelativity/lean-toolchain`)
+- OptionB standalone toolchain: `leanprover/lean4:v4.8.0` (from `HB/OptionB/standalone/lean-toolchain`)
 
-### Prerequisites
-- Lean 4 (version specified in `lean-toolchain`)
-- Lake build system (comes with Lean 4)
+## Build instructions
 
-### Quick Build (Main Theorem)
+### A. OptionB standalone (minimal, no mathlib)
 
 ```bash
-# Clone repository
-git clone https://github.com/AICardiologist/FoundationRelativity.git
-cd FoundationRelativity
-
-# Checkout tagged version
-git checkout p2-crm-v0.2
-
-# Build main theorem
-lake build Papers.P2_BidualGap.gap_equiv_wlpo
+cd /Users/quantmann/FoundationRelativity/Papers/P2_BidualGap/HB/OptionB/standalone
+lake clean
+lake build
 ```
 
-### Build Details
+### B. Full mathlib-based build (monorepo root)
 
-**Repository**: https://github.com/AICardiologist/FoundationRelativity  
-**Current Tag**: `p2-crm-v0.2`  
-**Build Target**: `Papers.P2_BidualGap.gap_equiv_wlpo`  
-**Toolchain**: `leanprover/lean4:v4.22.0-rc4` (see `lean-toolchain`)  
-**mathlib4**: `59e4fba0c656457728c559a7d280903732a6d9d1`  
-**Build Time**: ~1-2 minutes (main theorem with dependencies)
+```bash
+cd /Users/quantmann/FoundationRelativity
+lake clean
+lake build Papers.P2_BidualGap.P2_Full
+lake build Papers.P2_BidualGap.P2_Minimal
+```
 
-## Artifact Structure
+## Verification status (this session)
+- OptionB standalone: `lake clean` + `lake build` (success, 2026-02-05)
+- Full root build: not executed in this session (requires running from repo root)
 
-### Core Implementation (0 sorries)
-- `Papers/P2_BidualGap/Core/HBExact.lean` - Finite Hahn-Banach
-- `Papers/P2_BidualGap/Core/Kernel.lean` - Ishihara kernel infrastructure
-- `Papers/P2_BidualGap/Bidual/*.lean` - Bidual space theory
-- `Papers/P2_BidualGap/HB/Gap_to_WLPO_pure.lean` - Gap → WLPO direction
-- `Papers/P2_BidualGap/HB/WLPO_to_Gap_pure.lean` - WLPO → Gap core
-- `Papers/P2_BidualGap/HB/DirectDual.lean` - c₀ witness construction
+## Axiom audit commands
 
-### CRM Meta-Classical Components
-- `Papers/P2_BidualGap/CRM_MetaClassical/Ishihara.lean` - Prop-level kernel
-- `Papers/P2_BidualGap/CRM_MetaClassical/OpNormCore.lean` - Operator norms
-
-### Documentation
-- `Papers/P2_BidualGap/documentation/paper-v5.tex` - LaTeX paper with CRM updates
-- `Papers/P2_BidualGap/README.md` - Project overview
-- `Papers/P2_BidualGap/RELEASE_NOTES_v0.2.md` - Version 0.2 changes
-
-### Build Targets
-- **gap_equiv_wlpo** - Main equivalence theorem (0 sorries)
-- **P2_Minimal** - Minimal build target
-- **P2_Full** - Complete build with all components
-
-## Version History
-
-### v0.2 (September 2025) - CRM Compliance Update
-- Meta-classical separation in Gap → WLPO direction
-- Improved axiom hygiene with proper fencing
-- Prop-level Ishihara kernel
-- Updated LaTeX documentation
-- 0 sorries in main theorem
-
-### v0.1 (August 2025) - Initial Release
-- Option B architecture
-- Basic equivalence proof
-- Initial formalization
-
-## Verification
-
-The main theorem builds with:
-- **0 errors**
-- **0 sorries** in core equivalence
-- **3 WLPO-conditional sorries** in optional completeness module
-- **Axioms used**: `[propext, Classical.choice, Quot.sound]` (only in Gap → WLPO)
-
-## Archive Contents
-
-The release archive (`p2-crm-v0.2.tar.gz`) contains:
-- All Lean 4 source files for Paper 2
-- CRM_MetaClassical directory with meta-theory components
-- Updated LaTeX documentation (paper-v5.tex)
-- README and release notes
-- Build configuration files
-
-Excluded from archive:
-- Build artifacts (`.lake/`, `build/`)
-- Work-in-progress files (`WIP/`)
-- Test directories
-- Archive directories
-- System files (`.DS_Store`)
+```lean
+#print axioms WLPO_of_kernel
+#print axioms WLPO_of_gap
+#print axioms gap_from_WLPO
+#print axioms gap_equiv_wlpo
+```
 
 ## Notes
-
-- The main equivalence (bidual gap ↔ WLPO) is fully formalized with 0 sorries
-- Classical axioms are properly fenced and only used in the Gap → WLPO direction
-- The WLPO → Gap direction is fully constructive
-- Three optional completeness lemmas remain as WLPO-conditional sorries
-
-## LLM Acknowledgment
-
-Development assisted by:
-- Gemini 2.5 Deep Think (architecture brainstorming)
-- GPT-5 Pro (Lean scaffolding and refactoring)
-- Claude Code (repository management and build scripts)
-
-All final proofs and code were verified by Lean; any LLM-generated suggestions were reviewed and rewritten as needed.
+- Main equivalence is sorry-free in the current Lean build targets.
+- WLPO-only dual completeness lemmas are isolated and optional.
+- Stone window is a paper-level sketch in Appendix; not formalized in Lean.

@@ -1,0 +1,37 @@
+ZENODO UPLOAD METADATA — Paper 58
+===================================
+DOI: 10.5281/zenodo.18734718
+
+TITLE:
+Class Number Correction for Exotic Weil Classes on CM Abelian Fourfolds (Paper 58, Constructive Reverse Mathematics Series)
+
+UPLOAD TYPE: Software
+
+PUBLICATION DATE: 2026-02-22
+
+VERSION: 2.0.0
+
+AUTHORS:
+Lee, Paul Chun-Kit — New York University
+
+LICENSE: Apache-2.0
+
+DESCRIPTION:
+Paper 58 of the Constructive Reverse Mathematics and Arithmetic Geometry series. Papers 56-57 established the formula h = f for the Hermitian self-intersection of exotic Weil classes on CM abelian fourfolds, where f is the conductor and h_K = 1. This paper extends to h_K > 1.
+
+The corrected formula is h * Nm(a) = f, where a is the Steinitz class of the integral Weil lattice, uniquely determined by a decidable norm condition. The topological volume det(G) = f^2 |D_K| is an absolute geometric invariant; the class group redistributes it between the Hermitian metric h and the lattice density Nm(a).
+
+Test field: K = Q(sqrt(-5)), h_K = 2, |D_K| = 20. Verified for all nine conductors from Papers 56-57: 4 split (f = 7, 9, 61, 163), 5 inert. Steinitz class forced by mod-5 infinite descent. All Gram matrix determinants verified by native_decide.
+
+CRM classification: BISH. The Lean 4 / Mathlib formalization comprises 6 source files (~805 lines), zero errors, zero warnings, zero sorry, zero custom axioms. The corrected formula is a proof obligation (structure field) verified per-instance by native_decide.
+
+Code is distributed exclusively via this Zenodo record.
+
+KEYWORDS:
+constructive reverse mathematics, class number, exotic Weil class, self-intersection, CM abelian fourfold, Steinitz class, norm obstruction, Gram matrix, imaginary quadratic field, conductor, discriminant, arithmetic geometry, formal verification, Lean 4, Mathlib, constructive mathematics
+
+RELATED IDENTIFIER:
+isPartOf — DOI: 10.5281/zenodo.17054050
+
+NOTES:
+AI-assisted formalization using Claude (Anthropic, Opus 4.6) for Lean 4 code generation under human direction. All mathematical content specified by the author; every theorem verified by the Lean 4 type checker. Built with Lean 4 v4.29.0-rc1 and Mathlib. Reproducible via 'lake build' (zero errors, zero sorry). Code available exclusively on Zenodo (not hosted on GitHub).

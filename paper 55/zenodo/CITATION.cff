@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+- family-names: "Lee"
+  given-names: "Paul Chun-Kit"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+  affiliation: "New York University"
+title: "K3 Surfaces, the Kuga-Satake Construction, and the DPT Framework (Paper 55, Constructive Reverse Mathematics Series)"
+version: "1.0.0"
+date-released: 2026-02-21
+abstract: >-
+  Paper 55 of the Constructive Reverse Mathematics series. Second out-of-sample
+  test of the DPT framework, applied to K3 surfaces and the Kuga-Satake
+  construction. Theorem A: motivated cycle transfer (Andre 1996). Theorem B:
+  Axiom 2 independence (Deligne Weil I). Theorem C: Kuga-Satake provides
+  Axiom 3. Theorem D: supersingular bypass (rho = 22). Theorem E: no Picard
+  boundary. Theorem F: CY3 correction. Theorem G: 7-row comparison table.
+  Formalized in Lean 4 over Mathlib (1,131 lines, 8 modules, 9 principled
+  axioms, zero sorry gaps).
+keywords:
+  - "constructive reverse mathematics"
+  - "K3 surfaces"
+  - "Kuga-Satake construction"
+  - "DPT framework"
+  - "codimension principle"
+  - "motivated cycles"
+  - "supersingular"
+  - "Deligne Weil I"
+  - "formal verification"
+  - "Lean 4"
+  - "Mathlib"
+  - "arithmetic geometry"
+license: Apache-2.0

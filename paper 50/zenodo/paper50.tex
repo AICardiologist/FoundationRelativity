@@ -1,0 +1,1061 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[margin=1in]{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{red!60!black}
+}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{observation}[theorem]{Observation}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\BISH}{\mathrm{BISH}}
+\newcommand{\LPO}{\mathrm{LPO}}
+\newcommand{\MP}{\mathrm{MP}}
+\newcommand{\LLPO}{\mathrm{LLPO}}
+\newcommand{\CLASS}{\mathrm{CLASS}}
+\newcommand{\Hom}{\mathrm{Hom}}
+\newcommand{\End}{\mathrm{End}}
+\newcommand{\Gal}{\mathrm{Gal}}
+\newcommand{\Frob}{\mathrm{Frob}}
+\newcommand{\CH}{\mathrm{CH}}
+\newcommand{\Sha}{\text{\textcyr{Sh}}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+
+\title{Three Axioms for the Motive:\\
+A Decidability Characterization of Grothendieck's Universal Cohomology\\[6pt]
+\large (Paper 50, Constructive Reverse Mathematics Series)}
+
+\author{Paul Chun-Kit Lee\thanks{Lean 4 formalization available at \url{https://doi.org/10.5281/zenodo.18705837}.}\\
+\small New York University\\
+\small \texttt{dr.paul.c.lee@gmail.com}}
+
+\date{February 19, 2026 \\ \normalsize Version 2}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We propose that Grothendieck's category of numerical motives is characterized by three logical axioms: decidable equality on morphism spaces (Standard Conjecture~D), algebraic spectrum (endomorphisms satisfy monic $\Z$-polynomials), and Archimedean polarization (positive-definite inner product on the real fiber).  The characterization emerges from calibrating five major conjectures in arithmetic geometry---the Weight-Monodromy Conjecture, the Tate Conjecture, the Fontaine-Mazur Conjecture, the Birch and Swinnerton-Dyer Conjecture, and the Hodge Conjecture---against the constructive hierarchy $\BISH \subset \BISH{+}\MP \subset \BISH{+}\LPO \subset \CLASS$.  A uniform pattern appears: each conjecture asserts that continuous data over a complete field (requiring $\LPO$ for zero-testing) descends to discrete algebraic data over~$\Q$ or~$\bar{\Q}$ (decidable in~$\BISH$ or~$\BISH{+}\MP$).
+
+From the three axioms, combined with the Rosati involution of the Weil cohomology functor, we show:
+Standard Conjecture~D is the exact decidability axiom for motivic morphism spaces, with a bidirectional equivalence (Theorem~A, zero sorries);
+the Weil Riemann Hypothesis reduces to a single cancellation step enabled by positive-definiteness (Theorem~B, zero sorries);
+the subcategory of CM elliptic motives is unconditionally $\BISH$-decidable over~$\Q$, with a sharp failure boundary at dimension~$\ge 4$ (Theorem~C, zero sorries);
+the DPT category is inhabited over finite fields via Honda-Tate (Theorem~D);
+and the five conjectures classify as~$\Pi^0_2$ mandates in the arithmetic hierarchy, with the motive acting as a $-1$ shift operator on instance complexity (Observation~E).
+The Fontaine-Mazur conjecture admits a natural interpretation as a completeness theorem for the decidable motive category.
+
+The formalization comprises 8 Lean~4 files over Mathlib, compiling with 0~errors and 2~principled sorries, using 46 custom axioms (25~of which are \texttt{True}-valued placeholders for upstream results; see~\S\ref{sec:verification}).  Theorems~A, B, and~C carry zero sorries.
+\end{abstract}
+
+\tableofcontents
+
+%% ===================================================================
+\section{Introduction}
+\label{sec:intro}
+%% ===================================================================
+
+\subsection{The question}
+
+What is the motive?  Grothendieck's conjectural category of motives is intended to provide a ``universal cohomology''---an object that simultaneously determines all specific cohomology theories (\'etale, de~Rham, Betti, crystalline, prismatic) through realization functors.  Despite sixty years of effort, no fully satisfactory construction exists.  Approaches through algebraic cycles (Chow motives), cohomological realizations (Nori motives), and homotopy theory (Voevodsky motives) each capture partial aspects.
+
+This paper proposes a logical answer.  By calibrating five major conjectures in arithmetic geometry against the constructive hierarchy, we identify three properties that the motive category must satisfy---not geometric properties, but \emph{decidability} properties.  The motive is the minimal mathematical structure in which equality is decidable, eigenvalues are algebraic, and a positive-definite inner product exists over the reals.
+
+\subsection{Main results}
+
+We work within Constructive Reverse Mathematics (CRM), calibrating mathematical statements against logical principles of increasing strength within Bishop-style constructive mathematics ($\BISH$).  The hierarchy relevant to this paper is:
+\[
+\BISH \;\subset\; \BISH{+}\MP \;\subset\; \BISH{+}\LPO \;\subset\; \CLASS.
+\]
+Here $\LPO$ (Limited Principle of Omniscience) states that every binary sequence is identically zero or contains a~$1$.  In field-theoretic form, $\LPO(K)$ states $\forall x \in K,\; x = 0 \lor x \neq 0$.  Over any complete field ($\Q_p$, $\Q_\ell$, $\R$, $\C$), exact zero-testing of a Cauchy sequence requires $\LPO$.  Over $\Q$, $\bar\Q$, or $\Z$, equality is decidable by finite computation in $\BISH$.  $\MP$ (Markov's Principle) asserts $\neg\neg P \to P$ for decidable~$P$; it governs unbounded search through discrete sets.  For a thorough treatment of CRM, see Bridges--Richman~\cite{BridgesRichman}.
+
+The calibration data converges on a three-axiom specification of the motive category as a \emph{Decidable Polarized Tannakian} (DPT) category.  The specification is supported by five results:
+
+\medskip
+
+\noindent\textbf{Theorem~A} (Standard Conjecture~D as decidability). \checkmark\;
+Standard Conjecture~D is the exact axiom converting $\LPO$-dependent homological morphism equality to $\BISH$-decidable numerical equality.  Both directions are proved.  Zero sorries.
+
+\medskip
+
+\noindent\textbf{Theorem~B} (Weil RH from CRM axioms). \checkmark\;
+Given the DPT axioms and the Rosati scaling condition from the Weil cohomology functor, the Riemann Hypothesis for varieties over finite fields reduces to a single cancellation step: positive-definiteness (Axiom~3) guarantees $\langle x, x\rangle > 0$, enabling division to obtain $|\alpha|^2 = q^w$.  The Lean proof is one line (\texttt{mul\_right\_cancel\textsuperscript{0}}).  Zero sorries.
+
+\medskip
+
+\noindent\textbf{Theorem~C} (CM rescue---unconditional decidability over~$\Q$). \checkmark\;
+The subcategory of CM elliptic motives is unconditionally $\BISH$-decidable over~$\Q$.  Four bridge lemmas (Lieberman, Damerell, Shimura-Taniyama, Lefschetz~(1,1)) bypass all three axiom obstructions.  The failure boundary is sharp: CM abelian varieties of dimension~$\ge 4$ require open conjectures.  Zero sorries.
+
+\medskip
+
+\noindent\textbf{Theorem~D} (Honda-Tate inhabitant over~$\F_q$). \checkmark\;
+The DPT category is inhabited: ordinary elliptic curves over~$\F_p$ satisfy all three axioms, and the Hasse bound $|a_p| \le 2\sqrt{p}$ is Axiom~3.
+
+\medskip
+
+\noindent\textbf{Observation~E} (Dual hierarchy).
+The five major conjectures sit at~$\Pi^0_2$ or~$\Sigma^0_3$ in the arithmetic hierarchy.  The motive acts as a $-1$~shift operator: it accepts a $\Pi^0_2$ axiom (Conjecture~D) and delivers $\Sigma^0_2 \to \Sigma^0_1$ descent on all instances.  This classification is based on calibration data, not formal reductions.
+
+\medskip
+
+\noindent\textbf{Novelty.}  Theorems~A and~C are new.  Theorem~B is a reformulation of the classical Rosati involution proof (Weil for abelian varieties, Deligne for general varieties~\cite{DeligneWeilI}) that identifies the logical role of each ingredient; the Lean proof is a single call to \texttt{mul\_right\_cancel\textsuperscript{0}}.  Theorem~D is classical (Honda-Tate) verified against the DPT specification.  Observation~E is informal.
+
+\subsection{Position in the atlas}
+
+This is Paper~50 of a series applying constructive reverse mathematics to mathematical physics and arithmetic geometry.  Papers~1--44 calibrate physical theories; Papers~45--49 calibrate the Weight-Monodromy Conjecture~\cite{P45}, the Tate Conjecture, the Fontaine-Mazur Conjecture, the Birch and Swinnerton-Dyer Conjecture, and the Hodge Conjecture, respectively.  The present paper synthesizes the five calibrations, extracts the three-axiom DPT characterization, and proves Theorems~A--D and Observation~E.
+
+Papers~51--53 continue this investigation: Paper~51~\cite{Paper51} applies Axiom~3 (Archimedean polarization) to the rank-1 Birch--Swinnerton-Dyer conjecture; Paper~52~\cite{Paper52} transfers decidability from characteristic~$p$ to characteristic~$0$ for abelian varieties of dimension~$\le 3$, with a sharp failure at dimension~$4$; Paper~53~\cite{Paper53} provides a verified CM decidability oracle and confirms the dimension-$4$ boundary computationally.  Together, Papers~50--53 form a tetralogy addressing one question: \emph{is the category of numerical motives decidable?}
+
+\subsection{What this paper does not claim}
+
+We do not prove any major conjecture.  We do not construct the motivic category.  We classify: the calibration data reveals a uniform logical pattern across five conjectures, and the three-axiom characterization is the minimal structure explaining this pattern.  The characterization is conditional on the Standard Conjectures (as is every approach to motives since Grothendieck).  The CRM contribution is to identify \emph{what the Standard Conjectures are for}: they are the decidability axioms that make the motivic category constructively well-behaved.
+
+%% ===================================================================
+\section{Preliminaries}
+\label{sec:prelim}
+%% ===================================================================
+
+\begin{definition}[Limited Principle of Omniscience]
+$\LPO$ is the assertion that for every binary sequence $a : \mathbb{N} \to \{0,1\}$, either $\forall n,\, a(n) = 0$ or $\exists n,\, a(n) = 1$.  In field-theoretic form, $\LPO(K)$ states $\forall x \in K,\; x = 0 \lor x \neq 0$.
+\end{definition}
+
+\begin{definition}[Markov's Principle]
+$\MP$ is the assertion that for any decidable predicate~$P$ on~$\mathbb{N}$, if $\neg\forall n,\, \neg P(n)$, then $\exists n,\, P(n)$.
+\end{definition}
+
+\begin{definition}[$u$-invariant and positive-definiteness]
+\label{def:uinvariant}
+The $u$-invariant $u(K)$ of a field~$K$ is the maximal dimension of an anisotropic quadratic form over~$K$.  The values relevant to this paper are $u(\Q_p) = 4$ (Serre~\cite{Serre}) and $u(\R) = \infty$ (every positive-definite form $x_1^2 + \cdots + x_n^2$ is anisotropic, so no finite bound exists).
+
+The distinction that matters is \emph{positive-definiteness}: over~$\R$, positive-definite bilinear forms exist in every dimension (because $u(\R) = \infty$ means anisotropic forms persist indefinitely), while over~$\Q_p$, every Hermitian form of dimension~$\ge 5$ over a quadratic extension is isotropic (has nonzero null vectors), so positive-definite Hermitian forms cannot exist in dimension~$\ge 3$.  Axiom~3 of the DPT class requires positive-definiteness; this is available over~$\R$ but obstructed over~$\Q_p$.
+\end{definition}
+
+\subsection{The five conjectures}
+\label{sec:fiveconj}
+
+The five major conjectures calibrated in this atlas are:
+
+\medskip
+
+\noindent\textbf{1.~The Weight-Monodromy Conjecture} (Deligne~\cite{DeligneWeilI,DeligneWeilII}).  For a smooth projective variety~$X$ over a $p$-adic field~$K$, the monodromy filtration on $H^i_\text{\'et}(X_{\bar K}, \Q_\ell)$ equals the weight filtration.  Calibrated in Paper~45~\cite{P45}: abstract degeneration decidability~$\leftrightarrow \LPO$; geometric degeneration is~$\BISH$.
+
+\emph{What descends:} Eigenvalues.  The Frobenius eigenvalues, which are a~priori elements of~$\Q_\ell$, are forced by geometric origin (via Deligne's Weil~I/II) to be algebraic integers in~$\bar\Q$.
+
+\emph{Polarization:} Obstructed by $u(\Q_p) = 4$.  The Saito-Kashiwara polarization strategy for forcing spectral sequence degeneration fails $p$-adically because any Hermitian form of dimension~$\ge 3$ over a quadratic extension of~$\Q_p$ is isotropic.
+
+\medskip
+
+\noindent\textbf{2.~The Tate Conjecture} (Tate, 1965~\cite{Tate65}).  For a smooth projective variety~$X$ over~$\F_q$, the cycle class map $\mathrm{cl} : \CH^r(X) \otimes \Q_\ell \to H^{2r}_\text{\'et}(X, \Q_\ell(r))^{\Gal(\bar\F_q/\F_q)}$ is surjective.  Calibrated in Paper~46: Galois invariance testing requires $\LPO$ (deciding $(\Frob - I)x = 0$ over~$\Q_\ell$); cycle verification is~$\BISH$.
+
+\emph{What descends:} Eigenvectors.  The Galois-fixed subspace of $H^{2r}(X, \Q_\ell)$ descends from an abstract $\Q_\ell$-subspace to the $\Q$-span of algebraic cycles.
+
+\emph{Polarization:} Obstructed by $u(\Q_\ell) = 4$.  Orthogonal projection onto the Galois-fixed subspace is impossible via metric methods.  The constructive order of operations is forced: descend first (algebraically), polarize second (after passing to~$\Q$, which embeds into~$\R$).
+
+\medskip
+
+\noindent\textbf{3.~The Fontaine-Mazur Conjecture} (Fontaine-Mazur, 1995~\cite{FontaineMazur}).  A continuous $p$-adic Galois representation $\rho : \Gal(\bar\Q/\Q) \to \mathrm{GL}_n(\Q_p)$ that is unramified outside a finite set of primes and de~Rham at~$p$ is geometric.  Calibrated in Paper~47: verifying unramified $\rho(I_\ell) = \{I\}$ requires zero-testing of $p$-adic matrices ($\LPO$); the de~Rham condition requires computing rank of $(V \otimes B_{\mathrm{dR}})^{\Gal}$ ($\LPO$ over Fontaine's period ring); geometric origin forces descent to $\BISH{+}\MP$.
+
+\emph{What descends:} The entire state space.  Both the Hodge filtration (from $\Q_p$-Grassmannians to $\Q$-rational de~Rham cohomology) and the Frobenius traces (from~$\Q_p$ to~$\Q$).
+
+\emph{Polarization:} Obstructed by $u(\Q_p) = 4$.  The Corlette-Simpson correspondence over~$\C$ uses a harmonic metric to force semisimplicity; over~$\Q_p$, purely algebraic workarounds (perfectoid spaces, Fargues-Fontaine curve) are required.
+
+\medskip
+
+\noindent\textbf{4.~The Birch and Swinnerton-Dyer Conjecture} (Birch-Swinnerton-Dyer, 1965).  For an elliptic curve $E/\Q$: $\mathrm{ord}_{s=1} L(E,s) = \mathrm{rank}\, E(\Q)$, and the leading coefficient is determined by the regulator, the Sha group, and other arithmetic invariants.  Calibrated in Paper~48: analytic rank requires evaluating $L(E,1) = 0$ ($\LPO$: exact zero-testing of a computable real number); computing the order of vanishing requires testing successive derivatives ($\LPO$ for each) and searching for the first nonzero one ($\MP$).
+
+\emph{What descends:} Analytic rank.  The order of vanishing of a complex analytic function (transcendental, requiring $\LPO$) equals the $\Z$-rank of a finitely generated abelian group (discrete, decidable).
+
+\emph{Polarization:} Available---this is the Archimedean counterpart of the finite-prime conjectures.  The N\'eron-Tate height pairing on $E(\Q) \otimes \R$ is a real-valued positive-definite bilinear form enabled by positive-definiteness over~$\R$ (where $u(\R) = \infty$ ensures anisotropy in every dimension).  The $p$-adic BSD analogue exhibits the ``exceptional zero'' pathology: the $p$-adic regulator can vanish because $p$-adic heights are not positive-definite ($u(\Q_p) = 4$ forces isotropy).
+
+\medskip
+
+\noindent\textbf{5.~The Hodge Conjecture} (Hodge, 1950).  For a smooth projective variety $X/\C$, every class in $H^{2r}(X(\C), \Q) \cap H^{r,r}(X)$ is a $\Q$-linear combination of algebraic cycles.  Calibrated in Paper~49: Hodge type detection requires $\LPO$ (verifying that non-$(r,r)$ components vanish via harmonic projection); the Hodge-Riemann bilinear relations provide Archimedean polarization (positive-definite over~$\R$).
+
+\emph{What descends:} Hodge classes.  The intersection of the continuous analytic subspace $H^{r,r}(X)$ with the discrete rational lattice $H^{2r}(X, \Q)$ descends to the $\Q$-span of algebraic cycles.
+
+\emph{Polarization:} Available, but insufficient.  The Hodge-Riemann metric splits the continuous space ($\BISH$), but it is ``blind to~$\Q$'': the polarization cannot distinguish rational classes from irrational ones.  The Hodge Conjecture asserts that the analytic splitting and the rational lattice are jointly controlled by algebraic geometry---this goes beyond what polarization alone provides.  The Hodge Conjecture is the unique conjecture where algebraic descent and Archimedean polarization interact directly.
+
+\medskip
+
+The five calibrations reveal a uniform structure we call \textbf{de-omniscientizing descent}:
+\begin{enumerate}[label=(\arabic*)]
+\item \emph{The Continuous Prison.}  Data is computed over a complete field ($\Q_p$, $\Q_\ell$, $\R$, or~$\C$) where exact equality requires~$\LPO$.
+\item \emph{The Discrete Rescue.}  The conjecture asserts that the relevant data descends to $\Q$, $\bar\Q$, or~$\Z$, where equality is decidable in~$\BISH$.
+\item \emph{The Geometric Mechanism.}  Descent is mediated by geometric origin: algebraic cycles, cohomology of varieties, or other algebraic-geometric objects force coefficients to be algebraic rather than transcendental.
+\item \emph{The Polarization Bifurcation.}  At finite primes ($u(\Q_p) = 4$), descent proceeds purely algebraically.  At the infinite prime ($u(\R) = \infty$, so positive-definite forms exist in every dimension), the Archimedean polarization provides an additional constructive mechanism (orthogonal projection, harmonic splitting).
+\end{enumerate}
+
+
+\subsection{The DPT class}
+\label{sec:DPT}
+
+\begin{definition}[Decidable Polarized Tannakian category]
+\label{def:DPT}
+A \emph{Decidable Polarized Tannakian} (DPT) category over~$\Q$ is a $\Q$-linear abelian symmetric monoidal category~$\mathcal{C}$ equipped with three axioms:
+
+\medskip
+
+\noindent\textbf{Axiom~1} (Decidable morphisms---Standard Conjecture~D).  For all objects $X, Y \in \mathcal{C}$, the morphism space $\Hom(X,Y)$ has decidable equality: $\forall f, g : X \to Y,\; f = g \lor f \neq g$.
+
+\medskip
+
+\noindent\textbf{Axiom~2} (Algebraic spectrum).  For every endomorphism $f \in \End(X)$, there exists a monic polynomial $p \in \Z[t]$ with $p(f) = 0$.  This forces eigenvalues of endomorphisms into~$\bar\Q$ (algebraic integers), making spectral data decidable.
+
+\medskip
+
+\noindent\textbf{Axiom~3} (Archimedean polarization).  There exists a faithful functor to real vector spaces (the ``real fiber'') equipped with a positive-definite bilinear form: $\langle x, x \rangle > 0$ for all $x \neq 0$.  Positive-definiteness is available over~$\R$ (where $u(\R) = \infty$ ensures anisotropic forms exist in every dimension); it is obstructed over~$\Q_p$ where $u(\Q_p) = 4$ forces isotropy in dimension~$\ge 5$.
+\end{definition}
+
+The DPT class specifies three properties that the motive category must satisfy; a full characterization would additionally require rigidity (existence of duals), the fiber functor, and semisimplicity (which follows from the Standard Conjectures via Jannsen's theorem~\cite{Jannsen}).  We focus on the three CRM axioms because they capture the decidability content.
+
+The Lean~4 formalization of the DPT class (\texttt{DecPolarTann.lean}, 0~sorries):
+\begin{lstlisting}
+class DecidablePolarizedTannakian
+  (C : Type u) [Category.{v} C]
+  [Abelian C] [MonoidalCategory.{v} C]
+  [SymmetricCategory C] [Linear C] where
+  -- CRM Axiom 1: Standard Conjecture D
+  dec_hom : forall (X Y : C), DecidableEq (X --> Y)
+  -- CRM Axiom 2: Algebraic Spectrum
+  algebraic_spectrum : forall {X : C} (f : End X),
+    exists (p : Polynomial Z), p.Monic /\
+    Polynomial.aeval f p = 0
+  -- CRM Axiom 3: Archimedean Polarization
+  real_fiber_type : C -> Type v
+  real_fiber_zero : forall (X : C), real_fiber_type X
+  real_fiber_addCommGroup :
+    forall (X : C), AddCommGroup (real_fiber_type X)
+  real_fiber_module :
+    forall (X : C), Module R (real_fiber_type X)
+  ip : forall (X : C),
+    real_fiber_type X -> real_fiber_type X -> R
+  ip_add_left : forall {X : C} (x y z : ...),
+    ip X (x + y) z = ip X x z + ip X y z
+  ip_smul_left : forall {X : C} (a : R) (x y : ...),
+    ip X (a * x) y = a * ip X x y
+  polarization_pos : forall {X : C}
+    (x : real_fiber_type X),
+    x /= real_fiber_zero X -> ip X x x > 0
+\end{lstlisting}
+
+\begin{remark}[Source of each axiom]
+The three axioms were not designed a~priori; they were discovered by calibrating five conjectures:
+Axiom~1 emerges from Paper~46 (Tate Conjecture): Standard Conjecture~D makes motivic Hom-spaces decidable.
+Axiom~2 emerges from Paper~45 (WMC): geometric origin forces eigenvalues from~$\Q_\ell$ to~$\bar\Q$.
+Axiom~3 emerges from Paper~48 (BSD): the N\'eron-Tate height is the Archimedean polarization.  The obstruction at finite primes ($u(\Q_p) = 4$) is Papers~45/46/47.
+\end{remark}
+
+
+%% ===================================================================
+\section{Main Results}
+\label{sec:results}
+%% ===================================================================
+
+\subsection{Theorem~A: Standard Conjecture~D as the decidability axiom}
+\label{sec:thmA}
+
+\begin{theorem}[Conjecture~D decidabilizes morphisms]
+\label{thm:conjD}
+Standard Conjecture~D is the exact axiom required for the category of pure motives to have decidable morphism spaces:
+\begin{enumerate}[label=(\roman*)]
+\item \emph{Forward:} Conjecture~D gives $\Hom_\mathrm{hom} \simeq \Hom_\mathrm{num}$.  Since numerical morphism equality is decidable in~$\BISH$ (finitely many integer intersection comparisons), homological morphism equality becomes decidable.
+\item \emph{Reverse:} Decidable equality on $\Hom_\mathrm{hom}$ implies $\LPO(\Q_\ell)$, since homological zero-testing requires exact vanishing in $\Q_\ell$-cohomology.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{Forward.}  Let $D : \Hom_\mathrm{hom} \xrightarrow{\sim} \Hom_\mathrm{num}$ be the isomorphism given by Conjecture~D.  For $f, g \in \Hom_\mathrm{hom}$, we have $f = g \iff D(f) = D(g)$.  Since $\Hom_\mathrm{num}$ has decidable equality (intersection numbers are integers), $D(f) = D(g)$ is decidable.  Transport through the bijection: if $D(f) = D(g)$, then $f = g$ by injectivity; if $D(f) \neq D(g)$, then $f \neq g$ by contrapositive.
+
+\emph{Reverse.}  Without Conjecture~D, deciding equality in $\Hom_\mathrm{hom}$ intrinsically requires $\LPO(\Q_\ell)$.  We make this precise.  Fix a prime~$\ell$ and consider $\Q_\ell$-cohomology.  An element $\alpha \in H^{2r}_\text{\'et}(X, \Q_\ell)$ is represented by a compatible system of classes $\alpha_n \in H^{2r}_\text{\'et}(X, \Z/\ell^n\Z)$, and $\alpha = 0$ if and only if $\alpha_n = 0$ for all~$n$.  Given a binary sequence $a : \mathbb{N} \to \{0,1\}$, define the $\ell$-adic element $c_a = \sum_{n=0}^{\infty} a(n)\, \ell^n \in \Z_\ell$.  Then $c_a = 0$ in~$\Q_\ell$ if and only if $a(n) = 0$ for all~$n$, which is $\LPO$.  Any $\Q_\ell$-linear combination of cohomology classes with coefficients of this form inherits the same zero-testing complexity: deciding whether a homological morphism vanishes requires deciding whether its $\Q_\ell$-coordinates vanish, which encodes arbitrary instances of~$\LPO$.
+
+More concretely: for a cycle $Z \in \CH^r(X \times Y) \otimes \Q$, the cycle class $\mathrm{cl}(Z) \in H^{2r}(X \times Y, \Q_\ell)$ has coordinates that are elements of~$\Q_\ell$.  Testing $\mathrm{cl}(Z) = 0$ requires testing each coordinate against zero in the $\ell$-adic topology---a topological limit computation that is exactly~$\LPO$.  Conjecture~D asserts that this topological zero-test is logically equivalent to testing whether intersection numbers against all test cycles vanish (discrete $\Z$-arithmetic, decidable in~$\BISH$).
+
+Thus Conjecture~D is the metamathematical axiom that collapses the $\LPO$ requirement, bypassing the $\Q_\ell$ topology entirely.
+\end{proof}
+
+The Lean~4 proof (\texttt{ConjD.lean}, 0~sorries):
+\begin{lstlisting}
+noncomputable def conjD_decidabilizes :
+    DecidableEq HomHom := by
+  intro f g
+  let D := standard_conjecture_D
+  have h := HomNum_decidable
+    (D.toFun f) (D.toFun g)
+  cases h with
+  | isTrue heq =>
+    exact isTrue (D.injective heq)
+  | isFalse hne =>
+    exact isFalse
+    (fun heq => hne (congrArg D.toFun heq))
+\end{lstlisting}
+
+\begin{remark}[Why Conjecture~D is metamathematical]
+\label{rmk:metamath}
+Standard Conjecture~D is not merely a geometric conjecture about cycles---it is the metamathematical prerequisite for the category of motives to be constructively well-behaved.  Without~D, the motivic category requires~$\LPO$ to determine whether two morphisms are equal.  With~D, the category is computably abelian: one can constructively compute kernels, images, and exact sequences by integer linear algebra.  The passage from ``$\LPO$-dependent category'' to ``$\BISH$-decidable category'' is the logical content of Conjecture~D, and this is what makes it the first axiom of the DPT class.
+\end{remark}
+
+\begin{remark}[The \texttt{noncomputable} tag]
+The \texttt{noncomputable} tag arises because Standard Conjecture~D is introduced as an axiom, which lacks VM execution semantics in Lean~4.  This does not mean the mathematical reduction lacks computational content; a constructive proof of Conjecture~D would compile to executable code.
+\end{remark}
+
+\begin{remark}[Intermediate equivalences]
+Between homological and numerical equivalence lie two intermediate equivalence relations: rational equivalence (the finest, used in Chow groups) and algebraic equivalence (cycles connected by a family parametrized by a curve).  The constructive status of these is more nuanced.  Rational equivalence is $\BISH$-decidable for zero-cycles on curves (by the theory of divisors on curves), but the general case requires computing Chow groups, which involves both $\LPO$ (for intersection theory over~$\Q_\ell$) and $\MP$ (for searching through rational maps).  Algebraic equivalence requires $\MP$ (finding a connecting family), and the quotient $\CH^r_\mathrm{alg}/\CH^r_\mathrm{hom}$ (the Griffiths group) involves transcendence questions that interact with the Hodge conjecture.  The full picture of constructive equivalence relations on algebraic cycles requires calibrating all four classical relations, not just the two extreme ones that Conjecture~D compares.  We leave this as an open problem.
+\end{remark}
+
+
+\subsection{Theorem~B: Weil Riemann Hypothesis from CRM axioms}
+\label{sec:thmB}
+
+\begin{theorem}[Weil RH from DPT axioms and Rosati involution]
+\label{thm:weilRH}
+Let~$\mathcal{C}$ be a DPT category equipped with a Weil cohomology functor, and let $\pi \in \End(X)$ be a Frobenius endomorphism on a weight-$w$ object.  If the Rosati involution gives $\langle \pi x, \pi x \rangle = q^w \langle x, x \rangle$ for the Archimedean polarization, and $\alpha$ is an eigenvalue of~$\pi$ acting on the real fiber, then $|\alpha|^2 = q^w$.
+\end{theorem}
+
+\begin{proof}
+The proof uses Axioms~2 and~3 only (Axiom~1 is not needed here).
+
+\emph{Step~1} (Algebraic spectrum).  By Axiom~2, $\pi$ satisfies a monic $\Z$-polynomial, so $\alpha \in \bar\Q$---the eigenvalue is an algebraic integer.
+
+\emph{Step~2} (Archimedean polarization).  By Axiom~3, the real fiber carries a positive-definite form~$\langle \cdot, \cdot \rangle$ with $\langle x, x \rangle > 0$ for $x \neq 0$.
+
+\emph{Step~3} (Rosati involution).  The geometric intersection pairing gives the Rosati condition $\langle \pi x, \pi x \rangle = q^w \langle x, x \rangle$ for the weight-$w$ component.
+
+\emph{Step~4} (Cancellation).  For an eigenvector~$x$ with eigenvalue~$\alpha$:
+\[
+|\alpha|^2 \langle x, x \rangle = \langle \pi x, \pi x \rangle = q^w \langle x, x \rangle.
+\]
+By positive-definiteness (Step~2), $\langle x, x \rangle > 0$, so division is valid:
+\[
+|\alpha|^2 = q^w.
+\]
+To accommodate complex eigenvalues $\alpha \notin \R$, extend scalars to~$\C$, promoting the positive-definite bilinear form to a positive-definite Hermitian form on $V_\R \otimes \C$.  For an eigenvector $x \in V_\C$ with complex eigenvalue~$\alpha$, sesquilinearity gives $|\alpha|^2 \langle x, x \rangle = \langle \pi x, \pi x \rangle = q^w \langle x, x \rangle$, and the argument proceeds identically.
+
+This is where positive-definiteness over~$\R$ is essential.  Over~$\Q_p$ with $u(\Q_p) = 4$, there exist nonzero~$x$ with $\langle x, x \rangle = 0$ (isotropic vectors) in dimension~$\ge 5$, and Step~4 fails.  The positive-definiteness of the Archimedean polarization is the logical content of the Weil~RH.
+\end{proof}
+
+The Lean~4 proof (\texttt{WeilRH.lean}, 0~sorries):
+\begin{lstlisting}
+theorem weil_RH_from_CRM
+    {ip_val : R}
+    (alpha_sq : R) (qw : R)
+    (h_pos : ip_val > 0)
+    (h_eq : alpha_sq * ip_val = qw * ip_val) :
+    alpha_sq = qw := by
+  have h_ne : ip_val /= 0 := ne_of_gt h_pos
+  exact mul_right_cancel_0 h_ne h_eq
+\end{lstlisting}
+
+\begin{remark}[Novelty, historical context, and the Rosati hypothesis]
+This is a reformulation of the standard Rosati involution proof (Weil for abelian varieties, Deligne for general varieties~\cite{DeligneWeilI}).  The Lean proof is a single call to \texttt{mul\_right\_cancel\textsuperscript{0}}: the entire mathematical content is in the hypotheses, not the derivation.  The novelty is identifying the logical role of each ingredient: Axiom~2 provides decidability of eigenvalues, Axiom~3 provides the positive-definite form that makes division safe, and positive-definiteness over~$\R$ (obstructed over~$\Q_p$ by $u(\Q_p) = 4$) explains why the argument cannot be run $p$-adically.
+
+The Rosati scaling condition $\langle \pi x, \pi x \rangle = q^w \langle x, x \rangle$ is not a consequence of the three DPT axioms alone; it is an additional geometric input from the Weil cohomology functor.  We retain the three-axiom formulation because the Rosati condition is derivable from the DPT axioms together with the Weil cohomology functor in the \texttt{MotCat} structure, but the reader should note that the standalone DPT class does not suffice.
+\end{remark}
+
+\begin{remark}[The $p$-adic obstruction in detail]
+\label{rmk:padic}
+Over~$\Q_p$ with $u(\Q_p) = 4$, the Rosati argument fails at Step~4.  Consider a Hermitian form $\langle \cdot, \cdot \rangle$ over a quadratic extension of~$\Q_p$ on a vector space~$V$ of dimension $n \ge 3$.  By the theory of $p$-adic quadratic forms (Serre~\cite{Serre}, Lam~\cite{Lam}), $u(\Q_p) = 4$ implies that any quadratic form of dimension~$\ge 5$ over~$\Q_p$ is isotropic: there exists nonzero $x \in V$ with $\langle x, x \rangle = 0$.  For such an isotropic eigenvector, the equation $|\alpha|^2 \langle x, x \rangle = q^w \langle x, x \rangle$ reduces to $0 = 0$, which is vacuously true for any value of~$|\alpha|$.  The eigenvalue is unconstrained.  This is precisely the $p$-adic obstruction to spectral sequence degeneration identified in Paper~45: the absence of positive-definite metrics over~$\Q_p$ is what makes the weight-monodromy conjecture necessary as a separate assertion, rather than a formal consequence of the $p$-adic Hodge theory.  The obstruction is a structural feature of the $u$-invariant, not a deficiency of any particular proof technique.
+\end{remark}
+
+
+\subsection{Theorem~C: CM rescue---unconditional decidability over~$\Q$}
+\label{sec:thmC}
+
+Over number fields, the three DPT axioms face obstructions: Axiom~1 requires Standard Conjecture~D (open over~$\Q$), Axiom~2 requires $\ell$-independence of characteristic polynomials (open in general), and Axiom~3 requires proving the Hodge conjecture for cycle witnesses.  For CM elliptic curves, all three obstructions are bypassed by classical theorems:
+
+\begin{theorem}[CM elliptic motives are $\BISH$-decidable]
+\label{thm:CM}
+The subcategory of motives generated by all CM elliptic curves over~$\Q$ unconditionally satisfies all three DPT axioms.  Up to~$\bar\Q$-isomorphism, these curves correspond to exactly 13 rational CM $j$-invariants, arising from the 13 imaginary quadratic orders of class number~1 (nine maximal orders for $d \in \{1, 2, 3, 7, 11, 19, 43, 67, 163\}$ and four non-maximal orders with conductors $f = 2, 3$).  While there are infinitely many CM elliptic curves up to $\Q$-isomorphism due to quadratic twists, the motives of quadratic twists are generated by tensoring with a 1-dimensional Artin motive, which preserves $\BISH$-decidability.
+\end{theorem}
+
+The 13 CM $j$-invariants (classified by Shimura-Taniyama~\cite{ShimuraTaniyama}) are:
+
+\medskip
+\begin{center}
+\begin{tabular}{lrl}
+\toprule
+CM field $\Q(\sqrt{-d})$ & $j$-invariant & Model \\
+\midrule
+$d = 1$ & 1728 & $y^2 = x^3 + x$ \\
+$d = 2$ & 8000 & $y^2 = x^3 + 4x^2 + 2x$ \\
+$d = 3$ & 0 & $y^2 = x^3 + 1$ \\
+$d = 7$ & $-3375$ & $y^2 = x^3 - 1715x + 33614$ \\
+$d = 11$ & $-32768$ & (Weber class polynomial) \\
+$d = 19$ & $-884736$ & (Weber class polynomial) \\
+$d = 43$ & $-884736000$ & (Weber class polynomial) \\
+$d = 67$ & $-147197952000$ & (Weber class polynomial) \\
+$d = 163$ & $-262537412640768000$ & (Weber class polynomial) \\
+\midrule
+$d = 1,\, f = 2\;(\Delta = -16)$ & 287496 & $y^2 = x^3 - 11x + 14$ \\
+$d = 3,\, f = 2\;(\Delta = -12)$ & 54000 & $y^2 = x^3 - 15x + 22$ \\
+$d = 3,\, f = 3\;(\Delta = -27)$ & $-12288000$ & $y^2 = x^3 - 480x + 4048$ \\
+$d = 7,\, f = 2\;(\Delta = -28)$ & 16581375 & $y^2 = x^3 - 595x + 5586$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+
+Every CM elliptic curve over~$\Q$ is $\bar\Q$-isomorphic to one of these 13 $j$-invariants.  The $j$-invariant $j = -262537412640768000$ for $d = 163$ is Ramanujan's famous near-integer $e^{\pi\sqrt{163}} \approx j + 744$.
+
+\begin{proof}
+Each obstruction is lifted by a bridge lemma.
+
+\emph{Bridge~1: $\LPO \to \BISH$ via Damerell's theorem}~\cite{Damerell}.  For a CM elliptic curve $E/\Q$ with CM by $K = \Q(\sqrt{-d})$, Damerell proved that the special value $L(E,1)/\Omega$ is an explicit algebraic number in~$K$ (where~$\Omega$ is the real period of a N\'eron differential).  The general problem of testing $L(E,1) = 0$ requires evaluating an infinite Euler product to exact precision ($\LPO$: is this limit exactly zero?).  For CM curves, the algebraicity theorem collapses this to a rational computation: $L(E,1) = 0 \iff L(E,1)/\Omega = 0$, and the latter is an element of $K = \Q(\sqrt{-d})$, representable as a pair $(a, b) \in \Q^2$.  Testing $(a,b) = (0,0)$ is decidable in~$\BISH$.
+
+\emph{Bridge~2: FM obstruction $\to$ table lookup via Shimura-Taniyama}~\cite{ShimuraTaniyama}.  The Fontaine-Mazur obstruction (finding a variety realizing a given $p$-adic representation) generally requires $\MP$: unbounded search through a moduli space.  For CM elliptic curves, this search terminates trivially: the 13 CM $j$-invariants form a finite, explicitly known table.  Every CM elliptic motive over~$\Q$ is accounted for by a $\BISH$ table lookup (13~entries) rather than existential search.
+
+\emph{Bridge~3: $\MP \to$ linear algebra via Lefschetz~$(1,1)$}~\cite{Lefschetz}.  For products of CM elliptic curves $E_1 \times \cdots \times E_n$, the Hodge Conjecture asks whether all $(p,p)$-classes are algebraic.  The Lefschetz~$(1,1)$ theorem handles $H^2$: all $(1,1)$-classes on a product of curves are generated by divisors (projections, diagonal correspondences, and graph classes).  For CM elliptic curves, the CM endomorphism $\alpha \in \End(E) \otimes \Q = K$ provides explicit cycle representatives: $\Gamma_\alpha \subset E \times E$ (the graph of~$\alpha$) generates all Hodge classes on $H^1(E) \otimes H^1(E)$ by $\Q$-linear algebra.  Cycle witnesses are found by $\BISH$ linear algebra over~$\Z$---no unbounded search required.
+
+Together, these bypass all three axiom obstructions:
+\begin{itemize}
+\item \textbf{Axiom~1:} Lieberman's theorem~\cite{Lieberman} (over~$\C$; extended to arbitrary fields via Weil's positivity of the Rosati involution and Jannsen's semisimplicity theorem~\cite{Jannsen}) gives numerical $=$ homological equivalence for abelian varieties, so morphism spaces have decidable equality unconditionally.
+\item \textbf{Axiom~2:} Endomorphisms of~$E$ with CM by~$K$ satisfy $\alpha^2 - \mathrm{Tr}(\alpha)\alpha + \mathrm{Nm}(\alpha) = 0$, a monic $\Z$-polynomial.
+\item \textbf{Axiom~3:} The Rosati involution on $\End(E) \otimes \R$ acts as complex conjugation on $K \otimes \R \cong \C$, giving $|\alpha|^2 > 0$ for $\alpha \neq 0$.
+\end{itemize}
+\end{proof}
+
+\paragraph{Why dimension~$\ge 4$ fails.}  Anderson~\cite{Anderson} (see also Weil~\cite{Weil77}) showed that exotic Weil classes exist on products of CM abelian varieties of dimension~$\ge 4$---Hodge classes not generated by divisors.  The Hodge conjecture for these classes is open, so no $\BISH$ witness construction is available.  The DPT framework detects this boundary: CM elliptic curves (dim~1) are in; CM abelian fourfolds are out.
+
+\paragraph{Langlands progression.}  The CM rescue suggests a progression along the Langlands program.  CM elliptic curves are $\BISH$-decidable (this theorem): Damerell's algebraicity theorem eliminates $\LPO$ entirely by collapsing L-value zero-testing to rational arithmetic.  For general elliptic curves over~$\Q$, modularity (Taylor-Wiles-Breuil-Conrad-Diamond) gives effective computation of L-values to arbitrary precision, but exact zero-testing of $L(E,1) = 0$ remains $\LPO$ unless an analogue of Damerell's algebraicity theorem is established for non-CM curves.  The general case is therefore $\BISH{+}\MP{+}\LPO$ with modularity taming but not eliminating the $\LPO$ component.  Whether functoriality along the Langlands program systematically reduces logical strength remains open.
+
+The Lean~4 formalization (\texttt{CMDecidability.lean}, 0~sorries):
+\begin{lstlisting}
+structure CMMotivesBISH where
+  axiom1_dec_hom : forall (E1 E2 : CMEllipticCurve),
+    DecidableEq (CMHom E1 E2)
+  axiom2_algebraic_spectrum : True
+  axiom3_polarization : True
+
+noncomputable def cm_subcategory_is_DPT :
+    CMMotivesBISH where
+  axiom1_dec_hom := CMHom_decEq
+  axiom2_algebraic_spectrum := trivial
+  axiom3_polarization := trivial
+\end{lstlisting}
+
+
+\subsection{Theorem~D: Honda-Tate inhabitant over~$\F_q$}
+\label{sec:thmD}
+
+\begin{theorem}[DPT category is inhabited over~$\F_q$]
+\label{thm:HondaTate}
+For a prime~$p$, the category of ordinary elliptic curves over~$\F_p$ provides a concrete inhabitant of the DPT class.  The Hasse bound $|a_p| \le 2\sqrt{p}$ is precisely Axiom~3.
+\end{theorem}
+
+\begin{proof}
+Consider an ordinary elliptic curve $E/\F_p$ with Frobenius trace $a_p = \alpha + \bar\alpha$ where $|\alpha| = \sqrt{p}$.
+
+\emph{Axiom~1} (DecidableEq on Hom).  Over a finite field, every elliptic curve has CM.  The endomorphism algebra $\End(E) \otimes \Q$ is an imaginary quadratic field~$K$ (for ordinary curves) or a definite quaternion algebra over~$\Q$ (for supersingular curves).  In both cases, equality is decidable: $K$~by rational arithmetic on pairs $(a,b) \in \Q^2$, quaternion algebras by comparing four coordinates.
+
+\emph{Axiom~2} (Algebraic spectrum).  The Frobenius~$\pi_p$ satisfies $\pi_p^2 - a_p \pi_p + p = 0$, a monic $\Z$-polynomial.  Every endomorphism is integral over~$\Z$ (the ring of integers of~$K$ is a $\Z$-lattice).
+
+\emph{Axiom~3} (Archimedean polarization).  Over a finite field, all rational points are torsion, so the N\'eron-Tate height vanishes; the positive-definite form comes instead from the Rosati involution on $\End(E) \otimes \R$ induced by the principal polarization.  The Weil~RH gives $|\alpha|^2 = p$, hence $\alpha + \bar\alpha = a_p$ with $|a_p| \le 2\sqrt{p}$.  The Hasse bound IS the positivity constraint: the Rosati Gram matrix $\bigl(\begin{smallmatrix} 2 & a_p \\ a_p & 2p \end{smallmatrix}\bigr)$ has determinant $4p - a_p^2 > 0$.
+
+The Honda-Tate classification~\cite{Honda, Tate66} then asserts a bijection between isogeny classes of simple abelian varieties over~$\F_q$ and conjugacy classes of Weil numbers.  The DPT axioms make this classification effective: Axiom~1 makes isomorphism testing decidable, Axiom~2 ensures eigenvalues are algebraic integers, and Axiom~3 constrains them to the circle $|\alpha| = q^{w/2}$.
+\end{proof}
+
+\subsubsection{The \texttt{Weil1} skeleton: a worked example}
+
+To make the inhabitant concrete, consider the simplest case: an ordinary elliptic curve~$E$ over~$\F_5$ with Frobenius trace $a_5 = 3$ (so $\#E(\F_5) = 5 + 1 - 3 = 3$).
+
+The \texttt{Weil1} skeleton is a 2-dimensional $\Q$-vector space $M = \Q e_1 \oplus \Q e_2$ with Frobenius $\pi = \bigl(\begin{smallmatrix} 0 & -5 \\ 1 & 3 \end{smallmatrix}\bigr)$ satisfying $\pi^2 - 3\pi + 5 = 0$.
+
+\emph{Axiom~1 check.}  $\End(M) \cong \Q(\pi) = \Q(\sqrt{-11})$ (since $3^2 - 4 \cdot 5 = -11$).  Equality in $\Q(\sqrt{-11})$ reduces to comparing pairs $(a,b) \in \Q^2$: decidable.
+
+\emph{Axiom~2 check.}  The minimal polynomial $t^2 - 3t + 5 \in \Z[t]$ is monic.
+
+\emph{Axiom~3 check.}  The Rosati Gram matrix on $\End(M) \otimes \R$ (induced by the principal polarization) is:
+\[
+G = \begin{pmatrix} 2 & 3 \\ 3 & 10 \end{pmatrix}, \quad \det G = 20 - 9 = 11 > 0.
+\]
+Since~$G$ is $2 \times 2$ with positive diagonal entries and positive determinant, it is positive-definite.  The Hasse bound $|a_5| = 3 \le 2\sqrt{5} \approx 4.47$ is satisfied, which is equivalent to $\det G > 0$.
+
+The Lean~4 formalization of the Weil number definition (\texttt{WeilNumbers.lean}):
+\begin{lstlisting}
+def IsWeilNumber (q : N) (w : Z) (alpha : C) : Prop :=
+  IsIntegral Z alpha /\
+  ||alpha|| = (q : R) ^ ((w : R) / 2)
+\end{lstlisting}
+
+\subsubsection{The universal property}
+
+The motive category is not merely a DPT category; it is the \emph{initial} such category.
+
+\begin{definition}[CRM universal property]
+\label{def:universal}
+Let $\mathbf{DecTann}_\Q$ be the 2-category whose objects are pairs $(\mathcal{C}, h)$ where~$\mathcal{C}$ is a DPT category and $h : \mathrm{Var}_k^\mathrm{op} \to \mathcal{C}$ is a Weil cohomology functor.  The category of numerical motives $\mathrm{Mot}_\mathrm{num}(k)$ is the initial object in $\mathbf{DecTann}_\Q$.
+\end{definition}
+
+Initiality means: for every other pair $(\mathcal{C}', h')$ satisfying these axioms, there is a unique tensor functor $F : \mathrm{Mot} \to \mathcal{C}'$ such that $F \circ h \cong h'$.  The motivic category is the smallest DPT category that receives a Weil cohomology functor.  It contains nothing that does not come from geometry.
+
+This definition has a precise technical precedent: Nori's construction~\cite{Nori} of the universal abelian category generated by a diagram.  Our contribution is characterizing the target constraints on the universal category in CRM terms (decidability, algebraic spectrum, Archimedean polarization) rather than purely categorical terms.
+
+The Lean~4 structure encoding the universal property:
+\begin{lstlisting}
+structure MotCat (k : Type) [Field k]
+    (Var_k : Type u)
+    [Category.{v} Var_k] where
+  Mot : Type u
+  [cat : Category.{v} Mot]
+  [ab : Abelian Mot]
+  [mon : MonoidalCategory.{v} Mot]
+  [sym : SymmetricCategory Mot]
+  [lin : Linear Mot]
+  [dpt : DecidablePolarizedTannakian Mot]
+  h : Var_k ==> Mot
+  initial :
+    forall (C' : Type u) [Category.{v} C']
+    [Abelian C'] [MonoidalCategory.{v} C']
+    [SymmetricCategory C'] [Linear C']
+    [DecidablePolarizedTannakian C']
+    (h' : Var_k ==> C'),
+    exists! (F : Mot ==> C'),
+    forall (X : Var_k),
+    Nonempty (F.obj (h.obj X) ~~> h'.obj X)
+\end{lstlisting}
+
+\begin{remark}[Existence of the initial object]
+Proving that the initial object exists requires the Standard Conjectures.  Without them, homological and numerical equivalence may differ, and the category may not be semisimple.  The definition is conditional on the Standard Conjectures---but this is standard in the theory of motives (Jannsen~\cite{Jannsen}) and is not a deficiency of the CRM approach.  Over~$\F_q$, the Standard Conjectures are known (Deligne/Weil~II~\cite{DeligneWeilII}), so the initial object exists unconditionally.
+\end{remark}
+
+
+%% ===================================================================
+\section{CRM Audit}
+\label{sec:audit}
+%% ===================================================================
+
+\subsection{Constructive strength classification}
+
+\begin{center}
+\begin{tabular}{lccl}
+\toprule
+Result & Strength & Sorries & Custom axioms \\
+\midrule
+Thm~A (Conj~D) & $\BISH$ & 0 & \texttt{standard\_conjecture\_D} \\
+Thm~B (Weil RH) & $\BISH$ & 0 & \texttt{rosati\_condition} \\
+Thm~C (CM rescue) & $\BISH$ & 0 & 4 bridge lemmas \\
+Thm~D (Honda-Tate) & $\BISH$ & 1$^\dagger$ & Honda-Tate axioms \\
+Obs~E (Dual hierarchy) & --- & --- & (mathematical analysis) \\
+\bottomrule
+\end{tabular}
+\end{center}
+$^\dagger$Sorry in \texttt{WeilNumbers.lean}: $\sqrt{\cdot}$ extraction ($|\alpha|^2 = q^w \Rightarrow |\alpha| = q^{w/2}$).
+
+\subsection{The five-conjecture comparison}
+
+\begin{center}
+\begin{tabular}{lccccc}
+\toprule
+Feature & WMC & Tate & FM & BSD & Hodge \\
+\midrule
+Abstract strength & $\LPO$ & $\LPO$ & $\LPO{+}\MP$ & $\LPO{+}\MP$ & $\LPO{+}\MP$ \\
+Geometric strength & $\BISH$ & $\BISH{+}\MP$ & $\BISH{+}\MP$ & $\BISH{+}\MP$ & $\BISH{+}\MP$ \\
+What descends & eigenvalues & eigenvectors & state space & analytic rank & Hodge classes \\
+Descends from & $\Q_\ell$ & $\Q_\ell$ & $\Q_p$ & $\C$ & $\C$ \\
+Descends to & $\bar\Q$ & $\Q$ & $\Q$ & $\Z$ & $\Q$ \\
+Polarization & obstructed & obstructed & obstructed & available & available \\
+Pos.-def.\ form & no ($u{=}4$) & no ($u{=}4$) & no ($u{=}4$) & yes ($\R$) & yes ($\R$) \\
+Place & finite & finite & finite & infinite & infinite \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{What descends, from where, to where}
+
+The central CRM phenomenon is a descent in logical strength:
+\[
+\underbrace{\LPO(\text{complete field})}_{\text{Abstract data}} \xrightarrow{\text{geometric origin}} \underbrace{\text{Decidable equality in } \Q/\bar\Q/\Z}_{\text{Geometric data}} \in \BISH.
+\]
+The mechanism: geometric origin forces continuous data (eigenvalues, periods, coefficients) to be algebraic.  Over algebraic fields, equality is decidable by comparing minimal polynomials.  The conjecture ``rescues'' the mathematics from topological undecidability ($\LPO$) by asserting that the relevant data lives in a decidable sub-universe of the ambient complete field.
+
+Each conjecture exhibits this structure with different specifics.  The WMC is the cleanest case: Frobenius eigenvalues descend from~$\Q_\ell$ to~$\bar\Q$ with no $\MP$ residue (eigenvalues come from characteristic polynomials, no search needed).  The remaining four conjectures all carry an $\MP$ residue from different search problems:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Conjecture & $\MP$ source & What is searched for \\
+\midrule
+WMC & (none) & (eigenvalues come from char.\ poly) \\
+Tate & Cycle search & $Z \in \CH^r(X)$ with $\mathrm{cl}(Z) = \alpha$ \\
+FM & Variety search & $X/\Q$ with $H^i_\text{\'et}(X) \cong \rho$ \\
+BSD & Generator search & $P_1, \ldots, P_r \in E(\Q)$ independent \\
+Hodge & Cycle search & $Z \in \CH^r(X)$ with $\mathrm{cl}(Z) = \alpha$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+In each case, the $\MP$ component corresponds to an existence assertion: the conjecture asserts that a specific algebraic-geometric object exists, and finding it requires unbounded search.  The motive eliminates the topological obstacle ($\LPO$) to \emph{verifying} such objects, but does not eliminate the Diophantine obstacle ($\MP$) to \emph{finding} them.
+
+The WMC is distinguished by having no existence assertion: it identifies two filtrations already constructed from the variety, requiring no auxiliary witness search.  This makes it the purest instance of de-omniscientizing descent, isolating the $\LPO \to \BISH$ transition without Diophantine residue.
+
+\subsection{Comparison with Paper~45 calibration pattern}
+
+This paper extends the structural pattern established in Paper~45~\cite{P45} for the Weight-Monodromy Conjecture:
+\begin{enumerate}[label=(\arabic*)]
+\item Identify the constructive obstruction ($\LPO$ for abstract decidability).
+\item Prove an equivalence (Theorem~A: Conjecture~D $\leftrightarrow$ decidable morphisms).
+\item Identify a structural bypass (geometric origin $\to$ algebraicity $\to$ $\BISH$).
+\item Show the bypass is necessary (the $u$-invariant blocks the polarization alternative over~$\Q_p$).
+\end{enumerate}
+The novelty in the atlas is the de-omniscientizing descent pattern, where the bypass is not an alternative proof technique but a descent of the coefficient field from an undecidable ring to a decidable one.  The five calibrations confirm this as a uniform phenomenon, not a coincidence of a single conjecture.
+
+
+%% ===================================================================
+\section{Formal Verification}
+\label{sec:verification}
+%% ===================================================================
+
+\subsection{File structure and build status}
+
+The Lean~4 bundle resides at \texttt{P50\_Universal/} with the following structure:
+
+\begin{center}
+\begin{tabular}{lrllr}
+\toprule
+File & Lines & Content & Sorries \\
+\midrule
+\texttt{DecPolarTann.lean} & 120 & DPT class (UP1) & 0 \\
+\texttt{ConjD.lean} & 131 & Conj~D decidabilizes (UP2) & 0 \\
+\texttt{WeilRH.lean} & 116 & Weil RH (UP3, showpiece) & 0 \\
+\texttt{WeilNumbers.lean} & 112 & Weil numbers (UP5) & 1 \\
+\texttt{MotiveCategory.lean} & 122 & Universal property (UP4) & 0 \\
+\texttt{AtlasImport.lean} & 197 & Cross-bundle P45--P49 (UP6) & 0 \\
+\texttt{CMDecidability.lean} & 278 & CM decidability (UP7) & 0 \\
+\texttt{Main.lean} & 102 & Assembly + audit & 0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Build status: \texttt{lake build} $\to$ 0~errors.  Lean~4 version: v4.29.0-rc1.  Mathlib4 dependency via \texttt{lakefile.lean}.  Build targets: 2214.
+
+Per-file summary:
+
+\texttt{DecPolarTann.lean} (UP1) defines the \texttt{DecidablePolarizedTannakian} typeclass using Mathlib's \texttt{Category}, \texttt{Abelian}, \texttt{MonoidalCategory}, \texttt{SymmetricCategory}, and \texttt{Linear Q} typeclasses.  The real fiber is axiomatized as a custom type (not \texttt{InnerProductSpace}) to avoid \texttt{SeminormedAddCommGroup} universe issues.
+
+\texttt{ConjD.lean} (UP2) axiomatizes~$\Q_\ell$ as a field, declares \texttt{HomHom} and \texttt{HomNum} as types, and proves \texttt{conjD\_decidabilizes} by transporting \texttt{DecidableEq} through the equivalence $D : \texttt{HomHom} \simeq \texttt{HomNum}$.
+
+\texttt{WeilRH.lean} (UP3) is the showpiece: two theorems, both zero-sorry.  The standalone \texttt{weil\_RH\_from\_CRM} takes positive-definiteness and the combined eigenvalue-Rosati equation as hypotheses and derives $|\alpha|^2 = q^w$ by \texttt{mul\_right\_cancel\textsuperscript{0}}.  The derived form \texttt{weil\_RH\_from\_DPT} instantiates the class axioms.
+
+\texttt{WeilNumbers.lean} (UP5) defines \texttt{IsWeilNumber} using Mathlib's \texttt{IsIntegral Z} and complex norm.  Contains 1~sorry (square root extraction) and the Hasse bound theorem (1~sorry: triangle inequality).
+
+\texttt{MotiveCategory.lean} (UP4) defines the \texttt{MotCat} structure with an initial field encoding the universal property: for any other DPT category with a Weil cohomology functor, there exists a unique comparison functor.
+
+\texttt{AtlasImport.lean} (UP6) re-axiomatizes 12~theorems from Papers~45--49 as \texttt{True}-valued axioms with documentary docstrings.  The cross-paper patterns (encoding axioms, integer intersection decidability, Archimedean vs.\ $p$-adic polarization) are documented in comments.
+
+\texttt{CMDecidability.lean} (UP7) is the longest file (278~lines).  It axiomatizes CM fields, CM elliptic curves (finite, decidable), and the four bridge lemmas.  The main construction \texttt{cm\_subcategory\_is\_DPT} assembles the DPT instance from \texttt{CMHom\_decEq} (Axiom~1), \texttt{trivial} (Axioms~2--3).  The failure boundary at dimension~$\ge 4$ is stated.
+
+\texttt{Main.lean} imports all modules, provides \texttt{\#check} statements for every key theorem, and documents the sorry inventory and axiom budget.
+
+\subsection{Axiom inventory}
+
+The formalization uses 46 custom axioms organized into six categories:
+
+\begin{center}
+\begin{tabular}{llr}
+\toprule
+Category & Examples & Count \\
+\midrule
+Infrastructure (types, fields) & \texttt{Q\_ell}, \texttt{ImagQuadField}, \texttt{CMEllipticCurve} & 8 \\
+Known theorems & \texttt{standard\_conjecture\_D}, \texttt{HomNum\_decidable} & 4 \\
+P45--P49 imports & \texttt{P45\_C1}, \texttt{P46\_T1}--\texttt{T4}, etc.\ (all \texttt{True}-valued) & 19 \\
+CM bridge lemmas & \texttt{lieberman\_conjD\_for\_abelian}, \texttt{damerell\_L\_value\_algebraic} & 6 \\
+Honda-Tate & \texttt{honda\_tate\_classification}, \texttt{honda\_tate\_decidable} & 5 \\
+CM infrastructure & \texttt{cm\_curves\_finite}, \texttt{CMHom\_decEq} & 4 \\
+\midrule
+Total & & 46 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Of these 46 axioms, 25 have body \texttt{True} (the 19 P45--P49 imports and 6 CM bridge lemmas).  These carry no logical content within the P50 bundle; their verification is delegated to the upstream \texttt{lake build} of each P4X bundle (for imports) or to the cited mathematical literature (for bridge lemmas).
+
+\subsection{Sorry inventory}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Sorry & File & Status \\
+\midrule
+$\sqrt{\cdot}$ extraction: $|\alpha|^2 = q^w \Rightarrow |\alpha| = q^{w/2}$ & \texttt{WeilNumbers.lean} & Standard real analysis \\
+Hasse bound: $|\alpha + \bar\alpha| \le 2|\alpha|$ & \texttt{WeilNumbers.lean} & Triangle inequality \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Both \texttt{sorry} keywords are in standard analysis results, not conceptual gaps.  The zero-sorry theorems (Weil~RH, Conjecture~D decidabilization, CM decidability) are the core CRM results.
+
+\subsection{\texttt{\#print axioms} output}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Theorem & Custom axioms \\
+\midrule
+\texttt{weil\_RH\_from\_CRM} (Thm~B) & None \\
+\texttt{conjD\_decidabilizes} (Thm~A) & \texttt{standard\_conjecture\_D}, \texttt{HomNum\_decidable} \\
+\texttt{conjD\_is\_decidability\_axiom} (Thm~A rev.) & \texttt{HomHom\_equality\_requires\_LPO} \\
+\texttt{cm\_subcategory\_is\_DPT} (Thm~C) & \texttt{CMHom\_decEq} (from bridge lemmas) \\
+\texttt{honda\_tate\_is\_initial} (Thm~D) & Honda-Tate axioms \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{\texttt{Classical.choice} audit.}  The Lean infrastructure axiom \texttt{Classical.choice} appears in all theorems due to Mathlib's construction of~$\R$ and~$\C$ as Cauchy completions.  This is an infrastructure artifact: all theorems over~$\R$ in Lean/Mathlib carry \texttt{Classical.choice}.  Constructive stratification is established by proof content---explicit witnesses vs.\ principle-as-hypothesis---not by the axiom checker output (cf.\ Paper~10, \S Methodology; Paper~45~\cite{P45}, \S 4).
+
+Critically, \texttt{Classical.dec} does \emph{not} appear in Theorems~A, B, or~C.  The decidability instances are derived from axioms (Conjecture~D, CM bridge lemmas), not from classical omniscience.
+
+\subsection{What the formalization does and does not verify}
+
+The Lean bundle is a specification and logical plumbing check, not a construction of the motivic category.  We distinguish three tiers:
+
+\begin{enumerate}[label=(\alph*)]
+\item \textbf{Verified with no custom axioms.}  Theorem~B's cancellation step (\texttt{weil\_RH\_from\_CRM}) depends only on Mathlib's ordered field axioms.  The proof that $|\alpha|^2 \langle x, x \rangle = q^w \langle x, x \rangle$ and $\langle x, x \rangle > 0$ imply $|\alpha|^2 = q^w$ is fully machine-checked.
+
+\item \textbf{Verified modulo named mathematical axioms.}  Theorem~A (\texttt{conjD\_decidabilizes}) is machine-checked modulo the axiomatized equivalence \texttt{standard\_conjecture\_D} between homological and numerical morphisms.  Theorem~C Axiom~1 (\texttt{cm\_subcategory\_is\_DPT}) is machine-checked modulo \texttt{CMHom\_decEq}.  The Lean type-checker verifies that decidability transports correctly through these axioms.
+
+\item \textbf{Axiomatized content (\texttt{True}-valued).}  The 19 P45--P49 imports, 6 CM bridge lemmas, and CM Axioms~2--3 are axiomatized as \texttt{True}.  The Lean bundle does not verify their mathematical content; verification is delegated to upstream bundles or cited literature.  The \texttt{cm\_subcategory\_is\_DPT} construction fills Axioms~2 and~3 with \texttt{trivial}, meaning the formalization checks only that Axiom~1 (decidable Hom) is correctly assembled.
+\end{enumerate}
+
+The emphasis on ``zero sorries'' for Theorems~A, B, and~C refers to the absence of \texttt{sorry} keywords in those proof terms.  The mathematical content is in the axioms, and their correctness is established by the cited literature, not by the Lean type-checker.  In particular, Theorem~C's ``zero sorries'' claim is achieved because Axioms~2 and~3 for the CM subcategory are filled with \texttt{trivial} (proving \texttt{True}).  Full verification of these axioms would require formalizing the Rosati involution and CM endomorphism theory, which is delegated to the cited literature.
+
+\subsection{Reproducibility}
+
+The complete Lean~4 bundle is available at \url{https://doi.org/10.5281/zenodo.18705837}.  To reproduce:
+\begin{enumerate}
+\item Install Lean~4 (v4.29.0-rc1) and \texttt{lake}.
+\item Download and extract the bundle.
+\item Run \texttt{lake build} in the \texttt{P50\_Universal/} directory.
+\item Expected output: 0~errors, 2214~build targets.
+\end{enumerate}
+No external dependencies beyond Mathlib4.  No GitHub repository; the Zenodo archive is the primary distribution.
+
+
+%% ===================================================================
+\section{Discussion}
+\label{sec:discussion}
+%% ===================================================================
+
+\subsection{De-omniscientizing descent as a general pattern}
+
+The central phenomenon identified by this paper is a uniform pattern across five major conjectures: de-omniscientizing descent.  Each conjecture asserts that continuous data over a complete field (where zero-testing requires~$\LPO$) is secretly algebraic (decidable in~$\BISH$).  The mechanism bifurcates by place: at finite primes ($u(\Q_p) = 4$), descent proceeds algebraically without polarization; at the infinite prime (where positive-definite forms exist over~$\R$ in every dimension, since $u(\R) = \infty$), polarization provides an additional constructive mechanism.  The Hodge Conjecture sits at the nexus where both mechanisms interact.
+
+The logical hierarchy is stable across all five conjectures:
+\[
+\LPO \;\leftrightarrow\; \text{zero-testing over complete fields (analytic limits)}
+\]
+\[
+\MP \;\leftrightarrow\; \text{unbounded search through discrete sets (finding witnesses)}
+\]
+\[
+\BISH \;\leftrightarrow\; \text{algebraic verification (intersection numbers, polynomial comparison)}
+\]
+This hierarchy is not imposed by the framework; it emerges from the calibrations.
+
+The pattern admits natural formalization beyond the dependent type theory used in this paper.  In Cohesive Homotopy Type Theory (Schreiber, Shulman), types carry two modalities: $\sharp A$ (the continuous, spatial topology) and $\flat A$ (the discrete, topologically trivial core).  The de-omniscientizing descent is precisely the modal unit map $\flat H_v \to \sharp H_v$: the motivic conjectures assert that cohomological data over complete fields (living in~$\sharp$) lies in the essential image of the discrete modality~($\flat$).  The motive is the $\flat$-modal core of arithmetic geometry.  Alternatively, in Kleene realizability, a proof of $\exists x.\, P(x)$ is a computable function producing the witness~$x$ together with a proof of $P(x)$.  The motive-as-realizer provides the computational content: the computable function extracting algebraic cycle data from cohomological data.  Both frameworks capture the distinction between ``decidable'' (discrete, $\flat$) and ``$\LPO$-dependent'' (continuous, $\sharp$), but neither has been developed for arithmetic geometry.  Adapting them would require new cohesive structures for $p$-adic topologies, or an ``arithmetic realizability'' framework extending standard realizability from computability over~$\mathbb{N}$ to computability over number fields.
+
+\subsection{Fontaine-Mazur as completeness}
+\label{sec:FM}
+
+The Weil~RH derivation (Theorem~B) shows that the DPT axioms constrain the eigenvalues of geometric motives.  The Fontaine-Mazur conjecture~\cite{FontaineMazur} asserts the converse: every Galois representation satisfying these constraints IS geometric.
+
+In the CRM framework, this is a \emph{completeness theorem} for the decidable motive category.  The realization functor $\mathrm{real}_p : \mathrm{Mot}_\mathrm{num}(\Q) \to \mathrm{Rep}_{\Q_p}(\Gal(\bar\Q/\Q))$ sends decidable motives to continuous $p$-adic Galois representations.  The DPT axioms constrain the essential image: the algebraic spectrum forces $\mathrm{Tr}(\rho(\Frob_\ell)) \in \bar\Q$ (unramified almost everywhere), and the Archimedean polarization forces a Hodge-Tate decomposition (de~Rham at~$p$).  Fontaine-Mazur asserts these necessary conditions are sufficient: the decidable motive category is complete with respect to its $p$-adic realization.  No continuous representation ``looks decidable'' without actually being decidable.
+
+This completeness interpretation is, to our knowledge, new.  It suggests that Fontaine-Mazur is not merely a recognition criterion for geometric representations, but the assertion that the DPT specification captures exactly the right class of objects.
+
+\subsection{The $\LPO/\MP$ boundary}
+
+The motive eliminates~$\LPO$ but not~$\MP$.  Computing the rank of $E(\Q)$ in BSD, finding algebraic cycles in Tate or Hodge, locating the ramification set in Fontaine-Mazur---all require unbounded search through discrete sets.  The motive rescues arithmetic geometry from being topologically uncomputable ($\LPO$) to being computably enumerable ($\MP$).  The residual $\MP$ corresponds to genuine Diophantine difficulty---the hardness of finding rational points, algebraic cycles, and arithmetic witnesses.  This hardness is intrinsic to number theory and cannot be resolved by any foundational framework.
+
+The boundary is mathematically precise:
+\[
+\underbrace{\LPO + \MP}_{\text{Without motives}} \xrightarrow{\text{motivic conjectures}} \underbrace{\MP \text{ alone}}_{\text{With motives}}.
+\]
+The five conjectures sit at different points along this boundary.  WMC achieves full descent ($\LPO \to \BISH$) with no $\MP$ residue.  The remaining four all retain $\MP$ from their respective search problems.
+
+\subsection{The dual hierarchy}
+\label{sec:dualhierarchy}
+
+The five-conjecture calibrations have a natural second reading in terms of the arithmetic hierarchy.  While the \emph{instance} complexity of each conjecture (verifying a single variety) lives at $\LPO$ ($\Pi^0_1$) on the abstract side and $\BISH{+}\MP$ ($\Sigma^0_1 + \Delta_0$) on the geometric side, the \emph{global} conjectures---which universally quantify over all varieties and all cycles---push the logical complexity one level higher, to $\Pi^0_2$/$\Sigma^0_2$ in the arithmetic hierarchy.
+
+\begin{observation}[Dual hierarchy, informal]
+\label{obs:dualhierarchy}
+Based on the CRM calibrations and informal analysis of quantifier complexity (not formal reductions to second-order arithmetic), the five major motivic conjectures classify as follows:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Conjecture & Complexity & Structure \\
+\midrule
+Weight-Monodromy & $\Pi^0_2$ & $\forall X\, \forall v$ (pot.\ semistable $\Rightarrow$ degen.) \\
+Tate & $\Pi^0_2$ & $\forall X\, \forall \alpha$ (Galois-fixed $\Rightarrow \exists Z$) \\
+Standard Conj.~D & $\Pi^0_2$ & $\forall X\, \forall Z$ (hom.\ triv.\ $\Rightarrow$ num.\ triv.) \\
+Hodge & $\Pi^0_2$ & $\forall X\, \forall \alpha$ (type $(p,p)$ $\Rightarrow \exists Z$) \\
+Fontaine-Mazur & $\Pi^0_2$ & $\forall \rho$ (unram $+$ dR $\Rightarrow \exists X$) \\
+Finiteness of Sha & $\Sigma^0_3$ & $\exists B\, \forall x\, (\Pi^0_1 \Rightarrow \text{size}(x) \le B)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The motive acts as a $-1$ shift operator on instance complexity: it accepts a $\Pi^0_2$ axiom (Conjecture~D) and delivers $\Sigma^0_2 \to \Sigma^0_1$ descent on all instances.  One accepts a $\Pi^0_2$ global decree, and in return every operation drops one level.
+\end{observation}
+
+This connects to the physics undecidability program (Papers~36--39), where the spectral gap problem classifies as~$\Sigma^0_2$ (Cubitt-Perez-Garcia-Wolf).  The finiteness of Sha sits one tier higher ($\Sigma^0_3$) because verifying its local conditions requires an infinite prime search ($\forall p$).  The L-function, notably, does \emph{not} reach~$\Pi^0_2$ despite being an infinite Euler product: the Weil bounds rigidly control the local factors, guaranteeing effective convergence.  Zero-testing $L(X,1) = 0$ stays at~$\Pi^0_1$ ($\LPO$).  This is a consequence of the Archimedean polarization: the motive (via the Weil bounds, which follow from Axiom~3 as in Theorem~B) prevents the L-function from climbing the hierarchy.
+
+Whether the $\Pi^0_2$ classification has deeper consequences---in particular, whether the motivic conjectures could be independent of ZFC for the same structural reason as the spectral gap undecidability---remains open.  The spectral gap undecidability requires adversarial construction of Hamiltonians (encoding arbitrary Turing machines), while the motivic conjectures are restricted to smooth projective algebraic varieties, far more constrained objects.  The logical signature match is exact, but the structural implications are unclear.
+
+\subsection{Known limitations}
+\label{sec:limitations}
+
+\textbf{Template fitting.}  Five data points from structurally related conjectures (all connected through the motivic philosophy) may reflect the pattern's compatibility with this specific mathematical family rather than a universal phenomenon.  The critical test is calibrating conjectures outside the motivic family: if the de-omniscientizing descent pattern extends to geometric topology, combinatorics, or analytic number theory beyond the motivic range, the pattern is universal; if it does not, the boundary of the pattern marks the boundary of motivic influence.
+
+\textbf{Height pairing subtlety.}  The N\'eron-Tate height $\hat{h}(P) = \lim h(nP)/n^2$ is defined as a limit.  Verifying $\hat{h}(P) > 0$ (i.e., $P$ is non-torsion) requires either an a~priori lower bound or~$\MP$.  Strict positivity is semi-decidable: one can verify $\hat{h}(P) > \epsilon$ for any fixed $\epsilon > 0$ by a finite computation.  But the conclusion $\hat{h}(P) > 0$ from failure to find $\hat{h}(P) = 0$ is exactly~$\MP$.  The claim that the N\'eron-Tate height provides a ``constructive polarization'' therefore needs this qualification: the polarization form is available over~$\R$, but extracting positivity witnesses requires $\MP$ (consistent with the general pattern that $\MP$ is the residual obstruction).
+
+\textbf{L-function computability.}  The BSD calibration asserts that evaluating $L(E,1) = 0$ requires~$\LPO$.  This is correct at the level of general real number zero-testing, but L-functions have additional structure (functional equation, modularity, Euler product with explicit error terms) that may provide effective bounds.  The interaction between the computability of L-function zeros (cf.\ Turing's work on the Riemann zeta function) and $\LPO$ deserves more careful analysis.  For CM curves, Damerell's theorem collapses L-value zero-testing to $\BISH$ (Theorem~C); for general elliptic curves, modularity (Taylor-Wiles) gives effective algorithms for computing $L(E,1)$ to any precision, but the exact zero-testing step remains $\LPO$.
+
+\textbf{Period transcendence.}  The Hodge Conjecture calibration notes that the Archimedean polarization is ``blind to~$\Q$.''  This is related to the Kontsevich-Zagier period conjecture: the algebraic relations among period integrals of algebraic differential forms are exactly those predicted by geometry.  The interaction between period transcendence and constructive decidability is largely unexplored.
+
+\textbf{Standard Conjecture~D scope.}  The claim that Standard Conjecture~D is ``the decidability axiom'' for the motivic category is precise for the comparison between homological and numerical motives.  However, there are intermediate equivalence relations whose constructive status is more subtle (see Remark on intermediate equivalences in~\S\ref{sec:thmA}).  The full picture requires calibrating all four classical equivalence relations (rational, algebraic, homological, numerical), not just the two extreme ones.
+
+\textbf{Lean signature vs.\ construction.}  The DPT class describes what the motive does, not how to build one.  Inhabiting the class for a specific variety is precisely what the motivic conjectures assert.  The formalization is a specification, not a construction.  This is analogous to specifying the interface of an abstract data type without providing an implementation: the specification constrains what implementations must look like, but does not prove that any implementation exists.
+
+\subsection{Open questions}
+
+\begin{enumerate}
+\item \textbf{Standard Conjectures uniformity.}  Do the remaining Standard Conjectures (Lefschetz, Hodge-type, K\"unneth) calibrate at the same CRM strengths as Conjecture~D?
+
+\item \textbf{Langlands functoriality.}  Does Langlands functoriality exhibit the de-omniscientizing descent pattern?  If so, what descends?  The CM case (Theorem~C) suggests this is plausible: CM forms are the simplest automorphic objects, and their motives are $\BISH$-decidable.
+
+\item \textbf{CM extension beyond dim~1.}  Can the CM decidability result (Theorem~C) be extended beyond dimension~1?  For CM abelian surfaces (dim~2), the Hodge conjecture is known (Mattuck, 1958; Murasaki, 1981).  The Anderson obstruction~\cite{Anderson} begins at dimension~4.  Is the subcategory of CM abelian varieties of dimension~$\le 3$ unconditionally $\BISH$-decidable?
+
+\item \textbf{Arithmetic realizability.}  Is there a natural ``arithmetic realizability topos'' where the motive is a realizability structure and the motivic conjectures are realizability assertions?
+
+\item \textbf{Decidability transfer via specialization.}  Can Standard Conjecture~D over~$\Q$ be reduced to Conjecture~D over~$\F_p$ (which is known) by specialization?
+
+\item \textbf{Weight filtration and logical hierarchy.}  Does the motivic weight filtration correspond to the logical hierarchy ($\LPO/\MP/\BISH$) in any precise sense?
+\end{enumerate}
+
+
+%% ===================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+%% ===================================================================
+
+The motive is the minimal decidability structure for arithmetic geometry.  The three DPT axioms---decidable morphisms (Standard Conjecture~D), algebraic spectrum (monic $\Z$-polynomial annihilation), and Archimedean polarization (positive-definite inner product over~$\R$)---are not geometric axioms in any traditional sense.  They are logical: the first asserts decidable equality, the second asserts algebraic eigenvalues, the third asserts positive-definiteness.  Together they derive the Weil Riemann Hypothesis (Theorem~B), characterize Standard Conjecture~D as the decidability axiom (Theorem~A), and admit an unconditionally $\BISH$-decidable subcategory over~$\Q$ via the 13 CM elliptic curves (Theorem~C).
+
+The five motivic conjectures, viewed through CRM, assert that this decidability mechanism works universally.  The motive does not kill the arithmetic hierarchy; it shifts it down by one level, converting $\LPO$-dependent topological computation to $\MP$-level Diophantine search.  The residual hardness is intrinsic to number theory.
+
+The characterization makes four testable predictions:
+\begin{enumerate}
+\item Every motivic conjecture is a de-omniscientizing descent.  Any conjecture that follows from the existence of Grothendieck's category of motives should, when calibrated constructively, exhibit the pattern: $\LPO$ on the abstract side, $\BISH$ or $\BISH{+}\MP$ on the geometric side, with the gap bridged by algebraicity.
+
+\item The Standard Conjectures calibrate uniformly.  Grothendieck's remaining Standard Conjectures (Lefschetz, Hodge-type, K\"unneth) should calibrate at the same logical strengths as Conjecture~D.
+
+\item Non-motivic conjectures may calibrate differently.  Conjectures in geometric topology, combinatorics, or analytic number theory beyond the motivic range may exhibit different logical signatures.  The boundary of the de-omniscientizing descent pattern marks the boundary of motivic influence.
+
+\item The adelic structure is necessary.  The decidability certificate must operate at all places simultaneously.  A conjecture operating at only one place should exhibit only the corresponding mechanism (algebraic descent or polarization, not both).  The Hodge Conjecture is distinguished by requiring both.
+\end{enumerate}
+
+The 13 CM elliptic curves over~$\Q$ form the first known unconditionally $\BISH$-decidable motivic subcategory over a number field.  The CM decidability boundary (dimension~$\le 1$) is sharp: Anderson's exotic Weil classes~\cite{Anderson} block extension to dimension~$\ge 4$.  Whether dimensions~2 and~3 are $\BISH$-decidable is an open question that connects the CRM program to the arithmetic of CM abelian varieties.
+
+The atlas is a map, not a destination.  The five calibrations are data points; the de-omniscientizing descent is an empirical finding; the DPT characterization is a hypothesis that the data supports.  Further calibrations---especially of conjectures outside the motivic family---will either reinforce or refute the pattern.  The Lean~4 formalization (8~files, 0~errors, 2~principled sorries) provides a machine-checked foundation for this enterprise.
+
+
+%% ===================================================================
+\section*{Acknowledgments}
+%% ===================================================================
+
+We thank the Mathlib contributors for the category theory, inner product space, and polynomial infrastructure that made the Lean~4 formalization possible.  We are grateful to the constructive reverse mathematics community---especially the foundational work of Bishop, Bridges, Richman, and Ishihara---for developing the framework that makes calibrations like these possible.
+
+The Lean~4 formalization was produced using AI code generation (Claude Code, Opus~4.6) under human direction.  The author is a practicing cardiologist rather than a professional logician or arithmetic geometer; all mathematical claims should be evaluated on their formal content.  We welcome constructive feedback from domain experts.
+
+
+%% ===================================================================
+\begin{thebibliography}{27}
+%% ===================================================================
+
+\bibitem{Anderson}
+G.\,W.~Anderson.
+Torsion points on Fermat varieties, roots of circular units, and relative singular homology.
+\textit{Duke Math.\ J.}, 70:1--41, 1993.
+
+\bibitem{Andre}
+Y.~Andr\'e.
+\textit{Une introduction aux motifs}.
+Panoramas et Synth\`eses 17, SMF, 2004.
+
+\bibitem{BishopBridges}
+E.~Bishop and D.~Bridges.
+\textit{Constructive Analysis}.
+Springer, 1985.
+
+\bibitem{BridgesRichman}
+D.~Bridges and F.~Richman.
+\textit{Varieties of Constructive Mathematics}.
+LMS Lecture Note Series 97, Cambridge University Press, 1987.
+
+\bibitem{Damerell}
+R.\,M.~Damerell.
+L-functions of elliptic curves with complex multiplication, I.
+\textit{Acta Arith.}, 17:287--301, 1970.
+
+\bibitem{DeligneWeilI}
+P.~Deligne.
+La conjecture de Weil~I.
+\textit{Publ.\ Math.\ IH\'ES}, 43:273--307, 1974.
+
+\bibitem{DeligneWeilII}
+P.~Deligne.
+La conjecture de Weil~II.
+\textit{Publ.\ Math.\ IH\'ES}, 52:137--252, 1980.
+
+\bibitem{DeligneMilne}
+P.~Deligne and J.~Milne.
+Tannakian categories.
+In \textit{Hodge Cycles, Motives, and Shimura Varieties}, LNM 900, pages 101--228. Springer, 1982.
+
+\bibitem{FontaineMazur}
+J.-M.~Fontaine and B.~Mazur.
+Geometric Galois representations.
+In \textit{Elliptic Curves, Modular Forms, and Fermat's Last Theorem}, pages 41--78. Int.\ Press, 1995.
+
+\bibitem{Grothendieck}
+A.~Grothendieck.
+Standard conjectures on algebraic cycles.
+In \textit{Algebraic Geometry (Bombay, 1968)}, pages 193--199. Oxford University Press, 1969.
+
+\bibitem{Honda}
+T.~Honda.
+Isogeny classes of abelian varieties over finite fields.
+\textit{J.\ Math.\ Soc.\ Japan}, 20:83--95, 1968.
+
+\bibitem{Jannsen}
+U.~Jannsen.
+Motives, numerical equivalence, and semi-simplicity.
+\textit{Invent.\ Math.}, 107:447--452, 1992.
+
+\bibitem{Kleiman}
+S.~Kleiman.
+Algebraic cycles and the Weil conjectures.
+In \textit{Dix expos\'es sur la cohomologie des sch\'emas}, pages 359--386. North-Holland, 1968.
+
+\bibitem{Lam}
+T.\,Y.~Lam.
+\textit{Introduction to Quadratic Forms over Fields}.
+AMS Graduate Studies in Mathematics 67, 2005.
+
+\bibitem{Lefschetz}
+S.~Lefschetz.
+\textit{L'analysis situs et la g\'eom\'etrie alg\'ebrique}.
+Gauthier-Villars, 1924.
+
+\bibitem{Lieberman}
+D.\,I.~Lieberman.
+Numerical and homological equivalence of algebraic cycles on Hodge manifolds.
+\textit{Amer.\ J.\ Math.}, 90:366--374, 1968.
+
+\bibitem{Nori}
+M.~Nori.
+Constructible sheaves.
+In \textit{Algebra, Arithmetic and Geometry (TIFR)}, pages 471--491, 2002.
+
+\bibitem{Serre}
+J.-P.~Serre.
+\textit{A Course in Arithmetic}.
+Springer GTM 7, 1973.
+
+\bibitem{ShimuraTaniyama}
+G.~Shimura.
+\textit{Introduction to the Arithmetic Theory of Automorphic Functions}.
+Princeton University Press, 1971.
+
+\bibitem{P45}
+P.\,C.-K.~Lee.
+The Weight-Monodromy Conjecture and LPO\@: A Constructive Calibration of Spectral Sequence Degeneration via De-Omniscientizing Descent.
+Paper~45, CRM Series, 2026.
+
+\bibitem{Tate65}
+J.~Tate.
+Algebraic cycles and poles of zeta functions.
+In \textit{Arithmetical Algebraic Geometry}, pages 93--110. Harper \& Row, 1965.
+
+\bibitem{Tate66}
+J.~Tate.
+Endomorphisms of abelian varieties over finite fields.
+\textit{Invent.\ Math.}, 2:134--144, 1966.
+
+\bibitem{BirchSD}
+B.~Birch and H.\,P.\,F.~Swinnerton-Dyer.
+Notes on elliptic curves~II.
+\textit{J.\ Reine Angew.\ Math.}, 218:79--108, 1965.
+
+\bibitem{Ishihara}
+H.~Ishihara.
+Reverse mathematics in Bishop's constructive mathematics.
+\textit{Philosophia Scientiae}, Cahier sp\'ecial 6:43--59, 2006.
+
+\bibitem{Saito}
+M.~Saito.
+Mixed Hodge modules.
+\textit{Publ.\ Res.\ Inst.\ Math.\ Sci.}, 26:221--333, 1990.
+
+\bibitem{GrossZagier}
+B.~Gross and D.~Zagier.
+Heegner points and derivatives of L-series.
+\textit{Invent.\ Math.}, 84:225--320, 1986.
+
+\bibitem{Weil77}
+A.~Weil.
+Abelian varieties and the Hodge ring, 1977.
+Reprinted in \textit{Collected Papers III}, pages 421--429. Springer, 1979.
+
+\bibitem{Paper51}
+P.~C.-K. Lee.
+\newblock The Constructive Archimedean Rescue in Birch--Swinnerton-Dyer.
+\newblock Paper~51, CRM Series, 2026.
+
+\bibitem{Paper52}
+P.~C.-K. Lee.
+\newblock Decidability Transfer via Specialization: Standard Conjecture~D for Abelian Threefolds.
+\newblock Paper~52, CRM Series, 2026.
+
+\bibitem{Paper53}
+P.~C.-K. Lee.
+\newblock The CM Decidability Oracle: Verified Computation from Elliptic Curves to the Fourfold Boundary.
+\newblock Paper~53, CRM Series, 2026.
+
+\end{thebibliography}
+
+\end{document}

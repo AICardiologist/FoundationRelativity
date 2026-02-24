@@ -1,0 +1,40 @@
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
+\contentsline {section}{\numberline {2}Background}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Constructive Frameworks and Choice Principles}{3}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Ergodic Theorems}{4}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Laws of Large Numbers}{5}{subsection.2.3}%
+\contentsline {section}{\numberline {3}CC $\leftrightarrow $ Mean Ergodic Theorem}{5}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Statement}{5}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Forward Direction: $\mathrm {CC}\DOTSB \tmspace +\thickmuskip {.2777em}\DOTSB \Relbar \joinrel \Rightarrow \tmspace +\thickmuskip {.2777em}$ Mean Ergodic Theorem}{5}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Reverse Direction: Mean Ergodic $\DOTSB \tmspace +\thickmuskip {.2777em}\DOTSB \Relbar \joinrel \Rightarrow \tmspace +\thickmuskip {.2777em}\mathrm {CC}$}{6}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Paper-Level Proof}{6}{subsubsection.3.3.1}%
+\contentsline {subsubsection}{\numberline {3.3.2}The Classical Triviality Obstacle}{7}{subsubsection.3.3.2}%
+\contentsline {subsubsection}{\numberline {3.3.3}Type-Level Formalization}{7}{subsubsection.3.3.3}%
+\contentsline {section}{\numberline {4}DC and Birkhoff's Pointwise Ergodic Theorem}{8}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Statement}{8}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Forward Direction: DC $\DOTSB \tmspace +\thickmuskip {.2777em}\DOTSB \Relbar \joinrel \Rightarrow \tmspace +\thickmuskip {.2777em}$ Birkhoff}{8}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Reverse Direction: Birkhoff $\DOTSB \tmspace +\thickmuskip {.2777em}\DOTSB \Relbar \joinrel \Rightarrow \tmspace +\thickmuskip {.2777em}$ DC}{9}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}DC Strictly Above CC}{9}{subsection.4.4}%
+\contentsline {section}{\numberline {5}Quantum Measurement: Weak and Strong Laws}{9}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Weak Law at the CC Level}{9}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Strong Law at the DC Level}{10}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Physical Interpretation}{10}{subsection.5.3}%
+\contentsline {section}{\numberline {6}The DC Ceiling Thesis}{10}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Statement}{10}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Updated Two-Axis Calibration Table}{11}{subsection.6.2}%
+\contentsline {section}{\numberline {7}Lean 4 Formalization}{11}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Module Structure}{11}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Core Definitions}{12}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Main Theorem Snippet}{12}{subsection.7.3}%
+\contentsline {subsection}{\numberline {7.4}Type-Level Reverse: Key Definitions and Theorem}{12}{subsection.7.4}%
+\contentsline {subsection}{\numberline {7.5}Axiom Audit}{13}{subsection.7.5}%
+\contentsline {subsection}{\numberline {7.6}Formalization Scope and Classical/Constructive Boundary}{14}{subsection.7.6}%
+\contentsline {subsection}{\numberline {7.7}Reproducibility}{14}{subsection.7.7}%
+\contentsline {section}{\numberline {8}Discussion}{15}{section.8}%
+\contentsline {subsection}{\numberline {8.1}The Two-Axis Calibration}{15}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Relation to Proof Mining}{15}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}Limitations and Future Directions}{15}{subsection.8.3}%
+\contentsline {section}{\numberline {A}Selected Lean Code}{17}{appendix.A}%
+\contentsline {subsection}{\numberline {A.1}Key Lemma: Orthogonal Complement of Range$(U - I)$}{17}{subsection.A.1}%
+\contentsline {subsection}{\numberline {A.2}Equivalence Theorems}{18}{subsection.A.2}%
+\contentsline {subsection}{\numberline {A.3}Type-Level Reverse: Reflection Operator}{18}{subsection.A.3}%

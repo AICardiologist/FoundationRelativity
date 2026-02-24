@@ -1,0 +1,58 @@
+Paper 65 — Zenodo upload metadata
+
+
+Title:
+Self-Intersection Patterns Beyond Cyclic Cubics (Foundations of Constructive Relativity, Paper 65)
+
+Upload type: Publication > Preprint
+
+Publication date: 2026-02-23
+
+Authors:
+Lee, Paul Chun-Kit  |  New York University
+
+DOI: 10.5281/zenodo.18743151
+
+Description:
+Paper 65 of the Foundations of Constructive Relativity series.
+
+MAIN RESULT: We verify the Steinitz-conductor identity h * Nm(A) = f for the self-intersection degree h of the exotic Weil class on CM abelian fourfolds A_{K,F}, where K is an imaginary quadratic field, F is a totally real cyclic cubic of conductor f, and A is the Steinitz ideal class of the rank-1 O_K-Hermitian Weil lattice W_int.
+
+The identity is confirmed across all 1,220 pairs (K, F) with K = Q(sqrt(-d)), d <= 200 squarefree, and 10 cyclic cubic conductors f <= 200. Zero exceptions. Of these, 738 pairs have free lattices (h = f, Nm(A) = 1) and 482 pairs require a Steinitz twist (Nm(A) > 1).
+
+The Steinitz twist is forced if and only if f is not represented by the principal binary quadratic form of K. When all prime factors of f are inert in K, the lattice is necessarily free. For non-cyclic (S_3) cubics, the scalar identity breaks: h^2 = disc(F) never holds among 216 tested pairs, confirming that Z/3Z Galois symmetry is essential.
+
+This extends the h = f identity of Papers 56-57 (Heegner fields) and the Steinitz correction of Paper 58 to all imaginary quadratic fields with class number up to 20. The computation uses purely integer arithmetic (class numbers via reduced binary quadratic forms, cyclic cubics via algebraic discriminant solving). CRM level: BISH + WLPO.
+
+Package contains: LaTeX source and PDF (10 pages), self-contained Python computation script, all generated CSV/JSON data files, and 4 PNG plots.
+
+Access right: Open Access
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Language: English
+
+Keywords (one per line):
+CM abelian varieties
+Steinitz class
+self-intersection degree
+cyclic cubics
+conductor
+imaginary quadratic fields
+class number
+binary quadratic forms
+constructive mathematics
+WLPO
+
+Subjects:
+Algebraic geometry
+Mathematical logic and foundations
+
+Related identifiers:
+DOI 10.5281/zenodo.17054050  |  relation: isPartOf  |  type: publication
+(parent series DOI)
+DOI 10.5281/zenodo.18737090  |  relation: isNewVersionOf  |  type: publication
+(preceded by Paper 64)
+
+Additional notes:
+AI-assisted writing using Claude (Anthropic, Opus 4.6) under human direction. All mathematical content specified by the author. Computation is self-contained Python with purely integer arithmetic (no external APIs). No Lean formalization for this paper.

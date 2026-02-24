@@ -1,0 +1,94 @@
+% ====================================================================
+% FIGURE: From physical question to complexity classification
+% For Paper 26 Discussion or Introduction
+% All examples calibrate at WLPO (not LPO)
+% ====================================================================
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  >=Stealth,
+  box/.style={draw, rounded corners=3pt, minimum width=52mm,
+              minimum height=14mm, align=center, font=\small,
+              text width=50mm},
+  arrow/.style={->, thick, font=\footnotesize},
+  annot/.style={font=\scriptsize, text=black!60, align=center},
+]
+
+% === Column 1: Physical questions ===
+\node[box, fill=green!10] (phys1) at (0, 4.5)
+  {\textbf{Physical question}\\[2pt]
+   Does this detector signal\\eventually vanish?};
+
+\node[box, fill=green!10] (phys2) at (0, 1.5)
+  {\textbf{Physical question}\\[2pt]
+   Can I exhibit a singular state\\
+   $\Psi \in S_1(H)^{**} \setminus J(S_1(H))$?};
+
+\node[box, fill=green!10] (phys3) at (0, -1.5)
+  {\textbf{Physical question}\\[2pt]
+   Has this quantum system\\
+   fully decohered?};
+
+% === Column 2: Mathematical formalization ===
+\node[box, fill=blue!10] (math1) at (7, 4.5)
+  {\textbf{Formalization}\\[2pt]
+   $v \in \ell^\infty$: is $[v] = [0]$\\
+   in $\ell^\infty/c_0$\;?};
+
+\node[box, fill=blue!10] (math2) at (7, 1.5)
+  {\textbf{Formalization}\\[2pt]
+   Non-reflexivity witness\\
+   for $S_1(H)$};
+
+\node[box, fill=blue!10] (math3) at (7, -1.5)
+  {\textbf{Formalization}\\[2pt]
+   Off-diagonal elements of $\rho$:\\
+   does $\|\rho_{ij}\|_{i \neq j} \to 0$\;?};
+
+% === Arrows from physical to formal ===
+\draw[arrow] (phys1) -- (math1) node[midway, above, annot] {Paper 2};
+\draw[arrow] (phys2) -- (math2) node[midway, above, annot] {Paper 7};
+\draw[arrow] (phys3) -- (math3) node[midway, above, annot] {Paper 9};
+
+% === Convergence to WLPO ===
+\node[box, fill=red!10, minimum width=45mm, minimum height=16mm,
+      font=\normalsize] (wlpo) at (3.5, -4.5)
+  {\textbf{WLPO}\\[2pt]
+   \small $\forall \alpha\!:\!\mathbb{N}\!\to\!2.\;
+   (\forall n.\,\alpha(n)\!=\!0)$\\
+   $\lor\;\lnot(\forall n.\,\alpha(n)\!=\!0)$};
+
+\draw[arrow, blue!60!black] (math1.south) -- ++(0,-0.5) -| (wlpo.north);
+\draw[arrow, blue!60!black] (math2.south) -- ++(0,-0.3) -| (wlpo.north east);
+\draw[arrow, blue!60!black] (math3.south) -- ++(0,-0.5) -| (wlpo.north west);
+
+% === Paper 26's contribution ===
+\node[box, fill=orange!10, minimum width=45mm] (p26) at (10.5, -4.5)
+  {\textbf{Paper 26}\\[2pt]
+   \small $\Pi^0_1$ consistency\\
+   reduces to gap membership};
+
+\draw[arrow, orange!70!black, <->] (wlpo) -- node[above, annot]
+  {independent\\arithmetic proof} (p26);
+
+% === Annotations ===
+\node[annot] at (3.5, 5.4) {Independent physical instances};
+\node[annot] at (3.5, -3.3) {all calibrate at the same level};
+\node[annot, text width=30mm] at (10.5, -3.0)
+  {explains \emph{why}:\\
+   gap detection is\\
+   $\Pi^0_1$-equivalent};
+
+\end{tikzpicture}
+\caption{Multiple independent physical questions (left) formalize as
+mathematical problems (right) that all calibrate at $\WLPO$.
+Paper~26 provides an arithmetic explanation: gap detection is
+$\WLPO$-complete because $\ell^\infty/c_0$ admits a reduction
+from $\Pi^0_1$ consistency.  The physical questions are real;
+the bidual gap is the mathematical obstruction that explains
+their shared undecidability; Paper~26's reduction explains
+why this obstruction sits at the $\Pi^0_1$ level of the
+arithmetic hierarchy.}
+\label{fig:physical-chain}
+\end{figure}

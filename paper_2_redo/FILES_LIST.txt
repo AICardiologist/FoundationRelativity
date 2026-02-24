@@ -1,0 +1,21 @@
+# Paper 2: Bidual Gap - File List for v0.3 Release
+# Updated with CRM terminology and comprehensive documentation
+
+## Core Lean Files
+Papers/P2_BidualGap/P2_Full.lean               # Main aggregator
+Papers/P2_BidualGap/Setup.lean                 # Basic setup and definitions
+Papers/P2_BidualGap/CRM_MetaClassical/Ishihara.lean  # Meta-classical witness extraction
+Papers/P2_BidualGap/CRM_Constructive/WLPO.lean       # Constructive consumer
+Papers/P2_BidualGap/HB/DirectDual.lean         # Direct dual construction G
+Papers/P2_BidualGap/HB/WLPO_to_Gap_HB.lean    # WLPO → Gap direction
+Papers/P2_BidualGap/HB/OptionA/                # Option A: classical kernel
+Papers/P2_BidualGap/HB/OptionB/                # Option B: pure Banach approach
+
+## Documentation
+Papers/P2_BidualGap/documentation/paper-v5.tex  # LaTeX paper with CRM terminology
+Papers/P2_BidualGap/documentation/paper-v5.pdf  # Compiled PDF (if available)
+Papers/P2_BidualGap/README.md                  # Project overview
+
+## Build Configuration
+lakefile.toml                                   # Lake build configuration (excerpt)
+lean-toolchain                                  # Lean version specification

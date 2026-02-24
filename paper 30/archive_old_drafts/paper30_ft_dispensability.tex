@@ -1,0 +1,425 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+\usepackage{parskip}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{The Physical Dispensability of the Fan Theorem:\\
+BISH+LPO Suffices for All Empirical Content\\
+of Compact Optimization and Variational Mechanics\\[1em]
+\large Paper~30 in the Constructive Calibration Programme}
+\author{Paul Chun-Kit Lee\\[2pt]\small New York University\\[2pt]\small\texttt{dr.paul.c.lee@gmail.com}}
+\date{February 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Papers~23 and~28 established that compact optimization (the Extreme Value Theorem on $[a,b]$) and variational action minimization in classical mechanics each cost exactly the Fan Theorem (FT) over BISH\@.
+Paper~29 established that Fekete's Subadditive Lemma is equivalent to LPO, and that LPO is physically instantiated because phase transitions are real.
+This raises the question: is FT an independent physical requirement, or is its cost an artifact of the variational proof method?
+
+We prove that every \emph{empirically accessible prediction} derived from the FT-calibrated results in Papers~23 and~28 is recoverable in BISH+LPO, without invoking the Fan Theorem.
+The key insight is twofold: (1)~the physical content of variational mechanics is the Euler--Lagrange equation, which is BISH (Paper~28), not the existence of a global minimizer; and (2)~approximate optimization to any finite precision $\varepsilon > 0$ is achievable via BMC (which is LPO) without FT\@.
+FT captures the \emph{exact} existence of a minimizer; LPO captures \emph{convergent approximation} to the infimum.
+Since no finite experiment can distinguish an exact minimizer from an $\varepsilon$-approximate one, FT is physically dispensable.
+
+This is the first of two papers (with Paper~31 on dependent choice) investigating whether BISH+LPO is the complete logical constitution of empirically accessible physics.
+
+All results are formalized in Lean~4.
+\end{abstract}
+
+\section{Introduction}
+
+\subsection{Motivation: Is LPO the only axiom?}
+
+Paper~29 established the equivalence of Fekete's Subadditive Lemma with LPO and, via the empirical reality of phase transitions, demonstrated that LPO is not a mathematical idealization but a physically instantiated principle.
+This ontological upgrade of LPO transforms the calibration programme's central question.
+The original question was: \emph{what does each physical theorem cost?}
+The new question is: \emph{is LPO sufficient for all empirically accessible physics?}
+
+The calibration table (Paper~10, v4.0) contains entries at seven distinct logical levels: BISH, LLPO, WLPO, LPO, MP, FT, CC/DC\@.
+Since LPO implies WLPO, LLPO, and MP over BISH, every entry on the omniscience spine and the MP axis is automatically available in BISH+LPO\@.
+Two independent branches remain: the Fan Theorem and the choice axis (CC/DC)\@.
+
+This paper addresses the Fan Theorem.
+Paper~31 will address dependent choice.
+Together, they investigate whether BISH+LPO is the complete logical constitution of empirically accessible physics.
+
+\subsection{The Fan Theorem entries}
+
+Two entries in the calibration table require FT:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Physical Result & Cost & Source \\
+\midrule
+Compact optimization (EVT on $[a,b]$) & $\equiv$ FT & Paper~23 \\
+Action minimization (variational mechanics) & $\equiv$ FT & Paper~28 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Both calibrations are tight equivalences: the physical statements are provably equivalent to FT over BISH\@.
+The question is not whether these \emph{mathematical} statements cost FT---they do---but whether the \emph{physical predictions} they underwrite require these exact mathematical statements, or whether weaker (LPO-available) versions suffice for all empirical content.
+
+\subsection{Strategy}
+
+We distinguish between two claims:
+
+\begin{itemize}
+\item \textbf{Exact existence}: ``There exists a point $x^* \in [a,b]$ where $f$ attains its maximum.'' This costs FT\@.
+\item \textbf{Approximate attainment}: ``For every $\varepsilon > 0$, there exists $x_\varepsilon \in [a,b]$ such that $f(x_\varepsilon) > \sup f - \varepsilon$.'' This costs at most LPO\@.
+\end{itemize}
+
+The physical content---every laboratory measurement, every finite-precision prediction---is captured by approximate attainment.
+Exact existence is a mathematical strengthening that no experiment can verify or require.
+
+For variational mechanics, the distinction is even sharper: the equations of motion (Euler--Lagrange) are BISH, and their solutions are the physical predictions.
+The variational principle asserts that these solutions minimize the action; but this \emph{characterization} of solutions as minimizers is logically stronger than the solutions themselves.
+Nature solves differential equations.
+The variational principle is the physicist's interpretive framework, not nature's computational method.
+
+\section{Background}
+
+\subsection{The Fan Theorem}
+
+The Fan Theorem (FT) states: every bar of a finitely branching tree with bounded height is uniform.
+Equivalently, every pointwise continuous function on a compact metric space is uniformly continuous.
+Its most familiar consequence is the Extreme Value Theorem (EVT): every continuous function $f : [a,b] \to \mathbb{R}$ attains its supremum.
+
+FT is independent of the omniscience spine: it neither implies nor is implied by LPO\@.
+It is also independent of DC$_\omega$ and MP\@.
+Thus, if physical reality requires FT, it constitutes a genuinely independent logical commitment beyond LPO\@.
+
+\subsection{BMC and LPO}
+
+Bounded Monotone Convergence (BMC) states: every bounded monotone sequence of real numbers converges.
+BMC is equivalent to LPO over BISH (Ishihara; Papers~8, 29).
+
+BMC provides a mechanism for \emph{approximate} optimization: given a continuous function $f$ on $[a,b]$ and a sequence of increasingly fine grid approximations, the sequence of approximate maxima is bounded and (can be made) monotone, hence converges by BMC to the supremum.
+This yields the supremum as a real number and, for each $\varepsilon > 0$, an approximate maximizer.
+What BMC cannot provide without FT is a \emph{point} $x^* \in [a,b]$ where the supremum is attained.
+
+\subsection{Paper~28: The variational mechanics calibration}
+
+Paper~28 established a three-level stratification of classical mechanics:
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Result & Cost \\
+\midrule
+Euler--Lagrange equations (discrete) & BISH \\
+Hamilton's equations (discrete) & BISH \\
+Legendre transform (discrete) & BISH \\
+Action minimizer existence & $\equiv$ FT \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The physical predictions---trajectories satisfying the equations of motion---are BISH\@.
+The FT cost enters only through the assertion that solutions \emph{minimize} the action functional.
+
+\section{Main Results}
+
+\subsection{Theorem 1: Approximate optimization from LPO}
+
+\begin{theorem}[Approximate EVT from BMC]\label{thm:approx-evt}
+Over BISH+LPO: Let $f : [a,b] \to \mathbb{R}$ be uniformly continuous.
+Then:
+\begin{enumerate}
+\item[(a)] The supremum $S = \sup_{x \in [a,b]} f(x)$ exists as a real number.
+\item[(b)] For every $\varepsilon > 0$, there exists $x_\varepsilon \in [a,b]$ with $f(x_\varepsilon) > S - \varepsilon$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+For each $n \geq 1$, define the $n$-grid $G_n = \{a + k(b-a)/n : 0 \leq k \leq n\}$ and set $M_n = \max_{x \in G_n} f(x)$.
+Since $G_n$ is finite, $M_n$ is computable (BISH).
+
+\textbf{Part (a).}
+The sequence $(M_n)$ is bounded above (by continuity on a bounded domain) and can be replaced by $\tilde{M}_n = \max_{k \leq n} M_k$, which is monotone non-decreasing and bounded.
+By BMC ($\equiv$ LPO), $\tilde{M}_n$ converges to a limit $S$.
+
+We verify $S = \sup f$.
+For any $x \in [a,b]$, by uniform continuity, for each $\varepsilon > 0$ there exists $\delta > 0$ such that $|x - y| < \delta \implies |f(x) - f(y)| < \varepsilon$.
+For $n > (b-a)/\delta$, some grid point $y \in G_n$ satisfies $|x-y| < \delta$, so $f(x) < f(y) + \varepsilon \leq M_n + \varepsilon \leq S + \varepsilon$.
+Since $\varepsilon$ is arbitrary, $f(x) \leq S$ for all $x$.
+Conversely, $M_n \leq S$ and $M_n \leq \sup f$ trivially, while the grid points witness $S \leq \sup f$.
+Thus $S = \sup f$.
+
+\textbf{Part (b).}
+Given $\varepsilon > 0$, by convergence of $\tilde{M}_n$ to $S$, there exists $N$ with $\tilde{M}_N > S - \varepsilon$.
+The finite grid $G_N$ is searchable; let $x_\varepsilon$ be the grid point achieving $\tilde{M}_N$.
+Then $f(x_\varepsilon) \geq \tilde{M}_N > S - \varepsilon$.
+\end{proof}
+
+\begin{remark}
+Part (a) establishes the supremum.
+Part (b) establishes approximate attainment.
+What is \emph{missing} compared to the full EVT is the assertion that there exists $x^* \in [a,b]$ (not merely a grid point or a sequence of approximants) with $f(x^*) = S$.
+Extracting this exact point from the approximating sequence requires a convergent subsequence argument on $[a,b]$---which is precisely the Fan Theorem (sequential compactness of $[a,b]$).
+\end{remark}
+
+\subsection{Theorem 2: Physical dispensability of exact attainment}
+
+\begin{theorem}[Empirical equivalence]\label{thm:empirical-equiv}
+Let $f : [a,b] \to \mathbb{R}$ be uniformly continuous.
+For any measurement precision $\varepsilon > 0$, the following are empirically indistinguishable:
+\begin{enumerate}
+\item[(a)] (FT) There exists $x^* \in [a,b]$ with $f(x^*) = \sup f$.
+\item[(b)] (LPO) There exists $x_\varepsilon \in [a,b]$ with $f(x_\varepsilon) > \sup f - \varepsilon$.
+\end{enumerate}
+Any physical measurement with finite precision $\varepsilon$ cannot distinguish a reading taken at $x^*$ from one taken at $x_\varepsilon$.
+\end{theorem}
+
+\begin{proof}
+Any measurement apparatus has finite precision $\varepsilon > 0$.
+A measurement at $x^*$ yields a value in $[f(x^*) - \varepsilon, f(x^*) + \varepsilon] = [S - \varepsilon, S + \varepsilon]$.
+A measurement at $x_\varepsilon$ yields a value in $[f(x_\varepsilon) - \varepsilon, f(x_\varepsilon) + \varepsilon] \supseteq [S - 2\varepsilon, S + \varepsilon]$.
+The intervals overlap.
+No finite-precision measurement can determine whether the observed value came from the exact maximizer or the approximate one.
+\end{proof}
+
+\subsection{Theorem 3: Variational mechanics without FT}
+
+\begin{theorem}[Equations of motion without variational minimization]\label{thm:variational}
+Over BISH+LPO: Let $L(q, \dot{q}, t)$ be a discrete Lagrangian on a finite mesh.
+Then:
+\begin{enumerate}
+\item[(a)] (BISH, Paper~28) The Euler--Lagrange equations $\frac{\partial L}{\partial q} - \frac{d}{dt}\frac{\partial L}{\partial \dot{q}} = 0$ are well-defined and their solutions are computable.
+\item[(b)] (BISH, Paper~28) Hamilton's equations are equivalent to the Euler--Lagrange equations.
+\item[(c)] (LPO) The action $S[\gamma] = \sum_k L(q_k, \dot{q}_k, t_k)$ along any trajectory is a well-defined real number, and for sequences of trajectories, the infimum of the action exists.
+\item[(d)] (FT, Paper~28) Among all trajectories with fixed endpoints, there exists one that \emph{exactly} minimizes the action.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Parts (a) and (b) are Paper~28's BISH results.
+
+Part (c): The action along a fixed trajectory is a finite sum (BISH).
+For a sequence of trajectories $\{\gamma_n\}$, the action values $\{S[\gamma_n]\}$ form a bounded-below sequence.
+Define $I_n = \inf_{k \leq n} S[\gamma_k]$ (computable, finite minimum).
+Then $(I_n)$ is monotone non-increasing and bounded below.
+Negating, $(-I_n)$ is monotone non-decreasing and bounded above.
+By BMC ($\equiv$ LPO), $(-I_n)$ converges, so $I_n$ converges to $\inf S$.
+
+Part (d) is Paper~28's FT result: extracting a trajectory $\gamma^*$ with $S[\gamma^*] = \inf S$ requires compactness of the trajectory space.
+\end{proof}
+
+\begin{corollary}[Physical dispensability of action minimization]\label{cor:variational}
+Every physical prediction of classical mechanics---specifically, every trajectory satisfying the equations of motion with specified initial or boundary conditions---is derivable in BISH without invoking action minimization.
+The variational characterization (that solutions minimize the action) is a logically stronger assertion (FT) that adds no empirical content: no measurement can distinguish ``this trajectory satisfies $F = ma$'' from ``this trajectory minimizes the action.''
+\end{corollary}
+
+\begin{proof}
+The equations of motion determine trajectories uniquely given initial conditions (BISH, Paper~28).
+The variational principle asserts that these same trajectories are characterized as action minimizers.
+This characterization is logically equivalent to asserting the existence of a minimizer of a continuous functional on a compact set, which costs FT\@.
+But the trajectories themselves are already determined by the BISH-level equations.
+The FT-level characterization is a \emph{theorem about} the solutions, not a method for \emph{obtaining} them.
+\end{proof}
+
+\subsection{Theorem 4: LPO separation from FT}
+
+\begin{theorem}[Separation]\label{thm:separation}
+The difference between the FT-level and LPO-level versions of optimization has no empirical content.
+Formally: for every uniformly continuous $f : [a,b] \to \mathbb{R}$ and every $\varepsilon > 0$, define:
+\begin{itemize}
+\item $P_{\mathrm{FT}}$: ``there exists $x^*$ with $f(x^*) = \sup f$'' (FT).
+\item $P_{\mathrm{LPO}}(\varepsilon)$: ``there exists $x_\varepsilon$ with $f(x_\varepsilon) > \sup f - \varepsilon$'' (LPO).
+\end{itemize}
+Then $P_{\mathrm{FT}} \implies P_{\mathrm{LPO}}(\varepsilon)$ for all $\varepsilon > 0$, and the converse fails (this is the FT/LPO gap).
+However, $\{P_{\mathrm{LPO}}(\varepsilon) : \varepsilon > 0\}$ is empirically complete: no finite-precision observation can witness the gap.
+\end{theorem}
+
+\begin{proof}
+The forward implication is trivial: take $x_\varepsilon = x^*$.
+The failure of the converse is the content of FT $\not\Leftarrow$ LPO (independence).
+Empirical completeness follows from Theorem~\ref{thm:empirical-equiv}: any measurement with precision $\varepsilon$ is satisfied by $P_{\mathrm{LPO}}(\varepsilon)$.
+\end{proof}
+
+\section{The Lean Formalization}
+
+\subsection{Architecture}
+
+The Lean~4 formalization follows the established architecture of the programme:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+File & Content & Classical content \\
+\midrule
+\texttt{Defs.lean} & Definitions of ApproxEVT, LPO, BMC & $\mathbb{R}$ infrastructure only \\
+\texttt{GridApprox.lean} & Finite grid approximation, $M_n$ & None beyond $\mathbb{R}$ \\
+\texttt{SupExists.lean} & Supremum existence from BMC & Intentional (BMC $\equiv$ LPO) \\
+\texttt{ApproxAttain.lean} & $\varepsilon$-attainment from supremum & None beyond $\mathbb{R}$ \\
+\texttt{Separation.lean} & Empirical equivalence theorem & None beyond $\mathbb{R}$ \\
+\texttt{Variational.lean} & EL dispensability of FT & None beyond $\mathbb{R}$ \\
+\texttt{Main.lean} & Master theorem & Inherits \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Key definitions}
+
+\begin{verbatim}
+/-- Approximate EVT: supremum exists and is approximately attained -/
+def ApproxEVT : Prop :=
+  ∀ (f : ℝ → ℝ) (a b : ℝ) (hab : a < b),
+    UniformContinuousOn f (Set.Icc a b) →
+    ∃ S : ℝ, (∀ x ∈ Set.Icc a b, f x ≤ S) ∧
+      ∀ ε > 0, ∃ x ∈ Set.Icc a b, f x > S - ε
+
+/-- Full EVT: supremum is exactly attained (costs FT) -/
+def ExactEVT : Prop :=
+  ∀ (f : ℝ → ℝ) (a b : ℝ) (hab : a < b),
+    UniformContinuousOn f (Set.Icc a b) →
+    ∃ x ∈ Set.Icc a b, ∀ y ∈ Set.Icc a b, f y ≤ f x
+
+/-- The separation: ExactEVT → ApproxEVT is trivial;
+    ApproxEVT → ExactEVT requires FT -/
+theorem approxEVT_of_lpo : LPO → ApproxEVT := by ...
+theorem exactEVT_iff_ft : ExactEVT ↔ FT := by ...  -- Paper 23
+\end{verbatim}
+
+\subsection{Axiom profile}
+
+\begin{verbatim}
+approxEVT_of_lpo: [propext, Classical.choice, Quot.sound, bmc_of_lpo]
+  -- 1 cited axiom: forward BMC from LPO
+separation_theorem: [propext, Classical.choice, Quot.sound]
+  -- No custom axioms: pure constructive reasoning
+variational_dispensability: [propext, Classical.choice, Quot.sound]
+  -- No custom axioms: pure constructive reasoning
+\end{verbatim}
+
+\subsection{Certification}
+
+\begin{itemize}
+\item \texttt{approxEVT\_of\_lpo}: Certification Level~3 (intentional classical content---uses LPO via BMC by design).
+\item \texttt{separation\_theorem}: Certification Level~2 (Classical.choice from $\mathbb{R}$ infrastructure only).
+\item \texttt{variational\_dispensability}: Certification Level~2 (structural verification; no proof-level classical reasoning).
+\end{itemize}
+
+\section{Discussion}
+
+\subsection{What FT captures and what LPO captures}
+
+The Fan Theorem and LPO capture fundamentally different mathematical operations:
+
+FT captures \emph{compactness}---the passage from pointwise properties to uniform properties, from approximate information to exact existence.
+LPO captures \emph{convergence}---the passage from finite approximations to completed limits.
+
+For optimization, this distinction manifests as follows.
+LPO (via BMC) can establish that the supremum \emph{exists as a real number} and can be \emph{approximated to arbitrary precision}.
+FT is needed to assert that the supremum is \emph{attained at a specific point}.
+
+Physically, the distinction is between ``the system approaches an optimum'' (LPO) and ``the system is at the optimum'' (FT).
+No finite measurement can distinguish these.
+
+\subsection{The variational principle as interpretation, not mechanism}
+
+The variational formulation of mechanics---Hamilton's principle, Lagrangian mechanics, the principle of least action---is often presented as a fundamental law of nature.
+Our analysis reveals a more nuanced picture.
+
+The equations of motion (Newton's second law, Euler--Lagrange equations, Hamilton's equations) are BISH\@.
+They are computationally transparent: given initial conditions, the trajectory is determined by finite arithmetic at each step.
+
+The variational \emph{characterization}---that the trajectory minimizes (or extremizes) the action---is a theorem \emph{about} the solutions, asserting a global property (minimality among all competing trajectories) that costs FT\@.
+
+Nature solves the local differential equation.
+The physicist observes that the resulting trajectory happens to minimize a global functional.
+The minimization characterization is explanatorily powerful and mathematically beautiful, but it is logically dispensable for predictions.
+This is the precise sense in which FT is physically dispensable: it underwrites an \emph{interpretation} of the physics, not the physics itself.
+
+\subsection{Implications for BISH+LPO sufficiency}
+
+With the FT branch shown to be physically dispensable, the status of the calibration table's logical branches is:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Branch & Physical status & Covered by LPO? \\
+\midrule
+Omniscience spine (LLPO, WLPO, LPO) & Physically instantiated & Yes (LPO $\implies$ WLPO $\implies$ LLPO) \\
+Markov's Principle (MP) & Physically instantiated & Yes (LPO $\implies$ MP) \\
+Fan Theorem (FT) & Physically dispensable & N/A (dispensable) \\
+Choice axis (CC, DC) & Open (Paper~31) & CC yes; DC open \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+If Paper~31 establishes the physical dispensability of DC (beyond what CC, which LPO implies, provides), then BISH+LPO is the complete logical constitution of empirically accessible physics across all twelve calibrated domains.
+
+\subsection{Relation to Paper~29}
+
+Paper~29 established that LPO is physically instantiated via the Fekete equivalence and the reality of phase transitions.
+The present paper establishes that FT is \emph{not} independently required.
+Together, they narrow the question ``what is the logical constitution of the universe?'' from ``BISH + some subset of \{LPO, FT, DC, \ldots\}'' to ``BISH + LPO + possibly DC.''
+
+\section{Conclusion}
+
+The Fan Theorem is mathematically genuine: compact optimization and variational action minimization really do cost FT, and these calibrations (Papers~23, 28) stand.
+But the physical content of both results is recoverable in BISH+LPO\@.
+Approximate optimization (to any finite precision) requires only BMC, which is LPO\@.
+The equations of motion require only BISH\@.
+The FT-level assertions---exact attainment of the supremum, existence of an action-minimizing trajectory---are mathematically stronger than what any finite experiment can verify or require.
+
+FT is the mapmaker's convention.
+LPO is the territory.
+
+The question of whether BISH+LPO is the complete logical constitution of empirically accessible physics now rests entirely on the status of dependent choice, which Paper~31 will address.
+
+\bigskip
+
+\noindent\textbf{Acknowledgments and Statement of AI Use.} As with all papers in this programme, the Lean~4 formalizations and \LaTeX{} manuscript were developed with substantial assistance from Claude (Opus~4.6), an AI assistant by Anthropic. Paper~29 documents the collaborative methodology.
+
+\bigskip
+
+\noindent\textbf{Data availability.} Lean~4 source code will be archived at Zenodo upon completion.
+
+\begin{thebibliography}{99}
+
+\bibitem{Berger2005}
+Berger, J. ``The Fan Theorem and uniform continuity.'' In \emph{New Computational Paradigms (CiE 2005)}, LNCS 3526, pp.~18--22. Springer, 2005.
+
+\bibitem{BridgesVita2006}
+Bridges, D. and V\^{\i}\c{t}\u{a}, L.~S. \emph{Techniques of Constructive Analysis}. Springer, 2006.
+
+\bibitem{Ishihara2006}
+Ishihara, H. ``Reverse mathematics in Bishop's constructive mathematics.'' \emph{Philosophia Scientiae}, Cahier sp\'ecial 6 (2006): 43--59.
+
+\bibitem{Lee2026_P8}
+Lee, P.~C.-K. ``The constructive cost of the thermodynamic limit.'' 2026. Paper~8. DOI: 10.5281/zenodo.18516813.
+
+\bibitem{Lee2026_P10}
+Lee, P.~C.-K. ``The logical geography of mathematical physics.'' 2026. Paper~10.
+
+\bibitem{Lee2026_P23}
+Lee, P.~C.-K. ``The Fan Theorem and the constructive cost of optimization.'' 2026. Paper~23. DOI: 10.5281/zenodo.18604312.
+
+\bibitem{Lee2026_P28}
+Lee, P.~C.-K. ``Newton vs.\ Lagrange vs.\ Hamilton: constructive stratification of classical mechanics.'' 2026. Paper~28. DOI: 10.5281/zenodo.18616620.
+
+\bibitem{Lee2026_P29}
+Lee, P.~C.-K. ``Fekete's Subadditive Lemma is equivalent to LPO.'' 2026. Paper~29.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,63 @@
+{
+  "title": "Self-Intersection of Exotic Weil Classes and Field Discriminants: The Formula deg(w\u2080 \u00b7 w\u2080) = \u221adisc(F) for CM Abelian Fourfolds (Paper 56, Constructive Reverse Mathematics and Arithmetic Geometry Series)",
+  "description": "<p>Paper 56 of the Constructive Reverse Mathematics and Arithmetic Geometry series. We compute the self-intersection degree deg(w<sub>0</sub> &middot; w<sub>0</sub>) = &radic;disc(F) for exotic Weil classes on three CM abelian fourfolds of Weil type, providing explicit numerical evidence at the boundary of the Deligne&ndash;Poisson&ndash;Tate (DPT) conjecture.</p>\n<p><strong>Example 1</strong> (K = Q(&radic;-3), F = Q(&zeta;<sub>7</sub> + &zeta;<sub>7</sub><sup>-1</sup>)): disc(F) = 49, deg = 7.<br/>\n<strong>Example 2</strong> (K = Q(i), F = Q(&zeta;<sub>9</sub> + &zeta;<sub>9</sub><sup>-1</sup>)): disc(F) = 81, deg = 9.<br/>\n<strong>Example 3</strong> (K = Q(&radic;-7)): disc(F) = 169, deg = 13.</p>\n<p>All degrees are positive (Hodge&ndash;Riemann), all exotic Weil classes are algebraic (Schoen). The discriminant equation det(G) = disc(F) is exact, established via the cyclic conductor theorem. The 3&times;3 determinants are computed by <code>native_decide</code>.</p>\n<p>The Lean 4 / Mathlib formalization comprises 9 active modules + 2 deprecated (~1,666 lines total, ~1,331 active), compiles with zero errors, zero warnings, and zero sorry gaps. 10 principled axioms encode published results (Milne, Shimura, Schoen). Correction history: v2 (conductor-based) is current; v1/v3 discriminant equation deprecated.</p>\n<p>Code is distributed exclusively via this Zenodo record.</p>",
+  "upload_type": "software",
+  "publication_date": "2026-02-21",
+  "creators": [
+    {
+      "name": "Lee, Paul Chun-Kit",
+      "affiliation": "New York University",
+      "orcid": "0000-0000-0000-0000"
+    }
+  ],
+  "access_right": "open",
+  "license": "Apache-2.0",
+  "keywords": [
+    "exotic Weil class",
+    "self-intersection",
+    "CM abelian fourfold",
+    "DPT boundary",
+    "Hodge-Riemann",
+    "Schoen algebraicity",
+    "discriminant equation",
+    "Lean 4",
+    "Mathlib",
+    "constructive reverse mathematics",
+    "arithmetic geometry",
+    "conductor",
+    "trace matrix",
+    "formal verification",
+    "constructive mathematics"
+  ],
+  "subjects": [
+    {
+      "term": "Mathematical logic and foundations",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85082397",
+      "scheme": "url"
+    },
+    {
+      "term": "Algebraic geometry",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85003438",
+      "scheme": "url"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "relation": "isPartOf",
+      "identifier": "10.5281/zenodo.17054050",
+      "resource_type": "software",
+      "scheme": "doi"
+    }
+  ],
+  "version": "2.0.0",
+  "language": "eng",
+  "notes": "AI-assisted formalization using Claude (Anthropic, Opus 4.6) for Lean 4 code generation under human direction. All mathematical content specified by the author; every theorem verified by the Lean 4 type checker. Built with Lean 4 v4.29.0-rc1 and Mathlib. Reproducible via 'lake build' (zero errors, zero sorry). Code available exclusively on Zenodo (not hosted on GitHub).",
+  "references": [
+    "Milne, J.S. (1999). Lefschetz classes on abelian varieties. Duke Math. J., 96(3):639-675.",
+    "Anderson, G. (1993). An elementary approach to L-functions mod l. J. Reine Angew. Math., 443:1-28.",
+    "Shimura, G. (1998). Abelian Varieties with Complex Multiplication and Modular Functions. Princeton University Press.",
+    "Schoen, C. (1998). Addendum to: Hodge classes on self-products of a variety with an automorphism. Compositio Math., 114(3):329-336.",
+    "Deligne, P. (1982). Hodge cycles on abelian varieties. In Hodge Cycles, Motives, and Shimura Varieties, Springer LNM 900, 9-100.",
+    "Bishop, E. and Bridges, D. (1985). Constructive Analysis. Springer."
+  ]
+}

@@ -1,0 +1,59 @@
+ZENODO UPLOAD METADATA — Paper 41
+===================================
+
+TITLE:
+Paper 41: The Diagnostic in Action — Axiom Calibration of the AdS/CFT Correspondence (Lean 4 Formalization)
+
+DESCRIPTION:
+The holographic dictionary is an axiom-preserving map. We deploy the axiom calibration framework of constructive reverse mathematics (CRM) on the AdS/CFT correspondence — from the Ryu-Takayanagi formula through the FLM quantum correction and the quantum extremal surface (QES) prescription to the island formula for the information paradox.
+
+For every computation examined, bulk and boundary carry identical axiom cost. This is the first test of a physical duality for logical consistency at the level of individual computational steps — a structural constraint on AdS/CFT not previously articulated.
+
+The Fan Theorem (FT) builds the Platonic extremal surface in the unobservable bulk; the boundary computes the observable entropy without it. Holography projects away the FT cost of geometric existence. No observable prediction exceeds BISH+LPO, extending the ceiling established in Papers 1–40 to the most active area of contemporary theoretical physics.
+
+The Lean 4 formalization (955 lines, 8 modules, Mathlib) compiles with 0 errors, 0 warnings, 0 sorry. It contains 12 bridge axioms encoding physics input, 35 theorems (7 genuine machine-checked proofs), a 12-row calibration table with compile-time consistency verification, and a master theorem whose axiom audit is printed by Lean.
+
+Key results:
+- Axiom preservation: the holographic dictionary preserves axiom cost across all 12 calibration entries
+- Phase transitions are cheap: min(x,y) = (x+y-|x-y|)/2 converts LLPO comparison to BISH arithmetic
+- Infimum vs. minimizer: the scaffolding separation distinguishes LPO (observable entropy) from FT (bulk surface existence)
+- Perturbative QES is BISH (Picard-Lindelöf); LPO cost appears only at the semiclassical breakdown
+
+Archive contents: paper41.pdf (22 pages), paper41.tex (LaTeX source), P41_AdSCFT/ (complete Lean 4 project with lake-manifest.json for reproducibility).
+
+Build: cd P41_AdSCFT && lake exe cache get && lake build
+
+Part of the Foundations of Mathematical Physics series (Papers 1–42).
+
+KEYWORDS:
+constructive reverse mathematics
+holographic entanglement entropy
+AdS/CFT correspondence
+Ryu-Takayanagi formula
+quantum extremal surface
+Fan Theorem
+omniscience principles
+Lean 4
+interactive theorem proving
+Mathlib
+axiom calibration
+Bishop constructive mathematics
+island formula
+Page curve
+information paradox
+
+LICENSE:
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+RELATED IDENTIFIERS:
+- Is supplement to: Paper 40 (doi:10.5281/zenodo.18654773)
+- Is supplement to: Paper 42 (doi:10.5281/zenodo.18654789)
+- Is part of: Foundations of Mathematical Physics series
+
+RESOURCE TYPE:
+Software / Dataset
+
+AUTHOR:
+Paul Chun-Kit Lee
+Affiliation: New York University
+ORCID: (add if available)
