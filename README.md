@@ -139,19 +139,6 @@ Physics descends by *projection* (→ BISH). Arithmetic descends by *search* (�
 
 ---
 
-## Open Questions
-
-These are signposts, not planned work. The programme stops at Paper 70.
-
-1. Is the MP gap refinable? Does a natural domain sit at BISH + LLPO?
-2. Can the Langlands correspondence serve as a CRM axiom?
-3. Are the three spectral gaps exactly Σ⁰₂-complete?
-4. Does condensed mathematics (Clausen–Scholze) provide an alternative descent mechanism?
-5. Is the Fargues–Scholze geometrisation BISH? (The Archimedean Principle predicts yes.)
-6. Where do CRM boundaries create engineering failures — in numerical stability, quantum complexity, and optimisation?
-
----
-
 ## Complete Paper List
 
 Every paper with its bottom line. Papers 1 and 3 withdrawn; Papers 60 and 62 retired (merged into 59 and 63).
