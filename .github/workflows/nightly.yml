@@ -36,11 +36,7 @@ jobs:
       - name: Build stable targets only
         run: |
           # Build only the stable, sorry-free modules
-          lake build Papers.P3_2CatFramework.Paper3A_Main
-          lake build Papers.P3_2CatFramework.Paper3B_Main
-          lake build Papers.P4_SpectralGeometry.Smoke
-          lake build Papers.P2_BidualGap.SmokeTest || true  # P2 has 3 expected sorries
-          # Note: P1 has 4 sorries, skip for nightly builds
+          lake build Papers.P2_BidualGap.P2_Minimal || true
 
       - name: Verify no 'sorry'
         run: |
@@ -53,7 +49,7 @@ jobs:
       - name: Run all tests
         run: |
           # Run all test executables if they exist
-          for test in Paper1SmokeTest Paper2SmokeTest; do
+          for test in Paper2SmokeTest; do
             if lake exe $test 2>/dev/null; then
               echo "✓ $test passed"
             else

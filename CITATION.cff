@@ -3,61 +3,23 @@ message: "If you use this software, please cite it as below."
 type: software
 authors:
 - family-names: "Lee"
-  given-names: "Paul C"
-  orcid: "https://orcid.org/0000-0000-0000-0000"
-  affiliation: "AICardiologist"
-title: "Foundation Relativity: Axiom Calibration Framework"
-version: "1.0.1"
+  given-names: "Paul Chun-Kit"
+  affiliation: "New York University"
+title: "Constructive Reverse Mathematics Series"
 doi: 10.5281/zenodo.17054050
-date-released: 2025-09-15
-url: "https://github.com/AICardiologist/FoundationRelativity"
+date-released: 2026-02-24
+url: "https://doi.org/10.5281/zenodo.17054050"
 repository-code: "https://github.com/AICardiologist/FoundationRelativity"
 abstract: >-
-  A Lean 4 formalization exploring axiom calibration in constructive 
-  mathematics. Demonstrates how mathematical pathologies behave differently 
-  under BISH vs ZFC foundations, with complete ρ-hierarchy proofs showing 
-  logical strength requirements (WLPO, DC_ω, DC_{ω+1}) for various constructions.
+  70-paper programme with ~88,000 lines of Lean 4 formalizations establishing
+  that the logical cost of mathematics is the logical cost of the real numbers.
+  Calibrates non-constructive principles (LPO, WLPO, LLPO, MP) across
+  mathematical physics, arithmetic geometry, and number theory.
 keywords:
+  - "constructive reverse mathematics"
   - "formal verification"
-  - "constructive mathematics"
   - "lean4"
-  - "axiom calibration"
-  - "category theory"
-  - "mathematical logic"
+  - "omniscience principles"
+  - "mathematical physics"
+  - "arithmetic geometry"
 license: Apache-2.0
-references:
-  - type: software
-    title: "Paper 2 Minimal Artifact: WLPO ↔ Bidual Gap (Option-B core)"
-    authors:
-      - family-names: Lee
-        given-names: Paul Chun-Kit
-    version: "p2-minimal-v0.1"
-    doi: "10.5281/zenodo.13356587"
-    url: "https://github.com/AICardiologist/FoundationRelativity/releases/tag/p2-minimal-v0.1"
-    notes: "Lean 4 minimal target; dependency-free, sorry-free core."
-  - type: software
-    title: "Paper 3A: Three Orthogonal Axes (Lean 4 Artifacts)"
-    authors:
-      - family-names: Lee
-        given-names: Paul Chun-Kit
-    version: "0.2.0"
-    doi: "10.5281/zenodo.17054050"
-    url: "https://github.com/AICardiologist/FoundationRelativity/releases/tag/p3a-three-axes-v0.2"
-    notes: "Lean 4 formalization of AxCal framework with WLPO, FT, DCω axes"
-  - type: software
-    title: "Paper 3B: Proof-Theoretic Collisions (Lean 4 Artifacts)"
-    authors:
-      - family-names: Lee
-        given-names: Paul Chun-Kit
-    version: "0.2.0"
-    doi: "10.5281/zenodo.17054155"
-    url: "https://github.com/AICardiologist/FoundationRelativity/releases/tag/p3b-collisions-v0.2"
-    notes: "Lean 4 formalization of proof-theoretic ladders and collision diagrams"
-  - type: software
-    title: "Paper 5: General Relativity AxCal Analysis"
-    authors:
-      - family-names: Lee
-        given-names: Paul Chun-Kit
-    version: "1.0.1"
-    url: "https://github.com/AICardiologist/FoundationRelativity/releases/tag/paper5-v1.0.1"
-    notes: "Maintenance: DCω→Choice axis alignment; axiom-free Schwarzschild anchor (positivity + Γ^r_{tt}≠0); portable build."

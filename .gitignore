@@ -1,22 +1,39 @@
-# Build artifacts
-/.lake/build/
-/.lake/lakefile.*
-/.lake/packages/*/
-
-# Lean artifacts  
+# ============================================================
+# Lean build artifacts
+# ============================================================
+/.lake/
+**/.lake/
 *.olean
 *.ilean
 *.clean
 
-# IDE files
+# ============================================================
+# LaTeX build artifacts
+# ============================================================
+*.aux
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.blg
+*.bbl
+*.synctex.gz
+*.nav
+*.snm
+*.vrb
+*.run.xml
+*-blx.bib
+.latexmkrc
+
+# ============================================================
+# IDE / OS / temp
+# ============================================================
 .vscode/
 *.code-workspace
-
-# OS files
 .DS_Store
 Thumbs.db
-
-# Temporary files
 *.tmp
 *.log
 *.swp
@@ -24,27 +41,162 @@ Thumbs.db
 *~
 .Rhistory
 texput.log
-
-# Local development files
 old_files/
 .tmp.driveupload/
-/.lake/
 
-# All nested .lake build caches (can be multi-GB)
-**/.lake/
+# ============================================================
+# Python
+# ============================================================
+__pycache__/
+*.pyc
+*.pyo
 
-# Bundle archives (large, reproducible from source)
+# ============================================================
+# Archives (reproducible from source)
+# ============================================================
+*.zip
+*.tar.gz
+
+# ============================================================
+# Backup / variant / dev snapshot files
+# ============================================================
+*.backup
+*.backup-*
+*.bak
+*.bak.*
+*.before*
+*.future
+*.orig
+*.rej
+*.patch
+*.lean.bisect*
+*.lean.bottleneck*
+*.lean.broken*
+*.lean.modular_backup
+*.lean.route_*
+*.lean.shields
+*.lean.simpa_fix*
+*.lean.step*
+*.lean.test
+*.lean.uncommitted*
+*.lean.with_sorries*
+**/_backup_*/
+**/_zenodo_pkg_*/
+**/Zenodo_Deliverables/
+**/Zenodo_v*/
+*.sb-*
+
+# ============================================================
+# Private / internal (never publish)
+# ============================================================
+master folder/
+CLAUDE.md
+.claude/
+Makefile
+SORRY_ALLOWLIST.txt
+alignment_report.json
+
+# ============================================================
+# Withdrawn, retired, discarded, archived content
+# ============================================================
+old_paper_abandoned/
+paper_2_redo/
 paper_2_bundle/
-paper_2_bundle.tar.gz
-paper_2_bundle.zip
 paper_7_bundle/
+paper 58_old_obsolete_do_not_read/
+paper 60_on_hold_synthesis/
+paper 60_withdrawn/
+paper 62/
+paper 69_old_discard/
+paper 70_old_discard/
+paper 71_old_discard/
+archival_folder/
+doc_archival_obsolete/
+Human-AI-unpublished/
+untitled folder/
+untitled folder 2/
+untitled folder 3/
+**/archive_old_drafts/
+**/archive_old_pdfs/
+**/CReal_obsolete/
+**/*_deprecated.lean
 
-# Hide non-essential Paper directories
+# Withdrawn papers (Papers 1, 3)
+Papers/P1_GBC/
+Papers/P3_2CatFramework/
+Papers/P3C_DCwAxis/
+Papers/P3C_DCwAxis.lean
+
+# Zenodo nested duplicates (keep only metadata, not code copies)
+**/zenodo/**/*.lean
+**/zenodo/**/lakefile*
+**/zenodo/**/lean-toolchain
+**/zenodo/**/*.toml
+**/zenodo/**/*.tex
+**/zenodo/**/*.bib
+**/zenodo/**/*.pdf
+**/zenodo/**/*.sty
+**/zenodo/**/*.bst
+**/zenodo/**/lake-manifest.json
+
+# ============================================================
+# Obsolete top-level files
+# ============================================================
+ACTIVATION_DIFF.md
+CHANGELOG_ENTRY.md
+DRAFT_PR_218_FINAL.md
+DRAFT_PR_TEMPLATE.md
+PR_218_UPDATE.md
+REORGANIZATION_SUMMARY.md
+ROADMAP.md
+UNIFIED_PR_TEMPLATE.md
+crm_research_plan.md
+paper11_rg_assessment.md
+mathlib_reflexive_search_report.txt
+
+# ============================================================
+# Build logs / dev diagnostics
+# ============================================================
+build_*.txt
+**/build_*.txt
+error_*.txt
+**/error_*.txt
+
+# ============================================================
+# Internal dev / session documents
+# ============================================================
+**/VICTORY_*.md
+**/SPRINT_*.md
+**/SESSION_*.md
+**/CONSULTATION_*.md
+**/TACTICAL_*.md
+**/GUIDANCE_*.md
+**/CHECKPOINT_*.md
+**/PASTE_READY*.md
+**/WORK_ORDER*.md
+**/EDITORIAL_MEMO*.md
+**/communication/correspondence/
+
+# ============================================================
+# CI / test infrastructure (removed from repo)
+# ============================================================
+.ci/
+test/
+
+# ============================================================
+# RTF / macOS document formats (not part of deliverables)
+# ============================================================
+*.rtf
+*.rtfd/
+
+# ============================================================
+# Papers/ internal development files
+# ============================================================
 Papers/P*_*_AUDIT_*.md
 Papers/QA_AUDIT_FINDINGS.md
 Papers/PseudoFunctorInstances.lean
 
-# Paper 2 - Hide internal files but keep core Lean and LaTeX
+# Paper 2
 Papers/P2_BidualGap/Archived/
 Papers/P2_BidualGap/WIP/
 Papers/P2_BidualGap/old_file_last_print/
@@ -61,7 +213,7 @@ Papers/P2_BidualGap/documentation/paper-final-previous.tex
 Papers/P2_BidualGap/documentation/paper-v[1-4].tex
 Papers/P2_BidualGap/documentation/lmcs-*.tex
 
-# Paper 3 - Hide internal files
+# Paper 3
 Papers/P3_2CatFramework/archive/
 Papers/P3_2CatFramework/old_3b_*/
 Papers/P3_2CatFramework/test/
@@ -69,34 +221,34 @@ Papers/P3_2CatFramework/documentation/archive/
 Papers/P3_2CatFramework/documentation/*.md
 !Papers/P3_2CatFramework/documentation/MASTER_DEPENDENCY_CHART.md
 !Papers/P3_2CatFramework/documentation/MIGRATION_STATUS.md
-
-# Paper 3C - Hide internal files
 Papers/P3C_DCwAxis/archive/
 Papers/P3C_DCwAxis/old_*/
 Papers/P3C_DCwAxis/test/
 
-# Paper 4 - Hide internal files  
+# Paper 4
 Papers/P4_SpectralGeometry/archive/
 Papers/P4_SpectralGeometry/old_*/
 Papers/P4_SpectralGeometry/test/
 Papers/P4_SpectralGeometry/documentation/archive/
 
-# Paper 5 - Hide internal files
+# Paper 5
 Papers/P5_GeneralRelativity/archive/
 Papers/P5_GeneralRelativity/old_*/
 Papers/P5_GeneralRelativity/test/
 
-# Paper 6 - Hide internal files
+# Paper 6
 Papers/P6_Heisenberg/archive/
 Papers/P6_Heisenberg/old_*/
 Papers/P6_Heisenberg/test/
 
-# Paper 1 - Hide internal files
+# Paper 1
 Papers/P1_GBC/archive/
 Papers/P1_GBC/old_*/
 Papers/P1_GBC/test/
 
-# Hide build status and report files
+# ============================================================
+# Build status / report files (internal)
+# ============================================================
 **/FINAL_STATUS*.md
 **/FORMALIZATION_STATUS.md
 **/FROZEN.md
@@ -113,7 +265,7 @@ Papers/P1_GBC/test/
 **/STATUS_REPORT*.md
 **/TRANSPARENT_STATUS*.md
 
-# Hide miscellaneous folders
+# Miscellaneous internal folders
 Basics/
 Compat/
 Gap/
