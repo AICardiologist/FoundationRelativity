@@ -1,0 +1,109 @@
+================================================================================
+     CONSTRUCTIVE REVERSE MATHEMATICS SERIES — COMPLETE PAPER LIST
+                        Paul Chun-Kit Lee
+                       New York University
+                        February 2026
+================================================================================
+
+Series DOI (concept record): 10.5281/zenodo.17054050
+
+No.  Title                                                               DOI
+---- ------------------------------------------------------------------- --------------------------
+  1  [Withdrawn]                                                         —
+  2  The Bidual Gap and WLPO                                             10.5281/zenodo.18501689
+  3  [Withdrawn]                                                         —
+  4  Axiom Calibration for Quantum Spectra                               10.5281/zenodo.17118223
+  5  Schwarzschild Curvature Verification                                10.5281/zenodo.18489703
+  6  Heisenberg Uncertainty (v2, CRM over Mathlib)                       10.5281/zenodo.18519836
+  7  Physical Bidual Gap, Trace-Class Operators                          10.5281/zenodo.18527559
+  8  1D Ising Model and LPO                                              10.5281/zenodo.18516813
+  9  Ising Formulation-Invariance                                        10.5281/zenodo.18517570
+ 10  Logical Geography of Mathematical Physics                           10.5281/zenodo.18636180
+ 11  Entanglement, CHSH, Tsirelson Bound                                 10.5281/zenodo.18527676
+ 12  Constructive History of Mathematical Physics                        10.5281/zenodo.18636250
+ 13  Event Horizon as Logical Boundary                                   10.5281/zenodo.18529007
+ 14  Quantum Decoherence                                                 10.5281/zenodo.18569068
+ 15  Noether Theorem                                                     10.5281/zenodo.18572494
+ 16  Born Rule (Technical Note)                                          10.5281/zenodo.18575377
+ 17  Bekenstein-Hawking Formula                                          10.5281/zenodo.18597306
+ 18  Yukawa RG Constructive Stratification                               10.5281/zenodo.18626839
+ 19  WKB Tunneling and LLPO                                              10.5281/zenodo.18602596
+ 20  Observable-Dependent Logical Cost, 1D Ising Magnetization           10.5281/zenodo.18603079
+ 21  Bell Nonlocality and LLPO                                           10.5281/zenodo.18603251
+ 22  Markov's Principle and Radioactive Decay                            10.5281/zenodo.18603503
+ 23  Fan Theorem and Optimization                                        10.5281/zenodo.18604312
+ 24  Kochen-Specker Contextuality and LLPO                               10.5281/zenodo.18604317
+ 25  Choice Axis (CC, DC) and Ergodic Theorems                           10.5281/zenodo.18615453
+ 26  Bidual Gap Arithmetic Route, WLPO                                   10.5281/zenodo.18615457
+ 27  Bell Angle Optimisation via IVT, LLPO                               10.5281/zenodo.18615459
+ 28  Newton vs. Lagrange vs. Hamilton                                    10.5281/zenodo.18616620
+ 29  Fekete's Subadditive Lemma and LPO                                  10.5281/zenodo.18643617
+ 30  Physical Dispensability of the Fan Theorem                          10.5281/zenodo.18638394
+ 31  Physical Dispensability of Dependent Choice                         10.5281/zenodo.18645578
+ 32  QED One-Loop Renormalization: The Landau Pole                       10.5281/zenodo.18642598
+ 33  QCD One-Loop Renormalization and Confinement                        10.5281/zenodo.18642610
+ 34  Scattering Amplitudes Are Constructively Computable                 10.5281/zenodo.18642612
+ 35  Logical Constitution of Empirical Physics: Metatheorem              10.5281/zenodo.18642616
+ 36  Stratifying Spectral Gap Undecidability: Cubitt = LPO               10.5281/zenodo.18642620
+ 37  Undecidability Landscape Is LPO                                     10.5281/zenodo.18642802
+ 38  Wang Tiling and the Origin of Physical Undecidability                10.5281/zenodo.18642804
+ 39  Beyond LPO: Thermodynamic Stratification                            10.5281/zenodo.18642806
+ 40  Logical Constitution of Physical Reality (Monograph)                10.5281/zenodo.18654773
+ 41  AdS/CFT Diagnostic                                                  10.5281/zenodo.18654780
+ 42  Cosmological Constant Problem                                       10.5281/zenodo.18654789
+ 43  What the Ceiling Means: Constructive Schools                        10.5281/zenodo.18665418
+ 44  Measurement Problem Dissolved: Quantum Interpretations              10.5281/zenodo.18671162
+ 45  Weight-Monodromy Conjecture and LPO                                 10.5281/zenodo.18676170
+ 46  Tate Conjecture and LPO                                             10.5281/zenodo.18682285
+ 47  Fontaine-Mazur Conjecture and LPO                                   10.5281/zenodo.18682788
+ 48  Birch and Swinnerton-Dyer Conjecture and LPO                       10.5281/zenodo.18683400
+ 49  Hodge Conjecture and Constructive Omniscience                       10.5281/zenodo.18683802
+ 50  Three Axioms for the Motive                                         10.5281/zenodo.18705837
+ 51  Constructive Archimedean Rescue in BSD                              10.5281/zenodo.18732168
+ 52  Decidability Transfer via Specialization: Conj D, Abelian 3-folds  10.5281/zenodo.18732559
+ 53  CM Decidability Oracle                                              10.5281/zenodo.18713089
+ 54  Bloch-Kato Calibration: Out-of-Sample DPT Test                     10.5281/zenodo.18732964
+ 55  K3 Surfaces, Kuga-Satake Construction, and DPT                     10.5281/zenodo.18733731
+ 56  Exotic Weil Class Self-Intersection on CM Abelian Fourfolds         10.5281/zenodo.18734021
+ 57  Exotic Weil Self-Intersection Across All Nine Heegner Fields        10.5281/zenodo.18735172
+ 58  Class Number Correction for Exotic Weil Classes                     10.5281/zenodo.18734718
+ 59  De Rham Decidability and DPT Completeness                           10.5281/zenodo.18735931
+ 60  [Retired — merged into Paper 59]                                    —
+ 61  Lang's Conjecture as the MP→BISH Gate                               10.5281/zenodo.18736959
+ 62  [Retired — merged into Paper 63]                                    —
+ 63  The Intermediate Jacobian Obstruction                               —(pending)
+ 64  Uniform p-Adic Decidability for Elliptic Curves                     10.5281/zenodo.18737090
+ 65  Self-Intersection Patterns Beyond Cyclic Cubics                     10.5281/zenodo.18743151
+ 66  Form-Class Resolution for Non-Cyclic Totally Real Cubics            10.5281/zenodo.18745722
+ 67  The Motive Is a Decidability Certificate (Monograph)               10.5281/zenodo.18746343
+ 68  Fermat's Last Theorem Is BISH                                      10.5281/zenodo.18749965
+ 69  Function Field Langlands Is BISH                                    10.5281/zenodo.18749757
+ 70  The Archimedean Principle (Capstone)                                 10.5281/zenodo.18750992
+ 71  Archimedean Principle in Cryptography and Computation               10.5281/zenodo.18752015
+ 72  The DPT Characterization Theorem                                    10.5281/zenodo.18765393
+ 73  Standard Conjecture D Is Necessary for Morphism Decidability        (pending Zenodo)
+ 74  Algebraic Spectrum Is Necessary for Eigenvalue Decidability         (in progress)
+
+================================================================================
+STATISTICS
+================================================================================
+Total papers:         72 active (of 74 numbered)
+Withdrawn:            2 (Papers 1, 3)
+Retired:              2 (Paper 60 → 59; Paper 62 → 63)
+Papers with DOIs:     67
+Papers pending DOI:   3 (63, 73, 74)
+Papers with Lean 4:   ~64 (Papers 64-66 computational/LaTeX-only)
+Total Lean 4 lines:   ~88,950+
+Domains covered:      Functional Analysis, Quantum Mechanics, General Relativity,
+                      Statistical Mechanics, QFT (QED/QCD), Quantum Information,
+                      Classical Mechanics, Foundations, Undecidability, AdS/CFT,
+                      Cosmology, Arithmetic Geometry, Motives, Number Theory
+
+Logical hierarchy:    BISH < LLPO < WLPO < LPO (omniscience spine)
+                      MP (orthogonal to spine, implied by LPO)
+                      FT (independent, physically dispensable)
+                      DC (independent, physically dispensable)
+                      Ceiling: BISH + LPO for all empirical physics
+
+All DOIs carry prefix https://doi.org/
+================================================================================
