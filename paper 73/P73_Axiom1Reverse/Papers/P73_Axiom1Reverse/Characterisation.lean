@@ -12,7 +12,7 @@
   Paper 73: Axiom 1 ↔ BISH morphisms (via radical detachability).
 
   Combined with Paper 74 (Axiom 2, planned): all three DPT axioms
-  have individual reverse characterisations, upgrading "minimal"
+  have individual reverse characterizations, upgrading "minimal"
   (Paper 72 Theorem A) to "uniquely necessary" for each.
 -/
 import Papers.P73_Axiom1Reverse.Reverse
@@ -25,11 +25,11 @@ open CRMLevel RadicalStatus
 
 /-- **THEOREM C (Axiom 1 Characterisation):**
     Standard Conjecture D is necessary and sufficient for
-    BISH-decidable morphisms in a realisation-compatible category.
+    BISH-decidable morphisms in a realization-compatible category.
 
     (1) Forward: Conjecture D → BISH (Paper 46/50).
     (2) Reverse: BISH → Conjecture D (Paper 73, new).
-    (3) Without Conjecture D, realisation-compatible costs LPO.
+    (3) Without Conjecture D, realization-compatible costs LPO.
     (4) The Jannsen escape (numerical motives, BISH but unfaithful)
         confirms the trade-off is real, not vacuous.
 
@@ -40,9 +40,9 @@ theorem axiom1_characterisation :
     -- Forward and reverse
     (morphism_cost detachable = BISH)
     ∧ (morphism_cost non_detachable = LPO)
-    -- Realisation-compatible without Conj D costs LPO
+    -- Realization-compatible without Conj D costs LPO
     ∧ (morphism_cost (standard_without_conjD).radical = LPO)
-    -- Jannsen escape: BISH without realisation
+    -- Jannsen escape: BISH without realization
     ∧ (morphism_cost (numerical_without_conjD).radical = BISH) := by
   exact ⟨conjD_gives_BISH,
          no_conjD_gives_LPO,
@@ -62,9 +62,9 @@ theorem axiom1_characterisation :
     but the logically necessary bridge between ℓ-adic cohomology
     and constructive decidability. -/
 theorem axiom1_principle_sharpened (r : RadicalStatus) :
-    morphism_cost r = BISH ↔ conjD_holds r = true := by
-  rw [conjD_iff_detachable]
-  exact morphism_decidability_equivalence r
+    morphism_cost r = BISH ↔ conjD_holds r = true :=
+  ⟨fun h => (conjD_iff_detachable r).mpr ((morphism_decidability_equivalence r).mp h),
+   fun h => (morphism_decidability_equivalence r).mpr ((conjD_iff_detachable r).mp h)⟩
 
 -- ============================================================
 -- Verification

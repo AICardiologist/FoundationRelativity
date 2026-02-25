@@ -21,9 +21,9 @@
   ker(cl) is the non-constructive content.
 
   Jannsen's theorem (1992): numerical motives form a semisimple abelian
-  category without Conjecture D — but without faithful ℓ-adic realisation.
+  category without Conjecture D — but without faithful ℓ-adic realization.
   CRM reading: numerical motives are the BISH-accessible part; homological
-  motives are the realisation-faithful part; Conjecture D asserts these coincide.
+  motives are the realization-faithful part; Conjecture D asserts these coincide.
 
   Design: Paper 69/72 axiom pattern. Each mathematical component gets
   an opaque + axiom _eq pair. Proofs require rewriting through axioms.
@@ -100,7 +100,7 @@ def conjD_holds : RadicalStatus → Bool
   | non_detachable => false
 
 -- ============================================================
--- Axiomatised Morphism Costs (Paper 69/72 pattern)
+-- Axiomatized Morphism Costs (Paper 69/72 pattern)
 -- ============================================================
 
 /-- CRM cost of morphism decidability when Conjecture D holds.
@@ -127,41 +127,41 @@ axiom conjD_morphism_cost_eq : conjD_morphism_cost = BISH
     (1) Encoding: for any a ∈ ℚ_ℓ, there exist cycles Z_a, Z_0
         with cl(Z_a) = cl(Z_0) iff a = 0 (Paper 46, encode axiom).
         A homological-equality oracle would decide a = 0 for all a → LPO.
-    (2) Realisation compatibility: a faithful motivic category
+    (2) Realization compatibility: a faithful motivic category
         requires detecting homological equivalence (not just numerical).
         But homological equivalence requires ℚ_ℓ zero-testing → LPO.
 
     Jannsen's theorem (1992): numerical motives are semisimple and
     abelian WITHOUT Conjecture D. So you can build a nice BISH-decidable
-    category — but it lacks faithful ℓ-adic realisation. The trade-off:
-    BISH-decidable OR realisation-compatible, not both, unless Conj D.
+    category — but it lacks faithful ℓ-adic realization. The trade-off:
+    BISH-decidable OR realization-compatible, not both, unless Conj D.
     Reference: Paper 46 Theorem T4a, Jannsen (1992). -/
 opaque no_conjD_morphism_cost : CRMLevel
 axiom no_conjD_morphism_cost_eq : no_conjD_morphism_cost = LPO
 
-/-- CRM cost of morphism decidability in a realisation-compatible
+/-- CRM cost of morphism decidability in a realization-compatible
     motivic category, as a function of the radical status.
-    Delegates to axiomatised components. -/
+    Delegates to axiomatized components. -/
 def morphism_cost : RadicalStatus → CRMLevel
   | detachable     => conjD_morphism_cost
   | non_detachable => no_conjD_morphism_cost
 
 -- ============================================================
--- Realisation Compatibility
+-- Realization Compatibility
 -- ============================================================
 
-/-- A motivic category is realisation-compatible if its equivalence
+/-- A motivic category is realization-compatible if its equivalence
     relation ~ is at least as fine as homological equivalence:
       Z₁ ~ Z₂  ⟹  cl(Z₁) = cl(Z₂).
     Equivalently: ker(~) ⊆ ker(cl).
 
-    This is required for the ℓ-adic realisation functor to be faithful.
+    This is required for the ℓ-adic realization functor to be faithful.
     Without it, the category identifies motives with different cohomology.
 
     When the radical is detachable (Conj D): numerical = homological,
-    so numerical motives are automatically realisation-compatible.
+    so numerical motives are automatically realization-compatible.
     When the radical is non-detachable (no Conj D): only homological
-    motives are realisation-compatible, but these cost LPO. -/
+    motives are realization-compatible, but these cost LPO. -/
 structure MotivicCategory where
   radical : RadicalStatus
   realization_compatible : Bool

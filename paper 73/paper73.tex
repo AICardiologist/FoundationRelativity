@@ -349,7 +349,11 @@ without Conjecture~D?  No: Paper~46's encoding axiom
 (\texttt{encode\_scalar\_to\_hom\_equiv}) shows that a
 homological-equality oracle decides \emph{all} $\Qell$-scalar
 equalities, which is full $\LPO$---not a weaker principle.
-The encoding is sharp.
+The mechanism: for any binary sequence $(a_n)$, Paper~46 constructs
+a cycle whose homological triviality is equivalent to $(a_n)$ being
+identically zero; an oracle for morphism equality therefore decides
+the halting-like question for arbitrary sequences, yielding $\LPO$
+directly rather than a fragment like $\WLPO$ or $\LLPO$.
 \end{remark}
 
 \subsection{The Jannsen escape}\label{sec:jannsen}
@@ -586,9 +590,11 @@ $\LPO \ne \BISH$ in the inductive type.
 theorem axiom1_principle_sharpened
     (r : RadicalStatus) :
     morphism_cost r = BISH ↔
-    conjD_holds r = true := by
-  rw [conjD_iff_detachable]
-  exact morphism_decidability_equivalence r
+    conjD_holds r = true :=
+  ⟨fun h => (conjD_iff_detachable r).mpr
+    ((morphism_decidability_equivalence r).mp h),
+   fun h => (morphism_decidability_equivalence r).mpr
+    ((conjD_iff_detachable r).mp h)⟩
 \end{lstlisting}
 
 \subsection{\texttt{\#print axioms} output}
@@ -596,22 +602,30 @@ theorem axiom1_principle_sharpened
 \begin{small}
 \begin{verbatim}
 'axiom1_characterisation' depends on axioms:
-  [conjD_morphism_cost, conjD_morphism_cost_eq,
-   no_conjD_morphism_cost, no_conjD_morphism_cost_eq]
+  [conjD_morphism_cost_eq, no_conjD_morphism_cost_eq]
 
 'axiom1_principle_sharpened' depends on axioms:
-  [conjD_morphism_cost, conjD_morphism_cost_eq,
-   no_conjD_morphism_cost, no_conjD_morphism_cost_eq]
+  [conjD_morphism_cost_eq, no_conjD_morphism_cost_eq]
 
 'morphism_decidability_equivalence' depends on axioms:
-  [conjD_morphism_cost, conjD_morphism_cost_eq,
-   no_conjD_morphism_cost, no_conjD_morphism_cost_eq]
+  [conjD_morphism_cost_eq, no_conjD_morphism_cost_eq]
+
+'conjD_iff_detachable' does not depend on any axioms
+
+'jannsen_obstruction' depends on axioms:
+  [no_conjD_morphism_cost_eq]
+
+'jannsen_escape' depends on axioms:
+  [conjD_morphism_cost_eq]
 \end{verbatim}
 \end{small}
 
 \noindent No theorem depends on \texttt{Classical.choice}, \texttt{propext},
-or \texttt{Quot.sound}.  The only axioms are the four custom declarations
-in \cref{tab:axioms}, all with mathematical references.
+or \texttt{Quot.sound}.  The \texttt{opaque} data constants
+(\texttt{conjD\_morphism\_cost}, \texttt{no\_conjD\_morphism\_cost})
+do not appear in the axiom trace because Lean~4 reports only
+propositional axioms; the \texttt{opaque} declarations contribute
+indirectly via their \texttt{\_eq} axioms.
 
 \subsection{Classical.choice audit}
 All theorems in this bundle are constructively clean: no invocation of

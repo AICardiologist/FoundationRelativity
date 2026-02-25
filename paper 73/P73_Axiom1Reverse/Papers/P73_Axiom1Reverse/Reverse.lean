@@ -1,7 +1,7 @@
 /-
   Paper 73: Reverse Direction — BISH Morphisms → Conjecture D
 
-  The new result. If morphism equality in a realisation-compatible
+  The new result. If morphism equality in a realization-compatible
   motivic category is BISH-decidable, then Conjecture D must hold.
 
   Proof (contrapositive):
@@ -11,17 +11,17 @@
   The mathematical content behind the axiom:
   If Conjecture D fails, there exist cycles Z that are numerically
   trivial (Z·W = 0 for all W) but homologically nontrivial (cl(Z) ≠ 0).
-  A realisation-compatible category must distinguish Z from 0
+  A realization-compatible category must distinguish Z from 0
   (since cl(Z) ≠ cl(0)). But detecting Z requires ℚ_ℓ zero-testing.
   Paper 46 Theorem T4a: this encodes LPO.
 
   The "Jannsen escape" doesn't work:
   Jannsen (1992) showed numerical motives are semisimple even without
   Conjecture D. So one could use numerical motives and get BISH.
-  But this sacrifices realisation-compatibility: numerical motives
-  identify cycles that cohomology distinguishes. The realisation
+  But this sacrifices realization-compatibility: numerical motives
+  identify cycles that cohomology distinguishes. The realization
   functor is not faithful. For the "correct" motivic category
-  (faithful realisation), Conjecture D is necessary.
+  (faithful realization), Conjecture D is necessary.
 
   References: Paper 46 (encoding, LPO), Jannsen (1992),
     Grothendieck (Standard Conjectures, 1969).
@@ -38,7 +38,9 @@ open CRMLevel RadicalStatus
     Conjecture D holds iff the radical is detachable. -/
 theorem conjD_iff_detachable (r : RadicalStatus) :
     conjD_holds r = true ↔ r = detachable := by
-  cases r <;> simp [conjD_holds]
+  cases r
+  · exact ⟨fun _ => rfl, fun _ => rfl⟩
+  · exact ⟨fun h => Bool.noConfusion h, fun h => RadicalStatus.noConfusion h⟩
 
 -- ============================================================
 -- The Main Equivalence
@@ -71,13 +73,13 @@ theorem morphism_decidability_equivalence (r : RadicalStatus) :
     exact conjD_gives_BISH
 
 -- ============================================================
--- Realisation-Compatibility Constraint
+-- Realization-Compatibility Constraint
 -- ============================================================
 
 /-- **COROLLARY (Jannsen obstruction):**
     Without Conjecture D, you cannot have BOTH:
     (1) BISH-decidable morphisms, AND
-    (2) faithful ℓ-adic realisation.
+    (2) faithful ℓ-adic realization.
 
     - Numerical motives: (1) holds, (2) fails.
     - Homological motives: (2) holds, (1) fails (costs LPO).

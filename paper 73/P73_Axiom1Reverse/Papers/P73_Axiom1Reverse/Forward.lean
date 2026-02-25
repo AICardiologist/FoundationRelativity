@@ -11,7 +11,7 @@
                   → BISH                     (integer comparisons)
 
   References: Paper 46 Theorem T2 (numerical = BISH),
-    Paper 46 Theorem T4b (Conj D decidabilises),
+    Paper 46 Theorem T4b (Conj D decidabilizes),
     Paper 50 §6 (ConjD.lean).
 -/
 import Papers.P73_Axiom1Reverse.Defs
@@ -30,7 +30,7 @@ theorem conjD_gives_BISH :
   unfold morphism_cost
   exact conjD_morphism_cost_eq
 
-/-- Without Conjecture D, realisation-compatible morphism decidability
+/-- Without Conjecture D, realization-compatible morphism decidability
     requires LPO (homological equivalence needs ℚ_ℓ zero-testing). -/
 theorem no_conjD_gives_LPO :
     morphism_cost non_detachable = LPO := by
