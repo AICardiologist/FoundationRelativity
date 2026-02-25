@@ -43,7 +43,7 @@ open CRMLevel SpectrumType
     Scope: applies to eigenvalue/spectral parameter comparison.
     Whether Axiom 2 is necessary for OTHER operations (e.g.,
     L-function evaluation, Euler product convergence) is separate. -/
-theorem axiom2_characterisation :
+theorem axiom2_characterization :
     -- Forward and reverse
     (eigenvalue_cost algebraic = BISH)
     ∧ (eigenvalue_cost continuous = WLPO)
@@ -102,6 +102,6 @@ theorem dpt_trio_costs :
 #check axiom2_iff_algebraic
 #check deligne_constraint
 #check ramanujan_resolution
-#check axiom2_characterisation
+#check axiom2_characterization
 #check axiom2_principle_sharpened
 #check dpt_trio_costs

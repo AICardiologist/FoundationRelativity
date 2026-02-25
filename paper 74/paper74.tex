@@ -192,27 +192,69 @@ In the CRM hierarchy, $\WLPO$ sits strictly below $\LPO$: $\LPO$
 implies $\WLPO$ but not conversely.  The DPT axiom trio therefore
 stratifies the constructive cost across two distinct levels.
 
-\medskip
-\noindent\textbf{Three fatal flaws in the naive framing.}
+\subsection{Three fatal flaws in the naive framing}\label{sec:fatal-flaws}
+
 One might attempt to frame Axiom~2's failure as ``eigenvalues become
-transcendental.''  This framing suffers three fatal defects:
-\begin{enumerate}
-  \item \emph{Weil~II (Deligne 1980)}~\cite{deligne-weil2}: all
-    separated schemes of finite type over~$\mathbb{F}_q$ have
-    algebraic Frobenius eigenvalues.  There are no transcendental
-    eigenvalues in classical motives.
-  \item \emph{Linear algebra}: Axiom~1 (finite-dimensional
-    $\mathbb{Q}$-morphisms) forces endomorphisms to satisfy minimal
-    polynomials, hence eigenvalues are algebraic.  One cannot drop
-    Axiom~2 without first dropping Axiom~1.
-  \item \emph{$\ell$-adic $\CLASS$ trap}: mapping transcendental
-    elements of $\bar{\mathbb{Q}}_\ell$ to~$\mathbb{C}$ requires
-    the Axiom of Choice, landing in~$\CLASS$, not~$\WLPO$.
-\end{enumerate}
-The correct framing: Axiom~2 fails when the category extends beyond
-geometric origin to the full analytic Langlands spectrum.  The
-spectral parameters of Maass forms and unramified characters
-live in~$\mathbb{C}$ natively, avoiding the $\CLASS$ trap entirely.
+transcendental.''  This framing suffers three fatal defects.
+
+\medskip
+\noindent\textbf{Flaw~1: Weil~II (Deligne 1980).}
+Deligne's Weil~II theorem~\cite{deligne-weil2} proves that for every
+separated scheme of finite type over~$\mathbb{F}_q$, the eigenvalues
+of the Frobenius endomorphism acting on $\ell$-adic cohomology are
+algebraic numbers.  More precisely, if $X$ is a variety
+over~$\mathbb{F}_q$ and $\alpha$ is an eigenvalue of $\mathrm{Frob}_q$
+acting on $H^i_{\text{\'et}}(X_{\bar{\mathbb{F}}_q}}, \mathbb{Q}_\ell)$,
+then $\alpha$ is an algebraic integer with $|\iota(\alpha)| = q^{w/2}$
+for every embedding $\iota \colon \bar{\mathbb{Q}} \hookrightarrow
+\mathbb{C}$ and some weight $w \le i$.  There are no transcendental
+Frobenius eigenvalues in the classical motivic setting.  The ``naive''
+framing contradicts established arithmetic geometry.
+
+\medskip
+\noindent\textbf{Flaw~2: The linear algebra vacuum.}
+Axiom~1 (Standard Conjecture~D) provides that morphisms between motives
+are finite-dimensional $\mathbb{Q}$-vector spaces.  Any endomorphism
+$\phi \colon M \to M$ of a motive therefore satisfies a minimal
+polynomial $p(x) \in \mathbb{Q}[x]$ of degree at most $\dim_{\mathbb{Q}}
+\mathrm{End}(M)$.  The eigenvalues of $\phi$ are roots of $p(x)$, hence
+algebraic over~$\mathbb{Q}$.  Consequently, within the DPT framework
+where all three axioms are in play, algebraic spectrum is already forced
+by Axiom~1 alone.  One cannot isolate the failure of Axiom~2 while
+keeping Axiom~1 intact---the axioms interact through the linear algebra
+of endomorphism rings.
+
+\medskip
+\noindent\textbf{Flaw~3: The $\ell$-adic $\CLASS$ trap.}
+Even granting the existence of non-algebraic elements in
+$\bar{\mathbb{Q}}_\ell$, comparing such elements with complex
+numbers requires an embedding $\bar{\mathbb{Q}}_\ell \hookrightarrow
+\mathbb{C}$.  No canonical such embedding exists; constructing one
+requires the Axiom of Choice (specifically, extending a field
+isomorphism from $\bar{\mathbb{Q}}$ to a transcendence basis).  This
+lands in~$\CLASS$, not~$\WLPO$.  The naive framing would assign a
+cost of $\CLASS$ to Axiom~2 failure, which is both too expensive
+and mathematically misleading: it conflates the choice principle
+needed for $\ell$-adic embeddings with the constructive content of
+eigenvalue comparison.
+
+\medskip
+\noindent\textbf{The correct framing.}
+Axiom~2 fails when the category extends beyond
+geometric origin to the full analytic Langlands spectrum.%
+\footnote{Paper~72's descent table used the phrase ``transcendental
+$|\alpha|$'' for Axiom~2 failure.  The present paper supersedes that
+terminology: the mechanism is continuous spectral parameters in the
+analytic Langlands spectrum, not transcendental algebraic numbers
+(which do not arise, per Weil~II).}
+The spectral parameters of Maass forms and unramified characters
+live in~$\mathbb{C}$ natively---they are archimedean analytic objects,
+not $\ell$-adic algebraic objects.  No embedding $\bar{\mathbb{Q}}_\ell
+\hookrightarrow \mathbb{C}$ is involved.  The comparison $\mathrm{Re}(s)
+= \tfrac{1}{2}$ is a real-number equality test, which is exactly $\WLPO$.
+This is why the correct cost is $\WLPO$ and not $\CLASS$: the analytic
+Langlands spectrum avoids the $\ell$-adic CLASS trap by working with
+archimedean parameters from the start.
 
 \medskip
 \noindent\textbf{Atlas position.}
@@ -300,9 +342,10 @@ conjecture remains open.
 A Maass form has a spectral parameter $s \in \mathbb{C}$ with
 $\mathrm{Re}(s) \in [0, 1]$.  The Ramanujan conjecture asserts
 $\mathrm{Re}(s) = \tfrac{1}{2}$.  Selberg~\cite{selberg} proved
-the weaker bound $\mathrm{Re}(s) \ge \tfrac{1}{4}$ (equivalently,
-$\lambda_1 \ge \tfrac{1}{4}$ for the first eigenvalue of the
-Laplacian on congruence surfaces).
+the weaker bound $\lambda_1 \ge \tfrac{3}{16}$ for the first
+eigenvalue of the Laplacian on congruence surfaces; the conjecture
+$\lambda_1 \ge \tfrac{1}{4}$ (equivalently, $\mathrm{Re}(s) =
+\tfrac{1}{2}$) remains open.
 
 \begin{definition}[Continuous spectrum]
 A spectral category has \emph{continuous spectrum} if its spectral
@@ -333,6 +376,42 @@ answer.  Eigenvalue comparison (``does $s$ equal $\tfrac{1}{2}$?'')
 is a single equality test.  Cycle-search (``is there $Z$ with
 $h(Z) \le B$?'') and radical detection (``is there $W$ with
 $\langle Z, W \rangle \ne 0$?'') are existential searches.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+  >=Stealth,
+  box/.style={draw, rounded corners, minimum width=3.6cm, minimum height=1.2cm,
+              align=center, font=\small},
+  lpo/.style={box, fill=red!10, draw=red!60},
+  wlpo/.style={box, fill=orange!10, draw=orange!60},
+  bish/.style={box, fill=green!10, draw=green!60},
+]
+  % WLPO column
+  \node[wlpo] (wlpo) at (0,0) {\textbf{WLPO}\\equality test\\$x = c\,?$};
+  \node[bish] (bish-w) at (0,-2.5) {\textbf{BISH}\\known constraint\\$\mathrm{Re}(s) = \tfrac{1}{2}$};
+  \draw[->, thick, orange!70] (wlpo) -- node[right, font=\footnotesize] {Ramanujan} (bish-w);
+  \node[above=0.3cm of wlpo, font=\footnotesize\bfseries] {Axiom~2 (spectrum)};
+
+  % LPO column — search
+  \node[lpo] (lpo1) at (5.5,0) {\textbf{LPO}\\existential search\\$\exists Z,\, h(Z) \le B\,?$};
+  \node[bish] (bish-s) at (5.5,-2.5) {\textbf{BISH}\\bounded enumeration\\Northcott finite set};
+  \draw[->, thick, red!70] (lpo1) -- node[right, font=\footnotesize] {Axiom~3} (bish-s);
+  \node[above=0.3cm of lpo1, font=\footnotesize\bfseries] {Axiom~3 (cycle-search)};
+
+  % LPO column — radical
+  \node[lpo] (lpo2) at (11,0) {\textbf{LPO}\\existential search\\$\exists W,\, \langle Z,W\rangle \ne 0\,?$};
+  \node[bish] (bish-r) at (11,-2.5) {\textbf{BISH}\\finite-dim test\\Conjecture~D};
+  \draw[->, thick, red!70] (lpo2) -- node[right, font=\footnotesize] {Axiom~1} (bish-r);
+  \node[above=0.3cm of lpo2, font=\footnotesize\bfseries] {Axiom~1 (morphisms)};
+\end{tikzpicture}
+\caption{The equality-vs-search dichotomy across the DPT axiom trio.
+  Axiom~2 (left, orange) involves a single equality test, costing
+  $\WLPO$ when it fails.  Axioms~1 and~3 (right, red) involve
+  existential searches, costing $\LPO$ when they fail.  Each axiom
+  provides the descent arrow from omniscience to $\BISH$.}
+\label{fig:dichotomy}
+\end{figure}
 
 % ============================================================
 % 3. MAIN RESULTS
@@ -455,23 +534,66 @@ spectrum'' automatically algebraic).
 
 If the Ramanujan conjecture is proven unconditionally, every Maass
 form satisfies $\mathrm{Re}(s) = \tfrac{1}{2}$; the spectral
-parameters are effectively algebraic (they satisfy a known algebraic
-equation), restoring $\BISH$ decidability without geometric origin.
+parameters satisfy a known constraint ($\mathrm{Re}(s) = \tfrac{1}{2}$),
+eliminating the equality test entirely and restoring $\BISH$ decidability
+without geometric origin.
 Axiomatized as \texttt{ramanujan\_resolution}.
 \end{proof}
 
-\begin{remark}[The Selberg eigenvalue conjecture as a $\WLPO$ instance]
-\label{rmk:selberg}
-Selberg~\cite{selberg} conjectured $\lambda_1 \ge \tfrac{1}{4}$ for
-the first eigenvalue of the Laplacian on congruence surfaces, and
-proved $\lambda_1 \ge \tfrac{3}{16}$.  In the CRM framework, the
-full Selberg conjecture (equivalent to the Ramanujan conjecture
-for $\mathrm{GL}_2$ over~$\mathbb{Q}$) asserts that a specific
-real-number equality holds; verifying it for a given Maass form is
-a $\WLPO$ instance.  Proving the conjecture unconditionally would
-eliminate the $\WLPO$ cost for the $\mathrm{GL}_2(\mathbb{Q})$ case,
-paralleling how Deligne's theorem eliminates it for geometric motives.
-\end{remark}
+\subsection{The Selberg eigenvalue conjecture as a $\WLPO$ instance}
+\label{sec:selberg}
+
+The Selberg eigenvalue conjecture provides a concrete illustration of
+the $\WLPO$ cost identified in \cref{thm:no-forward}.
+
+For a congruence subgroup $\Gamma \le \mathrm{SL}_2(\mathbb{Z})$,
+the Laplacian $\Delta$ on $L^2(\Gamma \backslash \mathfrak{H})$ has a
+discrete spectrum $0 = \lambda_0 < \lambda_1 \le \lambda_2 \le \cdots$
+for cuspidal eigenfunctions.  Each eigenvalue $\lambda = s(1-s)$ is
+parameterized by a spectral parameter $s$ with $\mathrm{Re}(s) \in
+[0, 1]$.
+
+\begin{itemize}
+\item \textbf{Selberg's proven bound} (1965)~\cite{selberg}:
+  $\lambda_1 \ge \tfrac{3}{16}$ for all congruence subgroups.  This
+  is equivalent to $\mathrm{Re}(s) \ge \tfrac{1}{4}$ for the spectral
+  parameter.
+
+\item \textbf{Selberg's conjecture}: $\lambda_1 \ge \tfrac{1}{4}$,
+  equivalently $\mathrm{Re}(s) = \tfrac{1}{2}$ for all cuspidal
+  Maass forms on congruence surfaces.  This is equivalent to the
+  Ramanujan conjecture for $\mathrm{GL}_2$ over~$\mathbb{Q}$
+  (Satake~1966).
+
+\item \textbf{Best known bound}: Kim and Sarnak (2003, appendix to
+  Kim~\cite{bump}) proved $\lambda_1 \ge \tfrac{1}{4} - (\tfrac{7}{64})^2
+  \approx 0.2380$, i.e., $\mathrm{Re}(s) \ge \tfrac{1}{2} - \tfrac{7}{64}$.
+  The gap between this bound and $\tfrac{1}{4}$ remains open.
+\end{itemize}
+
+In the CRM framework, verifying the Selberg conjecture for a
+\emph{specific} Maass form $f$ amounts to testing the real-number
+equality $\mathrm{Re}(s_f) = \tfrac{1}{2}$.  This is a single
+equality test on a continuous parameter, hence a $\WLPO$ instance.
+The proven bounds ($\tfrac{3}{16}$, Kim-Sarnak) narrow the range
+but do not decide equality.
+
+Proving the full Selberg conjecture unconditionally would eliminate
+the $\WLPO$ cost for the $\mathrm{GL}_2(\mathbb{Q})$ case, paralleling
+how Deligne's theorem eliminates it for geometric motives.  The
+conceptual parallel is precise:
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Setting} & \textbf{Constraint} & \textbf{Effect} \\
+\midrule
+Geometric motives & Deligne (Weil~II) & Algebraic eigenvalues $\to \BISH$ \\
+Maass forms ($\mathrm{GL}_2/\mathbb{Q}$) & Selberg conjecture
+  & $\mathrm{Re}(s) = \tfrac{1}{2}$ $\to \BISH$ \\
+General automorphic & Ramanujan conjecture & Eliminates all $\WLPO$ costs \\
+\bottomrule
+\end{tabular}
+\end{center}
 
 \subsection{Theorem C: The characterization}\label{sec:characterization}
 
@@ -491,7 +613,7 @@ condition for $\BISH$-decidable eigenvalue comparison:
 
 \begin{proof}
 Assembly of \cref{thm:forward,thm:no-forward,thm:biconditional,thm:deligne}.
-Axiomatized as \texttt{axiom2\_characterisation}.
+Axiomatized as \texttt{axiom2\_characterization}.
 \end{proof}
 
 \begin{corollary}[Axiom~2 Principle, sharpened]\label{cor:axiom2-sharp}
@@ -628,7 +750,7 @@ The Lean~4 bundle \texttt{Papers/P74\_Axiom2Reverse/} contains:
 \texttt{Defs.lean}             & CRM hierarchy, spectrum type, axiomatized costs \\
 \texttt{Forward.lean}          & Theorem A: algebraic $\to$ BISH \\
 \texttt{Reverse.lean}          & Theorem B: biconditional + Deligne constraint \\
-\texttt{Characterisation.lean} & Theorem C: full assembly + sharpened principle \\
+\texttt{Characterization.lean} & Theorem C: full assembly + sharpened principle \\
 \texttt{Main.lean}             & Aggregator with \texttt{\#check} statements \\
 \bottomrule
 \end{tabular}
@@ -703,7 +825,7 @@ theorem axiom2_principle_sharpened
 
 \begin{small}
 \begin{verbatim}
-'axiom2_characterisation' depends on axioms:
+'axiom2_characterization' depends on axioms:
   [algebraic_eigenvalue_cost_eq, continuous_eigenvalue_cost_eq]
 
 'axiom2_principle_sharpened' depends on axioms:
@@ -801,12 +923,38 @@ is not merely minimal (no axiom is redundant) but \emph{canonical}
 
 \subsection{Connection to Paper~75 (conservation test)}
 
-Paper~75 (planned) will test the conservation thesis: that the CRM
-calibration of a specific Fargues--Scholze result can be predicted
+Paper~75 (planned) will test the \emph{conservation thesis}: that
+the CRM calibration of arithmetic results proved via condensed and
+perfectoid methods (Fargues--Scholze~\cite{serre}) can be predicted
 from the DPT framework.  The trilogy established in Papers~72--74
 provides the tool: if one knows which spectral, morphism, or
 cycle-search operations a theorem employs, the DPT biconditionals
 predict the exact CRM cost.
+
+The conservation question is stratified across three layers of the
+condensed mathematics programme:
+\begin{enumerate}
+  \item \emph{Algebraic layer} (solidification functor for condensed
+    abelian groups): the relevant constructions involve countable
+    inverse limits, where the Mittag-Leffler condition or Dependent
+    Choice governs convergence.  Preliminary analysis suggests this
+    layer conserves: the arithmetic content descends to $\BISH + \LPO$
+    or lower.
+  \item \emph{Homological layer} (injective resolutions in
+    solid module categories): existence of enough injectives in general
+    abelian categories requires Zorn's lemma ($= \CLASS$).
+    Conservation may fail here unless bounded derived categories can
+    bypass injective resolutions via \v{C}ech complexes.
+  \item \emph{Geometric layer} (the v-topology on perfectoid spaces):
+    the existence of enough points for the v-site requires the Boolean
+    Prime Ideal theorem (BPI, a consequence of the Axiom of Choice).
+    Conservation fails at this layer in full generality.
+\end{enumerate}
+The DPT biconditionals from Papers~72--74 predict exactly which
+layer an arithmetic conclusion depends on: if the conclusion involves
+only eigenvalue comparison (Axiom~2), the conservation question reduces
+to whether $\WLPO$ suffices; if it involves cycle-search (Axiom~3),
+$\LPO$ is the threshold.
 
 \subsection{The geometric-analytic boundary}
 
@@ -827,14 +975,45 @@ the axiom is the logical bridge between a decidable world
 ($\BISH$) and an omniscient one ($\WLPO$ or $\LPO$).
 
 \subsection{De-omniscientizing descent}
-The standard pattern: identify a classical theorem requiring
-omniscience, locate the specific principle, and find the hypothesis
-that eliminates it.  Here: eigenvalue comparison classically decides
-spectral parameters via $\WLPO$ (real-number equality test).
-Axiom~2 (algebraic spectrum) de-omniscientizes: it replaces
-real-number equality with algebraic GCD computation.  The descent:
-$\WLPO$ (without Axiom~2, continuous parameters) $\to$ $\BISH$
-(with Axiom~2, algebraic eigenvalues via Deligne).
+The standard pattern in the CRM programme is: (1)~identify a classical
+theorem requiring omniscience, (2)~locate the specific constructive
+principle, and (3)~find the hypothesis that eliminates it.  The
+DPT trilogy instantiates this pattern three times, with the same
+logical structure but different mathematical mechanisms:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lp{3.1cm}p{3.3cm}p{3.3cm}}
+\toprule
+\textbf{Axiom} & \textbf{Classical operation} & \textbf{Omniscience}
+  & \textbf{De-omniscientizing hypothesis} \\
+\midrule
+2 (Spectrum) & Eigenvalue comparison: $s = \tfrac{1}{2}$?
+  & $\WLPO$ (equality test)
+  & Algebraic spectrum: GCD replaces real equality \\
+\addlinespace
+1 (Conj.~D) & Radical detection: $\exists W,\, \langle Z,W\rangle \ne 0$?
+  & $\LPO$ (search)
+  & Conj.~D: finite-dim $\mathbb{Q}$-space $\to$ bounded search \\
+\addlinespace
+3 (Polar.) & Cycle search: $\exists Z,\, h(Z) \le B$?
+  & $\LPO$ (search)
+  & Northcott: pos-def height $\to$ finite enumeration \\
+\bottomrule
+\end{tabular}
+\caption{The de-omniscientizing descent across the DPT trilogy.
+  Each axiom replaces an omniscient operation with a constructive
+  computation, descending from $\WLPO$ or $\LPO$ to $\BISH$.}
+\label{tab:descent-pattern}
+\end{table}
+
+\noindent The descent target is always $\BISH$, but the omniscience
+cost varies.  Axiom~2 costs $\WLPO$ because eigenvalue comparison
+is an equality test; Axioms~1 and~3 cost $\LPO$ because morphism
+and cycle operations are existential searches.  This asymmetry
+reflects the intrinsic difference between testing a value and
+searching a structure---a distinction invisible to classical
+mathematics but sharp in the constructive hierarchy.
 
 % ============================================================
 % 7. CONCLUSION
@@ -882,10 +1061,11 @@ Mathlib contributors for maintaining this essential infrastructure.
 
 This paper was drafted with AI assistance (Claude, Anthropic) for
 proof search and exposition.  The author is a clinician (interventional
-cardiology), not a professional mathematician; all mathematical content
-has been verified by formal proof (Lean~4) and by consultation with
-domain experts.  Errors of mathematical judgment remain the author's
-responsibility.
+cardiology), not a professional mathematician; the logical structure of
+the main results has been verified by formal proof (Lean~4); the
+mathematical arguments supporting the axiom assignments have been
+checked by the author and by consultation with domain experts.
+Errors of mathematical judgment remain the author's responsibility.
 
 This series is dedicated to the memory of Errett Bishop (1928--1983),
 whose program demonstrated that constructive mathematics is not a
@@ -967,53 +1147,59 @@ J.-P.~Serre.
 Graduate Texts in Mathematics~7, Springer-Verlag, 1973.
 
 \bibitem{p1}
-P.~C.~K.~Lee.
+P.~C.-K.~Lee.
 The Logical Cost of Physics Is the Logical Cost of $\mathbb{R}$
 (Paper~1).
 Zenodo, 2024.
 \url{https://doi.org/10.5281/zenodo.14538213}.
 
 \bibitem{p2}
-P.~C.~K.~Lee.
+P.~C.-K.~Lee.
 The Real Line Requires LPO (Paper~2).
 Zenodo, 2024.
 \url{https://doi.org/10.5281/zenodo.14545327}.
 
 \bibitem{p45}
-P.~C.~K.~Lee.
+P.~C.-K.~Lee.
 Constructive Reverse Mathematics of Weil Eigenvalues (Paper~45).
 Zenodo, 2025.
 \url{https://doi.org/10.5281/zenodo.18676170}.
 
 \bibitem{p46}
-P.~C.~K.~Lee.
+P.~C.-K.~Lee.
 Constructive Reverse Mathematics of Tate's Conjecture (Paper~46).
 Zenodo, 2025.
 \url{https://doi.org/10.5281/zenodo.18682285}.
 
 \bibitem{p50}
-P.~C.~K.~Lee.
+P.~C.-K.~Lee.
 Three Axioms for the Motive (Paper~50).
 Zenodo, 2025.
 \url{https://doi.org/10.5281/zenodo.18705837}.
 
 \bibitem{p51}
-P.~C.~K.~Lee.
+P.~C.-K.~Lee.
 Constructive Archimedean Rescue in BSD (Paper~51).
 Zenodo, 2025.
 \url{https://doi.org/10.5281/zenodo.18732168}.
 
 \bibitem{p72}
-P.~C.~K.~Lee.
+P.~C.-K.~Lee.
 The DPT Characterization Theorem (Paper~72).
 Zenodo, 2026.
 \url{https://doi.org/10.5281/zenodo.18765393}.
 
 \bibitem{p73}
-P.~C.~K.~Lee.
+P.~C.-K.~Lee.
 Standard Conjecture~D Is Necessary for Constructive Morphism
 Decidability (Paper~73).
 Zenodo, 2026.
+
+\bibitem{format-guide}
+P.~C.-K.~Lee.
+Paper Format Guide for the Constructive Reverse Mathematics Series.
+Zenodo, 2026.
+\url{https://doi.org/10.5281/zenodo.18765700}.
 
 \end{thebibliography}
 

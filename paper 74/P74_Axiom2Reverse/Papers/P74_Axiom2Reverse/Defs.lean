@@ -139,10 +139,10 @@ axiom algebraic_eigenvalue_cost_eq : algebraic_eigenvalue_cost = BISH
     through an infinite structure. This is precisely WLPO.
 
     Example: Maass forms for GL₂(ℝ) have spectral parameter
-    s ∈ ½ + iℝ. The Ramanujan conjecture asserts Re(s) = ½.
-    Testing this for a given Maass form is a real-number equality
-    test → WLPO. Selberg proved Re(s) ≥ ¼ unconditionally, but
-    the exact bound requires WLPO.
+    s with Re(s) ∈ [0,1]. The Ramanujan conjecture asserts Re(s) = ½
+    (equivalently λ₁ ≥ ¼). Testing this for a given Maass form is a
+    real-number equality test → WLPO. Selberg proved λ₁ ≥ 3/16
+    unconditionally; the full conjecture λ₁ ≥ ¼ requires WLPO.
     Reference: Paper 45 Theorem C2, Bump (1997), Selberg (1965). -/
 opaque continuous_eigenvalue_cost : CRMLevel
 axiom continuous_eigenvalue_cost_eq : continuous_eigenvalue_cost = WLPO

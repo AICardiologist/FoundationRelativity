@@ -36,7 +36,7 @@ Bundle: `P74_Axiom2Reverse/`
 | `Defs.lean` | CRM hierarchy, SpectrumType, axiomatized eigenvalue costs |
 | `Forward.lean` | Theorem A: algebraic → BISH |
 | `Reverse.lean` | Theorem B: biconditional + Deligne constraint |
-| `Characterisation.lean` | Theorem C: full assembly + sharpened principle |
+| `Characterization.lean` | Theorem C: full assembly + sharpened principle |
 | `Main.lean` | Aggregator with #check statements |
 
 **Build:** `lake build` from `P74_Axiom2Reverse/` directory.

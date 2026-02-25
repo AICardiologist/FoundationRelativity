@@ -24,7 +24,7 @@
     algebraic_eigenvalue_cost   + _eq  → Paper 45 C1, Deligne (1974)
     continuous_eigenvalue_cost  + _eq  → Paper 45 C2, Bump (1997)
 -/
-import Papers.P74_Axiom2Reverse.Characterisation
+import Papers.P74_Axiom2Reverse.Characterization
 
 -- Theorem A: forward direction
 #check algebraic_gives_BISH
@@ -35,7 +35,7 @@ import Papers.P74_Axiom2Reverse.Characterisation
 #check axiom2_iff_algebraic
 
 -- Theorem C: characterization
-#check axiom2_characterisation
+#check axiom2_characterization
 #check axiom2_principle_sharpened
 
 -- Deligne constraint
