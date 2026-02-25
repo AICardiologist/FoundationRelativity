@@ -82,18 +82,19 @@ No.  Title                                                               DOI
  71  Archimedean Principle in Cryptography and Computation               10.5281/zenodo.18752015
  72  The DPT Characterization Theorem                                    10.5281/zenodo.18765393
  73  Standard Conjecture D Is Necessary for Morphism Decidability        (pending Zenodo)
- 74  Algebraic Spectrum Is Necessary for Eigenvalue Decidability         (in progress)
+ 74  Algebraic Spectrum Is Necessary for Eigenvalue Decidability         (pending Zenodo)
+ 75  Conservation Test: Genestier-Lafforgue LLC Calibration              (in progress)
 
 ================================================================================
 STATISTICS
 ================================================================================
-Total papers:         72 active (of 74 numbered)
+Total papers:         73 active (of 75 numbered)
 Withdrawn:            2 (Papers 1, 3)
 Retired:              2 (Paper 60 → 59; Paper 62 → 63)
 Papers with DOIs:     67
-Papers pending DOI:   3 (63, 73, 74)
-Papers with Lean 4:   ~64 (Papers 64-66 computational/LaTeX-only)
-Total Lean 4 lines:   ~88,950+
+Papers pending DOI:   4 (63, 73, 74, 75)
+Papers with Lean 4:   ~65 (Papers 64-66 computational/LaTeX-only)
+Total Lean 4 lines:   ~89,150+
 Domains covered:      Functional Analysis, Quantum Mechanics, General Relativity,
                       Statistical Mechanics, QFT (QED/QCD), Quantum Information,
                       Classical Mechanics, Foundations, Undecidability, AdS/CFT,

@@ -61,13 +61,20 @@ BISH  ⊂  BISH + MP  ⊂  BISH + LLPO  ⊂  BISH + WLPO  ⊂  BISH + LPO  ⊂  
 
 **Result: Standard Conjecture D is necessary for BISH morphism decidability.** Conjecture D ↔ BISH morphism decidability in a realization-compatible motivic category. Without Conjecture D, the radical of the intersection pairing is non-detachable; morphism equality requires ℚ_ℓ zero-testing → LPO. Jannsen's theorem (1992) confirms the trade-off: numerical motives are BISH but lack faithful realization. 11 pages, ~250 lines Lean, zero sorry, 4 axioms.
 
-### Phase 6b: Axiom 2 Reverse (Paper 74) — IN PROGRESS
+### Phase 6b: Axiom 2 Reverse (Paper 74) — COMPLETE
 
-**Goal:** Algebraic spectrum ↔ BISH eigenvalue decidability. The reverse: if eigenvalue comparison is BISH-decidable, Frobenius eigenvalues must be algebraic. Without algebraic spectrum, comparison costs WLPO.
+**Result: Algebraic spectrum is necessary for BISH eigenvalue decidability.** Algebraic spectrum ↔ BISH eigenvalue decidability. Without geometric origin, the full analytic Langlands spectrum (Maass forms, unramified characters) has continuous spectral parameters; eigenvalue comparison costs WLPO (equality test, not existential search). The naive "transcendental eigenvalues" framing has three fatal flaws (Weil II, linear algebra vacuum, ℓ-adic CLASS trap); the correct domain of failure is the geometric-analytic boundary. 15 pages, ~200 lines Lean, zero sorry, zero propext, 4 axioms. Peer reviewed.
 
-### Phase 6c: Conservation Test (Paper 75) — PLANNED
+### Phase 6c: Conservation Test (Paper 75) — IN PROGRESS
 
-**Goal:** CRM-calibrate a specific Fargues-Scholze result. Test the conservation conjecture: do FS results cast BISH shadows?
+**Target:** CRM-calibrate the Genestier-Lafforgue semisimple local Langlands parametrization for arbitrary G. Statement costs BISH + WLPO (trace equality = eigenvalue comparison = Axiom 2). Proof costs CLASS (homological + v-topology layers).
+
+Three-layer stratification (established via external analysis, Feb 2026):
+- Algebraic layer (solidification): BISH. Mittag-Leffler holds trivially — transition maps of finite sets are split epimorphisms, lim¹ = 0 constructively. No DC needed.
+- Homological layer (K-injectives): CLASS (Zorn). Čech bypass fails — v-site has infinite cohomological dimension (Scholze 2017, Prop 14.12). Animation resolves sources only, not targets (Rf! needs injective envelopes).
+- Geometric layer (v-topology): CLASS (BPI). BunG is an Artin v-stack, not pro-étale. G-torsors on Fargues-Fontaine curve require v-covers to trivialize.
+
+Conservation hypothesis: the GL parametrization is a Π²₀ arithmetic statement; the CLASS scaffolding is plausibly eliminable, with residual cost BISH + WLPO predicted by DPT (the WLPO from Axiom 2's trace-equality test, per Paper 74).
 
 ---
 
@@ -82,6 +89,8 @@ BISH  ⊂  BISH + MP  ⊂  BISH + LLPO  ⊂  BISH + WLPO  ⊂  BISH + LPO  ⊂  
 **Paper 72** says: ℝ is not just sufficient but necessary. Without positive-definite height (which requires ℝ), cycle-search costs LPO. The Archimedean Principle is a biconditional. DPT and Fargues-Scholze are a logically forced partition: discrete sector (ℝ, BISH) vs continuous sector (ℚ_p, CLASS).
 
 **Paper 73** says: Conjecture D is not just sufficient but necessary for BISH morphism decidability. Without it, numerical and homological equivalence diverge; detecting the gap costs LPO. Jannsen's escape (numerical motives) is BISH but unfaithful — confirming the trade-off is real.
+
+**Paper 74** says: Algebraic spectrum is not just sufficient but necessary for BISH eigenvalue decidability. Without it, eigenvalue comparison costs WLPO (not LPO) — an equality test, not an existential search. The DPT axiom system is now fully characterized: each axiom is the unique condition for its domain (canonical, not merely minimal).
 
 ---
 
@@ -100,8 +109,8 @@ BISH  ⊂  BISH + MP  ⊂  BISH + LLPO  ⊂  BISH + WLPO  ⊂  BISH + LPO  ⊂  
 | 71 | **Archimedean Principle in Cryptography** | — | ✅ Published |
 | 72 | **DPT Characterization Theorem** | 10 | ✅ DONE — Lean verified, PDF compiled, Zenodo zip |
 | 73 | **Standard Conjecture D Is Necessary** | 11 | ✅ DONE — Lean verified, PDF compiled, Zenodo zip |
-| 74 | Axiom 2 reverse characterization | — | 🔨 IN PROGRESS |
-| 75 | Conservation test (FS result calibration) | — | 📋 PLANNED |
+| 74 | **Algebraic Spectrum Is Necessary** | 15 | ✅ DONE — Lean verified, PDF compiled, Zenodo zip, peer reviewed |
+| 75 | **Conservation Test: GL LLC Calibration** | — | 🔨 IN PROGRESS |
 
 ### File Inventory (actual state of `/mnt/user-data/outputs/`)
 
@@ -162,22 +171,25 @@ BISH  ⊂  BISH + MP  ⊂  BISH + LLPO  ⊂  BISH + WLPO  ⊂  BISH + LPO  ⊂  
 14. **DPT Characterization**: Archimedean Principle is a biconditional, not just forward (Paper 72)
 15. **DPT-vs-FS partition**: logically forced dichotomy — discrete/BISH vs continuous/CLASS (Paper 72)
 16. **ℤ-density obstruction**: ℤ dense in ℚ_p blocks Northcott independent of algebraic considerations (Paper 72)
+17. **WLPO-vs-LPO asymmetry**: Axiom 2 failure costs WLPO (equality test), Axioms 1 and 3 cost LPO (existential search) — intrinsic computational distinction (Paper 74)
+18. **DPT axiom system is canonical**: each axiom is the unique condition for its domain, not merely minimal (Papers 72–74)
+19. **Geometric-analytic boundary**: the correct domain of Axiom 2 failure is Langlands parameters without geometric origin, not "transcendental eigenvalues" (Paper 74)
 
 ---
 
-## 6. Open Questions (from Papers 70 and 72)
+## 6. Open Questions (from Papers 70–74)
 
 1. MP gap refinement — natural domain at BISH + LLPO?
 2. Langlands correspondence as CRM axiom?
 3. Three spectral gaps: exactly Σ⁰₂-complete?
-4. **Light condensed constructivity** — can light condensed math (sheaves on light profinite sets, i.e., countable inverse limits of finite sets) be developed in BISH + LPO rather than CLASS? Gemini analysis (Feb 2026): conservation holds at the algebraic layer (solidification = LPO via Mittag-Leffler), fails at the homological layer (injective envelopes require Zorn = CLASS) and geometric layer (v-site requires BPI = CLASS). Open: can bounded derived categories bypass injective resolutions via Čech complexes?
-5. **Axiom 1 reverse characterization** — is Standard Conjecture D *necessary* for BISH numerical equivalence, or could something weaker work? (Paper 73)
-6. **Axiom 2 reverse characterization** — is algebraic spectrum *necessary* for BISH eigenvalue verification? (Paper 74)
-7. **Conservation conjecture** — stratified: holds at algebraic layer (solidification = LPO), fails at geometric layer (v-site = CLASS). Paper 75 target: CRM calibration of the solidification functor for light condensed abelian groups.
+4. **Light condensed constructivity** — PARTIALLY RESOLVED. Gemini analysis (Feb 2026): solidification is BISH (not LPO) — Mittag-Leffler holds trivially because transition maps of finite sets are split epimorphisms, lim¹ = 0 constructively, no DC needed. Čech bypass FAILS — v-site has infinite cohomological dimension (Scholze 2017, Prop 14.12); animation resolves sources only, not targets (Rf! needs injective envelopes). Open: can bounded derived categories bypass K-injective resolutions via alternative methods?
+5. ~~Axiom 1 reverse characterization~~ — **ANSWERED** by Paper 73. Yes, Conjecture D is necessary. Conjecture D ↔ BISH morphism decidability.
+6. ~~Axiom 2 reverse characterization~~ — **ANSWERED** by Paper 74. Yes, algebraic spectrum is necessary. Algebraic spectrum ↔ BISH eigenvalue decidability (cost without: WLPO).
+7. **Conservation conjecture** — REFINED. Three-layer stratification: algebraic layer (solidification) is BISH, homological layer (K-injectives) is CLASS (Zorn), geometric layer (v-topology) is CLASS (BPI). Paper 75 target: CRM-calibrate the Genestier-Lafforgue semisimple LLC for arbitrary G. Statement costs BISH + WLPO (trace equality = eigenvalue comparison = Axiom 2, per Paper 74). Proof costs CLASS. Conservation hypothesis: the GL parametrization is a Π²₀ arithmetic statement; the CLASS scaffolding is plausibly eliminable, with residual cost BISH + WLPO.
 8. **Intermediate axiom sets** — natural axiom systems strictly between BISH and LPO for partial cycle-search decidability?
 9. **Function field characterization** — does Paper 72's characterization extend to function fields with modifications to Axiom 3?
 
-The programme continues through Papers 73–75, then closes with Paper 67 revision.
+The programme continues through Paper 75, then closes with Paper 67 revision.
 
 ---
 

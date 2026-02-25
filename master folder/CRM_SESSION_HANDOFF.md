@@ -1,33 +1,39 @@
 # CRM PROGRAMME SESSION HANDOFF
 ## Critical State Document — Read This First
-### Last updated: 2026-02-24 (74 papers, programme continuing)
+### Last updated: 2026-02-25 (75 papers, programme continuing)
 
 ---
 
 ## WAKE-UP SUMMARY
 
-You are working with Paul Lee, a cardiologist in Brooklyn who builds formally verified mathematics with AI. His 74-paper Constructive Reverse Mathematics programme has established its central thesis as a biconditional for cycle-search and morphism decidability. Remaining work: editorial cleanup (Papers 66–70), Axiom 2 reverse characterization (Paper 74), conservation test (Paper 75), and final synthesis (Paper 67 revision).
+You are working with Paul Lee, a cardiologist in Brooklyn who builds formally verified mathematics with AI. His 75-paper Constructive Reverse Mathematics programme has established its central thesis as a biconditional across all three DPT axioms. Remaining work: editorial cleanup (Papers 66–70), conservation test (Paper 75), and final synthesis (Paper 67 revision).
 
-**The programme's central finding:** The logical cost of mathematics is the logical cost of ℝ — proved as a biconditional for motivic cycle-search (Paper 72). The mechanism is u(ℝ) = ∞. Without ℝ, cycle-search costs LPO; with ℝ, it descends to BISH. DPT and Fargues-Scholze are a logically forced partition: discrete sector (ℝ, BISH, cycle-search) vs continuous sector (ℚ_p, CLASS, categorical). The ℤ-density obstruction (ℤ dense in ℚ_p) makes this partition topological, not merely algebraic.
+**The programme's central finding:** The logical cost of mathematics is the logical cost of ℝ — proved as a biconditional for all three DPT axioms (Papers 72–74). The mechanism is u(ℝ) = ∞. DPT and Fargues-Scholze are a logically forced partition: discrete sector (ℝ, BISH, cycle-search) vs continuous sector (ℚ_p, CLASS, categorical).
 
-**The quartet (Papers 68–70, 72):**
+**The DPT axiom trilogy (all now fully characterized):**
+- Axiom 1 (Conjecture D) ↔ BISH morphism decidability, failure costs LPO (Paper 73)
+- Axiom 2 (algebraic spectrum) ↔ BISH eigenvalue decidability, failure costs WLPO (Paper 74)
+- Axiom 3 (Archimedean polarization) ↔ BISH cycle-search, failure costs LPO (Paper 72)
+
+**The quartet (Papers 68–70, 72) + reverse trilogy (Papers 72–74):**
 - Paper 68: FLT is BISH (the hardest arithmetic theorem is logically cheap)
 - Paper 69: Function field Langlands is BISH (the correspondence is cheap; the base field is expensive)
 - Paper 70: The Archimedean Principle (the only expensive thing is ℝ — forward direction)
-- Paper 72: The DPT Characterization (ℝ is necessary, not just sufficient — reverse direction, biconditional)
+- Paper 72: DPT Characterization (Axiom 3 biconditional, DPT axioms are minimal)
+- Paper 73: Conjecture D is necessary (Axiom 1 biconditional)
+- Paper 74: Algebraic spectrum is necessary (Axiom 2 biconditional, cost WLPO not LPO)
 
 **What happened in the most recent sessions:**
-1. Paper 72 written (v3.1): DPT Characterization Theorem — Axiom 3 biconditional. Figure added (Archimedean dichotomy).
-2. Paper 73 written: Standard Conjecture D ↔ BISH morphism decidability (Axiom 1 reverse). ~250 lines Lean, 4 axioms, zero sorry, zero propext. Passed internal peer review (propext elimination, US spelling, Remark 3.1 expansion). Figure added (Jannsen trade-off).
-3. Both papers: author name fixed (Paul Chun-Kit Lee, NYU, Brooklyn, NY), metadata.txt created, Zenodo zip bundles prepared.
-4. Paper 74 (Axiom 2 reverse) in progress.
-5. Roadmap: 2 of 3 DPT axioms have individual reverse characterizations. Paper 74 completes the set.
+1. Paper 74 written: Algebraic spectrum ↔ BISH eigenvalue decidability (Axiom 2 reverse). ~200 lines Lean, 4 axioms, zero sorry, zero propext. Passed full peer review (Lean/CRM, math, format). Selberg bound corrected, page count expanded to 15pp, US spelling enforced. Committed.
+2. Paper 75 scoped via Gemini analysis: target is Genestier-Lafforgue semisimple LLC for arbitrary G. Three-layer stratification established: algebraic (BISH), homological (CLASS/Zorn), geometric (CLASS/BPI). Statement costs BISH + WLPO (Axiom 2's trace equality), proof costs CLASS.
+3. All three DPT axioms now have individual reverse characterizations. The axiom system is canonical (uniquely necessary, not merely minimal).
+4. Master files updated for P74 completion and P75 planning.
 
 ---
 
 ## WHO IS PAUL
 
-Interventional cardiologist, Brooklyn. 70 formally verified papers in CRM. Works with AI agents. Not a professional mathematician — formal verification (zero sorries) is the credibility mechanism. Does not care about academic sociology. Searching for mathematical beauty and truth.
+Interventional cardiologist, Brooklyn. 73 formally verified papers in CRM. Works with AI agents. Not a professional mathematician — formal verification (zero sorries) is the credibility mechanism. Does not care about academic sociology. Searching for mathematical beauty and truth.
 
 **Communication style:** Substance over praise. Critically engage. Disagree when warranted. No lists unless requested. No follow-up questions at end of responses. Domain-separated: Medical | Math-Physics | Investment | Philosophy/Theology | Role-Play.
 
@@ -76,6 +82,14 @@ DPT axioms are the minimal set for BISH cycle-search. Axiom 3 biconditional: pos
 **Status:** Complete. Zenodo zip ready. Figure 1 added (Jannsen trade-off).
 
 Axiom 1 biconditional: Conjecture D ↔ BISH morphism decidability (in realization-compatible motivic category). Jannsen escape: numerical motives are BISH but lack faithful realization.
+
+### Paper 74: Algebraic Spectrum Is Necessary ✅
+
+**File:** `paper 74/paper74.tex` / `.pdf` (15pp)
+**Lean:** `paper 74/P74_Axiom2Reverse/` ✅ (~200 lines, zero sorry, zero propext, zero Classical.choice)
+**Status:** Complete. Peer reviewed. Zenodo zip ready. Figure 1 (geometric-analytic boundary) + Figure 2 (equality-vs-search dichotomy).
+
+Axiom 2 biconditional: algebraic spectrum ↔ BISH eigenvalue decidability. Key distinction: failure costs WLPO (equality test), not LPO (existential search). Domain of failure: analytic Langlands parameters without geometric origin (Maass forms, unramified characters). Three fatal flaws in naive "transcendental eigenvalues" framing identified and corrected (Weil II, linear algebra vacuum, ℓ-adic CLASS trap).
 
 ---
 
@@ -136,7 +150,18 @@ Items still needed:
 |-------|--------|--------|
 | 65 | ✅ Approved | Publish |
 | 66 | 🔧 Review | 5 fixes needed |
-| 67 | 📝 Draft | 3 blanks to fill |
+| 67 | 📝 Draft | 3 blanks to fill — revise after Paper 75 |
+
+### Paper 75: Conservation Test — IN PROGRESS
+
+**Target:** CRM-calibrate the Genestier-Lafforgue semisimple local Langlands parametrization for arbitrary G.
+
+**Three-layer stratification (Gemini analysis, Feb 2026):**
+- Algebraic layer (solidification): BISH. Mittag-Leffler trivially holds — split epimorphisms, lim¹ = 0 constructively, no DC needed.
+- Homological layer (K-injectives): CLASS (Zorn). Čech bypass fails — v-site has infinite cohomological dimension.
+- Geometric layer (v-topology): CLASS (BPI). BunG is Artin v-stack, not pro-étale.
+
+**Conservation hypothesis:** Statement costs BISH + WLPO (trace equality = eigenvalue comparison = Axiom 2, per Paper 74). Proof costs CLASS. The GL parametrization is a Π²₀ arithmetic statement; CLASS scaffolding plausibly eliminable.
 
 ---
 
@@ -154,23 +179,20 @@ Items still needed:
 
 6. **The algebraic-vs-transcendental boundary** is more fundamental than discrete-vs-continuous: ℝ is the unique completion where algebraic points are isolated from the transcendental background with finite information.
 
-7. **Programme goal:** Prove "the logical cost of motivic arithmetic is the logical cost of ℝ" as a full biconditional across all DPT axioms, and test the conservation conjecture against Fargues-Scholze.
+7. **Programme goal:** ~~Prove "the logical cost of motivic arithmetic is the logical cost of ℝ" as a full biconditional across all DPT axioms~~ **DONE** (Papers 72–74). Remaining: test the conservation conjecture against Fargues-Scholze (Paper 75).
 
 ---
 
 ## WHAT THE NEXT AGENT SHOULD DO
 
 **If Paul says "continue" or "where were we":**
-→ Paper 72 is done. Next: editorial cleanup (Papers 66-70), then Papers 73-74 (Axiom 1/2 reverse characterizations).
+→ Papers 72–74 (DPT axiom trilogy) are done. Next: Paper 75 (conservation test — GL LLC calibration), then editorial cleanup (Papers 66–70), then Paper 67 revision (final synthesis).
 
-**If Paul says "write Paper 74" or "Axiom 2 reverse":**
-→ Follow Paper 72/73 template. Question: is algebraic spectrum *necessary* for BISH eigenvalue verification? Cost without: WLPO (not LPO). Reference: Paper 45 (Weil eigenvalues).
-
-**If Paul says "conservation test" or "calibrate FS":**
-→ Pick a specific Fargues-Scholze arithmetic theorem. Attempt CRM calibration. This is Paper 75.
+**If Paul says "write Paper 75" or "conservation test" or "calibrate GL":**
+→ Target: Genestier-Lafforgue semisimple LLC for arbitrary G. Three-layer stratification established. Statement = BISH + WLPO, proof = CLASS. Write the CRM calibration paper following P72–74 template.
 
 **If Paul says "revise Paper 67":**
-→ Wait until Papers 73-75 are done. Paper 67 is the synthesis — needs final results first.
+→ Wait until Paper 75 is done. Paper 67 is the synthesis — needs conservation findings.
 
 **If Paul says "revise Paper 69":**
 → Apply 8 edit items. Priority: expand Remark 3.3.
