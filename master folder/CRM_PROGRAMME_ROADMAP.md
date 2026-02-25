@@ -1,7 +1,7 @@
 # Constructive Reverse Mathematics Series — Programme Roadmap
 
 **Author:** Paul Chun-Kit Lee
-**Last updated:** 2026-02-25 (75 papers, programme continuing)
+**Last updated:** 2026-02-25 (75 papers, editorial complete)
 **For:** Writing team, Lean agents, editorial collaborators
 
 ---
@@ -108,56 +108,26 @@ Conservation conjecture: whether the CLASS scaffolding is eliminable remains ope
 |-------|-------|-------|--------|
 | 1–44 | Physics phase | — | ✅ Published |
 | 45–64 | Arithmetic geometry | — | ✅ Published |
-| 65 | h · Nm(𝔄) = f (1,220 pairs) | — | ✅ Approved → Publish |
-| 66 | Trace-zero form extension | — | 🔧 5 fixes needed |
-| 67 | Synthesis monograph (45–66) | 15 | 📝 3 blanks to fill |
-| 68 | **FLT is BISH** | 18 | ✅ DONE (⚠️ Lean file missing from outputs) |
-| 69 | **Function field Langlands is BISH** | 8 | ✅ DONE — editorial revision needed |
-| 70 | **The Archimedean Principle** | 8 | ✅ DONE — editorial revision needed |
+| 65 | h · Nm(𝔄) = f (1,220 pairs) | — | ✅ Published |
+| 66 | Trace-zero form extension | 15 | ✅ DONE — Zenodo zip ready |
+| 67 | Synthesis monograph (45–75) | 17 | ✅ DONE — revised to cover Papers 45–75 (biconditionals + conservation) |
+| 68 | **FLT is BISH** | 18 | ✅ DONE — Lean verified (P68_WilesFLT/, 493 lines, 0 sorry), Zenodo zip |
+| 69 | **Function field Langlands is BISH** | 15 | ✅ DONE — editorial complete, Zenodo zip |
+| 70 | **The Archimedean Principle** | 16 | ✅ DONE — editorial complete, Zenodo zip |
 | 71 | **Archimedean Principle in Cryptography** | — | ✅ Published |
 | 72 | **DPT Characterization Theorem** | 10 | ✅ DONE — Lean verified, PDF compiled, Zenodo zip |
 | 73 | **Standard Conjecture D Is Necessary** | 11 | ✅ DONE — Lean verified, PDF compiled, Zenodo zip |
 | 74 | **Algebraic Spectrum Is Necessary** | 15 | ✅ DONE — Lean verified, PDF compiled, Zenodo zip, peer reviewed |
 | 75 | **Conservation Test: GL LLC Calibration** | 15 | ✅ DONE — Lean verified, PDF compiled, Zenodo zip, peer reviewed |
 
-### File Inventory (actual state of `/mnt/user-data/outputs/`)
+### Editorial Work — COMPLETE
 
-**Active files:**
-- `paper68_final.tex` / `.pdf` — Paper 68 (18pp) ✅
-- `paper69_funcfield.tex` / `.pdf` — Paper 69 (8pp) ✅
-- `paper70.tex` / `.pdf` — Paper 70 (8pp) ✅
-- `Paper69_FuncField.lean` — Paper 69 Lean ✅
-- `Paper70_Archimedean.lean` — Paper 70 Lean (328 lines) ✅
-
-**Missing:**
-- `Paper68_Final.lean` — referenced in Paper 68 but not in outputs. Regenerate from `PAPER68_LEAN_WORK_ORDER.md`.
-
-**Retired (from earlier paper numbering):**
-- `paper69.tex` / `.pdf` — was BCDT extension, now working notes
-- `Paper69_BCDT.lean` — was BCDT Lean
-- `Paper70_KW.lean` — was Khare-Wintenberger Lean
-- `paper71.tex` / `.pdf` — was weight 1 boundary, content absorbed into Paper 68
-- `Paper71_Weight1.lean` — was weight 1 Lean
-
-### Editorial Work Remaining
-
-**Paper 69** — 8 edit items in `paper69_edit_instructions.txt`:
-1. CRITICAL: Expand Remark 3.3 into full subsection (algebraic-vs-transcendental boundary)
-2. Foreground Theorem C over Theorems A/B
-3. Soften "WLPO necessary" → "WLPO (no known bypass)"
-4. Remove "final paper" claims (Paper 70 now exists)
-5. Address derived category gap in Proposition 3.2
-6. Expand §6.5 with forward reference to Paper 70
-7. Fix Paper 50 reference ambiguity
-8. Zenodo DOI check
-
-**Paper 70** — remaining items:
-1. Brouwer inoculation sentence
-2. Trim Discussion §8 redundancy
-3. Two TikZ figures (four-domain diagram + matched control experiment)
-4. Minor: Paper 50 reference, Zenodo DOI
-
-**Paper 68** — Lean file recovery from `PAPER68_LEAN_WORK_ORDER.md`
+All editorial items for Papers 66–70 have been completed:
+- **Paper 66:** Acknowledgments standardized, format-guide bibitem added.
+- **Paper 67:** Major synthesis revision — now covers Papers 45–75 (was 45–66). Five new subsections: FLT (Paper 68), function field + Archimedean (Papers 69–70), DPT biconditional trilogy (Papers 72–74), conservation test (Paper 75), remaining open questions. Conclusion updated.
+- **Paper 68:** Lean bundle verified complete (P68_WilesFLT/, 493 lines, 0 sorry). Acknowledgments standardized.
+- **Paper 69:** All 8 edit items completed (Remark 3.3 expanded, Theorem C foregrounded, etc.). Acknowledgments standardized.
+- **Paper 70:** Discussion §8.1 trimmed (redundant with rewritten intro). TikZ figures and Brouwer inoculation already present. Acknowledgments standardized.
 
 ---
 
@@ -201,33 +171,26 @@ Conservation conjecture: whether the CLASS scaffolding is eliminable remains ope
 8. **Intermediate axiom sets** — natural axiom systems strictly between BISH and LPO for partial cycle-search decidability?
 9. **Function field characterization** — does Paper 72's characterization extend to function fields with modifications to Axiom 3?
 
-Paper 75 complete. The programme closes with editorial cleanup (Papers 66–70) and Paper 67 revision (final synthesis incorporating biconditional results and conservation findings).
+Paper 75 complete. Editorial cleanup (Papers 66–70) and Paper 67 revision complete. All Zenodo zips built. Programme closed pending Zenodo uploads.
 
 ---
 
 ## 7. File Locations
 
-### The Trilogy
-- `paper68_final.tex` / `.pdf` — Paper 68 (18pp)
-- `paper69_funcfield.tex` / `.pdf` — Paper 69 (8pp)
-- `paper70.tex` / `.pdf` — Paper 70 (8pp)
+All paths relative to `~/FoundationRelativity/`.
 
-### Lean (present)
-- `Paper69_FuncField.lean` — zero sorry
-- `Paper70_Archimedean.lean` — 328 lines, zero sorry
-
-### Lean (missing)
-- Paper68_Final.lean — regenerate from `PAPER68_LEAN_WORK_ORDER.md`
-
-### Edit Instructions
-- `paper69_edit_instructions.txt` — 8 items
-- `paper70_edit_instructions.txt` — 11 items
+### Active Papers
+- `paper 66/paper66.tex` / `.pdf` (15pp) + `Zenodo_P66_TraceZeroForm.zip`
+- `paper 67/paper67.tex` / `.pdf` (17pp) + `Zenodo_P67_MotiveDecidability.zip`
+- `paper 68/paper68_final.tex` / `.pdf` (18pp) + `Zenodo_P68_WilesFLT.zip`
+- `paper 69/paper69_funcfield.tex` / `.pdf` (15pp) + `Zenodo_P69_FuncField.zip`
+- `paper 70/paper70.tex` / `.pdf` (16pp) + `Zenodo_P70_Archimedean.zip`
+- `paper 72/paper72.tex` / `.pdf` (10pp) + `P72_DPTCharacterisation.zip`
+- `paper 73/paper73.tex` / `.pdf` (11pp) + `P73_Axiom1Reverse.zip`
+- `paper 74/paper74.tex` / `.pdf` (15pp) + `P74_Axiom2Reverse.zip`
+- `paper 75/paper75.tex` / `.pdf` (15pp) + `P75_ConservationTest.zip`
 
 ### Programme Documents
-- `CRM_PROGRAMME_ROADMAP.md` — This document
-- `CRM_SESSION_HANDOFF.md` — Session handoff
-
-### Transcripts
-- `/mnt/transcripts/journal.txt` — Index
-
-All files in `/mnt/user-data/outputs/` unless otherwise noted.
+- `master folder/master_paper_list.txt` — complete paper list with DOIs (71 active, 0 pending)
+- `master folder/CRM_PROGRAMME_ROADMAP.md` — this document
+- `master folder/CRM_SESSION_HANDOFF.md` — session handoff
