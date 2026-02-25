@@ -24,10 +24,10 @@ You are working with Paul Lee, a cardiologist in Brooklyn who builds formally ve
 - Paper 74: Algebraic spectrum is necessary (Axiom 2 biconditional, cost WLPO not LPO)
 
 **What happened in the most recent sessions:**
-1. Paper 74 written: Algebraic spectrum ↔ BISH eigenvalue decidability (Axiom 2 reverse). ~200 lines Lean, 4 axioms, zero sorry, zero propext. Passed full peer review (Lean/CRM, math, format). Selberg bound corrected, page count expanded to 15pp, US spelling enforced. Committed.
-2. Paper 75 scoped via Gemini analysis: target is Genestier-Lafforgue semisimple LLC for arbitrary G. Three-layer stratification established: algebraic (BISH), homological (CLASS/Zorn), geometric (CLASS/BPI). Statement costs BISH + WLPO (Axiom 2's trace equality), proof costs CLASS.
-3. All three DPT axioms now have individual reverse characterizations. The axiom system is canonical (uniquely necessary, not merely minimal).
-4. Master files updated for P74 completion and P75 planning.
+1. Paper 74 written and peer reviewed. Committed.
+2. Paper 75 written: Conservation Test — CRM calibration of the Genestier-Lafforgue semisimple LLC for arbitrary G. Three-layer stratification (algebraic BISH, homological CLASS/Zorn, geometric CLASS/BPI). Statement = WLPO, proof = CLASS, gap = 2 levels. DPT prediction confirmed. ~180 lines Lean, 4 axioms, zero sorry, zero propext, zero Classical.choice. Passed Gemini peer review with 4 critical fixes applied (solidification formula, trace trap, CLASS definition, function field qualification). 15 pages. Committed.
+3. All three DPT axioms have biconditional reverse characterizations (Papers 72–74). The axiom system is canonical.
+4. DPT passes its first external validation test (Paper 75). The programme's core claims are now established on three pillars: biconditionals, external validation, and case studies.
 
 ---
 
@@ -152,16 +152,13 @@ Items still needed:
 | 66 | 🔧 Review | 5 fixes needed |
 | 67 | 📝 Draft | 3 blanks to fill — revise after Paper 75 |
 
-### Paper 75: Conservation Test — IN PROGRESS
+### Paper 75: Conservation Test — GL LLC Calibration ✅
 
-**Target:** CRM-calibrate the Genestier-Lafforgue semisimple local Langlands parametrization for arbitrary G.
+**File:** `paper 75/paper75.tex` / `.pdf` (15pp)
+**Lean:** `paper 75/P75_ConservationTest/` ✅ (~180 lines, zero sorry, zero propext, zero Classical.choice, 4 axioms)
+**Status:** Complete. Peer reviewed. Zenodo zip ready.
 
-**Three-layer stratification (Gemini analysis, Feb 2026):**
-- Algebraic layer (solidification): BISH. Mittag-Leffler trivially holds — split epimorphisms, lim¹ = 0 constructively, no DC needed.
-- Homological layer (K-injectives): CLASS (Zorn). Čech bypass fails — v-site has infinite cohomological dimension.
-- Geometric layer (v-topology): CLASS (BPI). BunG is Artin v-stack, not pro-étale.
-
-**Conservation hypothesis:** Statement costs BISH + WLPO (trace equality = eigenvalue comparison = Axiom 2, per Paper 74). Proof costs CLASS. The GL parametrization is a Π²₀ arithmetic statement; CLASS scaffolding plausibly eliminable.
+DPT external validation on Genestier-Lafforgue semisimple LLC for arbitrary G. Three-layer stratification: algebraic (BISH, solidification via free generators + animation), homological (CLASS, Zorn for K-injectives), geometric (CLASS, BPI for v-covers). Statement = WLPO (Bernstein block finite generation → finite conjunction of equality tests). Proof = CLASS. Gap = 2 levels. DPT Axiom 2 correctly predicts WLPO. Conservation (eliminability of CLASS scaffolding) remains open conjecture.
 
 ---
 
@@ -179,17 +176,17 @@ Items still needed:
 
 6. **The algebraic-vs-transcendental boundary** is more fundamental than discrete-vs-continuous: ℝ is the unique completion where algebraic points are isolated from the transcendental background with finite information.
 
-7. **Programme goal:** ~~Prove "the logical cost of motivic arithmetic is the logical cost of ℝ" as a full biconditional across all DPT axioms~~ **DONE** (Papers 72–74). Remaining: test the conservation conjecture against Fargues-Scholze (Paper 75).
+7. **Programme goal:** ~~Prove "the logical cost of motivic arithmetic is the logical cost of ℝ" as a full biconditional across all DPT axioms~~ **DONE** (Papers 72–74). ~~Test the conservation conjecture against Fargues-Scholze~~ **DONE** (Paper 75 — external validation passed). Remaining: editorial cleanup and Paper 67 synthesis revision.
 
 ---
 
 ## WHAT THE NEXT AGENT SHOULD DO
 
 **If Paul says "continue" or "where were we":**
-→ Papers 72–74 (DPT axiom trilogy) are done. Next: Paper 75 (conservation test — GL LLC calibration), then editorial cleanup (Papers 66–70), then Paper 67 revision (final synthesis).
+→ Papers 72–75 all done. Remaining: editorial cleanup (Papers 66–70), Paper 67 revision (final synthesis incorporating biconditionals + conservation findings), Zenodo uploads (Papers 73–75).
 
-**If Paul says "write Paper 75" or "conservation test" or "calibrate GL":**
-→ Target: Genestier-Lafforgue semisimple LLC for arbitrary G. Three-layer stratification established. Statement = BISH + WLPO, proof = CLASS. Write the CRM calibration paper following P72–74 template.
+**If Paul says "upload" or "Zenodo":**
+→ Papers 73, 74, 75 have Zenodo zips ready but DOIs still pending. Upload and update master_paper_list.txt with DOIs.
 
 **If Paul says "revise Paper 67":**
 → Wait until Paper 75 is done. Paper 67 is the synthesis — needs conservation findings.

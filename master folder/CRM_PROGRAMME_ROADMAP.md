@@ -1,7 +1,7 @@
 # Constructive Reverse Mathematics Series — Programme Roadmap
 
 **Author:** Paul Chun-Kit Lee
-**Last updated:** 2026-02-24 (74 papers, programme continuing)
+**Last updated:** 2026-02-25 (75 papers, programme continuing)
 **For:** Writing team, Lean agents, editorial collaborators
 
 ---
@@ -65,16 +65,22 @@ BISH  ⊂  BISH + MP  ⊂  BISH + LLPO  ⊂  BISH + WLPO  ⊂  BISH + LPO  ⊂  
 
 **Result: Algebraic spectrum is necessary for BISH eigenvalue decidability.** Algebraic spectrum ↔ BISH eigenvalue decidability. Without geometric origin, the full analytic Langlands spectrum (Maass forms, unramified characters) has continuous spectral parameters; eigenvalue comparison costs WLPO (equality test, not existential search). The naive "transcendental eigenvalues" framing has three fatal flaws (Weil II, linear algebra vacuum, ℓ-adic CLASS trap); the correct domain of failure is the geometric-analytic boundary. 15 pages, ~200 lines Lean, zero sorry, zero propext, 4 axioms. Peer reviewed.
 
-### Phase 6c: Conservation Test (Paper 75) — IN PROGRESS
+### Phase 6c: Conservation Test (Paper 75) — COMPLETE
 
-**Target:** CRM-calibrate the Genestier-Lafforgue semisimple local Langlands parametrization for arbitrary G. Statement costs BISH + WLPO (trace equality = eigenvalue comparison = Axiom 2). Proof costs CLASS (homological + v-topology layers).
+**Result: DPT passes its first external validation test.** The Genestier-Lafforgue semisimple LLC for arbitrary G decomposes into three independently calibrated layers. Statement costs BISH + WLPO; proof costs CLASS; conservation gap of two levels (WLPO < CLASS). DPT Axiom 2 correctly predicts the statement cost. 15 pages, ~180 lines Lean, zero sorry, zero propext, zero Classical.choice. 4 axioms. Peer reviewed (4 critical flaws corrected: solidification formula, trace trap, CLASS definition, function field qualification).
 
-Three-layer stratification (established via external analysis, Feb 2026):
-- Algebraic layer (solidification): BISH. Mittag-Leffler holds trivially — transition maps of finite sets are split epimorphisms, lim¹ = 0 constructively. No DC needed.
+Four theorems:
+- **Theorem A (Stratification):** fs_proof_cost = CLASS (join of three layers).
+- **Theorem B (Statement Cost):** gl_statement_cost = WLPO (Bernstein center + Schur's lemma extract φ deterministically; residual = finite conjunction of WLPO equality tests on Bernstein block generators).
+- **Theorem C (Conservation Gap):** WLPO < CLASS (two-level gap).
+- **Theorem D (DPT Prediction):** Axiom 2 predicts WLPO; observed WLPO.
+
+Three-layer stratification:
+- Algebraic layer (solidification): BISH. Free generators Z[S]^■ = lim Z[S_n]; transition maps are split epimorphisms → Mittag-Leffler → lim¹ = 0 constructively. Animation for general M avoids injective envelopes. No DC needed.
 - Homological layer (K-injectives): CLASS (Zorn). Čech bypass fails — v-site has infinite cohomological dimension (Scholze 2017, Prop 14.12). Animation resolves sources only, not targets (Rf! needs injective envelopes).
 - Geometric layer (v-topology): CLASS (BPI). BunG is an Artin v-stack, not pro-étale. G-torsors on Fargues-Fontaine curve require v-covers to trivialize.
 
-Conservation hypothesis: the GL parametrization is a Π²₀ arithmetic statement; the CLASS scaffolding is plausibly eliminable, with residual cost BISH + WLPO predicted by DPT (the WLPO from Axiom 2's trace-equality test, per Paper 74).
+Conservation conjecture: whether the CLASS scaffolding is eliminable remains open.
 
 ---
 
@@ -91,6 +97,8 @@ Conservation hypothesis: the GL parametrization is a Π²₀ arithmetic statemen
 **Paper 73** says: Conjecture D is not just sufficient but necessary for BISH morphism decidability. Without it, numerical and homological equivalence diverge; detecting the gap costs LPO. Jannsen's escape (numerical motives) is BISH but unfaithful — confirming the trade-off is real.
 
 **Paper 74** says: Algebraic spectrum is not just sufficient but necessary for BISH eigenvalue decidability. Without it, eigenvalue comparison costs WLPO (not LPO) — an equality test, not an existential search. The DPT axiom system is now fully characterized: each axiom is the unique condition for its domain (canonical, not merely minimal).
+
+**Paper 75** says: DPT works on theorems it wasn't designed for. The GL LLC (proved by condensed/perfectoid methods that never mention DPT) has exactly the statement cost DPT predicts. The proof costs CLASS, the statement costs only WLPO, and the gap is identified precisely: homological Zorn + geometric BPI.
 
 ---
 
@@ -110,7 +118,7 @@ Conservation hypothesis: the GL parametrization is a Π²₀ arithmetic statemen
 | 72 | **DPT Characterization Theorem** | 10 | ✅ DONE — Lean verified, PDF compiled, Zenodo zip |
 | 73 | **Standard Conjecture D Is Necessary** | 11 | ✅ DONE — Lean verified, PDF compiled, Zenodo zip |
 | 74 | **Algebraic Spectrum Is Necessary** | 15 | ✅ DONE — Lean verified, PDF compiled, Zenodo zip, peer reviewed |
-| 75 | **Conservation Test: GL LLC Calibration** | — | 🔨 IN PROGRESS |
+| 75 | **Conservation Test: GL LLC Calibration** | 15 | ✅ DONE — Lean verified, PDF compiled, Zenodo zip, peer reviewed |
 
 ### File Inventory (actual state of `/mnt/user-data/outputs/`)
 
@@ -174,6 +182,10 @@ Conservation hypothesis: the GL parametrization is a Π²₀ arithmetic statemen
 17. **WLPO-vs-LPO asymmetry**: Axiom 2 failure costs WLPO (equality test), Axioms 1 and 3 cost LPO (existential search) — intrinsic computational distinction (Paper 74)
 18. **DPT axiom system is canonical**: each axiom is the unique condition for its domain, not merely minimal (Papers 72–74)
 19. **Geometric-analytic boundary**: the correct domain of Axiom 2 failure is Langlands parameters without geometric origin, not "transcendental eigenvalues" (Paper 74)
+20. **Three-layer stratification**: Fargues-Scholze proof decomposes into algebraic (BISH), homological (CLASS/Zorn), geometric (CLASS/BPI) — logically independent layers (Paper 75)
+21. **DPT external validation**: DPT predictions match observations on a theorem proved by entirely different methods (condensed/perfectoid, not motivic) (Paper 75)
+22. **Solidification is free**: algebraic layer contributes nothing to logical cost; animation avoids injective envelopes (Paper 75)
+23. **Conservation gap pattern**: FLT (5 levels), GL LLC (2 levels), fun field LLC (0*) — decreasing gap correlates with increasing algebraicity of spectrum (Papers 68, 69, 75)
 
 ---
 
@@ -185,11 +197,11 @@ Conservation hypothesis: the GL parametrization is a Π²₀ arithmetic statemen
 4. **Light condensed constructivity** — PARTIALLY RESOLVED. Gemini analysis (Feb 2026): solidification is BISH (not LPO) — Mittag-Leffler holds trivially because transition maps of finite sets are split epimorphisms, lim¹ = 0 constructively, no DC needed. Čech bypass FAILS — v-site has infinite cohomological dimension (Scholze 2017, Prop 14.12); animation resolves sources only, not targets (Rf! needs injective envelopes). Open: can bounded derived categories bypass K-injective resolutions via alternative methods?
 5. ~~Axiom 1 reverse characterization~~ — **ANSWERED** by Paper 73. Yes, Conjecture D is necessary. Conjecture D ↔ BISH morphism decidability.
 6. ~~Axiom 2 reverse characterization~~ — **ANSWERED** by Paper 74. Yes, algebraic spectrum is necessary. Algebraic spectrum ↔ BISH eigenvalue decidability (cost without: WLPO).
-7. **Conservation conjecture** — REFINED. Three-layer stratification: algebraic layer (solidification) is BISH, homological layer (K-injectives) is CLASS (Zorn), geometric layer (v-topology) is CLASS (BPI). Paper 75 target: CRM-calibrate the Genestier-Lafforgue semisimple LLC for arbitrary G. Statement costs BISH + WLPO (trace equality = eigenvalue comparison = Axiom 2, per Paper 74). Proof costs CLASS. Conservation hypothesis: the GL parametrization is a Π²₀ arithmetic statement; the CLASS scaffolding is plausibly eliminable, with residual cost BISH + WLPO.
+7. **Conservation conjecture** — ESTABLISHED as open conjecture (Paper 75). Statement = WLPO, proof = CLASS, gap = 2 levels. The three-layer stratification identifies exactly where CLASS enters: homological (Zorn for K-injectives) and geometric (BPI for v-covers). The algebraic layer is free (BISH). Whether the CLASS scaffolding is eliminable via Lurie animation, prismatic cohomology, or condensed stable ∞-categories remains open. Five specific open questions posed in Paper 75 §6.5.
 8. **Intermediate axiom sets** — natural axiom systems strictly between BISH and LPO for partial cycle-search decidability?
 9. **Function field characterization** — does Paper 72's characterization extend to function fields with modifications to Axiom 3?
 
-The programme continues through Paper 75, then closes with Paper 67 revision.
+Paper 75 complete. The programme closes with editorial cleanup (Papers 66–70) and Paper 67 revision (final synthesis incorporating biconditional results and conservation findings).
 
 ---
 
