@@ -39,7 +39,7 @@ Interventional cardiologist, Brooklyn. 75 formally verified papers in CRM. Works
 | Paper | File | Pages | Lean | Zenodo Zip | DOI |
 |-------|------|-------|------|------------|-----|
 | 66 | `paper 66/paper66.tex` | 15 | None (computational) | `Zenodo_P66_TraceZeroForm.zip` | 10.5281/zenodo.18745722 |
-| 67 | `paper 67/paper67.tex` | 17 | None (synthesis monograph) | `Zenodo_P67_MotiveDecidability.zip` | 10.5281/zenodo.18746343 |
+| 67 | `paper 67/paper67.tex` | 17 | None (synthesis monograph) | `Zenodo_P67_MotiveDecidability.zip` | 10.5281/zenodo.18776113 |
 | 68 | `paper 68/paper68_final.tex` | 18 | `P68_WilesFLT/` ✅ (493 lines, 0 sorry) | `Zenodo_P68_WilesFLT.zip` | 10.5281/zenodo.18749965 |
 | 69 | `paper 69/paper69_funcfield.tex` | 15 | `P69_FuncField/` ✅ (236 lines, 0 sorry) | `Zenodo_P69_FuncField.zip` | 10.5281/zenodo.18749757 |
 | 70 | `paper 70/paper70.tex` | 16 | `P70_Archimedean/` ✅ (545 lines, 0 sorry) | `Zenodo_P70_Archimedean.zip` | 10.5281/zenodo.18750992 |
@@ -75,8 +75,10 @@ All published with DOIs. See `master folder/master_paper_list.txt` for complete 
 
 ## WHAT THE NEXT AGENT SHOULD DO
 
-**If Paul says "upload" or "Zenodo":**
-→ Papers 66–70 have new Zenodo zips ready. Paul must upload himself (credential security). Papers 72–75 DOIs already assigned. DOIs don't change on v2 upload.
+**Zenodo upload status (2026-02-25):**
+→ Papers 72–75: **uploaded** (first uploads, DOIs live).
+→ Paper 67: **uploaded** as new record (major revision, scope 45→75). New DOI: 10.5281/zenodo.18776113. Old DOI 18746343 superseded.
+→ Papers 66, 68, 69, 70: **not re-uploaded** — edits were cosmetic only (acknowledgments, format-guide ref). Existing Zenodo versions are fine.
 
 **If Paul says "push":**
 → `git push origin main`. Repository has multiple unpushed commits.
