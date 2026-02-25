@@ -175,7 +175,61 @@ Paper 75 complete. Editorial cleanup (Papers 66–70) and Paper 67 revision comp
 
 ---
 
-## 7. File Locations
+## 7. Future Direction: CRMLint — Automated Logical Cost Analysis at Scale
+
+### The Idea
+
+The 75-paper programme audited theorems manually: decompose a proof into stages, calibrate each against BISH ⊂ MP ⊂ WLPO ⊂ LPO ⊂ CLASS, identify concentration points. This methodology can be automated and run on the entire Mathlib library (~150,000 declarations), producing a **proof technique atlas** — a systematic map of where logical difficulty lives in formalized mathematics.
+
+### Why This Matters
+
+CRM's deepest insight is the distinction between **logical cost** and **proof complexity**. Taylor-Wiles patching looks complex but is logically free (BISH). Weight 1 automorphic forms look routine but carry the entire logical cost of FLT (WLPO). This distinction is invisible without CRM and becomes actionable at scale: it tells you which proof techniques are scaffolding (don't try to simplify) and which are structural obstacles (focus here for breakthroughs).
+
+### Architecture: Four Layers
+
+**Layer 1 — Classical dependency tracer (pure metaprogramming).** Traverse Lean 4 `Environment`. For each theorem, trace transitive dependency paths to every `Classical.choice`, `Classical.em`, `propext`, `Quot.sound` callsite. Output: dependency graph showing exactly where classical content enters. No mathematical judgment required.
+
+**Layer 2 — Pattern classifier.** Classify each Classical.choice callsite by pattern:
+- `Decidable` on real equality → WLPO pattern
+- `Decidable` on `∃ n, f(n) = 0` → LPO pattern
+- Through `Zorn`/`zorn_preorder` → CLASS/Zorn
+- Through `IsWellOrder`/well-ordering → CLASS/AC
+- `Classical.em` on Σ⁰₁ predicate → MP pattern
+- Through `LinearOrder` on ℝ → infrastructure (ℝ construction artifact)
+
+**Layer 3 — Concentration analysis.** For each theorem: count distinct Classical.choice entry points, classify each (infrastructure vs essential), identify the "essential classical core" — the minimal set of steps that can't be reclassified. Output: "47 transitive Classical.choice deps; 44 infrastructure; 2 WLPO-pattern; 1 CLASS/Zorn. Essential cost: CLASS, concentrated at step X."
+
+**Layer 4 — AI audit layer (requires LLM).** For theorems with conservation gaps (BISH-statable, CLASS-proved): predict whether the gap is eliminable. Use the 75-paper programme as training data. The DPT biconditionals (Papers 72–74) provide the theoretical framework for predictions in arithmetic geometry.
+
+### What CRM Uniquely Contributes to AI Mathematics
+
+Not better tactic selection (marginal value). Two deeper capabilities:
+
+1. **Proof existence prediction.** When the conservation gap says "statement is BISH, proof is CLASS," CRM predicts a simpler proof exists. The biconditionals make this precise for DPT-classified theorems. An AI trained on CRM-annotated Mathlib learns to predict conservation gaps for unaudited theorems — generating search targets for new, simpler proofs.
+
+2. **Discovery through a different question.** The programme found the h = f identity, the algebraic-vs-transcendental boundary, and the projection-vs-search distinction by asking "what's the logical cost?" — a question nobody else was asking. Running this question through 150,000 theorems instead of 75 may reveal patterns invisible at manual scale.
+
+### Relationship to Condensed Mathematics / Fargues-Scholze
+
+CRM and condensed mathematics form a logically forced partition: CRM/DPT handles the discrete sector (ℝ, BISH, cycle-search), Fargues-Scholze handles the continuous sector (ℚ_p, CLASS, categorical). They are complementary, not competing. Paper 75 showed that DPT predictions match observations on theorems proved entirely within condensed methods. The conservation conjecture (is CLASS scaffolding eliminable?) is the open interface between them.
+
+### Concrete First Step
+
+Build `CRMLint` — a Lean 4 library exporting `#crm_audit TheoremName`. Test against the programme's 14 existing Lean bundles (known ground truth). Run on Mathlib's `NumberTheory`, `Analysis`, and `Topology`. Publish the atlas as a standalone tool + companion paper. The 75-paper programme is the calibration dataset.
+
+### Calibration: Known Ground Truth from the Programme
+
+| Paper | Theorem | Predicted CRM Level | Key Concentration Point |
+|-------|---------|--------------------|-----------------------|
+| 68 | FLT is BISH | BISH (via Kisin bypass) | Weight 1 forms (WLPO, artefactual) |
+| 69 | Fun field LLC | BISH | None (all stages BISH) |
+| 70 | Archimedean Principle | LPO (with ℝ) / BISH (without) | Spectral theorem |
+| 72 | DPT Characterization | Axiom 3 ↔ BISH | Positive-definite height |
+| 75 | GL LLC | Statement WLPO, Proof CLASS | Zorn (homological) + BPI (geometric) |
+
+---
+
+## 8. File Locations
 
 All paths relative to `~/FoundationRelativity/`.
 

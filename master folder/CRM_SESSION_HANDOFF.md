@@ -76,10 +76,13 @@ All published with DOIs. See `master folder/master_paper_list.txt` for complete 
 ## WHAT THE NEXT AGENT SHOULD DO
 
 **If Paul says "upload" or "Zenodo":**
-→ Papers 66–70 have new Zenodo zips ready. Paul must upload himself (credential security). Papers 72–75 DOIs already assigned.
+→ Papers 66–70 have new Zenodo zips ready. Paul must upload himself (credential security). Papers 72–75 DOIs already assigned. DOIs don't change on v2 upload.
 
 **If Paul says "push":**
 → `git push origin main`. Repository has multiple unpushed commits.
+
+**If Paul says "CRMLint" or "linter" or "atlas" or "next project":**
+→ Build automated CRM logical cost analyzer for Mathlib. Full design in `CRM_PROGRAMME_ROADMAP.md` §7. Four layers: classical dependency tracer → pattern classifier → concentration analysis → AI audit. The 75-paper programme is the calibration dataset. Start with a Lean 4 metaprogram that exports `#crm_audit TheoremName`. Test against the 14 existing Lean bundles first.
 
 **If Paul asks about something else:**
 → Respect domain separation.
