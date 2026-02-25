@@ -1095,8 +1095,13 @@ The $p$-adic theory of overconvergent modular forms
 (Buzzard--Taylor \cite{BuzzardTaylor1999}, Kassaei, Pilloni)
 provides a purely $p$-adic construction of weight~$1$ forms
 that avoids all three Archimedean obstructions: Hida families
-are~$\BISH$, specialisation is~$\BISH$, and the
-Kassaei--Pilloni classicality theorem is~$\BISH$.
+are~$\BISH$ and specialisation is~$\BISH$.  However, the
+Kassaei--Pilloni classicality theorem relies on rigid analytic
+geometry (Tate), whose foundation requires locating maximal
+ideals of Tate algebras---structurally invoking Krull's Maximal
+Ideal Theorem (equivalent to the Boolean Prime Ideal theorem,
+hence~$\CLASS$).  The constructive status of classicality
+therefore remains open.
 
 However, the $p$-adic machinery cannot \emph{originate}
 modularity.  To place $\bar{\rho}_3$ on the eigencurve requires
@@ -1210,6 +1215,17 @@ No analytic input from the trace formula is required.
 \end{theorem}
 
 \subsection{Completing the proof}
+
+\emph{Decidability of the case-split.}  For an elliptic curve
+$E/\Q\colon y^2 = x^3 + ax + b$, the representation
+$\bar{\rho}_{E,2}$ is absolutely irreducible if and only if the
+$2$-torsion field $\Q(E[2])$---the splitting field of
+$f(x) = x^3 + ax + b$---has degree~$6$ over~$\Q$, equivalently
+$f$ is irreducible over~$\Q$.  Because polynomial factorisation
+over~$\Q$ is unconditionally $\BISH$-decidable (Kronecker's
+algorithm: test divisibility by all integer polynomials of
+bounded degree and coefficient size), the branch between the two
+cases below is fully constructive.
 
 If $\bar{\rho}_{E,2}$ is absolutely irreducible, then:
 \begin{enumerate}[nosep]

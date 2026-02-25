@@ -5,7 +5,7 @@ A Constructive Reverse Mathematics Audit
 
 Author: Paul Chun-Kit Lee, New York University
 Date: February 2026
-DOI: 10.5281/zenodo.18749965
+DOI: 10.5281/zenodo.18777925
 
 ## Overview
 
