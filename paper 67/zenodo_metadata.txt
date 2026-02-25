@@ -24,16 +24,16 @@ constructive reverse mathematics, arithmetic geometry, motives, decidability, Bi
 
 Related Identifiers:
 - Is supplement to: Paper 40, "Logical Constitution of Physical Reality" (CRM Series physics synthesis)
-- Is part of: Constructive Reverse Mathematics Series, Papers 1-67
-- Synthesizes: Papers 45-66 (arithmetic geometry phase of the CRM Series)
-- References: Papers 50-53 (DPT framework, CM oracle), Papers 56-58 (Weil lattice identity), Papers 64-66 (p-adic and form-class extensions)
+- Is part of: Constructive Reverse Mathematics Series, Papers 1-75
+- Synthesizes: Papers 45-75 (arithmetic geometry phase of the CRM Series)
+- References: Papers 50-53 (DPT framework, CM oracle), Papers 56-58 (Weil lattice identity), Papers 64-66 (p-adic and form-class extensions), Papers 68-70 (FLT, function field Langlands, Archimedean Principle), Papers 72-74 (DPT biconditional trilogy), Paper 75 (conservation test)
 - Series DOI: 10.5281/zenodo.17054050
 
 Description:
 
 Every major conjecture in arithmetic geometry—Hodge, Tate, BSD, Fontaine-Mazur, Weight-Monodromy—has a precise logical address.  This monograph finds those addresses.
 
-Working in Bishop's constructive mathematics (BISH), we ask a question that classical number theory never asks: how much omniscience does each conjecture actually cost?  The answer, assembled across twenty-two papers (Papers 45-66 of the Constructive Reverse Mathematics series), is that the motive itself acts as a decidability certificate.  Geometric origin—the property that converts a cohomological datum into a cycle—systematically eliminates the need for the Limited Principle of Omniscience (LPO), reducing problems from undecidable to constructively solvable.
+Working in Bishop's constructive mathematics (BISH), we ask a question that classical number theory never asks: how much omniscience does each conjecture actually cost?  The answer, assembled across thirty-one papers (Papers 45-75 of the Constructive Reverse Mathematics series), is that the motive itself acts as a decidability certificate.  Geometric origin—the property that converts a cohomological datum into a cycle—systematically eliminates the need for the Limited Principle of Omniscience (LPO), reducing problems from undecidable to constructively solvable.  The programme's central finding—the logical cost of mathematics is the logical cost of R—is now established as a biconditional across all three DPT axioms (Papers 72-74) and validated externally against the Genestier-Lafforgue LLC (Paper 75).
 
 THE CLASSIFICATION
 
@@ -45,13 +45,13 @@ The constructive lens also found something classical mathematics missed entirely
 
 FORMAL VERIFICATION
 
-Fifty-three papers in the series carry Lean 4 + Mathlib formalizations totaling 86,898 lines, with twenty-two achieving zero sorry.  The verification corpus is summarized in Table 2.
+Approximately sixty-five papers in the series carry Lean 4 + Mathlib formalizations totaling over 89,000 lines.  The verification corpus is summarized in Table 2.
 
 STRUCTURE
 
 Part I  — The Map: Decidable Polarized Tannakian (DPT) framework, de-omniscientizing descent, dimension-4 wall, p-adic resolution, mixed motive frontier.
 Part II — The Identity: the h = f discovery, Steinitz generalization, computational verification at scale, form-class extension to non-cyclic cubics.
-Part III — The Architecture: methodology, future directions (Taylor-Wiles audit, Fermat's Last Theorem, Langlands correspondence).
+Part III — The Architecture: FLT is BISH (Paper 68), function field comparison (Paper 69), Archimedean Principle (Paper 70), DPT biconditional trilogy (Papers 72-74), conservation test (Paper 75), remaining open questions.
 
 DEPOSIT CONTENTS
 

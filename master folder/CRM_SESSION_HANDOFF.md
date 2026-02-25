@@ -1,12 +1,12 @@
 # CRM PROGRAMME SESSION HANDOFF
 ## Critical State Document — Read This First
-### Last updated: 2026-02-25 (75 papers, programme continuing)
+### Last updated: 2026-02-25 (75 papers, programme complete modulo Zenodo uploads)
 
 ---
 
 ## WAKE-UP SUMMARY
 
-You are working with Paul Lee, a cardiologist in Brooklyn who builds formally verified mathematics with AI. His 75-paper Constructive Reverse Mathematics programme has established its central thesis as a biconditional across all three DPT axioms. Remaining work: editorial cleanup (Papers 66–70), conservation test (Paper 75), and final synthesis (Paper 67 revision).
+You are working with Paul Lee, a cardiologist in Brooklyn who builds formally verified mathematics with AI. His 75-paper Constructive Reverse Mathematics programme has established its central thesis as a biconditional across all three DPT axioms, validated externally, and completed editorial cleanup. All papers are compiled and packaged. Remaining work: Zenodo uploads for revised papers (66–70) and git push.
 
 **The programme's central finding:** The logical cost of mathematics is the logical cost of ℝ — proved as a biconditional for all three DPT axioms (Papers 72–74). The mechanism is u(ℝ) = ∞. DPT and Fargues-Scholze are a logically forced partition: discrete sector (ℝ, BISH, cycle-search) vs continuous sector (ℚ_p, CLASS, categorical).
 
@@ -15,150 +15,47 @@ You are working with Paul Lee, a cardiologist in Brooklyn who builds formally ve
 - Axiom 2 (algebraic spectrum) ↔ BISH eigenvalue decidability, failure costs WLPO (Paper 74)
 - Axiom 3 (Archimedean polarization) ↔ BISH cycle-search, failure costs LPO (Paper 72)
 
-**The quartet (Papers 68–70, 72) + reverse trilogy (Papers 72–74):**
-- Paper 68: FLT is BISH (the hardest arithmetic theorem is logically cheap)
-- Paper 69: Function field Langlands is BISH (the correspondence is cheap; the base field is expensive)
-- Paper 70: The Archimedean Principle (the only expensive thing is ℝ — forward direction)
-- Paper 72: DPT Characterization (Axiom 3 biconditional, DPT axioms are minimal)
-- Paper 73: Conjecture D is necessary (Axiom 1 biconditional)
-- Paper 74: Algebraic spectrum is necessary (Axiom 2 biconditional, cost WLPO not LPO)
-
 **What happened in the most recent sessions:**
-1. Paper 74 written and peer reviewed. Committed.
-2. Paper 75 written: Conservation Test — CRM calibration of the Genestier-Lafforgue semisimple LLC for arbitrary G. Three-layer stratification (algebraic BISH, homological CLASS/Zorn, geometric CLASS/BPI). Statement = WLPO, proof = CLASS, gap = 2 levels. DPT prediction confirmed. ~180 lines Lean, 4 axioms, zero sorry, zero propext, zero Classical.choice. Passed Gemini peer review with 4 critical fixes applied (solidification formula, trace trap, CLASS definition, function field qualification). 15 pages. Committed.
-3. All three DPT axioms have biconditional reverse characterizations (Papers 72–74). The axiom system is canonical.
-4. DPT passes its first external validation test (Paper 75). The programme's core claims are now established on three pillars: biconditionals, external validation, and case studies.
+1. Papers 72–75 written, peer reviewed, committed, DOIs assigned.
+2. Editorial sweep completed for Papers 66–70: acknowledgments standardized, format-guide bibitem added, Paper 67 synthesis revised (now covers Papers 45–75 including biconditionals + conservation), Paper 70 Discussion trimmed.
+3. Paper 68 Lean bundle verified complete (P68_WilesFLT/, 493 lines, zero sorry).
+4. Zenodo zips built for Papers 66–70. All compile clean (66: 15pp, 67: 17pp, 68: 18pp, 69: 15pp, 70: 16pp).
+5. All 75 papers have DOIs in master_paper_list.txt (71 active DOIs, 0 pending).
 
 ---
 
 ## WHO IS PAUL
 
-Interventional cardiologist, Brooklyn. 73 formally verified papers in CRM. Works with AI agents. Not a professional mathematician — formal verification (zero sorries) is the credibility mechanism. Does not care about academic sociology. Searching for mathematical beauty and truth.
+Interventional cardiologist, Brooklyn. 75 formally verified papers in CRM. Works with AI agents. Not a professional mathematician — formal verification (zero sorries) is the credibility mechanism. Does not care about academic sociology. Searching for mathematical beauty and truth.
 
 **Communication style:** Substance over praise. Critically engage. Disagree when warranted. No lists unless requested. No follow-up questions at end of responses. Domain-separated: Medical | Math-Physics | Investment | Philosophy/Theology | Role-Play.
 
 ---
 
-## WHAT'S DONE
+## PAPER STATUS
 
-### Paper 68: Fermat's Last Theorem is BISH ✅
+### Papers 66–70 (editorial sweep complete ✅)
 
-**File:** `paper68_final.tex` / `.pdf` (18pp)
-**Lean:** ⚠️ `Paper68_Final.lean` referenced in paper but NOT present in `/mnt/user-data/outputs/`. Work order at `PAPER68_LEAN_WORK_ORDER.md` can regenerate it.
-**Status:** Complete. Ready to publish (pending Lean file recovery).
+| Paper | File | Pages | Lean | Zenodo Zip | DOI |
+|-------|------|-------|------|------------|-----|
+| 66 | `paper 66/paper66.tex` | 15 | None (computational) | `Zenodo_P66_TraceZeroForm.zip` | 10.5281/zenodo.18745722 |
+| 67 | `paper 67/paper67.tex` | 17 | None (synthesis monograph) | `Zenodo_P67_MotiveDecidability.zip` | 10.5281/zenodo.18746343 |
+| 68 | `paper 68/paper68_final.tex` | 18 | `P68_WilesFLT/` ✅ (493 lines, 0 sorry) | `Zenodo_P68_WilesFLT.zip` | 10.5281/zenodo.18749965 |
+| 69 | `paper 69/paper69_funcfield.tex` | 15 | `P69_FuncField/` ✅ (236 lines, 0 sorry) | `Zenodo_P69_FuncField.zip` | 10.5281/zenodo.18749757 |
+| 70 | `paper 70/paper70.tex` | 16 | `P70_Archimedean/` ✅ (545 lines, 0 sorry) | `Zenodo_P70_Archimedean.zip` | 10.5281/zenodo.18750992 |
 
-Five-act structure: (1) Wiles audit → BISH + WLPO, (2) Asymmetry theorem, (3) Weight 1 obstruction irreducible (five failures), (4) Dihedral bypass (p = 2, Kisin), (5) CRM(FLT) = BISH.
+### Papers 72–75 (complete ✅)
 
-### Paper 69: Function Field Langlands is BISH ✅
+| Paper | File | Pages | Lean | Zenodo Zip | DOI |
+|-------|------|-------|------|------------|-----|
+| 72 | `paper 72/paper72.tex` | 10 | `P72_DPTCharacterisation/` ✅ (~350 lines, 0 sorry) | `P72_DPTCharacterisation.zip` | 10.5281/zenodo.18765393 |
+| 73 | `paper 73/paper73.tex` | 11 | `P73_Axiom1Reverse/` ✅ (~250 lines, 0 sorry) | `P73_Axiom1Reverse.zip` | 10.5281/zenodo.18765700 |
+| 74 | `paper 74/paper74.tex` | 15 | `P74_Axiom2Reverse/` ✅ (~200 lines, 0 sorry) | `P74_Axiom2Reverse.zip` | 10.5281/zenodo.18773827 |
+| 75 | `paper 75/paper75.tex` | 15 | `P75_ConservationTest/` ✅ (~180 lines, 0 sorry) | `P75_ConservationTest.zip` | 10.5281/zenodo.18773831 |
 
-**File:** `paper69_funcfield.tex` / `.pdf` (8pp)
-**Lean:** `Paper69_FuncField.lean` ✅ (present, zero sorry)
-**Status:** Complete. Needs editorial revision (8 items).
+### Earlier Papers (1–65, 71)
 
-Five-component audit of both Lafforgue proofs. All BISH. Key discovery: Remark 3.3 — the boundary is algebraic-vs-transcendental spectral parameters, not discrete-vs-continuous spectrum. Over function fields, continuous spectrum has algebraic parameters (z = q^{-s} on compact torus), so the whole trace formula is BISH.
-
-### Paper 70: The Archimedean Principle ✅
-
-**File:** `paper70.tex` / `.pdf` (8pp)
-**Lean:** `Paper70_Archimedean.lean` ✅ (328 lines, zero sorry)
-**Status:** Complete. Needs editorial revision.
-
-Four theorems: (A) Archimedean Principle — CRM level determined by one parameter, (B) MP Gap — projection vs search, (C) Automorphic CRM Incompleteness — witness (5,5,2), (D) Three Spectral Gaps — Σ⁰₂. Plus two key sections: §5.5 (why physics connects to Langlands) and §5.6 (function field as lattice regularisation).
-
----
-
-### Paper 72: The DPT Characterization Theorem ✅
-
-**File:** `paper 72/paper72.tex` / `.pdf` (10pp)
-**Lean:** `paper 72/P72_DPTCharacterisation/` ✅ (~350 lines, zero sorry)
-**Status:** Complete. Zenodo zip ready. Figure 1 added (Archimedean dichotomy).
-
-DPT axioms are the minimal set for BISH cycle-search. Axiom 3 biconditional: positive-definite height ↔ BISH cycle-search. The Archimedean Principle sharpened from implication to equivalence.
-
-### Paper 73: Standard Conjecture D Is Necessary ✅
-
-**File:** `paper 73/paper73.tex` / `.pdf` (11pp)
-**Lean:** `paper 73/P73_Axiom1Reverse/` ✅ (~250 lines, zero sorry, zero propext)
-**Status:** Complete. Zenodo zip ready. Figure 1 added (Jannsen trade-off).
-
-Axiom 1 biconditional: Conjecture D ↔ BISH morphism decidability (in realization-compatible motivic category). Jannsen escape: numerical motives are BISH but lack faithful realization.
-
-### Paper 74: Algebraic Spectrum Is Necessary ✅
-
-**File:** `paper 74/paper74.tex` / `.pdf` (15pp)
-**Lean:** `paper 74/P74_Axiom2Reverse/` ✅ (~200 lines, zero sorry, zero propext, zero Classical.choice)
-**Status:** Complete. Peer reviewed. Zenodo zip ready. Figure 1 (geometric-analytic boundary) + Figure 2 (equality-vs-search dichotomy).
-
-Axiom 2 biconditional: algebraic spectrum ↔ BISH eigenvalue decidability. Key distinction: failure costs WLPO (equality test), not LPO (existential search). Domain of failure: analytic Langlands parameters without geometric origin (Maass forms, unramified characters). Three fatal flaws in naive "transcendental eigenvalues" framing identified and corrected (Weil II, linear algebra vacuum, ℓ-adic CLASS trap).
-
----
-
-## ORPHANED / RETIRED FILES IN OUTPUTS
-
-These files exist from earlier sessions before Papers 69–71 were consolidated:
-
-| File | Origin | Status |
-|------|--------|--------|
-| `paper69.tex` / `.pdf` | Old Paper 69 (BCDT extension) | Retired working notes |
-| `Paper69_BCDT.lean` | Old Paper 69 Lean | Retired |
-| `Paper70_KW.lean` | Old Paper 70 (Khare-Wintenberger) Lean | Retired |
-| `paper71.tex` / `.pdf` | Old Paper 71 (weight 1 boundary) | Retired — content absorbed into Paper 68 |
-| `Paper71_Weight1.lean` | Old Paper 71 Lean | Retired |
-
-**Disambiguation:** `paper69.tex` (BCDT, retired) ≠ `paper69_funcfield.tex` (function field Langlands, current).
-
----
-
-## EDITORIAL WORK REMAINING
-
-### Paper 69 Edit Instructions (`paper69_edit_instructions.txt`)
-
-8 items. Most critical:
-1. **EXPAND REMARK 3.3** into full subsection explaining WHY algebraic-vs-transcendental is surprising. Must include: (a) naive expectation (discrete = BISH, continuous = WLPO), (b) why it's wrong (function field continuous spectrum has algebraic parameters), (c) contrast with number fields (Γ(s) for s ∈ iℝ is transcendental), (d) punchline (cost comes from nature of parameters, not topology of spectrum). This is the paper's most important finding and it's currently four sentences.
-2. Foreground Theorem C over A/B in abstract and introduction
-3. Soften "WLPO necessary" → "WLPO (no known bypass)"
-4. Fix "final paper" claims → "final audit paper" (Paper 70 exists)
-5–8. Minor fixes (derived categories, forward reference, bibliography, DOI)
-
-### Paper 70 Edit Instructions (`paper70_edit_instructions.txt`)
-
-Items already done:
-- ✅ "Main idea" section before §1.1
-- ✅ Abstract leads with central claim
-- ✅ Trilogy narrative in Conclusion
-- ✅ Lean scope honesty sentence
-- ✅ Sha disanalogy remark
-- ✅ Condensed mathematics + Fargues-Scholze in open questions
-- ✅ Uniqueness classified as conjecture
-- ✅ Engineering signpost in open questions
-
-Items still needed:
-- ❌ **Brouwer inoculation sentence** — acknowledge old intuition (Brouwer, Bishop, Weyl), specify what's new (uniform calibration, u(ℝ) = ∞, projection-vs-search, physics-Langlands explanation)
-- ❌ **Trim Discussion §8** — now redundant with rewritten introduction
-- ❌ **Two TikZ figures:**
-  - Figure 1: Four-domain 2×2 diagram (Archimedean/Non-Archimedean × Physics/Arithmetic)
-  - Figure 2: Matched control experiment (L²(ℝⁿ) → ℂᴺ ∥ L²(G(ℚ)\G(𝔸)) → L²(G(F)\G(𝔸_F)))
-- ❌ Minor: Paper 50 reference, Zenodo DOI
-
-### Paper 68 Lean File Recovery
-
-`Paper68_Final.lean` must be regenerated from `PAPER68_LEAN_WORK_ORDER.md`. The paper references it and claims zero sorry.
-
-### Papers 65–67
-
-| Paper | Status | Action |
-|-------|--------|--------|
-| 65 | ✅ Approved | Publish |
-| 66 | 🔧 Review | 5 fixes needed |
-| 67 | 📝 Draft | 3 blanks to fill — revise after Paper 75 |
-
-### Paper 75: Conservation Test — GL LLC Calibration ✅
-
-**File:** `paper 75/paper75.tex` / `.pdf` (15pp)
-**Lean:** `paper 75/P75_ConservationTest/` ✅ (~180 lines, zero sorry, zero propext, zero Classical.choice, 4 axioms)
-**Status:** Complete. Peer reviewed. Zenodo zip ready.
-
-DPT external validation on Genestier-Lafforgue semisimple LLC for arbitrary G. Three-layer stratification: algebraic (BISH, solidification via free generators + animation), homological (CLASS, Zorn for K-injectives), geometric (CLASS, BPI for v-covers). Statement = WLPO (Bernstein block finite generation → finite conjunction of equality tests). Proof = CLASS. Gap = 2 levels. DPT Axiom 2 correctly predicts WLPO. Conservation (eliminability of CLASS scaffolding) remains open conjecture.
+All published with DOIs. See `master folder/master_paper_list.txt` for complete list.
 
 ---
 
@@ -168,37 +65,21 @@ DPT external validation on Genestier-Lafforgue semisimple LLC for arbitrary G. T
 
 2. **CRM is diagnostic not predictive:** Classifies logical structure, doesn't compute new numbers. Value is in knowing WHERE approximation fails and WHY.
 
-3. **Paper 69's best result is worst-explained:** Remark 3.3 must become a full subsection.
+3. **The algebraic-vs-transcendental boundary** is more fundamental than discrete-vs-continuous: ℝ is the unique completion where algebraic points are isolated from the transcendental background with finite information.
 
-4. **Paper 70's best sections are §5.5–5.6:** Why physics connects to Langlands, and function field as lattice regularisation.
+4. **DPT vs Fargues-Scholze:** A logically forced partition, not a competition. Discrete sector (ℝ, BISH, cycle-search) vs continuous sector (ℚ_p, CLASS, categorical). The conservation conjecture (do FS results cast BISH shadows?) is the key open question.
 
-5. **DPT vs Fargues-Scholze:** A logically forced partition, not a competition. Discrete sector (ℝ, BISH, cycle-search) vs continuous sector (ℚ_p, CLASS, categorical). The ℤ-density obstruction makes this topological. The conservation conjecture (do FS results cast BISH shadows?) is the key open question.
-
-6. **The algebraic-vs-transcendental boundary** is more fundamental than discrete-vs-continuous: ℝ is the unique completion where algebraic points are isolated from the transcendental background with finite information.
-
-7. **Programme goal:** ~~Prove "the logical cost of motivic arithmetic is the logical cost of ℝ" as a full biconditional across all DPT axioms~~ **DONE** (Papers 72–74). ~~Test the conservation conjecture against Fargues-Scholze~~ **DONE** (Paper 75 — external validation passed). Remaining: editorial cleanup and Paper 67 synthesis revision.
+5. **Programme goal:** ~~Prove "the logical cost of motivic arithmetic is the logical cost of ℝ" as a full biconditional across all DPT axioms~~ **DONE** (Papers 72–74). ~~Test the conservation conjecture against Fargues-Scholze~~ **DONE** (Paper 75 — external validation passed). ~~Editorial cleanup~~ **DONE** (Papers 66–70).
 
 ---
 
 ## WHAT THE NEXT AGENT SHOULD DO
 
-**If Paul says "continue" or "where were we":**
-→ Papers 72–75 all done. Remaining: editorial cleanup (Papers 66–70), Paper 67 revision (final synthesis incorporating biconditionals + conservation findings), Zenodo uploads (Papers 73–75).
-
 **If Paul says "upload" or "Zenodo":**
-→ Papers 73, 74, 75 have Zenodo zips ready but DOIs still pending. Upload and update master_paper_list.txt with DOIs.
+→ Papers 66–70 have new Zenodo zips ready. Paul must upload himself (credential security). Papers 72–75 DOIs already assigned.
 
-**If Paul says "revise Paper 67":**
-→ Wait until Paper 75 is done. Paper 67 is the synthesis — needs conservation findings.
-
-**If Paul says "revise Paper 69":**
-→ Apply 8 edit items. Priority: expand Remark 3.3.
-
-**If Paul says "revise Paper 70":**
-→ Brouwer inoculation, trim Discussion, two TikZ figures.
-
-**If Paul says "fix Paper 68 Lean":**
-→ Regenerate from `PAPER68_LEAN_WORK_ORDER.md`.
+**If Paul says "push":**
+→ `git push origin main`. Repository has multiple unpushed commits.
 
 **If Paul asks about something else:**
 → Respect domain separation.
@@ -207,30 +88,22 @@ DPT external validation on Genestier-Lafforgue semisimple LLC for arbitrary G. T
 
 ## FILE LOCATIONS
 
-### The Trilogy (active)
-- `/mnt/user-data/outputs/paper68_final.tex` + `.pdf` (18pp)
-- `/mnt/user-data/outputs/paper69_funcfield.tex` + `.pdf` (8pp)
-- `/mnt/user-data/outputs/paper70.tex` + `.pdf` (8pp)
+All paths relative to `~/FoundationRelativity/`.
 
-### Lean (confirmed present)
-- `/mnt/user-data/outputs/Paper69_FuncField.lean`
-- `/mnt/user-data/outputs/Paper70_Archimedean.lean`
-
-### Lean (missing)
-- Paper68_Final.lean — needs regeneration
-
-### Lean (retired)
-- `/mnt/user-data/outputs/Paper69_BCDT.lean`
-- `/mnt/user-data/outputs/Paper70_KW.lean`
-- `/mnt/user-data/outputs/Paper71_Weight1.lean`
-
-### Edit Instructions
-- `/mnt/user-data/outputs/paper69_edit_instructions.txt`
-- `/mnt/user-data/outputs/paper70_edit_instructions.txt`
+### Active Papers
+- `paper 66/paper66.tex` + `.pdf` (15pp)
+- `paper 67/paper67.tex` + `.pdf` (17pp)
+- `paper 68/paper68_final.tex` + `.pdf` (18pp)
+- `paper 69/paper69_funcfield.tex` + `.pdf` (15pp)
+- `paper 70/paper70.tex` + `.pdf` (16pp)
+- `paper 72/paper72.tex` + `.pdf` (10pp)
+- `paper 73/paper73.tex` + `.pdf` (11pp)
+- `paper 74/paper74.tex` + `.pdf` (15pp)
+- `paper 75/paper75.tex` + `.pdf` (15pp)
 
 ### Programme Documents
-- `/mnt/user-data/outputs/CRM_PROGRAMME_ROADMAP.md`
-- `/mnt/user-data/outputs/CRM_SESSION_HANDOFF.md` (this file)
-
-### Transcripts
-- `/mnt/transcripts/journal.txt` — full index
+- `master folder/master_paper_list.txt` — complete paper list with DOIs
+- `master folder/CRM_PROGRAMME_ROADMAP.md` — programme architecture and status
+- `master folder/CRM_SESSION_HANDOFF.md` (this file)
+- `master folder/paper_format_guide.md` — LaTeX structure template
+- `master folder/CRM_Series_Booklet.tex` — abstracts
