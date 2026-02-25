@@ -1084,70 +1084,112 @@ $(D_{\mathrm{res}}, f_{\mathrm{Art}})$ determines it within the
 dataset, but the functional relationship resists a simple
 closed form.
 
-\subsection{The Taylor--Wiles audit}
+\subsection{The Taylor--Wiles audit (completed: Paper~68)}
 
-The de-omniscientizing descent (\S\ref{sec:descent}) classifies
-the logical content of the five major conjectures.  The natural
-next step is to classify the logical content of the
-\emph{proofs}---specifically, the Taylor--Wiles patching argument
-that underlies all modern modularity lifting theorems.
+Paper~68 performed the full CRM audit of Wiles's proof of
+Fermat's Last Theorem.  The five-stage Taylor--Wiles patching
+argument classifies at $\BISH$: the patching limit is over
+finitely presented Hecke algebras (Brochard's finite-level
+criterion), effective Chebotarev (Lagarias--Montgomery--Odlyzko)
+replaces the density theorem, and Nakayama's lemma applies
+constructively in the explicitly presented local ring.  The sole
+non-constructive content is Stage~1 (base change from weight~2 to
+weight~1 via Langlands--Tunnell), which costs $\WLPO$ through
+the Archimedean place.  Result: $\mathrm{CRM}(\mathrm{FLT}) = \BISH$.
 
-The question is: what is the omniscience cost of the
-Taylor--Wiles method?  A preliminary analysis suggests three
-sites where non-constructive content may enter:
+\subsection{The function field comparison and Archimedean
+  Principle (Papers~69--70)}
+
+Paper~69 audited both Lafforgue proofs over function fields:
+both are $\BISH$.  The structural finding is that the
+$\BISH$/$\WLPO$ boundary in the trace formula is not
+discrete-vs-continuous spectrum but algebraic-vs-transcendental
+spectral parameters.  Paper~70 synthesized this into the
+\emph{Archimedean Principle}: the CRM level of every domain is
+determined by one parameter (presence of an Archimedean place),
+with $u(\R) = \infty$ as the mechanism forcing positive-definite
+descent.
+
+\subsection{The DPT biconditional trilogy (Papers~72--74)}
+
+Papers~72--74 proved reverse characterizations for all three
+DPT axioms, upgrading ``minimal'' to ``uniquely necessary'':
 \begin{enumerate}
-\item The patching argument constructs a limit over an inverse
-  system of Hecke algebras (compactness---classical).
-\item Galois representations via the Chebotarev density theorem
-  (deciding splitting conditions---$\LPO$).
-\item The $R = T$ theorem uses Nakayama's lemma in a completed
-  local ring (constructively valid if the ring is explicitly
-  presented) and a numerical criterion involving Selmer groups
-  and $L$-values.
+\item Axiom~3 (positive-definite height) $\Leftrightarrow$
+  $\BISH$ cycle-search; failure costs $\LPO$ (Paper~72).
+\item Axiom~1 (Standard Conjecture~D) $\Leftrightarrow$
+  $\BISH$ morphism decidability; failure costs $\LPO$ (Paper~73).
+\item Axiom~2 (algebraic spectrum) $\Leftrightarrow$
+  $\BISH$ eigenvalue decidability; failure costs $\WLPO$, not
+  $\LPO$---equality test, not search (Paper~74).
 \end{enumerate}
+The DPT axiom system is thereby canonical: each axiom is
+the unique condition for constructivizing its sector.
 
-A systematic CRM audit of Wiles's original argument for
-semistable elliptic curves---listing every non-constructive step
-and classifying it as $\MP$, $\LPO$, or eliminable---would
-determine whether the patching method is essentially $\LPO$ or
-contains eliminable non-constructive content.  This is deferred
-to future work.
+\subsection{The conservation test (Paper~75)}
 
-\subsection{The synthesis monograph}
+Paper~75 applied the DPT framework as an external diagnostic on
+the Genestier--Lafforgue semisimple local Langlands
+parametrization.  The Fargues--Scholze proof stratifies into
+three layers: algebraic ($\BISH$, solidification), homological
+($\CLASS$, Zorn), geometric ($\CLASS$, BPI).  The statement
+costs only $\BISH + \WLPO$: the Bernstein center deterministically
+extracts the semisimple parameter, and the residual is a finite
+conjunction of trace equality tests (Paper~74 Theorem~C).
+The two-level conservation gap ($\WLPO < \CLASS$) confirms that
+DPT correctly predicts the statement cost.  Whether the $\CLASS$
+scaffolding is eliminable remains an open conjecture.
 
-This paper is itself a step toward a standalone monograph
-packaging the program.  The full monograph would integrate
-the physics calibrations (Papers~1--44, synthesized in
-Paper~40), the arithmetic geometry calibrations (this paper),
-and the formal verification corpus into a single document.
+\subsection{Remaining open questions}
+
+Two structural questions survive:
+\begin{enumerate}
+\item \emph{Form-class predictor.}  The trace-zero form class
+  (\S\ref{sec:formclass}) is injective on discriminants within
+  the computed range.  Is there a closed-form predictor?
+\item \emph{Conservation conjecture.}  Does every $\CLASS$-proof
+  of a $\BISH$-statement cast a $\BISH$ shadow?  Paper~75
+  identifies the gap; closing it requires eliminating Zorn and
+  BPI from the Fargues--Scholze architecture.
+\end{enumerate}
 
 
 % ============================================================
 \section{Conclusion}\label{sec:conclusion}
 % ============================================================
 
-The Constructive Reverse Mathematics program, across sixty-six
+The Constructive Reverse Mathematics program, across seventy-five
 papers, has pursued a single thesis: every major theorem of
 arithmetic geometry has a natural logical address, and finding
 that address reveals computational structure invisible to
 classical analysis.
 
-The thesis has held up.  The five great conjectures exhibit a
+The thesis has held up---and has been proved as a biconditional.
+The five great conjectures exhibit a
 uniform de-omniscientizing descent from $\LPO$ to $\BISH$,
 mediated by the motive (Theorem~\ref{thm:five}).  The
 three-invariant hierarchy (Theorem~\ref{thm:three}) classifies
-the full mixed motive frontier.  At the Axiom~1 boundary, where
+the full mixed motive frontier.  Papers~72--74 showed that each
+DPT axiom is not merely sufficient but \emph{uniquely necessary}
+for constructivizing its sector, making the axiom system canonical.
+Paper~75 passed the first external validation test: the
+Genestier--Lafforgue parametrization costs exactly what DPT predicts.
+
+At the Axiom~1 boundary, where
 the Lefschetz ring goes blind, the constructive lens discovered
 an exact numerical identity---$h \cdot \Nm(\fA) = f$---that was
 invisible at classical resolution.  At the Axiom~3 boundary, the
 $p$-adic precision bound $N_M \le 2$ showed that finite primes
 are computationally trivial, resolving the framework's
-``Axiom~5'' question.
+``Axiom~5'' question.  At the Axiom~2 boundary, the algebraic-vs-transcendental
+spectral parameter distinction (Paper~69) revealed that the $\BISH$/$\WLPO$
+boundary is not where classical analysis places it.
 
 The program's deepest finding may be methodological:
 constructive logic is not merely a foundation but an
 \emph{instrument}.  It detects structure---the $h = f$ identity,
-the form-class invariant, the three-invariant classification---that
+the form-class invariant, the three-invariant classification,
+the algebraic-vs-transcendental boundary---that
 the classical lens misses, not because classical mathematics is
 wrong but because it does not look at the right resolution.  The
 motive is a decidability certificate.  The constructive proof is a
@@ -1205,7 +1247,8 @@ mathematician.  All mathematical claims in this paper should be
 evaluated on their formal content---the Lean~4 proof code and the
 written arguments---rather than on the author's credentials.
 Errors of exposition or mathematical culture are the author's
-alone.
+alone.  This paper follows the standard format for the CRM
+series~\cite{format-guide}.
 
 
 % ============================================================
@@ -1435,6 +1478,11 @@ Oxford Univ.\ Press, 1969.
 B.~van~Geemen.
 Half twists of Hodge structures of CM-type.
 \textit{J.\ Math.\ Soc.\ Japan}, 53(4):813--833, 2001.
+
+\bibitem{format-guide}
+P.~C.-K.~Lee.
+\emph{Paper format guide for the CRM series}.
+\textit{Zenodo}, 2026.
 
 \end{thebibliography}
 

@@ -1,0 +1,33 @@
+Title: The DPT Characterisation Theorem: Archimedean Polarisation Is Necessary for Cycle-Search (Paper 72, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, NY
+
+Date: February 2026
+
+Description:
+Paper 72 of the Constructive Reverse Mathematics (CRM) Series proves that the three DPT axioms (Paper 50) are the minimal axiom set for BISH-decidable motivic cycle-search. The new result: positive-definiteness of the height pairing (Axiom 3) is not merely sufficient but necessary. Without Northcott's finiteness guarantee, the search for Mordell-Weil generators is unbounded and the L-function zero-test encodes LPO (Paper 48). Combined with the forward direction (Papers 45-51), this gives a biconditional: Axiom 3 if and only if BISH cycle-search.
+
+The Archimedean Principle (Paper 70) is thereby sharpened from a forward implication to an equivalence. The completion type determines the u-invariant (u(R) = infinity vs u(Q_p) = 4), which determines the height-pairing signature, which determines whether Northcott applies, which determines the CRM level. Each link is a biconditional.
+
+The Lean 4 formalization comprises approximately 350 lines across 5 files with zero sorry, using 8 axioms (4 data + 4 propositional), each with mathematical references to Papers 45, 46, 48, 50, and 51. The bundle builds cleanly with lake build on Lean 4 v4.29.0-rc2 with Mathlib4.
+
+Main results:
+- Theorem A (Minimality): No proper subset of {Axiom 1, Axiom 2, Axiom 3} suffices for BISH-decidable motivic arithmetic. Drop Axiom 1: LPO. Drop Axiom 2: WLPO. Drop Axiom 3: LPO.
+- Theorem B (Height-Search Equivalence): cycle_search_cost(h) = BISH if and only if h = positive-definite (new biconditional).
+- Theorem C (DPT Characterisation): DPT Axioms 1, 2, 3 are the minimal axioms for BISH-decidable motivic cycle-search. The Archimedean Principle is a biconditional.
+- Corollary (Archimedean Principle, sharpened): cycle_search_cost(available_height(c)) = BISH if and only if c is Archimedean.
+
+Keywords: constructive reverse mathematics, DPT axioms, Archimedean Principle, Northcott theorem, height pairing, positive-definiteness, u-invariant, cycle-search, BISH, LPO, WLPO, motivic category, Lean 4, formal verification
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related identifiers:
+- Paper 48 (L-function zero-test): https://doi.org/10.5281/zenodo.18700959
+- Paper 50 (DPT axioms): https://doi.org/10.5281/zenodo.18705837
+- Paper 51 (BSD rescue): https://doi.org/10.5281/zenodo.18705863
+- Paper 70 (Archimedean Principle): https://doi.org/10.5281/zenodo.18758987
+- Format guide: (DOI pending)
+
+Upload type: Publication / Preprint

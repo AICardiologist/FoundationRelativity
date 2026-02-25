@@ -726,15 +726,6 @@ theorem witness_family (p : Nat) (hp : p >= 5) :
 \label{sec:discuss}
 % ===========================================================
 
-\subsection{Summary of the structural picture}
-
-The introduction (\S\ref{sec:intro}) stated the Archimedean Principle in prose; \S\ref{sec:results} proved it formally. Three consequences deserve emphasis:
-\begin{itemize}
-\item \emph{One parameter.} The CRM level of every domain is determined by a single Boolean---has Archimedean place?---with the descent type fixing the residual (\S\ref{sec:results}, Theorem~\ref{thm:A}; Figure~\ref{fig:four-domain}).
-\item \emph{Physics--Langlands connections.} Multiple physical theories encode Langlands because all share the same logical constraint and solve it with the same mechanism (\S\ref{sec:langlands-physics}).
-\item \emph{Function field as lattice regularization.} Removing the Archimedean place collapses both physics and arithmetic to $\BISH$; the function field is arithmetic's lattice regularization (\S\ref{sec:results}; Figure~\ref{fig:matched-control}).
-\end{itemize}
-
 \subsection{Open questions}
 
 \begin{enumerate}
@@ -780,9 +771,23 @@ The Constructive Reverse Mathematics series continues in Paper~71 with quantum c
 \addcontentsline{toc}{section}{Acknowledgments}
 % ===========================================================
 
-The program owes its foundation to Bishop, Bridges, Richman, and Ishihara; its subject matter to Grothendieck, Deligne, Langlands, Selberg, Arthur, and the two Lafforgues; its arithmetic geometry to Wiles, Taylor, Kisin, Khare, and Wintenberger; and its verification infrastructure to the Lean and Mathlib communities.
+The Lean~4 formalization uses Mathlib4~\cite{mathlib}; we thank the
+Mathlib contributors for maintaining this essential infrastructure.
 
-The Lean~4 formalization was produced using AI code generation (Claude, Anthropic) under human direction. The author's primary training is in medicine (cardiology), not in mathematical logic or arithmetic geometry. All mathematical claims rest on their formal content---in particular the Lean-verified proofs---and should be evaluated accordingly. We welcome constructive feedback from domain experts.
+This paper was drafted with AI assistance (Claude, Anthropic).
+The formal verification was developed and checked with Claude
+(Anthropic).  The author is a clinician (interventional
+cardiology), not a professional mathematician; the logical structure
+of the main results has been verified by formal proof (Lean~4); the
+mathematical arguments supporting the domain-cost assignments have been
+checked by the author and by consultation with domain experts.
+Errors of mathematical judgment remain the author's responsibility.
+This paper follows the standard format for the CRM
+series~\cite{format-guide}.
+
+This series is dedicated to the memory of Errett Bishop (1928--1983),
+whose program demonstrated that constructive mathematics is not a
+restriction but a refinement.
 
 % ===========================================================
 % References
@@ -895,6 +900,16 @@ Reverse mathematics in Bishop's constructive mathematics,
 J.-P.~Serre,
 \emph{A Course in Arithmetic},
 Springer GTM~7, 1973.
+
+\bibitem{mathlib}
+The Mathlib Community.
+\textit{Mathlib4}.
+\url{https://github.com/leanprover-community/mathlib4}, 2024.
+
+\bibitem{format-guide}
+P.~C.-K.~Lee.
+\emph{Paper format guide for the CRM series}.
+\textit{Zenodo}, 2026.
 
 \end{thebibliography}
 

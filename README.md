@@ -7,7 +7,7 @@
 
 **Author:** Paul Chun-Kit Lee (New York University)
 
-**70 papers. ~88,000 lines Lean 4. One finding:**
+**75 papers. ~89,000 lines Lean 4. One finding:**
 
 **The logical cost of mathematics is the logical cost of the real numbers.**
 
@@ -67,7 +67,7 @@ LPO enters through exactly one door: the spectral theorem for unbounded self-adj
 
 ---
 
-## Part Two: Arithmetic Geometry (Papers 45–71)
+## Part Two: Arithmetic Geometry (Papers 45–75)
 
 ### The finding
 
@@ -108,8 +108,10 @@ A new arithmetic identity, not a CRM classification: the Faltings height times t
 | Paper | Title | Role |
 |-------|-------|------|
 | **50** | Three Axioms for the Motive | DPT framework — three axioms for Grothendieck's motives |
-| **67** | The Motive Is a Decidability Certificate | Arithmetic monograph — (r, ℓ, c) classify all motives |
+| **67** | The Motive Is a Decidability Certificate | Arithmetic monograph — (r, ℓ, c) classify all motives (Papers 45–75) |
 | **70** | The Archimedean Principle | Capstone — u(ℝ) = ∞ unifies physics and arithmetic |
+| **72–74** | DPT Biconditional Trilogy | Each DPT axiom is uniquely necessary — canonical, not merely minimal |
+| **75** | Conservation Test | External validation: GL LLC statement WLPO, proof CLASS |
 
 ---
 
@@ -248,11 +250,20 @@ Every paper with its bottom line. Papers 1 and 3 withdrawn; Papers 60 and 62 ret
 
 | # | Title | Bottom line |
 |---|-------|------------|
-| **67** | **The Motive Is a Decidability Certificate** | **Monograph: (r, ℓ, c) classify all motives** |
+| **67** | **The Motive Is a Decidability Certificate** | **Monograph: (r, ℓ, c) classify all motives (Papers 45–75)** |
 | 68 | Fermat's Last Theorem Is BISH | Wiles WLPO; Kisin bypass → BISH |
 | 69 | Function Field Langlands Is BISH | Algebraic-vs-transcendental boundary, not discrete-vs-continuous |
 | **70** | **The Archimedean Principle** | **Capstone: the only expensive thing is ℝ** |
 | 71 | Archimedean Principle in Cryptography | Lattice crypto Archimedean-hard; SVP at projection/search boundary |
+
+#### DPT Biconditional Trilogy and Conservation Test (Papers 72–75)
+
+| # | Title | Bottom line |
+|---|-------|------------|
+| **72** | **The DPT Characterisation Theorem** | **Axiom 3 (Archimedean polarisation) ↔ BISH cycle-search; failure costs LPO** |
+| 73 | Standard Conjecture D Is Necessary | Axiom 1 (Conjecture D) ↔ BISH morphism decidability; failure costs LPO |
+| 74 | Algebraic Spectrum Is Necessary | Axiom 2 (algebraic spectrum) ↔ BISH eigenvalue decidability; failure costs WLPO |
+| **75** | **Conservation Test: GL LLC Calibration** | **Statement WLPO, proof CLASS — conservation gap validates DPT externally** |
 
 ---
 
@@ -269,15 +280,20 @@ Papers/                     Lean 4 formalization bundles (self-contained)
   P28_NewtonLagrange/
   P33_QCDConfinement/
   P51_BSD/
+  P68_WilesFLT/
   P69_FuncField/
   P70_Archimedean/
+  P72_DPTCharacterisation/
+  P73_Axiom1Reverse/
+  P74_Axiom2Reverse/
+  P75_ConservationTest/
 paper N/                    LaTeX sources and PDFs for each paper
 scripts/                    CI audit scripts
 ```
 
-Each `Papers/P{N}_*/` bundle builds independently: `cd Papers/P70_Archimedean && lake build`. Lean 4 toolchain v4.28.0-rc1. Zero `sorry` across all published bundles. `Classical.choice` in every ℝ theorem is Mathlib infrastructure, not classical content — constructive stratification is by proof content, not `#print axioms` output.
+Each `Papers/P{N}_*/` bundle builds independently: `cd Papers/P72_DPTCharacterisation && lake build`. Lean 4 toolchain v4.28.0-rc1 (Papers 72–75: v4.29.0-rc2). Zero `sorry` across all published bundles. `Classical.choice` in every ℝ theorem is Mathlib infrastructure, not classical content — constructive stratification is by proof content, not `#print axioms` output.
 
-69 active papers (Papers 1 and 3 withdrawn; Papers 60 and 62 retired into 59 and 63).
+73 active papers (Papers 1 and 3 withdrawn; Papers 60 and 62 retired into 59 and 63).
 
 ## Citation
 
