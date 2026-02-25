@@ -1,0 +1,33 @@
+Title: Standard Conjecture D Is Necessary for Constructive Morphism Decidability (Paper 73, Constructive Reverse Mathematics Series)
+
+Author: Paul C. K. Lee
+
+Affiliation: Department of Medicine, New York University Grossman School of Medicine
+
+Date: February 2026
+
+Description:
+Paper 73 of the Constructive Reverse Mathematics (CRM) Series proves the reverse characterization of DPT Axiom 1: Standard Conjecture D is not merely sufficient but necessary for BISH-decidable morphism spaces in a realization-compatible motivic category. Without Conjecture D, homological and numerical equivalence diverge, the radical of the intersection pairing is non-detachable, and testing morphism equality requires rational l-adic zero-testing, which encodes LPO (Paper 46). Combined with the forward direction (Papers 46, 50), this gives a biconditional: Conjecture D if and only if BISH morphism decidability.
+
+Jannsen's theorem (1992) shows the constraint is sharp: numerical motives are semisimple and BISH-decidable without Conjecture D, but lack faithful l-adic realization. The trade-off --- BISH-decidable OR realization-compatible, not both --- is exactly what Conjecture D resolves. This is the Axiom 1 analogue of Paper 72's characterization (positive-definite height if and only if BISH cycle-search). Together, Papers 72-73 upgrade "minimal" (Paper 72 Theorem A) to "uniquely necessary" for two of the three DPT axioms.
+
+The Lean 4 formalization comprises approximately 250 lines across 6 files with zero sorry, using 4 axioms (2 data + 2 propositional), each with mathematical references to Papers 46 and 50. The bundle builds cleanly with lake build on Lean 4 v4.29.0-rc2 with Mathlib4.
+
+Main results:
+- Theorem A (Forward): Conjecture D converts LPO-dependent homological equivalence to BISH-decidable numerical equivalence (review of Papers 46, 50).
+- Theorem B (Morphism-Decidability Equivalence): morphism_cost(r) = BISH if and only if r = detachable if and only if Conjecture D holds (new biconditional).
+- Theorem C (Axiom 1 Characterization): Standard Conjecture D is the minimal and unique axiom for BISH-decidable morphisms in a realization-compatible motivic category.
+- Corollary (Jannsen obstruction): Without Conjecture D, BISH-decidable morphisms and faithful l-adic realization are mutually exclusive.
+- Corollary (Axiom 1 Principle, sharpened): morphism_cost(r) = BISH if and only if conjD_holds(r) = true.
+
+Keywords: constructive reverse mathematics, Standard Conjecture D, motivic category, BISH, LPO, morphism decidability, numerical equivalence, homological equivalence, Jannsen semisimplicity, Lean 4, formal verification
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related identifiers:
+- Paper 46 (Tate CRM): https://doi.org/10.5281/zenodo.18682285
+- Paper 50 (DPT axioms): https://doi.org/10.5281/zenodo.18705837
+- Paper 72 (DPT characterization): https://doi.org/10.5281/zenodo.18765393
+- Format guide: https://doi.org/10.5281/zenodo.18765700
+
+Upload type: Publication / Preprint
