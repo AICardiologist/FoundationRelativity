@@ -178,10 +178,14 @@ axiom geometric_layer_cost_eq : geometric_layer_cost = CLASS
     Spec(Z(G)) corresponding to χ_π — deterministically extracted,
     not searched for.
 
-    The only residual logical cost is the trace equality test:
-      trace(π)(f) = trace(φ)(f) for all test functions f.
-    This is an equality test on algebraic/continuous values,
-    which costs WLPO (Paper 74, Theorem C).
+    The only residual logical cost is the trace equality test.
+    Each Bernstein block has a finitely generated commutative
+    Q̄_ℓ-algebra as its center Z_Ω. Two algebra homomorphisms
+    χ_π, χ_φ : Z_Ω → Q̄_ℓ agree iff they agree on finitely many
+    generators (the V-excursion operators in GL's framework).
+    Verifying χ_π = χ_φ is a finite conjunction of exact equality
+    tests on Q̄_ℓ-valued spectral data — each costing WLPO by
+    Paper 74 Theorem C. A finite conjunction of WLPO remains WLPO.
 
     NOT LPO: there is no existential search. The Bernstein center
     hands you φ; you only need to verify the trace identity.
