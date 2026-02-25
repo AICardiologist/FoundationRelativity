@@ -144,11 +144,11 @@ the logical cost of mathematical theorems within the hierarchy
   \BISH \subset \BISH{+}\mathrm{MP} \subset \LLPO
   \subset \WLPO \subset \LPO \subset \CLASS.
 \end{equation}
-Papers~72--74 established the DPT axiom trilogy as a system of
-biconditionals: each of the three DPT axioms for motivic arithmetic
-is the unique condition ensuring its associated operation is
-$\BISH$-decidable.  The axiom system is canonical, not merely
-minimal.
+Papers~72--74~\cite{lee-p72, lee-p73, lee-p74} established the DPT
+axiom trilogy as a system of biconditionals: each of the three DPT
+axioms for motivic arithmetic is the unique condition ensuring its
+associated operation is $\BISH$-decidable.  The axiom system is
+canonical, not merely minimal.
 
 This paper tests the DPT framework on a theorem proved by entirely
 different methods.  The Genestier--Lafforgue semisimple local Langlands
@@ -214,9 +214,12 @@ The key omniscience principles:
     $\exists n,\; a(n) = 1$ --- an existential search.
     Strictly stronger than $\WLPO$: every existential search
     subsumes an equality test, but not conversely.
-  \item $\CLASS$ (full classical logic): the Law of Excluded
-    Middle for all propositions.  Equivalent to $\LPO$ for all
-    separable metric spaces.
+  \item $\CLASS$ (full classical logic): unrestricted Law of
+    Excluded Middle together with the Axiom of Choice (including
+    Zorn's lemma and $\BPI$).  The proof-level constructions
+    in this paper invoke both: Zorn for injective envelopes
+    (Theorem~\ref{thm:homological}) and $\BPI$ for v-covers
+    (Theorem~\ref{thm:geometric}).
 \end{itemize}
 The DPT axioms are the three hypotheses of the Deuring--Hecke--Tate
 formalism for motivic arithmetic.  Papers~72--74 proved that each
@@ -252,7 +255,7 @@ biconditional.  The reverse trilogy (Papers~72--74) showed each DPT
 axiom is individually necessary.  Paper~75 is the first conservation
 test: applying the completed framework as a diagnostic tool on
 external mathematics.  Paper~67 (revision) will incorporate these
-findings into the programme's final synthesis.
+findings into the program's final synthesis.
 
 % ============================================================
 % 2. PRELIMINARIES
@@ -263,12 +266,13 @@ findings into the programme's final synthesis.
 
 The CRM hierarchy~\eqref{eq:hierarchy} stratifies classical
 mathematics by omniscience cost.  The DPT axioms for motivic
-arithmetic are:
+arithmetic~\cite{lee-p45, lee-p50} are:
 \begin{itemize}
   \item \textbf{Axiom~1} (Standard Conjecture~D): homological
     and numerical equivalence coincide.
   \item \textbf{Axiom~2} (algebraic spectrum): Frobenius/Hecke
-    eigenvalues have algebraic origin.
+    eigenvalues have algebraic origin
+    (Deligne~\cite{deligne-weil1, deligne-weil2}).
   \item \textbf{Axiom~3} (Archimedean polarization): the pairing
     has a positive-definite real-valued height.
 \end{itemize}
@@ -286,17 +290,26 @@ functors from extremally disconnected compact Hausdorff spaces to
 abelian groups satisfying a sheaf condition.  \emph{Light} condensed
 abelian groups restrict to countable inverse limits of finite sets.
 
-The solidification functor $\mathrm{Solid} \colon \mathrm{CondAb}
-\to \mathrm{SolidAb}$ projects a condensed abelian group onto its
-solid part.  For light condensed groups, solidification computes as
-an inverse limit over the category of finite sets, where the
-transition maps are surjections of finite sets.
+The solidification functor $(-)^\blacksquare \colon \mathrm{CondAb}
+\to \mathrm{SolidAb}$ is the left adjoint to the inclusion of solid
+abelian groups into condensed abelian groups.  For a light profinite
+set $S = \varprojlim S_n$ (a cofiltered limit of finite sets), the
+solidification of the free condensed abelian group is
+$\mathbb{Z}[S]^\blacksquare = \varprojlim \mathbb{Z}[S_n]$.
+The transition maps $\mathbb{Z}[S_{n+1}] \to \mathbb{Z}[S_n]$ are
+induced by surjections of finite sets, which split.  For a general
+light condensed abelian group~$M$, the derived solidification
+$L(-)^\blacksquare$ is computed by animation: a simplicial
+resolution of~$M$ by free condensed groups $\mathbb{Z}[S_i]$,
+which avoids the injective envelopes required by right-derived
+functors.
 
 \subsection{The Bernstein center and Schur's lemma}
 
 Let~$G$ be a connected reductive group over a non-archimedean
 local field~$F$.  The Bernstein center~$\mathcal{Z}(G)$ is the
-center of the category of smooth representations of~$G(F)$.
+center of the category of smooth representations
+of~$G(F)$~\cite{bernstein, bump}.
 For an irreducible admissible representation~$\pi$, the space
 of $K$-fixed vectors~$\pi^K$ is finite-dimensional for any
 compact open subgroup~$K \subset G(F)$.  By Schur's
@@ -361,24 +374,42 @@ Choice is required.
 \end{theorem}
 
 \begin{proof}
-Solidification of a light condensed abelian group~$M$ computes as
-$M^{\mathrm{solid}} = \varprojlim_{S \in \mathrm{FinSet}^{\mathrm{op}}}
-M(S)$, an inverse limit indexed by the category of finite sets.
+The argument proceeds in three steps: free generators, split
+epimorphisms, and animation.
 
-The key observation: every surjection of finite sets splits.  Given
-$f \colon S \twoheadrightarrow T$ with $S, T$ finite, a section
-$s \colon T \to S$ exists by choosing one preimage per element ---
-a finite process requiring no axiom of choice.
+\medskip\noindent\textbf{Step~1 (Free generators).}
+Let $S = \varprojlim S_n$ be a light profinite set, written as a
+cofiltered limit of finite sets.  The solidification of the free
+light condensed abelian group $\mathbb{Z}[S]$ is defined as
+$\mathbb{Z}[S]^\blacksquare = \varprojlim \mathbb{Z}[S_n]$.
 
-Consequence: the transition maps in the inverse system are split
-epimorphisms.  The Mittag-Leffler condition holds trivially (the
-image stabilizes immediately), so $\varprojlim^1 = 0$
-constructively.  The inverse limit exists and is computable in~$\BISH$.
+\medskip\noindent\textbf{Step~2 (Split epimorphisms).}
+The transition maps $\mathbb{Z}[S_{n+1}] \to \mathbb{Z}[S_n]$ are
+induced by surjections $S_{n+1} \twoheadrightarrow S_n$ of finite
+sets.  Every such surjection splits: a section $s \colon S_n \to
+S_{n+1}$ exists by choosing one preimage per element, a finite
+process requiring no axiom of choice.  The induced maps on free
+abelian groups are therefore split epimorphisms.  The Mittag-Leffler
+condition holds trivially (images stabilize immediately), so
+$\varprojlim^1 = 0$ constructively.
 
-This corrects earlier programme estimates (see
-\S\ref{sec:correction}) that placed solidification at $\LPO$
-via Mittag-Leffler and Dependent Choice.  In fact, the finiteness of
-the index sets makes $\DC$ unnecessary.
+\medskip\noindent\textbf{Step~3 (Animation).}
+For a general light condensed abelian group~$M$, the derived
+solidification $L(-)^\blacksquare$ is computed by animation: a
+simplicial resolution of~$M$ by free condensed groups
+$\mathbb{Z}[S_i]$.  Each level of the resolution solidifies
+constructively by Steps~1--2.  Crucially, animation resolves the
+\emph{source} via free/projective presentations, entirely avoiding
+the injective envelopes (and hence Zorn's lemma) that right-derived
+functors would require.  This foreshadows the source-vs-target
+asymmetry discussed in~\S\ref{sec:main}.
+
+\medskip
+The solidification functor for light condensed groups is therefore
+computable in~$\BISH$.  This corrects earlier program estimates
+(see~\S\ref{sec:correction}) that placed solidification at~$\LPO$
+via the Mittag-Leffler condition and Dependent Choice.  The
+finiteness of the index sets makes~$\DC$ unnecessary.
 \end{proof}
 
 \subsubsection{Homological layer: K-injective resolutions
@@ -513,15 +544,18 @@ deterministically extracted from~$\pi$ via the algebraic structure
 of the Bernstein center.
 
 \medskip\noindent\textbf{The trace equality test costs $\WLPO$.}
-The residual operation is verifying
-$\mathrm{trace}(\pi)(f) = \mathrm{trace}(\varphi)(f)$ for test
-functions~$f$.  This is an equality test on values that may be
-continuous/algebraic parameters.  By Paper~74 (Theorem~C),
-eigenvalue/trace comparison costs $\WLPO$ when the parameters are
-not guaranteed to have geometric origin.  The Bernstein center
-extraction gives~$\varphi$ algebraically, but the trace values
-themselves involve spectral data whose exact equality requires
-$\WLPO$.
+The representation~$\pi$ belongs to a specific Bernstein block,
+which is a finitely generated commutative $\Qell$-algebra
+(Bernstein~\cite{bernstein}).  Two algebra homomorphisms
+$\chi_\pi, \chi_\varphi \colon \mathcal{Z}(G) \to \bar{\mathbb{Q}}_\ell$
+agree if and only if they agree on a finite set of algebra generators.
+In the Genestier--Lafforgue framework, these generators correspond
+to the $V$-excursion operators~\cite{genestier-lafforgue}.
+Verifying $\chi_\pi = \chi_\varphi$ therefore reduces to a finite
+conjunction of exact equality tests on $\Qell$-valued spectral
+data.  By Paper~74 (Theorem~C), each such equality test costs
+$\WLPO$ when the parameters are not guaranteed to have geometric
+origin.  A finite conjunction of $\WLPO$ tests remains~$\WLPO$.
 
 \medskip\noindent\textbf{Why not $\LPO$.}
 The $\WLPO$-vs-$\LPO$ distinction (Paper~74, \S 3.3) is critical.
@@ -536,7 +570,8 @@ an equality test, not a search.
 \subsection{The conservation gap (Theorem~C)}\label{sec:gap}
 
 \begin{theorem}[Conservation gap]\label{thm:gap}
-$\CRM(\text{GL statement}) = \WLPO < \CLASS = \CRM(\text{FS proof})$.
+The GL statement costs $\WLPO$ and the FS proof costs $\CLASS$,
+giving a strict inequality $\WLPO < \CLASS$.
 The gap consists of the homological and geometric scaffolding.
 \end{theorem}
 
@@ -552,7 +587,7 @@ the gap.
 \end{proof}
 
 \begin{remark}[Analogy with Paper~68 (FLT)]\label{rem:flt}
-Paper~68 established the same pattern for Fermat's Last Theorem:
+Paper~68~\cite{lee-p68} established the same pattern for Fermat's Last Theorem:
 the statement is $\BISH$ (Diophantine, no omniscience) but Wiles's
 proof uses $\CLASS$ (modularity lifting via deformation theory).
 Paper~75 extends this pattern: the GL statement is $\WLPO$ (one
@@ -625,7 +660,7 @@ the existence of v-covers.
 \subsection{Correction: solidification is $\BISH$, not $\LPO$}
 \label{sec:correction}
 
-Earlier programme estimates (see~\cite{roadmap}, Open Question~4)
+Earlier program estimates (see~\cite{roadmap}, Open Question~4)
 placed the solidification functor at $\LPO$ via the Mittag-Leffler
 condition and Dependent Choice.  This was incorrect.
 
@@ -820,18 +855,19 @@ appears as a Mathlib infrastructure artifact.
 \node[layer, fill=red!15] (geo) at (0, 4)
   {Geometric (v-topology)\\$\CLASS$ ($\BPI$)};
 
-% Statement (separate)
-\node[layer, fill=yellow!20, minimum width=4cm] (stmt) at (7, 0)
+% Statement (separate, vertically centered between alg and hom)
+\node[layer, fill=yellow!20, minimum width=4cm] (stmt) at (7.5, 1)
   {GL LLC Statement\\$\WLPO$};
 
-% Gap indicator
+% Gap arrow from statement up to CLASS level
 \draw[arrow, dashed, red!60!black] (stmt.north) --
-  node[right, label] {conservation gap}
-  ++(0, 3.5) node[above, font=\small\bfseries] {$\CLASS$};
+  node[right, label, pos=0.5] {conservation gap}
+  ++(0, 2.4);
+\node[font=\small\bfseries, red!60!black] at (7.5, 4.6) {$\CLASS$};
 
 % Annotations
-\node[label, anchor=west] at (3.2, 0) {$\BISH \leq \WLPO$};
-\draw[arrow, dotted, gray] (alg.east) -- (stmt.west);
+\node[label, anchor=west] at (3.3, 0.5) {$\BISH \leq \WLPO$};
+\draw[arrow, dotted, gray] (alg.east) -- (stmt.south west);
 
 \node[label, anchor=east] at (-3.5, 2)
   {\v{C}ech bypass fails};
@@ -922,7 +958,7 @@ technical.
 
 \subsection{Connection to Paper~67 (final synthesis)}
 
-Paper~67 (the programme's synthesis monograph) will incorporate
+Paper~67 (the program's synthesis monograph) will incorporate
 three lines of evidence:
 \begin{enumerate}[label=(\arabic*)]
   \item The DPT biconditionals (Papers~72--74): each axiom is
@@ -932,7 +968,7 @@ three lines of evidence:
   \item The FLT pattern (Paper~68): classical proofs of
     arithmetically cheap theorems are a general phenomenon.
 \end{enumerate}
-Together, these support the programme's central thesis: the logical
+Together, these support the program's central thesis: the logical
 cost of mathematics is the logical cost of~$\mathbb{R}$.
 
 \subsection{De-omniscientizing descent}
@@ -951,25 +987,39 @@ without losing the arithmetic content.
   & \textbf{Gap} \\
 \midrule
 FLT & Modularity lifting & $\BISH$ & $\CLASS$ & 5 levels \\
-Fun.\ field LLC & Trace formula & $\BISH$ & $\BISH$ & 0 \\
+Fun.\ field LLC & Trace formula & $\BISH$ & $\BISH^*$ & $0^*$ \\
 GL LLC (semisimple) & FS geometrization & $\WLPO$ & $\CLASS$ & 2 levels \\
 \bottomrule
 \end{tabular}
-\caption{De-omniscientizing descent across the programme.  The
-function field LLC (Paper~69) has zero gap: the proof is already
-$\BISH$.  FLT (Paper~68) and the GL LLC (Paper~75) exhibit
-conservation gaps.}
+\caption{De-omniscientizing descent across the program.
+${}^*$Paper~69 classifies the function field LLC proof as~$\BISH$.
+This relies on the \'etale site's finite cohomological dimension
+(enabling \v{C}ech bypass of K-injective resolutions) and
+Godement resolutions (avoiding Zorn for bounded derived categories).
+A full constructive audit of the homological layer for perverse
+sheaves on stacks of shtukas remains open.}
 \label{tab:descent-comparison}
 \end{table}
 
-The function field case (Paper~69) is instructive: L.~Lafforgue's
-proof of the function field LLC is already $\BISH$, with zero
-conservation gap.  The difference is that function fields have
-algebraic spectral parameters (Remark~3.3 of Paper~69: $z = q^{-s}$
-lies on a compact algebraic torus), so the trace formula's
-eigenvalue comparison is exact algebraic arithmetic.  Over number
-fields, the analytic Langlands spectrum introduces continuous
-parameters, forcing the statement cost up to $\WLPO$.
+The function field case (Paper~69) is instructive.  L.~Lafforgue's
+proof uses the trace formula and \'etale cohomology of shtukas.
+The \'etale site of a curve over~$\mathbb{F}_q$ has finite
+cohomological dimension, so \v{C}ech complexes replace
+K-injective resolutions, and bounded derived categories~$D^b$
+suffice --- removing the geometric $\BPI$ obstruction and the
+unbounded-complex Zorn obstruction that force Fargues--Scholze
+into~$\CLASS$.  The standard construction of perverse sheaves on
+stacks of shtukas uses the Grothendieck six-functor formalism;
+whether this remaining homological scaffolding is fully
+constructivizable is an open question (see Open Question~3).
+
+The key spectral difference: function fields have algebraic
+spectral parameters~\cite{deligne-weil2}.  As noted in Paper~69
+(Remark~3.3), $z = q^{-s}$ lies on a compact algebraic torus, so
+the trace formula's eigenvalue comparison is exact algebraic
+arithmetic.  Over local fields without geometric origin, the
+analytic Langlands spectrum introduces continuous parameters,
+forcing the statement cost up to~$\WLPO$.
 
 This provides a consistency check: the DPT framework predicts that
 the function field LLC should be cheaper (no Axiom~2 cost, since the
@@ -1026,14 +1076,14 @@ and both must be addressed by any future de-omniscientizing
 program.
 
 The conservation test also provides a consistency check against
-previous programme results.  Paper~69 showed the function field LLC
+previous program results.  Paper~69 showed the function field LLC
 is $\BISH$ (zero gap); Paper~68 showed FLT is $\BISH$ (five-level
 gap).  Paper~75's GL LLC at $\WLPO$ (two-level gap) falls between
 these extremes, consistent with the DPT prediction that trace
 comparison (Axiom~2) adds exactly one logical level above $\BISH$
 operations.
 
-The programme's central thesis --- the logical cost of mathematics
+The program's central thesis --- the logical cost of mathematics
 is the logical cost of~$\mathbb{R}$ --- now rests on three pillars:
 biconditional characterization (Papers~72--74), external validation
 (Paper~75), and case studies (Papers~68--70).  Paper~67 (revision)
@@ -1053,6 +1103,8 @@ Lean~4 code uses the Mathlib library~\cite{mathlib}.  The logical
 structure of the main results has been verified by formal proof; the
 mathematical arguments supporting the layer cost assignments have been
 checked by the author and by consultation with domain experts.
+This paper follows the standard format for the CRM
+series~\cite{format-guide}.
 
 % ============================================================
 % REFERENCES
