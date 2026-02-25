@@ -1,0 +1,36 @@
+Title: Algebraic Spectrum Is Necessary for Constructive Eigenvalue Decidability (Paper 74, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, NY
+
+Date: February 2026
+
+Description:
+Paper 74 of the Constructive Reverse Mathematics (CRM) Series proves the reverse characterization of DPT Axiom 2: algebraic spectrum (geometric origin) is not merely sufficient but necessary for BISH-decidable eigenvalue comparison. Without geometric origin, the full analytic Langlands spectrum includes continuous spectral parameters (Maass forms, unramified characters), and testing the Ramanujan bound requires a real-number equality test, which costs WLPO. Combined with the forward direction (Paper 45), this gives a biconditional: algebraic spectrum if and only if BISH eigenvalue decidability.
+
+The key distinction from Axioms 1 and 3: Axiom 2's failure costs WLPO (equality test), not LPO (existential search). Eigenvalue comparison is a single equality test, not a search through an infinite structure. This reflects the intrinsic computational difference between comparing a spectral value and searching a geometric structure.
+
+Paper 74 completes the DPT axiom trilogy: Paper 72 (Axiom 3, cycle-search, LPO), Paper 73 (Axiom 1, morphism decidability, LPO), Paper 74 (Axiom 2, eigenvalue decidability, WLPO). All three DPT axioms now have individual reverse characterizations, upgrading "minimal" (Paper 72 Theorem A) to "uniquely necessary" for each.
+
+The Lean 4 formalization comprises approximately 200 lines across 5 files with zero sorry, using 4 axioms (2 data + 2 propositional), each with mathematical references to Paper 45 and Deligne. The bundle builds cleanly with lake build on Lean 4 v4.29.0-rc2 with Mathlib4.
+
+Main results:
+- Theorem A (Forward): Algebraic spectrum reduces eigenvalue comparison to exact algebraic arithmetic (BISH).
+- Theorem B (Eigenvalue-Decidability Equivalence): eigenvalue_cost(s) = BISH if and only if s = algebraic (new biconditional).
+- Theorem C (Axiom 2 Characterization): Algebraic spectrum is the minimal and unique condition for BISH-decidable eigenvalue comparison.
+- Corollary (Deligne constraint): Without geometric origin, BISH eigenvalues and the full analytic Langlands spectrum are incompatible.
+- Corollary (Axiom 2 Principle, sharpened): eigenvalue_cost(s) = BISH if and only if is_algebraic(s) = true.
+
+Keywords: constructive reverse mathematics, DPT axioms, algebraic spectrum, geometric origin, Frobenius eigenvalues, BISH, WLPO, Ramanujan conjecture, Maass forms, Langlands program, Deligne, Lean 4, formal verification
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related identifiers:
+- Paper 45 (Weil eigenvalue CRM): https://doi.org/10.5281/zenodo.18681925
+- Paper 50 (DPT axioms): https://doi.org/10.5281/zenodo.18705837
+- Paper 72 (DPT characterization): https://doi.org/10.5281/zenodo.18765393
+- Paper 73 (Axiom 1 reverse): (pending Zenodo)
+- Format guide: https://doi.org/10.5281/zenodo.18765700
+
+Upload type: Publication / Preprint
