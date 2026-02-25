@@ -71,7 +71,7 @@ No.  Title                                                               DOI
  60  [Retired — merged into Paper 59]                                    —
  61  Lang's Conjecture as the MP→BISH Gate                               10.5281/zenodo.18736959
  62  [Retired — merged into Paper 63]                                    —
- 63  The Intermediate Jacobian Obstruction                               —(pending)
+ 63  The Intermediate Jacobian Obstruction                               10.5281/zenodo.18736965
  64  Uniform p-Adic Decidability for Elliptic Curves                     10.5281/zenodo.18737090
  65  Self-Intersection Patterns Beyond Cyclic Cubics                     10.5281/zenodo.18743151
  66  Form-Class Resolution for Non-Cyclic Totally Real Cubics            10.5281/zenodo.18745722
@@ -91,8 +91,8 @@ STATISTICS
 Total papers:         73 active (of 75 numbered)
 Withdrawn:            2 (Papers 1, 3)
 Retired:              2 (Paper 60 → 59; Paper 62 → 63)
-Papers with DOIs:     70
-Papers pending DOI:   1 (63)
+Papers with DOIs:     71
+Papers pending DOI:   0
 Papers peer-reviewed: 75 (passed Gemini peer review)
 Papers with Lean 4:   ~65 (Papers 64-66 computational/LaTeX-only)
 Total Lean 4 lines:   ~89,150+
