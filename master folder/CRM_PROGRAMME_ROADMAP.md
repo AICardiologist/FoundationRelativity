@@ -267,6 +267,14 @@ Working title: *Automated De-Omniscientisation: Reverse-Engineering Classical Pr
 
 This transitions the programme from auditing the history of mathematics to engineering its future: the logical cost metric becomes a loss function that forces the generation of explicit algebraic structures.
 
+### Paper 78: Explicit Local Langlands for Wildly Ramified Representations
+
+Harris–Taylor proved the Local Langlands Correspondence for GL_n using global Shimura varieties and etale cohomology (CLASS, ineffective). Bushnell–Kutzko proved local representations are induced from finite "types" (discrete, finite matrix algebra, BISH). An algebraic formula mapping the type directly to the Galois parameter must exist but human mathematicians cannot find it because the Harish-Chandra character polynomials are too massive. The CRMLint Squeeze bans the global trace formula in Lean and forces the AI to match character polynomials to Galois traces — yielding the explicit wild Langlands parameter.
+
+### Paper 79: Standard Conjecture D for Abelian Fourfolds
+
+Homological equivalence = numerical equivalence is known for abelian varieties of dimension at most 3 (Lieberman). Completely open for dimension 4. The CLASS proof for dimension 3 relies on Lefschetz standard conjectures; parameterised to dimension 4, it crashes at Anderson's exotic Weil classes. Feed the dimension 3 Lean proof into CRMLint, isolate the node where the intersection pairing fails to be positive-definite on the exotic subspace, prompt the AI to find a purely algebraic BISH matrix equivalence on the orthogonal complement of divisor classes. This is finite-dimensional Q-linear algebra — the AI's search tree is maximally efficient.
+
 ---
 
 ## 9. File Locations
@@ -283,8 +291,10 @@ All paths relative to `~/FoundationRelativity/`.
 - `paper 73/paper73.tex` / `.pdf` (11pp) + `P73_Axiom1Reverse.zip`
 - `paper 74/paper74.tex` / `.pdf` (15pp) + `P74_Axiom2Reverse.zip`
 - `paper 75/paper75.tex` / `.pdf` (15pp) + `P75_ConservationTest.zip`
+- `paper 76/paper76.tex` / `.pdf` + `CRMLint.zip` (in progress)
+- `paper 77/paper77.tex` / `.pdf` + `P77_DAGSurgery/` (scaffold)
 
 ### Programme Documents
-- `master folder/master_paper_list.txt` — complete paper list with DOIs (71 active, 0 pending)
+- `master folder/master_paper_list.txt` — complete paper list with DOIs (73 active, 2 pending)
 - `master folder/CRM_PROGRAMME_ROADMAP.md` — this document
 - `master folder/CRM_SESSION_HANDOFF.md` — session handoff

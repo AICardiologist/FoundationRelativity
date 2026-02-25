@@ -13,6 +13,23 @@
 
 ## Active Tasks
 
+### feat/p77-dagsurgery — Paper 77: Automated De-Omniscientisation (DAG Surgery)
+- **Status:** in-progress (scaffold created, LaTeX + Lean stub)
+- **Worktree:** N/A (created directly in main repo)
+- **Last update:** 2026-02-26
+- **What's done:**
+  - paper77.tex scaffold: 19 sections, TikZ pipeline figure, 18 references
+  - P77_DAGSurgery/ Lean stub: CRM hierarchy, opaque cycle types, classical axiom, Sigma-target, restricted generators
+  - README.md, metadata.txt
+  - master_paper_list.txt updated (Papers 76-77 added)
+  - Roadmap §8 updated (Papers 78-79 named as future targets)
+- **What's next:**
+  - Fill TODO sections (state of art, intersection matrix, MCTS prompt, results)
+  - Run CRMLint Squeeze on E^4 target
+  - Zenodo packaging
+- **Blockers:** Paper 76 (CRMLint) must be complete before squeeze can execute
+- **Branch:** main (direct)
+
 ### fix/p68-section-fixes — Paper 68 LaTeX fixes (two active failure modes)
 - **Status:** done
 - **Worktree:** ../worktrees/p68-fixes

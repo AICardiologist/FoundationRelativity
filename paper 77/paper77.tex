@@ -1,0 +1,798 @@
+\documentclass[11pt]{article}
+
+% ------------------------------------------------------------
+% Standard LaTeX packages
+% ------------------------------------------------------------
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{amsthm}
+\usepackage[american]{babel}
+\usepackage{stmaryrd}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{listings}
+\usepackage[x11names,table]{xcolor}
+\usepackage{mdframed}
+\usepackage{tikz}
+\usepackage{url}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+% ---------- Theorem environments ----------
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{axiombox}[theorem]{Axiom}
+\newtheorem{protocol}[theorem]{Protocol}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% ---------- Lean repo link ----------
+\newcommand{\leanRepo}{\url{(DOI pending)}}
+
+% ---------- Notation ----------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Fp}{\mathbb{F}_p}
+\newcommand{\Qbar}{\overline{\Q}}
+\newcommand{\Qp}{\Q_p}
+\newcommand{\Qell}{\Q_\ell}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\calO}{\mathcal{O}}
+\newcommand{\fm}{\mathfrak{m}}
+\newcommand{\fp}{\mathfrak{p}}
+\newcommand{\Gal}{\mathrm{Gal}}
+\newcommand{\GL}{\mathrm{GL}}
+\newcommand{\Hom}{\mathrm{Hom}}
+\newcommand{\Ext}{\mathrm{Ext}}
+\newcommand{\CH}{\mathrm{CH}}
+\newcommand{\cl}{\mathrm{cl}}
+\newcommand{\End}{\mathrm{End}}
+\newcommand{\Frob}{\mathrm{Frob}}
+\newcommand{\CRM}{\mathrm{CRM}}
+\newcommand{\tr}{\mathrm{tr}}
+\newcommand{\rk}{\mathrm{rk}}
+
+\newcommand{\BISH}{\mathsf{BISH}}
+\newcommand{\LPO}{\mathsf{LPO}}
+\newcommand{\WLPO}{\mathsf{WLPO}}
+\newcommand{\LLPO}{\mathsf{LLPO}}
+\newcommand{\MP}{\mathsf{MP}}
+\newcommand{\FT}{\mathsf{FT}}
+\newcommand{\CLASS}{\mathsf{CLASS}}
+
+\newcommand{\CBN}{\mathrm{CBN}} % Classical Boundary Node
+
+% ---------- Code listing style for Lean ----------
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinelanguage{Lean}{
+  keywords={theorem, lemma, def, definition, axiom, structure, class, instance,
+            by, exact, intro, intros, apply, refine, constructor, use, obtain,
+            have, show, from, fun, assume, let, in, if, then, else,
+            match, with, end, namespace, section, variable, variables,
+            example, begin, sorry, admit, noncomputable, classical,
+            import, open, export, private, protected, mutual, meta,
+            do, for, while, return, try, catch, finally,
+            Type, Prop, Sort, Type*, forall, exists, where, extends,
+            set, push_neg, rw, simp, omega, nlinarith, linarith,
+            ext, rfl, congr, fin_cases, haveI, letI, attribute, inductive,
+            deriving, opaque, decide},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+  literate=
+    {α}{{$\alpha$}}1 {β}{{$\beta$}}1 {γ}{{$\gamma$}}1
+    {δ}{{$\delta$}}1 {ε}{{$\varepsilon$}}1 {ζ}{{$\zeta$}}1
+    {η}{{$\eta$}}1 {θ}{{$\theta$}}1 {ι}{{$\iota$}}1
+    {κ}{{$\kappa$}}1 {λ}{{$\lambda$}}1 {μ}{{$\mu$}}1
+    {ν}{{$\nu$}}1 {ξ}{{$\xi$}}1 {π}{{$\pi$}}1
+    {ρ}{{$\rho$}}1 {σ}{{$\sigma$}}1 {τ}{{$\tau$}}1
+    {φ}{{$\varphi$}}1 {χ}{{$\chi$}}1 {ψ}{{$\psi$}}1
+    {ω}{{$\omega$}}1 {Γ}{{$\Gamma$}}1 {Δ}{{$\Delta$}}1
+    {Θ}{{$\Theta$}}1 {Λ}{{$\Lambda$}}1 {Σ}{{$\Sigma$}}1
+    {Φ}{{$\Phi$}}1 {Ψ}{{$\Psi$}}1 {Ω}{{$\Omega$}}1
+    {→}{{$\rightarrow$}}1 {←}{{$\leftarrow$}}1 {↔}{{$\leftrightarrow$}}1
+    {⇒}{{$\Rightarrow$}}1 {⇐}{{$\Leftarrow$}}1 {⇔}{{$\Leftrightarrow$}}1
+    {∀}{{$\forall$}}1 {∃}{{$\exists$}}1 {∈}{{$\in$}}1
+    {∉}{{$\notin$}}1 {⊆}{{$\subseteq$}}1 {⊂}{{$\subset$}}1
+    {∪}{{$\cup$}}1 {∩}{{$\cap$}}1 {≤}{{$\leq$}}1
+    {≥}{{$\geq$}}1 {≠}{{$\neq$}}1 {≈}{{$\approx$}}1 {≃}{{$\simeq$}}1
+    {≡}{{$\equiv$}}1 {∧}{{$\land$}}1 {∨}{{$\lor$}}1
+    {¬}{{$\neg$}}1 {ℕ}{{$\mathbb{N}$}}1 {ℝ}{{$\mathbb{R}$}}1
+    {ℂ}{{$\mathbb{C}$}}1 {ℤ}{{$\mathbb{Z}$}}1 {ℓ}{{$\ell$}}1
+    {·}{{$\cdot$}}1 {∑}{{$\sum$}}1 {∏}{{$\prod$}}1
+    {∅}{{$\emptyset$}}1 {∞}{{$\infty$}}1 {∂}{{$\partial$}}1
+    {⟨}{{$\langle$}}1 {⟩}{{$\rangle$}}1 {…}{{$\ldots$}}1
+    {₀}{{$_0$}}1 {₁}{{$_1$}}1 {₂}{{$_2$}}1 {⧸}{{$/$}}1 {‖}{{$\|$}}1
+    {•}{{$\cdot$}}1 {⁻¹}{{$^{-1}$}}1 {⋆}{{$\star$}}1
+    {∘}{{$\circ$}}1
+}
+
+\lstdefinestyle{leanstyle}{
+    language=Lean,
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    numberstyle=\tiny\color{codegray}
+}
+
+\lstset{style=leanstyle}
+
+% ---------- Title and author ----------
+\title{Automated De-Omniscientisation:\\
+  Reverse-Engineering Classical Proofs\\
+  via DAG Surgery\\[6pt]
+  {\large (Paper~77, Constructive Reverse Mathematics Series)}}
+
+\author{Paul Chun-Kit Lee\thanks{Lean 4 formalization available at \leanRepo.} \\
+New York University \\
+\texttt{dr.paul.c.lee@gmail.com}}
+
+\date{February 2026}
+
+% ============================================================
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We introduce the \emph{CRMLint Squeeze}, a systematic protocol for
+reverse-engineering classical proofs into constructive ones by
+combining CRM logical cost analysis with AI-driven combinatorial
+search.  The method identifies the \emph{Classical Boundary Node}
+(CBN)---the exact lemma where a classical proof invokes an
+omniscience principle---excises it from the Lean~4 environment,
+and tasks a reinforcement-learning-trained prover with closing the
+resulting gap using only~$\BISH$-admissible tactics.  The CRM
+classification acts as a reward function: $+10$ for a $\BISH$
+closure, $-1$ for any branch introducing $\CLASS$ dependencies.
+This forces the AI into the bounded algebraic search space where
+Monte Carlo Tree Search achieves superhuman performance.
+
+We apply the protocol to Greg Anderson's exotic Weil classes on
+CM abelian fourfolds~$E^4$ \cite{Anderson1993}.  The Hodge
+Conjecture guarantees an algebraic cycle exists for these classes
+($\CLASS$), but provides no construction.  Finding the cycle is a
+bounded $\Q$-linear algebra problem in the Chow group---a finite
+combinatorial search over intersection products of abelian
+subvarieties, CM endomorphism graphs, and twisted diagonal
+embeddings.  We define the Lean~4 architecture that separates the
+classical axiom from the constructive $\Sigma$-type target,
+establish the restricted generator set, and characterise the
+search space.
+
+This paper marks the transition of the CRM program from
+\emph{diagnostic} (auditing classical proofs, Papers~1--76) to
+\emph{generative}: using the logical cost metric as a loss
+function that forces the production of explicit algebraic
+structures.
+\end{abstract}
+
+\tableofcontents
+
+% ============================================================
+\section{Introduction}\label{sec:intro}
+% ============================================================
+
+\subsection{The helicopter and the forest}
+
+Human mathematicians use classical principles---Zorn's Lemma,
+uncountable limits, topological compactness---as \emph{compression
+algorithms}.  A human brain cannot hold a 10,000-term polynomial
+or a $70 \times 70$ intersection matrix in working memory.
+Classical existence theorems allow the mathematician to fly over
+the algebraic thicket and declare ``a solution exists,'' leaving
+behind an ineffective result.  We call this the \emph{classical
+helicopter}.
+
+AI models are the exact opposite.  They are poor at abstract,
+infinite-dimensional topological jumps (they hallucinate), but
+possess effectively infinite working memory for navigating massive,
+dense combinatorial thickets.  If the classical axioms are enabled,
+the AI lazily mimics humans and takes the helicopter.  But if
+CRMLint systematically bans the helicopter, the AI is
+algorithmically cornered into searching the algebraic forest---the
+exact domain where Monte Carlo Tree Search (MCTS) achieves
+superhuman performance.
+
+The CRMLint Squeeze exploits this asymmetry: \emph{human geometric
+intuition sets the boundaries; CRMLint acts as the electric fence;
+AI combinatorial search builds the bridge.}
+
+\subsection{The Goldilocks zone}
+
+The method works only in the \emph{Goldilocks zone}: conjectures
+where the classical helicopter has already landed (an ineffective
+$\CLASS$ proof of existence), or where the cliff boundary is
+strictly narrowed by adjacent theorems.  Pointing an AI at the
+empty void of a totally open problem yields infinite search width
+and certain failure.  The CRM atlas (Papers~1--76)
+identifies the narrow-cliff targets.
+
+\subsection{State of the art}
+
+% TODO: brief survey of AI theorem proving (AlphaProof, DeepSeek-Prover,
+% Lean Copilot), relationship to CRM, why nobody has used logical cost
+% as an RL reward function before.
+
+\subsection{Main results}
+
+We establish three contributions:
+
+\begin{enumerate}[nosep]
+\item \textbf{The CRMLint Squeeze Protocol} (\S\ref{sec:protocol}):
+  a four-step method (Scaffold, X-Ray, Excise, Squeeze) for
+  converting CRM classifications into AI search targets, with
+  CRMLint as the reward function.
+\item \textbf{The CM Fourfold Target} (\S\ref{sec:target}):
+  the explicit Lean~4 architecture for attacking Anderson's exotic
+  Weil classes on $E^4$, including the Classical Boundary Node
+  isolation, the $\Sigma$-type reformulation, and the restricted
+  generator set.
+\item \textbf{Search Space Characterisation} (\S\ref{sec:results}):
+  bounds on the combinatorial search space, the required Lean
+  scaffolding, and (if available) the explicit cycle equations
+  discovered by the AI.
+\end{enumerate}
+
+\subsection{Position in the atlas}
+
+Paper~77 occupies a unique position: it is the first paper in the
+CRM series that is \emph{methodological} rather than
+\emph{classificatory}.  Papers~1--76 asked ``what is the logical
+cost of theorem~$X$?''  Paper~77 asks ``given the logical cost,
+can we force an AI to discover a cheaper proof?''
+
+% ============================================================
+\section{Preliminaries}\label{sec:prelim}
+% ============================================================
+
+\subsection{The CRM hierarchy}
+
+The constructive hierarchy of omniscience principles:
+\[
+  \BISH \;\subset\; \BISH{+}\MP \;\subset\; \BISH{+}\LLPO
+  \;\subset\; \BISH{+}\WLPO \;\subset\; \BISH{+}\LPO
+  \;\subset\; \CLASS.
+\]
+For definitions and the programme's calibration data, see
+Paper~50~\cite{Paper50}.
+
+\subsection{CRMLint}
+
+CRMLint (Paper~76~\cite{Paper76}) is an automated logical cost
+analyzer for Lean~4 formalizations.  It operates in four layers:
+
+\begin{enumerate}[nosep]
+\item \emph{Dependency tracer.} BFS traversal of the Lean~4
+  \texttt{Environment}, tracing transitive paths to every
+  \texttt{Classical.choice}, \texttt{Classical.em},
+  \texttt{propext}, \texttt{Quot.sound} callsite.
+\item \emph{Pattern classifier.} 12-rule priority classifier
+  with root-context fallback, distinguishing infrastructure
+  artifacts from essential classical content.
+\item \emph{Concentration analysis.} Identifies the minimal
+  essential classical core of each theorem.
+\item \emph{AI audit layer.} Predicts conservation gap
+  eliminability using the 75-paper programme as training data.
+\end{enumerate}
+
+\subsection{Classical Boundary Nodes}
+
+\begin{definition}[Classical Boundary Node]\label{def:cbn}
+Let $T$ be a theorem with CRM classification $\CLASS$ (or
+$\WLPO$, $\LPO$).  A \emph{Classical Boundary Node}
+$\CBN(T)$ is a lemma $L$ in the dependency DAG of~$T$ such that:
+\begin{enumerate}[nosep]
+\item $L$ itself invokes a classical principle (directly or
+  through one step), and
+\item every dependency of $L$ that is not infrastructure is
+  $\BISH$-classified.
+\end{enumerate}
+The CBN is the \emph{shallowest point} at which classical content
+enters the proof.  Excising the CBN and all paths through it
+produces a $\BISH$ environment with an open goal.
+\end{definition}
+
+\subsection{The Anderson obstruction}
+
+Anderson~\cite{Anderson1993} (see also Weil~\cite{Weil1977})
+proved that products of CM elliptic curves of dimension $\geq 4$
+support \emph{exotic Weil classes}: Hodge classes not generated by
+divisors.  Paper~50~\cite{Paper50} showed that:
+\begin{itemize}[nosep]
+\item CM elliptic curves ($\dim = 1$) are unconditionally
+  $\BISH$-decidable (Theorem~E).
+\item The Anderson obstruction begins at $\dim = 4$.
+\item The Hodge Conjecture for these classes is open.
+\end{itemize}
+The DPT framework detects this boundary: CM elliptic curves are
+in; CM abelian fourfolds are out.
+
+% ============================================================
+\section{The CRMLint Squeeze Protocol}\label{sec:protocol}
+% ============================================================
+
+\subsection{Step~1: The Scaffold}
+
+Take a known classical theorem (or a partial $\CLASS$ attempt)
+and write its outline in Lean~4.  The proof need not be complete;
+what matters is that the \emph{logical structure} is formalised:
+which lemmas invoke which principles, and where the classical
+content enters.
+
+\subsection{Step~2: The X-Ray (CRMLint)}
+
+Run CRMLint on the scaffold.  The tool maps the dependency DAG
+and flags the Classical Boundary Nodes---the exact lemmas where
+the classical helicopter lands.
+
+\begin{protocol}[X-Ray]\label{prot:xray}
+\begin{lstlisting}
+-- Run CRMLint on the target theorem
+#crm_audit hodge_conjecture_E4
+
+-- Expected output:
+-- hodge_conjecture_E4 : CLASS
+--   CBN: hodge_conjecture_existence (1 step to Classical.choice)
+--   All other dependencies: BISH
+\end{lstlisting}
+\end{protocol}
+
+\subsection{Step~3: The Excise}
+
+Isolate the local Lean state at the CBN.  Delete the classical
+axiom and apply \texttt{[-Classical]} to the environment.  The
+result is a $\BISH$ context with an open goal of the form
+\[
+  \vdash \Sigma\,(Z : \CH^2(A)),\; \cl(Z) = w_{\mathrm{exotic}}.
+\]
+
+\emph{Key design choice:} The target is a $\Sigma$-type (data),
+not a $\exists$ (proposition).  This forces the AI to
+\emph{construct} the cycle, not merely prove its existence.
+
+\subsection{Step~4: The Squeeze}
+
+Hand the isolated state to an RL-trained prover.  The CRMLint
+classification acts as the reward function:
+
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+\textbf{Event} & \textbf{Reward} \\
+\midrule
+Goal closed with $\BISH$ classification & $+10.0$ \\
+Proof step introduces $\CLASS$ dependency & $\times(-1.0)$ \\
+$\WLPO$ dependency (marginal cost) & $\times(+0.5)$ \\
+Timeout / failure & $0.0$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Because the AI knows the theorem is true but is barred from the
+classical shortcut, its MCTS is structurally forced to invent a
+new algebraic witness: a bounding polynomial, a finite matrix
+identity, or an explicit invariant.  That witness is novel,
+publishable mathematics.
+
+% ---------- TikZ figure: the Squeeze pipeline ----------
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    node distance=2.5cm,
+    box/.style={rectangle, draw, rounded corners,
+                minimum width=3.5cm, minimum height=1cm,
+                align=center, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+\node[box] (scaffold) {1. Scaffold\\{\footnotesize Lean outline of\\classical proof}};
+\node[box, right of=scaffold, xshift=2cm] (xray) {2. X-Ray\\{\footnotesize CRMLint flags\\CBN nodes}};
+\node[box, right of=xray, xshift=2cm] (excise) {3. Excise\\{\footnotesize Delete CBN,\\force $\Sigma$-type}};
+\node[box, below of=excise, yshift=-0.5cm] (squeeze) {4. Squeeze\\{\footnotesize AI MCTS with\\CRM reward}};
+\node[box, below of=scaffold, yshift=-0.5cm] (result) {Result\\{\footnotesize Explicit algebraic\\witness ($\mathsf{BISH}$)}};
+
+\draw[arrow] (scaffold) -- (xray);
+\draw[arrow] (xray) -- (excise);
+\draw[arrow] (excise) -- (squeeze);
+\draw[arrow] (squeeze) -- (result);
+\end{tikzpicture}
+\caption{The CRMLint Squeeze protocol.  CRMLint identifies the Classical Boundary Node (Step~2), the CBN is excised and the goal reformulated as a $\Sigma$-type (Step~3), and an RL-trained prover searches the $\BISH$-restricted space with CRM-shaped rewards (Step~4).}
+\label{fig:squeeze}
+\end{figure}
+
+% ============================================================
+\section{The Target: Anderson's Exotic Weil Classes on $E^4$}%
+\label{sec:target}
+% ============================================================
+
+\subsection{Setup}
+
+Let $E/\Q$ be a CM elliptic curve with complex multiplication by
+an imaginary quadratic order $\calO_K \subset K = \Q(\sqrt{-d})$.
+Set $A = E^4 = E \times E \times E \times E$, a CM abelian
+fourfold.
+
+The singular cohomology $H^*(A, \Q)$ is generated by pullbacks
+from $H^1(E, \Q) \cong \Q^2$.  Write $e_1, e_2$ for a basis of
+$H^1(E, \Q)$.  The cohomology ring is
+\[
+  H^*(A, \Q) \;\cong\; \bigwedge\nolimits^* (e_{1,1}, e_{2,1},
+  \ldots, e_{1,4}, e_{2,4}),
+\]
+where $e_{j,i}$ denotes the pullback of $e_j$ from the $i$-th
+factor.
+
+\subsection{The exotic Weil class}
+
+The CM endomorphism $\alpha \in \calO_K$ acts on $H^1(E, \Q)$ by
+a $2 \times 2$ matrix $M_\alpha$.  On $H^4(A, \Q)$, the
+4-fold wedge products of the eigenspaces of $M_\alpha$ produce
+Hodge classes that are \emph{not} in the $\Q$-span of products of
+divisor classes.  Anderson~\cite{Anderson1993} showed:
+
+\begin{theorem}[Anderson 1993]\label{thm:anderson}
+There exist Hodge classes in $H^{2,2}(E^4) \cap H^4(E^4, \Q)$
+that do not lie in the subring generated by divisor classes.
+These are the \emph{exotic Weil classes}.
+\end{theorem}
+
+\subsection{The classical cliff}
+
+The Hodge Conjecture asserts:
+\[
+  \forall\, w \in H^{p,p}(X) \cap H^{2p}(X, \Q),\;\;
+  \exists\, Z \in \CH^p(X)_\Q \text{ such that }
+  \cl(Z) = w.
+\]
+For $w = w_{\mathrm{exotic}}$ on $E^4$, this is the
+CBN---a $\CLASS$ existential with no constructive witness.
+
+\subsection{The restricted generator set}
+
+Finding the cycle requires searching within the subring of
+$\CH^2(E^4)_\Q$ generated by:
+
+\begin{enumerate}[nosep]
+\item \textbf{Projections.} $p_i : E^4 \to E_i$ and their
+  graphs $\Gamma_{p_i} \subset E^4$.
+\item \textbf{CM endomorphism graphs.}
+  $\Gamma_\alpha \subset E_i \times E_j$ for
+  $\alpha \in \calO_K$, embedded in $E^4$ via the inclusion
+  $E_i \times E_j \hookrightarrow E^4$.
+\item \textbf{Twisted diagonal embeddings.}
+  $\Delta_{\alpha,\beta} \subset E_i \times E_j \times E_k$
+  defined by $(x, \alpha(x), \beta(x))$, embedded in $E^4$.
+\end{enumerate}
+
+The search space is the $\Q$-linear span of intersection
+products of these generators in $\CH^2(E^4)_\Q$.  This is a
+\emph{finite-dimensional} $\Q$-vector space---the exact domain
+where MCTS is maximally efficient.
+
+\subsection{The intersection matrix}
+
+% TODO: Compute the explicit intersection matrix of the generator
+% set on E^4 for a specific CM discriminant (e.g., d = 1, the
+% Gaussian integers). The matrix has dimension ~70x70 and is
+% computable over Q by standard intersection theory.
+% This section will contain the explicit numerical data.
+
+% ============================================================
+\section{The Lean Architecture}\label{sec:lean}
+% ============================================================
+
+\subsection{Separating the classical axiom from the constructive target}
+
+The Lean~4 stub physically separates the CBN from the squeeze
+target:
+
+\begin{lstlisting}
+-- The Classical Boundary Node (the helicopter)
+-- CRMLint classification: CLASS
+axiom hodge_conjecture_existence
+    (A : AbelianVariety) (w : HodgeClass A) :
+  ∃ (Z : AlgebraicCycle A), cycle_class Z = w
+
+-- The constructive squeeze target
+-- Note: Sigma-type forces data extraction
+def exotic_cycle_constructive :
+    Σ (Z : AlgebraicCycle E4),
+      cycle_class Z = exotic_weil_class :=
+  by sorry
+  -- The AI will replace this sorry with explicit generators
+\end{lstlisting}
+
+The axiom \texttt{hodge\_conjecture\_existence} is present in the
+environment but \emph{unused} by the constructive target.  CRMLint
+verifies that the completed proof (when \texttt{sorry} is replaced)
+does not transitively depend on the axiom.
+
+\subsection{Action space restriction}
+
+The AI's tactic space is restricted to:
+
+\begin{lstlisting}
+-- Permitted generators (the path in the woods)
+def projection_graph (i : Fin 4) : AlgebraicCycle E4 := ...
+def cm_graph (α : O_K) (i j : Fin 4) : AlgebraicCycle E4 := ...
+def twisted_diag (α β : O_K) (i j k : Fin 4) :
+    AlgebraicCycle E4 := ...
+
+-- The AI constructs a Q-linear combination:
+-- c₁ · projection_graph 0 ∩ projection_graph 1
+-- + c₂ · cm_graph α 0 1 ∩ cm_graph β 2 3
+-- + ...
+\end{lstlisting}
+
+\subsection{MCTS prompt design}
+
+% TODO: Detail the exact prompt given to DeepSeek-Prover or
+% equivalent, including the CRMLint reward shaping, the
+% restricted tactic set, and the termination criterion.
+
+% ============================================================
+\section{Results and Current Status}\label{sec:results}
+% ============================================================
+
+\subsection{Search space bounds}
+
+% TODO: Dimension of the generator space, number of intersection
+% products to evaluate, estimated MCTS budget.
+
+\subsection{Lean scaffolding status}
+
+The Lean~4 stub (\texttt{P77\_DAGSurgery/}) compiles with
+\texttt{lake build} on Lean v4.29.0-rc2 + Mathlib4.  The
+single \texttt{sorry} is the squeeze target.
+
+\subsection{Cycle equations}
+
+% TODO: If the AI run completes before publication, insert the
+% explicit Q-linear combination of intersection products here.
+% If not, characterise the partial results and search frontier.
+
+% ============================================================
+\section{CRM Audit}\label{sec:crm}
+% ============================================================
+
+\subsection{Constructive strength classification}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Component} & \textbf{CRM Level} & \textbf{Justification} \\
+\midrule
+CRMLint Squeeze protocol & $\BISH$ & Algorithmic: bounded search \\
+Anderson's exotic class (existence) & $\CLASS$ & Hodge Conjecture \\
+Explicit cycle (if found) & $\BISH$ & Finite $\Q$-linear algebra \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{What descends, from where, to where}
+
+If the AI discovers the explicit cycle:
+\[
+  \CLASS \;(\text{Hodge Conjecture for } E^4)
+  \quad\longrightarrow\quad
+  \BISH \;(\text{explicit cycle construction}).
+\]
+This is a de-omniscientising descent: the $\CLASS$ existence
+theorem is replaced by a $\BISH$ construction.
+
+% ============================================================
+\section{Discussion}\label{sec:discuss}
+% ============================================================
+
+\subsection{Asymmetric offloading}
+
+The CRMLint Squeeze exploits a three-way division of labor:
+\begin{itemize}[nosep]
+\item \emph{Human geometric intuition} identifies the target,
+  defines the exotic Weil class, and restricts the generator set.
+\item \emph{CRMLint} acts as the electric fence, ensuring the AI
+  constructs an explicit algebraic witness rather than
+  hallucinating an analytic shortcut.
+\item \emph{AI working memory} performs the massive $\Q$-linear
+  matrix algebra required to align the cycle class with the exotic
+  cohomology class.
+\end{itemize}
+
+\subsection{Implications for AI theorem proving}
+
+% TODO: Relationship to AlphaProof, DeepSeek-Prover.
+% CRM as reward shaping vs. the standard binary reward.
+% Why this is the first method that systematically penalises
+% omniscience to force discovery.
+
+\subsection{Future targets}
+
+Two further narrow-cliff targets are identified for future work:
+\begin{itemize}[nosep]
+\item \textbf{Paper~78:} Explicit Local Langlands for wildly
+  ramified representations.  Harris--Taylor's $\CLASS$ proof
+  guarantees the Galois parameter exists; Bushnell--Kutzko's
+  $\BISH$ types provide the algebraic framework; the AI solves
+  the character polynomial matching.
+\item \textbf{Paper~79:} Standard Conjecture~D for abelian
+  fourfolds ($\dim = 4$).  Known for $\dim \leq 3$ (Lieberman);
+  the $\CLASS$ proof crashes at Anderson's exotic classes.  The
+  AI finds the $\BISH$ matrix equivalence on the orthogonal
+  complement.
+\end{itemize}
+
+% ============================================================
+\section{Conclusion}\label{sec:conclusion}
+% ============================================================
+
+The CRMLint Squeeze transitions the CRM program from auditing
+the history of mathematics to engineering its future.  The
+logical cost metric becomes a loss function that forces the
+production of explicit algebraic structures.  We do not ask the
+AI to invent a new helicopter; we use the CRM classification to
+force the AI to stack algebraic stones until a bridge is formed.
+
+The first target---Anderson's exotic Weil classes on CM abelian
+fourfolds---is chosen because the search space is strictly
+bounded, the classical cliff is precisely identified, and the
+generator set is geometrically natural.  Success would provide the
+first explicitly constructed algebraic cycle for an exotic Weil
+class in the history of mathematics: a 33-year-old problem
+reduced to a single, verifiable, $\BISH$-decidable formula.
+
+% ============================================================
+\section*{Acknowledgments}
+\addcontentsline{toc}{section}{Acknowledgments}
+% ============================================================
+
+Lean~4 formalization produced using AI code generation (Claude Code)
+under human direction.  The CRMLint Squeeze protocol was developed
+collaboratively between the author and AI.  The mathematical
+foundations of the target problem are due to Anderson~\cite{Anderson1993},
+Weil~\cite{Weil1977}, and the broader arithmetic geometry community.
+
+This work is part of the Constructive Reverse Mathematics series
+(Papers~1--77).  The Lean~4 code uses the Mathlib library;
+see~\cite{Mathlib4}.  The series format follows the CRM format
+guide~\cite{FormatGuide}.
+
+% ============================================================
+\begin{thebibliography}{30}
+% ============================================================
+
+\bibitem{Anderson1993}
+G.~W. Anderson.
+\newblock \emph{Torsion points on Fermat Jacobians, roots of circular
+  units and relative singular homology}.
+\newblock Duke Math.\ J., 70(1):1--43, 1993.
+
+\bibitem{Weil1977}
+A.~Weil.
+\newblock \emph{Abelian varieties and the Hodge ring}.
+\newblock In: Collected papers, Vol.~III, 421--429.
+  Springer, 1977.
+
+\bibitem{Paper50}
+P.~C.~Lee.
+\newblock \emph{The Motive Is the Universal Decidability Certificate:
+  A Constructive Reverse Mathematics Atlas of Five Great Conjectures
+  in Arithmetic Geometry}.
+\newblock Paper~50, Constructive Reverse Mathematics Series.
+\newblock \url{https://doi.org/10.5281/zenodo.14934946}
+
+\bibitem{Paper68}
+P.~C.~Lee.
+\newblock \emph{Fermat's Last Theorem Is $\BISH$: A Constructive
+  Reverse Mathematics Audit}.
+\newblock Paper~68, Constructive Reverse Mathematics Series.
+\newblock \url{https://doi.org/10.5281/zenodo.18777925}
+
+\bibitem{Paper76}
+P.~C.~Lee.
+\newblock \emph{CRMLint: Automated CRM Logical Cost Analysis at Scale}.
+\newblock Paper~76, Constructive Reverse Mathematics Series.
+\newblock (DOI pending.)
+
+\bibitem{FormatGuide}
+P.~C.~Lee.
+\newblock \emph{CRM Series Paper Format Guide}.
+\newblock \url{https://doi.org/10.5281/zenodo.18765700}
+
+\bibitem{Mathlib4}
+The Mathlib Community.
+\newblock \emph{Mathlib4}.
+\newblock \url{https://github.com/leanprover-community/mathlib4}
+
+\bibitem{Hodge1950}
+W.~V.~D. Hodge.
+\newblock \emph{The topological invariants of algebraic varieties}.
+\newblock Proc.\ Int.\ Congr.\ Math., Cambridge, 1:182--192, 1950.
+
+\bibitem{Lieberman1968}
+D.~I. Lieberman.
+\newblock \emph{Numerical and homological equivalence of algebraic cycles
+  on Hodge manifolds}.
+\newblock Amer.\ J.\ Math., 90(2):366--374, 1968.
+
+\bibitem{Mattuck1958}
+A.~Mattuck.
+\newblock \emph{Cycles on abelian varieties}.
+\newblock Proc.\ Amer.\ Math.\ Soc., 9(1):88--98, 1958.
+
+\bibitem{Kisin2009}
+M.~Kisin.
+\newblock \emph{Modularity of 2-adic Barsotti--Tate representations}.
+\newblock Invent.\ Math., 178(3):587--634, 2009.
+
+\bibitem{HarrisTaylor2001}
+M.~Harris and R.~Taylor.
+\newblock \emph{The Geometry and Cohomology of Some Simple Shimura Varieties}.
+\newblock Annals of Math.\ Studies~151.
+\newblock Princeton Univ.\ Press, 2001.
+
+\bibitem{BushnellKutzko1993}
+C.~J.~Bushnell and P.~C.~Kutzko.
+\newblock \emph{The Admissible Dual of $\GL(N)$ via Compact Open Subgroups}.
+\newblock Annals of Math.\ Studies~129.
+\newblock Princeton Univ.\ Press, 1993.
+
+\bibitem{Kronecker1882}
+L.~Kronecker.
+\newblock \emph{Grundz\"uge einer arithmetischen Theorie der algebraischen
+  Gr\"o\ss en}.
+\newblock J.~reine angew.\ Math., 92:1--122, 1882.
+
+\bibitem{Grothendieck1969}
+A.~Grothendieck.
+\newblock \emph{Standard conjectures on algebraic cycles}.
+\newblock In: Algebraic Geometry (Bombay 1968), 193--199.
+  Oxford Univ.\ Press, 1969.
+
+\bibitem{Kleiman1968}
+S.~L. Kleiman.
+\newblock \emph{Algebraic cycles and the Weil conjectures}.
+\newblock In: Dix expos\'es sur la cohomologie des sch\'emas,
+  359--386. North-Holland, 1968.
+
+\bibitem{Bishop1967}
+E.~Bishop.
+\newblock \emph{Foundations of Constructive Analysis}.
+\newblock McGraw-Hill, 1967.
+
+\bibitem{BridgeRichman1987}
+D.~Bridges and F.~Richman.
+\newblock \emph{Varieties of Constructive Mathematics}.
+\newblock London Math.\ Soc.\ Lecture Note Ser.~97, Cambridge Univ.\ Press,
+  1987.
+
+\end{thebibliography}
+
+\end{document}
