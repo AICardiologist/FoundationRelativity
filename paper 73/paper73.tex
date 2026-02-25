@@ -90,9 +90,9 @@
 for Constructive Morphism Decidability\\[6pt]
 \large (Paper~73, Constructive Reverse Mathematics Series)}
 
-\author{Paul C.\ K.\ Lee\\
-\small Department of Medicine, New York University Grossman School of Medicine\\
-\small \texttt{paul.lee@nyulangone.org}}
+\author{Paul Chun-Kit Lee\\
+\small New York University, Brooklyn, NY\\
+\small \texttt{dr.paul.c.lee@gmail.com}}
 
 \date{February 2026}
 
@@ -402,9 +402,9 @@ Axiomatized: \texttt{jannsen\_obstruction} (without~D, $\LPO$),
     {DPT category\\$\BISH$ + faithful};
 
   % Edges
-  \draw[->, thick] (num) -- node[above, font=\footnotesize]
+  \draw[->, thick, bend left=15] (num) to node[above, font=\footnotesize]
     {sacrifice faithfulness} (hom);
-  \draw[->, thick] (hom) -- node[above, font=\footnotesize, sloped]
+  \draw[->, thick, bend left=15] (hom) to node[below, font=\footnotesize]
     {sacrifice $\BISH$} (num);
   \draw[->, thick, dashed] (dpt) -- node[left, font=\footnotesize, align=right]
     {Conj.\ D\\(hom=num)} (num);

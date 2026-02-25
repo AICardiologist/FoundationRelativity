@@ -55,4 +55,4 @@ Zero `sorry`, zero warnings, 4 axioms (2 data + 2 propositional).
 
 ## Author
 
-Paul C. K. Lee, Department of Medicine, NYU Grossman School of Medicine
+Paul Chun-Kit Lee, New York University, Brooklyn, NY
