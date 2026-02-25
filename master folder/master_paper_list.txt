@@ -81,7 +81,7 @@ No.  Title                                                               DOI
  70  The Archimedean Principle (Capstone)                                 10.5281/zenodo.18750992
  71  Archimedean Principle in Cryptography and Computation               10.5281/zenodo.18752015
  72  The DPT Characterization Theorem                                    10.5281/zenodo.18765393
- 73  Standard Conjecture D Is Necessary for Morphism Decidability        (pending Zenodo)
+ 73  Standard Conjecture D Is Necessary for Morphism Decidability        10.5281/zenodo.18765700
  74  Algebraic Spectrum Is Necessary for Eigenvalue Decidability         10.5281/zenodo.18773827
  75  Conservation Test: Genestier-Lafforgue LLC Calibration              10.5281/zenodo.18773831
 
@@ -91,8 +91,8 @@ STATISTICS
 Total papers:         73 active (of 75 numbered)
 Withdrawn:            2 (Papers 1, 3)
 Retired:              2 (Paper 60 → 59; Paper 62 → 63)
-Papers with DOIs:     69
-Papers pending DOI:   2 (63, 73 — P73 DOI needs verification)
+Papers with DOIs:     70
+Papers pending DOI:   1 (63)
 Papers peer-reviewed: 75 (passed Gemini peer review)
 Papers with Lean 4:   ~65 (Papers 64-66 computational/LaTeX-only)
 Total Lean 4 lines:   ~89,150+
