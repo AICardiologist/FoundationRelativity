@@ -1146,19 +1146,58 @@ The method has clear boundaries:
 
 \subsection{Technical tips for future use}\label{sec:tips}
 
-We record several practical lessons from the $E^4$ execution that
-apply to future applications of the Squeeze protocol:
+We record practical lessons from the $E^4$ execution, codified as
+named principles for future applications of the Squeeze protocol.
+
+\medskip\noindent
+\textbf{Principle~1: The LLM is an Architect, not a calculator.}
+Large language models suffer \emph{context-window collapse} when
+asked to output thousands of matrix coordinates or polynomial
+systems autoregressively.  The AI's role is to \emph{design} the
+computation: identify the target, choose the generator set, write
+the Python script.  The CAS executes the computation in RAM
+(effectively unlimited working memory), and writes the Lean code
+\emph{directly to disk}, bypassing the LLM's output token limit
+entirely.  Never ask the AI to print large algebraic data in the
+conversation---this is guaranteed to produce truncation or
+hallucination.
+
+\medskip\noindent
+\textbf{Principle~2: Compute Before You Squeeze.}
+Never begin formalizing the Squeeze target in Lean until the
+Python script has successfully computed the exact algebraic
+matching.  The combinatorial skeleton must be empirically verified
+first.  The $E^4$ hallucination (Remark~\ref{rem:hallucination})
+was caught precisely because the computation phase preceded the
+formalization phase.  Running the CAS first is a \emph{hallucination
+guard}: it catches false targets before any Lean code is written.
+
+\medskip\noindent
+\textbf{Principle~3: The \texttt{noncomputable} Trap.}
+If a Lean definition depends (even transitively) on an axiom,
+Lean marks it \texttt{noncomputable} and \texttt{native\_decide}
+silently fails.  The Python-emitted \texttt{.lean} file must
+contain \emph{only} hardcoded data arrays and computable
+\texttt{def}s.  All algebraic values must be normalized to exact
+elements of the coefficient field ($\Q$ for Hodge classes,
+cyclotomic fields for Langlands parameters).  Absolutely no
+\texttt{axiom} or \texttt{noncomputable} tags are permitted in
+the emitted data file.
+
+\medskip\noindent
+In addition to these three principles, we record specific
+technical lessons:
 
 \begin{enumerate}[nosep]
-\item \textbf{Verify the target before searching.}  The
-  hallucination cost us one computation cycle.  Always run the
+\item \textbf{Verify the target before searching.}  Always run the
   CAS dimension check (Steps~1--5 of Theorem~\ref{thm:no-exotic})
   before committing to a decomposition search.
 \item \textbf{Use exact arithmetic.}  Python's
   \texttt{fractions.Fraction} provides arbitrary-precision $\Q$
-  arithmetic with zero numerical error.  Floating-point
-  computation would have introduced rounding that
-  \texttt{native\_decide} cannot tolerate.
+  arithmetic with zero numerical error.  For cyclotomic fields
+  (as in wild Langlands, Paper~78), use \texttt{sympy} algebraic
+  number fields.  Floating-point computation introduces rounding
+  that \texttt{native\_decide} cannot tolerate.
 \item \textbf{Emit sparse, not dense.}  Always emit Lean vectors
   as \texttt{fun i => match i.val with ...} rather than
   $\texttt{![}\ldots\texttt{]}$.  The elaboration cost difference
@@ -1170,10 +1209,13 @@ apply to future applications of the Squeeze protocol:
   (\texttt{hodge\_data.json}) between the CAS phase and the
   Lean emission phase.  This allows re-emission with different
   encoding strategies without re-running the computation.
-\item \textbf{Test the decomposition coefficient vectors before
-  emission.}  Verify $Gx = w$ in Python before writing Lean code.
-  A single wrong coefficient will cause \texttt{native\_decide}
-  to fail with an unhelpful error.
+\item \textbf{Test before emission.}  Verify $Gx = w$ in Python
+  before writing Lean code.  A single wrong coefficient will cause
+  \texttt{native\_decide} to fail with an unhelpful error.
+\item \textbf{Restrict the AI to minimal cases first.}  For
+  Paper~78, this means starting with $\GL_2(\Q_2)$ at minimal
+  conductor, not attempting the full wild Langlands at once.
+  Bounding the target prevents infinite search space explosion.
 \end{enumerate}
 
 \subsection{Open questions}
