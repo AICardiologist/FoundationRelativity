@@ -1316,6 +1316,66 @@ class is algebraic'' (Lefschetz $(1,1)$, classical).  The
 vectors, verified by \texttt{native\_decide}.''  The decompiled
 version is strictly more informative.
 
+\subsection{From Paper~5 to Paper~77: the learning curve}%
+\label{sec:learningcurve}
+
+Paper~5~\cite{Paper5} of this series formalized the Schwarzschild
+curvature verification in Lean~4---a direct computation involving
+Ricci tensors, Christoffel symbols, and the metric components of
+a static spherically symmetric spacetime.  That formalization
+required approximately four months of development and produced a
+monolithic Lean bundle in which the proof assistant was asked to
+\emph{compute}: verify curvature identities by \texttt{simp},
+\texttt{ring}, and \texttt{field\_simp} applied to enormous
+rational expressions.  The differential geometry API in Mathlib
+was (and remains) incomplete, requiring substantial scaffolding.
+
+Paper~77's $E^4$ computation---a problem of comparable mathematical
+density (a $70 \times 70$ matrix computation with 36 exact rational
+decompositions)---was completed in approximately one hour, from
+problem specification to \texttt{lake build} success.  Three
+independent factors explain the speedup:
+
+\begin{enumerate}[nosep]
+\item \textbf{The AI is more capable.}  Between mid-2025 and
+  February~2026, the underlying language model improved
+  substantially in Lean~4 code generation, error diagnosis, and
+  multi-file project management.  Paper~5's development involved
+  frequent hallucination of nonexistent Mathlib lemmas; Paper~77's
+  development involved zero such hallucinations (the one error---the
+  non-simple target---was a mathematical design mistake, not a code
+  generation failure).
+\item \textbf{The operator is more experienced.}  After 14~Lean
+  bundles and ${\sim}89{,}000$ lines of formalization, the key
+  design lesson is: \emph{do not ask Lean to compute what a CAS
+  can compute faster.}  Paper~5 tried to formalize differential
+  geometry \emph{in Lean}.  Paper~77 does not touch Mathlib's
+  algebraic geometry at all---no Chow rings, no cycle class maps,
+  no cup products as Lean objects.  It projects the geometry into
+  a combinatorial skeleton ($\Q^{70}$ linear algebra) and works
+  there.  Knowing what to formalize and what to offload is
+  operator skill, not AI capability.
+\item \textbf{The method is factored.}  Paper~5 was monolithic:
+  everything happened inside Lean.  Paper~77 is factored into
+  three layers with distinct roles: Python CAS (exact computation,
+  unlimited working memory), Lean kernel (\texttt{native\_decide}
+  equality checking on hardcoded data), and human/AI (problem
+  design, generator selection, architecture).  The asymmetric
+  offloading architecture eliminates the bottleneck that made
+  Paper~5 painful: Lean no longer needs to evaluate complex
+  algebraic expressions, only to verify that two concrete rational
+  vectors are equal.
+\end{enumerate}
+
+\noindent
+The progression from Paper~5 to Paper~77 is itself a data point
+about the CRM program's methodology: the formalization
+infrastructure matured from ``fight the proof assistant'' to
+``let each tool do what it does best.''  Whether this
+factored architecture scales to harder targets (where the
+CAS phase is not linear algebra but Gr\"obner bases or
+combinatorial search) remains to be tested.
+
 \subsection{What is and is not new}\label{sec:whatsnew}
 
 \textbf{The mathematical result is not novel.}
@@ -1684,6 +1744,12 @@ A.~Genestier and V.~Lafforgue.
 \newblock \emph{Chtoucas restreints pour les groupes r\'eductifs
   et param\'etrisation de Langlands locale}.
 \newblock arXiv:1709.00978, 2018.
+
+\bibitem{Paper5}
+P.~C.~Lee.
+\newblock \emph{Schwarzschild Curvature Verification}.
+\newblock Paper~5, Constructive Reverse Mathematics Series.
+\newblock \url{https://doi.org/10.5281/zenodo.18489703}
 
 \bibitem{Voisin2002}
 C.~Voisin.
