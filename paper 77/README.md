@@ -1,4 +1,4 @@
-# Paper 77: Automated De-Omniscientisation — Reverse-Engineering Classical Proofs via DAG Surgery
+# Paper 77: The Complete Constructive Hodge Theorem for CM Abelian Fourfolds — Automated De-Omniscientisation via DAG Surgery
 
 **Paper 77, Constructive Reverse Mathematics Series**
 
@@ -8,7 +8,9 @@ DOI: [10.5281/zenodo.18779210](https://doi.org/10.5281/zenodo.18779210)
 
 ## Summary
 
-This paper introduces the **CRMLint Squeeze**, a systematic protocol for reverse-engineering classical proofs into constructive ones. The method identifies the Classical Boundary Node (CBN) — the exact lemma where a classical proof invokes an omniscience principle — excises it, and replaces it with an explicit algebraic witness verified by compiled rational arithmetic (`native_decide`).
+The Hodge Conjecture for CM abelian varieties was proved classically by Lieberman (1968) and Deligne (1982), but these proofs produce no explicit algebraic representatives. This paper provides the first explicit constructive proof for E⁴ (E a CM elliptic curve with End(E)⊗Q ≅ Q(i)): all 36 Hodge (2,2) basis vectors are decomposed into Q-linear combinations of cup products of divisor classes, formally verified in Lean 4 by `native_decide`. The proof also establishes that E⁴ supports no exotic Weil classes (dim Hodge = dim div. products = 36).
+
+The results are produced by the **CRMLint Squeeze**, a protocol for reverse-engineering classical proofs into constructive ones. The method identifies the Classical Boundary Node (CBN) — the exact lemma where a classical proof invokes an omniscience principle — excises it, and replaces it with an explicit algebraic witness verified by compiled rational arithmetic.
 
 ## Main Results
 
