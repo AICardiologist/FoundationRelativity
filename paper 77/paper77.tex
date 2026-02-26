@@ -15,7 +15,7 @@
 \usepackage[x11names,table]{xcolor}
 \usepackage{mdframed}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning}
+\usetikzlibrary{arrows.meta,positioning,calc,decorations.pathreplacing}
 \usepackage{url}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 
@@ -30,12 +30,13 @@
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{axiombox}[theorem]{Axiom}
 \newtheorem{protocol}[theorem]{Protocol}
+\newtheorem{example}[theorem]{Example}
 
 \theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remark}
 
 % ---------- Lean repo link ----------
-\newcommand{\leanRepo}{\url{(DOI pending)}}
+\newcommand{\leanRepo}{\url{https://doi.org/10.5281/zenodo.18779210}}
 
 % ---------- Notation ----------
 \newcommand{\N}{\mathbb{N}}
@@ -63,6 +64,8 @@
 \newcommand{\CRM}{\mathrm{CRM}}
 \newcommand{\tr}{\mathrm{tr}}
 \newcommand{\rk}{\mathrm{rk}}
+\newcommand{\NS}{\mathrm{NS}}
+\newcommand{\Hdg}{\mathrm{Hdg}}
 
 \newcommand{\BISH}{\mathsf{BISH}}
 \newcommand{\LPO}{\mathsf{LPO}}
@@ -91,7 +94,7 @@
             Type, Prop, Sort, Type*, forall, exists, where, extends,
             set, push_neg, rw, simp, omega, nlinarith, linarith,
             ext, rfl, congr, fin_cases, haveI, letI, attribute, inductive,
-            deriving, opaque, decide},
+            deriving, opaque, decide, native_decide, abbrev},
   sensitive=true,
   morecomment=[l]{--},
   morecomment=[s]{/-}{-/},
@@ -123,6 +126,7 @@
     {•}{{$\cdot$}}1 {⁻¹}{{$^{-1}$}}1 {⋆}{{$\star$}}1
     {∘}{{$\circ$}}1
     {×}{{$\times$}}1
+    {ℚ}{{$\mathbb{Q}$}}1
 }
 
 \lstdefinestyle{leanstyle}{
@@ -153,7 +157,7 @@
   via DAG Surgery\\[6pt]
   {\large (Paper~77, Constructive Reverse Mathematics Series)}}
 
-\author{Paul Chun-Kit Lee\thanks{Lean 4 formalization available at \leanRepo.} \\
+\author{Paul Chun-Kit Lee\thanks{Lean 4 formalization and Python source available at \leanRepo.} \\
 New York University \\
 \texttt{dr.paul.c.lee@gmail.com}}
 
@@ -166,35 +170,45 @@ New York University \\
 \begin{abstract}
 We introduce the \emph{CRMLint Squeeze}, a systematic protocol for
 reverse-engineering classical proofs into constructive ones by
-combining CRM logical cost analysis with AI-driven combinatorial
-search.  The method identifies the \emph{Classical Boundary Node}
+combining CRM logical cost analysis (Paper~76) with computational
+algebra.  The method identifies the \emph{Classical Boundary Node}
 (CBN)---the exact lemma where a classical proof invokes an
 omniscience principle---excises it from the formal environment,
 and replaces it with an explicit algebraic witness verified by
 compiled rational arithmetic (\texttt{native\_decide}).
 
 We execute the protocol on CM abelian fourfolds~$E^4$ with
-$\End(E) \cong \Z[i]$.  The initial target---Anderson's exotic
-Weil classes~\cite{Anderson1993}---is computationally refuted:
-we prove that $\dim(\text{Hodge}^{2,2}) = \dim(\text{div.\ products})
-= 36$, so $E^4$ supports \emph{no exotic Hodge classes whatsoever}.
-This computational discovery is itself the first application of
-the Squeeze methodology.
+$\End(E) \cong \Z[i]$.  The initial target---exotic
+Weil classes---is computationally refuted:
+we prove that $\dim_\Q(\mathrm{Hodge}^{2,2}) = \dim_\Q(\text{div.\ products})
+= 36$, so $E^4$ supports \emph{no exotic Hodge classes whatsoever}
+(Theorem~A).  This computational discovery is itself the first
+application of the Squeeze methodology.
 
 Pivoting to the correct target, we prove the \emph{Complete
 Constructive Hodge Theorem for~$E^4$}: every Hodge~$(2,2)$ class
 is an explicit $\Q$-linear combination of cup products of
 divisor classes, with all 36 basis decompositions verified by
-\texttt{native\_decide} in Lean~4.  The Lean bundle builds with
-0~sorry, 0~axiom in the constructive path, and 0~\texttt{noncomputable}.
-The classical Lefschetz~$(1,1)$ existence axiom is present
-but provably unused---excised by the Squeeze.
+\texttt{native\_decide} in Lean~4 (Theorem~B).  The Lean bundle
+builds with 0~sorry, 0~axiom in the constructive path, and
+0~\texttt{noncomputable}.  The classical Lefschetz~$(1,1)$
+existence axiom is present but provably unused---excised by the
+Squeeze.
+
+The paper also introduces the \emph{asymmetric offloading} architecture
+for machine-verified constructive proofs (Theorem~C):
+Python CAS computes exact $\Q$-linear algebra, emits Lean~4
+source with hardcoded rational data, and the Lean kernel verifies via
+\texttt{native\_decide}.  We document the token overflow problem
+encountered in this pipeline and its resolution through sparse encoding.
 
 This paper marks the transition of the CRM program from
 \emph{diagnostic} (auditing classical proofs, Papers~1--76) to
-\emph{generative}: using the logical cost metric to force the
-production of explicit algebraic structures via asymmetric
-offloading (Python CAS computes; Lean kernel verifies).
+\emph{generative}: forcing the production of explicit algebraic
+structures by banning the classical helicopter.  It continues the
+progression from Paper~75 (conservation gap detection in
+Genestier--Lafforgue) through Paper~76 (CRMLint automated
+analysis) to Paper~77 (automated constructivisation).
 \end{abstract}
 
 \tableofcontents
@@ -219,8 +233,8 @@ opposite.  They are poor at abstract, infinite-dimensional
 topological jumps, but possess effectively unlimited working memory
 for navigating massive, dense combinatorial thickets.  If the
 classical axioms are enabled, the prover lazily mimics humans and
-takes the helicopter.  But if CRMLint systematically bans the
-helicopter, the prover is algorithmically cornered into the
+takes the helicopter.  But if CRMLint~\cite{Paper76} systematically
+bans the helicopter, the prover is algorithmically cornered into the
 algebraic forest---a bounded domain where the problem may collapse
 from ``hard search'' into deterministic linear algebra.
 
@@ -254,36 +268,74 @@ the protocol reshapes the search landscape.  In the best case
 (demonstrated in this paper), the restriction is so absolute that
 the problem \emph{deterministically collapses}: what appeared to
 require stochastic search reduces to $P$-time Gaussian elimination
-over~$\Q$.  The logical cost metric acts as an action-space
-restrictor, not merely a post-hoc classifier.
+over~$\Q$.
 
 \subsection{Main results}
 
-We establish three contributions:
+We state the three principal contributions as named theorems:
 
-\begin{enumerate}[nosep]
-\item \textbf{The CRMLint Squeeze Protocol} (\S\ref{sec:protocol}):
-  a four-step method (Scaffold, X-Ray, Excise, Squeeze) for
-  converting CRM classifications into constructive proofs.
-\item \textbf{The $E^4$ Hallucination} (\S\ref{sec:target}):
-  computational proof that $E^4 = E \times E \times E \times E$
-  with $\End(E) \cong \Z[i]$ supports no exotic Weil classes
-  ($\dim_\Q(\text{Hodge}^{2,2}) = \dim_\Q(\text{div.\ products}) = 36$),
-  refuting the initial target.
-\item \textbf{The Complete Constructive Hodge Theorem for $E^4$}
-  (\S\ref{sec:results}): all 36 Hodge basis vectors decomposed
-  into explicit cup products of NS classes, verified by
-  \texttt{native\_decide} in Lean~4.  Zero sorry, zero axiom
-  in the constructive path.
-\end{enumerate}
+\begin{quote}
+\textbf{Theorem A} (No Exotic Weil Classes on~$E^4$).
+\emph{For $E/\Q$ with $\End(E) \otimes \Q \cong \Q(i)$,
+\[
+  \dim_\Q \Hdg^{2,2}(E^4) = \dim_\Q (\NS(E^4) \cup \NS(E^4)) = 36.
+\]
+The exotic complement is zero-dimensional: $E^4$ supports no exotic
+Hodge classes.}
+\end{quote}
 
-\subsection{Position in the atlas}
+\begin{quote}
+\textbf{Theorem B} (Complete Constructive Hodge Theorem for~$E^4$).
+\emph{Every Hodge $(2,2)$ class on $E^4$ is an explicit $\Q$-linear
+combination of cup products of divisor classes.  The 36 basis
+decompositions are formally verified in Lean~4 by
+\texttt{native\_decide}.  Zero sorry, zero axiom in the constructive
+path, zero~\texttt{noncomputable}.}
+\end{quote}
 
-Paper~77 occupies a unique position: it is the first paper in the
-CRM series that is \emph{methodological} rather than
-\emph{classificatory}.  Papers~1--76 asked ``what is the logical
-cost of theorem~$X$?''  Paper~77 asks ``given the logical cost,
-can we force an AI to discover a cheaper proof?''
+\begin{quote}
+\textbf{Theorem C} (CRMLint Squeeze Protocol).
+\emph{The four-step protocol (Scaffold $\to$ X-Ray $\to$ Excise
+$\to$ Squeeze) reduces the Hodge Conjecture for~$E^4$ from a
+$\CLASS$ existence statement to a $\BISH$ finite database, verified
+end-to-end by compiled rational arithmetic.}
+\end{quote}
+
+\subsection{The diagnostic-to-generative pipeline: Papers 75--76--77}
+
+This paper occupies a unique position in the CRM series.  The
+logical progression is:
+
+\begin{itemize}[nosep]
+\item \textbf{Paper~75}~\cite{Paper75}: \emph{Conservation gap
+  detection.}  Applied CRM to Genestier--Lafforgue's proof of the
+  Local Langlands Correspondence for function fields.
+  Proved the key conservation result: the $\CLASS$ Shimura
+  variety machinery used in the global proof is dispensable for
+  the purely local correspondence, which descends to~$\BISH$.
+  This established that conservation gaps are \emph{detectable}
+  in modern geometry and not merely a foundational curiosity.
+
+\item \textbf{Paper~76}~\cite{Paper76}: \emph{Automated detection.}
+  Built CRMLint, a four-layer automated logical cost analyzer
+  for Lean~4 formalizations.  CRMLint traces classical dependencies
+  through Lean's \texttt{Environment}, classifies them via a
+  12-rule priority system, identifies the minimal classical core,
+  and predicts conservation gap eliminability.  The 75-paper
+  program serves as its calibration dataset.
+
+\item \textbf{Paper~77} (this paper): \emph{Automated
+  constructivisation.}  Uses CRMLint's output as the electric fence
+  in the Squeeze protocol, transitioning from \emph{diagnosing}
+  conservation gaps to \emph{exploiting} them.  The first
+  end-to-end execution produces the Complete Constructive Hodge
+  Theorem for~$E^4$.
+\end{itemize}
+
+\noindent
+The three papers form a single arc: \emph{detect} (Paper~75)
+$\to$ \emph{automate detection} (Paper~76) $\to$
+\emph{automate elimination} (Paper~77).
 
 % ============================================================
 \section{Preliminaries}\label{sec:prelim}
@@ -297,8 +349,8 @@ The constructive hierarchy of omniscience principles:
   \;\subset\; \BISH{+}\WLPO \;\subset\; \BISH{+}\LPO
   \;\subset\; \CLASS.
 \]
-For definitions and the programme's calibration data, see
-Paper~50~\cite{Paper50}.
+For definitions and the program's calibration data, see
+Paper~50~\cite{Paper50} and Bridges--Richman~\cite{BridgeRichman1987}.
 
 \subsection{CRMLint}
 
@@ -316,7 +368,7 @@ analyzer for Lean~4 formalizations.  It operates in four layers:
 \item \emph{Concentration analysis.} Identifies the minimal
   essential classical core of each theorem.
 \item \emph{AI audit layer.} Predicts conservation gap
-  eliminability using the 75-paper programme as training data.
+  eliminability using the 75-paper program as training data.
 \end{enumerate}
 
 \subsection{Classical Boundary Nodes}
@@ -356,64 +408,69 @@ The DPT framework detects this boundary: CM elliptic curves are
 in; simple CM abelian fourfolds are out.
 
 % ============================================================
-\section{The CRMLint Squeeze Protocol}\label{sec:protocol}
+\section{Main Results}\label{sec:main}
 % ============================================================
 
-\subsection{Step~1: The Scaffold}
+\subsection{The CRMLint Squeeze Protocol}
 
-Take a known classical theorem (or a partial $\CLASS$ attempt)
-and write its outline in Lean~4.  The proof need not be complete;
-what matters is that the \emph{logical structure} is formalised:
-which lemmas invoke which principles, and where the classical
-content enters.
-
-\subsection{Step~2: The X-Ray (CRMLint)}
-
-Run CRMLint on the scaffold.  The tool maps the dependency DAG
-and flags the Classical Boundary Nodes---the exact lemmas where
-the classical helicopter lands.
-
-\begin{protocol}[X-Ray]\label{prot:xray}
-\begin{lstlisting}
--- Run CRMLint on the target theorem
-#crm_audit hodge_conjecture_E4
-
--- Expected output:
--- hodge_conjecture_E4 : CLASS
---   CBN: hodge_conjecture_existence (1 step to Classical.choice)
---   All other dependencies: BISH
-\end{lstlisting}
+\begin{protocol}[The CRMLint Squeeze]\label{prot:squeeze}
+Given a classical theorem~$T$ with a known $\CLASS$ proof:
+\begin{enumerate}
+\item \textbf{Scaffold.} Write the logical structure of the proof
+  in Lean~4.  The proof need not be complete; what matters is that
+  the dependency DAG is formalised.
+\item \textbf{X-Ray.} Run CRMLint on the scaffold.  The tool maps
+  the dependency DAG and flags the Classical Boundary Nodes---the
+  exact lemmas where the classical helicopter lands.
+\item \textbf{Excise.} Isolate the local Lean state at the CBN.
+  Delete the classical axiom.  The result is a $\BISH$ context
+  with an open goal of the form
+  $\vdash \Sigma\,(Z : \CH^2(A)),\; \cl(Z) = w_{\mathrm{target}}$.
+  Key design choice: the target is a $\Sigma$-type (data), not
+  $\exists$ (proposition), forcing the prover to \emph{construct}
+  the witness.
+\item \textbf{Squeeze.} Hand the isolated state to a solver.
+  The solver operates in one of two modes depending on the
+  restricted search space:
+  \begin{itemize}[nosep]
+  \item \emph{Deterministic collapse.} If the Excise restricts
+    the action space to a finite-dimensional $\Q$-linear system,
+    the solver is a CAS performing exact Gaussian elimination.
+  \item \emph{MCTS search.} If the space is combinatorially rich
+    (nonlinear constraints, multiple branches), an RL-trained
+    prover with CRMLint as reward function explores the space.
+  \end{itemize}
+\end{enumerate}
 \end{protocol}
 
-\subsection{Step~3: The Excise}
+% ---------- TikZ figure: the Squeeze pipeline ----------
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    node distance=1.5cm and 1.8cm,
+    block/.style={rectangle, draw, rounded corners,
+                minimum width=2.8cm, minimum height=0.8cm,
+                align=center, font=\small},
+    >=Stealth
+]
+\node[block] (scaffold) {1.\ Scaffold};
+\node[block, right=of scaffold] (xray) {2.\ X-Ray\\{\scriptsize (CRMLint)}};
+\node[block, right=of xray] (excise) {3.\ Excise\\{\scriptsize ($\exists \to \Sigma$)}};
+\node[block, below=of excise] (squeeze) {4.\ Squeeze\\{\scriptsize (CAS / MCTS)}};
+\node[block, below=of scaffold] (result) {Result: $\mathsf{BISH}$\\{\scriptsize (native\_decide)}};
 
-Isolate the local Lean state at the CBN.  Delete the classical
-axiom and apply \texttt{[-Classical]} to the environment.  The
-result is a $\BISH$ context with an open goal of the form
-\[
-  \vdash \Sigma\,(Z : \CH^2(A)),\; \cl(Z) = w_{\mathrm{target}}.
-\]
-
-\emph{Key design choice:} The target is a $\Sigma$-type (data),
-not a $\exists$ (proposition).  This forces the prover to
-\emph{construct} the witness, not merely prove its existence.
-
-\subsection{Step~4: The Squeeze}
-
-Hand the isolated state to a solver.  The solver operates in
-one of two modes, depending on the dimension of the restricted
-search space:
-
-\begin{enumerate}[nosep]
-\item \textbf{Deterministic collapse.}  If the Excise step
-  restricts the action space to a finite-dimensional $\Q$-linear
-  system, the solver is a CAS performing exact Gaussian
-  elimination.  This is the mode executed in this paper.
-\item \textbf{MCTS search.}  If the restricted space is
-  finite-dimensional but combinatorially rich (e.g., nonlinear
-  constraints, multiple solution branches), an RL-trained prover
-  with CRMLint as reward function explores the space.
-\end{enumerate}
+\draw[->,thick] (scaffold) -- (xray);
+\draw[->,thick] (xray) -- (excise);
+\draw[->,thick] (excise) -- (squeeze);
+\draw[->,thick] (squeeze) -- (result);
+\end{tikzpicture}
+\caption{The CRMLint Squeeze protocol.  CRMLint identifies the
+Classical Boundary Node (Step~2), the CBN is excised and the goal
+reformulated as a $\Sigma$-type (Step~3), and a CAS or RL-trained
+prover solves the $\BISH$-restricted problem (Step~4).  For~$E^4$,
+Step~4 deterministically collapses into Gaussian elimination.}
+\label{fig:squeeze}
+\end{figure}
 
 \noindent
 The CRMLint classification shapes the search in both modes:
@@ -431,46 +488,7 @@ Timeout / failure & $0.0$ \\
 \end{tabular}
 \end{center}
 
-\noindent
-In the deterministic mode, the ``reward'' is binary: the CAS
-either finds a solution in the $\BISH$-restricted space or proves
-the space is empty (as happened with the exotic class target).
-The significance of the protocol is that it \emph{identifies
-which mode applies}: the Scaffold and X-Ray steps compute the
-dimension and structure of the search space before any search
-begins.
-
-% ---------- TikZ figure: the Squeeze pipeline ----------
-
-\begin{figure}[ht]
-\centering
-\begin{tikzpicture}[
-    node distance=1.5cm and 1.8cm,
-    block/.style={rectangle, draw, rounded corners,
-                minimum width=2.8cm, minimum height=0.8cm,
-                align=center, font=\small},
-    >=Stealth
-]
-\node[block] (scaffold) {1.\ Scaffold};
-\node[block, right=of scaffold] (xray) {2.\ X-Ray};
-\node[block, right=of xray] (excise) {3.\ Excise};
-\node[block, below=of excise] (squeeze) {4.\ Squeeze};
-\node[block, below=of scaffold] (result) {Result: $\mathsf{BISH}$};
-
-\draw[->,thick] (scaffold) -- (xray);
-\draw[->,thick] (xray) -- (excise);
-\draw[->,thick] (excise) -- (squeeze);
-\draw[->,thick] (squeeze) -- (result);
-\end{tikzpicture}
-\caption{The CRMLint Squeeze protocol.  CRMLint identifies the Classical Boundary Node (Step~2), the CBN is excised and the goal reformulated as a $\Sigma$-type (Step~3), and a CAS or RL-trained prover solves the $\BISH$-restricted problem (Step~4).  For $E^4$, Step~4 deterministically collapses into Gaussian elimination.}
-\label{fig:squeeze}
-\end{figure}
-
-% ============================================================
-\section{The Target: CM Abelian Fourfolds}\label{sec:target}
-% ============================================================
-
-\subsection{Setup}
+\subsection{Setup: CM abelian fourfolds}\label{sec:setup}
 
 Let $E/\Q$ be a CM elliptic curve with $\End(E) \otimes \Q \cong
 \Q(i)$ (Gaussian integers).  Set $A = E^4 = E \times E \times E
@@ -483,226 +501,237 @@ The target space $H^4(A, \Q) \cong \bigwedge^4 \Q^8$ has
 $\dim = \binom{8}{4} = 70$.  Its basis elements are
 $e_a \wedge e_b \wedge e_c \wedge e_d$ for
 $0 \leq a < b < c < d \leq 7$, where indices $2k$ and $2k{+}1$
-correspond to $e_1, e_2$ from the $(k{+}1)$-th factor.
+correspond to $e_1, e_2$ from the $(k{+}1)$-th factor of~$E^4$.
 
-\subsection{The CM action}
+\subsection{The CM action on $H^4(E^4,\Q)$}\label{sec:cmaction}
 
 The CM endomorphism $i \in \Z[i]$ acts on $H^1(E, \Q) \cong \Q^2$ by
-$M_i = \bigl(\begin{smallmatrix} 0 & -1 \\ 1 & 0 \end{smallmatrix}\bigr)$.
+\begin{equation}\label{eq:cm-matrix}
+M_i = \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}.
+\end{equation}
 On $\Q^8 = H^1(E^4, \Q)$ it acts by $M_i^{\oplus 4}$.
 The induced action on $\bigwedge^4 \Q^8$ is a $70 \times 70$
-matrix $\Lambda^4(M_i^{\oplus 4})$ satisfying $M^2 = I$
-(since $i^2 = -1$ acts as $(-1)^4 = 1$ on $\bigwedge^4$).
+matrix $M := \Lambda^4(M_i^{\oplus 4})$.  A class
+$w \in H^4(E^4, \Q)$ is a \emph{Hodge class} if and only if
+$M w = w$ (i.e., $w$ lies in the $+1$~eigenspace of~$M$).
 
-\subsection{The $E^4$ Hallucination: computational refutation}
+\begin{lemma}\label{lem:involution}
+$M^2 = I_{70}$.
+\end{lemma}
 
-Anderson~\cite{Anderson1993} proved that \emph{simple} CM abelian
-varieties of dimension $\geq 4$ (e.g., Jacobians of Fermat
-curves) support exotic Weil classes.  The initial design of this
-paper erroneously selected $E^4 = E \times E \times E \times E$
-as a proxy, conflating ``CM abelian fourfold'' with ``simple CM
-abelian fourfold.''  The product $E^4$ is maximally non-simple:
-$\End(E^4) \otimes \Q \cong M_4(\Q(i))$, and its large
-endomorphism algebra generates far more divisor classes than a
-simple variety of the same dimension.
+\begin{proof}
+Each factor $M_i$ satisfies $M_i^2 = -I_2$.  The induced action
+on $\bigwedge^4$ of the $k$-th factor contributes $(-1)$ from
+$M_i^2 = -I_2$ applied to the two basis vectors
+$e_{2k}, e_{2k+1}$ of that factor.  A $4$-form involves exactly
+4~of the 8~basis vectors; since the $4$~vectors span parts of all
+4~factors, the total sign is $(-1)^4 = 1$.  More precisely:
+$M_i^{\oplus 4}$ acts on $\Q^8$ as the block diagonal
+$\mathrm{diag}(M_i, M_i, M_i, M_i)$; applying it twice gives
+$\mathrm{diag}(-I_2, -I_2, -I_2, -I_2) = -I_8$; the induced
+action on $\bigwedge^4(-I_8) = (-1)^4 I_{70} = I_{70}$.
+Verified computationally by \texttt{solve\_hodge.py}
+(line~68--72: \texttt{assert val == expected}).
+\end{proof}
 
-We computed the following dimensions over~$\Q$ by exact rational
-arithmetic (\texttt{solve\_hodge.py}, using \texttt{fractions.Fraction}):
+\begin{corollary}\label{cor:eigenspace-dim}
+Since $M^2 = I$ and $M \neq \pm I$, the $\Q$-vector space
+$\Q^{70}$ splits as
+$V_{+1} \oplus V_{-1}$ where $V_{\pm 1} = \ker(M \mp I)$.
+\end{corollary}
 
-\begin{center}
-\begin{tabular}{lr}
-\toprule
-\textbf{Subspace} & \textbf{Dimension} \\
-\midrule
-$+1$ eigenspace of $M$ on $\bigwedge^4 \Q^8$ & 38 \\
-$(4,0)+(0,4)$ component & 2 \\
-Hodge $(2,2)$ classes & 36 \\
-NS$(E^4) \otimes \Q$ (CM-invariant $\bigwedge^2 \Q^8$) & 16 \\
-Cup product span (NS $\cup$ NS $\to H^4$) & 36 \\
-\textbf{Exotic dimension} & \textbf{0} \\
-\bottomrule
-\end{tabular}
-\end{center}
+\subsection{Theorem A: No exotic Weil classes on $E^4$}
 
-\begin{theorem}[Computational]\label{thm:no-exotic}
+We now prove the first main result.
+
+\begin{theorem}[No Exotic Weil Classes on $E^4$]\label{thm:no-exotic}
 For $A = E^4$ with $\End(E) \otimes \Q \cong \Q(i)$, every
 Hodge $(2,2)$ class lies in the $\Q$-span of cup products of
 divisor classes.  There are no exotic Weil classes.
 \end{theorem}
 
-\noindent
-The equality $\dim(\text{Hodge}^{2,2}) = \dim(\text{cup products})
-= 36$ is verified by Gaussian elimination over~$\Q$.
+\begin{proof}
+The proof proceeds by exact rational computation in six steps.
 
-\begin{remark}[The hallucination]\label{rem:hallucination}
-The selection of $E^4$ as a target for exotic classes was a
-human--AI pipeline error: the human designer specified ``CM
-abelian fourfold of dimension~4'' without enforcing the
-simplicity hypothesis that Anderson's theorem requires.  For
-product varieties, the endomorphism algebra $M_4(\Q(i))$ is
-so large that divisor cup products trivially span the entire
-Hodge $(2,2)$ space.
+\smallskip\noindent
+\textbf{Step~1: Eigenspace decomposition.}
+Compute the $70 \times 70$ matrix $M = \Lambda^4(M_i^{\oplus 4})$
+by the formula: for each basis element
+$e_a \wedge e_b \wedge e_c \wedge e_d$, apply $M_i^{\oplus 4}$
+to each index, compute the resulting 4-form, and record its
+coordinates.  The $+1$~eigenspace $V_{+1}$ is computed as the
+row space of $\tfrac{1}{2}(I + M)$ over~$\Q$.  Result:
+$\dim V_{+1} = 38$.
 
-This error was caught by the Squeeze methodology itself: the
-Scaffold step demands concrete computation \emph{before} any
-axiom is invoked.  The Python CAS immediately revealed the
-exotic complement is empty, preventing a search over a
-non-existent target.  The methodology's insistence on
-\emph{computation before axiomatics} is self-correcting.
+\smallskip\noindent
+\textbf{Step~2: The $(4,0)+(0,4)$ component.}
+Expand the holomorphic $4$-form
+$\omega = (e_0 + ie_1) \wedge (e_2 + ie_3)
+  \wedge (e_4 + ie_5) \wedge (e_6 + ie_7)$.
+Its real and imaginary parts span a $2$-dimensional subspace
+of~$V_{+1}$ corresponding to the $(4,0) + (0,4)$ Hodge
+component.
+
+\smallskip\noindent
+\textbf{Step~3: Hodge $(2,2)$ extraction.}
+Project $V_{+1}$ orthogonal to the $(4,0)+(0,4)$ subspace
+(Gram--Schmidt over~$\Q$).  Row-reduce to obtain a basis for
+$\Hdg^{2,2}(E^4) \otimes \Q$.  Result:
+$\dim \Hdg^{2,2} = 38 - 2 = 36$.
+
+\smallskip\noindent
+\textbf{Step~4: N\'eron--Severi computation.}
+The CM action on $\bigwedge^2 \Q^8$ is a $28 \times 28$ matrix
+$M_2$.  Its $+1$~eigenspace is $\NS(E^4) \otimes \Q$.  Result:
+$\dim \NS(E^4) \otimes \Q = 16$.
+
+The 16 generators include the 4 diagonal classes $e_{2k} \wedge
+e_{2k+1}$ (one per factor) and 12 off-diagonal classes
+arising from the CM cross-correlations between factors.
+
+\smallskip\noindent
+\textbf{Step~5: Cup product enumeration.}
+Form all $\binom{16}{2} + 16 = 136$ cup products
+$\alpha_i \cup \alpha_j$ for $\alpha_i, \alpha_j \in
+\NS(E^4) \otimes \Q$, where the cup product
+$\bigwedge^2 \Q^8 \times \bigwedge^2 \Q^8 \to \bigwedge^4 \Q^8$
+is the standard wedge product.  Of these, 102 are nonzero.
+Row-reduce to determine the rank of the divisor product subspace
+in~$\Q^{70}$.  Result: $\mathrm{rank} = 36$.
+
+\smallskip\noindent
+\textbf{Step~6: Dimension comparison.}
+\[
+  \dim_\Q \Hdg^{2,2}(E^4) = 36 = \dim_\Q
+  \langle \NS_i \cup \NS_j \rangle.
+\]
+Since the divisor product subspace is contained in the Hodge space
+(divisor products are automatically Hodge classes), and both have
+dimension~36, they are equal.  The exotic complement
+$\Hdg^{2,2} / \langle \text{div.\ products} \rangle$ is
+zero-dimensional.
+\end{proof}
+
+\begin{remark}[Why $E^4$ has no exotic classes]\label{rem:why-no-exotic}
+Anderson~\cite{Anderson1993} proved exotic classes exist on
+\emph{simple} CM abelian fourfolds, such as Jacobians of Fermat
+curves.  The product $E^4$ is maximally non-simple:
+$\End(E^4) \otimes \Q \cong M_4(\Q(i))$ has dimension~32 over~$\Q$.
+This large endomorphism algebra generates far more divisor classes
+(16~independent NS generators) than a simple variety of the same
+dimension, causing the cup product span to saturate the Hodge space.
 \end{remark}
 
-\subsection{The pivot: Complete Constructive Hodge Theorem}
+\begin{remark}[The hallucination and self-correction]%
+\label{rem:hallucination}
+The selection of $E^4$ as a target for exotic classes was a
+human--AI pipeline error: the designer specified ``CM abelian
+fourfold of dimension~4'' without enforcing the simplicity
+hypothesis that Anderson's theorem requires.  This error was
+caught by the Squeeze methodology itself: the Scaffold step
+demands concrete computation \emph{before} any axiom is invoked.
+The Python CAS immediately revealed the exotic complement is
+empty, preventing search over a non-existent target.  The
+methodology's insistence on \emph{computation before axiomatics}
+is self-correcting.
+\end{remark}
+
+\subsection{Theorem B: Complete Constructive Hodge Theorem for $E^4$}
 
 Since the exotic complement is empty, the correct target is
-stronger: prove that \emph{every} Hodge $(2,2)$ class is
-an explicit $\Q$-linear combination of cup products.  This
-replaces the classical Lefschetz $(1,1)$ existence theorem with
-a brute-force $\BISH$ database of 36 explicit decompositions.
-
-The classical boundary node is the Lefschetz $(1,1)$ theorem
-(or its $(2,2)$ analogue via the K\"unneth formula), which
-asserts existence of divisor representatives without constructing
-them.  The Squeeze excises this axiom and replaces it with
-36 concrete rational coefficient vectors, each verified by
-\texttt{native\_decide}.
-
-% ============================================================
-\section{The Lean Architecture}\label{sec:lean}
-% ============================================================
-
-\subsection{Asymmetric offloading}
-
-The key architectural insight is \emph{asymmetric offloading}:
-Python performs the heavy CAS computation (eigenspace
-decomposition, Gaussian elimination over~$\Q$, cup product
-evaluation), and emits a Lean~4 source file containing only
-\emph{hardcoded} rational data and \texttt{native\_decide}
-verification theorems.  The Lean kernel's job is pure:
-check that the emitted data satisfies the claimed equalities.
-
-This sidesteps the ``\texttt{noncomputable} trap'': if the
-Lean definitions depend on axioms, \texttt{native\_decide}
-cannot evaluate them.  By emitting all data as computable
-\texttt{def}s (no \texttt{axiom}, no \texttt{noncomputable}),
-the verification is a closed computation.
-
-\subsection{The Combinatorial Skeleton}
-
-Mathlib~4 lacks a computational Chow ring API for abelian
-varieties.  The Lean bundle projects the geometry into its
-\emph{Combinatorial Skeleton}: pure $\Q$-linear algebra on
-$\Q^{70}$.
-
-\begin{lstlisting}[literate=]
--- Cup product generators (36 independent, in Q^70)
--- Each is the wedge product nsBasis_i ^ nsBasis_j
-def cupGen_0 : Fin 70 -> Rat := fun i =>
-  if i.val = 0 then 1 else 0
-
--- Hodge (2,2) basis vectors (in RREF)
-def hodgeBasis_0 : Fin 70 -> Rat := fun i =>
-  if i.val = 0 then 1 else 0
-
--- Decomposition coefficients
-def decomp_0 : Fin 36 -> Rat := fun i =>
-  if i.val = 0 then 1 else 0
-\end{lstlisting}
-
-\subsection{Separating the classical axiom from the constructive proof}
-
-The CBN and the constructive proof are physically separated:
-
-\begin{lstlisting}[literate=]
--- The Classical Boundary Node (CLASS, present but UNUSED)
-axiom hodge_conjecture_H22_existence :
-  forall (w : Fin 70 -> Rat),
-    Exists (fun (coeffs : Fin 36 -> Rat) =>
-      sumGens coeffs = w)
-
--- The constructive proof (BISH, does NOT use the axiom)
-theorem hodge_decomp_0 :
-  sumGens decomp_0 = hodgeBasis_0 := by native_decide
--- ... 35 more theorems, all by native_decide
-\end{lstlisting}
-
-The axiom \texttt{hodge\_conjecture\_H22\_existence} is
-present but \emph{unused} by the 36 constructive theorems.
-CRMLint verifies that none of the \texttt{hodge\_decomp\_k}
-theorems transitively depend on it.
-
-\subsection{Verification architecture}
-
-The proof tree for each theorem is depth-1:
-\[
-  \texttt{hodge\_decomp\_k} \;\;:\;\;
-  \texttt{sumGens decomp\_k = hodgeBasis\_k}
-  \;\;:=\;\; \texttt{by native\_decide}
-\]
-where \texttt{native\_decide} compiles the rational arithmetic
-to native code, evaluates both sides at all 70 coordinates,
-and confirms equality.  No tactic search is needed; the
-compiled $\Q$-arithmetic runs in ${\sim}15$ seconds for all
-36 theorems combined.
-
-% ============================================================
-\section{Results}\label{sec:results}
-% ============================================================
-
-\subsection{The computation}
-
-The Python script \texttt{solve\_hodge.py} performs the following
-steps using exact rational arithmetic
-(\texttt{fractions.Fraction}):
-
-\begin{enumerate}[nosep]
-\item Enumerate 70 basis elements of $\bigwedge^4 \Q^8$ and
-  28 basis elements of $\bigwedge^2 \Q^8$.
-\item Compute the $70 \times 70$ CM action matrix on
-  $\bigwedge^4 \Q^8$.  Verify $M^2 = I$.
-\item Find the $+1$ eigenspace (dim~38) and extract the
-  Hodge $(2,2)$ subspace (dim~36) by removing the $(4,0)+(0,4)$
-  component (dim~2).
-\item Compute the $+1$ eigenspace of the CM action on
-  $\bigwedge^2 \Q^8$: this is $\mathrm{NS}(E^4) \otimes \Q$
-  (dim~16).
-\item Form all 102 nonzero cup products $\mathrm{NS}_i \cup
-  \mathrm{NS}_j \to H^4$.  Select 36 linearly independent ones.
-\item Solve $C \cdot x_i = w_i$ for each Hodge basis vector $w_i$,
-  where $C \in \Q^{70 \times 36}$ is the cup product matrix.
-\item Emit \texttt{HodgeBasisData.lean} with all 36 decompositions
-  as hardcoded rational defs.
-\end{enumerate}
-
-\subsection{The decompositions}
-
-All 36 Hodge basis vectors decompose into cup products.  The
-decompositions are extremely sparse: 42 total nonzero coefficients
-across 36 vectors.  Most Hodge basis vectors (30 of 36) are
-\emph{exactly} a single cup product; the remaining 6 are
-$\Q$-linear combinations of two cup products.
-
-\subsection{Lean verification}
-
-The Lean~4 bundle (\texttt{P77\_DAGSurgery/}) compiles with
-\texttt{lake build} on Lean v4.29.0-rc2 + Mathlib4:
-\begin{itemize}[nosep]
-\item 3121 build jobs (including Mathlib).
-\item \texttt{HodgeBasisData.lean}: 798 lines, 36 theorems by
-  \texttt{native\_decide}, builds in 15 seconds.
-\item \texttt{Paper77\_CMFourfold.lean}: CRM metadata, CM action
-  defs, classical axiom (unused), theorem re-exports.
-\item \textbf{0 sorry.  0 axiom in the constructive path.
-  0 \texttt{noncomputable}.}
-\end{itemize}
+stronger: prove that \emph{every} Hodge $(2,2)$ class has
+an explicit decomposition.
 
 \begin{theorem}[Complete Constructive Hodge Theorem for $E^4$]%
 \label{thm:constructive-hodge}
 For $E/\Q$ with $\End(E) \otimes \Q \cong \Q(i)$, every
 Hodge $(2,2)$ class on $E^4$ is an explicit $\Q$-linear
-combination of cup products of NS classes.  The 36 basis
-decompositions are formally verified in Lean~4 by
+combination of cup products of NS classes.  Specifically:
+\begin{enumerate}[nosep]
+\item There exist 36 linearly independent cup products
+  $g_0, \ldots, g_{35} \in \bigwedge^4 \Q^8$, each of the
+  form $\alpha_i \cup \alpha_j$ for CM-invariant
+  $\alpha_i, \alpha_j \in \bigwedge^2 \Q^8$.
+\item There exist 36 Hodge $(2,2)$ basis vectors
+  $w_0, \ldots, w_{35}$ (in reduced row echelon form).
+\item For each $k \in \{0, \ldots, 35\}$, there exist
+  explicit rational coefficients
+  $c_k = (c_{k,0}, \ldots, c_{k,35}) \in \Q^{36}$ such that
+  \[
+    w_k = \sum_{j=0}^{35} c_{k,j} \cdot g_j.
+  \]
+\end{enumerate}
+The 36 decompositions are formally verified in Lean~4 by
 \texttt{native\_decide}.
 \end{theorem}
+
+\begin{proof}
+The proof is computational, executed by \texttt{solve\_hodge.py}
+using exact rational arithmetic (\texttt{fractions.Fraction}).
+
+\smallskip\noindent
+\textbf{Step~1: Generator selection.}
+From the 102 nonzero cup products computed in
+Theorem~\ref{thm:no-exotic} Step~5, greedily select 36 linearly
+independent generators $g_0, \ldots, g_{35}$ by iteratively adding
+cup products that increase the rank.  The generator matrix
+$G \in \Q^{70 \times 36}$ has columns $g_0, \ldots, g_{35}$.
+
+\smallskip\noindent
+\textbf{Step~2: Decomposition solving.}
+For each Hodge basis vector $w_k$, solve the linear system
+\begin{equation}\label{eq:decomp}
+  G \cdot x = w_k, \qquad x \in \Q^{36},
+\end{equation}
+by augmented-matrix row reduction over~$\Q$.  Since
+$\mathrm{rank}(G) = 36 = \dim \Hdg^{2,2}$ (Theorem~\ref{thm:no-exotic}),
+and each $w_k$ lies in the column space of~$G$, the system is
+consistent for every~$k$.  The solution is unique (the system is
+determined on the column space).
+
+\smallskip\noindent
+\textbf{Step~3: Verification.}
+For each $k$, verify that $\sum_{j} c_{k,j} \cdot g_j = w_k$ by
+direct evaluation at all 70 coordinates.  This is performed both
+by Python (immediate assertion) and by Lean~4
+(\texttt{native\_decide} on the hardcoded rational data).
+
+\smallskip\noindent
+\textbf{Sparsity.}
+The decompositions are extremely sparse: 42 total nonzero
+coefficients across 36~vectors.  Of the 36~Hodge basis vectors,
+30 are \emph{exactly} a single cup product (coefficient~$1$);
+the remaining 6 are $\Q$-linear combinations of two cup products.
+All nonzero coefficients are $\pm 1$ or $\pm \frac{1}{2}$.
+\end{proof}
+
+\subsection{Summary of the computation}
+
+The Python script \texttt{solve\_hodge.py} performs the six-step
+computation of Theorem~\ref{thm:no-exotic} and the three-step
+construction of Theorem~\ref{thm:constructive-hodge} in a single
+pass.  All intermediate values are exact rationals
+(\texttt{fractions.Fraction}, Python~3 arbitrary-precision).
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+\textbf{Quantity} & \textbf{Value} \\
+\midrule
+$\dim H^4(E^4, \Q) = \binom{8}{4}$ & 70 \\
+$\dim V_{+1}$ ($+1$~eigenspace of $M$ on $\Q^{70}$) & 38 \\
+$\dim \bigl((4,0)+(0,4)\bigr)$ component & 2 \\
+$\dim \Hdg^{2,2}(E^4) \otimes \Q$ & 36 \\
+$\dim \NS(E^4) \otimes \Q$ & 16 \\
+Nonzero cup products $\NS_i \cup \NS_j$ & 102 \\
+Linearly independent cup products & 36 \\
+Total nonzero coefficients (all 36 decompositions) & 42 \\
+Single-generator decompositions ($c_{k,j} = \delta_{jj_0}$) & 30 \\
+Two-generator decompositions & 6 \\
+\textbf{Exotic dimension} & \textbf{0} \\
+\bottomrule
+\end{tabular}
+\end{center}
 
 % ============================================================
 \section{CRM Audit}\label{sec:crm}
@@ -717,7 +746,8 @@ decompositions are formally verified in Lean~4 by
 \midrule
 CRMLint Squeeze protocol & $\BISH$ & Algorithmic: bounded search \\
 Hodge Conj.\ existence (axiom) & $\CLASS$ & Unbounded $\exists$ \\
-36 decomposition theorems & $\BISH$ & \texttt{native\_decide} \\
+Theorem~A (no exotic classes) & $\BISH$ & Dimension computation \\
+Theorem~B (36 decompositions) & $\BISH$ & \texttt{native\_decide} \\
 Python CAS computation & $\BISH$ & Exact $\Q$-arithmetic \\
 \bottomrule
 \end{tabular}
@@ -735,67 +765,434 @@ is present in the Lean environment but provably unused by the
 36 constructive theorems.  CRMLint verifies: 0~paths from
 any \texttt{hodge\_decomp\_k} to \texttt{Classical.choice}.
 
+\subsection{Comparison with Paper~50 calibration}
+
+Paper~50~\cite{Paper50} classified the Hodge Conjecture as
+$\CLASS$ for general abelian varieties (the existence of algebraic
+representatives requires the Axiom of Choice or equivalent).
+Paper~77 shows that for the specific case $A = E^4$ with
+$\End(E) \otimes \Q \cong \Q(i)$, the classical content is
+completely eliminable: the $\CLASS$ existence collapses to a
+$\BISH$ finite database.  This is the strongest possible form of
+descent: from unbounded classical existence to a finitely
+enumerable constructive witness.
+
+% ============================================================
+\section{Formal Verification}\label{sec:formal}
+% ============================================================
+
+\subsection{Lean~4 file structure}
+
+The Lean bundle \texttt{P77\_DAGSurgery/} has the following
+structure:
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{File} & \textbf{Contents} \\
+\midrule
+\texttt{lean-toolchain} & \texttt{leanprover/lean4:v4.29.0-rc2} \\
+\texttt{lakefile.lean} & Requires Mathlib4 \\
+\texttt{Papers.lean} & Entry point (imports both modules) \\
+\texttt{Papers/P77\_DAGSurgery/} & \\
+\quad\texttt{HodgeBasisData.lean} & 798 lines, auto-generated \\
+\quad\texttt{Paper77\_CMFourfold.lean} & CRM metadata, CM defs, axiom \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Build: \texttt{lake build} from the bundle root.
+3121~build jobs (including Mathlib).  Build time: $\sim$15\,s
+for the two project files after Mathlib cache.
+
+\subsection{Asymmetric offloading}\label{sec:offload}
+
+The key architectural insight is \emph{asymmetric offloading}
+(Figure~\ref{fig:offload}):
+
+\begin{enumerate}[nosep]
+\item \textbf{Python CAS} performs the heavy computation:
+  eigenspace decomposition, cup product evaluation, Gaussian
+  elimination, all in exact $\Q$-arithmetic.
+\item \textbf{Python emitter} writes a Lean~4 source file
+  containing only hardcoded rational \texttt{def}s and
+  \texttt{native\_decide} verification theorems.
+\item \textbf{Lean kernel} checks that the emitted data satisfies
+  the claimed equalities by compiling the rational arithmetic to
+  native code.
+\end{enumerate}
+
+\noindent
+No Lean tactic search is needed.  The proof tree for each
+theorem is depth-1:
+\[
+  \texttt{hodge\_decomp\_k} \;\;:\;\;
+  \texttt{sumGens decomp\_k = hodgeBasis\_k}
+  \;\;:=\;\; \texttt{by native\_decide}
+\]
+where \texttt{native\_decide} compiles both sides to native code,
+evaluates at all 70 coordinates, and confirms equality.
+
+% ---------- TikZ: Asymmetric offloading ----------
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm and 2.5cm,
+    block/.style={rectangle, draw, rounded corners,
+                minimum width=3.5cm, minimum height=0.8cm,
+                align=center, font=\small},
+    data/.style={rectangle, draw, dashed, rounded corners,
+                minimum width=3.5cm, minimum height=0.6cm,
+                align=center, font=\small\ttfamily},
+    >=Stealth
+]
+\node[block, fill=blue!10] (python) {Python CAS\\{\scriptsize (fractions.Fraction)}};
+\node[data, below=0.8cm of python] (json) {hodge\_data.json\\{\scriptsize (exact $\Q$ data)}};
+\node[block, below=0.8cm of json, fill=orange!10] (emitter) {Python emitter\\{\scriptsize (emit\_lean.py)}};
+\node[data, below=0.8cm of emitter] (lean4) {HodgeBasisData.lean\\{\scriptsize (798 lines, sparse encoding)}};
+\node[block, below=0.8cm of lean4, fill=green!10] (kernel) {Lean 4 kernel\\{\scriptsize (native\_decide)}};
+\node[block, below=0.8cm of kernel, fill=green!20] (qed) {36 verified theorems\\{\scriptsize 0 sorry, 0 axiom}};
+
+\draw[->,thick] (python) -- (json);
+\draw[->,thick] (json) -- (emitter);
+\draw[->,thick] (emitter) -- (lean4);
+\draw[->,thick] (lean4) -- (kernel);
+\draw[->,thick] (kernel) -- (qed);
+
+% Annotations
+\node[right=0.3cm of python, font=\scriptsize, text=gray] {eigenspaces, Gauss elim.};
+\node[right=0.3cm of emitter, font=\scriptsize, text=gray] {sparse match encoding};
+\node[right=0.3cm of kernel, font=\scriptsize, text=gray] {compiled $\Q$-arithmetic};
+\end{tikzpicture}
+\caption{Asymmetric offloading architecture.  Python performs
+exact computation; Lean verifies.  The key constraint: all
+emitted defs must be \texttt{computable} (no \texttt{axiom},
+no \texttt{noncomputable}) so \texttt{native\_decide} can
+evaluate them.}
+\label{fig:offload}
+\end{figure}
+
+\subsection{The \texttt{noncomputable} trap}
+
+If a Lean definition depends (even transitively) on an axiom
+such as \texttt{Classical.choice}, Lean marks it
+\texttt{noncomputable}.  The tactic \texttt{native\_decide}
+cannot evaluate noncomputable definitions---it requires closed
+computation.
+
+This creates a strict design constraint for asymmetric offloading:
+\emph{all data definitions in the emitted file must be free of
+axiom dependencies.}  The \texttt{hodge\_conjecture\_H22\_existence}
+axiom is declared in a separate file (\texttt{Paper77\_CMFourfold.lean})
+and is \emph{never imported} by the data definitions in
+\texttt{HodgeBasisData.lean}.  The separation is architectural,
+not accidental.
+
+\subsection{Token overflow and sparse encoding}\label{sec:overflow}
+
+The first emission of \texttt{HodgeBasisData.lean}
+(by \texttt{solve\_hodge.py}) used Lean's vector notation
+$\texttt{![}v_0, v_1, \ldots, v_{69}\texttt{]}$ for each
+70-entry rational vector.  This produced a 6020-line file.
+Lean's elaborator expands $\texttt{![}\ldots\texttt{]}$ into
+nested \texttt{Matrix.cons} applications, resulting in
+$O(n^2)$ elaboration cost for $n$-entry vectors.  For $n = 70$
+and 108~vector definitions (36~cup generators + 36~Hodge basis
++ 36~decomposition vectors), the elaboration time exceeded
+several minutes and risked kernel memory exhaustion.
+
+The fix was \emph{sparse match encoding}
+(\texttt{emit\_lean.py}).  Each vector is emitted as a function
+\texttt{fun i => ...} with explicit \texttt{if}/\texttt{match}
+on \texttt{i.val}:
+
+\begin{lstlisting}[literate=]
+-- Dense (6020 lines, slow elaboration):
+def cupGen_0 : Fin 70 -> Rat := ![1, 0, 0, ..., 0]
+
+-- Sparse (798 lines, fast elaboration):
+def cupGen_0 : Fin 70 -> Rat := fun i =>
+  if i.val = 0 then 1 else 0
+\end{lstlisting}
+
+\noindent
+The sparse encoding exploits the extreme sparsity of the data:
+most vectors have fewer than 5 nonzero entries out of~70.
+The emitter selects \texttt{if/else} for $\leq 3$~nonzero
+entries and \texttt{match i.val with} for 4+.  Result:
+6020~lines $\to$ 798~lines, elaboration time
+several minutes $\to$ 15~seconds.
+
+\begin{remark}[Token overflow as a general problem]\label{rem:overflow}
+This is not specific to our computation.  Any asymmetric
+offloading pipeline that emits large data into Lean~4 will
+encounter the same elaboration bottleneck if dense array notation
+is used.  The sparse match encoding is a general-purpose solution:
+it applies whenever the emitted data is sparse relative to its
+ambient dimension.  For dense data, alternative strategies include
+chunking (split vectors into blocks), binary encoding (emit data
+as bit strings decoded by a custom function), or hex-encoded
+lookup tables.
+\end{remark}
+
+\subsection{Axiom inventory}
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{Axiom} & \textbf{CRM} & \textbf{Used?} & \textbf{Role} \\
+\midrule
+\texttt{hodge\_conjecture\_H22\_existence} &
+  $\CLASS$ & Unused & CBN (excised) \\
+\texttt{propfunext} & Infra & Used & Lean infrastructure \\
+\texttt{Quot.sound} & Infra & Used & Lean infrastructure \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The infrastructure axioms \texttt{propfunext} and
+\texttt{Quot.sound} are Lean~4 kernel primitives required by all
+definitions over~$\Q$; they carry no classical content
+(see Papers~2, 68~\cite{Paper68}).
+\texttt{Classical.choice} does \emph{not} appear in
+\texttt{\#print axioms hodge\_decomp\_0} through
+\texttt{\#print axioms hodge\_decomp\_35}.
+
+\subsection{Classical.choice audit}
+
+\begin{lstlisting}[literate=]
+-- Expected output (each of 36 theorems):
+#print axioms hodge_decomp_0
+-- [propfunext, Quot.sound]
+-- (NO Classical.choice)
+
+#print axioms hodge_conjecture_H22_existence
+-- [hodge_conjecture_H22_existence]
+-- (This IS the classical axiom; it is deliberately unused.)
+\end{lstlisting}
+
+\noindent
+The 36 constructive theorems depend only on the Lean kernel
+infrastructure axioms.  The classical axiom is physically present
+but transitively unreachable from any \texttt{hodge\_decomp\_k}.
+
+\subsection{Reproducibility}
+
+\begin{itemize}[nosep]
+\item \textbf{Lean bundle:} \texttt{P77\_DAGSurgery/},
+  builds with \texttt{lake build} on Lean v4.29.0-rc2 + Mathlib4.
+\item \textbf{Python computation:} \texttt{solve\_hodge.py}
+  (computation + first emission) and \texttt{emit\_lean.py}
+  (sparse re-emission).  Requires Python~3.9+ (standard library
+  only: \texttt{fractions}, \texttt{itertools}, \texttt{json}).
+\item \textbf{Intermediate data:} \texttt{hodge\_data.json}
+  (all eigenspaces, decompositions, and labels in JSON format).
+\item \textbf{Zenodo:} Complete package (PDF, LaTeX, Lean source,
+  Python scripts) at
+  \url{https://doi.org/10.5281/zenodo.18779210}.
+\end{itemize}
+
+% ---------- TikZ: Papers 75-76-77 pipeline ----------
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    node distance=0.8cm and 0.6cm,
+    pbox/.style={rectangle, draw, rounded corners=4pt,
+                minimum width=5.5cm, minimum height=1.6cm,
+                align=left, font=\small, inner sep=6pt},
+    arr/.style={->, thick, >=Stealth},
+    lab/.style={font=\footnotesize\itshape, text=gray}
+]
+\node[pbox, fill=red!8] (p75) {
+  \textbf{Paper 75:} Conservation test\\
+  Genestier--Lafforgue LLC\\
+  \textsf{Output:} gap detected ($\CLASS \to \BISH$)
+};
+\node[pbox, fill=orange!8, below=1.2cm of p75] (p76) {
+  \textbf{Paper 76:} CRMLint\\
+  Automated logical cost analyzer\\
+  \textsf{Output:} CBN identification
+};
+\node[pbox, fill=green!8, below=1.2cm of p76] (p77) {
+  \textbf{Paper 77:} CRMLint Squeeze\\
+  Automated constructivisation\\
+  \textsf{Output:} $\BISH$ proof (36 decomps)
+};
+
+\draw[arr] (p75) -- node[right, lab] {gaps are detectable} (p76);
+\draw[arr] (p76) -- node[right, lab] {detection is automatable} (p77);
+
+% Phase labels
+\node[left=0.3cm of p75, font=\footnotesize\bfseries, text=red!60] {Diagnostic};
+\node[left=0.3cm of p76, font=\footnotesize\bfseries, text=orange!70] {Tool};
+\node[left=0.3cm of p77, font=\footnotesize\bfseries, text=green!50!black] {Generative};
+\end{tikzpicture}
+\caption{The diagnostic-to-generative pipeline.  Paper~75 proved
+conservation gaps exist in modern geometry.  Paper~76 automated
+their detection.  Paper~77 automates their elimination.}
+\label{fig:pipeline}
+\end{figure}
+
 % ============================================================
 \section{Discussion}\label{sec:discuss}
 % ============================================================
 
-\subsection{Asymmetric offloading}
-
-The CRMLint Squeeze exploits a three-way division of labor:
-\begin{itemize}[nosep]
-\item \emph{Human geometric intuition} identifies the target,
-  defines the Hodge space, and restricts the generator set.
-\item \emph{CRMLint} acts as the electric fence, banning
-  classical axioms and forcing the solver into the bounded
-  algebraic domain.
-\item \emph{Python CAS} performs the exact $\Q$-linear algebra:
-  eigenspace decomposition, cup product evaluation, Gaussian
-  elimination, and Lean code emission.
-\item \emph{Lean kernel} verifies the emitted data by compiled
-  rational arithmetic (\texttt{native\_decide}).
-\end{itemize}
-
 \subsection{The deterministic collapse phenomenon}
 
-Existing AI provers treat all closed goals equally.  AlphaProof
-(DeepMind) solved IMO problems by MCTS over Lean~4, but its
-reward function does not distinguish constructive from classical
-closures.  The CRMLint Squeeze is designed to shape the RL
-reward landscape using logical cost.  But the $E^4$ case reveals
-a deeper phenomenon: when the Squeeze restricts the action space
-sufficiently, the problem \emph{deterministically collapses}.
+The CRMLint Squeeze protocol is designed for two modes:
+deterministic collapse (CAS) and stochastic search (MCTS).  The
+$E^4$ execution produced the first mode---the action space
+restriction (``only cup products of NS classes'') reduced the
+problem from an infinite-dimensional topological existence to a
+$36 \times 36$ linear system over~$\Q$.  No stochastic search was
+needed.
 
-For $E^4$, the action space restriction (``only cup products of
-NS classes'') reduced the problem from an infinite-dimensional
-topological existence to a $36 \times 36$ linear system over~$\Q$.
-No stochastic search was needed; the Python CAS solved the system
-exactly.  This is not a failure to use AI---it is the \emph{ideal
-outcome} of the protocol.  The Squeeze's purpose is to identify
-the minimal algebraic structure that witnesses the classical
-theorem.  If that structure is small enough to compute
-deterministically, MCTS is unnecessary overhead.
+This is not a failure of the protocol but its \emph{ideal outcome}.
+The Squeeze's purpose is to identify the minimal algebraic
+structure witnessing the classical theorem.  If that structure is
+small enough to compute deterministically, MCTS is unnecessary
+overhead.  The protocol identifies which mode applies
+\emph{before} any search begins: Steps~1--3 compute the dimension
+and linearity of the restricted space.
 
 The MCTS mode becomes relevant when the restricted space is
-combinatorially rich: nonlinear constraints, multiple branches,
-or high-dimensional parameter spaces that defy exact
-enumeration.  The Squeeze protocol identifies which mode applies
-\emph{before} any search begins.
+combinatorially rich: nonlinear constraints, multiple solution
+branches, or high-dimensional parameter spaces.  The wild
+Langlands case (Paper~78) and Standard Conjecture~D for simple
+fourfolds (Paper~79) are expected to require this second mode.
 
-\subsection{Future targets}
+\subsection{Proof decompilation}
 
-Two further narrow-cliff targets are identified for future work:
-\begin{itemize}[nosep]
-\item \textbf{Paper~78:} Explicit Local Langlands for wildly
-  ramified representations.  Harris--Taylor's $\CLASS$ proof
-  guarantees the Galois parameter exists; Bushnell--Kutzko's
-  $\BISH$ types provide the algebraic framework; the AI solves
-  the character polynomial matching.
-\item \textbf{Paper~79:} Standard Conjecture~D for simple CM
-  abelian fourfolds.  Known for $\dim \leq 3$ (Lieberman);
-  the $\CLASS$ proof requires Anderson's exotic classes.  The
-  Squeeze targets the $\BISH$ matrix equivalence on the
-  orthogonal complement of the exotic subspace.
-\end{itemize}
+The Squeeze protocol can be viewed as \emph{proof decompilation}:
+extracting the constructive content from a classical proof.  A
+classical existence proof is ``compiled''---it asserts $\exists x,
+P(x)$ without revealing~$x$.  The Squeeze ``decompiles'' this by:
+\begin{enumerate}[nosep]
+\item identifying which classical axiom provides the
+  $\exists$-introduction (the CBN),
+\item excising that axiom to reveal the open goal
+  $\Sigma\,x,\; P(x)$,
+\item computing the witness $x$ explicitly.
+\end{enumerate}
+In the $E^4$ case, the ``compiled'' proof says ``every Hodge
+class is algebraic'' (Lefschetz $(1,1)$, classical).  The
+``decompiled'' proof says ``here are the 36 explicit coefficient
+vectors, verified by \texttt{native\_decide}.''  The decompiled
+version is strictly more informative.
+
+\subsection{Novelty and relation to existing work}
+
+The Complete Constructive Hodge Theorem for $E^4$
+(Theorem~\ref{thm:constructive-hodge}) is, to our knowledge, the
+first time the Hodge Conjecture for a specific non-trivial abelian
+variety has been machine-verified as a finite $\BISH$ database with
+explicit rational witnesses.
+
+The individual ingredients---CM action computation, cup product
+enumeration, Gaussian elimination over~$\Q$---are standard
+computational algebraic geometry.  The novelty lies in three aspects:
+
+\begin{enumerate}[nosep]
+\item \textbf{The CRM framing.}  The computation is driven by the
+  logical cost metric, not by intrinsic geometric interest.
+  CRMLint identifies \emph{which} computation to perform (the CBN
+  tells us where the classical content enters); the CAS performs it.
+\item \textbf{The asymmetric offloading architecture.}  Python
+  computes; Lean verifies.  The separation avoids the
+  \texttt{noncomputable} trap and produces a formally verified
+  result without requiring Lean to perform any CAS computation.
+\item \textbf{The self-correcting methodology.}  The hallucination
+  (Remark~\ref{rem:hallucination}) was caught by the protocol's
+  insistence on computation before axiomatics.  This is a design
+  feature, not an accident.
+\end{enumerate}
+
+\noindent
+The mathematical content is elementary (the proof is linear algebra
+over~$\Q$).  The methodological content---using logical cost as a
+search-space restrictor, asymmetric offloading, and automated
+constructivisation---is the primary contribution.
+
+\subsection{Limitations}\label{sec:limits}
+
+The method has clear boundaries:
+
+\begin{enumerate}[nosep]
+\item \textbf{The Goldilocks zone.}  The Squeeze requires a
+  pre-existing classical proof (or at least a formal cliff).
+  Totally open problems yield infinite search width.
+\item \textbf{Deterministic collapse is rare.}  The $E^4$ case
+  collapsed because the Hodge space and the cup product span have
+  the same dimension (both~36).  For simple CM fourfolds where
+  exotic classes exist, the system $Gx = w$ will be inconsistent
+  for the exotic component, and the Squeeze must search over a
+  larger generator set (CM graphs, twisted diagonals).
+\item \textbf{Nonlinear targets.}  If the algebraic identity
+  is polynomial but not linear (e.g., intersection products
+  satisfying a quadratic form), the CAS phase requires
+  Gr\"obner basis computation or multivariate polynomial solving,
+  which may not scale to high dimensions.
+\item \textbf{Lean CAS gap.}  Mathlib~4 lacks a computational
+  Chow ring, cup product API, or Hodge decomposition library.
+  The Lean bundle projects the geometry into a combinatorial
+  skeleton ($\Q^{70}$ linear algebra), which works for this case
+  but would need enrichment for more sophisticated targets.
+\item \textbf{Token overflow scales with dimension.}  For
+  varieties with $\dim H^4 \gg 70$, the sparse encoding may
+  still produce large files.  The binary/hex encoding strategies
+  mentioned in Remark~\ref{rem:overflow} would be needed.
+\end{enumerate}
+
+\subsection{Technical tips for future use}\label{sec:tips}
+
+We record several practical lessons from the $E^4$ execution that
+apply to future applications of the Squeeze protocol:
+
+\begin{enumerate}[nosep]
+\item \textbf{Verify the target before searching.}  The
+  hallucination cost us one computation cycle.  Always run the
+  CAS dimension check (Steps~1--5 of Theorem~\ref{thm:no-exotic})
+  before committing to a decomposition search.
+\item \textbf{Use exact arithmetic.}  Python's
+  \texttt{fractions.Fraction} provides arbitrary-precision $\Q$
+  arithmetic with zero numerical error.  Floating-point
+  computation would have introduced rounding that
+  \texttt{native\_decide} cannot tolerate.
+\item \textbf{Emit sparse, not dense.}  Always emit Lean vectors
+  as \texttt{fun i => match i.val with ...} rather than
+  $\texttt{![}\ldots\texttt{]}$.  The elaboration cost difference
+  is $O(n)$ vs.\ $O(n^2)$ for $n$-entry vectors.
+\item \textbf{Separate axioms from data.}  Place the CBN axiom in
+  a separate Lean file from the constructive data.  This prevents
+  accidental \texttt{noncomputable} contamination.
+\item \textbf{Save intermediate data.}  Emit JSON
+  (\texttt{hodge\_data.json}) between the CAS phase and the
+  Lean emission phase.  This allows re-emission with different
+  encoding strategies without re-running the computation.
+\item \textbf{Test the decomposition coefficient vectors before
+  emission.}  Verify $Gx = w$ in Python before writing Lean code.
+  A single wrong coefficient will cause \texttt{native\_decide}
+  to fail with an unhelpful error.
+\end{enumerate}
+
+\subsection{Open questions}
+
+\begin{enumerate}[nosep]
+\item Can the Squeeze produce constructive Hodge theorems for
+  \emph{simple} CM abelian fourfolds, where exotic classes exist?
+  This requires a larger generator set and possibly MCTS search.
+\item Can asymmetric offloading handle nonlinear algebraic
+  identities (e.g., Standard Conjecture~D) with polynomial
+  or Gr\"obner basis methods?
+\item What is the computational complexity of the Squeeze as a
+  function of the variety's dimension?  For $\dim A = n$,
+  the Hodge space grows as $O(\binom{2n}{n})$; is sparse encoding
+  sufficient, or are fundamentally different strategies needed?
+\item Can the MCTS mode of the Squeeze be trained on the existing
+  75-paper CRM dataset to predict which generator sets are likely
+  to succeed?
+\end{enumerate}
 
 % ============================================================
 \section{Conclusion}\label{sec:conclusion}
@@ -817,28 +1214,41 @@ Theorem for $E^4$ was proved: 36 explicit decompositions, each
 verified by \texttt{native\_decide}, replacing the classical
 Lefschetz existence axiom with a finite $\BISH$ database.
 
-The scientific value is threefold: (1)~the Squeeze protocol
-is demonstrated end-to-end on a non-trivial target; (2)~the
-``hallucination correction'' validates the methodology's
+The scientific value is fourfold: (1)~the Squeeze protocol is
+demonstrated end-to-end on a non-trivial target; (2)~the
+hallucination correction validates the methodology's
 self-diagnostic capacity; (3)~the Lean bundle provides the
 first formally verified constructive Hodge theorem for a
-CM abelian fourfold.
+CM abelian fourfold; (4)~the asymmetric offloading architecture
+and sparse encoding technique are documented as reusable tools
+for future machine-verified constructive mathematics.
+
+The progression Papers~75--76--77 completes the arc from
+diagnostic to generative CRM.  The era of automated
+de-omniscientisation has begun.
 
 % ============================================================
 \section*{Acknowledgments}
 \addcontentsline{toc}{section}{Acknowledgments}
 % ============================================================
 
-Lean~4 formalization produced using AI code generation (Claude Code)
-under human direction.  The CRMLint Squeeze protocol was developed
-collaboratively between the author and AI.  The mathematical
-foundations of the target problem are due to Anderson~\cite{Anderson1993},
-Weil~\cite{Weil1977}, and the broader arithmetic geometry community.
+Lean~4 formalization and Python computation produced using AI code
+generation (Claude Code) under human direction.  The CRMLint
+Squeeze protocol was developed collaboratively between the author
+and AI.  The mathematical foundations of the target problem are
+due to Anderson~\cite{Anderson1993}, Weil~\cite{Weil1977}, and the
+broader arithmetic geometry community.
 
 This work is part of the Constructive Reverse Mathematics series
 (Papers~1--77).  The Lean~4 code uses the Mathlib library;
 see~\cite{Mathlib4}.  The series format follows the CRM format
 guide~\cite{FormatGuide}.
+
+The author is an interventional cardiologist, not a professional
+mathematician.  All mathematical claims are substantiated by
+formal verification (Lean~4) or explicit computation (Python,
+exact $\Q$-arithmetic).  Errors in mathematical judgment are the
+author's; errors in computation are verifiable.
 
 % ============================================================
 \begin{thebibliography}{30}
@@ -870,6 +1280,12 @@ P.~C.~Lee.
   Reverse Mathematics Audit}.
 \newblock Paper~68, Constructive Reverse Mathematics Series.
 \newblock \url{https://doi.org/10.5281/zenodo.18777925}
+
+\bibitem{Paper75}
+P.~C.~Lee.
+\newblock \emph{Conservation Test: Genestier--Lafforgue LLC Calibration}.
+\newblock Paper~75, Constructive Reverse Mathematics Series.
+\newblock \url{https://doi.org/10.5281/zenodo.18773831}
 
 \bibitem{Paper76}
 P.~C.~Lee.
@@ -948,6 +1364,28 @@ D.~Bridges and F.~Richman.
 \newblock \emph{Varieties of Constructive Mathematics}.
 \newblock London Math.\ Soc.\ Lecture Note Ser.~97, Cambridge Univ.\ Press,
   1987.
+
+\bibitem{AlphaProof2024}
+DeepMind.
+\newblock \emph{AlphaProof: AI for formal mathematical reasoning}.
+\newblock Google DeepMind Technical Report, 2024.
+
+\bibitem{DeepSeekProver2024}
+Z.~Xin et al.
+\newblock \emph{DeepSeek-Prover-V1.5: Harnessing proof assistant feedback
+  for reinforcement learning and Monte Carlo tree search}.
+\newblock arXiv:2408.08152, 2024.
+
+\bibitem{Lefschetz1924}
+S.~Lefschetz.
+\newblock \emph{L'analysis situs et la g\'eom\'etrie alg\'ebrique}.
+\newblock Gauthier-Villars, Paris, 1924.
+
+\bibitem{GenestierLafforgue2018}
+A.~Genestier and V.~Lafforgue.
+\newblock \emph{Chtoucas restreints pour les groupes r\'eductifs
+  et param\'etrisation de Langlands locale}.
+\newblock arXiv:1709.00978, 2018.
 
 \end{thebibliography}
 
