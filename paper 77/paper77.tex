@@ -989,7 +989,9 @@ def sparse_def(name, vec, dim):
     """Emit def name : Fin dim -> Q using sparse match."""
     nz = [(i, vec[i]) for i in range(dim) if vec[i] != F(0)]
     lines = [f"def {name} : Fin {dim} -> Q := fun i =>"]
-    if len(nz) <= 3:
+    if not nz:                    # all-zeros vector
+        lines = [f"def {name} : Fin {dim} -> Q := fun _ => 0"]
+    elif len(nz) <= 3:
         for k, (idx, val) in enumerate(nz):
             prefix = "  if" if k == 0 else "  else if"
             lines.append(f"{prefix} i.val = {idx} then {val}")
@@ -1004,7 +1006,7 @@ def sparse_def(name, vec, dim):
 
 \medskip\noindent
 \textbf{Sample output.}  Running \texttt{python3 solve\_hodge.py}
-produces (selected lines):
+produces (selected lines; Unicode symbols simplified for typesetting):
 
 \begin{lstlisting}[style=consolestyle,literate=]
 $ python3 solve_hodge.py
