@@ -1,0 +1,484 @@
+\documentclass[11pt]{article}
+
+% ------------------------------------------------------------
+% Standard LaTeX packages
+% ------------------------------------------------------------
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{amsthm}
+\usepackage[american]{babel}
+\usepackage{stmaryrd}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{listings}
+\usepackage[x11names,table]{xcolor}
+\usepackage{mdframed}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning}
+\usepackage{url}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+% ---------- Theorem environments ----------
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{axiombox}[theorem]{Axiom}
+\newtheorem{protocol}[theorem]{Protocol}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% ---------- Lean repo link ----------
+\newcommand{\leanRepo}{\url{(DOI pending)}}
+
+% ---------- Notation ----------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Fp}{\mathbb{F}_p}
+\newcommand{\Qbar}{\overline{\Q}}
+\newcommand{\Qp}{\Q_p}
+\newcommand{\Qell}{\Q_\ell}
+\newcommand{\calO}{\mathcal{O}}
+\newcommand{\fm}{\mathfrak{m}}
+\newcommand{\fp}{\mathfrak{p}}
+\newcommand{\Gal}{\mathrm{Gal}}
+\newcommand{\GL}{\mathrm{GL}}
+\newcommand{\Hom}{\mathrm{Hom}}
+\newcommand{\Ext}{\mathrm{Ext}}
+\newcommand{\End}{\mathrm{End}}
+\newcommand{\Frob}{\mathrm{Frob}}
+\newcommand{\CRM}{\mathrm{CRM}}
+\newcommand{\tr}{\mathrm{tr}}
+\newcommand{\rk}{\mathrm{rk}}
+\newcommand{\Ind}{\mathrm{Ind}}
+\newcommand{\cInd}{\mathrm{c\text{-}Ind}}
+
+\newcommand{\BISH}{\mathsf{BISH}}
+\newcommand{\LPO}{\mathsf{LPO}}
+\newcommand{\WLPO}{\mathsf{WLPO}}
+\newcommand{\LLPO}{\mathsf{LLPO}}
+\newcommand{\MP}{\mathsf{MP}}
+\newcommand{\FT}{\mathsf{FT}}
+\newcommand{\CLASS}{\mathsf{CLASS}}
+\newcommand{\CBN}{\mathrm{CBN}}
+
+% ---------- Code listing style for Lean ----------
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinelanguage{Lean}{
+  keywords={theorem, lemma, def, definition, axiom, structure, class, instance,
+            by, exact, intro, intros, apply, refine, constructor, use, obtain,
+            have, show, from, fun, assume, let, in, if, then, else,
+            match, with, end, namespace, section, variable, variables,
+            example, begin, sorry, admit, noncomputable, classical,
+            import, open, export, private, protected, mutual, meta,
+            do, for, while, return, try, catch, finally,
+            Type, Prop, Sort, Type*, forall, exists, where, extends,
+            set, push_neg, rw, simp, omega, nlinarith, linarith,
+            ext, rfl, congr, fin_cases, haveI, letI, attribute, inductive,
+            deriving, opaque, decide},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+  literate=
+    {→}{{$\rightarrow$}}1 {←}{{$\leftarrow$}}1
+    {∀}{{$\forall$}}1 {∃}{{$\exists$}}1 {∈}{{$\in$}}1
+    {≤}{{$\leq$}}1 {≥}{{$\geq$}}1 {≠}{{$\neq$}}1
+    {∧}{{$\land$}}1 {∨}{{$\lor$}}1 {¬}{{$\neg$}}1
+    {ℕ}{{$\mathbb{N}$}}1 {ℝ}{{$\mathbb{R}$}}1 {ℚ}{{$\mathbb{Q}$}}1
+    {ℂ}{{$\mathbb{C}$}}1 {ℤ}{{$\mathbb{Z}$}}1
+    {⟨}{{$\langle$}}1 {⟩}{{$\rangle$}}1
+    {×}{{$\times$}}1
+}
+
+\lstdefinestyle{leanstyle}{
+    language=Lean,
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    numberstyle=\tiny\color{codegray}
+}
+
+\lstset{style=leanstyle}
+
+% ---------- Title and author ----------
+\title{Explicit Local Langlands for Wildly Ramified Groups:\\
+  A CRMLint Squeeze\\[6pt]
+  {\large (Paper~78, Constructive Reverse Mathematics Series)}}
+
+\author{Paul Chun-Kit Lee\thanks{Lean 4 formalization available at \leanRepo.} \\
+New York University \\
+\texttt{dr.paul.c.lee@gmail.com}}
+
+\date{February 2026}
+
+% ============================================================
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We apply the CRMLint Squeeze protocol (Paper~77) to the Local
+Langlands Correspondence (LLC) for wildly ramified supercuspidal
+representations of~$\GL(n, F)$ over $p$-adic fields~$F$.
+
+The Classical Boundary Node is the Harris--Taylor existence
+theorem~\cite{HarrisTaylor2001}: for every irreducible smooth
+representation~$\pi$, a Weil--Deligne parameter
+$\sigma(\pi) : W_F \to \GL(n, \C)$ exists.  This is~$\CLASS$:
+the proof uses Shimura varieties, \'etale cohomology, and
+Lefschetz fixed-point theorems.
+
+The constructive target: for supercuspidal representations
+built from Bushnell--Kutzko simple types~$(\lambda, J)$
+\cite{BushnellKutzko1993}, the Galois parameter is determined
+by finitely many Harish-Chandra character values.  These values
+are computable from the type data by Bushnell--Henniart's
+explicit matching~\cite{BushnellHenniart2006}.  The Squeeze
+reduces the LLC to a polynomial identity over a finite extension
+of~$\Qp$---deterministically solvable by exact $p$-adic algebra
+via asymmetric offloading (Python CAS computes; Lean verifies).
+
+% TODO: fill in after computation
+\end{abstract}
+
+\tableofcontents
+
+% ============================================================
+\section{Introduction}\label{sec:intro}
+% ============================================================
+
+\subsection{The Local Langlands Correspondence}
+
+The LLC for $\GL(n, F)$ establishes a bijection between
+isomorphism classes of irreducible smooth representations of
+$\GL(n, F)$ and $n$-dimensional Frobenius-semisimple
+Weil--Deligne parameters of~$W_F$.  For $n = 1$ (class field
+theory) and tamely ramified representations ($p \nmid n$),
+constructive proofs exist.  The wildly ramified case ($p \mid n$)
+requires the full Harris--Taylor machinery.
+
+\subsection{The CRMLint Squeeze applied to LLC}
+
+Paper~75~\cite{Paper75} proved that the continuous topological
+machinery (Shimura varieties, $v$-sites, injective envelopes) in
+the Fargues--Scholze proof is strictly~$\CLASS$.  This guarantees
+that the discrete algebraic framework of Bushnell--Kutzko types
+provides a~$\BISH$ path to the same classification---if the
+character matching can be made explicit.
+
+The Squeeze strategy:
+\begin{enumerate}[nosep]
+\item \textbf{Scaffold:} Formalise the type-theoretic side of LLC
+  in Lean~4 (simple strata, simple types, compact induction).
+\item \textbf{X-Ray:} CRMLint identifies the CBN as
+  Harris--Taylor's global-to-local transfer.
+\item \textbf{Excise:} Remove the CBN.  The remaining goal is:
+  given~$(\lambda, J)$, construct~$\sigma$ such that
+  $\tr(\sigma(\Frob^k)) = \Theta_\pi(\gamma_k)$ for all test
+  elements~$\gamma_k$.
+\item \textbf{Squeeze:} Compute both sides explicitly from the
+  type data.  Verify the polynomial identity by
+  \texttt{native\_decide}.
+\end{enumerate}
+
+\subsection{Main results}
+
+% TODO: fill in after computation
+
+This paper is a scaffold.  The explicit computation will follow
+the asymmetric offloading protocol established in Paper~77.
+
+\subsection{Position in the atlas}
+
+Paper~78 applies the CRMLint Squeeze to the Langlands program,
+the deepest interface between number theory and representation
+theory.  If successful, it provides the first formally verified
+constructive LLC for a wildly ramified supercuspidal
+representation.
+
+% ============================================================
+\section{Preliminaries}\label{sec:prelim}
+% ============================================================
+
+\subsection{The CRM hierarchy}
+
+\[
+  \BISH \;\subset\; \BISH{+}\MP \;\subset\; \BISH{+}\LLPO
+  \;\subset\; \BISH{+}\WLPO \;\subset\; \BISH{+}\LPO
+  \;\subset\; \CLASS.
+\]
+
+\subsection{$p$-adic fields}
+
+Let $F/\Qp$ be a finite extension with ring of integers
+$\calO_F$, maximal ideal~$\fp$, residue field
+$k_F = \calO_F/\fp \cong \F_q$ where $q = p^f$, and uniformizer
+$\varpi$.
+
+\subsection{Bushnell--Kutzko types}
+
+\begin{definition}[Simple stratum]
+A \emph{simple stratum} $[\mathfrak{A}, n, r, \beta]$ consists of:
+\begin{itemize}[nosep]
+\item a hereditary order $\mathfrak{A}$ in $M_n(F)$,
+\item integers $n > r \geq 0$ (the level and jump),
+\item an element $\beta \in M_n(F)$ with $v_{\mathfrak{A}}(\beta) = -n$,
+  generating a field extension $E = F[\beta]/F$ of degree~$n$.
+\end{itemize}
+\end{definition}
+
+\begin{definition}[Simple type]
+A \emph{simple type} $(\lambda, J)$ is an irreducible
+representation~$\lambda$ of a compact open subgroup $J \subset
+\GL(n, F)$, constructed from a simple stratum by a sequence of
+Heisenberg extensions and $\beta$-extensions.
+\end{definition}
+
+The key theorem of Bushnell--Kutzko~\cite{BushnellKutzko1993}:
+every supercuspidal representation $\pi$ of~$\GL(n, F)$ arises
+as $\pi = \cInd_J^G(\lambda)$ for some simple type~$(\lambda, J)$.
+This construction is entirely~$\BISH$: it involves only finite
+group theory and linear algebra over finite extensions of~$F$.
+
+\subsection{The Harris--Taylor CBN}
+
+\begin{axiombox}[Harris--Taylor 2001]\label{ax:ht}
+For every irreducible smooth representation~$\pi$ of $\GL(n, F)$,
+there exists a Frobenius-semisimple Weil--Deligne parameter
+$\sigma(\pi) : W_F \to \GL(n, \C)$ such that:
+\[
+  L(s, \pi) = L(s, \sigma(\pi)), \qquad
+  \varepsilon(s, \pi, \psi) = \varepsilon(s, \sigma(\pi), \psi).
+\]
+\end{axiombox}
+
+CRM classification: $\CLASS$.  The proof uses the
+cohomology of Shimura varieties (global input),
+Lefschetz fixed-point (topological), and trace formula
+arguments (analytic continuation over~$\C$).
+
+% ============================================================
+\section{The Squeeze Architecture}\label{sec:arch}
+% ============================================================
+
+\subsection{The character polynomial}
+
+For a supercuspidal $\pi = \cInd_J^G(\lambda)$, the
+Harish-Chandra character~$\Theta_\pi$ is a locally constant
+function on the regular elliptic set of~$\GL(n, F)$.
+Bushnell--Henniart~\cite{BushnellHenniart2006} gave an explicit
+formula for $\Theta_\pi(\gamma)$ in terms of the type
+data~$(\lambda, J)$.
+
+\subsection{The Galois trace}
+
+On the Galois side, the parameter $\sigma$ is determined by
+its characteristic polynomial:
+\[
+  \det(1 - \sigma(\Frob) \cdot X)
+  = \prod_{i=1}^n (1 - \alpha_i X),
+\]
+where the $\alpha_i \in \Qbar_\ell$ are the Satake parameters.
+For supercuspidals, these are determined by the simple stratum.
+
+\subsection{The matching}
+
+The Squeeze reduces to verifying the identity:
+\[
+  \sum_{k=1}^n \alpha_i^k = \Theta_\pi(\gamma_k)
+  \qquad \text{for } k = 1, \ldots, n,
+\]
+where $\gamma_k$ ranges over a standard set of test elements.
+Both sides are explicitly computable from the type data.
+
+% TODO: explicit computation for a specific (n, p, f) triple
+
+% ============================================================
+\section{CRM Audit}\label{sec:crm}
+% ============================================================
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Component} & \textbf{CRM Level} & \textbf{Justification} \\
+\midrule
+Simple strata, types & $\BISH$ & Finite algebra over $F$ \\
+Harris--Taylor existence & $\CLASS$ & Shimura varieties \\
+Harish-Chandra character & $\BISH$ & Explicit formula \\
+Character polynomial match & $\BISH$ & Exact $p$-adic algebra \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{What descends, from where, to where}
+
+\[
+  \CLASS \;(\text{Harris--Taylor for } \GL(n, F))
+  \quad\longrightarrow\quad
+  \BISH \;(\text{explicit character polynomial identity}).
+\]
+
+% ============================================================
+\section{Discussion}\label{sec:discuss}
+% ============================================================
+
+Paper~78 extends the CRMLint Squeeze from algebraic geometry
+(Paper~77: Hodge theory on $E^4$) to the Langlands program.
+The key structural parallel: in both cases, a $\CLASS$ existence
+theorem (Lefschetz $(1,1)$ / Harris--Taylor) is replaced by
+an explicit $\BISH$ computation (cup product decomposition /
+character polynomial matching).
+
+The wildly ramified case ($p \mid n$) is the frontier: for
+tame representations, the LLC is constructive by Henniart's
+explicit formulas.  The wild case requires navigating
+Bushnell--Kutzko's $\beta$-extensions, which are algebraically
+intricate but strictly~$\BISH$.
+
+% ============================================================
+\section{Conclusion}\label{sec:conclusion}
+% ============================================================
+
+% TODO: fill in after computation
+
+This paper is a scaffold for the CRMLint Squeeze applied to
+the Local Langlands Correspondence.  The architecture is in
+place; the explicit computation awaits.
+
+% ============================================================
+\section*{Acknowledgments}
+\addcontentsline{toc}{section}{Acknowledgments}
+% ============================================================
+
+Lean~4 formalization produced using AI code generation (Claude Code)
+under human direction.  The mathematical foundations are due to
+Bushnell--Kutzko~\cite{BushnellKutzko1993},
+Harris--Taylor~\cite{HarrisTaylor2001}, and
+Bushnell--Henniart~\cite{BushnellHenniart2006}.
+
+This work is part of the Constructive Reverse Mathematics series
+(Papers~1--78).  The Lean~4 code uses the Mathlib library;
+see~\cite{Mathlib4}.  The series format follows the CRM format
+guide~\cite{FormatGuide}.
+
+% ============================================================
+\begin{thebibliography}{30}
+% ============================================================
+
+\bibitem{HarrisTaylor2001}
+M.~Harris and R.~Taylor.
+\newblock \emph{The Geometry and Cohomology of Some Simple Shimura Varieties}.
+\newblock Annals of Math.\ Studies~151.
+\newblock Princeton Univ.\ Press, 2001.
+
+\bibitem{BushnellKutzko1993}
+C.~J.~Bushnell and P.~C.~Kutzko.
+\newblock \emph{The Admissible Dual of $\GL(N)$ via Compact Open Subgroups}.
+\newblock Annals of Math.\ Studies~129.
+\newblock Princeton Univ.\ Press, 1993.
+
+\bibitem{BushnellHenniart2006}
+C.~J.~Bushnell and G.~Henniart.
+\newblock \emph{The Local Langlands Conjecture for $\GL(2)$}.
+\newblock Grundlehren der math.\ Wissenschaften~335.
+\newblock Springer, 2006.
+
+\bibitem{Henniart1993}
+G.~Henniart.
+\newblock \emph{Caract\'erisation de la correspondance de Langlands locale
+  par les facteurs $\varepsilon$ de paires}.
+\newblock Invent.\ Math., 113(2):339--350, 1993.
+
+\bibitem{Paper75}
+P.~C.~Lee.
+\newblock \emph{The Genestier--Lafforgue Conservation Test}.
+\newblock Paper~75, Constructive Reverse Mathematics Series.
+\newblock \url{https://doi.org/10.5281/zenodo.18773831}
+
+\bibitem{Paper77}
+P.~C.~Lee.
+\newblock \emph{Automated De-Omniscientisation:
+  Reverse-Engineering Classical Proofs via DAG Surgery}.
+\newblock Paper~77, Constructive Reverse Mathematics Series.
+\newblock (DOI pending.)
+
+\bibitem{Paper50}
+P.~C.~Lee.
+\newblock \emph{The Motive Is the Universal Decidability Certificate}.
+\newblock Paper~50, Constructive Reverse Mathematics Series.
+\newblock \url{https://doi.org/10.5281/zenodo.14934946}
+
+\bibitem{FormatGuide}
+P.~C.~Lee.
+\newblock \emph{CRM Series Paper Format Guide}.
+\newblock \url{https://doi.org/10.5281/zenodo.18765700}
+
+\bibitem{Mathlib4}
+The Mathlib Community.
+\newblock \emph{Mathlib4}.
+\newblock \url{https://github.com/leanprover-community/mathlib4}
+
+\bibitem{Bishop1967}
+E.~Bishop.
+\newblock \emph{Foundations of Constructive Analysis}.
+\newblock McGraw-Hill, 1967.
+
+\bibitem{BridgeRichman1987}
+D.~Bridges and F.~Richman.
+\newblock \emph{Varieties of Constructive Mathematics}.
+\newblock London Math.\ Soc.\ Lecture Note Ser.~97, Cambridge Univ.\ Press,
+  1987.
+
+\bibitem{Scholze2018}
+P.~Scholze.
+\newblock \emph{Lectures on analytic geometry}.
+\newblock Lecture notes, Bonn, 2018.
+
+\bibitem{FarguesScholze2024}
+L.~Fargues and P.~Scholze.
+\newblock \emph{Geometrization of the local Langlands correspondence}.
+\newblock Annals of Math.\ Studies, Princeton Univ.\ Press, 2024.
+
+\bibitem{Bernstein1984}
+I.~N.~Bernstein.
+\newblock \emph{$P$-invariant distributions on $\GL(N)$ and the
+  classification of unitary representations of $\GL(N)$
+  (non-Archimedean case)}.
+\newblock In: Lie group representations II, Lecture Notes in Math.~1041,
+  50--102, Springer, 1984.
+
+\bibitem{Kronecker1882}
+L.~Kronecker.
+\newblock \emph{Grundz\"uge einer arithmetischen Theorie der algebraischen
+  Gr\"o\ss en}.
+\newblock J.~reine angew.\ Math., 92:1--122, 1882.
+
+\end{thebibliography}
+
+\end{document}
