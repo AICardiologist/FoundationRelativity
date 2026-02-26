@@ -151,6 +151,38 @@
 
 \lstset{style=leanstyle}
 
+% ---------- Python listing style ----------
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=4,
+    numberstyle=\tiny\color{codegray}
+}
+
+% ---------- Console output style ----------
+\lstdefinestyle{consolestyle}{
+    backgroundcolor=\color{backcolour},
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,
+    keepspaces=true,
+    numbers=none,
+    showstringspaces=false,
+    tabsize=4,
+}
+
 % ---------- Title and author ----------
 \title{Automated De-Omniscientisation:\\
   Reverse-Engineering Classical Proofs\\
@@ -894,6 +926,108 @@ no \texttt{noncomputable}) so \texttt{native\_decide} can
 evaluate them.}
 \label{fig:offload}
 \end{figure}
+
+\subsection{Python implementation}\label{sec:python}
+
+The CAS phase (\texttt{solve\_hodge.py}, 491~lines) implements the
+computation of Theorems~\ref{thm:no-exotic}--\ref{thm:constructive-hodge}
+using exact rational arithmetic.  We reproduce the core routines.
+
+\medskip\noindent
+\textbf{CM action on $\Lambda^4(\Q^8)$.}
+The CM endomorphism sends basis vector~$e_k$ to
+$(-1)^{k\bmod 2}\,e_{k \pm 1}$.  The induced action on
+$\Lambda^4$ is computed by applying this map to each index of
+a $4$-form and resolving the wedge sign:
+
+\begin{lstlisting}[style=pythonstyle,literate=]
+def cm_on_basis(k):
+    """CM action on e_k: returns (sign, new_index)."""
+    if k % 2 == 0:
+        return (-1, k + 1)
+    else:
+        return (1, k - 1)
+
+# CM on Lambda^4(Q^8): 70x70 matrix
+cm4 = [[F(0)] * 70 for _ in range(70)]
+for i, b in enumerate(basis4):
+    total_sign = 1
+    new_idx = []
+    for k in b:
+        s, j = cm_on_basis(k)
+        total_sign *= s
+        new_idx.append(j)
+    sign, sorted_idx = wedge_sign(new_idx)
+    if sign != 0:
+        cm4[idx4[sorted_idx]][i] += F(total_sign * sign)
+\end{lstlisting}
+
+\medskip\noindent
+\textbf{Decomposition solving.}
+For each Hodge basis vector, solve the linear system
+$G \cdot x = w_k$ by augmented-matrix row reduction over~$\Q$:
+
+\begin{lstlisting}[style=pythonstyle,literate=]
+for i, hv in enumerate(hodge_basis):
+    coeffs = solve_system(selected_cups, hv, 36)
+    # Verify reconstruction
+    recon = [F(0)] * 70
+    for k in range(36):
+        if coeffs[k] != F(0):
+            for r in range(70):
+                recon[r] += coeffs[k] * selected_cups[k][r]
+    assert recon == hv  # exact Q-arithmetic: no rounding
+\end{lstlisting}
+
+\medskip\noindent
+\textbf{Sparse Lean emission.}
+The re-emitter (\texttt{emit\_lean.py}) encodes each
+70-entry rational vector as a pattern match on nonzero indices:
+
+\begin{lstlisting}[style=pythonstyle,literate=]
+def sparse_def(name, vec, dim):
+    """Emit def name : Fin dim -> Q using sparse match."""
+    nz = [(i, vec[i]) for i in range(dim) if vec[i] != F(0)]
+    lines = [f"def {name} : Fin {dim} -> Q := fun i =>"]
+    if len(nz) <= 3:
+        for k, (idx, val) in enumerate(nz):
+            prefix = "  if" if k == 0 else "  else if"
+            lines.append(f"{prefix} i.val = {idx} then {val}")
+        lines.append("  else 0")
+    else:
+        lines.append("  match i.val with")
+        for idx, val in nz:
+            lines.append(f"  | {idx} => {val}")
+        lines.append("  | _ => 0")
+    return "\n".join(lines)
+\end{lstlisting}
+
+\medskip\noindent
+\textbf{Sample output.}  Running \texttt{python3 solve\_hodge.py}
+produces (selected lines):
+
+\begin{lstlisting}[style=consolestyle,literate=]
+$ python3 solve_hodge.py
+M^2 = I on Lambda^4(Q^8)
++1 eigenspace of CM on Lambda^4: dim = 38
+NS(E^4) x Q: dim = 16
+Hodge (2,2) basis: dim = 36
+Non-zero cup products: 102
+Divisor product subspace: dim = 36
+Selected 36 independent cup products
+ALL 36 Hodge basis vectors decomposed into cup products
+Summary:
+  Hodge (2,2) dimension: 36
+  NS(E^4) dimension: 16
+  Cup product generators used: 36
+  Total nonzero coefficients: 42
+  Exotic dimension: 0
+\end{lstlisting}
+
+\noindent
+Every dimension matches the theoretical prediction.  The script
+runs in $< 1$\,second on a standard laptop (exact $\Q$-arithmetic
+via \texttt{fractions.Fraction}).
 
 \subsection{The \texttt{noncomputable} trap}
 
