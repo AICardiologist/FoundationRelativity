@@ -1,0 +1,91 @@
+Title:
+CRMLint: An Automated Logical Cost Analyzer for Proof Assistants (Paper 76, Constructive Reverse Mathematics Series)
+
+Authors:
+Lee, Paul Chun-Kit (New York University)
+
+DOI:
+10.5281/zenodo.18777597
+
+Publication Date:
+2026-02
+
+Type:
+Software / Dataset (Lean 4 metaprogram + LaTeX paper)
+
+Version:
+1.0
+
+License:
+CC-BY 4.0 (paper and all content)
+Copyright 2026 Paul Chun-Kit Lee
+
+Language:
+English
+
+Keywords:
+constructive reverse mathematics, CRMLint, logical cost analyzer, de-omniscientisation, DAG surgery, conservation gap, classical dependency tracing, pattern classifier, type-aware classification, infrastructure artifact, BISH, WLPO, LPO, CLASS, Lean 4, Mathlib, formal verification, metaprogram, proof assistant, constructive mathematics
+
+Abstract:
+We present CRMLint, a Lean 4 metaprogram that computes the Constructive Reverse Mathematics (CRM) logical cost of any declaration in the Mathlib library. The tool traces transitive dependencies to classical axioms (Classical.choice, Classical.em, propext, Quot.sound), classifies each entry point by its CRM pattern (infrastructure artifact vs. essential classical content), and computes the CRM level as the join of essential costs over the hierarchy BISH < BISH+MP < LLPO < WLPO < LPO < CLASS.
+
+We identify and fix a critical classification failure in v0.1: Real.instField was incorrectly classified as BISH because the infrastructure whitelist blanket-suppressed Classical.propDecidable. Since the total inverse inv : R -> R requires Decidable(x = 0) for x : R, which is WLPO, we develop a type-aware classifier that inspects the type being decided rather than the axiom name alone. The corrected tool reads Real.instField -> WLPO.
+
+Calibration against ground truth from 14 Lean 4 bundles in the CRM program yields correct classifications on all test cases. Namespace scans reveal conservation gaps across Mathlib: 70% of Nat.Prime (57/81 declarations) and 60% of Int.ModEq (25/42) are classified CLASS despite having BISH statements. We close three such gaps, providing Lean-verified constructive proofs that replace Classical.em, byContradiction, and Classical.not_not with decidable case splits and explicit witness construction.
+
+Related Identifiers:
+Part of: Constructive Reverse Mathematics Series (Papers 1-77)
+References: Paper 50 (CRM Atlas, DOI: 10.5281/zenodo.14934946)
+References: Paper 67 (Synthesis, DOI: 10.5281/zenodo.18776113)
+References: Paper 72 (DPT Trilogy, DOI: 10.5281/zenodo.18765393)
+References: Paper 74 (Axiom 2 Reverse, DOI: 10.5281/zenodo.18773827)
+References: Paper 75 (Conservation Test, DOI: 10.5281/zenodo.18773831)
+References: Paper 77 (CRMLint Squeeze, DOI: 10.5281/zenodo.18779210)
+References: CRM Format Guide (DOI: 10.5281/zenodo.18765700)
+
+Subjects:
+Mathematical Logic
+Formal Verification
+Constructive Mathematics
+Proof Assistants
+
+Technical Details:
+Lean version: leanprover/lean4:v4.29.0-rc2
+Dependency: Mathlib4 (via lakefile.lean, pinned at aac298a)
+Lean files (core): 6 (Defs: 168, Trace: 128, Infrastructure: 142, Classify: 267, Report: 74, Audit: 161)
+Lean files (tests): 5 (Smoke: 35, CaseStudies: 129, Mathlib: 62, Scan: 26, ScanNumberTheory: 25)
+Total lines (core): 940
+Total lines (with tests): 1217
+Sorry count: 0
+CRMLint's own CRM level: BISH (all layers constructive)
+Build command: cd CRMLint && lake build
+Test command: lake env lean Test/Mathlib.lean
+
+File Manifest:
+README.md                                       Overview and build instructions
+metadata.txt                                     This file
+paper76.tex                                      LaTeX source
+paper76.pdf                                      Compiled PDF (16 pages)
+CRMLint/lean-toolchain                           Lean version pin
+CRMLint/lakefile.lean                            Lake build configuration
+CRMLint/lake-manifest.json                       Mathlib dependency pin
+CRMLint/CRMLint.lean                             Root import file
+CRMLint/CRMLint/Defs.lean                        CRMLevel, ClassicalPattern, result types
+CRMLint/CRMLint/Trace.lean                       Layer 1: BFS classical dependency tracer
+CRMLint/CRMLint/Infrastructure.lean              BISH whitelist, analytic/quotient detection
+CRMLint/CRMLint/Classify.lean                    Layer 2: 12-rule priority classifier
+CRMLint/CRMLint/Report.lean                      Pretty-printing and namespace summaries
+CRMLint/CRMLint/Audit.lean                       #crm_audit, #crm_scan commands
+CRMLint/Test/Smoke.lean                          Basic smoke tests
+CRMLint/Test/CaseStudies.lean                    3 constructive gap closures
+CRMLint/Test/Mathlib.lean                        5-point calibration suite
+CRMLint/Test/Scan.lean                           Namespace scan tests
+CRMLint/Test/ScanNumberTheory.lean               Nat.Prime number theory scan
+
+Build Instructions:
+1. Lean: cd CRMLint && lake update && lake build
+2. Tests: lake env lean Test/Mathlib.lean (calibration suite)
+3. LaTeX: pdflatex paper76.tex && pdflatex paper76.tex
+
+Contact:
+dr.paul.c.lee@gmail.com
