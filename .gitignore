@@ -1,4 +1,15 @@
 # ============================================================
+# Agent-internal / private (local only, never pushed)
+# ============================================================
+CLAUDE.md
+.claude/
+master folder/CRM_PROGRAMME_ROADMAP.md
+master folder/CRM_SESSION_HANDOFF.md
+paper 78/
+paper 79/
+paper 80/
+
+# ============================================================
 # Lean build artifacts
 # ============================================================
 /.lake/
