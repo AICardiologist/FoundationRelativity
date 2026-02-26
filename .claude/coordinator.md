@@ -13,23 +13,6 @@
 
 ## Active Tasks
 
-### feat/p77-dagsurgery — Paper 77: Automated De-Omniscientisation (DAG Surgery)
-- **Status:** in-progress (scaffold created, LaTeX + Lean stub)
-- **Worktree:** N/A (created directly in main repo)
-- **Last update:** 2026-02-26
-- **What's done:**
-  - paper77.tex scaffold: 19 sections, TikZ pipeline figure, 18 references
-  - P77_DAGSurgery/ Lean stub: CRM hierarchy, opaque cycle types, classical axiom, Sigma-target, restricted generators
-  - README.md, metadata.txt
-  - master_paper_list.txt updated (Papers 76-77 added)
-  - Roadmap §8 updated (Papers 78-79 named as future targets)
-- **What's next:**
-  - Fill TODO sections (state of art, intersection matrix, MCTS prompt, results)
-  - Run CRMLint Squeeze on E^4 target
-  - Zenodo packaging
-- **Blockers:** Paper 76 (CRMLint) must be complete before squeeze can execute
-- **Branch:** main (direct)
-
 ### fix/p68-section-fixes — Paper 68 LaTeX fixes (two active failure modes)
 - **Status:** done
 - **Worktree:** ../worktrees/p68-fixes
@@ -81,6 +64,24 @@
 
 ## Completed Tasks
 
+### feat/p77-dagsurgery — Paper 77: Explicit Hodge Decompositions for E⁴
+- **Status:** done
+- **Worktree:** N/A (created directly in main repo)
+- **Last update:** 2026-02-26
+- **What's done:**
+  - paper77.tex: 21 pages, 24 references, honest framing (methods paper, not mathematical breakthrough)
+  - P77_DAGSurgery/ Lean bundle: 798 lines (sparse), 0 sorry, 0 warnings, 3121 build jobs
+  - Asymmetric offloading: Python CAS computes → Lean kernel verifies via native_decide
+  - 36 explicit Hodge (2,2) decompositions, 0 exotic Weil classes confirmed
+  - Four peer reviews (2 rounds), all fixes applied
+  - Zenodo zip built: `Paper77_ExplicitHodgeE4.zip` (458 KB, 16 files) on Desktop
+  - DOI assigned: 10.5281/zenodo.18779210
+  - README.md, metadata.txt, master_paper_list.txt updated
+  - Roadmap, session handoff, coordinator updated
+- **What's next:** user uploads Zenodo zip
+- **Blockers:** none
+- **Branch:** main (direct)
+
 ### feat/p72-characterisation — Paper 72 DPT Characterisation
 - **Status:** done
 - **Worktree:** ../worktrees/p72-characterisation
@@ -105,14 +106,11 @@ These items need agents assigned:
 - [ ] **Paper 69 editorial revision** — 8 edit items, CRITICAL: expand Remark 3.3 (algebraic-vs-transcendental boundary)
 - [ ] **Paper 70 editorial revision** — Brouwer inoculation sentence, trim Discussion §8, two TikZ figures
 
-### Priority 2 — Lean Recovery
-- [ ] **Paper 68 Lean file** — regenerate `Paper68_Final.lean` from `PAPER68_LEAN_WORK_ORDER.md`
-
-### Priority 3 — Remaining Papers
+### Priority 2 — Remaining Papers
 - [ ] **Paper 66** — 5 fixes needed (form-class resolution for non-cyclic totally real cubics)
 - [ ] **Paper 67** — 3 blanks to fill (synthesis monograph Papers 45–66)
 - [ ] **Paper 63** — pending DOI (Intermediate Jacobian Obstruction)
 
-### Priority 4 — Infrastructure
+### Priority 3 — Infrastructure
 - [ ] **Paper 71 Lean bundle** — verify/create `Papers/P71_Archimedean/` if not present
 - [ ] **Zenodo DOI audit** — verify all 66 DOIs resolve correctly
