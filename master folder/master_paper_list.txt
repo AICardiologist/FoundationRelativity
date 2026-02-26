@@ -85,7 +85,7 @@ No.  Title                                                               DOI
  74  Algebraic Spectrum Is Necessary for Eigenvalue Decidability         10.5281/zenodo.18773827
  75  Conservation Test: Genestier-Lafforgue LLC Calibration              10.5281/zenodo.18773831
  76  CRMLint: Automated CRM Logical Cost Analysis at Scale              (DOI pending)
- 77  Automated De-Omniscientisation: DAG Surgery                        (DOI pending)
+ 77  Automated De-Omniscientisation: DAG Surgery                        10.5281/zenodo.18779210
 
 ================================================================================
 STATISTICS
@@ -93,8 +93,8 @@ STATISTICS
 Total papers:         75 active (of 77 numbered)
 Withdrawn:            2 (Papers 1, 3)
 Retired:              2 (Paper 60 → 59; Paper 62 → 63)
-Papers with DOIs:     71
-Papers pending DOI:   0
+Papers with DOIs:     72
+Papers pending DOI:   1 (Paper 76)
 Papers peer-reviewed: 75 (passed Gemini peer review)
 Papers with Lean 4:   ~65 (Papers 64-66 computational/LaTeX-only)
 Total Lean 4 lines:   ~89,150+

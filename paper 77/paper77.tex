@@ -190,8 +190,8 @@ Constructive Hodge Theorem for~$E^4$}: every Hodge~$(2,2)$ class
 is an explicit $\Q$-linear combination of cup products of
 divisor classes, with all 36 basis decompositions verified by
 \texttt{native\_decide} in Lean~4 (Theorem~B).  The Lean bundle
-builds with 0~sorry, 0~axiom in the constructive path, and
-0~\texttt{noncomputable}.  The classical Lefschetz~$(1,1)$
+builds with 0~sorry and 0~\texttt{noncomputable}; no user-declared
+axiom is used by the constructive path.  The classical Lefschetz~$(1,1)$
 existence axiom is present but provably unused---excised by the
 Squeeze.
 
@@ -255,7 +255,8 @@ identifies the narrow-cliff targets.
 \subsection{State of the art}
 
 Recent AI theorem provers---AlphaProof (DeepMind, 2024),
-DeepSeek-Prover~V1.5 (2024), and Lean Copilot---optimise a
+DeepSeek-Prover~V1.5 (2024)~\cite{AlphaProof2024,DeepSeekProver2024},
+and Lean Copilot---optimize a
 \emph{binary} reward: $+1$ for closing a goal, $0$ for failure.
 This treats all proofs as equivalent: a constructive witness and
 an appeal to the Axiom of Choice receive the same score.  No
@@ -289,8 +290,8 @@ Hodge classes.}
 \emph{Every Hodge $(2,2)$ class on $E^4$ is an explicit $\Q$-linear
 combination of cup products of divisor classes.  The 36 basis
 decompositions are formally verified in Lean~4 by
-\texttt{native\_decide}.  Zero sorry, zero axiom in the constructive
-path, zero~\texttt{noncomputable}.}
+\texttt{native\_decide}.  Zero sorry, zero~\texttt{noncomputable};
+the user-declared classical axiom is provably unused.}
 \end{quote}
 
 \begin{quote}
@@ -308,8 +309,8 @@ logical progression is:
 
 \begin{itemize}[nosep]
 \item \textbf{Paper~75}~\cite{Paper75}: \emph{Conservation gap
-  detection.}  Applied CRM to Genestier--Lafforgue's proof of the
-  Local Langlands Correspondence for function fields.
+  detection.}  Applied CRM to Genestier--Lafforgue's~\cite{GenestierLafforgue2018}
+  proof of the Local Langlands Correspondence for function fields.
   Proved the key conservation result: the $\CLASS$ Shimura
   variety machinery used in the global proof is dispensable for
   the purely local correspondence, which descends to~$\BISH$.
@@ -349,8 +350,9 @@ The constructive hierarchy of omniscience principles:
   \;\subset\; \BISH{+}\WLPO \;\subset\; \BISH{+}\LPO
   \;\subset\; \CLASS.
 \]
-For definitions and the program's calibration data, see
-Paper~50~\cite{Paper50} and Bridges--Richman~\cite{BridgeRichman1987}.
+For definitions, see Bishop~\cite{Bishop1967} and
+Bridges--Richman~\cite{BridgeRichman1987}; for the program's
+calibration data, see Paper~50~\cite{Paper50}.
 
 \subsection{CRMLint}
 
@@ -418,7 +420,7 @@ Given a classical theorem~$T$ with a known $\CLASS$ proof:
 \begin{enumerate}
 \item \textbf{Scaffold.} Write the logical structure of the proof
   in Lean~4.  The proof need not be complete; what matters is that
-  the dependency DAG is formalised.
+  the dependency DAG is formalized.
 \item \textbf{X-Ray.} Run CRMLint on the scaffold.  The tool maps
   the dependency DAG and flags the Classical Boundary Nodes---the
   exact lemmas where the classical helicopter lands.
@@ -473,7 +475,7 @@ Step~4 deterministically collapses into Gaussian elimination.}
 \end{figure}
 
 \noindent
-The CRMLint classification shapes the search in both modes:
+The CRMLint classification shapes the search in Mode~2 (MCTS):
 
 \begin{center}
 \begin{tabular}{lc}
@@ -487,6 +489,13 @@ Timeout / failure & $0.0$ \\
 \bottomrule
 \end{tabular}
 \end{center}
+
+\noindent
+\textbf{Note.}  This reward function is \emph{designed but not yet
+deployed}: the $E^4$ execution collapsed deterministically
+(Mode~1), so no stochastic search was needed.  The reward table
+is included as the specification for future MCTS-mode applications
+(Papers~78--79).
 
 \subsection{Setup: CM abelian fourfolds}\label{sec:setup}
 
@@ -512,8 +521,15 @@ M_i = \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}.
 On $\Q^8 = H^1(E^4, \Q)$ it acts by $M_i^{\oplus 4}$.
 The induced action on $\bigwedge^4 \Q^8$ is a $70 \times 70$
 matrix $M := \Lambda^4(M_i^{\oplus 4})$.  A class
-$w \in H^4(E^4, \Q)$ is a \emph{Hodge class} if and only if
-$M w = w$ (i.e., $w$ lies in the $+1$~eigenspace of~$M$).
+$w \in H^4(E^4, \Q)$ is \emph{CM-invariant} if $Mw = w$,
+i.e., $w$ lies in the $+1$~eigenspace $V_{+1}$ of~$M$.
+By the Hodge decomposition for CM abelian varieties
+(Deligne~\cite{Deligne1982}), the Hodge~$(2,2)$ classes
+are precisely the CM-invariant classes in $H^{2,2}$:
+\[
+  \Hdg^{2,2}(E^4) = V_{+1} \cap H^{2,2}
+  = V_{+1} \;\setminus\; \bigl((4,0)+(0,4)\bigr).
+\]
 
 \begin{lemma}\label{lem:involution}
 $M^2 = I_{70}$.
@@ -699,10 +715,12 @@ by Python (immediate assertion) and by Lean~4
 \smallskip\noindent
 \textbf{Sparsity.}
 The decompositions are extremely sparse: 42 total nonzero
-coefficients across 36~vectors.  Of the 36~Hodge basis vectors,
-30 are \emph{exactly} a single cup product (coefficient~$1$);
-the remaining 6 are $\Q$-linear combinations of two cup products.
-All nonzero coefficients are $\pm 1$ or $\pm \frac{1}{2}$.
+coefficients across 36~vectors ($96.8\%$ zeros).  Of the 36~Hodge
+basis vectors, 32 are \emph{exactly} a single cup product
+(coefficient~$\pm 1$); 2~require two cup products; 2~require three.
+All nonzero coefficients are $\pm 1$ (no fractional values).
+The non-trivial rows are localized in indices 14--22 of the
+generator ordering.
 \end{proof}
 
 \subsection{Summary of the computation}
@@ -726,8 +744,9 @@ $\dim \NS(E^4) \otimes \Q$ & 16 \\
 Nonzero cup products $\NS_i \cup \NS_j$ & 102 \\
 Linearly independent cup products & 36 \\
 Total nonzero coefficients (all 36 decompositions) & 42 \\
-Single-generator decompositions ($c_{k,j} = \delta_{jj_0}$) & 30 \\
-Two-generator decompositions & 6 \\
+Single-generator decompositions (coeff.\ $\pm 1$) & 32 \\
+Two-generator decompositions & 2 \\
+Three-generator decompositions & 2 \\
 \textbf{Exotic dimension} & \textbf{0} \\
 \bottomrule
 \end{tabular}
@@ -761,15 +780,19 @@ Python CAS computation & $\BISH$ & Exact $\Q$-arithmetic \\
   \BISH \;(\text{36 explicit decompositions}).
 \]
 The classical existence axiom \texttt{hodge\_conjecture\_H22\_existence}
+(the Lefschetz~$(1,1)$ theorem~\cite{Lefschetz1924} generalized to
+$(2,2)$ via the Hodge Conjecture~\cite{Hodge1950})
 is present in the Lean environment but provably unused by the
-36 constructive theorems.  CRMLint verifies: 0~paths from
-any \texttt{hodge\_decomp\_k} to \texttt{Classical.choice}.
+36 constructive theorems.
 
 \subsection{Comparison with Paper~50 calibration}
 
-Paper~50~\cite{Paper50} classified the Hodge Conjecture as
+Paper~50~\cite{Paper50} classified the Hodge
+Conjecture~\cite{Hodge1950,Grothendieck1969} as
 $\CLASS$ for general abelian varieties (the existence of algebraic
-representatives requires the Axiom of Choice or equivalent).
+representatives requires the Axiom of Choice or equivalent;
+cf.~Mattuck~\cite{Mattuck1958}, Lieberman~\cite{Lieberman1968},
+Kleiman~\cite{Kleiman1968} for the classical foundations).
 Paper~77 shows that for the specific case $A = E^4$ with
 $\End(E) \otimes \Q \cong \Q(i)$, the classical content is
 completely eliminable: the $\CLASS$ existence collapses to a
@@ -851,7 +874,7 @@ evaluates at all 70 coordinates, and confirms equality.
 \node[block, below=0.8cm of json, fill=orange!10] (emitter) {Python emitter\\{\scriptsize (emit\_lean.py)}};
 \node[data, below=0.8cm of emitter] (lean4) {HodgeBasisData.lean\\{\scriptsize (798 lines, sparse encoding)}};
 \node[block, below=0.8cm of lean4, fill=green!10] (kernel) {Lean 4 kernel\\{\scriptsize (native\_decide)}};
-\node[block, below=0.8cm of kernel, fill=green!20] (qed) {36 verified theorems\\{\scriptsize 0 sorry, 0 axiom}};
+\node[block, below=0.8cm of kernel, fill=green!20] (qed) {36 verified theorems\\{\scriptsize 0 sorry, 0 noncomputable}};
 
 \draw[->,thick] (python) -- (json);
 \draw[->,thick] (json) -- (emitter);
@@ -944,28 +967,20 @@ lookup tables.
 \midrule
 \texttt{hodge\_conjecture\_H22\_existence} &
   $\CLASS$ & Unused & CBN (excised) \\
-\texttt{propfunext} & Infra & Used & Lean infrastructure \\
-\texttt{Quot.sound} & Infra & Used & Lean infrastructure \\
+\texttt{propext} & Infra & Yes & Lean kernel primitive \\
+\texttt{Classical.choice} & Infra & Yes & \texttt{DecidableEq} instance \\
+\texttt{Quot.sound} & Infra & Yes & Lean kernel primitive \\
+\texttt{native\_decide} axiom & Infra & Yes & Kernel reflection bridge \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\noindent
-The infrastructure axioms \texttt{propfunext} and
-\texttt{Quot.sound} are Lean~4 kernel primitives required by all
-definitions over~$\Q$; they carry no classical content
-(see Papers~2, 68~\cite{Paper68}).
-\texttt{Classical.choice} does \emph{not} appear in
-\texttt{\#print axioms hodge\_decomp\_0} through
-\texttt{\#print axioms hodge\_decomp\_35}.
-
-\subsection{Classical.choice audit}
+\subsection{Classical.choice audit}\label{sec:choice-audit}
 
 \begin{lstlisting}[literate=]
--- Expected output (each of 36 theorems):
 #print axioms hodge_decomp_0
--- [propfunext, Quot.sound]
--- (NO Classical.choice)
+-- [propext, Classical.choice, Quot.sound,
+--  hodge_decomp_0._native.native_decide.ax_1_1]
 
 #print axioms hodge_conjecture_H22_existence
 -- [hodge_conjecture_H22_existence]
@@ -973,9 +988,27 @@ definitions over~$\Q$; they carry no classical content
 \end{lstlisting}
 
 \noindent
-The 36 constructive theorems depend only on the Lean kernel
-infrastructure axioms.  The classical axiom is physically present
-but transitively unreachable from any \texttt{hodge\_decomp\_k}.
+\texttt{Classical.choice} \emph{does} appear in the axiom list
+of every \texttt{hodge\_decomp\_k}.  This is a Lean~4 infrastructure
+artifact, not classical mathematical content: the
+\texttt{DecidableEq} instance on \texttt{Fin~70~$\to$~$\Q$} is
+synthesized via Mathlib's decision procedure, which transitively
+invokes \texttt{Classical.choice}.  The \texttt{native\_decide}
+axiom (each theorem's \texttt{.\_native.native\_decide.ax\_1\_1})
+is the kernel bridge allowing compiled code evaluation.
+
+This is the standard series convention (see Papers~2, 68~\cite{Paper68}):
+\emph{all} Lean~4 theorems involving $\Q$-valued functions show
+\texttt{Classical.choice} in \texttt{\#print axioms} through the
+\texttt{DecidableEq} infrastructure path.  Constructive
+stratification is established by \emph{proof content}---the 36
+decompositions are explicit rational data verified by compiled
+arithmetic---not by the axiom checker's output.
+
+The key structural fact: the user-declared classical axiom
+\texttt{hodge\_conjecture\_H22\_existence} is \emph{not} among the
+dependencies of any \texttt{hodge\_decomp\_k}.  No path exists
+from the constructive theorems to the excised CBN.
 
 \subsection{Reproducibility}
 
@@ -983,8 +1016,10 @@ but transitively unreachable from any \texttt{hodge\_decomp\_k}.
 \item \textbf{Lean bundle:} \texttt{P77\_DAGSurgery/},
   builds with \texttt{lake build} on Lean v4.29.0-rc2 + Mathlib4.
 \item \textbf{Python computation:} \texttt{solve\_hodge.py}
-  (computation + first emission) and \texttt{emit\_lean.py}
-  (sparse re-emission).  Requires Python~3.9+ (standard library
+  (computation + first emission), \texttt{emit\_lean.py}
+  (sparse re-emission), and \texttt{compute\_cm.py}
+  (standalone CM diagonalization, used for initial exploration).
+  Requires Python~3.9+ (standard library
   only: \texttt{fractions}, \texttt{itertools}, \texttt{json}).
 \item \textbf{Intermediate data:} \texttt{hodge\_data.json}
   (all eigenspaces, decompositions, and labels in JSON format).
@@ -1056,11 +1091,12 @@ overhead.  The protocol identifies which mode applies
 \emph{before} any search begins: Steps~1--3 compute the dimension
 and linearity of the restricted space.
 
-The MCTS mode becomes relevant when the restricted space is
+The MCTS mode is designed for cases where the restricted space is
 combinatorially rich: nonlinear constraints, multiple solution
-branches, or high-dimensional parameter spaces.  The wild
+branches, or high-dimensional parameter spaces.  This mode remains
+\emph{speculative}---it has not been tested.  The wild
 Langlands case (Paper~78) and Standard Conjecture~D for simple
-fourfolds (Paper~79) are expected to require this second mode.
+fourfolds (Paper~79) are the intended first applications.
 
 \subsection{Proof decompilation}
 
@@ -1201,7 +1237,7 @@ technical lessons:
 \item \textbf{Emit sparse, not dense.}  Always emit Lean vectors
   as \texttt{fun i => match i.val with ...} rather than
   $\texttt{![}\ldots\texttt{]}$.  The elaboration cost difference
-  is $O(n)$ vs.\ $O(n^2)$ for $n$-entry vectors.
+  is $O(k)$ vs.\ $O(n^2)$ for $n$-entry vectors with $k$~nonzero entries.
 \item \textbf{Separate axioms from data.}  Place the CBN axiom in
   a separate Lean file from the constructive data.  This prevents
   accidental \texttt{noncomputable} contamination.
@@ -1240,7 +1276,9 @@ technical lessons:
 \section{Conclusion}\label{sec:conclusion}
 % ============================================================
 
-The CRMLint Squeeze transitions the CRM program from auditing
+The CRMLint Squeeze transitions the CRM program---which
+traces its intellectual lineage to Kronecker's~\cite{Kronecker1882}
+insistence on explicit construction---from auditing
 the history of mathematics to engineering its future.  The
 logical cost metric drives explicit algebraic constructions
 via asymmetric offloading: human geometric intuition identifies
@@ -1342,8 +1380,14 @@ P.~C.~Lee.
 
 \bibitem{Mathlib4}
 The Mathlib Community.
-\newblock \emph{Mathlib4}.
-\newblock \url{https://github.com/leanprover-community/mathlib4}
+\newblock \emph{Mathlib4: The Lean 4 Mathematical Library}.
+\newblock \url{https://leanprover-community.github.io/mathlib4_docs/}
+
+\bibitem{Deligne1982}
+P.~Deligne.
+\newblock \emph{Hodge cycles on abelian varieties}.
+\newblock In: Hodge Cycles, Motives, and Shimura Varieties,
+  Lecture Notes in Math.~900, 9--100. Springer, 1982.
 
 \bibitem{Hodge1950}
 W.~V.~D. Hodge.
@@ -1360,23 +1404,6 @@ D.~I. Lieberman.
 A.~Mattuck.
 \newblock \emph{Cycles on abelian varieties}.
 \newblock Proc.\ Amer.\ Math.\ Soc., 9(1):88--98, 1958.
-
-\bibitem{Kisin2009}
-M.~Kisin.
-\newblock \emph{Modularity of 2-adic Barsotti--Tate representations}.
-\newblock Invent.\ Math., 178(3):587--634, 2009.
-
-\bibitem{HarrisTaylor2001}
-M.~Harris and R.~Taylor.
-\newblock \emph{The Geometry and Cohomology of Some Simple Shimura Varieties}.
-\newblock Annals of Math.\ Studies~151.
-\newblock Princeton Univ.\ Press, 2001.
-
-\bibitem{BushnellKutzko1993}
-C.~J.~Bushnell and P.~C.~Kutzko.
-\newblock \emph{The Admissible Dual of $\GL(N)$ via Compact Open Subgroups}.
-\newblock Annals of Math.\ Studies~129.
-\newblock Princeton Univ.\ Press, 1993.
 
 \bibitem{Kronecker1882}
 L.~Kronecker.

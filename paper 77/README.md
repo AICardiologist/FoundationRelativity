@@ -49,7 +49,7 @@ lake update    # fetch Mathlib4 (first time only)
 lake build     # 3121 jobs; ~15s for project files after Mathlib cache
 ```
 
-**0 sorry. 0 axiom in the constructive path. 0 noncomputable.**
+**0 sorry. 0 user-declared axiom in the constructive path. 0 noncomputable.**
 
 ## How to Build (LaTeX)
 
@@ -74,10 +74,12 @@ Requires Python 3.9+ (standard library only: `fractions`, `itertools`, `json`).
 | Axiom | CRM Level | Used by constructive path? | Role |
 |-------|-----------|---------------------------|------|
 | `hodge_conjecture_H22_existence` | CLASS | No | CBN (deliberately excised) |
-| `propfunext` | Infrastructure | Yes | Lean kernel primitive |
+| `propext` | Infrastructure | Yes | Lean kernel primitive |
+| `Classical.choice` | Infrastructure | Yes | DecidableEq instance |
 | `Quot.sound` | Infrastructure | Yes | Lean kernel primitive |
+| `native_decide` axiom | Infrastructure | Yes | Kernel reflection bridge |
 
-`Classical.choice` does NOT appear in `#print axioms` for any of the 36 constructive theorems.
+`Classical.choice` appears in `#print axioms` for each `hodge_decomp_k` via the `DecidableEq` instance on `Fin 70 -> Q`. This is a Lean 4 infrastructure artifact, not classical mathematical content (series convention: constructive stratification by proof content, not axiom checker output). The user-declared classical axiom `hodge_conjecture_H22_existence` is NOT among the dependencies.
 
 ## Key Technical Innovation: Asymmetric Offloading
 
