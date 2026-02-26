@@ -7,7 +7,7 @@
 
 **Author:** Paul Chun-Kit Lee (New York University)
 
-**75 papers. ~89,000 lines Lean 4. One finding:**
+**77 papers. ~91,000 lines Lean 4. One finding:**
 
 **The logical cost of mathematics is the logical cost of the real numbers.**
 
@@ -265,6 +265,13 @@ Every paper with its bottom line. Papers 1 and 3 withdrawn; Papers 60 and 62 ret
 | 74 | Algebraic Spectrum Is Necessary | Axiom 2 (algebraic spectrum) ↔ BISH eigenvalue decidability; failure costs WLPO |
 | **75** | **Conservation Test: GL LLC Calibration** | **Statement WLPO, proof CLASS — conservation gap validates DPT externally** |
 
+#### Generative Phase (Papers 76–77)
+
+| # | Title | Bottom line |
+|---|-------|------------|
+| **76** | **CRMLint: Automated Logical Cost Analyzer** | **Lean 4 metaprogram: type-aware classifier, Real.instField → WLPO, three conservation gaps closed** |
+| **77** | **Explicit Hodge Decompositions for E⁴** | **CRMLint Squeeze: Python CAS → Lean kernel, 36 Hodge decompositions verified by native_decide** |
+
 ---
 
 ## Repository
@@ -287,13 +294,15 @@ Papers/                     Lean 4 formalization bundles (self-contained)
   P73_Axiom1Reverse/
   P74_Axiom2Reverse/
   P75_ConservationTest/
+paper 76/CRMLint/           Paper 76: CRMLint metaprogram (940 lines core)
+paper 77/P77_DAGSurgery/    Paper 77: Hodge decompositions (798 lines)
 paper N/                    LaTeX sources and PDFs for each paper
 scripts/                    CI audit scripts
 ```
 
-Each `Papers/P{N}_*/` bundle builds independently: `cd Papers/P72_DPTCharacterisation && lake build`. Lean 4 toolchain v4.28.0-rc1 (Papers 72–75: v4.29.0-rc2). Zero `sorry` across all published bundles. `Classical.choice` in every ℝ theorem is Mathlib infrastructure, not classical content — constructive stratification is by proof content, not `#print axioms` output.
+Each `Papers/P{N}_*/` bundle builds independently: `cd Papers/P72_DPTCharacterisation && lake build`. Lean 4 toolchain v4.28.0-rc1 (Papers 72–77: v4.29.0-rc2). Zero `sorry` across all published bundles. `Classical.choice` in every ℝ theorem is Mathlib infrastructure, not classical content — constructive stratification is by proof content, not `#print axioms` output.
 
-73 active papers (Papers 1 and 3 withdrawn; Papers 60 and 62 retired into 59 and 63).
+75 active papers (Papers 1 and 3 withdrawn; Papers 60 and 62 retired into 59 and 63).
 
 ## Citation
 

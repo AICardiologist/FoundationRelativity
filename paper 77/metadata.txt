@@ -1,0 +1,83 @@
+Title:
+Explicit Hodge Decompositions for E^4 via Automated De-Omniscientisation (Paper 77, Constructive Reverse Mathematics Series)
+
+Authors:
+Lee, Paul Chun-Kit (New York University)
+
+DOI:
+10.5281/zenodo.18779210
+
+Publication Date:
+2026-02
+
+Type:
+Software / Dataset (Lean 4 formalization + Python computation + LaTeX paper)
+
+Version:
+1.0
+
+License:
+CC-BY 4.0 (paper and all content)
+Copyright 2026 Paul Chun-Kit Lee
+
+Language:
+English
+
+Keywords:
+constructive reverse mathematics, CRMLint Squeeze, de-omniscientisation, asymmetric offloading, Hodge conjecture, CM abelian fourfolds, exotic Weil classes, Anderson obstruction, cup products, divisor classes, Neron-Severi group, BISH, CLASS, Lean 4, formal verification, native_decide, exact rational arithmetic, sparse encoding, conservation gap, constructive mathematics
+
+Abstract:
+The Hodge Conjecture for products of CM elliptic curves was proved by Lieberman (1968) and subsumed by Deligne (1982). The mathematical content of this paper is a known consequence of these results and is not novel. The contribution is methodological.
+
+We produce explicit Hodge decompositions for E^4 (E a CM elliptic curve with End(E) tensor Q = Q(i)): all 36 Hodge (2,2) basis vectors expressed as Q-linear combinations of cup products of divisor classes, formally verified in Lean 4 by native_decide. We also verify that E^4 supports no exotic Weil classes (dim Hodge = dim div. products = 36).
+
+These results are produced by the CRMLint Squeeze, a protocol for reverse-engineering classical proofs into constructive ones, demonstrated on a case where the answer is independently known. The paper introduces asymmetric offloading (Python CAS computes exact Q-algebra, Lean kernel verifies) and documents the engineering: the noncomputable trap, token overflow, and sparse encoding. The Lean bundle builds with 0 sorry, 0 user-declared axiom in the constructive path, and 0 noncomputable.
+
+Related Identifiers:
+Part of: Constructive Reverse Mathematics Series (Papers 1-77)
+References: Paper 50 (CRM Atlas, DOI: 10.5281/zenodo.14934946)
+References: Paper 68 (FLT is BISH, DOI: 10.5281/zenodo.18777925)
+References: Paper 75 (Conservation Test, DOI: 10.5281/zenodo.18773831)
+References: Paper 76 (CRMLint, DOI pending)
+References: CRM Format Guide (DOI: 10.5281/zenodo.18765700)
+
+Subjects:
+Mathematical Logic
+Algebraic Geometry
+Formal Verification
+Constructive Mathematics
+
+Technical Details:
+Lean version: leanprover/lean4:v4.29.0-rc2
+Dependency: Mathlib4 (via lakefile.lean)
+Lean files: 2 (HodgeBasisData.lean: 798 lines; Paper77_CMFourfold.lean: 160 lines)
+Python scripts: 3 (solve_hodge.py, emit_lean.py, compute_cm.py)
+Sorry count: 0
+Warning count: 0
+Error count: 0
+Build jobs: 3121 (including Mathlib)
+Build time: ~15 seconds (project files after Mathlib cache)
+
+File Manifest:
+README.md                                       Overview and build instructions
+metadata.txt                                     This file
+paper77.tex                                      LaTeX source
+paper77.pdf                                      Compiled PDF (20 pages)
+solve_hodge.py                                   Main computation + Lean emission
+emit_lean.py                                     Sparse re-emitter
+compute_cm.py                                    Original CM diagonalisation
+hodge_data.json                                  Intermediate computation data (JSON)
+P77_DAGSurgery/lean-toolchain                    Lean version pin
+P77_DAGSurgery/lakefile.lean                     Lake build configuration
+P77_DAGSurgery/Papers.lean                       Root import file
+P77_DAGSurgery/Papers/P77_DAGSurgery/
+  HodgeBasisData.lean                            Auto-generated: 36 decompositions (798 lines)
+  Paper77_CMFourfold.lean                        CRM metadata, CM defs, classical axiom (unused)
+
+Build Instructions:
+1. Lean: cd P77_DAGSurgery && lake update && lake build
+2. Python: python3 solve_hodge.py (computation + emission)
+3. LaTeX: pdflatex paper77.tex && pdflatex paper77.tex
+
+Contact:
+dr.paul.c.lee@gmail.com
