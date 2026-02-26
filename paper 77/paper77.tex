@@ -15,6 +15,7 @@
 \usepackage[x11names,table]{xcolor}
 \usepackage{mdframed}
 \usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning}
 \usepackage{url}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 
@@ -121,6 +122,7 @@
     {₀}{{$_0$}}1 {₁}{{$_1$}}1 {₂}{{$_2$}}1 {⧸}{{$/$}}1 {‖}{{$\|$}}1
     {•}{{$\cdot$}}1 {⁻¹}{{$^{-1}$}}1 {⋆}{{$\star$}}1
     {∘}{{$\circ$}}1
+    {×}{{$\times$}}1
 }
 
 \lstdefinestyle{leanstyle}{
@@ -237,9 +239,20 @@ identifies the narrow-cliff targets.
 
 \subsection{State of the art}
 
-% TODO: brief survey of AI theorem proving (AlphaProof, DeepSeek-Prover,
-% Lean Copilot), relationship to CRM, why nobody has used logical cost
-% as an RL reward function before.
+Recent AI theorem provers---AlphaProof (DeepMind, 2024),
+DeepSeek-Prover~V1.5 (2024), and Lean Copilot---optimise a
+\emph{binary} reward: $+1$ for closing a goal, $0$ for failure.
+This treats all proofs as equivalent: a constructive witness and
+an appeal to the Axiom of Choice receive the same score.  No
+existing system uses the \emph{logical cost} of the proof as a
+reward signal.
+
+The CRMLint Squeeze fills this gap.  By penalising branches that
+introduce classical dependencies and rewarding constructive
+closures, the RL loop is reshaped so that the AI's MCTS
+\emph{preferentially explores} the bounded algebraic search space
+where its combinatorial strength is maximal.  The logical cost
+metric acts as a loss function, not merely a post-hoc classifier.
 
 \subsection{Main results}
 
@@ -407,22 +420,22 @@ publishable mathematics.
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-    node distance=2.5cm,
-    box/.style={rectangle, draw, rounded corners,
-                minimum width=3.5cm, minimum height=1cm,
+    node distance=1.5cm and 1.8cm,
+    block/.style={rectangle, draw, rounded corners,
+                minimum width=2.8cm, minimum height=0.8cm,
                 align=center, font=\small},
-    arrow/.style={->, thick, >=stealth}
+    >=Stealth
 ]
-\node[box] (scaffold) {1. Scaffold\\{\footnotesize Lean outline of\\classical proof}};
-\node[box, right of=scaffold, xshift=2cm] (xray) {2. X-Ray\\{\footnotesize CRMLint flags\\CBN nodes}};
-\node[box, right of=xray, xshift=2cm] (excise) {3. Excise\\{\footnotesize Delete CBN,\\force $\Sigma$-type}};
-\node[box, below of=excise, yshift=-0.5cm] (squeeze) {4. Squeeze\\{\footnotesize AI MCTS with\\CRM reward}};
-\node[box, below of=scaffold, yshift=-0.5cm] (result) {Result\\{\footnotesize Explicit algebraic\\witness ($\mathsf{BISH}$)}};
+\node[block] (scaffold) {1.\ Scaffold};
+\node[block, right=of scaffold] (xray) {2.\ X-Ray};
+\node[block, right=of xray] (excise) {3.\ Excise};
+\node[block, below=of excise] (squeeze) {4.\ Squeeze};
+\node[block, below=of scaffold] (result) {Result: $\mathsf{BISH}$};
 
-\draw[arrow] (scaffold) -- (xray);
-\draw[arrow] (xray) -- (excise);
-\draw[arrow] (excise) -- (squeeze);
-\draw[arrow] (squeeze) -- (result);
+\draw[->,thick] (scaffold) -- (xray);
+\draw[->,thick] (xray) -- (excise);
+\draw[->,thick] (excise) -- (squeeze);
+\draw[->,thick] (squeeze) -- (result);
 \end{tikzpicture}
 \caption{The CRMLint Squeeze protocol.  CRMLint identifies the Classical Boundary Node (Step~2), the CBN is excised and the goal reformulated as a $\Sigma$-type (Step~3), and an RL-trained prover searches the $\BISH$-restricted space with CRM-shaped rewards (Step~4).}
 \label{fig:squeeze}
@@ -499,64 +512,139 @@ where MCTS is maximally efficient.
 
 \subsection{The intersection matrix}
 
-% TODO: Compute the explicit intersection matrix of the generator
-% set on E^4 for a specific CM discriminant (e.g., d = 1, the
-% Gaussian integers). The matrix has dimension ~70x70 and is
-% computable over Q by standard intersection theory.
-% This section will contain the explicit numerical data.
+We fix $E/\Q$ with CM by $\Z[i]$ ($d = 1$, the Gaussian integers).
+The cohomology $H^1(E, \Q) \cong \Q^2$ with basis $\{e_1, e_2\}$,
+so $H^1(E^4, \Q) \cong \Q^8$.  The target space is
+\[
+  H^4(E^4, \Q) \;\cong\; \textstyle\bigwedge^4 \Q^8,
+  \qquad \dim = \binom{8}{4} = 70.
+\]
+The 70 basis elements are $e_{a} \wedge e_{b} \wedge e_{c} \wedge
+e_{d}$ for $0 \leq a < b < c < d \leq 7$, where index $2k$ and
+$2k{+}1$ correspond to $e_1$ and $e_2$ pulled back from the
+$(k{+}1)$-th factor.
+
+The CM endomorphism $i \in \Z[i]$ acts on $H^1(E, \Q)$ by
+$M_i = \bigl(\begin{smallmatrix} 0 & -1 \\ 1 & 0 \end{smallmatrix}\bigr)$,
+and on $H^1(E^4, \Q)$ by $M_i^{\oplus 4}$.  The induced action on
+$\bigwedge^4 \Q^8$ is the 4-th exterior power of this $8 \times 8$
+matrix: a $70 \times 70$ matrix $\Lambda^4(M_i^{\oplus 4})$
+computable by standard multilinear algebra.
+
+The cycle class map sends each permitted generator to a specific
+vector in $\Q^{70}$:
+\begin{itemize}[nosep]
+\item $\cl(\mathrm{proj}(a,b))$: the Poincar\'e dual of the
+  embedding $E_a \times E_b \hookrightarrow E^4$, a vector with
+  $\binom{4}{2} = 6$ nonzero entries corresponding to the
+  complement indices.
+\item $\cl(\Gamma_\alpha(a,b))$ for $\alpha = p + qi$: the
+  fundamental class of the graph, which depends on $p, q$ through
+  the action $M_\alpha = pI + qM_i$ on $H^1$.
+\item $\cl(\Delta_{\alpha,\beta}(a,b,c))$: the push-forward
+  of the diagonal under $(1, \alpha, \beta)$, a vector
+  determined by the matrix products $M_\alpha, M_\beta$.
+\end{itemize}
+
+Assembling the cycle class vectors as columns of a matrix
+$M \in \Q^{70 \times K}$ (where $K$ is the number of generators
+for $|\,p\,|, |\,q\,| \leq N$), the squeeze target reduces to:
+\[
+  M \cdot x \;=\; w_{\mathrm{exotic}}, \qquad x \in \Q^K.
+\]
+This is a \emph{finite} system of linear equations over~$\Q$.
+Solvability is $\BISH$-decidable by Gaussian elimination
+(Kronecker~\cite{Kronecker1882}).
 
 % ============================================================
 \section{The Lean Architecture}\label{sec:lean}
 % ============================================================
 
+\subsection{The Combinatorial Skeleton}
+
+Mathlib~4 lacks a computational API for Chow rings on abelian
+varieties.  The Lean stub therefore projects the geometry into
+its \emph{Combinatorial Skeleton}: pure finite-dimensional
+$\Q$-linear algebra.  The topology is stripped; what remains is
+a $70$-dimensional vector space over~$\Q$ and a matrix equation.
+
+\begin{lstlisting}[literate=]
+-- H^4(E^4, Q) as Q^70
+abbrev CohomClass := Fin 70 -> Rat
+
+-- Permitted algebraic cycle types (the action space)
+inductive PermittedCycle where
+  | proj (a b : Fin 4) (hab : a /= b)
+  | cm_graph (a b : Fin 4) (p q : Int) (hab : a /= b)
+  | twisted_diag (a b c : Fin 4) (p1 q1 p2 q2 : Int)
+      (hab : a /= b) (hbc : b /= c) (hac : a /= c)
+
+-- Cycle class evaluation: PermittedCycle -> Q^70
+axiom cycle_class_eval : PermittedCycle -> CohomClass
+\end{lstlisting}
+
 \subsection{Separating the classical axiom from the constructive target}
 
-The Lean~4 stub physically separates the CBN from the squeeze
-target:
+The CBN and the squeeze target are physically separated:
 
-\begin{lstlisting}
--- The Classical Boundary Node (the helicopter)
--- CRMLint classification: CLASS
-axiom hodge_conjecture_existence
-    (A : AbelianVariety) (w : HodgeClass A) :
-  ∃ (Z : AlgebraicCycle A), cycle_class Z = w
+\begin{lstlisting}[literate=]
+-- The Classical Boundary Node (CLASS, present but UNUSED)
+axiom hodge_conjecture_existence (w : CohomClass) :
+  Exists (fun (coeffs : List (Rat * PermittedCycle)) =>
+    sumScaledClasses coeffs = w)
 
--- The constructive squeeze target
--- Note: Sigma-type forces data extraction
-def exotic_cycle_constructive :
-    Σ (Z : AlgebraicCycle E4),
-      cycle_class Z = exotic_weil_class :=
-  by sorry
-  -- The AI will replace this sorry with explicit generators
+-- The constructive squeeze target (Sigma-type = data)
+def explicit_exotic_cycle :
+    Sigma (fun (cycles : List (Rat * PermittedCycle)) =>
+      sumScaledClasses cycles = exotic_weil_class) := by
+  sorry  -- MCTS target: replace with explicit coefficients
 \end{lstlisting}
 
 The axiom \texttt{hodge\_conjecture\_existence} is present in the
-environment but \emph{unused} by the constructive target.  CRMLint
-verifies that the completed proof (when \texttt{sorry} is replaced)
-does not transitively depend on the axiom.
+environment but \emph{unused} by the squeeze target.  CRMLint
+verifies that the completed proof does not transitively depend on
+it.  The $\Sigma$-type forces the AI to \emph{construct} the
+cycle (output data), not merely prove existence (output a
+proposition).
 
 \subsection{Action space restriction}
 
-The AI's tactic space is restricted to:
-
-\begin{lstlisting}
--- Permitted generators (the path in the woods)
-def projection_graph (i : Fin 4) : AlgebraicCycle E4 := ...
-def cm_graph (α : O_K) (i j : Fin 4) : AlgebraicCycle E4 := ...
-def twisted_diag (α β : O_K) (i j k : Fin 4) :
-    AlgebraicCycle E4 := ...
-
--- The AI constructs a Q-linear combination:
--- c₁ · projection_graph 0 ∩ projection_graph 1
--- + c₂ · cm_graph α 0 1 ∩ cm_graph β 2 3
--- + ...
-\end{lstlisting}
+The AI's tactic space is restricted to constructing a term of the
+form $\langle$\texttt{[(c\_1, g\_1), (c\_2, g\_2), ...], proof}$\rangle$
+where each \texttt{c\_i}~$: \Q$ and each \texttt{g\_i}~$:$~\texttt{PermittedCycle}.  The
+proof obligation reduces to verifying that a specific
+$\Q$-linear combination of $70$-dimensional vectors equals the
+target---decidable by \texttt{native\_decide} or
+\texttt{norm\_num}.
 
 \subsection{MCTS prompt design}
 
-% TODO: Detail the exact prompt given to DeepSeek-Prover or
-% equivalent, including the CRMLint reward shaping, the
-% restricted tactic set, and the termination criterion.
+The RL prover receives the following system prompt:
+
+\begin{mdframed}[backgroundcolor=backcolour]
+\small\texttt{%
+You are an automated theorem prover restricted by CRM.
+Your goal: solve \texttt{explicit\_exotic\_cycle} in
+\texttt{Paper77\_CMFourfold.lean}.\\[4pt]
+CONSTRAINTS (the CRMLint electric fence):\\
+1. Forbidden: Classical.choice, Classical.em, by\_contra,
+   any uncomputable existential.\\
+2. Any branch introducing a CLASS dependency receives reward
+   $-1.0$ and is immediately terminated.\\
+3. You must output an explicit
+   $\langle$[(c$_1$, g$_1$), \ldots], proof$\rangle$.\\[4pt]
+STRATEGY: This is finite-dimensional $\Q$-linear algebra.
+Enumerate generators for $|p|, |q| \leq 2$.  Evaluate
+\texttt{cycle\_class\_eval} on each $\to$ $\Q^{70}$.
+Form $Mx = w_{\mathrm{exotic}}$.
+Solve by Gaussian elimination (\texttt{norm\_num}/\texttt{decide}).
+Extract nonzero coefficients.}
+\end{mdframed}
+
+The CRMLint reward table (\S\ref{sec:protocol}, Step~4)
+ensures that the MCTS preferentially explores constructive
+branches.  The termination criterion is: goal closed with
+$\BISH$ classification, verified by \texttt{\#crm\_audit}.
 
 % ============================================================
 \section{Results and Current Status}\label{sec:results}
@@ -564,8 +652,36 @@ def twisted_diag (α β : O_K) (i j k : Fin 4) :
 
 \subsection{Search space bounds}
 
-% TODO: Dimension of the generator space, number of intersection
-% products to evaluate, estimated MCTS budget.
+While the full Chow group $\CH^2(E^4)$ is infinite-rank and
+intractable, the restricted generator set is finite.  For
+$|p|, |q| \leq N$:
+
+\begin{center}
+\begin{tabular}{lrl}
+\toprule
+\textbf{Generator type} & \textbf{Count} & \textbf{Formula} \\
+\midrule
+$\mathrm{proj}(a,b)$ & $12$ & $4 \times 3$ \\
+$\Gamma_\alpha(a,b)$ for $|p|,|q| \leq N$ &
+  $12 \cdot (2N{+}1)^2$ & factor pairs $\times$ lattice \\
+$\Delta_{\alpha,\beta}(a,b,c)$ for $|p_i|,|q_i| \leq N$ &
+  $24 \cdot (2N{+}1)^4$ & triples $\times$ two lattice pts \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+For $N = 2$, the generator count is $K = 12 + 300 + 15{,}000 =
+15{,}312$.  The matrix $M \in \Q^{70 \times K}$ has rank at
+most~$70$.  The AI's task is: compute $M$, solve
+$Mx = w_{\mathrm{exotic}}$ over~$\Q$, extract nonzero entries.
+This is Gaussian elimination on a $70 \times 15{,}312$ matrix
+--- entirely $\BISH$, and well within the capacity of an MCTS
+solver with access to rational arithmetic.
+
+Even at $N = 1$ ($K = 12 + 108 + 1{,}944 = 2{,}064$ generators),
+the problem is tractable.  The key question is whether the exotic
+class lies in the span of these generators at all---this is
+precisely what the squeeze discovers.
 
 \subsection{Lean scaffolding status}
 
@@ -575,9 +691,31 @@ single \texttt{sorry} is the squeeze target.
 
 \subsection{Cycle equations}
 
-% TODO: If the AI run completes before publication, insert the
-% explicit Q-linear combination of intersection products here.
-% If not, characterise the partial results and search frontier.
+At the time of writing, the squeeze has not been executed: the
+prerequisite is a complete computation of
+\texttt{cycle\_class\_eval} (the map from generators to
+$\Q^{70}$ vectors), which requires implementing the
+Poincar\'e duality push-forward for each generator type on~$E^4$.
+This computation is itself $\BISH$ (it is finite multilinear
+algebra over~$\Q$), but requires engineering effort.
+
+When the computation is complete and the AI run yields a solution,
+the explicit $\Q$-linear combination of intersection products
+will be inserted here.  The cycle equations will take the form:
+\[
+  Z \;=\; \sum_{i=1}^{m} c_i \cdot \cl(g_i),
+  \qquad c_i \in \Q, \quad g_i \in \texttt{PermittedCycle},
+\]
+where $m$ is the number of nonzero coefficients and
+$\cl(Z) = w_{\mathrm{exotic}}$ is verified by
+\texttt{native\_decide} in Lean.
+
+The scientific value does not depend on whether the first AI run
+succeeds.  What this paper establishes is the \emph{architecture}:
+the reduction from an ineffective $\CLASS$ existence theorem to a
+concrete, bounded, $\BISH$-decidable matrix equation---and the
+demonstration that CRM classification can serve as a reward
+function for AI-driven mathematical discovery.
 
 % ============================================================
 \section{CRM Audit}\label{sec:crm}
@@ -628,10 +766,27 @@ The CRMLint Squeeze exploits a three-way division of labor:
 
 \subsection{Implications for AI theorem proving}
 
-% TODO: Relationship to AlphaProof, DeepSeek-Prover.
-% CRM as reward shaping vs. the standard binary reward.
-% Why this is the first method that systematically penalises
-% omniscience to force discovery.
+Existing AI provers treat all closed goals equally.  AlphaProof
+(DeepMind) solved IMO problems by MCTS over Lean~4, but its
+reward function does not distinguish constructive from classical
+closures.  DeepSeek-Prover~V1.5 and Lean Copilot similarly
+optimise for goal closure without regard to logical cost.
+
+The CRMLint Squeeze is the first method that systematically
+\emph{penalises omniscience} to force discovery.  The key
+insight is that CRM classification is not merely a post-hoc
+label---it is a \emph{differentiable signal} that can shape the
+RL reward landscape.  By making classical shortcuts
+``expensive,'' the MCTS is steered toward the combinatorial
+search space where:
+\begin{enumerate}[nosep]
+\item The AI's infinite working memory is a genuine advantage
+  over human mathematicians.
+\item The search space is bounded (finite $\Q$-linear algebra),
+  so the MCTS converges rather than thrashing.
+\item Any solution found is automatically a novel constructive
+  proof, publishable independently of the AI methodology.
+\end{enumerate}
 
 \subsection{Future targets}
 
