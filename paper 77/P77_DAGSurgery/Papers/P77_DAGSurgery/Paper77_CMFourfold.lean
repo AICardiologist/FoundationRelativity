@@ -10,8 +10,8 @@
     §2. The cohomology vector space (concrete: Q^70)
     §3. The CM action on H^4(E^4, Q)
     §4. Anderson's exotic Weil class (concrete target vector)
-    §5. The Classical Boundary Node (Hodge Conjecture — CLASS)
-    §6. Restricted generator set (concrete cycle class vectors)
+    §5. Restricted generator set (concrete cycle class vectors)
+    §6. The Classical Boundary Node (Hodge Conjecture — CLASS)
     §7. The Squeeze Target (Σ-type, 1 sorry)
 
   Key design: Mathlib lacks a computational Chow ring API for
@@ -28,9 +28,6 @@
   Date: February 2026
 -/
 import Mathlib.Tactic
-import Mathlib.Data.Fin.VecNotation
-import Mathlib.Data.Rat.Basic
-import Mathlib.LinearAlgebra.Matrix.DotProduct
 
 -- ============================================================
 -- §1. CRM Hierarchy (metadata only)
@@ -63,27 +60,14 @@ abbrev cohomDim : Nat := 70
 /-- A class in H^4(E^4, Q), represented as a vector in Q^70. -/
 abbrev CohomClass := Fin cohomDim → ℚ
 
-/-- The zero class. -/
-def zeroCohom : CohomClass := fun _ => 0
-
-/-- Scalar multiplication on cohomology classes. -/
-def smulCohom (c : ℚ) (v : CohomClass) : CohomClass :=
-  fun i => c * v i
-
-/-- Addition of cohomology classes. -/
-def addCohom (v w : CohomClass) : CohomClass :=
-  fun i => v i + w i
-
-instance : Add CohomClass := ⟨addCohom⟩
-instance : SMul ℚ CohomClass := ⟨smulCohom⟩
-instance : Zero CohomClass := ⟨zeroCohom⟩
+-- Note: CohomClass inherits Add, SMul ℚ, Zero from Pi instances.
+-- No custom instances needed.
 
 -- ============================================================
 -- §2a. Basis indexing for Λ^4(Q^8)
 -- ============================================================
 -- The 70 basis elements of Λ^4(Q^8) are indexed by
 -- 4-element subsets {a,b,c,d} ⊂ {0,...,7} with a < b < c < d.
--- We fix a lexicographic enumeration.
 
 /-- A 4-element subset of {0,...,7}, strictly increasing. -/
 structure Basis4 where
@@ -96,20 +80,9 @@ structure Basis4 where
   hcd : c < d
   deriving DecidableEq
 
-/-- Enumerate all 70 basis elements in lexicographic order.
-    This is a computable function; the actual enumeration is
-    generated at elaboration time. -/
-def basisList : List Basis4 := Id.run do
-  let mut result : List Basis4 := []
-  for a' in List.range 8 do
-    for b' in List.range 8 do
-      for c' in List.range 8 do
-        for d' in List.range 8 do
-          if h : a' < b' ∧ b' < c' ∧ c' < d' then
-            result := result ++ [⟨⟨a', by omega⟩, ⟨b', by omega⟩,
-              ⟨c', by omega⟩, ⟨d', by omega⟩, by exact_mod_cast h.1,
-              by exact_mod_cast h.2.1, by exact_mod_cast h.2.2⟩]
-  return result
+/-- The number of 4-element subsets of an 8-element set is 70.
+    This is a sanity check on our dimension. -/
+theorem basis4_count : Nat.choose 8 4 = 70 := by native_decide
 
 -- ============================================================
 -- §3. The CM Action
@@ -132,14 +105,16 @@ def cmActionH1 (v : Fin 2 → ℚ) : Fin 2 → ℚ :=
   | 0 => -(v 1)
   | 1 => v 0
 
-/-- The CM action on H^1(E^4, Q) = Q^8, acting blockwise. -/
+/-- The CM action on H^1(E^4, Q) = Q^8, acting blockwise.
+    Each 2-block undergoes the CM rotation. -/
 def cmActionH1_4 (v : Fin 8 → ℚ) : Fin 8 → ℚ :=
   fun j =>
     let factor := j.val / 2  -- which E factor (0,1,2,3)
     let coord := j.val % 2   -- which coordinate within the factor
-    match coord with
-    | 0 => -(v ⟨2 * factor + 1, by omega⟩)
-    | _ => v ⟨2 * factor, by omega⟩
+    if coord = 0 then
+      -(v ⟨2 * factor + 1, by omega⟩)
+    else
+      v ⟨2 * factor, by omega⟩
 
 -- ============================================================
 -- §4. Anderson's Exotic Weil Class
@@ -152,15 +127,10 @@ def cmActionH1_4 (v : Fin 8 → ℚ) : Fin 8 → ℚ :=
 -- in Q^70 that is orthogonal to the image of the divisor
 -- product map Div^1 ⊗ Div^1 → H^4.
 --
--- PLACEHOLDER: The exact 70-dimensional coordinate vector
+-- AXIOMATISED: The exact 70-dimensional coordinate vector
 -- requires computing the CM-invariant decomposition of Λ^4(Q^8)
--- under the Q(i)-action. This computation is the subject of
--- the CRMLint Squeeze — the AI must either:
---   (a) compute the exotic class from the CM action, or
---   (b) receive it as input and find the cycle.
---
--- For the squeeze architecture, we axiomatise the target vector
--- and make the cycle-finding problem concrete.
+-- under the Q(i)-action. When the full computation is performed,
+-- this axiom will be replaced by a computable definition.
 
 /-- Anderson's exotic Weil class on E^4, represented as a
     concrete vector in Q^70.
@@ -168,49 +138,20 @@ def cmActionH1_4 (v : Fin 8 → ℚ) : Fin 8 → ℚ :=
     AXIOMATISED: The exact coordinates depend on the choice of
     CM discriminant and basis normalisation. The squeeze target
     is well-posed regardless of which specific exotic class is
-    chosen, because the cycle class map is Q-linear.
-
-    When the full computation is performed (§3 CM action
-    diagonalisation), this axiom will be replaced by a
-    computable definition. -/
+    chosen, because the cycle class map is Q-linear. -/
 axiom exotic_weil_class : CohomClass
 
-/-- The exotic class is CM-invariant (required property). -/
-axiom exotic_is_cm_invariant :
-  -- Informal: cmAction_H4 exotic_weil_class = exotic_weil_class
-  True  -- placeholder; the real statement requires the induced
-        -- Λ^4 action, which will be computed in the full version
-
-/-- The exotic class is NOT in the divisor product subspace. -/
-axiom exotic_not_divisorial :
-  -- Informal: exotic_weil_class ∉ span(div_products)
-  True  -- placeholder; verified by orthogonality computation
+/-- The exotic class is nonzero. -/
+axiom exotic_weil_class_ne_zero : exotic_weil_class ≠ 0
 
 -- ============================================================
--- §5. The Classical Boundary Node (The Helicopter)
--- ============================================================
--- CRMLint classification: CLASS
--- This axiom is present but UNUSED by the squeeze target.
--- It represents the Hodge Conjecture: "a cycle exists."
-
-/-- The Hodge Conjecture (classical existence, ineffective).
-    This is the Classical Boundary Node that the Squeeze excises.
-    It guarantees an algebraic cycle exists for every Hodge class,
-    but provides zero constructive information about which cycle.
-
-    CRMLint classification: CLASS (invokes unbounded existential
-    over infinite Chow group). -/
-axiom hodge_conjecture_existence (w : CohomClass) :
-  ∃ (coeffs : List (ℚ × PermittedCycle)),
-    (coeffs.map (fun c => c.1 • cycle_class_eval c.2)).foldl
-      (· + ·) 0 = w
--- Forward-declared; see §6 for PermittedCycle and cycle_class_eval.
-
--- ============================================================
--- §6. Restricted Generator Set (The Path in the Woods)
+-- §5. Restricted Generator Set (The Path in the Woods)
 -- ============================================================
 -- The permitted algebraic cycles, projected into H^4(E^4, Q).
 -- Each generator is a CONCRETE vector in Q^70.
+--
+-- These MUST be declared before the CBN (§6) so that the
+-- axiom statement can reference them.
 
 /-- The permitted algebraic cycle types.
     These are the only building blocks the AI may use. -/
@@ -242,6 +183,25 @@ inductive PermittedCycle where
 axiom cycle_class_eval : PermittedCycle → CohomClass
 
 -- ============================================================
+-- §6. The Classical Boundary Node (The Helicopter)
+-- ============================================================
+-- CRMLint classification: CLASS
+-- This axiom is present but UNUSED by the squeeze target.
+-- It represents the Hodge Conjecture: "a cycle exists."
+
+/-- The Hodge Conjecture (classical existence, ineffective).
+    This is the Classical Boundary Node that the Squeeze excises.
+    It guarantees an algebraic cycle exists for every Hodge class,
+    but provides zero constructive information about which cycle.
+
+    CRMLint classification: CLASS (invokes unbounded existential
+    over infinite Chow group). -/
+axiom hodge_conjecture_existence (w : CohomClass) :
+  ∃ (coeffs : List (ℚ × PermittedCycle)),
+    (coeffs.map (fun c => c.1 • cycle_class_eval c.2)).foldl
+      (· + ·) 0 = w
+
+-- ============================================================
 -- §7. The Squeeze Target (Σ-type)
 -- ============================================================
 -- CRMLint classification target: BISH
@@ -249,7 +209,7 @@ axiom cycle_class_eval : PermittedCycle → CohomClass
 -- *construct* the explicit rational coefficients.
 
 /-- Sum a list of scaled cohomology classes. -/
-def sumScaledClasses (cycles : List (ℚ × PermittedCycle)) :
+noncomputable def sumScaledClasses (cycles : List (ℚ × PermittedCycle)) :
     CohomClass :=
   cycles.foldl (fun acc c => acc + (c.1 • cycle_class_eval c.2)) 0
 
@@ -271,9 +231,9 @@ def sumScaledClasses (cycles : List (ℚ × PermittedCycle)) :
     - Must not depend on hodge_conjecture_existence
     - Must not depend on Classical.choice / Classical.em
     - Classification: BISH (finite Q-linear algebra) -/
-def explicit_exotic_cycle :
-    Σ (cycles : List (ℚ × PermittedCycle)),
-      sumScaledClasses cycles = exotic_weil_class := by
+noncomputable def explicit_exotic_cycle :
+    {cycles : List (ℚ × PermittedCycle) //
+      sumScaledClasses cycles = exotic_weil_class} := by
   sorry
   -- ═══════════════════════════════════════════════════════════
   -- SQUEEZE TARGET for RL Prover / MCTS
@@ -295,16 +255,15 @@ def explicit_exotic_cycle :
 -- §8. Verification infrastructure
 -- ============================================================
 
-/-- The squeeze target has the correct type. -/
+-- The squeeze target has the correct type:
 #check @explicit_exotic_cycle
--- Σ (cycles : List (ℚ × PermittedCycle)),
---   sumScaledClasses cycles = exotic_weil_class
+-- { cycles : List (ℚ × PermittedCycle) // sumScaledClasses cycles = exotic_weil_class }
 
-/-- When sorry is replaced, CRMLint should report:
-    explicit_exotic_cycle : BISH
-    Dependencies: sumScaledClasses (BISH), cycle_class_eval (axiom, BISH),
-                  exotic_weil_class (axiom, BISH target data)
-    NOT depending on: hodge_conjecture_existence (CLASS, excised) -/
+-- When sorry is replaced, CRMLint should report:
+--   explicit_exotic_cycle : BISH
+--   Dependencies: sumScaledClasses (BISH), cycle_class_eval (axiom, BISH),
+--                 exotic_weil_class (axiom, BISH target data)
+--   NOT depending on: hodge_conjecture_existence (CLASS, excised)
 
 -- #crm_audit explicit_exotic_cycle
 -- Expected output (after sorry replacement):

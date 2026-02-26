@@ -593,19 +593,19 @@ axiom hodge_conjecture_existence (w : CohomClass) :
   Exists (fun (coeffs : List (Rat * PermittedCycle)) =>
     sumScaledClasses coeffs = w)
 
--- The constructive squeeze target (Sigma-type = data)
-def explicit_exotic_cycle :
-    Sigma (fun (cycles : List (Rat * PermittedCycle)) =>
-      sumScaledClasses cycles = exotic_weil_class) := by
+-- The constructive squeeze target (Subtype = data + proof)
+noncomputable def explicit_exotic_cycle :
+    {cycles : List (Rat * PermittedCycle) //
+      sumScaledClasses cycles = exotic_weil_class} := by
   sorry  -- MCTS target: replace with explicit coefficients
 \end{lstlisting}
 
 The axiom \texttt{hodge\_conjecture\_existence} is present in the
 environment but \emph{unused} by the squeeze target.  CRMLint
 verifies that the completed proof does not transitively depend on
-it.  The $\Sigma$-type forces the AI to \emph{construct} the
-cycle (output data), not merely prove existence (output a
-proposition).
+it.  The \texttt{Subtype} packages a list together with a proof
+obligation, forcing the AI to \emph{construct} the cycle (output
+data), not merely prove existence (output a proposition).
 
 \subsection{Action space restriction}
 
