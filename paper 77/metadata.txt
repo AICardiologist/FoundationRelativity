@@ -1,5 +1,5 @@
 Title:
-The Complete Constructive Hodge Theorem for CM Abelian Fourfolds: Automated De-Omniscientisation via DAG Surgery (Paper 77, Constructive Reverse Mathematics Series)
+Explicit Hodge Decompositions for E^4 via Automated De-Omniscientisation (Paper 77, Constructive Reverse Mathematics Series)
 
 Authors:
 Lee, Paul Chun-Kit (New York University)
@@ -27,11 +27,11 @@ Keywords:
 constructive reverse mathematics, CRMLint Squeeze, de-omniscientisation, asymmetric offloading, Hodge conjecture, CM abelian fourfolds, exotic Weil classes, Anderson obstruction, cup products, divisor classes, Neron-Severi group, BISH, CLASS, Lean 4, formal verification, native_decide, exact rational arithmetic, sparse encoding, conservation gap, constructive mathematics
 
 Abstract:
-We introduce the CRMLint Squeeze, a systematic protocol for reverse-engineering classical proofs into constructive ones by combining CRM logical cost analysis with computational algebra. The method identifies the Classical Boundary Node (CBN) -- the exact lemma where a classical proof invokes an omniscience principle -- excises it, and replaces it with an explicit algebraic witness verified by compiled rational arithmetic (native_decide).
+The Hodge Conjecture for products of CM elliptic curves was proved by Lieberman (1968) and subsumed by Deligne (1982). The mathematical content of this paper is a known consequence of these results and is not novel. The contribution is methodological.
 
-We execute the protocol on CM abelian fourfolds E^4 with End(E) = Z[i]. The initial target (exotic Weil classes) is computationally refuted: we prove that dim(Hodge^{2,2}) = dim(div. products) = 36, so E^4 supports no exotic Hodge classes (Theorem A). Pivoting to the correct target, we prove the Complete Constructive Hodge Theorem for E^4: every Hodge (2,2) class is an explicit Q-linear combination of cup products of divisor classes, with all 36 basis decompositions verified by native_decide in Lean 4 (Theorem B). The Lean bundle builds with 0 sorry, 0 axiom in the constructive path, and 0 noncomputable.
+We produce explicit Hodge decompositions for E^4 (E a CM elliptic curve with End(E) tensor Q = Q(i)): all 36 Hodge (2,2) basis vectors expressed as Q-linear combinations of cup products of divisor classes, formally verified in Lean 4 by native_decide. We also verify that E^4 supports no exotic Weil classes (dim Hodge = dim div. products = 36).
 
-The paper introduces asymmetric offloading (Python CAS computes, Lean kernel verifies) and documents the token overflow problem and its resolution through sparse match encoding. This marks the transition of the CRM program from diagnostic (Papers 1-76) to generative, continuing the arc from Paper 75 (conservation gap detection) through Paper 76 (CRMLint automated analysis) to Paper 77 (automated constructivisation).
+These results are produced by the CRMLint Squeeze, a protocol for reverse-engineering classical proofs into constructive ones, demonstrated on a case where the answer is independently known. The paper introduces asymmetric offloading (Python CAS computes exact Q-algebra, Lean kernel verifies) and documents the engineering: the noncomputable trap, token overflow, and sparse encoding. The Lean bundle builds with 0 sorry, 0 user-declared axiom in the constructive path, and 0 noncomputable.
 
 Related Identifiers:
 Part of: Constructive Reverse Mathematics Series (Papers 1-77)
@@ -62,7 +62,7 @@ File Manifest:
 README.md                                       Overview and build instructions
 metadata.txt                                     This file
 paper77.tex                                      LaTeX source
-paper77.pdf                                      Compiled PDF (16 pages)
+paper77.pdf                                      Compiled PDF (20 pages)
 solve_hodge.py                                   Main computation + Lean emission
 emit_lean.py                                     Sparse re-emitter
 compute_cm.py                                    Original CM diagonalisation

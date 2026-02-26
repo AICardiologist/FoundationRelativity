@@ -184,9 +184,8 @@
 }
 
 % ---------- Title and author ----------
-\title{The Complete Constructive Hodge Theorem\\
-  for CM Abelian Fourfolds:\\
-  Automated De-Omniscientisation via DAG Surgery\\[6pt]
+\title{Explicit Hodge Decompositions for~$E^4$\\
+  via Automated De-Omniscientisation\\[6pt]
   {\large (Paper~77, Constructive Reverse Mathematics Series)}}
 
 \author{Paul Chun-Kit Lee\thanks{Lean 4 formalization and Python source available at \leanRepo.} \\
@@ -200,44 +199,41 @@ New York University \\
 \maketitle
 
 \begin{abstract}
-The Hodge Conjecture---that every rational $(p,p)$-class on a
-smooth projective variety is algebraic---has been verified for
-abelian varieties with complex multiplication by
-Deligne~(1982), Lieberman~(1968), and others, but always through
-classical existence arguments that produce no explicit algebraic
-representatives.  For CM abelian fourfolds such as~$E^4$
-($E$ an elliptic curve with $\End(E) \otimes \Q \cong \Q(i)$),
-the Hodge~$(2,2)$ space is 36-dimensional; classical proofs
-assert that divisor products span this space without exhibiting a
-single decomposition.
+The Hodge Conjecture for products of CM elliptic curves was
+proved by Lieberman~(1968) and subsumed by Deligne's~(1982)
+theorem on absolute Hodge classes.  These classical proofs
+establish existence---every Hodge class is algebraic---but produce
+no explicit algebraic representatives.  The mathematical content
+of the present paper is a direct consequence of these known
+results and is not novel.
 
-We prove the \emph{Complete Constructive Hodge Theorem for~$E^4$}:
-every Hodge~$(2,2)$ class is an explicit $\Q$-linear combination
-of cup products of divisor classes, with all 36 basis
-decompositions formally verified in Lean~4 by
-\texttt{native\_decide} (Theorem~B).  As a prerequisite, we prove
-there are \emph{no exotic Weil classes} on~$E^4$:
-$\dim_\Q \Hdg^{2,2} = \dim_\Q(\text{div.\ products}) = 36$
-(Theorem~A), refuting the initial hypothesis that the Anderson
-obstruction applies to this variety.  The Lean bundle builds with
-0~sorry and 0~\texttt{noncomputable}; the classical Hodge
-existence axiom is present but provably unused.
+What is new is the \emph{method} and the \emph{formal
+verification}.  We produce explicit Hodge decompositions for
+$E^4$ ($E$ a CM elliptic curve with
+$\End(E) \otimes \Q \cong \Q(i)$): all 36 Hodge~$(2,2)$ basis
+vectors are expressed as $\Q$-linear combinations of cup products
+of divisor classes, formally verified in Lean~4 by
+\texttt{native\_decide} (Theorem~B).  We also verify
+computationally that $E^4$ supports no exotic Weil classes
+(Theorem~A)---unsurprising for a non-simple variety with
+endomorphism algebra $M_4(\Q(i))$, but a necessary prerequisite.
 
-These results are produced by the \emph{CRMLint Squeeze}, a
-protocol for reverse-engineering classical proofs into constructive
-ones (Theorem~C).  The method identifies the \emph{Classical
-Boundary Node} (CBN)---the exact lemma where a classical proof
-invokes an omniscience principle---excises it, and replaces it
-with an explicit algebraic witness.  The paper introduces the
-\emph{asymmetric offloading} architecture: Python CAS computes
-exact $\Q$-linear algebra, emits Lean~4 source with hardcoded
-rational data, and the Lean kernel verifies via
-\texttt{native\_decide}.
+These results are produced by the \emph{CRMLint Squeeze}
+(Theorem~C), a protocol for reverse-engineering classical proofs
+into constructive ones by excising the \emph{Classical Boundary
+Node}---the lemma where an omniscience principle
+enters---and replacing it with an explicit algebraic witness.
+The paper introduces the \emph{asymmetric offloading}
+architecture (Python CAS computes exact $\Q$-linear algebra;
+Lean kernel verifies via \texttt{native\_decide}) and documents
+its engineering: the \texttt{noncomputable} trap, token overflow,
+and sparse encoding.
 
-This is the first time the Hodge Conjecture for a non-trivial
-abelian variety has been machine-verified as a finite constructive
-database with explicit rational witnesses, replacing the classical
-existence theorem with 36 computable decompositions.
+The contribution is methodological, not mathematical.  The
+value of the exercise is the pipeline---automated
+constructivisation of known classical theorems---demonstrated
+end-to-end on a case where the answer is independently
+known, so the output can be validated.
 \end{abstract}
 
 \tableofcontents
@@ -336,14 +332,18 @@ non-trivial Hodge structure.
 
 \medskip\noindent
 \textbf{What this paper adds.}
-We provide the first \emph{explicit constructive proof}: 36
-rational decompositions, each expressing a Hodge basis vector as a
-$\Q$-linear combination of cup products of divisor classes,
-formally verified in Lean~4.  This replaces the classical
-existence theorem (Lieberman/Deligne) with a finite computable
-database.  The proof also establishes that $E^4$ supports no
-exotic Weil classes, resolving the question of whether the
-Anderson obstruction applies to non-simple products.
+The mathematical result---that every Hodge $(2,2)$ class on~$E^4$
+is algebraic---is a known consequence of Lieberman and Deligne.
+Our contribution is \emph{making the classical existence explicit}:
+we produce 36 rational decompositions, each expressing a Hodge
+basis vector as a $\Q$-linear combination of cup products of
+divisor classes, formally verified in Lean~4.  Nobody has written
+down these decompositions before, because nobody needed to: the
+existence proof suffices.  We produce them as a proof-of-concept
+for the CRMLint Squeeze pipeline (Theorem~C), not as a
+mathematical advance.  The computation also confirms that~$E^4$
+supports no exotic Weil classes---unsurprising for a non-simple
+variety, but a necessary prerequisite for the decomposition.
 
 \subsection{State of the art in AI theorem proving}
 
@@ -889,9 +889,11 @@ Kleiman~\cite{Kleiman1968} for the classical foundations).
 Paper~77 shows that for the specific case $A = E^4$ with
 $\End(E) \otimes \Q \cong \Q(i)$, the classical content is
 completely eliminable: the $\CLASS$ existence collapses to a
-$\BISH$ finite database.  This is the strongest possible form of
-descent: from unbounded classical existence to a finitely
-enumerable constructive witness.
+$\BISH$ finite database.  This descent---from unbounded classical
+existence to finitely enumerable constructive witnesses---is
+expected for non-simple CM abelian varieties (the endomorphism
+algebra is large enough to generate all Hodge classes), but is
+demonstrated here with formal verification for the first time.
 
 % ============================================================
 \section{Formal Verification}\label{sec:formal}
@@ -1314,38 +1316,64 @@ class is algebraic'' (Lefschetz $(1,1)$, classical).  The
 vectors, verified by \texttt{native\_decide}.''  The decompiled
 version is strictly more informative.
 
-\subsection{Novelty and relation to existing work}
+\subsection{What is and is not new}\label{sec:whatsnew}
 
-The Complete Constructive Hodge Theorem for $E^4$
-(Theorem~\ref{thm:constructive-hodge}) is, to our knowledge, the
-first time the Hodge Conjecture for a specific non-trivial abelian
-variety has been machine-verified as a finite $\BISH$ database with
-explicit rational witnesses.
+\textbf{The mathematical result is not novel.}
+Lieberman~\cite{Lieberman1968} proved in 1968 that all Hodge
+classes on products of elliptic curves are algebraic.
+Deligne~\cite{Deligne1982} subsumed this in 1982 by proving
+all Hodge classes on CM abelian varieties are absolutely Hodge.
+The fact that $E^4$---a maximally non-simple variety with
+endomorphism algebra $M_4(\Q(i))$---has no exotic Weil classes
+is unsurprising: the large endomorphism algebra generates
+far more divisor classes than a simple variety of the same
+dimension, and the cup product span saturates the Hodge space.
+No number theorist would find Theorem~A unexpected.
 
-The individual ingredients---CM action computation, cup product
-enumeration, Gaussian elimination over~$\Q$---are standard
-computational algebraic geometry.  The novelty lies in three aspects:
+The individual computational ingredients---CM action on
+exterior powers, cup product enumeration, Gaussian elimination
+over~$\Q$---are standard computational algebraic geometry.
+The proof is, at bottom, a $36 \times 36$ linear system.
+
+\medskip\noindent
+\textbf{What is new is threefold:}
 
 \begin{enumerate}[nosep]
-\item \textbf{The CRM framing.}  The computation is driven by the
-  logical cost metric, not by intrinsic geometric interest.
-  CRMLint identifies \emph{which} computation to perform (the CBN
-  tells us where the classical content enters); the CAS performs it.
-\item \textbf{The asymmetric offloading architecture.}  Python
-  computes; Lean verifies.  The separation avoids the
-  \texttt{noncomputable} trap and produces a formally verified
-  result without requiring Lean to perform any CAS computation.
-\item \textbf{The self-correcting methodology.}  The hallucination
-  (Remark~\ref{rem:hallucination}) was caught by the protocol's
-  insistence on computation before axiomatics.  This is a design
-  feature, not an accident.
+\item \textbf{The explicit decompositions themselves.}  Although
+  the existence of algebraic representatives has been known since
+  Lieberman, the 36 explicit $\Q$-linear combinations expressing
+  each Hodge basis vector as a sum of cup products have not, to our
+  knowledge, been written down.  Nobody needed them---the
+  existence proof suffices for all mathematical purposes.  We
+  produce them as a demonstration, not as a mathematical
+  contribution.
+\item \textbf{The CRMLint Squeeze protocol.}  The systematic
+  method---identify the Classical Boundary Node via CRMLint,
+  excise the classical axiom, restrict the action space, solve the
+  residual system---is a reusable pipeline for converting
+  $\CLASS$ existence theorems into $\BISH$ constructive
+  witnesses.  The $E^4$ case is a proof-of-concept; the pipeline
+  is the contribution.
+\item \textbf{The asymmetric offloading architecture and its
+  engineering.}  The separation of CAS computation (Python) from
+  kernel verification (Lean~4), including the
+  \texttt{noncomputable} trap, token overflow, and sparse encoding,
+  constitutes a documented, reusable pattern for machine-verified
+  constructive mathematics.
 \end{enumerate}
 
-\noindent
-The mathematical content is elementary (the proof is linear algebra
-over~$\Q$).  The methodological content---using logical cost as a
-search-space restrictor, asymmetric offloading, and automated
-constructivisation---is the primary contribution.
+\medskip\noindent
+\textbf{Why demonstrate on a known case?}
+Precisely \emph{because} the answer is independently known.
+A methods paper should validate its pipeline on a target where
+the output can be checked against established mathematics.
+If the Squeeze produced an incorrect decomposition, the error
+would be caught immediately (by \texttt{native\_decide}, by
+comparison with Lieberman's theorem, or by direct computation).
+The $E^4$ case is a calibration run, not a frontier assault.
+The frontier targets---simple CM abelian fourfolds where exotic
+classes genuinely exist, wild Langlands parameters, Standard
+Conjecture~D---are identified as Papers~78--79.
 
 \subsection{Limitations}\label{sec:limits}
 
@@ -1473,36 +1501,40 @@ technical lessons:
 \section{Conclusion}\label{sec:conclusion}
 % ============================================================
 
-The CRMLint Squeeze transitions the CRM program---which
-traces its intellectual lineage to Kronecker's~\cite{Kronecker1882}
-insistence on explicit construction---from auditing
-the history of mathematics to engineering its future.  The
-logical cost metric drives explicit algebraic constructions
-via asymmetric offloading: human geometric intuition identifies
-the target; Python CAS performs the heavy computation; Lean
-verifies the result by compiled rational arithmetic.
+The mathematical result of this paper---that every Hodge
+$(2,2)$ class on~$E^4$ is an explicit $\Q$-linear combination
+of cup products of divisor classes---is a known consequence
+of Lieberman~\cite{Lieberman1968} and Deligne~\cite{Deligne1982}.
+The 36 explicit decompositions are new only in the literal sense
+that nobody has written them down, because nobody needed to.
 
-The first execution produced a surprise: the initial target
-(exotic Weil classes on $E^4$) does not exist.  The methodology
-itself caught the error---the Scaffold step's insistence on
-concrete computation refuted the target before any search began.
-Pivoting to the correct theorem, the Complete Constructive Hodge
-Theorem for $E^4$ was proved: 36 explicit decompositions, each
-verified by \texttt{native\_decide}, replacing the classical
-Lefschetz existence axiom with a finite $\BISH$ database.
+The contribution is the \emph{pipeline}: the CRMLint Squeeze
+protocol, demonstrated end-to-end on a case where the output can
+be validated against established mathematics.  The protocol
+identifies where the classical content enters a proof (CRMLint),
+excises it, restricts the search space to bounded algebraic
+generators, and solves the residual system by exact computation.
+The asymmetric offloading architecture (Python~CAS $\to$ Lean~4
+kernel verification via \texttt{native\_decide}) and the
+engineering lessons (the \texttt{noncomputable} trap, token
+overflow, sparse encoding) are documented as reusable tools.
 
-The scientific value is fourfold: (1)~the Squeeze protocol is
-demonstrated end-to-end on a non-trivial target; (2)~the
-hallucination correction validates the methodology's
-self-diagnostic capacity; (3)~the Lean bundle provides the
-first formally verified constructive Hodge theorem for a
-CM abelian fourfold; (4)~the asymmetric offloading architecture
-and sparse encoding technique are documented as reusable tools
-for future machine-verified constructive mathematics.
+The $E^4$ execution is a calibration run.  It validated two
+aspects of the methodology: (1)~the Scaffold step caught a
+hallucinated target (exotic classes on a non-simple variety)
+before any search began, confirming the protocol's
+self-diagnostic capacity; (2)~the deterministic collapse
+phenomenon---the problem reduced from infinite-dimensional
+classical existence to a $36 \times 36$ linear system---shows
+that the Squeeze can identify when stochastic search is
+unnecessary.
 
-The progression Papers~75--76--77 completes the arc from
-diagnostic to generative CRM.  The era of automated
-de-omniscientisation has begun.
+The frontier targets, where the Squeeze faces genuine resistance,
+are simple CM abelian fourfolds with exotic Weil classes
+(Paper~78--79).  The progression Papers~75--76--77 completes the
+arc from diagnostic to generative CRM.  Whether the pipeline
+scales to cases where the classical proof is the only proof---where
+no independent check exists---remains open.
 
 % ============================================================
 \section*{Acknowledgments}
