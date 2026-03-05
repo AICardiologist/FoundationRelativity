@@ -265,38 +265,103 @@ Every paper with its bottom line. Papers 1 and 3 withdrawn; Papers 60 and 62 ret
 | 74 | Algebraic Spectrum Is Necessary | Axiom 2 (algebraic spectrum) ↔ BISH eigenvalue decidability; failure costs WLPO |
 | **75** | **Conservation Test: GL LLC Calibration** | **Statement WLPO, proof CLASS — conservation gap validates DPT externally** |
 
-#### Generative Phase (Papers 76–77)
+---
+
+## Part Three: The CRMLint Campaign (Papers 76–102)
+
+### The finding
+
+**CRMLint automates what Papers 2–75 did by hand.** A Lean 4 metaprogram classifies axiom dependencies by type: `Real.instField` → WLPO, `Classical.choice` in cycle existence → CLASS. Applied systematically, it decomposes major theorems (Hodge, BSD, FLT, Kuga-Satake) into BISH and CLASS components, revealing that classical logic enters arithmetic geometry through exactly one door: Betti realization.
+
+### What is surprising
+
+**The BISH percentage is predictably high.** Across 17 CRMLint applications, BISH components range from 67% to 77%. The arithmetic and algebraic machinery is constructive; only the transcendental comparison (periods, regulators, Betti cohomology) forces CLASS.
+
+**CRM(FLT) = WKL.** Fermat's Last Theorem, audited end-to-end (Paper 99), has the same logical cost as Weak K&ouml;nig's Lemma. Three explicit CLASS→BISH excisions: Poisson summation → Mumford algebraic theta, Deligne-Serre → forward matching, Chebotarev → effective bounds.
+
+**The Conservation Conjecture emerges.** Paper 98 conjectures that every CLASS theorem in arithmetic geometry has a BISH proof of equal strength. Papers 99–100 provide positive evidence; Paper 102 formalizes the conjecture and its test cases.
+
+### CRMLint tool and method papers
+
+| # | Title | Role |
+|---|-------|------|
+| **76** | **CRMLint: Automated CRM Logical Cost Analysis** | **Tool paper. Lean 4 metaprogram: type-aware classifier, 940 lines core** |
+| **77** | **Explicit Hodge Decompositions for E⁴** | **Methods paper. Asymmetric offloading: Python CAS → Lean kernel** |
+
+### CRMLint Squeeze applications (Papers 78–89)
 
 | # | Title | Bottom line |
 |---|-------|------------|
-| **76** | **CRMLint: Automated Logical Cost Analyzer** | **Lean 4 metaprogram: type-aware classifier, Real.instField → WLPO, three conservation gaps closed** |
-| **77** | **Explicit Hodge Decompositions for E⁴** | **CRMLint Squeeze: Python CAS → Lean kernel, 36 Hodge decompositions verified by native_decide** |
+| 78 | LLC for GL₂(ℚ₂) Is Constructively Decidable | 2nd CRMLint app. Langlands program entry point |
+| 79 | Standard Conjecture D for Abelian Fourfolds of Weil Type | 3rd CRMLint app. CLASS → BISH descent via native_decide |
+| 80 | Algebraic Gauss-Manin via Griffiths Pole Reduction | 4th CRMLint app. ℚ(t)-algebra by `ring` |
+| 81 | Fixed Part Theorem via Tensor Gauss-Manin | 5th CRMLint app. Kronecker sum on H¹⊗H¹ |
+| 82 | Picard-Fuchs Monodromy via Kovacic's Algorithm | 6th CRMLint app. G_gal = SL₂ by rational function analysis |
+| 83 | Generic Picard Number of E_t × E_t | 7th CRMLint app. Capstone of P80–82: Picard rank = 3, zero axioms |
+| 84 | Exotic Weil Classes as Flat Sections | 8th CRMLint app. Genus-4 family, G_gal(∧⁴V₊) = {1} |
+| 85 | Universal Trace Vanishing for Exotic Weil Classes | 9th CRMLint app. τ₊ = 0 verified computationally, multi-genus evidence |
+| 86 | Hodge Conjecture for Exotic Weil via Kani-Rosen | 10th CRMLint app. Hidden D₈ symmetry, Kani-Rosen splitting, MT = GSp₄ |
+| 87 | The Omniscience Cost of the Hodge Conjecture | First CRM analysis of a Clay Millennium Problem. Uniform test ≡ WLPO; CM ≡ BISH |
+| 88 | Fermat Domination and the Variational Hodge Conjecture | 11th CRMLint app. Non-palindromic → conditional. Bifurcation: split vs simple |
+| 89 | Absolute Hodge Classes for Universal Hyperelliptic Weil Locus | 12th CRMLint app. Full 3-parameter universal family. τ₊(a,b,c) = 0 by `ring` |
+
+### Synthesis and capstone (Papers 90–98)
+
+| # | Title | Role |
+|---|-------|------|
+| **90** | **The Squeeze Is a Microscope** | **SYNTHESIS MONOGRAPH. Generative phase retrospective (P76–89). Four theorems: Squeeze Protocol, Bifurcation, Hodge Horizon = WLPO, Asymmetric Offloading. No Lean bundle (pure synthesis).** |
+| 91 | Logical Cost of Unconditional Hodge (CRM Audit of Markman) | CRM audit of Markman arXiv:2502.03415. Squeeze 90% vs Markman 44% BISH |
+| 92 | Cohomological Flatness for Genera 5–8 via Zariski Grid | 13th CRMLint app. Extends trace vanishing via Schwartz-Zippel |
+| 93 | The Structural Vanishing Theorem | Explanatory capstone for P84–92. Two independent proofs (Varchenko + Deligne). 13 BISH + 4 CLASS |
+| 94 | Griffiths Group of the Mirror Quintic | 14th CRMLint app. First CRM of Calabi-Yau middle cohomology. Detection BISH, existence CLASS |
+| 95 | The BSD Squeeze (Gross-Zagier-Kolyvagin) | 15th CRMLint app. First CRM audit of a Clay Millennium proof. 37a1 test case. 15 BISH + 6 CLASS (71%) |
+| 96 | The Root Number Bifurcation | 16th CRMLint app. BSD palindromic bifurcation. Rank 0 (11a1) detection BISH via modular symbols. 10 BISH + 3 CLASS (77%) |
+| 97 | BSD Landscape Survey — Null Finding | Internal note. No further CRMLint opportunities beyond P95–96 |
+| **98** | **The Motivic CRM Architecture** | **CAPSTONE SYNTHESIS + companion monograph "The Logical Cost of Everything." Archimedean Obstruction Thesis: CLASS enters through Betti realization only. Three calibration theorems. 607 lines Lean.** |
+
+### Final applications and open problems (Papers 99–102)
+
+| # | Title | Bottom line |
+|---|-------|------------|
+| 99 | The Hecke Theta Series Squeeze | 17th CRMLint app. CRM(FLT) = WKL. Three CLASS→BISH excisions. Validates P98's Archimedean Obstruction. Referee-accepted (v2). 1,180 lines Lean |
+| 100 | The Kuga-Satake Bifurcation | 18th CRMLint app. K3 Hodge capstone. Bifurcation at ρ=20: CM → BISH, generic → CLASS. 10 BISH + 5 CLASS (67%). 729 lines Lean |
+| 101 | The CRM Signature of Berkovich Motives | Non-Archimedean CRM: arc topology, perfectoid tilting, ∞-categorical motives |
+| **102** | **The Conservation Conjecture** | **Formalizes the principal open problem: every CLASS theorem in arithmetic geometry has a BISH proof of equal strength. Coding lemma + case studies. 6 Lean files.** |
+
+### Guide to synthesis and monograph papers
+
+For readers entering the series, these papers provide the architectural overview:
+
+| Paper | Type | Scope |
+|-------|------|-------|
+| **10** | Atlas | 50 calibration entries across 11 physics domains |
+| **12** | History | 150-year constructive mathematics narrative |
+| **40** | **Monograph** | **The Logical Constitution of Physical Reality — BISH + LPO ceiling proved** |
+| **50** | Framework | Three axioms (DPT) for Grothendieck's motives |
+| **67** | **Monograph** | **The Motive Is a Decidability Certificate — (r, ℓ, c) classify all motives** |
+| **70** | Capstone | The Archimedean Principle — u(ℝ) = ∞ unifies physics and arithmetic |
+| **76** | Tool | CRMLint — the automated logical cost analyzer |
+| **90** | **Monograph** | **The Squeeze Is a Microscope — generative phase synthesis (P76–89)** |
+| **98** | **Monograph** | **The Motivic CRM Architecture — capstone synthesis of P50–97** |
+| **102** | Open problem | The Conservation Conjecture — principal open problem for the field |
 
 ---
 
 ## Repository
 
 ```
-Papers/                     Lean 4 formalization bundles (self-contained)
+Papers/                     Lean 4 bundles (early papers, CI-tested)
   P2_BidualGap/
+  P4_SpectralGeometry/
   P5_GeneralRelativity/
   P6_Heisenberg_v2/
-  P7_ReflexiveWLPO/
-  P8_LPO_IsingBound/
-  P23_FanTheorem/
   P28_NewtonLagrange/
-  P33_QCDConfinement/
   P51_BSD/
-  P68_WilesFLT/
   P69_FuncField/
   P70_Archimedean/
-  P72_DPTCharacterisation/
-  P73_Axiom1Reverse/
-  P74_Axiom2Reverse/
-  P75_ConservationTest/
-paper 76/CRMLint/           Paper 76: CRMLint metaprogram (940 lines core)
-paper 77/P77_DAGSurgery/    Paper 77: Hodge decompositions (798 lines)
-paper N/                    LaTeX sources and PDFs for each paper
+paper N/                    LaTeX + PDF + Lean bundle per paper
+  paper 8/  through paper 102/   (ascending order)
+  Each paper N/ contains P{N}_{Name}/ Lean bundle where applicable
 scripts/                    CI audit scripts
 ```
 
