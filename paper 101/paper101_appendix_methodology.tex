@@ -1,0 +1,1601 @@
+% paper101_appendix_methodology.tex
+% Body content for Appendix C of Paper 101
+% Extracted from paper101_appendix_prelim.tex (CRMLint methodology paper)
+% Hierarchy: \subsection = original \part, \subsubsection = original \section
+
+\subsection{Genesis}\label{part:genesis}
+
+\subsubsection{The problem}\label{sec:problem}
+
+After 96 papers of manual CRM audit---classifying theorems one at a time,
+tracing axiom dependencies by hand, flagging each use of excluded middle
+or Archimedean completeness---the bottleneck in the program shifted from
+mathematics to labor.  The CRM classification of a single theorem
+(say, the Gross--Zagier formula) requires reading the proof, identifying
+every appeal to a non-constructive principle, and tracing each appeal
+to its minimal logical strength.  Papers~78--96 each took 2--5 days of
+combined human and AI effort.  Scaling this to the full Mathlib library
+(${\sim}200{,}000$ declarations as of early 2026) is infeasible by hand.
+
+The question that opens this paper is operational: \emph{can the CRM
+classification of a proof be automated?}
+
+\subsubsection{What CRM measures}\label{sec:what-crm-measures}
+
+CRM assigns to each proof a \emph{logical signature} $\sigma(P)$, the
+weakest axiom system in which the proof can be carried out.  The
+hierarchy is:
+\[
+  \BISH \;\subset\; \BISH{+}\MP \;\subset\; \BISH{+}\LLPO
+  \;\subset\; \BISH{+}\WKL \;\subset\; \BISH{+}\WLPO
+  \;\subset\; \BISH{+}\LPO \;\subset\; \CLASS
+\]
+A theorem with signature $\BISH$ requires no omniscience principle
+whatsoever: every step is computationally witnessed.  A theorem with
+signature $\CLASS$ invokes the full law of excluded middle somewhere
+in its proof tree.  The intermediate levels---$\MP$, $\LLPO$, $\WKL$,
+$\WLPO$, $\LPO$---measure calibrated degrees of non-constructivity,
+each corresponding to a specific decision problem on infinite sequences
+or real numbers.
+
+The CRM signature is \emph{not} a measure of proof complexity.
+Taylor--Wiles patching is technically intricate but logically $\WKL$
+(an inverse limit of finite objects).  The intermediate value theorem
+is elementary but logically $\WLPO$ (it requires deciding whether a
+real number equals zero).  CRM measures the \emph{logical cost} of a
+proof---the price paid for treating the continuum as a completed object
+with decidable properties.
+
+\subsubsection{Three generations of automation}\label{sec:three-gen}
+
+\CRMlint\ was developed in three stages, each addressing a different
+aspect of the automation problem:
+
+\medskip
+\noindent\textbf{Generation 1: Theoretical framework}
+(\texttt{crmlint.py}, 1{,}161 lines).
+Models the CRM hierarchy, six realization functors (Betti, de~Rham,
+\'etale, crystalline, Hodge, automorphic) with their CRM costs,
+comparison isomorphisms, and the Archimedean Obstruction Theorem of
+Paper~98.  Proof DAGs compute signatures by max-propagation over
+dependency edges.  A substitution database stores eight seed entries
+extracted from Papers~50--97: known techniques where a classical method
+can be replaced by a constructive alternative at lower logical cost.
+
+This generation answers: \emph{what is the right mathematical model
+for CRM signatures of composite proofs?}
+
+\medskip
+\noindent\textbf{Generation 2: Empirical validation}
+(\texttt{crmlint\_crawler.py}, 653 lines;
+\texttt{crmlint\_structure.py}, 793 lines).
+The crawler fetches Lean~4 source files from \Mathlib\ on GitHub,
+parses declarations, and heuristic-classifies each by CRM level using
+tactic and keyword signatures (${\sim}40$ classical indicators including
+\texttt{by\_contra}, \texttt{Classical.choice}, inner product space
+infrastructure, integration, and topological convergence patterns).
+The structure analyzer computes seven-dimensional proof profiles:
+proof size (lines, tactic count), dependency depth (\texttt{have}/\texttt{let}
+chains), proof width (active hypotheses, case splits), and modularity
+(automation ratio, external lemma invocations, rewrite density).
+
+This generation answers: \emph{does the CRM hierarchy correlate with
+structural proof complexity in real Lean code?}
+
+\medskip
+\noindent\textbf{Generation 3: LaTeX scanner}
+(\texttt{crmlint\_scanner.py}, 810 lines at v1.0, 870 lines at v1.1).
+Keyword and citation pattern matching against ${\sim}90$ technique
+markers and ${\sim}120$ landmark paper citations, applied directly to
+\texttt{.tex} source.  No Lean, no LLM, no external dependencies
+beyond the Python standard library.  Scans a directory of papers in
+seconds.  Anti-marker patterns suppress false positives (e.g.,
+algebraic ``integral closure'' is not analytic integration).
+
+This generation answers: \emph{can we triage thousands of papers by
+CRM cost before investing months in any one?}
+
+\medskip
+
+The three generations are complementary.  Generation~1 provides the
+theory; Generation~2 tests it against ground truth; Generation~3
+scales it to the full mathematical literature.  All three are
+implemented in pure Python with zero external dependencies (3{,}417
+lines total at v1.0).
+
+
+\subsection{Calibration: Mathlib at 627 Declarations}\label{part:mathlib}
+
+\subsubsection{Target selection}\label{sec:target-selection}
+
+We selected 10 \Mathlib\ files spanning eight mathematical domains:
+
+\begin{center}
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{File} & \textbf{Domain} & \textbf{Decls} \\
+\midrule
+\texttt{EllipticCurve/Weierstrass.lean} & Algebraic Geometry & 68 \\
+\texttt{InnerProductSpace/Basic.lean} & Analysis & 141 \\
+\texttt{SpecificLimits/Basic.lean} & Analysis & 83 \\
+\texttt{Galois/Basic.lean} & Field Theory & 61 \\
+\texttt{Charpoly/Basic.lean} & Linear Algebra & 39 \\
+\texttt{ArithmeticFunction.lean} & Number Theory & 0 \\
+\texttt{Bernoulli.lean} & Number Theory & 27 \\
+\texttt{RepresentationTheory/Basic.lean} & Representation Theory & 67 \\
+\texttt{Cyclotomic/Basic.lean} & Ring Theory & 57 \\
+\texttt{InfiniteSum/Basic.lean} & Topology & 84 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The selection was guided by two criteria: (1)~coverage of the
+algebraic/analytic divide that the Archimedean Obstruction Thesis
+predicts to be the primary CRM boundary, and (2)~inclusion of domains
+where the CRM series has ground-truth classifications from manual
+audit (inner product spaces from Paper~77, elliptic curves from
+Paper~95, Galois theory from Paper~78).
+
+\subsubsection{Generation 2 results: the crawler}\label{sec:crawler-results}
+
+The crawler classified 627 declarations:
+
+\begin{center}
+\begin{tabular}{lrrl}
+\toprule
+\textbf{CRM Level} & \textbf{Count} & \textbf{\%} & \\
+\midrule
+$\BISH$  & 577 & 92.0 & \rule{4.6cm}{6pt} \\
+$\WKL$   &  11 &  1.8 & \rule{0.09cm}{6pt} \\
+$\WLPO$  &  20 &  3.2 & \rule{0.16cm}{6pt} \\
+$\CLASS$ &  19 &  3.0 & \rule{0.15cm}{6pt} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The 92\% $\BISH$ figure is consistent with the programme's central
+finding: most of mathematics, as actually practiced in a modern proof
+library, is constructive.  The 8\% non-$\BISH$ content concentrates
+in three locations:
+
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Inner product spaces} (Analysis):
+  6 declarations at $\CLASS$, 4 at $\WLPO$.
+  The inner product on a Hilbert space is an inherently Archimedean
+  object: $\langle x, x \rangle \geq 0$ with equality iff $x = 0$
+  requires decidable equality of reals.  The Cauchy--Schwarz inequality
+  $|\langle x, y \rangle| \leq \|x\| \|y\|$ requires comparison of
+  real norms.  This is exactly the Archimedean obstruction of Papers~5
+  and 77.
+
+\item \textbf{Specific limits} (Analysis):
+  1 declaration at $\CLASS$, 11 at $\WKL$.
+  The geometric series $\sum_{n=0}^\infty r^n = 1/(1-r)$ for $|r|<1$
+  involves convergence of a real sequence---decidability of whether the
+  partial sums are within $\epsilon$ of the limit.  The single $\CLASS$
+  declaration (\texttt{tendsto\_pow\_atTop\_nhds\_zero\_of\_lt\_one})
+  uses \texttt{by\_contra}, a potentially eliminable appeal to
+  excluded middle.
+
+\item \textbf{Galois theory} (Field Theory):
+  12 declarations at $\CLASS$.
+  A false positive cluster: the crawler flags uses of ``integral''
+  (meaning integral closure, an algebraic concept) as analytic
+  integration.  This motivated the anti-marker system in the
+  Generation~3 scanner.
+\end{enumerate}
+
+\subsubsection{Per-domain cross-tabulation}\label{sec:per-domain}
+
+\begin{center}
+\small
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Domain} & \textbf{$N$} & \textbf{$\BISH$} & \textbf{$\WKL$}
+  & \textbf{$\WLPO$} & \textbf{$\CLASS$} \\
+\midrule
+Linear Algebra     & 39  & 39  &  0 &  0 &  0 \\
+Ring Theory        & 57  & 57  &  0 &  0 &  0 \\
+Number Theory      & 27  & 27  &  0 &  0 &  0 \\
+Topology           & 84  & 84  &  0 &  0 &  0 \\
+Algebraic Geometry & 68  & 66  &  0 &  2 &  0 \\
+Representation Th. & 67  & 55  &  0 & 12 &  0 \\
+Analysis           & 224 & 202 & 11 &  4 &  7 \\
+Field Theory       & 61  & 47  &  0 &  2 & 12 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The algebraic/analytic divide is sharp.  Four purely algebraic domains
+(linear algebra, ring theory, number theory, topology) are 100\%
+$\BISH$ across 207 declarations.  The two mixed domains (algebraic
+geometry, representation theory) show $\WLPO$ leakage from
+\texttt{noncomputable} definitions---the Lean~4 artifact of working
+over fields where equality is not decidable---but no $\CLASS$ content.
+The two analytic domains (analysis, field theory) contain all 19
+$\CLASS$ declarations.
+
+The field theory anomaly (algebraic domain, $\CLASS$ content) is
+instructive.  Manual inspection reveals that the 12 flagged
+declarations use the word ``integral'' in the sense of integral ring
+extensions, not integration.  The crawler's keyword dictionary
+conflated the two senses.  This false positive directly motivated the
+anti-marker system described in \S\ref{sec:patch}.
+
+
+\subsection{The Archimedean Obstruction, Quantified}\label{part:archimedean}
+
+\subsubsection{The three-axis profiler}\label{sec:three-axis}
+
+Generation~2 includes a structural profiler (\texttt{crmlint\_structure.py})
+that measures each proof along three axes orthogonal to CRM level:
+
+\begin{enumerate}[label=\textbf{Axis \arabic*:}]
+\item \textbf{Size.} Lines of proof, tactic invocations, term size.
+\item \textbf{Depth.} Length of the longest \texttt{have}/\texttt{let}
+  chain; maximum nesting of dependent intermediate results.
+\item \textbf{Width.} Number of simultaneously active hypotheses;
+  cyclomatic complexity (number of independent case branches).
+\end{enumerate}
+
+An additional modularity metric records the automation ratio (fraction
+of proof steps discharged by \texttt{simp}, \texttt{ring}, or
+\texttt{norm\_num} without human guidance) and the external lemma
+count (number of \texttt{exact}/\texttt{apply} calls referencing
+results outside the current file).
+
+\subsubsection{Aggregate statistics}\label{sec:aggregate-stats}
+
+Over 627 declarations:
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Metric} & \textbf{Mean} & \textbf{Median} & \textbf{Max} \\
+\midrule
+Proof lines          &  5.0 &  4 & 57 \\
+Dependency depth     &  0.3 &  0 &  8 \\
+Active hypotheses    &  0.4 &  0 &  8 \\
+Cyclomatic complexity & 1.5 &  1 & 15 \\
+Overall complexity   & 0.038 & 0.026 & 0.479 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The median proof is 4 lines with no intermediate dependencies and no
+case splits.  The distribution is strongly right-skewed: 70.7\% of
+proofs are classified as \texttt{TRIVIAL} (one-step \texttt{simp},
+\texttt{rfl}, or direct \texttt{exact}).
+
+\subsubsection{Tactic frequency}\label{sec:tactic-freq}
+
+\begin{center}
+\small
+\begin{tabular}{lrr}
+\toprule
+\textbf{Tactic} & \textbf{Count} & \textbf{\%} \\
+\midrule
+\texttt{simp}     & 577 & 27.5 \\
+\texttt{rw}       & 448 & 21.3 \\
+\texttt{exact}    & 214 & 10.2 \\
+\texttt{have}     & 167 &  7.9 \\
+\texttt{rfl}      &  82 &  3.9 \\
+\texttt{ext}      &  80 &  3.8 \\
+\texttt{refine}   &  80 &  3.8 \\
+\texttt{apply}    &  79 &  3.8 \\
+\texttt{intro}    &  72 &  3.4 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Three tactics (\texttt{simp}, \texttt{rw}, \texttt{exact}) account for
+59\% of all tactic invocations.  The high \texttt{simp} frequency
+reflects \Mathlib's design philosophy: push complexity into the simp
+lemma database, keep proofs short.  Crucially, \texttt{simp} is
+$\BISH$-safe: it applies equational rewriting, never introduces
+classical content.
+
+\subsubsection{The Archimedean structural gap}\label{sec:arch-gap}
+
+We partitioned the 627 declarations into those touching Archimedean
+content (43 declarations: inner product, real convergence, norm
+comparison) and the remainder (584 declarations).
+
+\begin{center}
+\begin{tabular}{lccr}
+\toprule
+\textbf{Metric} & \textbf{Archimedean} & \textbf{Non-Arch.} & \textbf{Ratio} \\
+\midrule
+Avg.\ complexity score  & 0.05  & 0.04  & $1.4\times$ \\
+Avg.\ proof lines       & 7.95  & 4.75  & $1.7\times$ \\
+Avg.\ dependency depth  & 0.72  & 0.26  & $2.8\times$ \\
+Avg.\ active hypotheses & 0.81  & 0.37  & $2.2\times$ \\
+Avg.\ external lemmas   & 0.65  & 0.15  & $4.3\times$ \\
+Avg.\ automation ratio  & 0.22  & 0.39  & $0.56\times$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Every axis tells the same story.  Archimedean proofs are longer, deeper,
+wider, more externally coupled, and less automatable than non-Archimedean
+proofs.  The automation ratio drops from 39\% to 22\%: when real-number
+arguments enter, \texttt{simp} and \texttt{ring} give way to \texttt{have}
+chains, explicit $\epsilon$-$\delta$ management, and manual case
+analysis.
+
+This is the Archimedean Obstruction Thesis of Papers~5--77 made
+quantitative: \emph{the logical cost of $\R$ is not just a classification
+fact but a structural fact visible in proof architecture}.  The proofs
+themselves are harder, not just more classical.
+
+
+\subsection{The Liquid Tensor Experiment}\label{part:lte}
+
+\subsubsection{Background}\label{sec:lte-background}
+
+The Liquid Tensor Experiment (LTE) is the formal verification, in
+Lean~3, of Theorem~9.4 from Scholze's \emph{Lectures on Analytic
+Geometry}~\cite{scholze-lte}.  The theorem states:
+
+\begin{theorem}[Scholze, Theorem 9.4]
+Let $0 < p' < 1$ and $V$ an $r$-normed $\Z[T^{\pm 1}]$-module.
+Then for all $i \geq 1$,
+\[
+  \mathrm{Ext}^i_{\mathrm{Cond}(\mathrm{Ab})}
+  \bigl(\mathcal{M}_{p'}(S)_{\leq c}, \widehat{V}\bigr) = 0.
+\]
+\end{theorem}
+
+This is a vanishing theorem for derived functors in the category of
+condensed abelian groups.  Its significance is foundational: it
+validates the condensed framework as a setting for real functional
+analysis---specifically, it shows that the passage from discrete
+algebra ($\Z$-modules) to real analysis ($p'$-liquid vector spaces)
+does not introduce cohomological obstructions.
+
+The LTE formalization comprises ${\sim}90{,}000$ lines of Lean~3
+code, produced by a team led by Commelin and Massot over approximately
+18 months.  No Lean~4 port exists.  However, Commelin and Massot
+authored a 15-file LaTeX \emph{blueprint} that mirrors the formal
+proof's structure, with \texttt{\textbackslash lean\{\}} and
+\texttt{\textbackslash leanok} annotations linking each LaTeX
+statement to its Lean counterpart.  This blueprint is the input to
+our scanner.
+
+\subsubsection{Why LTE?}\label{sec:why-lte}
+
+The LTE is the natural target for \CRMlint's first external deployment,
+for three reasons.
+
+First, it is one of the largest single formalization projects
+completed in a proof assistant (${\sim}90{,}000$ lines of Lean~3).
+Its size and complexity provide a serious stress test for the
+scanner---one the scanner initially failed, as Part~V documents.
+
+Second, the mathematical content sits at the interface between algebra
+and analysis---exactly where the Archimedean Obstruction Thesis
+predicts the CRM boundary to be.  Condensed mathematics encodes
+analytic objects (Banach spaces, measures, distributions) as algebraic
+objects (sheaves on profinite sets, condensed abelian groups).  The
+CRM question is whether this encoding \emph{reduces} the logical cost
+of the analysis, or merely \emph{reorganizes} it.
+
+Third, the conservation conjecture of Papers~72--74 makes a specific
+prediction.  The DPT axiom trilogy established that each omniscience
+principle ($\MP$, $\WLPO$, $\LPO$) does irreducible logical work:
+canonical, not merely minimal.  If condensed mathematics could
+genuinely reduce $\CLASS$ or $\LPO$ content to $\BISH$, it would
+violate this irreducibility.  The conjecture is that condensed math
+\emph{concentrates} classical content at identifiable gates without
+reducing the aggregate logical cost.  The LTE is the test case.
+
+\subsubsection{Blueprint structure}\label{sec:blueprint-structure}
+
+The 15 \texttt{.tex} files of the LTE blueprint decompose as follows:
+
+\begin{center}
+\small
+\begin{tabular}{llr}
+\toprule
+\textbf{File} & \textbf{Content} & \textbf{Size (bytes)} \\
+\midrule
+\texttt{proof.tex}              & Core inductive proof (Thm 9.4, 9.5$'$) & 20{,}729 \\
+\texttt{normed\_homological.tex} & Normed homological algebra             & 31{,}818 \\
+\texttt{condensed.tex}          & Condensed abelian groups, Ext-vanishing & 18{,}329 \\
+\texttt{measures.tex}           & Real measures, Laurent measures, $\theta$ & 10{,}555 \\
+\texttt{normed\_groups.tex}     & Normed groups, completions              &  6{,}724 \\
+\texttt{normed\_groups2.tex}    & Normed group homomorphisms              &  4{,}208 \\
+\texttt{polyhedral\_lattice.tex} & Polyhedral lattices, Tychonoff         & 12{,}893 \\
+\texttt{breen\_deligne.tex}     & Breen--Deligne resolution               &  8{,}412 \\
+\texttt{CLC.tex}                & Condensed limits, completions           &  5{,}117 \\
+\texttt{Lbar.tex}               & $\overline{\mathcal{L}}_{r'}(S)$ construction & 7{,}943 \\
+\texttt{homotopies.tex}         & Breen--Deligne homotopies               &  3{,}295 \\
+\texttt{maclane.tex}            & Mac\,Lane coherence                     &  1{,}842 \\
+\texttt{content.tex}            & Table of contents                       &    312 \\
+\texttt{intro.tex}              & Introduction                            &  1{,}547 \\
+\texttt{macros.tex}             & \LaTeX\ macros                          &  2{,}014 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The mathematical content concentrates in the first 12 files
+(${\sim}130{,}000$ bytes).  The last three are boilerplate.
+
+
+\subsubsection{Initial scan (v1.0)}\label{sec:initial-scan}
+
+We ran the Generation~3 scanner (v1.0, 810 lines, ${\sim}80$ keyword
+markers) against all 15 files.  The result:
+
+\begin{center}
+\begin{tabular}{lcl}
+\toprule
+\textbf{CRM} & \textbf{Files} & \textbf{Bottleneck} \\
+\midrule
+$\WKL$  & 2 (13.3\%) & Tychonoff theorem \\
+$\BISH$ & 13 (86.7\%) & --- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Two files (\texttt{condensed.tex}, \texttt{polyhedral\_lattice.tex})
+register as $\WKL$, both via the Tychonoff theorem: ``cofiltered limits
+of surjections of compact Hausdorff spaces are still surjective (by an
+application of Tychonoff).''  The remaining 13 files, including the
+core proof file \texttt{proof.tex} and the entire normed homological
+algebra layer, scan as $\BISH$.
+
+This is obviously wrong.  The LTE is a proof about real functional
+analysis, involving norms, completions, filtrations, and
+$\varepsilon$-$\delta$ estimates.  An 87\% $\BISH$ reading would
+mean the scanner has failed to detect most of the analytic content.
+
+It has.
+
+
+\subsection{Archimedean Dark Matter}\label{part:dark-matter}
+
+\subsubsection{What the scanner missed}\label{sec:missed}
+
+A manual reading of \texttt{proof.tex} reveals pervasive classical
+content that the v1.0 scanner does not detect.  Three categories:
+
+\paragraph{Normed group completions ($\WLPO$)}
+
+The hat notation $\widehat{V}$ appears in every theorem statement in
+\texttt{proof.tex}.  This denotes the completion of a semi-normed
+group $V$ with respect to its norm topology.  Constructively, forming
+the completion requires a Cauchy convergence test: given a Cauchy
+sequence $(x_n)$ and a target element $y$, decide whether
+$\|x_n - y\| < \epsilon$ for all sufficiently large $n$.  This is a
+$\WLPO$ operation (it asks whether a real number equals zero to
+within $\epsilon$).
+
+The v1.0 keyword dictionary has no pattern for $\widehat{V}$ or for
+the phrases ``completion of a normed group,'' ``completed with respect
+to the norm,'' or ``Cauchy completion.''
+
+\paragraph{Real-valued filtration cutoffs ($\LPO$)}
+
+The pseudo-normed groups in the LTE are filtered by real-valued
+thresholds:
+\[
+  M_{\leq c} = \{x \in M : \|x\| \leq c\}, \qquad c \in \R_{\geq 0}.
+\]
+Membership in $M_{\leq c}$ requires deciding whether $\|x\| \leq c$,
+a comparison of two real numbers.  In CRM terms, this is $\LPO$: the
+limited principle of omniscience is equivalent to the statement that
+every real number is either $\leq 0$ or $> 0$.
+
+The filtration $M_{\leq c}$ is not incidental to the proof.  It is
+the \emph{mechanism} by which condensed mathematics encodes the
+analytic content.  Every theorem in the proof core is stated in terms
+of these filtration levels: ``the system of complexes
+$C^\bullet_{\Lambda,c}$ is $\leq k$-exact in degrees $\leq m$
+for $c \geq c_0$'' (Theorem~9.5$'$).
+
+The v1.0 scanner has patterns for ``supremum of a bounded sequence''
+and ``least upper bound property'' (both $\LPO$), but nothing for
+the far more common pattern of a norm-filtration cutoff written as
+$\leq c$ or $\|x\| \leq c$ in \LaTeX\ math mode.
+
+\paragraph{Radius ordering ($\LPO$)}
+
+The proof works with two fixed radii $0 < r < r' \leq 1$.  The
+strict inequality $r < r'$ is used throughout to ensure convergence
+of Laurent series and to control error terms: ``choose a positive
+integer $b$ so that $2k'(r/r')^b \leq \epsilon$'' (\texttt{proof.tex},
+line~81).  Comparing real numbers is $\LPO$.
+
+The v1.0 scanner has no pattern for radius comparisons of the form
+$0 < r < r' \leq 1$ or for the exponential decay estimates that
+depend on them.
+
+\subsubsection{Quantifying the gap}\label{sec:gap}
+
+The three missed categories account for 32 pattern matches across
+10 of the 15 blueprint files.  Only the five purely combinatorial
+files (Breen--Deligne, Mac\,Lane, content, intro, macros) are genuinely
+free of Archimedean content.
+
+We call the gap between the v1.0 scan (86.7\% $\BISH$) and the
+corrected assessment (${\sim}33\%$ $\BISH$) \emph{Archimedean dark
+matter}: classical content that is structurally present in the proof
+but invisible to lexical pattern matching.  The dark matter is not
+random.  It concentrates at a single interface: the passage from
+discrete algebra ($\Z$-modules, polyhedral lattices, Breen--Deligne
+resolutions) to normed analysis ($M_{\leq c}$, $\widehat{V}$,
+radius comparisons).
+
+\subsubsection{The scanner patch (v1.1)}\label{sec:patch}
+
+We added 11 keyword patterns and 5 anti-markers to the scanner:
+
+\medskip
+\noindent\textbf{New $\LPO$ patterns} (6):
+
+\begin{itemize}[nosep]
+\item Norm filtration cutoffs: $\backslash$\texttt{leq c},
+  $\backslash$\texttt{leq c\_0} in math mode
+\item Norm bounds: $\|{\cdots}\| \leq$ (norm inequality)
+\item Real parameter thresholds: ``for $c \geq$\,'' patterns
+\item Normed filtration membership: ``norm\dots filtration''
+\item Radius ordering: $0 < r < r' \leq 1$
+\item Bounded exactness: ``exact in degrees $\leq$\,''
+\end{itemize}
+
+\noindent\textbf{New $\WLPO$ patterns} (5):
+
+\begin{itemize}[nosep]
+\item Completion hat: $\widehat{V}$ (\texttt{\textbackslash widehat})
+\item Explicit completion phrases: ``completion of/w.r.t.''
+\item Completed normed groups: ``complete\dots normed'' and reverse
+\item Cauchy completion: ``Cauchy sequence/completion''
+\end{itemize}
+
+\noindent\textbf{New anti-markers} (5):
+
+\begin{itemize}[nosep]
+\item ``complete local ring,'' ``complete lattice'' (not Cauchy completion)
+\item ``field norm,'' ``Galois norm'' (not analytic norm)
+\item ``weight filtration,'' ``Hodge filtration'' (not norm filtration)
+\item Degree/dimension/rank bounds (combinatorial $\leq$, not real-valued)
+\end{itemize}
+
+\noindent\textbf{New citation markers} (3):
+
+\begin{itemize}[nosep]
+\item Scholze 2019/2020, Clausen--Scholze $\to$ $\WKL$
+\end{itemize}
+
+\subsubsection{Patched results (v1.1)}\label{sec:patched-results}
+
+\begin{center}
+\begin{tabular}{lccl}
+\toprule
+\textbf{File} & \textbf{v1.0} & \textbf{v1.1} & \textbf{Bottleneck (v1.1)} \\
+\midrule
+\texttt{proof.tex}              & $\BISH$ & $\LPO$ & norm filtration cutoff \\
+\texttt{normed\_homological.tex} & $\BISH$ & $\LPO$ & norm filtration cutoff \\
+\texttt{condensed.tex}          & $\WKL$  & $\LPO$ & norm filtration cutoff \\
+\texttt{measures.tex}           & $\BISH$ & $\LPO$ & norm filtration cutoff \\
+\texttt{normed\_groups.tex}     & $\BISH$ & $\LPO$ & normed filtration \\
+\texttt{normed\_groups2.tex}    & $\BISH$ & $\LPO$ & normed filtration \\
+\texttt{polyhedral\_lattice.tex}& $\WKL$  & $\LPO$ & norm filtration cutoff \\
+\texttt{CLC.tex}                & $\BISH$ & $\LPO$ & norm filtration cutoff \\
+\texttt{Lbar.tex}               & $\BISH$ & $\LPO$ & norm filtration cutoff \\
+\texttt{homotopies.tex}         & $\BISH$ & $\LPO$ & norm filtration cutoff \\
+\texttt{breen\_deligne.tex}     & $\BISH$ & $\BISH$ & --- \\
+\texttt{maclane.tex}            & $\BISH$ & $\BISH$ & --- \\
+\texttt{content.tex}            & $\BISH$ & $\BISH$ & --- \\
+\texttt{intro.tex}              & $\BISH$ & $\BISH$ & --- \\
+\texttt{macros.tex}             & $\BISH$ & $\BISH$ & --- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Aggregate (v1.1):} 33.3\% $\BISH$, 66.7\% $\LPO$.
+
+The Tychonoff detections ($\WKL$) in \texttt{condensed.tex} and
+\texttt{polyhedral\_lattice.tex} are still present but are now dominated
+by the higher-level $\LPO$ content in the same files.  The five
+$\BISH$ files are exactly the modules with no normed-group content:
+Breen--Deligne resolution (pure combinatorics of free abelian groups),
+Mac\,Lane coherence (category-theoretic diagram chasing), and
+boilerplate.
+
+\subsubsection{Calibration check}\label{sec:calibration}
+
+To verify that the new patterns do not introduce false positives, we
+re-scanned Papers~78--96 of the CRM series:
+
+\begin{center}
+\small
+\begin{tabular}{lcc}
+\toprule
+\textbf{Paper} & \textbf{v1.0} & \textbf{v1.1} \\
+\midrule
+P95 (BSD Squeeze) & $\CLASS$ (Kolyvagin) & $\CLASS$ (Kolyvagin) \\
+P96 (Root Number)  & $\CLASS$ (Kolyvagin) & $\CLASS$ (Kolyvagin) \\
+P80 (Gauss--Manin) & $\CLASS$ (anal.\ cont.) & $\CLASS$ (anal.\ cont.) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+No regressions.  The existing CRM series papers scan identically under
+both versions, because their classical content ($\CLASS$) dominates any
+$\LPO$ patterns that might also be present.  The new patterns only
+change the classification of papers whose highest detected level was
+previously $\BISH$ or $\WKL$.
+
+
+\subsection{Conservation, Not Reduction}\label{part:conservation}
+
+\subsubsection{The concentration thesis}\label{sec:concentration}
+
+The LTE scanner results are consistent with the conservation
+conjecture of Papers~72--74.
+
+\begin{observation}[Concentration thesis---not a theorem]
+In the LTE blueprint, condensed mathematics does not reduce the CRM
+signature of the proof below $\LPO$.  It concentrates the $\LPO$
+content at identifiable \emph{gates}---the norm-filtration membership
+tests $x \in M_{\leq c}$---while leaving the surrounding algebraic
+infrastructure at $\BISH$.
+\end{observation}
+
+To be clear: this is not a surprise.  Scholze designed condensed
+mathematics to separate algebraic infrastructure from analytic
+content.  The concentration of classical content at norm-filtration
+gates is his architecture, not our discovery.  What the scanner
+provides is a quantitative readout of a pattern that the designers
+already understood qualitatively.
+
+In the LTE blueprint, every module that touches the normed filtration
+$M_{\leq c}$ acquires $\LPO$ signature.  Every module that does not
+touch it remains $\BISH$.  There is no mixing, no gradual degradation,
+no $\WLPO$-without-$\LPO$ intermediate.  The transition is sharp:
+either a module is purely algebraic ($\BISH$), or it invokes norm
+comparison ($\LPO$).
+
+In CRM language, $\LPO$ is the logical cost of comparing real numbers.
+The DPT axiom trilogy (Papers~72--74) established that each
+omniscience principle does canonical, irreducible work.  The LTE is
+one data point consistent with this: the $\LPO$ content appears
+irreducible, not an artifact of the proof strategy.
+
+\subsubsection{Where the $\LPO$ enters}\label{sec:where-lpo}
+
+The $\LPO$ enters the LTE through a single mathematical mechanism:
+the filtration
+\[
+  M_{\leq c} = \{x \in M : \|x\| \leq c\}.
+\]
+This definition requires deciding $\|x\| \leq c$ for arbitrary $x$
+and $c$---a comparison of real numbers.  In CRM terms:
+\[
+  \forall x \in M, \forall c \in \R_{\geq 0}: \quad
+  x \in M_{\leq c} \;\lor\; x \notin M_{\leq c}
+\]
+is equivalent to $\LPO$.
+
+The condensed framework does not avoid this decision.  It defers it.
+The algebraic infrastructure (Breen--Deligne resolutions, cosimplicial
+lattices, diagram chasing in abelian categories) is built without
+reference to norms.  The norm enters only when the abstract machinery
+is \emph{applied} to a specific analytic object ($\overline{\mathcal{L}}_{r'}(S)$,
+real measures, completed normed groups).  At that application point,
+the $\LPO$ cost is paid in full.
+
+This is the mechanism of concentration: push the classical content as
+late as possible, into as few gates as possible, while keeping the
+majority of the proof in the $\BISH$ regime.  The total $\LPO$ cost
+is unchanged, but its distribution is optimized.
+
+\subsubsection{Comparison with the CRM series}\label{sec:comparison}
+
+\begin{center}
+\begin{tabular}{lccl}
+\toprule
+\textbf{Target} & \textbf{$\BISH$\%} & \textbf{Ceiling} & \textbf{Bottleneck type} \\
+\midrule
+Mathlib (627 decls)   & 92.0\% & $\CLASS$ & Inner product, convergence \\
+CRM series (P78--96)  & 71.4\% & $\CLASS$ & Kolyvagin, trace formula \\
+LTE blueprint (v1.1)  & 33.3\% & $\LPO$  & Norm filtration \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The LTE's lower $\BISH$ percentage (33\% vs.\ Mathlib's 92\%) reflects
+its subject matter: the LTE is \emph{about} the passage from algebra
+to analysis.  Every module that implements this passage carries $\LPO$
+content.  In Mathlib's broader sample, most files never cross the
+Archimedean boundary.
+
+The LTE's ceiling ($\LPO$, not $\CLASS$) is the interesting finding.
+The proof never invokes the full law of excluded middle, analytic
+continuation, spectral decomposition, or any of the $\CLASS$
+techniques that dominate the CRM series.  The condensed framework
+avoids $\CLASS$ by algebraizing the arguments that would classically
+require integration, measure theory, and spectral analysis.  But it
+cannot avoid $\LPO$, because $\LPO$ is the logical cost of the norm
+itself.
+
+\subsubsection{The dark matter fraction}\label{sec:dark-matter-fraction}
+
+\begin{definition}
+The \emph{Archimedean dark matter fraction} of a scanner version $v$
+applied to a corpus $C$ is
+\[
+  \delta(v, C) = \frac{\text{\# files where manual CRM $>$ scanner CRM}}{\text{\# files total}}.
+\]
+\end{definition}
+
+For the LTE blueprint: $\delta(\text{v1.0}) = 8/15 = 53.3\%$ and
+$\delta(\text{v1.1}) = 0/15 = 0\%$.  The patch eliminates the dark
+matter entirely for the LTE corpus.
+
+But the dark matter fraction is corpus-dependent.  Different proof
+traditions use different vocabulary for the same logical content.
+A paper that writes ``for sufficiently large $n$'' instead of
+``for $c \geq c_0$'' will evade the $\LPO$ pattern.  The v1.1
+dictionary is tuned to the LTE's notation.  Scanning a different
+corpus (e.g., classical functional analysis, PDE theory, probability)
+will likely reveal new dark matter that requires further dictionary
+expansion.
+
+The dark matter fraction is a measure of scanner maturity.  A perfect
+scanner would have $\delta = 0$ on every corpus.  The gap between
+$\delta(\text{v1.0})$ and $\delta(\text{v1.1})$ measures the
+information gained from the LTE analysis.
+
+\subsubsection{Observations for the programme}\label{sec:implications}
+
+Three observations from the LTE exercise, stated at the appropriate
+level of confidence:
+
+\begin{enumerate}[label=(\arabic*)]
+\item \textbf{The LTE avoids $\CLASS$.}
+  The LTE proof ceiling is $\LPO$, not $\CLASS$.  It never invokes
+  analytic continuation, spectral decomposition, or the full law
+  of excluded middle.  This is by design: condensed mathematics
+  algebraizes arguments that would classically use these tools.
+  We are describing Scholze's architecture, not revealing it.
+
+\item \textbf{The scanner's blind spot was systematic.}
+  The v1.0 scanner missed all norm-filtration content.  This was
+  not random noise but a single structural gap: the scanner had no
+  patterns for the interface where real-valued norms enter algebraic
+  structures.  The v1.1 patch closed this gap for the LTE vocabulary.
+  Other corpora will likely expose other gaps.
+
+\item \textbf{CRM vocabulary may be useful for non-experts.}
+  Scholze does not need CRM labels to understand his own proof.  But
+  a researcher approaching condensed mathematics for the first time,
+  or a formalization team deciding which LTE components to port to
+  Lean~4, might benefit from a graduated scale ($\BISH < \WKL <
+  \WLPO < \LPO < \CLASS$) that replaces the binary
+  ``algebraic vs.\ analytic'' distinction.  Whether this vocabulary
+  earns its keep in practice is an open question.
+\end{enumerate}
+
+
+\subsubsection{Concentration as transferable method}\label{sec:transferable}
+
+The condensed strategy is not a black box.  It decomposes into three
+operations that can be applied---independently of the condensed
+framework---to any proof that mixes algebra and analysis.
+
+\medskip
+\noindent\textbf{Operation 1: Extract the algebraic skeleton.}
+Identify the subproof that works over any ring, any category, any
+abstract structure.  Build it without reference to norms, metrics,
+or completeness.  In the LTE, this is the Breen--Deligne resolution
+and the cosimplicial polyhedral lattice construction.  In the BSD
+squeeze (Paper~95), this is the Hecke arithmetic layer (28
+sub-results over $\Z$, all $\BISH$).  In the Hodge campaign
+(Papers~84--89), this is the Gauss--Manin connection and the
+Picard--Fuchs operator.
+
+\medskip
+\noindent\textbf{Operation 2: Identify the minimal gates.}
+Find the points where the algebraic skeleton must interface with
+the continuum.  These are the norm-filtration gates $M_{\leq c}$
+in the LTE, the Kolyvagin Euler system in BSD, the period matrix
+evaluation in the Hodge conjecture.  Each gate carries irreducible
+$\LPO$ or $\CLASS$ cost.
+
+\medskip
+\noindent\textbf{Operation 3: Defer and localize.}
+Restructure the proof so that the gates are invoked as late as
+possible and in as few places as possible.  The algebraic skeleton
+should be complete before any gate is opened.  This is what
+condensed mathematics does systematically via the sheaf-theoretic
+encoding.  But it can also be done ad hoc: Paper~95's separation
+of Hecke arithmetic from Kolyvagin, Paper~80's separation of
+$\Q(t)$-algebra from analytic continuation, Paper~86's separation
+of Kani--Rosen splitting from Hodge-theoretic input.
+
+\medskip
+
+The CRM series has been performing these operations informally
+for 96 papers.  What condensed mathematics does---and what Scholze
+understood from the start---is systematize them at the categorical
+level.  Our vocabulary (skeleton, gate, concentration ratio) is a
+rephrasing, not an advance.
+
+The modest utility of \CRMlint\ here is quantitative triage:
+a proof where the scanner reports $\LPO$ in 2 of 15 modules is
+well-concentrated; a proof where $\LPO$ appears in 14 of 15
+modules is diffuse.  The diffuse case is where refactoring might
+help most.  Whether \CRMlint\ actually helps anyone refactor
+remains to be demonstrated.
+
+\begin{observation}[Concentration ratio]
+Define the \emph{concentration ratio} of a proof corpus $C$ as
+\[
+  \rho(C) = 1 - \frac{\#\{\text{modules at } \LPO \text{ or above}\}}
+                      {\#\{\text{modules total}\}}.
+\]
+For the LTE: $\rho = 1 - 10/15 = 0.33$.  For a hypothetical
+``classical-diffuse'' proof of the same theorem, $\rho = 0$.
+The concentration thesis predicts $\rho > 0$ for any proof that
+has undergone algebraic skeleton extraction.  \CRMlint\ computes
+$\rho$ automatically.
+\end{observation}
+
+
+\subsection{From Concentration to Excision: Predictive Applications}\label{part:strategy}
+
+This part is prospective. The LTE analysis (\S\ref{part:conservation}) gave us a vocabulary: algebraic skeletons, analytic gates, and the strategy of \emph{concentration}---deferring classical $\LPO$ or $\CLASS$ costs to isolated interface points.
+
+However, the analysis of Scholze's Berkovich motives in the main body of this paper (Sections~\ref{sec:audit}--\ref{sec:signature}) reveals a vastly more powerful technique. By identifying the $\ell$-adic comparison isomorphism $\iota: \overline{\Q_\ell} \cong \C$ as a \emph{methodological} $\CLASS$ gate, Scholze bypassed it entirely by constructing a universal $\BISH$ skeleton: the motivic 6-functor formalism. We call this operation \emph{motivic descent}. It does not merely concentrate the Archimedean obstruction; it physically excises it.
+
+With motivic descent validated as a systemic bypass mechanism, we can transition the \CRMlint\ methodology from a retrospective diagnostic tool to a predictive radar. We now apply the Skeleton/Gate vocabulary to the open predictions of Section~\ref{sec:predictions}, providing an architectural blueprint for future formalization efforts.
+
+\subsubsection{The Weight-Monodromy Conjecture}\label{sec:predict-weight}
+
+\noindent\textbf{Problem} (Prediction 8.1). The weight-monodromy conjecture governs the action of the Weil group on the $\ell$-adic cohomology of varieties over local fields. Classical proofs of known cases typically route through complex geometry (Betti realization, Hodge theory) to establish strict purity.
+
+\medskip
+\noindent\textbf{Concentration analysis.}
+\begin{enumerate}[nosep,label=(\roman*)]
+\item \emph{Classical Gate:} The Betti--\'etale comparison isomorphism over $\C$ (cost: $\CLASS$).
+\item \emph{Motivic Skeleton:} Rebuilding the weight spectral sequence natively within $\Dmot(X)$ using motivic weight structures.
+\end{enumerate}
+
+\noindent\textbf{Scanner deployment.} A formalization blueprint attempting the motivic lift can be scanned by \CRMlint\ prior to coding. The scanner's role is to act as an Archimedean alarm system: if it detects markers like \texttt{Betti\_realization} or \texttt{complex\_conjugation}, the motivic lift has leaked into the $\CLASS$ regime. If the scan peaks at $\WKL$ (flagging only the structural perfectoid/profinite inverse limits required for local field geometry), the methodology confirms the bypass is successful.
+
+\subsubsection{Function Field Langlands ($\BISH$ Floor)}\label{sec:predict-function}
+
+\noindent\textbf{Problem} (Predictions 8.2 \& 8.3). Lafforgue's global Langlands correspondence and Deligne's Ramanujan--Petersson bounds for $\GL_n/\F_q(C)$.
+
+\medskip
+\noindent\textbf{Concentration analysis.} Over number fields, the global Arthur--Selberg trace formula is a \emph{structural} $\CLASS$ gate, intrinsically requiring the $L^2$ spectral decomposition of the Archimedean factor $G(\R)$. Over function fields $\F_q(C)$, the Archimedean place is physically absent (a domain transfer).
+
+\begin{enumerate}[nosep,label=(\roman*)]
+\item \emph{Motivic Skeleton:} The moduli stack of shtukas and its algebraic intersection theory natively in $DM(\F_q)$.
+\item \emph{Gate:} The Grothendieck--Lefschetz trace formula. Because this counts points on algebraic stacks over finite fields via $\ell$-adic cohomology, its motivic lift is purely finitary algebraic geometry.
+\end{enumerate}
+
+\noindent\textbf{Scanner deployment.} \CRMlint\ must be calibrated to strictly distinguish the algebraic Grothendieck--Lefschetz trace formula ($\BISH$) from the analytic Arthur--Selberg trace formula ($\CLASS$). A successful motivic blueprint for Lafforgue's theorem will scan as 100\% $\BISH$. Because discrete function fields require no analytic completions, even the $\WKL$ perfectoid cost is completely avoided.
+
+\subsubsection{The Shimura Boundary: A Positive Control}\label{sec:predict-shimura}
+
+\noindent\textbf{Problem} (Prediction 8.5). Can the motivic descent strategy eliminate $\CLASS$ from the Langlands correspondence for Shimura varieties?
+
+\medskip
+\noindent\textbf{Concentration analysis.} No. Shimura varieties are global objects defined over number fields; they inherently possess Archimedean places.
+
+\begin{enumerate}[nosep,label=(\roman*)]
+\item \emph{Skeleton:} The global ad\`ele ring $\A_\Q$ and the geometry of the Shimura variety.
+\item \emph{Obstruction:} To match the motivic Galois representation to an automorphic form, the proof structurally requires Matsushima's formula and the global trace formula.
+\end{enumerate}
+
+\noindent\textbf{Scanner deployment.} This provides a crucial \emph{positive control} for the \CRMlint\ methodology. The $\CLASS$ gate here is \emph{structural}, not \emph{methodological}. If the scanner is applied to landmark global Langlands proofs (e.g., Harris--Taylor), it \emph{must} light up with irreducible $\CLASS$ alerts: \texttt{Matsushima\_formula}, \texttt{discrete\_series}, \texttt{Plancherel\_measure}, and \texttt{L2\_cohomology}. This confirms that the scanner is not artificially blinding itself to classical logic; it strictly enforces the Archimedean Obstruction Thesis where the physics of the geometry demand it.
+
+\subsubsection{Legacy Upgrades: The BSD Conservation Gap}\label{sec:predict-bsd}
+
+We can also turn this new motivic/analytic lens backward onto legacy problems from earlier in the CRM series, such as the Gross--Zagier--Kolyvagin proof of BSD (Papers~95--96).
+
+\medskip
+\noindent\textbf{Motivic strategy.} Gate (1) in the BSD proof is the analytic behavior of the complex $L$-function near $s=1$, a methodological $\CLASS$ gate. The motivic framework suggests an immediate upgrade path: bypass the complex $L$-function entirely by passing to a $p$-adic $L$-function (via overconvergent modular symbols). If the height formula can be evaluated using $p$-adic integration (which requires only $\WKL$ for inverse limits in the Iwasawa algebra) rather than complex integration, the CRM ceiling of the Gross--Zagier theorem drops structurally from $\CLASS$ to $\WKL$. The scanner will cleanly track this bottleneck shift from \texttt{analytic\_continuation} ($\CLASS$) to \texttt{profinite\_inverse\_limit} ($\WKL$).
+
+\subsubsection{The Updated Recipe: Motivic Proof Engineering}\label{sec:recipe-updated}
+
+The discovery of Motivic Descent updates the proof-engineering loop from Section~\ref{part:conservation}. The general recipe for de-omniscientising a modern arithmetic geometry proof is now:
+
+\begin{enumerate}[label=\textbf{Step \arabic*.}]
+\item \textbf{Scan.}
+  Run \CRMlint\ on the initial LaTeX blueprint to map the CRM ceiling and concentration ratio $\rho$.
+\item \textbf{Map the gates.}
+  Identify exactly which mathematical mechanisms trigger non-$\BISH$ alerts (the ``bottleneck'' field).
+\item \textbf{Classify: Structural vs. Methodological.}
+  Determine if the gate is intrinsic to the theorem (like $M_{\leq c}$ in LTE, or $G(\R)$ in Shimura varieties) or an artifact of the proof technique (like comparing $\ell$-adic sheaves via $\C$).
+\item \textbf{Attempt Motivic Descent.}
+  If the gate is methodological, attempt to lift the algebraic skeleton into a universal coefficient system (like $\Dmot$) or execute a domain transfer \emph{before} any realization functor is applied.
+\item \textbf{Verify and Refactor.}
+  Re-scan the refactored blueprint. If a purely algebraic blueprint triggers a parasitic $\WLPO$ alert (e.g., an author carelessly writing an $\R_{\geq 0}$-valued norm instead of a decidable $\Q$-valued discrete group, as detected in the Berkovich audit), the team can refactor that definition to be discrete ($\BISH$) \emph{before} writing a single line of Lean~4 code.
+\end{enumerate}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    box/.style={draw, rounded corners, minimum width=2.0cm,
+                minimum height=0.8cm, align=center, font=\footnotesize},
+    arr/.style={-{Stealth[length=5pt]}, thick},
+    >=Stealth,
+    scale=0.92, transform shape
+]
+  \node[box] (scan) at (0,0) {Scan\\(\CRMlint)};
+  \node[box] (map) at (2.9,0) {Map\\gates};
+  \node[box] (classify) at (5.8,0) {Classify\\(struct.\ vs method.)};
+  \node[box] (search) at (9.0,0) {Motivic Descent /\\Domain Transfer};
+  \node[box] (verify) at (12.4,0) {Verify \&\\Refactor};
+
+  \draw[arr] (scan) -- (map);
+  \draw[arr] (map) -- (classify);
+  \draw[arr] (classify) -- (search);
+  \draw[arr] (search) -- (verify);
+  \draw[arr, dashed] (verify) to[bend right=28] node[below,font=\scriptsize]
+    {iterate if $\CLASS$ leaks remain} (scan);
+\end{tikzpicture}
+\caption{The upgraded scan-map-classify-search-verify loop, featuring Motivic Descent.}
+\label{fig:loop}
+\end{figure}
+
+The ultimate promise of this methodology is economic. By running \CRMlint\ on a LaTeX blueprint, a formalization team can identify and mathematically excise classical parasitic dependencies, saving thousands of hours of formalization labor by ensuring the architecture is constructively optimal before the programming begins.
+
+
+\subsection{The Mathematics of the LTE}\label{part:math}
+
+This part is expository.  We restate the main theorems of the LTE
+in the form proved by Scholze, Commelin, and Massot, and annotate
+each step with its CRM level.  Nothing here is new mathematics.
+The proofs are theirs; the CRM labels are ours.  The labels may
+be useful for readers approaching the LTE from the constructive
+side, or for formalization teams deciding which components to
+port to Lean~4.
+
+\subsubsection{The main theorem and its reduction}\label{sec:main-thm}
+
+The LTE establishes the following vanishing result, which
+Scholze proposed as a challenge in December 2020.
+
+\begin{theorem}[Clausen--Scholze {\cite{scholze-lte}}]\label{thm:lte-main}
+Let $0 < p' < p \leq 1$ be real numbers, let $S$ be a profinite set,
+and let $V$ be a $p$-Banach space.  Let $\mathcal{M}_{p'}(S)$ denote
+the space of real $p'$-measures on~$S$.  Then
+\[
+  \mathrm{Ext}^i_{\mathrm{Cond}(\mathrm{Ab})}(\mathcal{M}_{p'}(S),\, V) = 0
+  \qquad \text{for all } i \geq 1.
+\]
+\end{theorem}
+
+The Ext-groups are computed in the abelian category of condensed
+abelian groups.  The theorem says: from the perspective of homological
+algebra in the condensed world, real-valued measures are
+``projective-like'' --- they have no higher Ext against Banach targets.
+
+\medskip
+\noindent\textbf{CRM annotation.}
+The \emph{statement} of Theorem~\ref{thm:lte-main} requires:
+\begin{itemize}[nosep]
+\item $p$-Banach space $V$: the norm $\|\cdot\|$ on $V$ satisfies
+  $\|x + y\|^p \leq \|x\|^p + \|y\|^p$.  Defining
+  this norm and its completeness is $\WLPO$.
+\item The condensed abelian group $\mathcal{M}_{p'}(S)$:
+  defined via a filtration $\mathcal{M}_{p'}(S)_{\leq c}$, each
+  level a compact Hausdorff space.  The filtration cut-off is $\LPO$.
+\item Profinite $S$: a cofiltered limit of finite sets.  All $\BISH$.
+\end{itemize}
+
+\noindent The \emph{proof} reduces Theorem~\ref{thm:lte-main} to a
+chain of intermediate results, each of which we now state.
+
+\subsubsection{The proof chain: six links}\label{sec:proof-chain}
+
+The proof proceeds by six reductions, from the main theorem down to
+the key technical result (Theorem~\ref{thm:94}).  We trace the full
+chain and label each link with its CRM level.
+
+\begin{center}
+\small
+\begin{tabular}{clll}
+\toprule
+\textbf{Link} & \textbf{Result} & \textbf{Mechanism} & \textbf{CRM} \\
+\midrule
+6 & Theorem~\ref{thm:lte-main} (main) &
+  Long exact Ext sequence from Link~5 & $\BISH$ \\
+5 & Ext-vanishing for $\mathcal{L}_{r'}(S)$ &
+  $T^{-1}$-bijectivity via Link~4 & $\BISH$ \\
+4 & Ext-vanishing for $\overline{\mathcal{L}}_{r'}(S)$ &
+  Pro-isomorphism + derived limit via Link~3 & $\BISH$ \\
+3 & Theorem~\ref{thm:94} (Ext-vanishing at finite level) &
+  Double complex + spectral proposition & $\LPO$ \\
+2 & Column exactness (Proposition~\ref{prop:col-exact}) &
+  \v{C}ech nerve + normed snake lemma & $\LPO$ \\
+1 & \v{C}ech exactness (Proposition~\ref{prop:cech-exact}) &
+  Contracting homotopy + profinite limit & $\BISH$/$\WKL$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Link 1: \v{C}ech nerve exactness ($\BISH$/$\WKL$)}
+
+\begin{proposition}[\v{C}ech cover exactness {\cite{commelin-massot-lte}}]
+\label{prop:cech-exact}
+Let $\pi: X \to B$ be a surjective morphism of profinite sets,
+and let $S_\bullet \to S_{-1}$, $S_{-1} := B$, be its augmented
+\v{C}ech nerve.  Let $V$ be a semi-normed group.  Then the complex
+\[
+  0 \longrightarrow \widehat{V}(S_{-1}) \longrightarrow
+  \widehat{V}(S_0) \longrightarrow
+  \widehat{V}(S_1) \longrightarrow \cdots
+\]
+is exact.  Moreover, for every $\varepsilon > 0$ and
+$f \in \ker(\widehat{V}(S_m) \to \widehat{V}(S_{m+1}))$,
+there exists $g \in \widehat{V}(S_{m-1})$ with $d(g) = f$
+and $\|g\| \leq (1 + \varepsilon)\|f\|$.
+\end{proposition}
+
+\noindent\textbf{Proof sketch.}
+For \emph{finite} $X$ and $B$, a section $\sigma: B \to X$ of $\pi$
+induces maps $S_m \to S_{m+1}$ via
+$(a_0, \ldots, a_m) \mapsto (\sigma(\pi(a_0)), a_0, \ldots, a_m)$.
+These provide a contracting homotopy for the complex, and the homotopy
+maps are norm-nonincreasing.  For general profinite sets, write
+$X = \varprojlim_i X_i$ over its discrete (finite) quotients,
+pass to finite quotients $X_i \to B_i$, apply the finite case, and
+take the cofiltered limit.  Surjectivity of transition maps between
+compact Hausdorff spaces is preserved under cofiltered limits
+(by Tychonoff).
+
+\medskip
+\noindent\textbf{CRM annotation.}
+The finite case is entirely $\BISH$: the section $\sigma$ exists
+because $\pi$ is surjective between finite sets, and the contracting
+homotopy is an explicit combinatorial construction.  The passage to
+profinite limits uses Tychonoff's theorem for compact Hausdorff spaces
+(surjections of compact spaces remain surjective under cofiltered
+limits).  In CRM terms, Tychonoff for Hausdorff spaces is $\WKL$
+(equivalent to weak K\"onig's lemma: an infinite finitely-branching
+tree has an infinite path).  The norm estimates ($\|g\| \leq
+(1+\varepsilon)\|f\|$) do not introduce additional logical cost.
+
+\paragraph{Link 2: Column exactness via normed snake lemma ($\LPO$)}
+
+The double complex construction requires that each column is
+``weakly bounded exact.''  This is established by combining
+\v{C}ech exactness (Link~1) with the normed $T^{-1}$-action.
+
+\begin{definition}[Weak bounded exactness {\cite{commelin-massot-lte}}]
+\label{def:weak-exact}
+A system of complexes $C_\bullet^\bullet$ is
+\emph{weakly $\leq k$-exact in degrees $\leq m$ for $c \geq c_0$
+with bound~$K$} if for all $c \geq c_0$, all $x \in C_{kc}^i$ with
+$i \leq m$, and any $\varepsilon > 0$, there exists $y \in C_c^{i-1}$
+with
+\[
+  \|x_{|c} - dy\| \leq K\|dx\| + \varepsilon.
+\]
+\end{definition}
+
+\begin{proposition}[Column exactness {\cite{commelin-massot-lte}}]
+\label{prop:col-exact}
+Let $k > 1$, $c_0 > 0$ with $(k-1)c_0/N \geq d$ (the splittability
+error).  Let $m$ be any natural number, and put
+\[
+  K = (m+2) + \frac{r+1}{r(1-r)}(m+2)^2.
+\]
+Then the $i$-th column in the double complex is $(k^2, K)$-weakly
+bounded exact in degrees $\leq m$ for $c \geq c_0'$.
+\end{proposition}
+
+\noindent\textbf{Proof sketch.}
+The key input is the ``normed dual snake lemma''
+(Proposition~\ref{prop:snake} below): given two admissible systems of
+complexes $M_\bullet^\bullet$ and ${M'}_\bullet^\bullet$ with a map
+$f: M \to M'$, if both $M$ and $M'$ are weakly bounded exact, then
+the kernel complex inherits weak bounded exactness (with controlled
+loss in the constants).  The column is built from the Čech nerve of
+the summation map $M^N_{c/N} \to M_c$, and the $T^{-1}$-action
+introduces the norm scaling.
+
+\medskip
+\noindent\textbf{CRM annotation.}
+The splittability lemma ($N$-splittability of $\mathrm{Hom}(\Lambda,
+\overline{\mathcal{L}}_{r'}(S))$) is $\BISH$: it decomposes elements
+of a polyhedral lattice module into $N$ pieces of roughly $1/N$-th
+the norm.  The column exactness proof combines this with the $\LPO$
+content of the filtration cut-offs $M_{\leq c}$.  The constant~$K$
+depends on $m$ and $r$ (not on the profinite set $S$ or the normed
+module $V$), so the ``universal'' part of the proof is $\BISH$ and
+the $\LPO$ enters only at the interface where elements are tested
+against filtration levels.
+
+\paragraph{Link 3: The key technical result ($\LPO$)}
+
+\begin{theorem}[Theorem 9.4 {\cite{scholze-condensed, commelin-massot-lte}}]
+\label{thm:94}
+Let $\mathrm{BD} = (n, f, h)$ be a Breen--Deligne package, and let
+$\kappa = (\kappa_0, \kappa_1, \ldots)$ be a sequence of constants
+in $\R_{\geq 0}$ that is $\mathrm{BD}$-suitable.  Fix radii
+$1 > r' > r > 0$.  For any $m$ there exist $k$ and $c_0$ such that
+for all profinite sets $S$ and all $r$-normed
+$\Z[T^{\pm 1}]$-modules~$V$, the system of complexes
+\[
+  C^{\mathrm{BD}}_\kappa(\overline{\mathcal{L}}_{r'}(S))^\bullet_c
+  \colon \;
+  \widehat{V}(\overline{\mathcal{L}}_{r'}(S)_{\leq c})^{T^{-1}}
+  \longrightarrow
+  \widehat{V}(\overline{\mathcal{L}}_{r'}(S)_{\leq \kappa_1 c}^2)^{T^{-1}}
+  \longrightarrow \cdots
+\]
+is $\leq k$-exact in degrees $\leq m$ for $c \geq c_0$.
+\end{theorem}
+
+\noindent\textbf{Proof structure.}
+The proof is by induction on $m$.  The inductive step requires a
+\emph{stronger} statement (Theorem~9.5$'$ in the blueprint), which
+introduces a polyhedral lattice $\Lambda$ and replaces
+$\overline{\mathcal{L}}_{r'}(S)$ by
+$\mathrm{Hom}(\Lambda, \overline{\mathcal{L}}_{r'}(S))$.
+Theorem~\ref{thm:94} is recovered by setting $\Lambda = \Z$.
+
+The inductive step constructs a \emph{system of double complexes}:
+\begin{enumerate}[nosep]
+\item \textbf{Rows:} Apply the Breen--Deligne system functor to
+  $\mathrm{Hom}(\Lambda^{(\bullet)}, M)$, where $\Lambda^{(\bullet)}$
+  is the cosimplicial polyhedral lattice and $M$ abbreviates
+  $\overline{\mathcal{L}}_{r'}(S)$.  Take the alternating face map
+  complex.  Rescale norms by $m!$ for admissibility.
+\item \textbf{Columns:} The column at index~$i$ is the Čech nerve
+  construction of Link~2, applied with the $i$-th Breen--Deligne data.
+\item \textbf{Homotopy:} The Breen--Deligne homotopy $h^N$ (the
+  $N$-fold composition of the package's built-in homotopy) provides
+  maps $M^{0,q+1}_{k'c} \to M^{1,q}_c$ bounded by some constant~$H$.
+  The ``homotopic map'' $\delta^{0,q}_c$ factors through a deep
+  restriction and has norm $\leq \varepsilon$.
+\end{enumerate}
+
+\noindent The three ingredients (row exactness by induction, column
+exactness from Link~2, homotopy condition) are fed into the
+\emph{spectral proposition} (Proposition~\ref{prop:spectral} below),
+which yields weak bounded exactness of the first row---completing
+the induction.
+
+\medskip
+\noindent\textbf{CRM annotation.}
+The double complex construction (cosimplicial lattice, alternating
+face map, norm rescaling) is $\BISH$: it is combinatorial algebra
+over $\Z$.  The Breen--Deligne resolution itself is $\BISH$: it is a
+functorial resolution of abelian groups by free modules, specified by
+integer matrices.  The homotopy bound~$H$ is computed from the
+Breen--Deligne data and $r, r'$---a finite computation over $\Q$,
+hence $\BISH$.
+
+The $\LPO$ enters at two points: (i) the filtration cut-offs
+$\overline{\mathcal{L}}_{r'}(S)_{\leq c}$ in the system of complexes,
+and (ii) the norm estimate $r^b N \leq \varepsilon$ (choosing $b$
+so that $2k'(r/r')^b \leq \varepsilon$), which requires comparing
+real numbers.  The choice of $N$ as a power of~2 satisfying
+$k'/N \leq (r')^b$ is a single $\LPO$ decision on the ordered
+reals.
+
+\paragraph{Links 4--6: Algebraic reductions ($\BISH$)}
+
+\noindent\textbf{Link 4: From finite level to $\overline{\mathcal{L}}_{r'}(S)$.}
+Write $Q'(\overline{\mathcal{M}}_{r'}(S)) = \varinjlim_c
+Q'(\overline{\mathcal{M}}_{r'}(S))_{\leq c}$ and reduce to a
+pro-isomorphism statement at each finite level.  The passage to the
+derived limit uses a resolution
+$0 \to \bigoplus_n Q'_{\leq n} \to \bigoplus_n Q'_{\leq n} \to
+Q' \to 0$
+and checks that the relevant squares are bicartesian (vertical kernels
+and cokernels form pro-zero systems).  This is diagram chasing in
+$\mathrm{Cond}(\mathrm{Ab})$, entirely $\BISH$.
+
+\medskip
+\noindent\textbf{Link 5: From $\overline{\mathcal{L}}_{r'}(S)$
+to $\mathcal{L}_{r'}(S)$.}
+The short exact sequence
+\[
+  0 \longrightarrow \Z[T^{-1}][S] \longrightarrow
+  \mathcal{L}_{r'}(S) \longrightarrow
+  \overline{\mathcal{L}}_{r'}(S) \longrightarrow 0
+\]
+decomposes Laurent measures into negative and positive parts.
+Apply $\mathrm{Ext}^*(\_, V)$: the $\Z[T^{-1}][S]$-term has
+vanishing higher Ext (because $\Z[S]$ is free), and the
+$\overline{\mathcal{L}}_{r'}(S)$-term vanishes by Link~4.
+The five lemma gives vanishing for $\mathcal{L}_{r'}(S)$.
+This is abstract homological algebra, all $\BISH$.
+
+\medskip
+\noindent\textbf{Link 6: Main theorem.}
+The short exact sequence
+\[
+  0 \longrightarrow \mathcal{L}_{r'}(S) \xrightarrow{2T-1}
+  \mathcal{L}_{r'}(S) \longrightarrow
+  \mathcal{M}_{p'}(S) \longrightarrow 0
+\]
+(evaluation at $T = 1/2$) reduces the main theorem to the Ext-vanishing
+of $\mathcal{L}_{r'}(S)$ from Link~5 via the long exact sequence.
+The surjectivity of evaluation at $T = 1/2$ on pseudo-normed groups
+is a norm estimate (strong exactness), which uses
+Tychonoff ($\WKL$) for passage to profinite limits.  But the
+long-exact-sequence argument itself is $\BISH$.
+
+
+\subsubsection{The normed homological algebra toolkit}\label{sec:toolkit}
+
+The LTE's main technical innovation is not the theorem statement
+but the \emph{toolkit}: a library of normed homological algebra
+results with explicit quantitative control.  These results are
+general-purpose and transfer directly to other formalization targets.
+
+\paragraph{Controlled surjectivity}
+
+\begin{lemma}[Closure surjectivity {\cite{commelin-massot-lte}}]
+\label{lem:closure-surj}
+Let $G$ and $H$ be normed groups, $K \leq H$ a subgroup, and
+$f: G \to H$ a $C$-surjective morphism onto $K$ (i.e., for all
+$x \in K$ there exists $g$ with $f(g) = x$ and
+$\|g\| \leq C\|x\|$).  If $G$ is complete, then $f$ is
+$(C+\varepsilon)$-surjective onto $\overline{K}$ for every
+$\varepsilon > 0$.
+\end{lemma}
+
+\noindent\textbf{Proof idea.}
+Write $x \in \overline{K}$ as $x = \sum_{i \geq 0} x_i$ with
+$x_i \in K$ and $\|x_i\| \leq \varepsilon_i$ for a rapidly
+decreasing sequence.  Lift each $x_i$ to $g_i$ with
+$\|g_i\| \leq C\|x_i\|$, and set $g = \sum g_i$.  Completeness
+of $G$ guarantees convergence.  The norm estimate
+$\|g\| \leq (C+\varepsilon)\|x\|$ follows from the geometric
+series bound on the $\varepsilon_i$.
+
+\medskip
+\noindent\textbf{CRM annotation.}
+The proof uses completeness of $G$ (to sum the Cauchy series
+$\sum g_i$), which is $\WLPO$ (Cauchy convergence test).  The
+lifting $x_i \mapsto g_i$ uses the $C$-surjectivity hypothesis,
+which is $\BISH$ (explicit choice of lifts).  The norm comparison
+$\|g_i\| \leq C\|x_i\|$ is an inequality between real numbers
+($\LPO$).
+
+\paragraph{Controlled exactness}
+
+\begin{lemma}[Controlled exactness {\cite{commelin-massot-lte}}]
+\label{lem:controlled-exact}
+Let $f: M_0 \to M_1$ and $g: M_1 \to M_2$ be bounded maps between
+normed groups.  Suppose $f$ is $C$-surjective onto $\ker g$, and
+$g$ is $D$-surjective onto its image.  Then for every
+$\varepsilon > 0$, the completion $\widehat{f}$ is
+$(C+\varepsilon)$-surjective onto $\ker \widehat{g}$.
+\end{lemma}
+
+\noindent This is the mechanism by which the LTE passes from
+``incomplete'' exactness (at the pre-completion level, $\BISH$) to
+``completed'' exactness (at the normed-completion level, $\WLPO$).
+The upgrade is Lemma~\ref{lem:closure-surj} applied to $K = \ker g$
+inside $\widehat{M_1}$.
+
+\paragraph{The normed snake lemma}
+
+\begin{proposition}[Weak normed snake lemma {\cite{commelin-massot-lte}}]
+\label{prop:snake}
+Let $M_\bullet^\bullet$ and ${M'}_\bullet^\bullet$ be two admissible
+systems of complexes of complete normed abelian groups, with a
+norm-nonincreasing map $f: M \to M'$ satisfying
+$\|x_{|c}\| \leq K'' \|f(x)\|$ for all $x \in M^i_{k''c}$,
+$i \leq m+1$.  If $M$ is weakly $\leq k$-exact with bound~$K$
+and $M'$ is weakly $\leq k'$-exact with bound~$K'$, then the
+quotient $N = M'/M$ is weakly $\leq kk'k''$-exact in degrees
+$\leq m-1$ with bound $K'(KK''+1)$.
+\end{proposition}
+
+\noindent\textbf{CRM annotation.}
+The proof is a quantitative diagram chase: lift $n \in N^i$ to
+$m' \in M'^i$, decompose $dm'$ using the quotient norm, apply
+weak exactness of $M$ and $M'$, and track constants through.
+The diagram chase is $\BISH$; the norm estimates are $\LPO$.
+The bound $K'(KK''+1)$ is explicit and computable.
+
+The \emph{dual} snake lemma (for kernels instead of cokernels)
+is proved analogously, with bound $K + r_1 r_2 K K'$.
+Both versions are used in the inductive step of Theorem~\ref{thm:94}:
+the snake lemma produces column exactness,
+and the dual snake lemma produces the kernel
+complex for the $T^{-1}$-action.
+
+\paragraph{The spectral proposition}
+
+\begin{proposition}[Spectral proposition {\cite{commelin-massot-lte}}]
+\label{prop:spectral}
+Fix $m \geq 0$ and constants $k, K$.  There exist $\varepsilon > 0$
+and $k_0, K_0$ (depending only on $k, K, m$) such that: if
+a system of double complexes $M^{p,q}_c$ is admissible and satisfies
+\begin{enumerate}[nosep,label=(\roman*)]
+\item rows are weakly $\leq k$-exact in degrees $\leq m-1$ with
+  bound~$K$ (for $i = 0, \ldots, m+1$),
+\item columns are weakly $\leq k$-exact in degrees $\leq m$ with
+  bound~$K$,
+\item the normed spectral homotopy condition for $m$, some $H > 0$,
+  $c_0$, and~$\varepsilon$,
+\end{enumerate}
+then the first row is weakly $\leq k'^2$-exact in degrees $\leq m$
+with bound $2K_0 H$.
+\end{proposition}
+
+\noindent This is the engine of the induction.  The base case ($m=0$)
+uses $\varepsilon = 1/(2k)$ and the homotopy condition to absorb the
+$\varepsilon$-term.  The inductive step passes to the quotient complex
+$N^{p,0} = M^{p,1}/\overline{M^{p,0}}$ and applies the snake lemma
+(Proposition~\ref{prop:snake}) to verify the hypotheses for $m-1$.
+
+\medskip
+\noindent\textbf{CRM annotation.}
+The spectral proposition is $\BISH$ in its logical content: it is a
+statement about constants and admissibility conditions.  The $\LPO$
+enters only when the proposition is \emph{applied} to a specific
+system of double complexes built from normed groups.  This separation
+is a paradigm case of the concentration thesis: the abstract machinery
+is logically free, and the analytic cost is paid only at the
+point of application.
+
+
+\subsubsection{The Breen--Deligne resolution: pure algebra}\label{sec:BD}
+
+The deepest algebraic ingredient in the LTE is the Breen--Deligne
+resolution, which provides a functorial free resolution of any
+abelian group~$A$.
+
+\begin{theorem}[Breen--Deligne {\cite{breen-deligne}}]
+For any abelian group $A$, there is a resolution, functorial in~$A$:
+\[
+  \cdots \longrightarrow \bigoplus_{i} \Z[A^{r_{ij}}]
+  \longrightarrow \cdots
+  \longrightarrow \Z[A^3] \oplus \Z[A^2]
+  \longrightarrow \Z[A^2]
+  \longrightarrow \Z[A]
+  \longrightarrow A \longrightarrow 0.
+\]
+The functorial maps $\Z[A^m] \to \Z[A^n]$ are specified by
+integer matrices (``basic universal maps'': $n \times m$ matrices
+over $\Z$), composed via matrix multiplication.
+\end{theorem}
+
+\noindent\textbf{CRM annotation.}
+The entire Breen--Deligne resolution---its existence, functoriality,
+and the universal maps---is $\BISH$.  The universal maps are
+$\Z$-linear combinations of basic universal maps specified by
+integer matrices; their composition is matrix multiplication; the
+homotopy $h$ packaged with the resolution is a universal map bounded
+by an integer~$N$.  No real analysis, no completeness, no decidability
+of real arithmetic appears anywhere.  Just as Scholze's motivic
+geometric Satake achieves $\BISH$ by replacing analytic intersection
+cohomology with algebraic MV~cycles (\S\ref{sec:audit}), the
+Breen--Deligne resolution achieves $\BISH$ by replacing analytic
+bounds with integer matrices.
+
+This is the algebraic skeleton of the LTE in its purest form.
+The LTE formalizes it in Lean~3 as
+\texttt{breen\_deligne.basic\_universal\_map} (integer matrices),
+\texttt{breen\_deligne.universal\_map} (formal $\Z$-linear
+combinations), and \texttt{breen\_deligne.package} (the triple
+$(n, f, h)$).
+
+\subsubsection{What transfers: reusable components}\label{sec:reusable}
+
+The LTE's mathematical infrastructure divides into three categories
+by reusability.
+
+\paragraph{Category A: Directly reusable ($\BISH$)}
+
+These components depend on no analytic input and can be ported to
+Lean~4 as standalone libraries.
+
+\begin{enumerate}[nosep]
+\item \textbf{Breen--Deligne package.}  Integer matrices, universal
+  maps, the package triple $(n, f, h)$, homotopy composition
+  $h^N$, suitability conditions on $\kappa$.  All finitary
+  algebra over $\Z$.
+
+\item \textbf{Polyhedral lattices.}  Finite free abelian groups with
+  generating norms.  The key combinatorial lemma:
+  $N$-splittability of $\mathrm{Hom}(\Lambda,
+  \overline{\mathcal{L}}_{r'}(S))$ with explicit error term~$d$.
+
+\item \textbf{Cosimplicial polyhedral lattices.}
+  $\Lambda' = \Lambda^N$ with the $\ell^1$-norm; the cosimplicial
+  object $\Lambda^{(\bullet)}$; the Čech nerve isomorphisms
+  $\mathrm{Hom}(\Lambda'^{(m)}, M)_{\leq c} \cong
+  \mathrm{Hom}(\Lambda', M)_{\leq c}^{m /
+  \mathrm{Hom}(\Lambda, M)_{\leq c}}$.
+
+\item \textbf{Abstract diagram chasing.}  The pro-isomorphism
+  argument (Link~4), the five-lemma reduction (Link~5), the
+  short-exact-sequence reduction (Link~6).
+\end{enumerate}
+
+\paragraph{Category B: Reusable with $\LPO$ interface ($\LPO$)}
+
+These components are algebraic in structure but require norm
+comparisons at the interface.
+
+\begin{enumerate}[nosep]
+\item \textbf{Systems of complexes.}  Functors
+  $(\R_{\geq 0})^{\mathrm{op}} \to \mathrm{Ch}(\mathrm{SemiNormGrp})$.
+  The restriction maps $\mathrm{res}_{c',c}$ require
+  $c' \geq c$ ($\LPO$).  The definitions of $\leq k$-exactness,
+  weak $\leq k$-exactness, and admissibility are $\BISH$
+  conditions on the norms.
+
+\item \textbf{The spectral proposition.}
+  The statement and proof of Proposition~\ref{prop:spectral}
+  are $\BISH$ as abstract algebra.  The $\LPO$ enters only at
+  instantiation.
+
+\item \textbf{The normed snake lemma (both versions).}
+  The diagram chase is $\BISH$; the norm bounds use
+  $\LPO$.
+\end{enumerate}
+
+\paragraph{Category C: Analytic core ($\WLPO$/$\LPO$)}
+
+These components are irreducibly analytic.
+
+\begin{enumerate}[nosep]
+\item \textbf{Normed completions $\widehat{V}(\cdot)$.}
+  The completion functor on semi-normed groups.  Cauchy
+  convergence is $\WLPO$; the norm on the completion is $\LPO$.
+
+\item \textbf{The $T^{-1}$-action on $\overline{\mathcal{L}}_{r'}(S)$.}
+  The shift $T^{-1} \cdot (\sum a_n T^n) = (\sum a_{n+1} T^n)$
+  scales the norm by $r'$: the filtration level changes from
+  $\leq c$ to $\leq c/r'$.  This scaling requires norm
+  comparison ($\LPO$).
+
+\item \textbf{The homotopy norm estimate.}
+  The key bound $r^b N \leq \varepsilon$ (choosing $b$ so that
+  $2k'(r/r')^b \leq \varepsilon$) requires decidable ordering
+  on $\R$ ($\LPO$).  This is the deepest analytic content in
+  the entire proof: a single real-number comparison that
+  controls the convergence of the induction.
+\end{enumerate}
+
+\subsubsection{Lean~4 formalization targets}\label{sec:lean4}
+
+The LTE was formalized in Lean~3 (community \texttt{mathlib} fork).
+A Lean~4 port faces the standard Lean~3 $\to$ Lean~4 translation
+burden, but the \emph{mathematical} targets are well-defined.
+We identify the most valuable targets from the CRM perspective:
+components where the $\BISH$/$\LPO$ separation is sharpest and
+the reuse potential is highest.
+
+\paragraph{Target 1: Breen--Deligne package (pure $\BISH$)}
+
+\begin{verbatim}
+-- Basic universal maps: integer matrices
+structure BasicUniversalMap (m n : Nat) where
+  matrix : Matrix (Fin n) (Fin m) Int
+
+-- Universal maps: formal Z-linear combinations
+structure UniversalMap (m n : Nat) where
+  terms : List (Int x BasicUniversalMap m n)
+
+-- Composition via matrix multiplication
+def UniversalMap.comp (f : UniversalMap m n)
+    (g : UniversalMap l m) : UniversalMap l n := ...
+
+-- BD package: exponents, differentials, homotopy
+structure BDPackage where
+  n : Nat -> Nat                  -- exponents
+  f : (i : Nat) -> UniversalMap (n (i+1)) (n i)
+  h : (i : Nat) -> UniversalMap (n (i+1)) (n i)
+  chain_complex : forall i, (f i).comp (f (i+1)) = 0
+  homotopy_rel : forall i, ...   -- h witnesses null-homotopy
+\end{verbatim}
+
+This is finite combinatorics over $\Z$.  No axioms beyond
+\texttt{propext} and \texttt{Quot.sound}.  The key theorem to
+formalize: given a BD package and a suitable sequence $\kappa$,
+the $N$-fold homotopy $h^N$ exists and is bounded by an explicit
+integer.
+
+\paragraph{Target 2: Systems of complexes ($\BISH$ definitions, $\LPO$ at interface)}
+
+\begin{verbatim}
+-- System of complexes: parametrized by NNReal
+structure SystemOfComplexes where
+  C : NNReal -> ChainComplex SemiNormedGroup
+  res : forall c' c, c' >= c -> C c' --> C c
+  res_comp : forall c'' c' c (h1 : c'' >= c')
+    (h2 : c' >= c), res c'' c (le_trans h2 h1) =
+    (res c' c h2).comp (res c'' c' h1)
+
+-- Weak bounded exactness
+def SystemOfComplexes.IsWeakBoundedExact
+    (S : SystemOfComplexes) (k K : Real) (m : Nat)
+    (c0 : NNReal) : Prop :=
+  forall c >= c0, forall i <= m,
+    forall x in (S.C (k * c)).obj i,
+    forall eps > 0, exists y in (S.C c).obj (i-1),
+      norm (res x - d y) <= K * norm (d x) + eps
+\end{verbatim}
+
+The definition is $\BISH$.  The $\LPO$ enters at the inequality
+$c' \geq c$ (comparison of real numbers) and the norm estimate.
+
+\paragraph{Target 3: Controlled surjectivity lemma ($\WLPO$)}
+
+\begin{verbatim}
+-- Key lemma: C-surjectivity extends to closures
+theorem controlled_closure_of_complete
+    {G H : NormedAddCommGroup} [CompleteSpace G]
+    {K : AddSubgroup H} {f : G ->+ H} {C : Real}
+    (hf : forall x in K,
+      exists g, f g = x && norm g <= C * norm x)
+    (eps : Real) (heps : 0 < eps) :
+    forall x in K.topologicalClosure,
+      exists g, f g = x
+        && norm g <= (C + eps) * norm x := by
+  -- Proof: geometric series in complete G
+  ...
+\end{verbatim}
+
+This requires \texttt{CompleteSpace G} ($\WLPO$: Cauchy sequences
+converge) and the norm bound ($\LPO$: $\|g\| \leq C\|x\|$).
+The Lean~4 proof would use \texttt{Metric.cauchySeq\_of\_le\_geometric}
+from Mathlib.
+
+\paragraph{Target 4: Normed snake lemma ($\BISH$ chase, $\LPO$ bounds)}
+
+The most technically demanding target.  The Lean~3 proof
+(\texttt{weak\_normed\_snake} and \texttt{weak\_normed\_snake\_dual})
+runs approximately 200 lines.  A Lean~4 port would:
+\begin{itemize}[nosep]
+\item Define admissible systems of complexes over Mathlib's
+  \texttt{SemiNormedGroup}.
+\item Implement the quantitative diagram chase with explicit
+  $\varepsilon$-management.
+\item Prove the bound $K'(KK''+1)$ for quotients and
+  $K + r_1 r_2 K K'$ for kernels.
+\end{itemize}
+
+The entire chase is $\BISH$ (diagram manipulation in an abelian
+category with explicit lifts).  The $\LPO$ enters only at the
+final norm inequality.
+
+\paragraph{CRM summary of formalization targets}
+
+\begin{center}
+\begin{tabular}{llcl}
+\toprule
+\textbf{Target} & \textbf{Component} & \textbf{CRM} & \textbf{Lean~4 difficulty} \\
+\midrule
+1 & Breen--Deligne package  & $\BISH$ & Low (finite algebra over $\Z$) \\
+2 & Systems of complexes    & $\BISH$/$\LPO$ & Medium (parametrized complexes) \\
+3 & Controlled surjectivity & $\WLPO$ & Low (standard Cauchy argument) \\
+4 & Normed snake lemma      & $\BISH$/$\LPO$ & High (200-line diagram chase) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Targets~1 and~3 are low-hanging fruit: they are self-contained,
+well-typed, and already have Lean~3 implementations to translate.
+Target~2 requires design decisions about how to interface
+with Mathlib's \texttt{CategoryTheory.ChainComplex}.
+Target~4 is the highest-value formalization: the normed snake
+lemma is the engine of the induction, and a clean Lean~4
+version would serve as infrastructure for any future normed
+homological algebra project.
+
+\medskip
+\noindent\textbf{Acknowledgments for this appendix.}
+The LTE blueprint files used in this analysis were authored by Johan Commelin
+and Patrick Massot~\cite{commelin-massot-lte}. The mathematical content follows
+the proofs in~\cite{scholze-condensed} as formalized in~\cite{commelin-massot-lte}.

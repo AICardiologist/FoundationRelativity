@@ -4,7 +4,7 @@
 
 Author: Paul Chun-Kit Lee (NYU)
 Date: February 2026
-DOI: [10.5281/zenodo.18779210](https://doi.org/10.5281/zenodo.18779210)
+DOI: [10.5281/zenodo.18777596](https://doi.org/10.5281/zenodo.18777596)
 
 ## Summary
 
@@ -97,8 +97,8 @@ Paper 77 continues the diagnostic-to-generative pipeline:
 - **Paper 77:** Automated constructivisation (this paper)
 
 Future targets:
-- Paper 78: Explicit Local Langlands for wildly ramified representations
-- Paper 79: Standard Conjecture D for simple CM abelian fourfolds
+- Paper 78: The Local Langlands Correspondence for GL₂(ℚ₂) Is Constructively Decidable
+- Paper 79: Standard Conjecture D for Abelian Fourfolds of Weil Type Is Constructively Decidable
 
 ## License
 

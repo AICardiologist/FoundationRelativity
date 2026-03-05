@@ -127,16 +127,16 @@ The emerging narrative was arresting: "undecidability" in physics is a misnomer.
 
 **Paper 38 (Wang tiling is LPO — the Grandfather Theorem)** traced the genealogy to its root. Every undecidability result in quantum many-body physics descends from a single ancestor: the undecidability of Wang tiling (Berger 1966). Cubitt's construction encodes Turing machine computation into a Hamiltonian via aperiodic tilings — Robinson tilings derived from Berger's original construction. Paper 38 proved that Wang tiling itself is Turing-Weihrauch equivalent to LPO, and that all descendants in the genealogy — from Kanter's Potts model (1990) through Gu-Weedbrook's 2D Ising (2009) to Cubitt and all subsequent results — inherit exactly LPO. No more, no less. The Grandfather Theorem: physical undecidability has one ancestor, and that ancestor is LPO.
 
-**Paper 39 (Beyond LPO — thermodynamic stratification)** asked the deeper question. Papers 36–38 showed all *known* undecidabilities are LPO. Is this a hard ceiling?
+**Paper 39 (Beyond LPO — physical stratification)** asked the deeper question. Papers 36–38 showed all *known* undecidabilities are LPO. Is this a hard ceiling?
 
-The answer surprised: no, but the extension is empirically inaccessible. By modifying Cubitt's construction — using Robinson tilings with perimeter counters to encode the Finiteness Problem (Σ₂⁰-complete) rather than the Halting Problem (Σ₁⁰-complete) — Paper 39 proved that generic intensive observables (spectral gap, correlation length) without promise gap reach Σ₂⁰. The key insight: Cubitt's original construction has a promise gap (Δ ∈ {0} ∪ [γ, ∞)), which collapses the decision to Σ₁⁰. Remove the promise gap, and the decision ascends to Π₂⁰.
+The answer surprised: no, but the extension is empirically inaccessible. By modifying Cubitt's construction — using Robinson tilings with perimeter counters to encode the Finiteness Problem (Σ₂⁰-complete) rather than the Halting Problem (Σ₁⁰-complete) — Paper 39 proved that generic observables without promise gap reach Σ₂⁰. The key insight: Cubitt's original construction has a promise gap (Δ ∈ {0} ∪ [γ, ∞)), which collapses the decision to Σ₁⁰. Remove the promise gap, and the decision ascends to Π₂⁰.
 
 But the promise gap is not a convenience — it is the logical signature of finite experimental precision. A spectrometer measuring the spectral gap with precision ε enforces an effective promise gap that keeps the decision at Σ₁⁰. The Σ₂⁰ tier is mathematically real but empirically inaccessible.
 
-The Thermodynamic Stratification Theorem crystallized the picture:
-- Extensive observables (energy density, free energy): capped at LPO via Fekete/BMC, regardless of promise gap
-- Intensive observables without promise gap: reach Σ₂⁰ (LPO')
-- Empirical observables at finite precision: capped at LPO
+The Physical Stratification Theorem crystallized the picture: the *epistemic mode* (exact vs promise-gapped vs empirical) — not thermodynamic scaling (extensive vs intensive) — determines the arithmetic level:
+- Platonic exact observables (no promise gap): reach Σ₂⁰ (LPO')
+- Promise-gapped observables: capped at LPO (Σ₁⁰)
+- Empirical observables at finite precision: capped at LPO (Σ₁⁰)
 
 The refined thesis: empirical physics = BISH+LPO (confirmed). Platonic exact-limit physics = BISH+LPO'. The gap between them is precisely finite experimental precision.
 

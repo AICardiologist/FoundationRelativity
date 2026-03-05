@@ -1,0 +1,2 @@
+import Papers.P82_DiffGalois.KovacicData
+import Papers.P82_DiffGalois.Paper82_DiffGalois

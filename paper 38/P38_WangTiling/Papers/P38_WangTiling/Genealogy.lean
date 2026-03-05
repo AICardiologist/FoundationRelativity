@@ -37,7 +37,11 @@ structure GenealogyEntry where
       ├── BCW: Phase diagrams (2021)
       └── CLPE: RG flows (2022)
 
-    At every level: computable reduction from halting → LPO. -/
+    At every level: computable reduction from halting → LPO.
+
+    NOTE: Watson-Cubitt (2021) ground state energy density is
+    a BISH-computable finite eigenvalue problem (Paper 37), NOT
+    an undecidability result, and is therefore excluded. -/
 def undecidability_genealogy : List GenealogyEntry := [
   ⟨"Wang Tiling (Berger)", 1966,
    "Halting Problem", "Tile = transition rule", true, true⟩,
@@ -52,9 +56,7 @@ def undecidability_genealogy : List GenealogyEntry := [
   ⟨"Phase Diagrams (BCW)", 2021,
    "Halting via QPE", "QPE encodes input", true, true⟩,
   ⟨"RG Flows (CLPE)", 2022,
-   "CPgW Hamiltonian", "RG preserves gap", true, true⟩,
-  ⟨"Ground State Energy (WC)", 2021,
-   "Halting Problem", "Complexity (BISH)", true, true⟩
+   "CPgW Hamiltonian", "RG preserves gap", true, true⟩
 ]
 
 /-- THEOREM 3: All entries in the genealogy are Σ₁⁰-complete
@@ -66,7 +68,7 @@ theorem all_genealogy_lpo :
 
 /-- Count of entries. -/
 theorem genealogy_count :
-    undecidability_genealogy.length = 8 := by
+    undecidability_genealogy.length = 7 := by
   decide
 
 /-- The genealogy's message: every descendant inherits exactly

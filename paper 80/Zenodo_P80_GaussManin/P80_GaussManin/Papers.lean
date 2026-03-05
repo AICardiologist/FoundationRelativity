@@ -1,0 +1,2 @@
+import Papers.P80_GaussManin.GMData
+import Papers.P80_GaussManin.Paper80_GaussManin

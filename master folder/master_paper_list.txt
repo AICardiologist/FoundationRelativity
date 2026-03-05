@@ -76,7 +76,7 @@ No.  Title                                                               DOI
  65  Self-Intersection Patterns Beyond Cyclic Cubics                     10.5281/zenodo.18743151
  66  Form-Class Resolution for Non-Cyclic Totally Real Cubics            10.5281/zenodo.18745722
  67  The Motive Is a Decidability Certificate (Monograph)               10.5281/zenodo.18776113
- 68  Fermat's Last Theorem Is BISH                                      10.5281/zenodo.18749965
+ 68  Fermat's Last Theorem Is BISH                                      10.5281/zenodo.18777925
  69  Function Field Langlands Is BISH                                    10.5281/zenodo.18749757
  70  The Archimedean Principle (Capstone)                                 10.5281/zenodo.18750992
  71  Archimedean Principle in Cryptography and Computation               10.5281/zenodo.18752015
@@ -84,15 +84,17 @@ No.  Title                                                               DOI
  73  Standard Conjecture D Is Necessary for Morphism Decidability        10.5281/zenodo.18765700
  74  Algebraic Spectrum Is Necessary for Eigenvalue Decidability         10.5281/zenodo.18773827
  75  Conservation Test: Genestier-Lafforgue LLC Calibration              10.5281/zenodo.18773831
+ 76  CRMLint: Automated CRM Logical Cost Analysis at Scale              (DOI pending)
+ 77  Explicit Hodge Decompositions for E^4 (Methods Paper)              10.5281/zenodo.18779210
 
 ================================================================================
 STATISTICS
 ================================================================================
-Total papers:         73 active (of 75 numbered)
+Total papers:         75 active (of 77 numbered)
 Withdrawn:            2 (Papers 1, 3)
 Retired:              2 (Paper 60 → 59; Paper 62 → 63)
-Papers with DOIs:     71
-Papers pending DOI:   0
+Papers with DOIs:     72
+Papers pending DOI:   1 (Paper 76)
 Papers peer-reviewed: 75 (passed Gemini peer review)
 Papers with Lean 4:   ~65 (Papers 64-66 computational/LaTeX-only)
 Total Lean 4 lines:   ~89,150+

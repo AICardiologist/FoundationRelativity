@@ -1,0 +1,28 @@
+Title: Standard Conjecture D for Abelian Fourfolds of Weil Type Is Constructively Decidable (Paper 79, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University
+
+Date: March 2026
+
+Description:
+Paper 79 of the Constructive Reverse Mathematics Series applies the CRMLint Squeeze protocol to Grothendieck's Standard Conjecture D for abelian fourfolds of Weil type. The Classical Boundary Node is Lieberman's 1968 proof, which uses the Hard Lefschetz theorem and Hodge-Riemann bilinear relations (CLASS). The constructive target bypasses the abstract Hodge-Riemann machinery entirely: for a generic abelian fourfold A with K = Q(i) acting on H^1(A, Q) ~ Q^8, the exotic Weil subspace W_K = span{Re(w), Im(w)} is 2-dimensional with Gram matrix G = [[8, 0], [0, 8]], verified positive definite by Sylvester's criterion via decide in Lean 4 (0 sorry). A positive definite bilinear form is non-degenerate on every subspace, including the (unknown) algebraic subspace of W_K, establishing Conjecture D for the exotic Weil classes without Hodge-Riemann. A preliminary computational sweep over all 16 CM types for Q(zeta_15) confirms the Hazama-Ribet obstruction: cyclotomic fields of degree at most 8 cannot host exotic Weil classes, motivating the pivot to the generic setting. CRM descent: CLASS to BISH (sharpest possible). Third CRMLint Squeeze application.
+
+Lean 4 formalization: 149 lines (106 + 43 CAS-emitted), 5 constructive theorems by decide, 0 sorry. All constructive theorems depend on zero axioms (pure kernel-level decide on integer data). Axiom inventory: hodge_riemann_conjD (CLASS, unused by squeeze). Python CAS: solve_generic_weil.py emits Gram matrix data; sweep_cm_types.py validates all 16 CM types for Q(zeta_15).
+
+Keywords: constructive reverse mathematics, Standard Conjecture D, Grothendieck standard conjectures, abelian fourfold, Weil type, exotic Weil classes, Hodge-Riemann bilinear relations, Lieberman, Gram matrix, Sylvester criterion, Lean 4, formal verification, CRMLint Squeeze, BISH, CM types
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Upload type: publication / preprint
+
+DOI: 10.5281/zenodo.18843129
+
+Related identifiers:
+- Paper 77 (Hodge Decompositions): https://doi.org/10.5281/zenodo.18777596
+- Paper 78 (Local Langlands): https://doi.org/10.5281/zenodo.18789008
+- Paper 80 (Algebraic Gauss-Manin): https://doi.org/10.5281/zenodo.18791985
+- Paper 72 (DPT Characterization): https://doi.org/10.5281/zenodo.18765393
+- Paper 50 (DPT Framework): https://doi.org/10.5281/zenodo.14538379
+- CRM Series Format Guide: https://doi.org/10.5281/zenodo.18765700

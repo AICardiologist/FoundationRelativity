@@ -1,0 +1,7 @@
+import Papers.P98_MotivicCRM.CRMLevel
+import Papers.P98_MotivicCRM.Realizations
+import Papers.P98_MotivicCRM.ArchimedeanObstruction
+import Papers.P98_MotivicCRM.Calibration
+import Papers.P98_MotivicCRM.Langlands
+import Papers.P98_MotivicCRM.Physics
+import Papers.P98_MotivicCRM.Paper98_Assembly

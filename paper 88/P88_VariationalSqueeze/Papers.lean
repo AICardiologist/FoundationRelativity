@@ -1,0 +1,2 @@
+import Papers.P88_VariationalSqueeze.FermatData
+import Papers.P88_VariationalSqueeze.Paper88_Variational

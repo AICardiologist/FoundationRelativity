@@ -1,0 +1,22 @@
+Title: The Exotic Trace Probe: Transcendence of Weil Classes via Gauss-Manin Analysis (Paper 84, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: February 2026
+
+Description: Paper 84 of the Constructive Reverse Mathematics (CRM) Series. We compute the Gauss-Manin connection on the exotic Weil subspace of a genus-4 hyperelliptic family C_t: y^2 = x^9 - tx^5 + x with Q(i)-action. The Q(i)-eigenspace decomposition collapses the 70-dimensional exterior power computation to a scalar ODE via the trace trick. The CAS computation yields tau_+(t) = (-250t^5 + 1890t^3 - 3564t) / (81(t^2 - 4)), with an irregular singularity at infinity (polynomial part of degree 3). The differential Galois group is Gm, certifying that the exotic Weil classes are transcendental over Q(t). No finite base change can produce exotic algebraic cycles generically. CRM Squeeze: CLASS (Hodge Conjecture, comparison theorem, Baire category) descends to BISH (explicit Griffiths-Bezout reduction, trace computation, partial fraction analysis, Galois classification). Seventh CRMLint Squeeze. Lean 4 formalization: 389 lines, 0 sorry. The main squeeze theorem depends on no axioms whatsoever.
+
+Keywords: constructive reverse mathematics, Gauss-Manin connection, exotic Weil classes, Hodge conjecture, differential Galois theory, hyperelliptic curves, abelian fourfolds, Lean 4, formal verification
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Upload type: Publication / Preprint
+
+Related identifiers:
+- IsPartOf: 10.5281/zenodo.18765700 (CRM Series Format Guide)
+- IsPartOf: 10.5281/zenodo.18791985 (Paper 80, Algebraic Gauss-Manin)
+- IsPartOf: 10.5281/zenodo.18801814 (Paper 81, Algebraic Flat Sections)
+- IsPartOf: 10.5281/zenodo.18801822 (Paper 82, Constructive Differential Galois Theory)
+- IsPartOf: 10.5281/zenodo.18801826 (Paper 83, Generic Picard Number)

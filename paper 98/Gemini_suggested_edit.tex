@@ -1,0 +1,528 @@
+\documentclass[11pt,a4paper]{article}
+
+% === Packages ===
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,mathrsfs}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{tikz-cd}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{fancyvrb}
+
+\geometry{margin=1in}
+\hypersetup{colorlinks=true,linkcolor=blue!70!black,citecolor=green!50!black,urlcolor=purple!70!black}
+
+% === Cyrillic Sha Symbol ===
+\DeclareFontFamily{U}{wncy}{}
+\DeclareFontShape{U}{wncy}{m}{n}{<->wncyr10}{}
+\DeclareSymbolFont{mcy}{U}{wncy}{m}{n}
+\DeclareMathSymbol{\Sha}{\mathord}{mcy}{"58}
+
+% === Theorem environments ===
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{calibration}[theorem]{Calibration Theorem}
+
+% === Lean code environment ===
+\definecolor{leanblue}{RGB}{0,51,102}
+\definecolor{leanbg}{RGB}{245,248,252}
+\tcbset{
+  leanbox/.style={colback=leanbg, colframe=leanblue!60, 
+    fonttitle=\bfseries\ttfamily, title=#1, 
+    boxrule=0.5pt, arc=2pt, left=4pt, right=4pt}
+}
+
+% === Macros ===
+\newcommand{\BISH}{\textsf{BISH}}
+\newcommand{\WKL}{\textsf{WKL}_0}
+\newcommand{\WLPO}{\textsf{WLPO}}
+\newcommand{\LLPO}{\textsf{LLPO}}
+\newcommand{\LPO}{\textsf{LPO}}
+\newcommand{\CLASS}{\textsf{CLASS}}
+\newcommand{\CRM}{\textsf{CRM}}
+\newcommand{\Mot}{\mathsf{Mot}}
+\newcommand{\Real}{\mathsf{Real}}
+\newcommand{\Comp}{\mathsf{Comp}}
+\newcommand{\sig}{\sigma}
+\newcommand{\Gal}{\mathrm{Gal}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\GL}{\mathrm{GL}}
+\newcommand{\Spec}{\mathrm{Spec}}
+\newcommand{\Hom}{\mathrm{Hom}}
+\newcommand{\rank}{\mathrm{rank}}
+
+% === Title ===
+\title{\textbf{Paper 98: The Motivic CRM Architecture}\\[6pt]
+\large Why the Six Domains of Mathematics Have Different\\
+Logical Signatures, and How Motives Explain the Pattern\\[12pt]
+\normalsize\textit{A Capstone Synthesis of Papers 50--97}}
+
+\author{Paul Chun-Kit Lee}
+\date{March 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We formalize the observation that the six mathematical domains connected by the Langlands program---number theory, algebraic geometry, representation theory, harmonic analysis, topology, and mathematical physics---exhibit systematically different constructive reverse mathematics (CRM) signatures. We show that Grothendieck's theory of motives provides the structural explanation: the motive itself is $\BISH$ (Bishop-constructive), each realization functor has a definite CRM cost, and the comparison isomorphisms between realizations are $\CLASS$ (fully classical) if and only if they pass through the Archimedean place. This \emph{Archimedean Obstruction Thesis} transcends mere redescription by generating precise structural predictions---most notably, that function field arithmetic (lacking an Archimedean place) must be uniformly constructive. It further explains why algebra is constructive, analysis is classical, algebraic geometry bifurcates, and the Taylor--Wiles repair of Fermat's Last Theorem was a $\CLASS \to \WKL$ excision. We state three calibration theorems (Hodge detection $\leftrightarrow$ $\WLPO$; TW patching $\leftrightarrow$ $\WKL$; BSD rank/$\Sha$ decoupling) and a signature preservation theorem for the Langlands correspondence. A companion 0-\texttt{sorry} Lean~4 formalization mechanically verifies the core logical framework, representing the geometric functors as axiomatic stubs. This paper synthesizes the findings of Papers~50--97 in the CRM program.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%======================================================================
+\section{Introduction}\label{sec:intro}
+%======================================================================
+
+The Langlands program connects six areas of mathematics: number theory, algebraic geometry, representation theory, harmonic analysis, topology, and mathematical physics. Each area has its own methods, its own culture, and---as this paper documents---its own \emph{logical signature}. Number theory is algebraic at its core but hits sharp classical bottlenecks at $L$-functions. Algebraic geometry bifurcates: some theorems are constructive, others irreducibly classical, with the boundary controlled by moduli dimension. Representation theory (of algebraic groups, Hecke algebras) is almost entirely constructive. Harmonic analysis---spectral decomposition on locally symmetric spaces---is the principal factory of classical content. And mathematical physics recapitulates the pattern, with the quantum/classical divide mirroring the $\BISH$/$\CLASS$ boundary.
+
+Why? What structural feature of mathematics produces these differences, and what connects them?
+
+The answer, we argue, is Grothendieck's theory of \emph{motives}. The motive of a variety is its universal cohomological invariant---an algebraic object, defined by correspondences, living in a category built from finite-dimensional linear algebra over $\Q$. It is constructive in its syntax. But to \emph{use} a motive, one must apply a \emph{realization functor}: Betti (singular cohomology), de Rham (algebraic differential forms), \'etale ($\ell$-adic Galois representations), crystalline (over $\F_p$), Hodge (filtration and decomposition), or automorphic (via Langlands). Each realization has a definite CRM cost. And the \emph{comparison isomorphisms} between realizations---the period map (Betti $\leftrightarrow$ de Rham), the Artin comparison (\'etale $\leftrightarrow$ Betti), the Hodge decomposition (de Rham $\leftrightarrow$ Hodge)---are classical if and only if they pass through the topology of the complex manifold, i.e., through the \emph{Archimedean place} $\R$.
+
+This is the \textbf{Archimedean Obstruction Thesis}: $\R$ is the unique source of non-constructive content in arithmetic geometry.
+
+\paragraph{Explanation vs. Redescription.} One might ask if this thesis is merely a tautology: does ``the classical content comes from $\R$'' simply redescribe the truism that ``analysis requires analysis''? The explanatory power of the motivic framework lies in its \emph{falsifiable structural predictions}. If the thesis holds, then entirely removing the Archimedean place from the global arithmetic machinery must yield a strictly $\BISH$ proof architecture, even for the most profound theorems. This prediction is spectacularly confirmed by the \textbf{Function Field Langlands program} (\S\ref{sec:function-fields}). Over $\F_q(C)$, where $\A_F$ lacks an Archimedean factor, Lafforgue's proof utilizes moduli of shtukas (algebraic) rather than the trace formula (spectral analysis), remaining entirely within the constructive envelope.
+
+The thesis yields precise logical consequences, all verified across our program:
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Function field Langlands is $\BISH$} (Papers~69, 78): over $\F_q(C)$, the ad\`ele ring $\A_F$ has no Archimedean factor. All realizations are \'etale/crystalline. The trace formula uses shtukas instead of spectral theory. The entire correspondence is constructive.
+
+\item \textbf{The Taylor--Wiles fix was a logical excision} (Papers~68--71, \S\ref{sec:modularity}): Wiles's 1993 attempt computed the congruence ideal $\eta_\mathbb{T}$ via the Petersson inner product (integration on the complex upper half-plane: $\CLASS$). Taylor--Wiles patching replaced this with an inverse limit argument, cleanly excising the Archimedean computation and dropping the logical cost to $\WKL$.
+
+\item \textbf{Hodge detection bifurcates at $\WLPO$} (Papers~86--90, \S\ref{sec:hodge}): on the generic fiber, detecting Hodge classes requires the Hodge decomposition ($\CLASS$). On special loci, extra algebraic symmetries provide shortcuts ($\BISH$). The gap is precisely $\WLPO$.
+
+\item \textbf{BSD decouples at the rank/$\Sha$ boundary} (Papers~95--96, \S\ref{sec:bsd}): rank verification is $\BISH$ (algebraic descent), $\Sha$ finiteness is $\CLASS$ (Euler systems, Chebotarev). 
+
+\item \textbf{Physics parallels the pattern} (\S\ref{sec:physics}): classical mechanics ($\BISH$) vs.\ quantum spectral theory ($\CLASS$), lattice QFT ($\BISH$) vs.\ continuum QFT ($\CLASS$), explicit GR solutions ($\BISH$) vs.\ general existence theorems ($\CLASS$).
+\end{enumerate}
+
+
+%======================================================================
+\section{The CRM Hierarchy}\label{sec:crm}
+%======================================================================
+
+We work in the framework of constructive reverse mathematics (CRM), as developed by Ishihara, Bridges, Diener, and others. 
+
+\begin{definition}[CRM Signature]
+A \emph{CRM signature} of a mathematical theorem $T$ is the weakest level $\sigma \in \{\BISH, \textsf{MP}, \LLPO, \WKL, \WLPO, \LPO, \CLASS\}$ such that $T$ is provable in $\BISH + \sigma$. We write $\sig(T) = \sigma$.
+\end{definition}
+
+The hierarchy forms a partial order. The principal principles are strictly ordered by logical strength ($\BISH \subsetneq \LLPO \subsetneq \WLPO \subsetneq \LPO \subsetneq \CLASS$). We also include Weak K\"onig's Lemma ($\WKL$). Note that $\WKL$ (compactness) and $\WLPO$ (analytic decidability) are logically incomparable over $\BISH$.
+
+The key principles, for reference:
+\begin{itemize}[leftmargin=2em]
+\item $\BISH$: Bishop's constructive mathematics. Intuitionistic logic + dependent choice. Every existential proof provides a computable witness.
+\item $\WKL$: Every infinite, finitely branching tree has an infinite path. Equivalent to: every bounded sequence in $[0,1]$ has a convergent subsequence.
+\item $\WLPO$: For every real number $x$, either $x = 0$ or $x \neq 0$. Decidability of equality for reals.
+\item $\CLASS$: Full classical logic. Law of excluded middle for all propositions.
+\end{itemize}
+
+\begin{definition}[CRM Signature of a Proof Path]
+A \emph{proof path} $P$ consists of a set of realizations $\{R_i\}$ and comparison isomorphisms $\{C_j\}$. Its signature is:
+\[
+\sig(P) \;=\; \max\bigl(\sig(\text{motive}),\; \max_i \sig(R_i),\; \max_j \sig(C_j)\bigr)
+\]
+\end{definition}
+
+
+%======================================================================
+\section{Motives: The Universal Constructive Core}\label{sec:motives}
+%======================================================================
+
+Let $k$ be a field. Grothendieck's category of pure Chow motives $\Mot_{\mathrm{rat}}(k)$ has:
+
+\textbf{Objects:} Triples $(X, p, n)$ where $X$ is a smooth projective variety over $k$, $p \in \mathrm{CH}^{\dim X}(X \times X) \otimes \Q$ is an idempotent correspondence, and $n \in \Z$ is a Tate twist.
+
+\textbf{Morphisms:} Algebraic correspondences modulo rational equivalence, with $\Q$-coefficients. Composition is given by intersection theory.
+
+The essential point is that everything here is \emph{algebraic}: correspondences are formal sums of subvarieties, composition is a finite computation in the Chow ring, and all linear algebra takes place over $\Q$.
+
+\begin{proposition}\label{prop:motive-bish}
+The category $\Mot_{\mathrm{rat}}(k)$ is a $\Q$-linear, rigid, symmetric monoidal category. Its objects and formal morphisms are definable in $\BISH$.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+Equality of morphisms modulo rational equivalence is algebraically decidable in principle, as rational equivalence is explicitly generated by cycles parameterized by $\mathbb{P}^1$ (reducible to solving polynomial systems via elimination theory). All operations---tensor product, internal Hom, duality---are defined by algebraic correspondences and computed by intersection theory, which is a finite algebraic algorithm. No limits, no completions, no analysis.
+\end{proof}
+
+\begin{remark}[Decidability vs. Tractability]\label{rmk:decidability}
+While rational equivalence is algebraically decidable \emph{in principle} (thus strictly satisfying the logical requirements of $\BISH$), we emphasize the vast gap between decidability-in-principle and effective computability. Deep problems like Bloch's conjecture demonstrate that bounded geometric constructions can be computationally intractable in practice. The $\BISH$ classification reflects logical finiteness, not algorithmic feasibility. (Note: Passing to numerical equivalence $\Mot_{\mathrm{num}}(k)$ guarantees finite-dimensional Hom-spaces via Jannsen's theorem, but testing numerical triviality requires the Standard Conjectures to be computable, necessitating $\LPO$ as shown in Paper~73. Rational equivalence cleanly avoids this classical boundary.)
+\end{remark}
+
+\begin{tcolorbox}[leanbox={Lean: Motive signature}]
+\begin{Verbatim}[fontsize=\small]
+def motive_signature : CRMSignature :=
+  ⟨.BISH, "Algebraic cycles and intersection theory modulo rational equivalence"⟩
+
+theorem motive_is_bish : motive_signature.level = .BISH := rfl
+\end{Verbatim}
+\end{tcolorbox}
+
+
+%======================================================================
+\section{Realizations and Their CRM Cost}\label{sec:realizations}
+%======================================================================
+
+A realization functor is an exact, faithful, $\Q$-linear functor from $\Mot(k)$ to a linear category. Each carries a definite CRM cost determined by the analytic or algebraic nature of its target category.
+
+\subsection{Betti Realization ($\CLASS$)}
+
+For $k \hookrightarrow \C$, the Betti realization sends $M$ to $H^*_{\mathrm{sing}}(X(\C), \Q)$. The critical obstruction is forming the complex manifold $X(\C)$, which invokes $\R$ and the Archimedean completion. 
+
+\begin{calibration}[Betti Realization]\label{cal:betti}
+$\sig(\Real_{\mathrm{Betti}}) = \CLASS$. The obstruction is the formation of $X(\C)$ and integration of differential forms over topological cycles.
+\end{calibration}
+
+\subsection{de Rham Realization ($\BISH$)}
+
+The algebraic de Rham cohomology $H^*_{\mathrm{dR}}(X/k)$ is computed by the \v{C}ech--de Rham spectral sequence on an affine cover. All differentials are algebraic polynomials. No integration, no topology.
+
+\begin{calibration}[de Rham Realization]\label{cal:derham}
+$\sig(\Real_{\mathrm{dR}}) = \BISH$. Purely algebraic: differential forms modulo exact forms.
+\end{calibration}
+
+\subsection{\'Etale Realization ($\BISH$, with a caveat)}\label{sec:etale}
+
+The $\ell$-adic \'etale cohomology $H^*_{\mathrm{\acute{e}t}}(X_{\bar{k}}, \Q_\ell)$ is:
+
+\begin{enumerate}[label=(\alph*)]
+\item $H^*_{\mathrm{\acute{e}t}}(X_{\bar{k}}, \Z/\ell^n\Z)$ for each $n$: finite Galois cohomology, computed by finite covers. $\BISH$.
+\item $H^*_{\mathrm{\acute{e}t}}(X_{\bar{k}}, \Z_\ell) = \varprojlim_n H^*_{\mathrm{\acute{e}t}}(X_{\bar{k}}, \Z/\ell^n\Z)$: a projective limit of finite modules. 
+\item $H^*_{\mathrm{\acute{e}t}}(X_{\bar{k}}, \Q_\ell) = H^*_{\mathrm{\acute{e}t}}(X_{\bar{k}}, \Z_\ell) \otimes_{\Z_\ell} \Q_\ell$. 
+\end{enumerate}
+
+\begin{remark}[The ``Smooth Projective'' Heavy Lifting]\label{rmk:smooth-projective}
+We emphasize that the \emph{smooth projective} hypothesis does heavy lifting here. For pure motives, these are finitely generated modules, and the transition maps satisfy the Mittag-Leffler condition with effectively bounded torsion (via Deligne/Gabber). Thus, the limit is constructively bounded and only requires Dependent Choice ($\BISH$), avoiding $\WKL$. Furthermore, while equality testing in the completion $\Q_\ell$ generally requires $\WLPO$, the essential motivic data (Frobenius traces) lie in $\Z$ by Deligne's Weil II, so computations descend to exact $\Q$-arithmetic.
+
+If one moves to singular or open varieties (mixed motives), the Mittag-Leffler bounds on torsion may fail, potentially elevating the projective limit to genuinely require $\WKL$. The $\BISH$ signature is a strict feature of pure motives.
+\end{remark}
+
+\begin{calibration}[\'Etale Realization]\label{cal:etale}
+$\sig(\Real_{\mathrm{\acute{e}t}}) = \BISH$ (for pure motives). The limit is effectively bounded, and spectral data descend to $\Z$.
+\end{calibration}
+
+\subsection{Crystalline Realization ($\BISH$)}
+
+Crystalline cohomology $H^*_{\mathrm{cris}}(X/W(\F_q))$ is a finite-dimensional $W(\F_q)$-module. The Frobenius $\varphi$ is an explicit matrix whose characteristic polynomial descends to $\Z$, keeping the computational output safely in $\BISH$.
+
+\begin{calibration}[Crystalline Realization]\label{cal:crys}
+$\sig(\Real_{\mathrm{cris}}) = \BISH$. Linear algebra over Witt vectors.
+\end{calibration}
+
+\subsection{Hodge Realization ($\CLASS$)}
+
+The Hodge realization associates the decomposition $H^n(X(\C), \C) = \bigoplus H^{p,q}(X)$. The Hodge \emph{filtration} is algebraic ($\BISH$), but the \emph{decomposition} requires harmonic representatives via elliptic regularity and the $\partial\bar\partial$-lemma.
+
+\begin{calibration}[Hodge Realization]\label{cal:hodge}
+$\sig(\Real_{\mathrm{Hodge}}) = \CLASS$. Requires elliptic PDE theory on $X(\C)$.
+\end{calibration}
+
+\subsection{Automorphic Realization ($\CLASS$)}
+
+The automorphic realization (via Langlands) requires the spectral decomposition of $L^2(\GL_n(\Q)\backslash\GL_n(\A_\Q))$---analysis on the adelic quotient, inherently including the Archimedean factor $\GL_n(\R)$.
+
+\begin{calibration}[Automorphic Realization]\label{cal:auto}
+$\sig(\Real_{\mathrm{aut}}) = \CLASS$. $L^2$ spectral theory on $G(\R)$.
+\end{calibration}
+
+\begin{tcolorbox}[leanbox={Lean: Realization signatures}]
+\begin{Verbatim}[fontsize=\small]
+def realization_signature : Realization -> CRMSignature
+  | .Betti       => ⟨.CLASS, "Integration over topological cycles"⟩
+  | .deRham      => ⟨.BISH,  "Algebraic differential forms"⟩
+  | .etale       => ⟨.BISH,  "Bounded limits and finite Galois"⟩
+  | .crystalline => ⟨.BISH,  "Linear algebra over Witt vectors"⟩
+  | .Hodge       => ⟨.CLASS, "Hodge decomposition: elliptic PDE"⟩
+  | .automorphic => ⟨.CLASS, "L2 spectral decomposition"⟩
+\end{Verbatim}
+\end{tcolorbox}
+
+
+\subsection{Summary Table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Realization} & \textbf{CRM Level} & \textbf{Obstruction} \\
+\midrule
+de Rham (algebraic) & $\BISH$ & None \\
+\'Etale ($\Q_\ell$) & $\BISH$ & None (pure motives) \\
+Crystalline & $\BISH$ & None \\
+Betti (singular) & $\CLASS$ & $X(\C)$, integration \\
+Hodge (decomposition) & $\CLASS$ & Elliptic PDE \\
+Automorphic & $\CLASS$ & $L^2$ spectral theory \\
+\bottomrule
+\end{tabular}
+\caption{CRM signatures of realization functors. The $\BISH$/$\CLASS$ boundary coincides exactly with the algebraic/analytic boundary.}
+\label{tab:realizations}
+\end{table}
+
+
+%======================================================================
+\section{Comparison Isomorphisms: The Archimedean Obstruction}\label{sec:comparisons}
+%======================================================================
+
+The power of the motivic framework comes from comparison isomorphisms between realizations. These are the ``bridges'' that allow information to flow between cohomology theories. Their CRM cost is the key structural invariant.
+
+\subsection{Betti $\leftrightarrow$ de Rham: The Period Map ($\CLASS$)}
+
+The comparison is integration:
+\[
+H^n_{\mathrm{dR}}(X/\Q) \otimes_\Q \C \;\xrightarrow{\;\sim\;}\; H^n_{\mathrm{sing}}(X(\C), \Q) \otimes_\Q \C
+\]
+given by $\omega \mapsto \bigl(\gamma \mapsto \int_\gamma \omega\bigr)$. The period matrix consists of transcendental numbers computed by integration over $\R$. This is irreducibly $\CLASS$.
+
+\subsection{Crystalline $\leftrightarrow$ de Rham: $p$-adic Hodge Theory ($\BISH$)}
+
+Berthelot's comparison isomorphism and Fontaine's functors $D_{\mathrm{cris}}$, $D_{\mathrm{dR}}$ operate entirely within $p$-adic algebra. The filtered $\varphi$-module associated to a crystalline Galois representation is computed by explicit linear algebra over $\Q_p$. No $\R$, no integration: $\BISH$.
+
+\subsection{\'Etale $\leftrightarrow$ Betti: Artin Comparison ($\CLASS$)}
+
+The Artin comparison relates algebraic covers over $\bar{k}$ to topological covers over $\C$ via the Riemann Existence Theorem (RET). This fundamentally requires fixing an embedding $\bar{k} \hookrightarrow \C$. Constructing this embedding invokes the Archimedean continuum and the Axiom of Choice. Furthermore, RET relies on complex analysis (GAGA, elliptic PDEs) to promote analytic sections to global algebraic functions. Thus, the comparison is irreducibly $\CLASS$, even for finite coefficients.
+
+\subsection{de Rham $\leftrightarrow$ Hodge: The $\partial\bar\partial$-Lemma ($\CLASS$)}
+
+The comparison between the algebraic Hodge filtration and the analytic Hodge decomposition requires the $\partial\bar\partial$-lemma, which in turn requires elliptic regularity on the compact K\"ahler manifold $X(\C)$. This is $\CLASS$.
+
+\subsection{Crystalline $\leftrightarrow$ \'Etale: Fontaine--Laffaille ($\BISH$)}
+
+For crystalline representations with bounded Hodge--Tate weights, the Fontaine--Laffaille functor gives an explicit, algebraic equivalence between filtered $\varphi$-modules and Galois representations. It is $\BISH$.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Comparison} & \textbf{CRM Level} & \textbf{Passes through $\R$?} \\
+\midrule
+Crystalline $\leftrightarrow$ de Rham & $\BISH$ & No \\
+Crystalline $\leftrightarrow$ \'Etale & $\BISH$ & No \\
+\'Etale $\leftrightarrow$ Betti & $\CLASS$ & Yes (Embedding $\bar{k} \hookrightarrow \C$, RET) \\
+Betti $\leftrightarrow$ de Rham & $\CLASS$ & Yes (period integrals) \\
+de Rham $\leftrightarrow$ Hodge & $\CLASS$ & Yes (elliptic PDE) \\
+\bottomrule
+\end{tabular}
+\caption{CRM signatures of comparison isomorphisms. The pattern is sharp: $\CLASS$ iff Archimedean.}
+\label{tab:comparisons}
+\end{table}
+
+\subsection{The Archimedean Obstruction Theorem}
+
+\begin{theorem}[Archimedean Obstruction]\label{thm:archimedean}
+Let $P$ be a proof path using only non-Archimedean realizations (de Rham, \'etale, crystalline) and comparisons between them. Then $\sig(P) = \BISH$.
+
+Conversely, if $P$ uses any Archimedean realization (Betti, Hodge, automorphic) or any comparison passing through the Archimedean place, then $\sig(P) \geq \CLASS$.
+\end{theorem}
+
+\begin{tcolorbox}[leanbox={Lean: Archimedean Obstruction}]
+\begin{Verbatim}[fontsize=\small]
+theorem archimedean_obstruction (p : ProofPath) 
+    (h_real : forall r ∈ p.realizations, is_non_archimedean r = true)
+    (h_comp : forall c ∈ p.comparisons, comp_is_non_archimedean c = true) :
+    proof_signature p = .BISH := by
+  unfold proof_signature
+  apply max_eq_BISH_of_all_BISH
+  · exact motive_is_bish
+  · intro r hr
+    exact real_bish_of_non_arch r (h_real r hr)
+  · intro c hc
+    exact comp_bish_of_non_arch c (h_comp c hc)
+\end{Verbatim}
+\end{tcolorbox}
+
+
+%======================================================================
+\section{Why the Six Domains Have Different Signatures}\label{sec:sixdomains}
+%======================================================================
+
+The Archimedean obstruction theorem immediately explains the empirical pattern observed across Papers~50--97.
+
+\subsection{Algebra and Representation Theory: $\BISH$}
+
+Hecke algebras, Galois deformation rings, modular representation theory---these operate in the \'etale and de Rham world. No passage through $\R$. 
+
+\subsection{Harmonic Analysis: $\CLASS$}
+
+The trace formula---Selberg, Arthur, Langlands---decomposes $L^2(G(\Q)\backslash G(\A))$. The adelic group includes the Archimedean factor $G(\R)$. The continuous spectral decomposition at infinity is irreducibly $\CLASS$, making the trace formula the universal classical bottleneck of the Langlands program.
+
+\subsection{Number Theory: Sharp Classical Bottlenecks}
+
+$L$-functions are Dirichlet series defined for $\mathrm{Re}(s) \gg 0$ by an algebraic formula. The analytic continuation to all of $\C$ is an Archimedean construction. The critical values $L(k, f)$ involve the Archimedean $\Gamma$-factor and period integrals: $\CLASS$. But the core algebraic objects (Selmer groups) are \'etale: $\BISH$. 
+
+\subsection{Algebraic Geometry: Bifurcation}
+
+The Hodge conjecture sits at the intersection of algebraic and analytic: Hodge classes live in the Betti realization ($\CLASS$), but algebraic classes live in the motive ($\BISH$). Generically, the detection problem is $\WLPO$ (Paper~87). But algebraic geometry has moduli. On the palindromic locus of genus-4 curves, the Kani--Rosen decomposition $J(C_t) \sim A_1 \times A_2$ provides an algebraic shortcut ($\BISH$). Moduli dimension controls the availability of such bifurcations.
+
+\subsection{Topology: Mixed}
+
+\'Etale cohomology with finite coefficients is $\BISH$. Singular (Betti) cohomology is $\CLASS$ via the Archimedean place. 
+
+\subsection{Mathematical Physics}
+
+Classical mechanics (finite-dimensional Hamiltonian ODEs) is $\BISH$. Quantum mechanics introduces the spectral theorem on $L^2(\R^3)$---$\CLASS$ in general, but $\BISH$ for exactly solvable Hamiltonians with algebraic spectra.
+
+
+%======================================================================
+\section{Calibration Theorem I: Hodge Detection $\leftrightarrow$ $\WLPO$}\label{sec:hodge}
+%======================================================================
+
+We summarize the Hodge calibration from Papers~86--90.
+
+\begin{theorem}[Hodge Detection Calibration, Papers~87--90]\label{thm:hodge-cal}
+There exists a family of Hodge classes $\xi_t \in H^4(J(C_t)^2, \Q)$ over the genus-4 Torelli locus such that:
+\begin{enumerate}[label=(\roman*)]
+\item On the palindromic locus: $\xi_t$ is algebraic, verified by $\BISH$ methods (Kani--Rosen splitting, Ribet's theorem).
+\item On the generic fiber: deciding whether $\xi_t$ is algebraic is equivalent to $\WLPO$ (decidability of equality on the Mumford--Tate group).
+\end{enumerate}
+\end{theorem}
+
+\begin{remark}[The Generality of the Bifurcation]\label{rem:hodge_genus}
+The choice of genus~4 in Papers~86--90 was not an ad hoc quirk; it is the minimal dimension where the generic fiber has unforced Hodge classes (unlike curves or surfaces) while still possessing an explicitly computable continuous exceptional locus (the palindromic locus). The $\WLPO$ bifurcation is a general structural phenomenon for any moduli space of dimension $\geq 2$.
+\end{remark}
+
+
+%======================================================================
+\section{Calibration Theorem II: TW Patching $\leftrightarrow$ $\WKL$}\label{sec:modularity}
+%======================================================================
+
+We analyze the CRM structure of the Wiles--Taylor proof of modularity.
+
+\subsection{The Three Tiers}
+
+\textbf{Tier 1 ($\BISH$): The algebraic core.} Galois deformation rings $R$, Hecke algebras $\mathbb{T}$, Fontaine--Laffaille, Wiles's numerical criterion---all \'etale/de Rham.
+
+\textbf{Tier 2 ($\WKL$): Taylor--Wiles patching.} The patching argument constructs an inverse limit $R_\infty = \varprojlim R_{Q_n}$. Extracting a compatible system from this inverse limit of finite local rings is precisely Weak K\"onig's Lemma.
+
+\begin{calibration}[TW Patching $\leftrightarrow$ $\WKL$]\label{cal:tw}
+The Taylor--Wiles patching argument, as a logical principle, is equivalent to $\WKL$: extracting a compatible sequence from an inverse system of finite sets is equivalent to finding an infinite path through a finitely branching tree.
+\end{calibration}
+
+\textbf{Tier 3 ($\CLASS$): The analytic bridge.} The Langlands--Tunnell theorem uses the trace formula. Faltings's isogeny theorem uses Arakelov heights and complex integration: $\CLASS$.
+
+\subsection{The 1993 $\to$ 1995 Excision}
+
+Wiles's original (1993) strategy attempted to compute the congruence ideal $\eta_\mathbb{T}$ via the Petersson inner product, which requires integration over the complex upper half-plane ($\CLASS$). The Taylor--Wiles fix replaced this with the patching argument, which bypasses the inner product entirely. 
+
+\begin{theorem}[$\CLASS \to \WKL$ Excision]\label{thm:excision}
+The Taylor--Wiles (1995) repair of Wiles (1993) is a logical excision: it replaces a $\CLASS$ computation (Petersson inner product) with a $\WKL$ argument (inverse limit patching), strictly reducing the logical strength of the proof at the patching step.
+\end{theorem}
+
+\begin{remark}[Historical Intent vs.\ Logical Reality]\label{rem:wiles-intent}
+To be explicitly clear, this logical excision is a retrospective structural observation, not a historical claim about mathematical intent. Wiles and Taylor invented patching to bypass a profound mathematical gap (an inadequate bound on the Selmer group), not to deliberately reduce the formal logical strength of their proof. Nevertheless, the structural consequence of their historic repair was a strict reduction in the CRM signature.
+\end{remark}
+
+
+%======================================================================
+\section{Calibration Theorem III: BSD Rank/$\Sha$ Decoupling}\label{sec:bsd}
+%======================================================================
+
+\begin{theorem}[BSD Decoupling]\label{thm:bsd-decouple}
+The two components of the BSD conjecture have different CRM signatures:
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Rank verification}: Given a candidate point, computing the rank via algebraic 2-descent is $\BISH$.
+\item \textbf{$\Sha$ finiteness}: Proving $|\Sha(E/\Q)| < \infty$ is $\CLASS$. Kolyvagin's Euler system requires annihilating $\Sha[p^\infty]$ for all primes simultaneously, necessitating the analytic topology of the Euler system.
+\end{enumerate}
+\end{theorem}
+
+\textbf{Why no continuous bifurcation?} Unlike the Hodge conjecture, BSD does not exhibit a continuous constructive/classical bifurcation. Logical bifurcation requires a continuous parameter space where an algebraic constraint defines a positive-dimensional sublocus, allowing one to continuously bypass a generic equality test. For elliptic curves, the moduli space (the $j$-line) has dimension~1. A proper algebraic subvariety of a 1-dimensional space is 0-dimensional (isolated CM points). Without positive-dimensional intermediate loci to tune continuous parameters, the $\WLPO$-type structural bifurcation cannot exist.
+
+
+%======================================================================
+\section{Signature Preservation Under Langlands}\label{sec:langlands}
+%======================================================================
+
+\begin{theorem}[Signature Preservation]\label{thm:sig-preserve}
+The Langlands correspondence for $\GL_2/\Q$ preserves CRM signatures:
+\begin{enumerate}[label=(\roman*)]
+\item The algebraic data on both sides (Hecke eigenvalues, Galois traces) are $\BISH$.
+\item Verifying the correspondence for a given pair $(E, f)$ is $\BISH$.
+\item Establishing the correspondence generally is $\CLASS$: the proof uses the trace formula and cannot avoid the Archimedean place.
+\end{enumerate}
+\end{theorem}
+
+
+%======================================================================
+\section{The Function Field Test}\label{sec:function-fields}
+%======================================================================
+
+The ultimate predictive test of the Archimedean Obstruction Thesis lies in function fields $\F_q(C)$, where the ad\`ele ring $\A_F$ lacks an Archimedean factor. 
+
+\begin{theorem}[Function Field Constructivity]\label{thm:ff}
+The Langlands correspondence for $\GL_n$ over function fields $\F_q(C)$, as established by Lafforgue, is provable in $\BISH$ (with at most $\WKL$ for algebraic limits).
+\end{theorem}
+
+
+%======================================================================
+\section{The Archimedean Thesis: A Synthesis}\label{sec:thesis}
+%======================================================================
+
+\begin{tcolorbox}[colback=blue!5!white, colframe=blue!60!black, title=\textbf{The Archimedean Thesis}]
+The real numbers $\R$ are the unique source of non-constructive content in arithmetic geometry, and more broadly in the mathematics connected by the Langlands program.
+
+Formally: the CRM signature of a theorem about a motive $M$ is determined by:
+\[
+\sig(T) \;=\; \max\bigl(\underbrace{\sig(M)}_{= \BISH},\;\; \underbrace{\sig(\text{realizations})}_{= \BISH \text{ or } \CLASS},\;\; \underbrace{\sig(\text{comparisons})}_{= \BISH \text{ iff non-Archimedean}}\bigr)
+\]
+
+Consequences:
+\begin{enumerate}[label=(\arabic*)]
+\item Remove $\R$ (function fields): everything is $\BISH$.
+\item Keep $\R$ but avoid it (algebraic proofs): $\BISH$ where possible.
+\item Pass through $\R$ (analytic proofs): $\CLASS$ enters.
+\item The boundary is sharp: $\WLPO$ for Hodge detection, $\WKL$ for patching.
+\item The trace formula is the universal $\CLASS$ bottleneck.
+\end{enumerate}
+\end{tcolorbox}
+
+
+%======================================================================
+\section{Conclusion}\label{sec:conclusion}
+%======================================================================
+
+The motivic CRM architecture provides a unified explanation for why different areas of mathematics feel qualitatively different: they have different logical signatures, determined entirely by their interaction with the real numbers. Motives are the Rosetta Stone. The CRM signature of each domain is the CRM cost of the realization functor it uses. The trace formula is the universal classical bottleneck because it introduces the Archimedean place into the automorphic machinery. Function field arithmetic is fully constructive because it lacks an Archimedean place entirely. And the Taylor--Wiles fix of Fermat's Last Theorem was, at its logical core, an excision of an Archimedean computation.
+
+The companion Lean~4 formalization mechanically verifies the abstract logical framework (the CRM hierarchy, signature bounds, and path propagation maximums) without omitted proofs (\texttt{sorry}), while the geometric realization functors are represented as axiomatic stubs.
+
+This paper synthesizes the findings of Papers~50--97 in the CRM program.
+
+\bigskip
+\noindent\textbf{Acknowledgments.} The Lean~4 formalization uses Mathlib.
+
+%======================================================================
+\begin{thebibliography}{99}
+
+\bibitem{bishop67} E.\ Bishop, \emph{Foundations of Constructive Analysis}, McGraw-Hill, 1967.
+\bibitem{bridges-richman87} D.\ Bridges and F.\ Richman, \emph{Varieties of Constructive Mathematics}, LMS Lecture Notes 97, Cambridge, 1987.
+\bibitem{ishihara06} H.\ Ishihara, Reverse mathematics in Bishop's constructive mathematics, \emph{Phil.\ Sci.\ Cahier Sp\'ecial} 6 (2006), 43--59.
+\bibitem{ribet83} K.\ Ribet, Hodge classes on certain types of abelian varieties, \emph{Amer.\ J.\ Math.} 105 (1983), 523--538.
+\bibitem{kani-rosen89} E.\ Kani and M.\ Rosen, Idempotent relations and factors of Jacobians, \emph{Math.\ Ann.} 284 (1989), 307--327.
+\bibitem{wiles95} A.\ Wiles, Modular elliptic curves and Fermat's Last Theorem, \emph{Ann.\ of Math.} 141 (1995), 443--551.
+\bibitem{taylor-wiles95} R.\ Taylor and A.\ Wiles, Ring-theoretic properties of certain Hecke algebras, \emph{Ann.\ of Math.} 141 (1995), 553--572.
+\bibitem{faltings83} G.\ Faltings, Endlichkeitss\"atze f\"ur abelsche Variet\"aten \"uber Zahlk\"orpern, \emph{Invent.\ Math.} 73 (1983), 349--366.
+\bibitem{kolyvagin90} V.\ Kolyvagin, Euler systems, in: \emph{The Grothendieck Festschrift}, vol.~II, Birkh\"auser, 1990, 435--483.
+\bibitem{gross-zagier86} B.\ Gross and D.\ Zagier, Heegner points and derivatives of $L$-series, \emph{Invent.\ Math.} 84 (1986), 225--320.
+\bibitem{lafforgue02} L.\ Lafforgue, Chtoucas de Drinfeld et correspondance de Langlands, \emph{Invent.\ Math.} 147 (2002), 1--241.
+
+\end{thebibliography}
+
+\end{document}

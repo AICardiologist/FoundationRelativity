@@ -1,0 +1,32 @@
+Title: The BSD Squeeze: CRMLint Decomposition of the Gross-Zagier-Kolyvagin Proof (Paper 95, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: February 2026
+
+Description:
+The Gross-Zagier-Kolyvagin proof of the Birch and Swinnerton-Dyer conjecture for analytic rank at most 1 is the only proven case among the currently open Clay Millennium Problems. This paper applies the CRMLint Squeeze protocol to decompose the proof pipeline into constructive (BISH) and classical (CLASS) components, using the elliptic curve 37a1 (y^2 + y = x^3 - x, conductor 37, rank 1) as the computational test case.
+
+Four results are proved. Theorem A: the modular symbol arithmetic (Hecke eigenvalues, point counts, multiplicativity, recurrence, Hasse bounds) is strictly BISH, verified by native_decide (28 sub-results). Theorem B: the Gross-Zagier-Kolyvagin proof decomposes as 15 BISH + 6 CLASS = 21 components (71% constructive). The BISH core comprises Hecke arithmetic, Heegner point data, Silverman height bounds, torsion, Tamagawa numbers, and effective Chebotarev. The CLASS shell comprises analytic continuation of L(E,s), the Rankin-Selberg integral, and Kolyvagin's local duality machinery. Theorem C: the detection/existence bifurcation --- detecting the Heegner point via canonical height positivity is BISH, while bounding the Mordell-Weil rank via the Euler system is CLASS --- matches the pattern found in Paper 94 (CY3 normal functions) and Papers 84-93 (Hodge locus). Theorem D: the BSD formula audit confirms Paper 48's calibration that the algebraic side (regulator, torsion, Tamagawa) is BISH while the analytic side (L-value) is CLASS.
+
+The Lean 4 formalization comprises 796 lines, 58 verified theorems, 0 sorry, with clean axiom separation: Theorems A and B use only native_decide; Theorems C and D use documentary axiom stubs for CLASS classification; the BISH core theorem (naive_height_bounded) is proved by linarith alone.
+
+This is the fourteenth application of the CRMLint Squeeze protocol (Papers 77-95) and the first CRM audit of a Clay Millennium Problem proof.
+
+Keywords: Birch and Swinnerton-Dyer conjecture, Gross-Zagier formula, Kolyvagin Euler system, constructive reverse mathematics, CRMLint, Lean 4, formal verification, Heegner points, elliptic curves, modular symbols
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related Identifiers:
+- Paper 48 (BSD diagnostic): DOI 10.5281/zenodo.18683400
+- Paper 51 (Archimedean rescue): DOI 10.5281/zenodo.18732168
+- Paper 80 (Gauss-Manin): DOI 10.5281/zenodo.18791985
+- Paper 87 (Hodge cost): DOI 10.5281/zenodo.18809903
+- Paper 90 (Squeeze synthesis): DOI 10.5281/zenodo.18809911
+- Paper 94 (Normal Function Squeeze): DOI 10.5281/zenodo.18820969
+
+DOI: 10.5281/zenodo.18821019
+
+Upload Type: Publication / Preprint

@@ -1,0 +1,22 @@
+Title: The Motivic CRM Architecture: Why the Six Domains of Mathematics Have Different Logical Signatures, and How Motives Explain the Pattern (Paper 98, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: March 2026
+
+Description: Paper 98 of the Constructive Reverse Mathematics (CRM) Series. Capstone synthesis of Papers 50-97. We formalize the observation that the six mathematical domains connected by the Langlands program --- number theory, algebraic geometry, representation theory, harmonic analysis, topology, and mathematical physics --- exhibit systematically different constructive reverse mathematics (CRM) signatures. Grothendieck's theory of motives provides the structural explanation: the motive itself is BISH (Bishop-constructive), each realization functor has a definite CRM cost, and the comparison isomorphisms between realizations are CLASS (fully classical) if and only if they pass through the Archimedean place. This Archimedean Obstruction Thesis explains why algebra is constructive, analysis is classical, geometry bifurcates, number theory has sharp classical bottlenecks, function field arithmetic is fully constructive, and the Taylor-Wiles repair of Fermat's Last Theorem was a CLASS-to-WKL excision. Three calibration theorems: (I) Hodge detection bifurcates at WLPO; (II) BSD rank/Sha decouples (rank BISH, Sha CLASS, no bifurcation); (III) TW patching = WKL, 1993-to-1995 = CLASS-to-WKL excision. Signature preservation theorem for the Langlands correspondence. Companion Lean 4 bundle: 607 lines, 6 files, 0 sorry, 0 Classical.choice. Includes companion monograph "The Logical Cost of Everything" providing an accessible book-length exposition of the entire CRM program.
+
+Keywords: constructive reverse mathematics, motives, Langlands program, Archimedean obstruction, realization functors, comparison isomorphisms, Hodge conjecture, BSD conjecture, Taylor-Wiles patching, function fields, formal verification, Lean 4
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related Identifiers:
+- Paper 87 (Hodge cost): https://doi.org/10.5281/zenodo.18809903
+- Paper 95 (BSD squeeze): https://doi.org/10.5281/zenodo.18821019
+- Paper 96 (Root number bifurcation): https://doi.org/10.5281/zenodo.18869924
+
+Upload Type: Publication / Preprint
+
+Communities: Constructive Reverse Mathematics

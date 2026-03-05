@@ -181,7 +181,7 @@ $\CRM$ calibrates mathematical statements against logical principles of increasi
 \[
 \BISH \;\subset\; \BISH + \MP \;\subset\; \BISH + \LPO \;\subset\; \CLASS.
 \]
-Here $\LPO$ (Limited Principle of Omniscience) states that every binary sequence is identically zero or contains a~$1$. In field-theoretic form, $\LPO(K)$ states $\forall x \in K,\; x = 0 \lor x \neq 0$. Over any complete field ($\Qp$, $\Qell$, $\R$, $\C$), exact zero-testing of a Cauchy sequence requires $\LPO$. Over $\Q$, $\Qbar$, or $\Z$, equality is decidable by finite computation in $\BISH$. $\MP$ (Markov's Principle) asserts $\lnot\lnot P \to P$ for decidable $P$; it governs unbounded search through discrete sets. For a thorough treatment of $\CRM$, see Bridges--Richman~\cite{BridgesRichman1987}.
+Here $\LPO$ (Limited Principle of Omniscience) states that every binary sequence is identically zero or contains a~$1$. In field-theoretic form, $\LPO(K)$ states $\forall x \in K,\; x = 0 \lor x \neq 0$. Over the Archimedean completion~$\R$, exact zero-testing of a Cauchy sequence requires $\LPO$: the Archimedean metric provides no finite decidability radius, so confirming $x = 0$ requires inspecting all approximants. Over a non-Archimedean completion~$\Qp$, the ultrametric inequality $|a + b|_p \leq \max(|a|_p, |b|_p)$ makes the topology totally disconnected, and for pure motives the essential spectral data (Frobenius traces) descend to~$\Z$ by Deligne's Weil~II theorem; thus the relevant computations are $\BISH$-decidable. Over $\Q$, $\Qbar$, or $\Z$, equality is decidable by finite computation in $\BISH$. $\MP$ (Markov's Principle) asserts $\lnot\lnot P \to P$ for decidable $P$; it governs unbounded search through discrete sets. For a thorough treatment of $\CRM$, see Bridges--Richman~\cite{BridgesRichman1987}.
 
 \subsection{Position in the atlas}
 
@@ -209,6 +209,16 @@ $\MP$ is the assertion that for any decidable predicate $P$ on $\N$, if $\lnot\f
 \begin{definition}[$u$-invariant and positive-definiteness]
 The \emph{$u$-invariant} $u(K)$ of a field $K$ is the maximal dimension of an anisotropic quadratic form over $K$. The standard values are $u(\Qp) = 4$ (Serre~\cite{Serre1973}) and $u(\R) = \infty$ (every positive-definite form $x_1^2 + \cdots + x_n^2$ is anisotropic). The relevant distinction for this paper is \emph{positive-definiteness}: over $\R$, positive-definite bilinear forms exist in every dimension, while over $\Qp$, every Hermitian form of dimension $\geq 5$ over a quadratic extension is isotropic (has nonzero null vectors), so positive-definite Hermitian forms cannot exist in dimension $\geq 3$. Axiom~3 of the DPT class requires positive-definiteness; this is available over $\R$ but obstructed over $\Qp$.
 \end{definition}
+
+\begin{remark}[The algebraic layers of $\R$]\label{rmk:R-layers}
+The $u$-invariant $u(\R) = \infty$ is a property of $\R$-as-ordered-field: positive-definiteness requires the ordering~$<$ but not the completeness (least upper bound property). This distinction matters because $\R$ carries three nested algebraic structures with increasing CRM cost:
+\begin{enumerate}[label=(\roman*)]
+\item $(\R, +, \times)$ as a ring: polynomial arithmetic, decidable by \texttt{ring}. Cost: $\BISH$.
+\item $(\R, +, \times, <)$ as an ordered field: sign decisions, zero-testing, positive-definiteness. Cost: $\LPO$ (or $\WLPO$ for equality testing alone).
+\item $(\R, +, \times, <, \mathrm{LUB})$ as a complete ordered field: integration, spectral decomposition, existence of limits. Cost: $\CLASS$.
+\end{enumerate}
+The three DPT axioms interact with different layers: Axiom~1 (decidable morphisms) and Axiom~2 (algebraic spectrum) operate at the ring layer ($\BISH$); Axiom~3 (Archimedean polarization) operates at the ordered field layer, exploiting $u(\R) = \infty$. The comparison isomorphisms that the DPT axioms bypass---period maps, the Hodge decomposition---operate at the completeness layer ($\CLASS$). This stratification, implicit in the present paper, is made explicit in Paper~98.
+\end{remark}
 
 \subsection{The five conjectures}
 

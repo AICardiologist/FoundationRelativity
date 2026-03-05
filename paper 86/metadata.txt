@@ -1,0 +1,24 @@
+Title: The Hodge Conjecture for Exotic Weil Classes via Kani-Rosen Splitting: A CRMLint Squeeze (Paper 86, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University
+
+Date: February 2026
+
+Description:
+We prove that the exotic Weil class on J(C_t)^2 is algebraic, where C_t: y^2 = x^9 - tx^5 + x is the genus-4 hyperelliptic family from Papers 84-85. The proof exploits a hidden reciprocal involution mu(x,y) = (1/x, y/x^5) that, together with the order-4 automorphism sigma, generates a dihedral group D_8 acting on C_t. By the Kani-Rosen theorem, the Jacobian splits up to isogeny: J(C_t) ~ J(Q_1) x J(Q_2), where Q_1 and Q_2 are explicit genus-2 quotient curves. Over the complex numbers, Q_1 is isomorphic to Q_2, so J(C_t) ~ A^2 for an abelian surface A. For generic t, End(A) = Z forces MT(A) = GSp_4 (Zarhin), and all Hodge classes on products of such surfaces are algebraic by Weyl's invariant theory. The constructive content (BISH) identifies the splitting via polynomial identities verified by ring in Lean 4. The classical content (CLASS) provides the Hodge-theoretic conclusion. Ninth CRMLint Squeeze. Lean 4 formalization with zero sorry. Axioms: propext, Quot.sound only.
+
+Keywords: Hodge conjecture, exotic Weil classes, Kani-Rosen splitting, abelian surfaces, Jacobian decomposition, dihedral group, constructive reverse mathematics, Lean 4, formal verification
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related Identifiers:
+- IsPartOf: 10.5281/zenodo.17054050 (CRM Series concept record)
+- Continues: 10.5281/zenodo.18802819 (Paper 84)
+- Continues: 10.5281/zenodo.18806608 (Paper 85)
+- References: 10.5281/zenodo.18791985 (Paper 80)
+- References: 10.5281/zenodo.18801826 (Paper 83)
+- References: 10.5281/zenodo.7882969 (Mathlib)
+
+Upload Type: publication / preprint

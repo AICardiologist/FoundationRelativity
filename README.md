@@ -7,7 +7,7 @@
 
 **Author:** Paul Chun-Kit Lee (New York University)
 
-**77 papers. ~91,000 lines Lean 4. One finding:**
+**102 papers. ~99,000 lines Lean 4. One finding:**
 
 **The logical cost of mathematics is the logical cost of the real numbers.**
 
@@ -300,9 +300,9 @@ paper N/                    LaTeX sources and PDFs for each paper
 scripts/                    CI audit scripts
 ```
 
-Each `Papers/P{N}_*/` bundle builds independently: `cd Papers/P72_DPTCharacterisation && lake build`. Lean 4 toolchain v4.28.0-rc1 (Papers 72–77: v4.29.0-rc2). Zero `sorry` across all published bundles. `Classical.choice` in every ℝ theorem is Mathlib infrastructure, not classical content — constructive stratification is by proof content, not `#print axioms` output.
+Each `Papers/P{N}_*/` bundle builds independently: `cd Papers/P72_DPTCharacterisation && lake build`. Lean 4 toolchain v4.28.0-rc1 (Papers 72–102: v4.29.0-rc2). Zero `sorry` across all published bundles. `Classical.choice` in every ℝ theorem is Mathlib infrastructure, not classical content — constructive stratification is by proof content, not `#print axioms` output.
 
-75 active papers (Papers 1 and 3 withdrawn; Papers 60 and 62 retired into 59 and 63).
+100 active papers (Papers 1 and 3 withdrawn; Papers 60 and 62 retired into 59 and 63).
 
 ## Citation
 

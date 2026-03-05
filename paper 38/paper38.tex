@@ -76,7 +76,11 @@
   xleftmargin=15pt,
   captionpos=b,
   literate={<<}{$\langle$}1 {>>}{$\rangle$}1
-           {|||}{$\lor$}1,
+           {∀}{$\forall$}1 {∃}{$\exists$}1
+           {∨}{$\lor$}1 {¬}{$\lnot$}1
+           {↔}{$\leftrightarrow$}1 {→}{$\to$}1
+           {⟨}{$\langle$}1 {⟩}{$\rangle$}1
+           {ℕ}{$\mathbb{N}$}1 {ℤ}{$\mathbb{Z}$}1 {ℝ}{$\mathbb{R}$}1,
 }
 
 % ====================================================================
@@ -102,7 +106,7 @@
   \textbf{Wang Tiling and the Origin of Physical Undecidability}\\[6pt]
   {\normalsize Berger's Theorem Is \LPO: Every Physical Undecidability
   Result Inherits Exactly One Omniscience Principle}\\[6pt]
-  {\normalsize A Lean~4 Formalization (Paper~38)}%
+  {\normalsize A Lean~4 Formalization (Paper~38, Constructive Reverse Mathematics Series)}%
 }
 
 \author{
@@ -132,7 +136,7 @@ We establish: (1)~the Wang tiling decision is \LPO;
 Cubitt (2015) to the present---inherits exactly \LPO;
 (4)~the $\Sigma_1^0$ ceiling: no $\Sigma_1^0$-complete
 reduction can exceed \LPO.
-The entire formalization (573~lines of \Lean{}/\Mathlib{})
+The entire formalization (577~lines of \Lean{}/\Mathlib{})
 compiles with zero \texttt{sorry}, zero warnings.
 \end{abstract}
 
@@ -243,9 +247,9 @@ and (iii)~a compactness bridge axiom.
 
 \begin{lstlisting}[caption={Wang tiling $\leftrightarrow$ \LPO: \texttt{TilingDecision.lean}}]
 theorem wang_tiling_iff_lpo :
-    (forall (W : WangTileset),
-      tiles_plane W ||| not tiles_plane W) <-> LPO :=
-  <<tiling_to_lpo, lpo_to_tiling>>
+    (∀ (W : WangTileset),
+      tiles_plane W ∨ ¬tiles_plane W) ↔ LPO :=
+  ⟨tiling_to_lpo, lpo_to_tiling⟩
 \end{lstlisting}
 
 % ====================================================================
@@ -283,10 +287,10 @@ contradicting the witness. So $\lnot\mathrm{AperEnc}(a)$.
 
 \begin{lstlisting}[caption={Aperiodicity $\leftrightarrow$ \LPO: \texttt{Aperiodicity.lean}}]
 theorem aperiodicity_iff_lpo :
-    (forall (a : N -> Bool),
-      is_aperiodic_encoded a |||
-      not is_aperiodic_encoded a) <-> LPO :=
-  <<aperiodicity_to_lpo, lpo_to_aperiodicity>>
+    (∀ (a : ℕ → Bool),
+      is_aperiodic_encoded a ∨
+      ¬is_aperiodic_encoded a) ↔ LPO :=
+  ⟨aperiodicity_to_lpo, lpo_to_aperiodicity⟩
 \end{lstlisting}
 
 % ====================================================================
@@ -315,15 +319,25 @@ Concretely: (1)~Berger (1966) reduces halting to tiling;
 (4)~CPgW (2015) encodes tiling in Hamiltonian ground states;
 (5)~BCLPG (2020) compresses to 1D via quantum tiling;
 (6)~BCW (2021) reduces halting to phase diagram computation;
-(7)~CLPE (2022) lifts CPgW to renormalization group flows;
-(8)~Watson--Cubitt (2021) reduces halting to ground state energy
-density.
+(7)~CLPE (2022) lifts CPgW to renormalization group flows.
 
 Each entry is $\Sigma_1^0$-complete and \LPO-equivalent.
-The Lean formalization encodes all eight entries as a list of
+The Lean formalization encodes all seven entries as a list of
 \texttt{GenealogyEntry} records and verifies the classification
 by \texttt{decide} (kernel computation).
 \end{proof}
+
+\begin{remark}[Watson--Cubitt exclusion]\label{rem:wc-exclusion}
+Watson and Cubitt~(2022) proved that the \emph{ground state energy density}
+problem is computationally hard (QMA-complete for finite lattices).
+This is \emph{not} an undecidability result: QMA-hardness is a
+complexity-theoretic statement about finite systems, not a halting
+reduction.  The ground state energy density for a fixed Hamiltonian
+at finite volume is a finite eigenvalue problem, computable in
+$\BISH$.  Paper~37's meta-theorem correctly identifies this as
+$\BISH$-computable.  Earlier versions of this paper incorrectly
+included Watson--Cubitt in the genealogy; this has been corrected.
+\end{remark}
 
 \begin{table}[ht]
 \centering
@@ -338,11 +352,13 @@ Spectral Gap 2D (\CPgW) & 2015 & Tiling & \leanok \\
 Spectral Gap 1D (BCLPG) & 2020 & Tiling & \leanok \\
 Phase Diagrams (BCW) & 2021 & Halting/QPE & \leanok \\
 RG Flows (CLPE) & 2022 & \CPgW/RG & \leanok \\
-Ground State Energy (Watson--Cubitt)~\cite{WC2021} & 2021 & Halting & \leanok \\
 \bottomrule
 \end{tabular}
 \caption{The genealogy of physical undecidability.
-  8~entries, all \LPO-equivalent (verified by \texttt{decide}).}
+  7~entries, all \LPO-equivalent (verified by \texttt{decide}).
+  Watson--Cubitt (2021) ground state energy density is excluded:
+  it is a $\BISH$-computable finite eigenvalue problem (Paper~37),
+  not an undecidability result.}
 \label{tab:genealogy}
 \end{table}
 
@@ -380,7 +396,7 @@ Paper~39 investigates whether physics reaches this level.
 
 \begin{lstlisting}[caption={$\Sigma_1^0$ ceiling: \texttt{Ceiling.lean}}]
 theorem lpo_decides_sigma1 (P : Sigma1Property) (lpo : LPO) :
-    forall (M : TM), P.prop M ||| not P.prop M
+    ∀ (M : TM), P.prop M ∨ ¬P.prop M
 \end{lstlisting}
 
 To exceed \LPO, a construction would need to encode a
@@ -440,7 +456,7 @@ $\Sigma_1^0$ Ceiling (Thm~4) & $\BISH$ & 2 \\
 \draw (gen) -- (main);
 \draw (ceil) -- (main);
 \end{tikzpicture}
-\caption{Module dependency graph (573~lines, 7~modules).}
+\caption{Module dependency graph (577~lines, 7~modules).}
 \label{fig:arch}
 \end{figure}
 
@@ -612,11 +628,6 @@ S.~Gu, J.~D.~Watson, D.~Perez-Garcia, and B.~Nachtergaele,
 ``Undecidability of the 2D Ising model,''
 Unpublished manuscript (2009).
 
-\bibitem{WC2021}
-J.~D.~Watson and T.~S.~Cubitt,
-``Computational complexity of the ground state energy density problem,''
-\emph{Proc.\ 54th ACM STOC}, 1081--1094 (2022).
-
 \bibitem{Bishop1967}
 E.~Bishop,
 \emph{Foundations of Constructive Analysis},
@@ -637,6 +648,29 @@ P.~C.-K.~Lee,
 ``The map and the territory: a constructive history of
   mathematical physics,''
 Preprint, 2026. Paper~12.
+
+\bibitem{Lee26P29}
+P.~C.-K.~Lee,
+``Fekete's subadditive lemma and LPO,''
+Zenodo, 2026. Paper~29.
+DOI: \href{https://doi.org/10.5281/zenodo.18643617}{10.5281/zenodo.18643617}.
+
+\bibitem{Lee26P36}
+P.~C.-K.~Lee,
+``Stratifying spectral gap undecidability: Cubitt's theorem is LPO,''
+Zenodo, 2026. Paper~36.
+DOI: \href{https://doi.org/10.5281/zenodo.18642620}{10.5281/zenodo.18642620}.
+
+\bibitem{Lee26P37}
+P.~C.-K.~Lee,
+``The halting reduction meta-theorem: every halting reduction is LPO,''
+Zenodo, 2026. Paper~37.
+
+\bibitem{Lee26FormatGuide}
+P.~C.-K.~Lee,
+``Paper format guide for the CRM series,''
+Zenodo, 2026.
+DOI: \href{https://doi.org/10.5281/zenodo.18765700}{10.5281/zenodo.18765700}.
 
 \end{thebibliography}
 

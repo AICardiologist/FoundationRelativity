@@ -1,0 +1,203 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║                    CRMlint Mathlib Analysis Report                   ║
+║                 Heuristic CRM Signature Classification               ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+  Files analyzed:        10
+  Total declarations:    627
+  Theorems/lemmas:       557
+  Definitions/instances: 70
+
+  ──────────────────────────────────────────────────────────────────
+  CRM SIGNATURE DISTRIBUTION (all declarations)
+  ──────────────────────────────────────────────────────────────────
+    BISH       577  ( 92.0%)  ██████████████████████████████████████████████
+    MP           0  (  0.0%)  
+    LLPO         0  (  0.0%)  
+    WKL         11  (  1.8%)  
+    WLPO        20  (  3.2%)  █
+    LPO          0  (  0.0%)  
+    CLASS       19  (  3.0%)  █
+
+  ──────────────────────────────────────────────────────────────────
+  PER-DOMAIN ANALYSIS
+  ──────────────────────────────────────────────────────────────────
+
+  ▸ Algebra (Field Theory)
+    Declarations: 61  |  Max level: CLASS
+    Distribution: BISH: 47, CLASS: 12, WLPO: 2
+
+  ▸ Algebra (Linear)
+    Declarations: 39  |  Max level: BISH
+    Distribution: BISH: 39
+
+  ▸ Algebra (Ring Theory)
+    Declarations: 57  |  Max level: BISH
+    Distribution: BISH: 57
+
+  ▸ Algebraic Geometry
+    Declarations: 68  |  Max level: WLPO
+    Distribution: BISH: 66, WLPO: 2
+
+  ▸ Analysis
+    Declarations: 224  |  Max level: CLASS
+    Distribution: BISH: 202, CLASS: 7, WKL: 11, WLPO: 4
+
+  ▸ Number Theory
+    Declarations: 27  |  Max level: BISH
+    Distribution: BISH: 27
+
+  ▸ Representation Theory
+    Declarations: 67  |  Max level: WLPO
+    Distribution: BISH: 55, WLPO: 12
+
+  ▸ Topology
+    Declarations: 84  |  Max level: BISH
+    Distribution: BISH: 84
+
+  ──────────────────────────────────────────────────────────────────
+  PER-FILE DETAIL
+  ──────────────────────────────────────────────────────────────────
+
+  ▸ AlgebraicGeometry_EllipticCurve_Weierstrass.lean
+    Domain: Algebraic Geometry  |  Lines: 486  |  Declarations: 68
+    Import signature: BISH  |  File signature: WLPO
+    Noncomputable: 2  |  Classical axioms: 0
+    Classical declarations (2):
+      noncomputable def Δ': WLPO
+      noncomputable def j: WLPO
+
+  ▸ Analysis_InnerProductSpace_Basic.lean
+    Domain: Analysis  |  Lines: 982  |  Declarations: 141
+    Import signature: CLASS  |  File signature: CLASS
+    Noncomputable: 3  |  Classical axioms: 45
+    Classical declarations (10):
+      lemma inner_smul_left_eq_star_smul: CLASS [InnerProductSpace (Hilbert space)]
+      theorem coe_innerₛₗ_apply: WLPO [noncomputable declaration]
+      theorem innerₛₗ_apply_apply: WLPO [noncomputable declaration]
+      lemma re_inner_self_pos: CLASS [InnerProductSpace (Hilbert space)]
+      theorem norm_inner_le_norm: CLASS [InnerProductSpace (Hilbert space)]
+      theorem norm_inner_eq_norm_tfae: CLASS [InnerProductSpace (Hilbert space)]
+      def innerₛₗ: WLPO [noncomputable declaration]
+      def innerₗ: WLPO [noncomputable declaration]
+      ... and 2 more
+
+  ▸ Analysis_SpecificLimits_Basic.lean
+    Domain: Analysis  |  Lines: 781  |  Declarations: 83
+    Import signature: WKL  |  File signature: CLASS
+    Noncomputable: 1  |  Classical axioms: 1
+    Classical declarations (12):
+      theorem tendsto_pow_atTop_nhds_zero_of_lt_one: CLASS [by_contra]
+      theorem summable_geometric_two: WKL [Infinite sum (topological)]
+      theorem summable_geometric_two_encode: WKL [Infinite sum (topological)]
+      theorem tsum_geometric_two: WKL [Infinite sum (topological)]
+      theorem sum_geometric_two_le: WKL [Infinite sum (topological)]
+      theorem tsum_geometric_inv_two: WKL [Summable]
+      theorem tsum_geometric_inv_two_ge: WKL [Summable]
+      theorem hasSum_geometric_two': WKL [HasSum (convergence)]
+      ... and 4 more
+
+  ▸ FieldTheory_Galois_Basic.lean
+    Domain: Algebra (Field Theory)  |  Lines: 719  |  Declarations: 61
+    Import signature: BISH  |  File signature: CLASS
+    Noncomputable: 2  |  Classical axioms: 8
+    Classical declarations (14):
+      theorem isGalois_iff: CLASS [Integration]
+      theorem integral: CLASS [Integration]
+      theorem separable: CLASS [Integration]
+      theorem splits: CLASS [Integration]
+      theorem IntermediateField.AdjoinSimple.card_aut_eq_finrank: CLASS [Integration]
+      theorem card_aut_eq_finrank: CLASS [Integration]
+      lemma finiteDimensional_of_finite: CLASS [by_contra]
+      theorem is_separable_splitting_field: CLASS [Integration]
+      ... and 6 more
+
+  ▸ LinearAlgebra_Matrix_Charpoly_Basic.lean
+    Domain: Algebra (Linear)  |  Lines: 295  |  Declarations: 39
+    Import signature: BISH  |  File signature: BISH
+    Noncomputable: 1  |  Classical axioms: 0
+
+  ▸ NumberTheory_ArithmeticFunction.lean
+    Domain: Number Theory  |  Lines: 9  |  Declarations: 0
+    Import signature: BISH  |  File signature: BISH
+    Noncomputable: 0  |  Classical axioms: 0
+
+  ▸ NumberTheory_Bernoulli.lean
+    Domain: Number Theory  |  Lines: 388  |  Declarations: 27
+    Import signature: BISH  |  File signature: BISH
+    Noncomputable: 0  |  Classical axioms: 0
+
+  ▸ RepresentationTheory_Basic.lean
+    Domain: Representation Theory  |  Lines: 751  |  Declarations: 67
+    Import signature: BISH  |  File signature: WLPO
+    Noncomputable: 18  |  Classical axioms: 0
+    Classical declarations (12):
+      theorem ofMulAction_apply: WLPO [noncomputable declaration]
+      noncomputable def asAlgebraHom: WLPO
+      noncomputable def ofModule': WLPO
+      noncomputable def ofModule: WLPO
+      noncomputable def ofMulAction: WLPO
+      noncomputable def ofMulActionSelfAsModuleEquiv: WLPO
+      noncomputable def directSum: WLPO
+      noncomputable def prod: WLPO
+      ... and 4 more
+
+  ▸ RingTheory_Polynomial_Cyclotomic_Basic.lean
+    Domain: Algebra (Ring Theory)  |  Lines: 665  |  Declarations: 57
+    Import signature: BISH  |  File signature: BISH
+    Noncomputable: 1  |  Classical axioms: 2
+
+  ▸ Topology_Algebra_InfiniteSum_Basic.lean
+    Domain: Topology  |  Lines: 698  |  Declarations: 84
+    Import signature: WKL  |  File signature: WKL
+    Noncomputable: 1  |  Classical axioms: 0
+
+  ──────────────────────────────────────────────────────────────────
+  ARCHIMEDEAN OBSTRUCTION THESIS VERIFICATION
+  ──────────────────────────────────────────────────────────────────
+  Prediction: Algebraic domains → BISH, Analytic domains → CLASS
+
+    Algebra (Field Theory)              CLASS    ⚠ MIXED (algebraic domain but CLASS content found)
+    Algebra (Linear)                    BISH     ✓ CONFIRMED (algebraic → ≤ WLPO)
+    Algebra (Ring Theory)               BISH     ✓ CONFIRMED (algebraic → ≤ WLPO)
+    Algebraic Geometry                  WLPO     ✓ CONFIRMED (algebraic → ≤ WLPO)
+    Analysis                            CLASS    ✓ CONFIRMED (analytic → ≥ WKL)
+    Number Theory                       BISH     ✓ CONFIRMED (algebraic → ≤ WLPO)
+    Representation Theory               WLPO     ✓ CONFIRMED (algebraic → ≤ WLPO)
+    Topology                            BISH     ⚠ UNEXPECTED (analytic domain but only BISH)
+
+  ──────────────────────────────────────────────────────────────────
+  TOP CLASSICAL HOTSPOTS (highest CRM cost declarations)
+  ──────────────────────────────────────────────────────────────────
+    CLASS  lemma inner_smul_left_eq_star_smul [InnerProductSpace (Hilbert space)]
+           in Analysis_InnerProductSpace_Basic.lean
+    CLASS  lemma re_inner_self_pos [InnerProductSpace (Hilbert space)]
+           in Analysis_InnerProductSpace_Basic.lean
+    CLASS  theorem norm_inner_le_norm [InnerProductSpace (Hilbert space)]
+           in Analysis_InnerProductSpace_Basic.lean
+    CLASS  theorem norm_inner_eq_norm_tfae [InnerProductSpace (Hilbert space)]
+           in Analysis_InnerProductSpace_Basic.lean
+    CLASS  def InnerProductSpace.complexToReal [InnerProductSpace (Hilbert space)]
+           in Analysis_InnerProductSpace_Basic.lean
+    CLASS  noncomputable instance RCLike.toInnerProductSpaceReal [InnerProductSpace (Hilbert space)]
+           in Analysis_InnerProductSpace_Basic.lean
+    CLASS  theorem tendsto_pow_atTop_nhds_zero_of_lt_one [by_contra]
+           in Analysis_SpecificLimits_Basic.lean
+    CLASS  theorem isGalois_iff [Integration]
+           in FieldTheory_Galois_Basic.lean
+    CLASS  theorem integral [Integration]
+           in FieldTheory_Galois_Basic.lean
+    CLASS  theorem separable [Integration]
+           in FieldTheory_Galois_Basic.lean
+    CLASS  theorem splits [Integration]
+           in FieldTheory_Galois_Basic.lean
+    CLASS  theorem IntermediateField.AdjoinSimple.card_aut_eq_finrank [Integration]
+           in FieldTheory_Galois_Basic.lean
+    CLASS  theorem card_aut_eq_finrank [Integration]
+           in FieldTheory_Galois_Basic.lean
+    CLASS  lemma finiteDimensional_of_finite [by_contra]
+           in FieldTheory_Galois_Basic.lean
+    CLASS  theorem is_separable_splitting_field [Integration]
+           in FieldTheory_Galois_Basic.lean
+
+════════════════════════════════════════════════════════════════════════

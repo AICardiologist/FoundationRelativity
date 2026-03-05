@@ -1,7 +1,7 @@
 # Constructive Reverse Mathematics Series — Programme Roadmap
 
 **Author:** Paul Chun-Kit Lee
-**Last updated:** 2026-02-25 (75 papers, editorial complete)
+**Last updated:** 2026-02-25 (77 papers; Paper 77 complete — first CRMLint Squeeze execution)
 **For:** Writing team, Lean agents, editorial collaborators
 
 ---
@@ -119,6 +119,14 @@ Conservation conjecture: whether the CLASS scaffolding is eliminable remains ope
 | 73 | **Standard Conjecture D Is Necessary** | 11 | ✅ DONE — Lean verified, PDF compiled, Zenodo zip |
 | 74 | **Algebraic Spectrum Is Necessary** | 15 | ✅ DONE — Lean verified, PDF compiled, Zenodo zip, peer reviewed |
 | 75 | **Conservation Test: GL LLC Calibration** | 15 | ✅ DONE — Lean verified, PDF compiled, Zenodo zip, peer reviewed |
+| 76 | **CRMLint** | — | In progress (940 lines Lean, zero sorry) |
+| 77 | **Explicit Hodge Decompositions for E⁴** | 21 | ✅ DONE — Lean verified (798 lines, 0 sorry), PDF compiled, Zenodo zip, peer reviewed |
+
+### Paper 77 — COMPLETE
+
+Paper 77 is a **methods paper**, not a mathematical breakthrough. The Hodge Conjecture for products of CM elliptic curves was proved by Lieberman (1968) and Deligne (1982). Paper 77 makes the existence explicit: 36 rational decompositions of Hodge (2,2) basis vectors into cup products of divisor classes, formally verified in Lean 4 by `native_decide`. The contribution is the **CRMLint Squeeze pipeline** and the **asymmetric offloading architecture** (Python CAS → Lean kernel verification), demonstrated end-to-end on a case where the answer is independently known.
+
+Key metrics: 21 pages, 24 references, 798 lines Lean (auto-generated), 491 lines Python, ~1 hour development time (vs ~4 months for Paper 5's Schwarzschild formalization — a comparable density computation).
 
 ### Editorial Work — COMPLETE
 
@@ -156,6 +164,7 @@ All editorial items for Papers 66–70 have been completed:
 21. **DPT external validation**: DPT predictions match observations on a theorem proved by entirely different methods (condensed/perfectoid, not motivic) (Paper 75)
 22. **Solidification is free**: algebraic layer contributes nothing to logical cost; animation avoids injective envelopes (Paper 75)
 23. **Conservation gap pattern**: FLT (5 levels), GL LLC (2 levels), fun field LLC (0*) — decreasing gap correlates with increasing algebraicity of spectrum (Papers 68, 69, 75)
+24. **Asymmetric offloading**: factoring formalization into CAS computation (Python, unlimited working memory) + kernel verification (Lean, `native_decide`) eliminates the bottleneck of making Lean compute — reducing development from months to hours for comparable-density problems (Paper 77 vs Paper 5)
 
 ---
 
@@ -171,7 +180,7 @@ All editorial items for Papers 66–70 have been completed:
 8. **Intermediate axiom sets** — natural axiom systems strictly between BISH and LPO for partial cycle-search decidability?
 9. **Function field characterization** — does Paper 72's characterization extend to function fields with modifications to Axiom 3?
 
-Paper 75 complete. Editorial cleanup (Papers 66–70) and Paper 67 revision complete. All Zenodo zips built. Programme closed pending Zenodo uploads.
+Paper 77 complete. The diagnostic programme (Papers 1–75) is closed. Papers 76–77 begin the generative phase: automated logical cost analysis (Paper 76) and automated constructivisation (Paper 77). Papers 78–79 are the next frontier targets.
 
 ---
 
@@ -229,7 +238,58 @@ Build `CRMLint` — a Lean 4 library exporting `#crm_audit TheoremName`. Test ag
 
 ---
 
-## 8. File Locations
+## 8. Future Direction: The CRMLint Squeeze — Reverse-Engineering Classical Proofs via DAG Surgery
+
+### Why This Works
+
+Human mathematicians use CLASS (Zorn's Lemma, uncountable limits, topological compactness) as **compression algorithms** — they fly over the algebraic thicket and declare "a solution exists," leaving behind an ineffective result. AI models are the exact opposite: terrible at abstract, infinite-dimensional topological jumps (they hallucinate), but possess effectively infinite working memory for navigating massive, dense combinatorial thickets. If you leave `Classical.choice` enabled, the AI lazily mimics humans and uses the helicopter. If you use CRMLint to systematically ban the helicopter, you algorithmically corner the AI into playing to its inherent strength: searching the algebraic forest to find the exact matrix, cycle, or bounding polynomial that the human mathematician was too tired to compute.
+
+### The Systematic Pipeline
+
+To reverse-engineer a classical proof and discover new mathematics:
+
+1. **The Scaffold.** Take a known classical theorem (or partial CLASS attempt) and write its outline in Lean 4.
+2. **The X-Ray (CRMLint).** Run CRMLint. The tool maps the DAG and flags the **Classical Boundary Node** (CBN) — the exact lemma where the human invoked an infinite limit (LPO) or Excluded Middle (CLASS).
+3. **The Excise.** Isolate the local Lean state at the cliff edge. Delete the CBN and apply `[-Classical]` to the environment.
+4. **The Squeeze.** Hand this isolated state to an RL-trained prover (e.g., DeepSeek-Prover). Prompt: "Close this goal. You are forbidden from topological limits. Construct an explicit algebraic witness." Because the AI knows the theorem is true but is barred from the classical shortcut, its MCTS is structurally forced to invent a new algebraic bounding polynomial, finite matrix identity, or explicit invariant to bridge the gap. That invariant is novel, publishable mathematics.
+
+### The Goldilocks Zone
+
+This pipeline works only for conjectures where the classical helicopter has already landed (an ineffective CLASS proof exists) or where the cliff boundary is strictly narrowed by adjacent theorems. Pointing an AI at the empty void of a totally open problem yields infinite search width and certain failure. The CRM atlas identifies the narrow-cliff targets.
+
+### Original Targets (from planning phase)
+
+**Target 1: CM Fourfold Cycles — COMPLETED (Paper 77).** Result: E⁴ has no exotic Weil classes. The Anderson obstruction does not apply to non-simple products. Deterministic collapse — no search needed. The initial target (finding exotic cycle classes) was refuted by the computation itself. Pivoted to the Complete Constructive Hodge Theorem: 36 explicit decompositions, all verified.
+
+**Target 2: Explicit Local Langlands for Wildly Ramified Groups → Paper 78.** Harris–Taylor proved the LLC for GL_n using global Shimura varieties (CLASS, ineffective). Bushnell–Kutzko proved local representations are induced from finite "types" (BISH). An algebraic formula mapping the type directly to the Galois parameter must exist. The CRMLint Squeeze bans the global trace formula and forces explicit matching of character polynomials to Galois traces. First test case: GL₂(ℚ₂) at minimal conductor.
+
+**Target 3: Standard Conjecture D for Abelian Fourfolds → Paper 79.** Homological = numerical equivalence is known for dim ≤ 3 (Lieberman). Open for dim 4. For *simple* CM abelian fourfolds (where E⁴'s approach fails because exotic classes genuinely exist), the Squeeze must search over a larger generator set (CM graphs, twisted diagonals). This is the first target where the MCTS mode may be necessary.
+
+### Paper 77: Explicit Hodge Decompositions for E⁴ — COMPLETE
+
+Title: *Explicit Hodge Decompositions for E⁴ via Automated De-Omniscientisation*.
+DOI: 10.5281/zenodo.18779210
+
+Executed Target 1 (CM fourfold). The mathematical result is a known consequence of Lieberman/Deligne — the paper is transparent about this. The contribution is the pipeline:
+1. CRMLint Squeeze protocol formalized (Scaffold → X-Ray → Excise → Squeeze).
+2. Asymmetric offloading: Python CAS (exact ℚ-algebra) → Lean 4 (`native_decide` verification).
+3. Deterministic collapse: the problem reduced from CLASS existence to a 36×36 linear system over ℚ.
+4. Engineering documented: `noncomputable` trap, token overflow, sparse match encoding (6020→798 lines).
+5. Self-correction: methodology caught hallucinated target (exotic classes on non-simple variety).
+
+Key finding: E⁴ has no exotic Weil classes (dim Hodge = dim div. products = 36). All 36 decompositions verified. MCTS mode untested — deterministic collapse made it unnecessary.
+
+### Paper 78: Explicit Local Langlands for Wildly Ramified Representations
+
+Harris–Taylor proved the Local Langlands Correspondence for GL_n using global Shimura varieties and etale cohomology (CLASS, ineffective). Bushnell–Kutzko proved local representations are induced from finite "types" (discrete, finite matrix algebra, BISH). An algebraic formula mapping the type directly to the Galois parameter must exist but human mathematicians cannot find it because the Harish-Chandra character polynomials are too massive. The CRMLint Squeeze bans the global trace formula in Lean and forces the AI to match character polynomials to Galois traces — yielding the explicit wild Langlands parameter.
+
+### Paper 79: Standard Conjecture D for Abelian Fourfolds
+
+Homological equivalence = numerical equivalence is known for abelian varieties of dimension at most 3 (Lieberman). Completely open for dimension 4. The CLASS proof for dimension 3 relies on Lefschetz standard conjectures; parameterised to dimension 4, it crashes at Anderson's exotic Weil classes. Feed the dimension 3 Lean proof into CRMLint, isolate the node where the intersection pairing fails to be positive-definite on the exotic subspace, prompt the AI to find a purely algebraic BISH matrix equivalence on the orthogonal complement of divisor classes. This is finite-dimensional Q-linear algebra — the AI's search tree is maximally efficient.
+
+---
+
+## 9. File Locations
 
 All paths relative to `~/FoundationRelativity/`.
 
@@ -243,8 +303,10 @@ All paths relative to `~/FoundationRelativity/`.
 - `paper 73/paper73.tex` / `.pdf` (11pp) + `P73_Axiom1Reverse.zip`
 - `paper 74/paper74.tex` / `.pdf` (15pp) + `P74_Axiom2Reverse.zip`
 - `paper 75/paper75.tex` / `.pdf` (15pp) + `P75_ConservationTest.zip`
+- `paper 76/paper76.tex` / `.pdf` + `CRMLint.zip` (in progress)
+- `paper 77/paper77.tex` / `.pdf` (21pp) + `Paper77_ExplicitHodgeE4.zip` (Zenodo ready)
 
 ### Programme Documents
-- `master folder/master_paper_list.txt` — complete paper list with DOIs (71 active, 0 pending)
+- `master folder/master_paper_list.txt` — complete paper list with DOIs (75 active, 1 pending)
 - `master folder/CRM_PROGRAMME_ROADMAP.md` — this document
 - `master folder/CRM_SESSION_HANDOFF.md` — session handoff

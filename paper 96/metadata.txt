@@ -1,0 +1,30 @@
+Title: The Root Number Bifurcation: CRM Cost of BSD Detection Controlled by w = +/-1 (Paper 96, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: February 2026
+
+Description:
+The constructive reverse mathematics (CRM) cost of detecting the Birch and Swinnerton-Dyer conjecture bifurcates at the root number w = +/-1. For w = +1 (analytic rank 0), detection is BISH: the modular symbol L(E,1)/Omega^+ is a rational number whose nonvanishing is checked by norm_num. For w = -1 (analytic rank 1), detection is CLASS: the Gross-Zagier formula requires the Rankin-Selberg integral (non-compact integration over a fundamental domain). Existence (rank bounding + Sha finiteness) is CLASS regardless of root number.
+
+Four results are proved using two test cases: 11a1 (y^2 + y = x^3 - x^2 - 10x - 20, rank 0, w = +1) and 37a1 (y^2 + y = x^3 - x, rank 1, w = -1). Theorem A (Rank 0 Modular Symbol Core): L(E,1)/Omega^+ = 1/5 for 11a1, verified nonzero by norm_num. Five point counts, four Hecke recurrences, four multiplicativity checks, and fourteen Hasse bounds, all verified by native_decide. The BSD formula 1/5 = 1 * 5 / 25 is verified by norm_num. Pure finite arithmetic: BISH. Theorem B (Root Number Bifurcation): detection is BISH for w = +1 and CLASS for w = -1; existence is CLASS regardless. Rank 0 audit: 10 BISH + 3 CLASS = 13 components (77% constructive). Rank 1 audit: 15 BISH + 6 CLASS = 21 components (71% constructive). Theorem C (Descent Excision): explicit 2-descent gives the rank bound rk E(Q) <= 1 for 37a1 without invoking Kolyvagin's Euler system. Rank bounding is BISH (finite algebra); Sha finiteness is irreducibly CLASS. Theorem D (Universal Detection/Existence Table): across four independent Squeeze campaigns (Hodge locus, CY3 Griffiths group, BSD rank 1, BSD rank 0), existence is universally CLASS. Detection is BISH in 3 of 4 cases --- all except when forced to CLASS by the root number w = -1.
+
+The Lean 4 formalization comprises 1,033 lines, 86 verified theorems, 0 sorry, with exceptionally clean axiom separation: the headline Theorem B has zero axioms (proved by rfl alone), Theorem A uses only native_decide and norm_num, and no documentary axioms appear in any theorem statement. All CLASS axiom stubs are confined to boundary classification files and never invoked in proof paths.
+
+This is the fifteenth application of the CRMLint Squeeze protocol and the second CRM audit of a BSD conjecture proof (after Paper 95).
+
+Keywords: Birch and Swinnerton-Dyer conjecture, root number, modular symbols, 2-descent, constructive reverse mathematics, CRMLint, Lean 4, formal verification, elliptic curves, Hecke eigenvalues, Kolyvagin excision
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related Identifiers:
+- Paper 95 (BSD Squeeze, rank 1): DOI pending
+- Paper 94 (Griffiths Group Squeeze): DOI pending
+- Paper 89 (Universal Hodge Locus): DOI 10.5281/zenodo.18809909
+- Paper 48 (BSD diagnostic): DOI 10.5281/zenodo.18683400
+- Paper 51 (Archimedean rescue): DOI 10.5281/zenodo.18732168
+- Paper 90 (Squeeze synthesis): DOI 10.5281/zenodo.18809911
+
+Upload Type: Publication / Preprint

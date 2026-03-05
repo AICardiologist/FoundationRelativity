@@ -3,7 +3,7 @@
 ## Identity
 - **Author:** Paul Chun-Kit Lee (NYU, interventional cardiologist, Brooklyn)
 - **Repo:** `AICardiologist/FoundationRelativity` on GitHub
-- **Programme:** 75-paper CRM series (73 active, 2 withdrawn, 2 retired). ~89,150+ lines Lean 4.
+- **Programme:** 77-paper CRM series (75 active, 2 withdrawn, 2 retired). ~90,000+ lines Lean 4.
 - **Central finding:** The logical cost of mathematics is the logical cost of ℝ.
 
 ## Communication Style
@@ -114,25 +114,24 @@ BISH ⊂ BISH+MP ⊂ BISH+LLPO ⊂ BISH+WLPO ⊂ BISH+LPO ⊂ CLASS
 
 ---
 
-## Current Status (2026-02-25)
+## Current Status (2026-02-26)
 
-### Complete — Programme Closed
-- Papers 1–75: All written, compiled, Lean verified where applicable. 71 active DOIs, 0 pending.
-- Papers 66–70: Editorial sweep complete (acknowledgments, format-guide, Paper 67 synthesis revision covering Papers 45–75).
-- Papers 72–75: DOIs assigned (72: 18765393, 73: 18765700, 74: 18773827, 75: 18773831).
-- Zenodo zips built for Papers 66–70 and 72–75. Awaiting user upload.
+### Complete — Diagnostic Programme Closed, Generative Phase Begun
+- Papers 1–75: All written, compiled, Lean verified where applicable. 71 active DOIs.
+- Papers 66–70: Editorial sweep complete.
+- Papers 72–75: DPT axiom trilogy + conservation test. DOIs assigned.
+- Paper 77: Explicit Hodge decompositions for E⁴ (methods paper). 21 pages, 24 refs, 798 lines Lean (0 sorry). DOI: 10.5281/zenodo.18779210. Zenodo zip on Desktop.
+- Paper 76: CRMLint (in progress). 940 lines Lean, 0 sorry.
 
 ### Remaining Administrative
-- Zenodo uploads: 5 new versions (Papers 66–70) + 4 first uploads (Papers 72–75). User must do manually.
+- Zenodo uploads: Papers 66–70 (new versions) + 72–75 (first uploads) + 77 (first upload). User must do manually.
 - `git push origin main` — multiple unpushed commits.
-- Format guide DOI: still "(DOI pending)" in Papers 72–75 metadata.
 
-### Future Direction: CRMLint
-- Automated logical cost analyzer for Mathlib (~150k declarations).
-- Four layers: dependency tracer → pattern classifier → concentration analysis → AI audit.
-- Full design in `CRM_PROGRAMME_ROADMAP.md` §7.
-- The 75-paper programme serves as calibration dataset (14 Lean bundles = ground truth).
-- Goal: proof technique atlas — classify techniques as scaffolding vs structural, predict conservation gaps, discover patterns invisible at manual scale.
+### Generative Phase (Papers 76–79)
+- Paper 76: CRMLint automated CRM logical cost analyzer. Full design in `CRM_PROGRAMME_ROADMAP.md` §7.
+- Paper 77: COMPLETE. Asymmetric offloading demonstrated (Python CAS → Lean verify). ~1 hour vs ~4 months for comparable-density Paper 5.
+- Paper 78: Explicit Local Langlands for wildly ramified representations (GL₂(ℚ₂), minimal conductor).
+- Paper 79: Standard Conjecture D for simple CM abelian fourfolds (where exotic Weil classes genuinely exist).
 
 ---
 

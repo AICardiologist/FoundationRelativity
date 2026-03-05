@@ -4,11 +4,35 @@ ZENODO UPLOAD METADATA -- Paper 36
 TITLE:
 Stratifying Spectral Gap Undecidability: Cubitt's Theorem Is LPO (Paper 36, Constructive Reverse Mathematics Series)
 
+AUTHOR:
+Paul Chun-Kit Lee (New York University)
+
+DATE:
+2026-02-14
+
 DESCRIPTION:
-Paper 36 in the Constructive Reverse Mathematics of Mathematical Physics series. The celebrated result of Cubitt, Perez-Garcia, and Wolf (2015) showed that determining whether a many-body quantum Hamiltonian is gapped or gapless is undecidable. This paper calibrates that undecidability as Turing-Weihrauch equivalent to LPO (the Limited Principle of Omniscience). The key insight is that the macroscopic quantum undecidability costs exactly one thermodynamic limit --- the same logical price paid for phase transitions, continuum limits, and all other infinite-volume completions across physics. The stratification reveals: finite-volume spectral gap is BISH-computable, the thermodynamic limit costs LPO, pointwise decidability requires LPO, gap zero-test costs WLPO (subsumed by LPO), and uniform decidability costs LPO. All results formalized in Lean 4 over Mathlib with zero sorry. The formalization comprises 8 Lean source files.
+Paper 36 in the Constructive Reverse Mathematics of Mathematical Physics series. The celebrated result of Cubitt, Perez-Garcia, and Wolf (2015) showed that determining whether a many-body quantum Hamiltonian is gapped or gapless is undecidable. This paper calibrates that undecidability as Turing-Weihrauch equivalent to LPO (the Limited Principle of Omniscience). The key insight: macroscopic quantum undecidability costs exactly one thermodynamic limit, the same logical price paid for phase transitions, continuum limits, and all other infinite-volume completions across physics.
+
+The stratification reveals: (i) finite-volume spectral gap is BISH-computable; (ii) the thermodynamic limit costs LPO; (iii) pointwise decidability requires LPO; (iv) gap zero-test costs WLPO (using the negative disjunct: Delta = 0 or Delta != 0, not Delta > 0; the positive formulation would be LPO); (v) uniform decidability costs LPO. The WLPO/LPO distinction is subtle: for non-negative reals, deciding Delta = 0 v Delta > 0 is LPO, while deciding Delta = 0 v Delta != 0 is WLPO; passing from != 0 to > 0 requires Markov's Principle, and WLPO + MP = LPO.
+
+All results formalized in Lean 4 over Mathlib with zero sorry. The formalization comprises 8 Lean source files (667 lines total). Lean 4 toolchain v4.28.0-rc1.
 
 KEYWORDS:
-spectral gap, undecidability, Cubitt-Perez-Garcia-Wolf, thermodynamic limit, quantum many-body systems, Hamiltonian, gapped gapless, Weihrauch reduction, constructive reverse mathematics, LPO, Limited Principle of Omniscience, WLPO, BISH, Lean 4, Mathlib, formal verification, quantum information
+spectral gap, undecidability, Cubitt-Perez-Garcia-Wolf, thermodynamic limit, quantum many-body systems, Hamiltonian, gapped gapless, Weihrauch reduction, constructive reverse mathematics, LPO, Limited Principle of Omniscience, WLPO, BISH, Markov's Principle, Lean 4, Mathlib, formal verification, quantum information
+
+LICENSE:
+Apache License 2.0 (code), Creative Commons Attribution 4.0 International CC-BY 4.0 (paper)
+
+UPLOAD TYPE:
+Publication / Preprint
+
+RELATED IDENTIFIERS:
+DOI 10.5281/zenodo.18642620 (this record)
+DOI 10.5281/zenodo.18643617 (Paper 29: Fekete's Subadditive Lemma and LPO)
+DOI 10.5281/zenodo.18642598 (Paper 32: QED one-loop renormalization)
+DOI 10.5281/zenodo.18642610 (Paper 33: QCD mass gap)
+DOI 10.5281/zenodo.18642616 (Paper 35: Logical constitution of physics)
+DOI 10.5281/zenodo.18765700 (Paper format guide)
 
 COPYRIGHT STATEMENT:
 Copyright 2026 Paul Chun-Kit Lee. Code licensed under Apache License 2.0. Paper licensed under Creative Commons Attribution 4.0 International (CC-BY 4.0).

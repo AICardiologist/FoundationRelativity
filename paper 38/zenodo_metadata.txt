@@ -4,11 +4,35 @@ ZENODO UPLOAD METADATA -- Paper 38
 TITLE:
 Wang Tiling and the Origin of Physical Undecidability: Berger's Theorem Is LPO (Paper 38, Constructive Reverse Mathematics Series)
 
+AUTHOR:
+Paul Chun-Kit Lee (New York University)
+
+DATE:
+2026-02-14
+
 DESCRIPTION:
-Paper 38 in the Constructive Reverse Mathematics of Mathematical Physics series. Every undecidability result in quantum many-body physics --- from spectral gaps to phase diagrams --- descends from the undecidability of Wang tiling (Berger 1966). This paper establishes that Wang tiling itself is Turing-Weihrauch equivalent to LPO, proving that the entire genealogy of physical undecidability from Berger through Cubitt lives at a single logical stratum. The tiling decision problem and aperiodicity detection are both shown to be LPO-equivalent. The Genealogy Theorem demonstrates that all known physical undecidabilities factor through Wang tiling, and the Sigma-1-zero ceiling theorem explains why: all physical constructions reduce to halting (which is Sigma-1-zero-complete), so Wang tiling and all its descendants cost exactly LPO. No physical system yet known encodes Sigma-2-zero-complete problems (but see Paper 39). All results formalized in Lean 4 over Mathlib with zero sorry. The formalization comprises 7 Lean source files.
+Paper 38 in the Constructive Reverse Mathematics of Mathematical Physics series. Every undecidability result in quantum many-body physics --- from spectral gaps to phase diagrams --- descends from the undecidability of Wang tiling (Berger 1966). This paper establishes that Wang tiling itself is Turing-Weihrauch equivalent to LPO, proving that the entire genealogy of physical undecidability from Berger through Cubitt lives at a single logical stratum.
+
+The paper proves four theorems: (1) the Wang tiling decision problem is LPO-equivalent; (2) aperiodicity detection is LPO-equivalent; (3) the Genealogy Theorem: all 7 known undecidability results in mathematical physics (Berger 1966, Kanter 1990, GWPN 2009, CPgW 2015, BCLPG 2020, BCW 2021, CLPE 2022) factor through Wang tiling and are LPO-equivalent; (4) the Sigma-1-zero ceiling: no Sigma-1-zero-complete reduction can exceed LPO.
+
+Note: Watson-Cubitt (2022) ground state energy density is excluded from the genealogy. It is a QMA-hardness (complexity) result for finite lattices, not an undecidability result. The ground state energy at finite volume is a BISH-computable finite eigenvalue problem (Paper 37).
+
+All results formalized in Lean 4 over Mathlib with zero sorry. The formalization comprises 7 Lean source files (577 lines total). Lean 4 toolchain v4.28.0-rc1.
 
 KEYWORDS:
 Wang tiling, Berger's theorem, aperiodic tilings, halting problem, undecidability genealogy, physical computation, Sigma-1-zero, constructive reverse mathematics, LPO, Limited Principle of Omniscience, Turing-Weihrauch equivalence, spectral gap, Lean 4, Mathlib, formal verification, tiling decision problem
+
+LICENSE:
+Apache License 2.0 (code), Creative Commons Attribution 4.0 International CC-BY 4.0 (paper)
+
+UPLOAD TYPE:
+Publication / Preprint
+
+RELATED IDENTIFIERS:
+DOI 10.5281/zenodo.18642804 (this record)
+DOI 10.5281/zenodo.18642620 (Paper 36: Cubitt's Theorem Is LPO)
+DOI 10.5281/zenodo.18643617 (Paper 29: Fekete's Subadditive Lemma and LPO)
+DOI 10.5281/zenodo.18765700 (Paper format guide)
 
 COPYRIGHT STATEMENT:
 Copyright 2026 Paul Chun-Kit Lee. Code licensed under Apache License 2.0. Paper licensed under Creative Commons Attribution 4.0 International (CC-BY 4.0).

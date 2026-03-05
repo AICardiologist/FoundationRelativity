@@ -1,13 +1,18 @@
 /-
-  Paper 39: Physics Reaches Σ₂⁰ — The Thermodynamic Stratification
-  Stratification.lean: Theorem 4 — The Thermodynamic Stratification Theorem
+  Paper 39: Physics Reaches Σ₂⁰ — The Physical Stratification Theorem
+  Stratification.lean: Theorem 5 — The Physical Stratification
 
-  MAIN THEOREM: The arithmetic complexity of physical observables
-  bifurcates along their thermodynamic scaling:
-    (i)   Extensive observables cap at LPO (Σ₁⁰)
-    (ii)  Intensive observables reach LPO_jump (Σ₂⁰)
-    (iii) Promise-gapped physics caps at LPO
-    (iv)  Empirical physics caps at LPO
+  CORRECTED MAIN THEOREM: The arithmetic complexity of a physical
+  observable is determined by its epistemic mode, not its
+  thermodynamic scaling:
+    (i)   Platonic exact physics (no promise) → LPO_jump (Σ₂⁰)
+    (ii)  Promise-gapped physics → LPO (Σ₁⁰)
+    (iii) Empirical physics (finite precision) → LPO (Σ₁⁰)
+
+  The old "extensive vs intensive" bifurcation was wrong:
+  BOTH extensive and intensive exact zero-tests are Σ₂⁰.
+  What reduces Σ₂⁰ to Σ₁⁰ is the promise gap, not the
+  thermodynamic type.
 -/
 import Papers.P39_Sigma2.Defs
 import Papers.P39_Sigma2.GenericGapSigma2
@@ -17,29 +22,26 @@ import Papers.P39_Sigma2.ExtensiveCeiling
 noncomputable section
 
 -- ============================================================
--- Part (i): Extensive observables cap at LPO
+-- Part (i): Platonic exact physics requires LPO_jump
 -- ============================================================
 
--- (From ExtensiveCeiling.lean)
--- extensive_cap_lpo : ∀ O, LPO → (extensive_sign_positive O ∨ ¬...)
+-- Two independent witnesses:
+-- (a) The generic spectral gap (intensive observable):
+--     (∀ M, gapped ∨ gapless) ↔ LPO_jump
+--     (From GenericGapSigma2.lean)
+-- (b) The exact zero-test for decreasing sequences:
+--     (∀ s, limit > 0 ∨ limit = 0) ↔ LPO_jump
+--     (From ExtensiveCeiling.lean — covers BOTH extensive and intensive)
 
 -- ============================================================
--- Part (ii): Intensive observables reach LPO_jump
--- ============================================================
-
--- The modified Hamiltonian family witnesses the LPO_jump requirement
--- (From GenericGapSigma2.lean)
--- generic_gap_iff_lpo_jump : (∀ M, gapped ∨ ¬gapped) ↔ LPO_jump
-
--- ============================================================
--- Part (iii): Promise-gapped physics caps at LPO
+-- Part (ii): Promise-gapped physics caps at LPO
 -- ============================================================
 
 -- (From PromiseGapRecovery.lean)
 -- promise_gapped_caps_at_lpo : ∀ H, LPO → (gapless ∨ ¬gapless)
 
 -- ============================================================
--- Part (iv): Empirical physics caps at LPO
+-- Part (iii): Empirical physics caps at LPO
 -- ============================================================
 
 -- Finite measurement precision ε > 0 imposes an effective promise gap.
@@ -50,24 +52,24 @@ axiom empirical_gap_sigma1 (H : ModifiedHamiltonian) (ε : ℝ) (hε : ε > 0) :
     LPO → (gap_less_than H ε ∨ ¬gap_less_than H ε)
 
 -- ============================================================
--- Theorem 4: The Thermodynamic Stratification Theorem
+-- Theorem 5: The Physical Stratification Theorem
 -- ============================================================
 
-theorem thermodynamic_stratification :
-    -- Part (i): Extensive observables cap at LPO
-    (∀ (O : ExtensiveObservable), LPO →
-      (extensive_sign_positive O ∨ ¬extensive_sign_positive O)) ∧
-    -- Part (ii): Intensive observables reach LPO_jump
+theorem physical_stratification :
+    -- Part (i): Platonic exact physics — spectral gap ↔ LPO_jump
     ((∀ M, is_gapped (modified_hamiltonian M) ∨
            ¬is_gapped (modified_hamiltonian M)) ↔ LPO_jump) ∧
-    -- Part (iii): Promise-gapped physics caps at LPO
+    -- Part (i'): Platonic exact physics — zero-test ↔ LPO_jump
+    ((∀ s : DecreasingSeqWithLimit,
+        exact_limit_positive s ∨ exact_limit_zero s) ↔ LPO_jump) ∧
+    -- Part (ii): Promise-gapped physics caps at LPO
     (∀ (H : PromiseGapped), LPO →
       (is_gapless H.hamiltonian ∨ ¬is_gapless H.hamiltonian)) ∧
-    -- Part (iv): Empirical physics caps at LPO
+    -- Part (iii): Empirical physics caps at LPO
     (∀ (H : ModifiedHamiltonian) (ε : ℝ), ε > 0 → LPO →
       (gap_less_than H ε ∨ ¬gap_less_than H ε)) :=
-  ⟨extensive_cap_lpo,
-   generic_gap_iff_lpo_jump,
+  ⟨generic_gap_iff_lpo_jump,
+   exact_zero_test_iff_lpo_jump,
    promise_gapped_caps_at_lpo,
    empirical_gap_sigma1⟩
 

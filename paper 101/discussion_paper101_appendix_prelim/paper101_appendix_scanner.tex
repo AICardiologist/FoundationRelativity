@@ -1,0 +1,349 @@
+% paper101_appendix_scanner.tex
+% Supplementary Appendix: CRMLint Scanner Classification of Scholze's
+% Berkovich Motives and Motivic Geometrization
+% Paper 101 of the Constructive Reverse Mathematics Series
+%
+% Paul Chun-Kit Lee, NYU
+% March 2026
+
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage[T1]{fontenc}
+
+\newcommand{\BISH}{\textsf{BISH}}
+\newcommand{\WKL}{\textsf{WKL}}
+\newcommand{\WLPO}{\textsf{WLPO}}
+\newcommand{\LPO}{\textsf{LPO}}
+\newcommand{\CLASS}{\textsf{CLASS}}
+
+\title{Supplementary Appendix: CRMLint Scanner Output\\
+for Berkovich Motives and Motivic Geometrization}
+\author{Paul Chun-Kit Lee\\
+\small New York University}
+\date{March 2026}
+
+\begin{document}
+\maketitle
+
+\appendix
+\section{CRMLint Scanner Methodology}
+\label{sec:methodology}
+
+The CRMLint scanner (Paper~76 of this series; DOI:~10.5281/zenodo.18779362) is an
+automated static analysis tool that assigns a preliminary CRM level to each logical
+step in a mathematical text.  The scanner used here operates in \emph{keyword mode}
+on raw \LaTeX\ source, employing three detection layers:
+
+\begin{enumerate}
+\item \textbf{Keyword markers ($\sim$80 patterns).}
+  Each pattern maps a mathematical term to its minimal CRM level.
+  Examples: ``motivic sheaf'' $\to$ \BISH, ``normed completion'' $\to$ \WLPO,
+  ``perfectoid'' $\to$ \WKL, ``normed filtration'' $\to$ \LPO.
+  Patterns are case-insensitive substrings applied to each line of source.
+
+\item \textbf{Citation patterns ($\sim$120 entries).}
+  Bibliographic references are matched against a curated database of known
+  CRM-relevant works.  For example, a citation of Scholze's
+  \emph{Lectures on Analytic Geometry} triggers a \WKL\ alert (Tychonoff
+  gates require Weak K\"onig's Lemma for compactness of profinite
+  inverse limits).
+
+\item \textbf{Anti-marker system.}
+  Certain patterns \emph{suppress} false positives.
+  For instance, ``algebraic $K$-theory'' in a purely algebraic context
+  does not trigger an analytic alert.
+  The scanner reports suppressed hits separately (7 in BerkovichMotives,
+  3 in MotivicGeometrization).
+\end{enumerate}
+
+Scanner output is a JSON file listing each active hit with its line number,
+matched pattern, detected CRM level, and the enclosing section title.
+Human classification then assigns each hit to one of four categories:
+
+\begin{description}
+\item[Category~A (motivational):] Alerts in introductions or preambles.
+  These mention analytic infrastructure for context but do not contribute
+  to the logical content of any proof.
+
+\item[Category~B (parasitic):] Alerts where an analytic formalism
+  (Banach ring completion, seminorm filtration) \emph{carries} algebraic
+  content without contributing logical substance.  The WLPO/LPO cost is
+  an artifact of the presentation, not the theorem.
+
+\item[Category~\BISH\ (algebraic core):] Alerts confirming that the
+  flagged content (motivic sheaves, Tate twists, six-functor formalism)
+  is genuinely constructive, operating within Bishop-style mathematics.
+
+\item[Category~C (structural WKL):] Alerts where Weak K\"onig's Lemma
+  is \emph{structurally necessary}---inverse limits of profinite objects,
+  perfectoid tilting, condensed mathematics infrastructure.
+  These represent the irreducible non-constructive content.
+\end{description}
+
+\section{Alert Distribution}
+\label{sec:distribution}
+
+\subsection{Distribution by Category}
+
+Table~\ref{tab:category} summarizes the 208 active alerts by category
+and source document.
+
+\begin{table}[ht]
+\centering
+\caption{Alert distribution by category.}
+\label{tab:category}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Category & Berkovich Motives & Motivic Geometrization & Total \\
+\midrule
+A (motivational)    & 11  & 15  & 26  \\
+B (parasitic)       & 45  & 18  & 63  \\
+\BISH\ (algebraic)  & 43  & 20  & 63  \\
+C (structural \WKL) & 38  & 18  & 56  \\
+\midrule
+Total               & 137 & 71  & 208 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The combined parasitic-plus-motivational count ($\text{A} + \text{B} = 89$,
+or 43\% of alerts) represents analytic overhead that does not contribute
+to the logical structure of any theorem.  The \BISH\ alerts (30\%) confirm
+the algebraic core.  The remaining 56 Category~C alerts (27\%) constitute
+the genuine \WKL\ dependency.
+
+\subsection{Distribution by Section Type and CRM Level}
+
+Table~\ref{tab:section-level} cross-tabulates section type
+(motivation/definition/proof) against CRM level.
+
+\begin{table}[ht]
+\centering
+\caption{Alert distribution by section type and CRM level.
+  \CLASS\ column included to confirm the zero-alert finding.}
+\label{tab:section-level}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+Section type & \CLASS & \LPO & \WLPO & \WKL & \BISH & Total \\
+\midrule
+Motivation  & 0 & 0  & 11 & 15 & 21 & 47  \\
+Definition  & 0 & 4  & 17 &  7 &  0 & 28  \\
+Proof       & 0 & 4  & 38 & 49 & 42 & 133 \\
+\midrule
+Total       & 0 & 8  & 66 & 71 & 63 & 208 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Key observation.}
+The \CLASS\ column is uniformly zero.  Across both documents---a combined
+93~pages, 24~theorems, 78~lemmas, 90~proofs, and 87~bibliographic
+references---the scanner found no alert at the \CLASS\ level.  No
+invocation of the Axiom of Choice, Zorn's Lemma, well-ordering, or
+any equivalent principle was detected.  This is the primary evidence
+supporting the verdict $\mathrm{CRM}(\text{Scholze's motivic programme})
+= \WKL$.
+
+\paragraph{The 8 LPO alerts.}
+All 8 \LPO\ alerts arise from seminorm filtrations indexed by
+$\mathbb{R}_{\geq 0}$, where decidable comparison $\|x\| \leq r$
+triggers \LPO.  These are uniformly parasitic (Category~B): the filtration
+is an analytic bookkeeping device, and the algebraic content of the
+theorems it appears in does not require decidable norm comparison.
+
+\section{Representative Classified Alerts}
+\label{sec:samples}
+
+Table~\ref{tab:samples} lists 14 representative alerts spanning all four
+categories, both source documents, and multiple CRM levels.
+
+\begin{longtable}{@{}p{2.0cm}cp{2.8cm}cp{5.5cm}@{}}
+\caption{Representative classified alerts.  Line numbers refer to the
+  \LaTeX\ source.}
+\label{tab:samples} \\
+\toprule
+File & Line & Reason & Cat. & Justification \\
+\midrule
+\endfirsthead
+\toprule
+File & Line & Reason & Cat. & Justification \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r}{\emph{continued on next page}} \\
+\bottomrule
+\endfoot
+\bottomrule
+\endlastfoot
+%
+% Category A: motivational
+%
+Berkovich\-Motives & 60
+  & [\WKL] Lectures on Analytic Geometry (citation)
+  & A
+  & Introductory citation establishing background for condensed mathematics. \\
+%
+Berkovich\-Motives & 194
+  & [\WLPO] normed completion
+  & A
+  & Describing classical Berkovich approach in introduction; not in any proof. \\
+%
+Motivic\-Geom & 97
+  & [\WKL] perfectoid (inverse limit / tilting)
+  & A
+  & Perfectoid keyword in introduction; motivational context only. \\
+\midrule
+%
+% Category B: parasitic
+%
+Berkovich\-Motives & 307
+  & [\LPO] normed filtration
+  & B
+  & Seminorm filtration $\mathbb{R}_{\geq 0}$ indexing in Banach ring definition;
+    analytic formalism parasitic on algebraic content. \\
+%
+Berkovich\-Motives & 571
+  & [\WLPO] normed completion
+  & B
+  & Banach ring formalism carried through arc-topology proofs; parasitic. \\
+%
+Motivic\-Geom & 325
+  & [\LPO] normed filtration
+  & B
+  & Seminorm filtration in Basic results; $\mathbb{R}_{\geq 0}$ indexing
+    is parasitic on algebraic content. \\
+%
+Motivic\-Geom & 498
+  & [\WLPO] normed completion
+  & B
+  & Banach ring formalism in Stacks of $L$-parameters; parasitic. \\
+\midrule
+%
+% Category BISH: algebraic core
+%
+Berkovich\-Motives & 1172
+  & [\BISH] Tate twist (algebraic)
+  & \BISH
+  & Genuine algebraic marker; the Tate twist is a purely algebraic operation. \\
+%
+Berkovich\-Motives & 1924
+  & [\BISH] six-functor formalism
+  & \BISH
+  & Genuine algebraic marker in $D_\mathrm{mot}$; six-functor formalism
+    is categorical/constructive. \\
+%
+Motivic\-Geom & 391
+  & [\BISH] six-functor formalism
+  & \BISH
+  & Genuine algebraic marker in $D_\mathrm{mot}$; categorical infrastructure
+    is \BISH. \\
+\midrule
+%
+% Category C: structural WKL
+%
+Berkovich\-Motives & 501
+  & [\WKL] inverse limit of finite objects
+  & C
+  & Genuine profinite/inverse limit construction in the nonarchimedean
+    unit disc definition. \\
+%
+Berkovich\-Motives & 665
+  & [\WKL] perfectoid (tilting)
+  & C
+  & Structural: perfectoid inverse limit/tilting in the arc-topology proofs. \\
+%
+Berkovich\-Motives & 1607
+  & [\WKL] Lectures on Analytic Geometry (citation)
+  & C
+  & Structural dependency on condensed infrastructure in $K$-theory
+    proof section. \\
+%
+Motivic\-Geom & 436
+  & [\WKL] perfectoid (tilting)
+  & C
+  & Structural: perfectoid inverse limit in $D_\mathrm{mot}$ proof section. \\
+\end{longtable}
+
+\section{Zero-CLASS Confirmation}
+\label{sec:zero-class}
+
+The central finding of this scanner analysis is the \emph{absence} of
+\CLASS-level alerts.  Specifically:
+
+\begin{itemize}
+\item The keyword database includes markers for the Axiom of Choice
+  (``Axiom of Choice,'' ``Zorn's Lemma,'' ``well-ordering,''
+  ``transfinite induction,'' ``uncountable choice''), Baire category
+  (``Baire category theorem,'' ``generic point argument''),
+  and other \CLASS\ indicators.
+  None triggered.
+
+\item The citation database includes 17 works known to require full
+  \CLASS\ (e.g., general Hahn--Banach, uncountable Zorn applications).
+  None were cited.
+
+\item The anti-marker system did not suppress any \CLASS-level hits.
+  The 10 total suppressions (7 + 3) were all at \BISH\ or \WKL\ levels.
+\end{itemize}
+
+Combined with the structural observation that Scholze's programme
+replaces point-set topology (which requires \CLASS\ for Tychonoff and
+Stone--\v{C}ech) with condensed mathematics (which requires only \WKL\
+for profinite compactness), the zero-\CLASS\ finding is not accidental
+but architectural.
+
+\section{Reproduction Instructions}
+\label{sec:reproduction}
+
+The scanner and classification can be reproduced as follows.
+All files are in the directory
+\texttt{paper~101/discussion\_paper101\_appendix\_prelim/}.
+
+\begin{enumerate}
+\item \textbf{Run the CRMLint scanner on each source file.}
+
+\begin{verbatim}
+python3 crmlint_scanner.py BerkovichMotives.tex \
+    -o berkovich_scan.json --format json
+
+python3 crmlint_scanner.py MotivicGeometrization.tex \
+    -o motivic_geom_scan.json --format json
+\end{verbatim}
+
+Expected output: 137 active hits for BerkovichMotives
+(\BISH=43, \WKL=47, \WLPO=40, \LPO=7)
+and 71 active hits for MotivicGeometrization
+(\BISH=20, \WKL=24, \WLPO=26, \LPO=1).
+
+\item \textbf{Classify alerts into categories.}
+
+The classification follows the rules described in
+Section~\ref{sec:methodology}.  The output is stored in
+\texttt{scanner\_classification.csv} with columns:
+\texttt{file}, \texttt{line}, \texttt{level}, \texttt{reason},
+\texttt{location}, \texttt{category}, \texttt{section\_type},
+\texttt{justification}.
+
+\item \textbf{Verify totals.}
+
+The CSV should contain exactly 208 data rows:
+26 Category~A, 63 Category~B, 63 Category~\BISH,
+56 Category~C.  The \CLASS\ column of
+Table~\ref{tab:section-level} should be uniformly zero.
+\end{enumerate}
+
+\bigskip
+
+\noindent\textbf{Scanner version.}
+CRMLint scanner v1.0 (Paper~76, DOI:~10.5281/zenodo.18779362).
+Keyword database: 80 patterns, 120 citation entries.
+Python~3.11+, no external dependencies beyond the standard library.
+
+\end{document}

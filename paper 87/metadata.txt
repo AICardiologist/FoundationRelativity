@@ -1,0 +1,26 @@
+Title: The Omniscience Cost of the Hodge Conjecture: A CRM Analysis (Paper 87, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: Department of Medicine, Division of Cardiology, NYU Langone Health, Brooklyn, NY, USA
+
+Date: 2026-02-27
+
+Description: We analyse the logical cost of the Hodge condition for principally polarised abelian varieties using constructive reverse mathematics (CRM). The Hodge test asks whether a rational cohomology class is of type (p,p), which reduces to checking whether certain rational functions of period matrix entries vanish. Theorem A: when algebraic metadata is available (a CM type, giving algebraic periods via Shiga-Wolfart, or a known Mumford-Tate group, including the generic case via Moonen-Zarhin), the Hodge test is BISH-decidable. Theorem B: the uniform Hodge test, a single algorithm for arbitrary period matrices presented as Cauchy sequences, is equivalent to WLPO (Weak Limited Principle of Omniscience). Theorem C: HodgeTestCost = BISH if and only if algebraic metadata is available. Theorem D: over the algebraic closure of Q, algebraic period entries characterise CM varieties (Shiga-Wolfart 1995). This is the first CRM analysis of a Clay Millennium Problem. It does not prove or disprove the Hodge conjecture but reveals the structural reason why all known results require CM or equivalent algebraic rigidity. Formally verified in Lean 4 (602 lines, 0 sorry). Part of an 87-paper programme establishing that the logical cost of mathematics is the logical cost of the real numbers.
+
+Keywords: Hodge conjecture, constructive reverse mathematics, WLPO, abelian varieties, complex multiplication, period matrix, Shiga-Wolfart theorem, Mumford-Tate group, Lean 4, formal verification, Clay Millennium Problem, omniscience principles
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related Identifiers:
+- Paper 72 (DPT Characterisation): 10.5281/zenodo.15019571
+- Paper 73 (Axiom 1 Reverse): 10.5281/zenodo.15019579
+- Paper 74 (Axiom 2 Reverse): 10.5281/zenodo.15019585
+- Paper 80 (Gauss-Manin): 10.5281/zenodo.18791985
+- Paper 81 (Flat Sections): 10.5281/zenodo.18801814
+- Paper 82 (Kovacic): 10.5281/zenodo.18801822
+- Paper 83 (Picard Number): 10.5281/zenodo.18801826
+- Paper 84 (Weil Classes): 10.5281/zenodo.18802819
+- Paper 85 (Universal Flatness): 10.5281/zenodo.18806608
+
+Upload Type: publication / preprint

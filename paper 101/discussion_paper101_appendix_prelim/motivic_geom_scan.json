@@ -1,0 +1,529 @@
+[
+  {
+    "filepath": "MotivicGeometrization.tex",
+    "title": "",
+    "authors": "Peter Scholze",
+    "year": 0,
+    "arxiv_id": "",
+    "msc_codes": [],
+    "max_crm_level": "LPO",
+    "max_crm_value": 5,
+    "bottleneck": "normed filtration (decidable norm comparison)",
+    "bottleneck_location": "Basic results",
+    "num_active_hits": 71,
+    "num_suppressed": 3,
+    "level_counts": {
+      "BISH": 20,
+      "WLPO": 26,
+      "WKL": 24,
+      "LPO": 1
+    },
+    "structure": {
+      "theorems": 10,
+      "lemmas": 13,
+      "proofs": 19,
+      "sections": 7,
+      "citations": 47,
+      "estimated_pages": 27
+    },
+    "active_hits": [
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Preamble",
+        "line": 72,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Introduction",
+        "line": 82,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Introduction",
+        "line": 84,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Introduction",
+        "line": 86,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "perfectoid (inverse limit / tilting)",
+        "location": "Introduction",
+        "line": 97,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Introduction",
+        "line": 103,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Introduction",
+        "line": 111,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Introduction",
+        "line": 115,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Introduction",
+        "line": 119,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Introduction",
+        "line": 123,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Introduction",
+        "line": 133,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "six-functor formalism (categorical)",
+        "location": "Introduction",
+        "line": 133,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Introduction",
+        "line": 135,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Introduction",
+        "line": 137,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Introduction",
+        "line": 143,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "perfectoid (inverse limit / tilting)",
+        "location": "Basic results",
+        "line": 149,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Basic results",
+        "line": 149,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Basic results",
+        "line": 163,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "six-functor formalism (categorical)",
+        "location": "Basic results",
+        "line": 170,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "perfectoid (inverse limit / tilting)",
+        "location": "Basic results",
+        "line": 185,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "perfectoid (inverse limit / tilting)",
+        "location": "Basic results",
+        "line": 225,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "adic space (inverse limit of affinoids)",
+        "location": "Basic results",
+        "line": 264,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "perfectoid (inverse limit / tilting)",
+        "location": "Basic results",
+        "line": 264,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Basic results",
+        "line": 297,
+        "source": "keyword"
+      },
+      {
+        "level": "LPO",
+        "reason": "normed filtration (decidable norm comparison)",
+        "location": "Basic results",
+        "line": 325,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "completed normed group",
+        "location": "Basic results",
+        "line": 325,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "$ D_{mot",
+        "line": 387,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "six-functor formalism (categorical)",
+        "location": "$ D_{mot",
+        "line": 391,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "perfectoid (inverse limit / tilting)",
+        "location": "$ D_{mot",
+        "line": 436,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Stacks of $L$-parameters",
+        "line": 498,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "Stacks of $L$-parameters",
+        "line": 498,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Stacks of $L$-parameters",
+        "line": 500,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "Stacks of $L$-parameters",
+        "line": 527,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Stacks of $L$-parameters",
+        "line": 558,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "Stacks of $L$-parameters",
+        "line": 567,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Stacks of $L$-parameters",
+        "line": 572,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Stacks of $L$-parameters",
+        "line": 575,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "Geometric Satake",
+        "line": 666,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Geometric Satake",
+        "line": 714,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "Geometric Satake",
+        "line": 747,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Geometric Satake",
+        "line": 769,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Geometric Satake",
+        "line": 771,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Geometric Satake",
+        "line": 780,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "Geometric Satake",
+        "line": 780,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Synopsis",
+        "line": 790,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Synopsis",
+        "line": 792,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Synopsis",
+        "line": 800,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Synopsis",
+        "line": 805,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Synopsis",
+        "line": 818,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Synopsis",
+        "line": 834,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion (Cauchy convergence test)",
+        "location": "Synopsis",
+        "line": 874,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "Synopsis",
+        "line": 874,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Preamble",
+        "line": 72,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Introduction",
+        "line": 86,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Introduction",
+        "line": 97,
+        "source": "citation"
+      },
+      {
+        "level": "BISH",
+        "reason": "Lafforgue (function field Langlands, algebraic)",
+        "location": "Introduction",
+        "line": 107,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Introduction",
+        "line": 133,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Introduction",
+        "line": 145,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Basic results",
+        "line": 149,
+        "source": "citation"
+      },
+      {
+        "level": "BISH",
+        "reason": "Fontaine-Laffaille (p-adic, algebraic)",
+        "location": "Basic results",
+        "line": 163,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Basic results",
+        "line": 163,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Basic results",
+        "line": 174,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Basic results",
+        "line": 176,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Basic results",
+        "line": 185,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Basic results",
+        "line": 264,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "$ D_{mot",
+        "line": 385,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "$ D_{mot",
+        "line": 404,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Geometric Satake",
+        "line": 739,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Geometric Satake",
+        "line": 767,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Synopsis",
+        "line": 874,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Synopsis",
+        "line": 874,
+        "source": "citation"
+      }
+    ]
+  }
+]

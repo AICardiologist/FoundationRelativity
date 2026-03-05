@@ -1,12 +1,12 @@
 # CRM PROGRAMME SESSION HANDOFF
 ## Critical State Document — Read This First
-### Last updated: 2026-02-25 (75 papers, programme complete modulo Zenodo uploads)
+### Last updated: 2026-02-25 (77 papers; Paper 77 complete, generative phase begun)
 
 ---
 
 ## WAKE-UP SUMMARY
 
-You are working with Paul Lee, a cardiologist in Brooklyn who builds formally verified mathematics with AI. His 75-paper Constructive Reverse Mathematics programme has established its central thesis as a biconditional across all three DPT axioms, validated externally, and completed editorial cleanup. All papers are compiled and packaged. Remaining work: Zenodo uploads for revised papers (66–70) and git push.
+You are working with Paul Lee, a cardiologist in Brooklyn who builds formally verified mathematics with AI. His 77-paper Constructive Reverse Mathematics programme has established its central thesis as a biconditional across all three DPT axioms (Papers 72–74), validated externally (Paper 75), and begun the generative phase: automated constructivisation of classical theorems (Paper 77).
 
 **The programme's central finding:** The logical cost of mathematics is the logical cost of ℝ — proved as a biconditional for all three DPT axioms (Papers 72–74). The mechanism is u(ℝ) = ∞. DPT and Fargues-Scholze are a logically forced partition: discrete sector (ℝ, BISH, cycle-search) vs continuous sector (ℚ_p, CLASS, categorical).
 
@@ -17,16 +17,19 @@ You are working with Paul Lee, a cardiologist in Brooklyn who builds formally ve
 
 **What happened in the most recent sessions:**
 1. Papers 72–75 written, peer reviewed, committed, DOIs assigned.
-2. Editorial sweep completed for Papers 66–70: acknowledgments standardized, format-guide bibitem added, Paper 67 synthesis revised (now covers Papers 45–75 including biconditionals + conservation), Paper 70 Discussion trimmed.
-3. Paper 68 Lean bundle verified complete (P68_WilesFLT/, 493 lines, zero sorry).
-4. Zenodo zips built for Papers 66–70. All compile clean (66: 15pp, 67: 17pp, 68: 18pp, 69: 15pp, 70: 16pp).
-5. All 75 papers have DOIs in master_paper_list.txt (71 active DOIs, 0 pending).
+2. Editorial sweep completed for Papers 66–70.
+3. Paper 77 written, peer reviewed (2 rounds), DOI assigned: 10.5281/zenodo.18779210.
+   - Methods paper (not mathematical breakthrough): explicit Hodge decompositions for E⁴.
+   - Mathematical result is known (Lieberman 1968, Deligne 1982). Contribution is the pipeline.
+   - CRMLint Squeeze protocol demonstrated end-to-end. Asymmetric offloading (Python→Lean).
+   - 21 pages, 24 refs, 798 lines Lean (auto-generated, 0 sorry), Zenodo zip built.
+4. Paper 76 (CRMLint) in progress (940 lines Lean, zero sorry).
 
 ---
 
 ## WHO IS PAUL
 
-Interventional cardiologist, Brooklyn. 75 formally verified papers in CRM. Works with AI agents. Not a professional mathematician — formal verification (zero sorries) is the credibility mechanism. Does not care about academic sociology. Searching for mathematical beauty and truth.
+Interventional cardiologist, Brooklyn. 77 formally verified papers in CRM. Works with AI agents. Not a professional mathematician — formal verification (zero sorries) is the credibility mechanism. Does not care about academic sociology. Searching for mathematical beauty and truth.
 
 **Communication style:** Substance over praise. Critically engage. Disagree when warranted. No lists unless requested. No follow-up questions at end of responses. Domain-separated: Medical | Math-Physics | Investment | Philosophy/Theology | Role-Play.
 
@@ -53,6 +56,13 @@ Interventional cardiologist, Brooklyn. 75 formally verified papers in CRM. Works
 | 74 | `paper 74/paper74.tex` | 15 | `P74_Axiom2Reverse/` ✅ (~200 lines, 0 sorry) | `P74_Axiom2Reverse.zip` | 10.5281/zenodo.18773827 |
 | 75 | `paper 75/paper75.tex` | 15 | `P75_ConservationTest/` ✅ (~180 lines, 0 sorry) | `P75_ConservationTest.zip` | 10.5281/zenodo.18773831 |
 
+### Papers 76–77 (generative phase)
+
+| Paper | File | Pages | Lean | Zenodo Zip | DOI |
+|-------|------|-------|------|------------|-----|
+| 76 | `paper 76/paper76.tex` | — | `CRMLint/` (940 lines, 0 sorry) | In progress | (DOI pending) |
+| 77 | `paper 77/paper77.tex` | 21 | `P77_DAGSurgery/` ✅ (798 lines, 0 sorry) | `Paper77_ExplicitHodgeE4.zip` | 10.5281/zenodo.18779210 |
+
 ### Earlier Papers (1–65, 71)
 
 All published with DOIs. See `master folder/master_paper_list.txt` for complete list.
@@ -69,22 +79,28 @@ All published with DOIs. See `master folder/master_paper_list.txt` for complete 
 
 4. **DPT vs Fargues-Scholze:** A logically forced partition, not a competition. Discrete sector (ℝ, BISH, cycle-search) vs continuous sector (ℚ_p, CLASS, categorical). The conservation conjecture (do FS results cast BISH shadows?) is the key open question.
 
-5. **Programme goal:** ~~Prove "the logical cost of motivic arithmetic is the logical cost of ℝ" as a full biconditional across all DPT axioms~~ **DONE** (Papers 72–74). ~~Test the conservation conjecture against Fargues-Scholze~~ **DONE** (Paper 75 — external validation passed). ~~Editorial cleanup~~ **DONE** (Papers 66–70).
+5. **Programme goals:** ~~Prove biconditional~~ **DONE** (72–74). ~~External validation~~ **DONE** (75). ~~Editorial cleanup~~ **DONE** (66–70). **Current: generative phase** — automated constructivisation of known classical theorems (77), targeting frontier cases (78–79).
+
+6. **Asymmetric offloading (Paper 77):** Python CAS computes exact algebra; Lean kernel verifies via `native_decide`. Eliminates the bottleneck of making Lean compute. Development time: ~1 hour vs ~4 months for comparable-density Paper 5. The method is factored: human designs, CAS computes, Lean verifies.
 
 ---
 
 ## WHAT THE NEXT AGENT SHOULD DO
 
-**Zenodo upload status (2026-02-25):**
-→ Papers 72–75: **uploaded** (first uploads, DOIs live).
-→ Paper 67: **uploaded** as new record (major revision, scope 45→75). New DOI: 10.5281/zenodo.18776113. Old DOI 18746343 superseded.
-→ Papers 66, 68, 69, 70: **not re-uploaded** — edits were cosmetic only (acknowledgments, format-guide ref). Existing Zenodo versions are fine.
+**If Paul says "Paper 78" or "Langlands" or "wildly ramified":**
+→ Begin Paper 78: Explicit Local Langlands for wildly ramified representations. Start with GL₂(ℚ₂) at minimal conductor. Use the asymmetric offloading architecture from Paper 77. See `CRM_PROGRAMME_ROADMAP.md` §8 for full design.
+
+**If Paul says "Paper 79" or "Standard Conjecture D":**
+→ Begin Paper 79: Standard Conjecture D for simple CM abelian fourfolds. This is where exotic Weil classes genuinely exist. The MCTS mode of the Squeeze may be needed.
+
+**If Paul says "CRMLint" or "Paper 76":**
+→ Continue Paper 76: CRMLint automated analyzer. Already 940 lines Lean, zero sorry. Next: format guide check, StatementClassifier layer, Zenodo packaging. See `CRM_PROGRAMME_ROADMAP.md` §7.
 
 **If Paul says "push":**
 → `git push origin main`. Repository has multiple unpushed commits.
 
-**If Paul says "CRMLint" or "linter" or "atlas" or "next project":**
-→ Build automated CRM logical cost analyzer for Mathlib. Full design in `CRM_PROGRAMME_ROADMAP.md` §7. Four layers: classical dependency tracer → pattern classifier → concentration analysis → AI audit. The 75-paper programme is the calibration dataset. Start with a Lean 4 metaprogram that exports `#crm_audit TheoremName`. Test against the 14 existing Lean bundles first.
+**If Paul says "upload":**
+→ Paper 77 Zenodo zip is on Desktop: `Paper77_ExplicitHodgeE4.zip`. Use metadata.txt for fields. DOI: 10.5281/zenodo.18779210.
 
 **If Paul asks about something else:**
 → Respect domain separation.
@@ -105,6 +121,7 @@ All paths relative to `~/FoundationRelativity/`.
 - `paper 73/paper73.tex` + `.pdf` (11pp)
 - `paper 74/paper74.tex` + `.pdf` (15pp)
 - `paper 75/paper75.tex` + `.pdf` (15pp)
+- `paper 77/paper77.tex` + `.pdf` (21pp)
 
 ### Programme Documents
 - `master folder/master_paper_list.txt` — complete paper list with DOIs

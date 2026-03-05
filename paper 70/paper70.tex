@@ -153,11 +153,11 @@ New York University \\
 \begin{abstract}
 This capstone paper identifies a single structural principle underlying 70~papers of Constructive Reverse Mathematics: the real numbers are the sole source of logical difficulty in mathematical physics and arithmetic geometry. The mechanism is $u(\R) = \infty$---the real numbers are the only completion of~$\Q$ where positive-definite forms exist in every dimension---and three fields independently exploit it via the same architecture (Hilbert space inner product, Rosati involution, Petersson inner product).
 
-The principle is established by four theorems. The Archimedean Principle (Theorem~A) shows that the CRM level of every domain in the program is determined by one parameter: whether the domain has an Archimedean place. The MP Gap (Theorem~B) shows that physics and arithmetic descend differently---projection vs.\ search---producing a strict logical separation $\BISH < \BISH + \MP$. Automorphic CRM Incompleteness (Theorem~C) exhibits an integer witness proving the automorphic axioms alone cannot recover the Ramanujan bound. Three Spectral Gaps (Theorem~D) identifies identical $\Sigma^0_2$ quantifier structure across physics, automorphic theory, and arithmetic. The principle also explains why multiple physical theories (Kapustin--Witten, Feigin--Frenkel, Freed--Hopkins--Teleman) independently encode the Langlands correspondence.
+The principle is established by three theorems. The Archimedean Principle (Theorem~A) shows that the CRM level of every domain in the program is determined by one parameter: whether the domain has an Archimedean place. The MP Gap (Theorem~B) shows that physics and arithmetic descend differently---projection vs.\ search---producing a strict logical separation $\BISH < \BISH + \MP$. Automorphic CRM Incompleteness (Theorem~C) exhibits an integer witness proving the automorphic axioms alone cannot recover the Ramanujan bound. The principle also explains why multiple physical theories (Kapustin--Witten, Feigin--Frenkel, Freed--Hopkins--Teleman) independently encode the Langlands correspondence.
 
 Paper~68 showed that Fermat's Last Theorem is $\BISH$. Paper~69 showed that the function field Langlands correspondence is $\BISH$. This paper identifies what makes anything expensive: the Archimedean place, and specifically $u(\R) = \infty$.
 
-All results are formalized in Lean~4 over Mathlib with zero \texttt{sorry}s and zero custom axioms for the core theorems (0~errors, 0~warnings). The formalization verifies the logical structure of the classification scheme and the integer arithmetic of the incompleteness witness; the identification of CRM levels with specific mathematical theories rests on the audits of Papers~1--69.
+All results are formalized in Lean~4 over Mathlib with zero \texttt{sorry}s and zero custom axioms (0~errors, 0~warnings). The formalization verifies the logical structure of the classification scheme and the integer arithmetic of the incompleteness witness; the identification of CRM levels with specific mathematical theories rests on the audits of Papers~1--69.
 \end{abstract}
 
 \tableofcontents
@@ -167,7 +167,7 @@ All results are formalized in Lean~4 over Mathlib with zero \texttt{sorry}s and 
 \label{sec:intro}
 % ===========================================================
 
-The 70-paper program found one thing. The real numbers are the sole source of logical difficulty in both mathematical physics and arithmetic geometry. Every non-constructive principle required by any physical theory or any theorem in arithmetic geometry enters through the Archimedean place---the completion of~$\Q$ at infinity, which gives~$\R$. Remove~$\R$ and both fields collapse to basic constructive mathematics ($\BISH$). Paper~68~\cite{Paper68} showed that Fermat's Last Theorem is $\BISH$. Paper~69~\cite{Paper69} showed that the Langlands correspondence over function fields is $\BISH$. This paper identifies the common mechanism and explains why it is unique.
+The 70-paper program found one thing. The real numbers are the sole source of logical difficulty in both mathematical physics and arithmetic geometry. Every non-constructive principle required by any physical theory or any theorem in arithmetic geometry enters through the Archimedean place---the completion of~$\Q$ at infinity, which gives~$\R$. More precisely, $\R$ carries three nested algebraic structures with increasing logical cost: its ring operations ($\BISH$), its ordering ($\LPO$), and its completeness ($\CLASS$). Physics invokes the ordering but not the completeness---hence the physics ceiling at $\LPO$. Arithmetic geometry invokes the completeness through period integrals and the trace formula---hence the arithmetic ceiling at $\CLASS$. Remove~$\R$ entirely and both fields collapse to $\BISH$. Paper~68~\cite{Paper68} showed that Fermat's Last Theorem is $\BISH$. Paper~69~\cite{Paper69} showed that the Langlands correspondence over function fields is $\BISH$. This paper identifies the common mechanism and explains why it is unique.
 
 The mechanism is $u(\R) = \infty$: the real numbers are the only completion of~$\Q$ where positive-definite quadratic forms exist in every dimension. The intuition that the continuum is the source of mathematical difficulty is as old as Brouwer; what is new is the uniform calibration across both physics and arithmetic geometry, the identification of $u(\R) = \infty$ as the specific mechanism forcing parallel architectures, and the projection-vs-search distinction explaining the $\MP$ gap. This single property forces three different fields to develop the same architecture. Physics builds Hilbert space inner products. Motivic arithmetic builds the Rosati involution. Automorphic theory builds the Petersson inner product. All three are positive-definite structures over~$\R$, all three serve the same logical function---extracting computable finite answers ($\BISH$) from infinite continuous data ($\LPO$)---and all three exist because $u(\R) = \infty$. The Langlands program's connections to physics (Kapustin--Witten~\cite{KapustinWitten}, Feigin--Frenkel~\cite{FeiginFrenkel}, Freed--Hopkins--Teleman~\cite{FHT}) are not three separate miracles but three instances of one logical constraint.
 
@@ -213,7 +213,7 @@ The difference between physics and number theory is how they descend. Physics ex
 
 \subsection{Main results}
 
-The following four theorems formalise the principle described above. The Constructive Reverse Mathematics (CRM) program calibrates mathematical structures against the hierarchy
+The following three theorems formalise the principle described above. The Constructive Reverse Mathematics (CRM) program calibrates mathematical structures against the hierarchy
 \[
 \BISH \;\subset\; \BISH + \MP \;\subset\; \BISH + \LLPO \;\subset\; \BISH + \WLPO \;\subset\; \BISH + \LPO \;\subset\; \CLASS.
 \]
@@ -226,7 +226,6 @@ Over 69~papers, the program measured the logical cost of physical theories (Pape
 
 \item[Theorem C] (Automorphic CRM Incompleteness). \leanok\ There exists an integer instance satisfying all three automorphic CRM axioms (Strong Multiplicity One, Shimura algebraicity, Petersson unitarity) that violates the Ramanujan bound. Witness: $a_p = 5$, $p = 5$, $k = 2$. Unitary: $|5| = 5 < 6 = p + 1$. Violates Ramanujan: $5^2 = 25 > 20 = 4p$. Pure $\Z$-arithmetic; zero custom axioms.
 
-\item[Theorem D] (Three Spectral Gaps). \leanok\ The spectral gap problems in physics (Cubitt--Perez-Garcia--Wolf~\cite{CPW}), automorphic theory (Selberg~\cite{Selberg}), and arithmetic (Kolyvagin~\cite{Kolyvagin}) share identical $\Sigma^0_2$ quantifier structure: $\exists\, \Delta > 0,\; \forall\, N:\; \Delta \leq f(N)$.
 \end{description}
 
 \subsection{Constructive Reverse Mathematics: a brief primer}
@@ -290,10 +289,6 @@ An automorphic CRM instance is a triple $(a_p, p, k) \in \Z \times \N \times \N$
 An automorphic instance $(a_p, p, k)$ satisfies the Ramanujan bound if $a_p^2 \leq 4 p^{k-1}$. For weight $k = 2$: $a_p^2 \leq 4p$.
 \end{definition}
 
-\begin{definition}[Spectral gap problem]
-A spectral gap problem is a proposition of the form $\exists\, \Delta > 0,\; \forall\, N:\; \Delta \leq f(N)$, where $f : \N \to \Z$ is a computable local quantity. This has $\Sigma^0_2$ arithmetic complexity: one existential quantifier followed by a universal.
-\end{definition}
-
 % ===========================================================
 \section{Main Results}
 \label{sec:results}
@@ -317,15 +312,27 @@ The program found a single structural principle underlying both physics and numb
 \end{theorem}
 
 \begin{proof}
-In the Lean formalization, each domain is modeled as a \texttt{DomainProfile} with a Boolean \texttt{has\_archimedean} field and a \texttt{DescentType} field. The functions \texttt{pre\_descent\_level} and \texttt{post\_descent\_level} compute the CRM levels deterministically. All seven conjuncts are verified by \texttt{native\_decide} on the constructor indices.
+We verify each conjunct from the programme's accumulated evidence.
 
-The universality claim~(vi) is a separate theorem \texttt{archimedean\_sole\_source}, proved by case-splitting on the descent type:
-\begin{lstlisting}
-theorem archimedean_sole_source (d : DescentType) :
-    post_descent_level {has_archimedean := false, descent := d}
-      = BISH := by
-  cases d <;> native_decide
-\end{lstlisting}
+\emph{(i)~Archimedean domains start at $\LPO$.}
+Continuum physics operates on $L^2(\R^n)$. The spectral theorem for unbounded self-adjoint operators on this space requires deciding $\sigma(H) \cap (-\infty, E] = \emptyset$ for $E \in \R$---a universal quantification over real approximants, which is $\LPO$ (Paper~2). Number field arithmetic operates over the Archimedean completion~$\R$, where testing $x = 0$ for a Cauchy sequence requires inspecting all approximants---again $\LPO$ (Paper~50, Remark~2.4).
+
+\emph{(ii)~Non-Archimedean domains are $\BISH$.}
+Lattice physics replaces $L^2(\R^n)$ with $\C^N$; the spectral theorem becomes diagonalization of an $N \times N$ Hermitian matrix, which is algebraic. Function field arithmetic over $\Fq(C)$ has no Archimedean place; the Grothendieck--Lefschetz trace formula is a finite identity of algebraic numbers, and the space of cusp forms of a fixed level is finite-dimensional by Harder's theorem. Both are $\BISH$ (Paper~69).
+
+\emph{(iii)~Physics descends by projection.}
+A quantum measurement computes $\langle \psi | A | \psi \rangle$: a single inner-product evaluation, which is a finite-rank operation on $L^2(\R^n)$. This is a computable function---no search over an infinite space. Projection eliminates both $\LPO$ and $\MP$ simultaneously, landing at $\BISH$.
+
+\emph{(iv)~Arithmetic descends by search.}
+The motive guarantees that algebraic answers exist (eliminating $\LPO$: eigenvalues are algebraic numbers, not transcendental), but finding the explicit witness---a generator of $E(\Q)$, a cycle in the Chow group---requires searching an infinite discrete space with no computable bound. This is precisely $\MP$: $\neg\neg\exists n.\, P(n) \to \exists n.\, P(n)$. Arithmetic descends to $\BISH + \MP$.
+
+\emph{(v)~The gap is strict: $\BISH < \BISH + \MP$.}
+$\MP$ is not a theorem of $\BISH$: Bridges and Richman~\cite{BridgesRichman} show that there exist $\BISH$-definable sequences $\alpha : \N \to \{0, 1\}$ where $\neg\neg\exists n.\, \alpha(n) = 1$ holds but no $\BISH$-computable procedure produces such~$n$.
+
+\emph{(vi)~Removing the Archimedean place collapses any domain to $\BISH$.}
+There are two cases. If descent is by projection, then without the Archimedean place the pre-descent level is already $\BISH$ (the spectral theory is finite-dimensional), so projection from $\BISH$ lands at $\BISH$. If descent is by search, the same reasoning applies: the pre-descent level is $\BISH$, and searching over a $\BISH$ space is $\BISH$ (the unbounded existential is over algebraic data that is already decidable). In either case, the post-descent level is $\BISH$. \qed
+
+The Lean formalization models each domain as a \texttt{DomainProfile} with Boolean \texttt{has\_archimedean} and \texttt{DescentType} fields; all seven conjuncts are verified by \texttt{native\_decide}.
 \end{proof}
 
 \subsubsection{$u(\R) = \infty$ as the common mechanism}
@@ -352,18 +359,26 @@ Removing the Archimedean place collapses both domains to $\BISH$.
 
 \emph{Physics}: replace the continuum with a finite lattice; $L^2(\R^n)$ becomes $\C^N$; the spectral theorem becomes matrix diagonalization; the logical cost drops from $\LPO$ to $\BISH$.
 
-\emph{Arithmetic}: replace $\Q$ with $\Fq(C)$; the Arthur--Selberg trace formula becomes the Grothendieck--Lefschetz trace formula; the space of cusp forms becomes finite-dimensional (Harder's theorem). Both Lafforgue proofs are $\BISH$ (Paper~69~\cite{Paper69}).
+\emph{Arithmetic}: replace $\Q$ with $\Fq(C)$; the Arthur--Selberg trace formula becomes the Grothendieck--Lefschetz trace formula; the space of cusp forms of a fixed level becomes finite-dimensional (Harder's theorem). Both Lafforgue proofs are $\BISH$ (Paper~69~\cite{Paper69}).
 
 \begin{theorem}[Archimedean Removal]
 \label{thm:removal}
-\leanok\ Removing the Archimedean place collapses both physics and arithmetic to $\BISH$:
+\leanok\ Removing the Archimedean place collapses both physics and arithmetic to $\BISH$.
+\end{theorem}
+
+\begin{proof}
+\emph{Physics.} Replace the continuum $L^2(\R^n)$ with a finite lattice $\C^N$. The Hamiltonian becomes an $N \times N$ Hermitian matrix; its spectrum is the set of $N$ eigenvalues of a finite matrix, computable by algebraic operations (characteristic polynomial + root isolation). No $\LPO$ is needed because the spectral data is finite.
+
+\emph{Arithmetic.} Replace $\Q$ with a function field $\Fq(C)$. The Arthur--Selberg trace formula, whose spectral side involves transcendental orbital integrals over $G(\R)$, is replaced by the Grothendieck--Lefschetz trace formula: a finite sum of algebraic numbers (Frobenius eigenvalues). The space of cusp forms of a fixed level on $G(\Fq(C)) \backslash G(\A_{\Fq(C)})$ is finite-dimensional by Harder's theorem. Both Lafforgue proofs ($\GL_2$ and $\GL_n$) are entirely $\BISH$ (Paper~69~\cite{Paper69}).
+
+In the Lean formalization:
 \begin{lstlisting}
 theorem archimedean_removal :
     post_descent_level lattice_physics = BISH ∧
     post_descent_level funcfield_arith = BISH := by
   constructor <;> native_decide
 \end{lstlisting}
-\end{theorem}
+\end{proof}
 
 \subsection{Theorem B: The MP Gap}
 
@@ -373,38 +388,46 @@ theorem archimedean_removal :
 \end{theorem}
 
 \begin{proof}
-In physics, descent is by \emph{projection}. Measurement computes $\langle \psi | A | \psi \rangle$: a single inner product, a finite-rank operation, a computable function. No search. The descent eliminates both $\LPO$ and $\MP$.
+The CRM hierarchy has a decidable total order $\BISH < \BISH{+}\MP < \LLPO < \WLPO < \LPO < \CLASS$. We show projection descent lands at $\BISH$ while search descent lands at $\BISH + \MP$, and $\BISH < \BISH + \MP$ in this order.
 
-In arithmetic, descent is by \emph{search}. The motive guarantees algebraic answers (eliminating $\LPO$), but finding the witness---a generator of $E(\Q)$, a cycle in the Chow group---requires searching an infinite discrete space with no computable bound. This is $\MP$: $\neg\neg\exists n \to \exists n$, but without a bound. Arithmetic descends $\LPO \to \BISH + \MP$.
+\emph{Projection descent yields $\BISH$.}
+In physics, a measurement of observable~$A$ in state~$|\psi\rangle$ computes $\langle \psi | A | \psi \rangle$: a single inner-product evaluation against a fixed operator. This is a finite-rank operation---it evaluates a real number from finitely many algebraic operations on the spectral data of~$A$. No unbounded search is required. The result is a computable function of the input state, which is $\BISH$.
 
-The Lean proof:
+\emph{Search descent yields $\BISH + \MP$.}
+In arithmetic, geometric origin (the DPT axioms) guarantees that the relevant spectral data is algebraic---Frobenius eigenvalues are algebraic integers, $L$-values at critical points are algebraic multiples of periods. This eliminates $\LPO$: the data belongs to the countable algebraic closure $\overline{\Q}$, not to the uncountable continuum~$\R$. However, \emph{locating} the explicit witness---the generator of $E(\Q)$ in BSD, the algebraic cycle in Hodge, the modular lifting in Langlands---requires searching an infinite discrete space (the Mordell--Weil group, the Chow group, the set of newforms at a given level). The motive guarantees $\neg\neg\exists n.\, P(n)$, but producing the witness requires $\exists n.\, P(n)$. The gap is $\MP$: Markov's Principle asserts that $\neg\neg\exists n.\, P(n) \to \exists n.\, P(n)$ for decidable~$P$, but it is not a theorem of $\BISH$.
+
+\emph{The gap is strict.}
+$\BISH + \MP$ is strictly stronger than $\BISH$. The classical proof: there exist $\BISH$-definable sequences $\alpha : \N \to \{0,1\}$ for which $\neg\neg\exists n.\,\alpha(n) = 1$ holds but no $\BISH$-computable procedure produces such~$n$. Thus projection descent ($\BISH$) is strictly stronger than search descent ($\BISH + \MP$), in the sense that it requires strictly fewer logical resources.
+
+In the Lean formalization:
 \begin{lstlisting}
 theorem mp_gap :
     descent_output projection < descent_output search := by
   unfold descent_output; native_decide
 \end{lstlisting}
-
-This is why number theory is harder than physics, in a precise logical sense. Physical measurement projects onto a finite-dimensional eigenspace. Motivic witness search ranges over infinite discrete spaces. The residual $\MP$ is Diophantine hardness.
 \end{proof}
 
 \subsection{Theorem C: Automorphic CRM Incompleteness}
 
 \subsubsection{The motivic bound (Weil RH from CRM)}
 
-The Rosati equation $\langle \Frob \cdot x, \Frob \cdot x \rangle = q^w \langle x, x \rangle$ with positive-definiteness ($\langle x, x \rangle > 0$ for $x \neq 0$) gives $|\alpha|^2 = q^w$ by a single cancellation:
+The Rosati involution on the endomorphism algebra of an abelian variety induces a positive-definite bilinear form $\langle \cdot, \cdot \rangle$ on the cohomology $H^*(X)$. The Rosati involution $\dagger$ satisfies $\Frob \circ \Frob^\dagger = q^w$ (multiplication by $q^w$ on the abelian variety), which gives the scaling identity $\langle \Frob \cdot x, \Frob \cdot x \rangle = q^w \langle x, x \rangle$, where $q$ is the cardinality of the base field and $w$ is the weight. If $\alpha$ is an eigenvalue of Frobenius on a one-dimensional eigenspace with eigenvector~$x \neq 0$, then:
+\[
+  |\alpha|^2 \cdot \langle x, x \rangle = \langle \alpha x, \alpha x \rangle = \langle \Frob \cdot x, \Frob \cdot x \rangle = q^w \cdot \langle x, x \rangle.
+\]
+Positive-definiteness gives $\langle x, x \rangle > 0$, hence $\langle x, x \rangle \neq 0$. Cancel to obtain $|\alpha|^2 = q^w$. This is the Weil Riemann Hypothesis: every eigenvalue of Frobenius has absolute value $q^{w/2}$.
 
+The proof uses only two facts: the Rosati scaling identity and positive-definiteness. Both are consequences of $u(\R) = \infty$: the inner product is positive-definite because $\R$ supports positive-definite forms in every dimension. The CRM cost is $\BISH$: the cancellation is algebraic, over an ordered field.
+
+In the Lean formalization, this is a two-line proof by \texttt{mul\_right\_cancel$_0$}:
 \begin{lstlisting}
 theorem weil_RH_from_CRM {R : Type*}
     [Field R] [LinearOrder R] [IsStrictOrderedRing R]
-    (alpha_sq qw ip_val : R)
-    (h_pos : ip_val > 0)
+    (alpha_sq qw ip_val : R) (h_pos : ip_val > 0)
     (h_rosati : alpha_sq * ip_val = qw * ip_val) :
     alpha_sq = qw := by
-  have h_ne : ip_val ≠ 0 := ne_of_gt h_pos
-  exact mul_right_cancel₀ h_ne h_rosati
+  exact mul_right_cancel₀ (ne_of_gt h_pos) h_rosati
 \end{lstlisting}
-
-This is the motivic side's sharp eigenvalue bound: two lines from a single axiom.
 
 \subsubsection{The automorphic gap}
 
@@ -416,69 +439,35 @@ The Petersson inner product yields only the unitary bound $|a_p| < p + 1$, excee
 \end{theorem}
 
 \begin{proof}
-The separating witness: $a_p = 5$, $p = 5$, $k = 2$.
+We construct an explicit integer triple satisfying all three automorphic CRM axioms but violating the Ramanujan bound.
 
-\emph{Unitarity check}: $|5| = 5 < 6 = 5 + 1$. \checkmark
+\emph{Setup.} The three automorphic CRM axioms (the automorphic analogues of the DPT axioms) are: (A1)~strong multiplicity one, (A2)~Shimura algebraicity ($a_p \in \Z$), and (A3)~Petersson unitarity ($|a_p| < p + 1$). The Ramanujan bound is the sharper inequality $a_p^2 \leq 4p$ (for weight $k = 2$).
 
-\emph{Ramanujan check}: $5^2 = 25 > 20 = 4 \cdot 5$. $\times$
+\emph{The witness.} Take $a_p = 5$, $p = 5$, $k = 2$.
 
+Unitarity: $|5| = 5 < 6 = 5 + 1$. The triple satisfies all three automorphic CRM axioms. \checkmark
+
+Ramanujan: $5^2 = 25 > 20 = 4 \cdot 5$. The Ramanujan bound is violated. $\times$
+
+\emph{The gap is structural, not accidental.} For any prime $p \geq 2$, the unitarity bound $(p+1)^2$ strictly exceeds the Ramanujan bound~$4p$:
+\[
+  (p+1)^2 - 4p = p^2 + 2p + 1 - 4p = p^2 - 2p + 1 = (p-1)^2 > 0.
+\]
+The last inequality holds because $p \geq 2$ implies $p - 1 \geq 1$. Thus for every prime~$p$, there is a gap between the unitarity bound and the Ramanujan bound in which a separating witness can be placed. (For $p \geq 5$, the choice $a_p = p$ works: unitarity gives $|p| = p < p + 1$, while Ramanujan gives $p^2 > 4p$ since $p > 4$.)
+
+The conclusion: the three automorphic CRM axioms are \emph{too weak} to recover the Ramanujan bound. The motivic side proves the sharp bound from a single finite-dimensional axiom (Rosati). The automorphic side would require an infinite schema: unitarity of $\mathrm{Sym}^m(\pi)$ for all~$m$. This is why Deligne crossed to the motivic side---the automorphic side lacks sharp bounds~\cite{Deligne74}.
+
+In the Lean formalization, the witness is verified by \texttt{native\_decide} and \texttt{omega}; the structural gap by \texttt{nlinarith}:
 \begin{lstlisting}
-def separatingWitness : AutomorphicCRMInstance where
-  a_p := 5; p := 5; k := 2
-  unitary := by native_decide
-
-theorem witness_violates_ramanujan :
-    ¬ SatisfiesRamanujan 5 5 2 := by
-  unfold SatisfiesRamanujan; omega
-
 theorem automorphic_crm_incomplete :
     ∃ (inst : AutomorphicCRMInstance),
       ¬ SatisfiesRamanujan inst.a_p inst.p inst.k :=
-  ⟨separatingWitness, witness_violates_ramanujan⟩
-\end{lstlisting}
+  ⟨⟨5, 5, 2, by native_decide⟩, by unfold SatisfiesRamanujan; omega⟩
 
-Pure $\Z$-arithmetic. Zero custom axioms.
-\end{proof}
-
-\begin{proposition}[The gap is structural]
-\label{prop:structural}
-\leanok\ For all $p \geq 2$: $(p + 1)^2 > 4p$.
-\end{proposition}
-
-\begin{proof}
-$(p+1)^2 - 4p = (p-1)^2 > 0$ for $p \geq 2$. In Lean:
-\begin{lstlisting}
-theorem unitary_exceeds_ramanujan (p : Nat) (hp : p >= 2) :
+theorem unitary_exceeds_ramanujan (p : Nat) (hp : p ≥ 2) :
     (p + 1) * (p + 1) > 4 * p := by nlinarith
 \end{lstlisting}
 \end{proof}
-
-The motivic side proves the sharp bound from a single finite-dimensional axiom (Rosati). The automorphic side would require an infinite schema: unitarity of $\mathrm{Sym}^m(\pi)$ for all~$m$. The Langlands correspondence collapses this infinite schema into a single geometric argument. Deligne used exactly this strategy: he crossed to the motivic side because the automorphic side lacks sharp bounds~\cite{Deligne74}.
-
-\subsection{Theorem D: Three Spectral Gaps}
-
-Three spectral gap problems, all $\Sigma^0_2$ ($\exists\, \Delta > 0,\; \forall\, N:\; \Delta \leq f(N)$):
-
-\begin{enumerate}
-\item \emph{Physics} (Cubitt--Perez-Garcia--Wolf~\cite{CPW}): $\mathrm{gap}(H_N) \geq \Delta$ for all lattice sizes $N$. Proved undecidable in general.
-\item \emph{Automorphic} (Selberg~\cite{Selberg}): $\lambda_1(\Gamma_0(N) \backslash \HH) \geq 1/4$ for all levels $N$. Open. Best bound: $975/4096 \approx 0.238$ (Kim--Sarnak~\cite{KimSarnak}).
-\item \emph{Arithmetic} (Kolyvagin~\cite{Kolyvagin}): $|\text{Sha}(E)| \leq B$ for all torsors. Partial (analytic rank $\leq 1$).
-\end{enumerate}
-
-\begin{theorem}[Three Spectral Gaps]
-\label{thm:D}
-\leanok\ All three problems have identical quantifier structure: $\Sigma^0_2$.
-\end{theorem}
-
-\begin{proof}
-All three are modeled as instances of \texttt{SpectralGapProblem}: a function $f : \N \to \Z$ with the claim $\exists\, b > 0,\; \forall\, N:\; b \leq f(N)$. The structural identity is witnessed by the type.
-\end{proof}
-
-\begin{remark}[Disanalogy for $\Sha$]
-The $\Sha$ bound shares the $\Sigma^0_2$ quantifier structure with the physics and automorphic spectral gaps but is not a spectral gap in the operator-theoretic sense: there is no self-adjoint operator whose spectrum encodes $|\Sha(E)|$. The structural parallel is logical (quantifier complexity) rather than mathematical (operator spectrum). Whether a deeper unification exists---connecting $\Sha$ finiteness to an actual spectral gap via the BSD $L$-function---remains open.
-\end{remark}
-
-The connections between the first two are not merely analogous. Lubotzky--Phillips--Sarnak~\cite{LPS} mapped the Ramanujan conjecture to optimal expander graphs. The Selberg trace formula \emph{is} the Gutzwiller trace formula~\cite{Gutzwiller} of quantum chaos. The trace formula connects all three: spectral side ($\LPO$) $=$ geometric side ($\BISH$).
 
 \subsection{The trace formula as descent equation}
 
@@ -519,7 +508,7 @@ The parallel is precise across three mechanisms:
 
 \emph{Spectral parameters.} Over number fields, automorphic spectral parameters are transcendental (Gamma factors $\Gamma(s)$ for $s \in i\R$), costing $\WLPO$. Over function fields, they are algebraic ($z = q^{-s}$ on a compact torus), costing $\BISH$. In physics, continuum eigenvalues are transcendental (solutions of $-\psi'' = E\psi$ on $\R$), while lattice eigenvalues are algebraic roots of the characteristic polynomial.
 
-\emph{Dimensional reduction.} Over number fields, the space of cusp forms on $L^2(G(\Q) \backslash G(\A))$ is infinite-dimensional. Over function fields, Harder's theorem makes it finite-dimensional. In physics, $L^2(\R^n)$ is infinite-dimensional; on a lattice, $\C^N$ is finite-dimensional.
+\emph{Dimensional reduction.} Over number fields, the space of cusp forms on $L^2(G(\Q) \backslash G(\A))$ is infinite-dimensional. Over function fields, Harder's theorem makes it finite-dimensional for a fixed level. In physics, $L^2(\R^n)$ is infinite-dimensional; on a lattice, $\C^N$ is finite-dimensional.
 
 \emph{Trace formula.} Over number fields, the Arthur--Selberg trace formula involves transcendental orbital integrals ($\log \varepsilon_K$). Over function fields, the Grothendieck--Lefschetz trace formula is a finite identity of algebraic numbers. In physics, the Gutzwiller trace formula on $\R$ involves transcendental action integrals; on a lattice, the trace is a finite sum.
 
@@ -588,7 +577,6 @@ Function field arithmetic & $\BISH$ & $\BISH$ & --- & \leanok \\
 Weil RH from CRM & \multicolumn{3}{l}{$\BISH$ (algebraic cancellation over ordered field)} & \leanok \\
 Automorphic incompleteness & \multicolumn{3}{l}{$\BISH$ (pure $\Z$-arithmetic, \texttt{omega}/\texttt{native\_decide})} & \leanok \\
 MP gap & \multicolumn{3}{l}{$\BISH$ (decidable comparison, \texttt{native\_decide})} & \leanok \\
-Three spectral gaps & \multicolumn{3}{l}{$\BISH$ (structural: type-level identity)} & \leanok \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -630,12 +618,11 @@ The Lean~4 bundle resides at \texttt{Papers/P70\_Archimedean/} with the followin
 \toprule
 \textbf{File} & \textbf{Lines} & \textbf{Content} \\
 \midrule
-\texttt{Defs.lean} & 80 & CRM hierarchy, descent types, domain profiles \\
+\texttt{Defs.lean} & 130 & CRM hierarchy, descent types, domain profiles, MP gap \\
 \texttt{WeilRH.lean} & 47 & Weil RH from CRM axioms (motivic two-liner) \\
 \texttt{Ramanujan.lean} & 100 & Automorphic CRM incompleteness ($\Z$-witness) \\
-\texttt{SpectralGaps.lean} & 90 & Three spectral gaps as $\Sigma^0_2$ + MP gap \\
 \texttt{ArchimedeanPrinciple.lean} & 100 & DPT assembly + main theorem \\
-\texttt{Main.lean} & 46 & Root module + \texttt{\#check} audit \\
+\texttt{Main.lean} & 40 & Root module + \texttt{\#check} audit \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -645,21 +632,8 @@ The Lean~4 bundle resides at \texttt{Papers/P70\_Archimedean/} with the followin
 
 \subsection{Axiom inventory}
 
-\begin{center}
-\small
-\begin{tabular}{rllll}
-\toprule
-\textbf{\#} & \textbf{Axiom} & \textbf{Status} & \textbf{Category} & \textbf{Reference} \\
-\midrule
-1 & \texttt{physics\_gap} & Structural & Three spectral gaps & CPW~\cite{CPW} \\
-2 & \texttt{selberg\_gap} & Structural & Three spectral gaps & Selberg~\cite{Selberg} \\
-3 & \texttt{sha\_gap} & Structural & Three spectral gaps & Kolyvagin~\cite{Kolyvagin} \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\medskip\noindent
-The three spectral gap axioms declare the \emph{existence} of these problems (as instances of \texttt{SpectralGapProblem}); they do not assert any mathematical claims about their solutions. All other results---the Archimedean Principle, the MP gap, the Weil RH, the automorphic CRM incompleteness---use \textbf{zero custom axioms}.
+\noindent
+\textbf{Zero custom axioms.} Every theorem in this paper---the Archimedean Principle, the MP gap, the Weil RH from CRM, automorphic CRM incompleteness---uses \textbf{zero custom axioms}. The only Lean axioms appearing in \texttt{\#print axioms} output are the three Lean infrastructure axioms (\texttt{propext}, \texttt{Quot.sound}, \texttt{Classical.choice}); the last appears only in \texttt{weil\_RH\_from\_CRM} due to Mathlib's ordered field infrastructure.
 
 \subsection{Key code snippets}
 
@@ -703,7 +677,6 @@ theorem witness_family (p : Nat) (hp : p >= 5) :
 \texttt{automorphic\_crm\_incomplete} & \textbf{None} \\
 \texttt{unitary\_exceeds\_ramanujan} & \textbf{None} \\
 \texttt{witness\_family} & \textbf{None} \\
-\texttt{three\_gaps\_same\_structure} & \texttt{physics\_gap}, \texttt{selberg\_gap}, \texttt{sha\_gap} \\
 \texttt{archimedean\_sole\_source} & \textbf{None} \\
 \bottomrule
 \end{tabular}
@@ -731,7 +704,6 @@ theorem witness_family (p : Nat) (hp : p >= 5) :
 \begin{enumerate}
 \item Can the $\MP$ gap be made finer? Is there a natural domain that descends to $\BISH + \LLPO$ (between physics and arithmetic)?
 \item The automorphic CRM incompleteness (Theorem~C) shows the automorphic axioms alone cannot recover Ramanujan. Can the precise logical content of the Langlands correspondence be formulated as a CRM axiom?
-\item The three spectral gaps share $\Sigma^0_2$ structure. Is the arithmetic complexity of each gap \emph{exactly} $\Sigma^0_2$-complete (as Cubitt--Perez-Garcia--Wolf~\cite{CPW} showed for the physics case)?
 \item Clausen--Scholze condensed mathematics~\cite{ClausenScholze} replaces topological vector spaces with condensed modules, eliminating many pathologies of functional analysis over~$\R$. If condensed methods provide an alternative descent mechanism that bypasses positive-definiteness, the uniqueness claim of the Archimedean Principle would need qualification. Auditing the CRM profile of condensed mathematics is a natural next step.
 \item Fargues--Scholze~\cite{FarguesScholze} geometrise the local Langlands correspondence via the Fargues--Fontaine curve, a fundamentally non-Archimedean construction. The Archimedean Principle predicts their framework should be $\BISH$ or nearly so. Auditing this would test the principle against a major recent advance.
 \item The CRM classifications identify precise logical boundaries where computational approximations of continuous mathematics must fail; the engineering implications for numerical stability, quantum computational complexity, and optimisation theory remain unexplored.
@@ -755,8 +727,18 @@ The logical cost of mathematics is the logical cost of~$\R$.
 \end{center}
 \end{mdframed}
 
+\begin{remark}[The Archimedean Stratification]\label{rmk:stratification}
+The statement above admits a precise refinement. The real numbers~$\R$ carry three nested algebraic structures, each with a different CRM cost:
+\begin{enumerate}[label=(\roman*)]
+\item $(\R, +, \times)$ as a ring: polynomial arithmetic, verifiable by \texttt{ring}. Cost: $\BISH$. This is the layer used by explicit physics (Schwarzschild by direct substitution, scattering amplitudes by polynomial evaluation) and by the algebraic de~Rham realization.
+\item $(\R, +, \times, <)$ as an ordered field: sign decisions, zero-testing, positive-definiteness. Cost: $\LPO$ (or $\WLPO$ for equality testing). This is the physics ceiling: $u(\R) = \infty$ lives here; spectral gap decidability (Paper~36), Fekete's lemma (Paper~29), and quantum spectral theory all invoke the ordering.
+\item $(\R, +, \times, <, \mathrm{LUB})$ as a complete ordered field: integration, $L^2$ spectral decomposition, existence of limits. Cost: $\CLASS$. This is the arithmetic geometry ceiling: period integrals, the Hodge decomposition, the trace formula, and the Betti realization all invoke completeness.
+\end{enumerate}
+The physics ceiling at $\LPO$ reflects physics's use of the ordering without completeness. The arithmetic geometry ceiling at $\CLASS$ (documented in Papers~45--49, 98) reflects the use of completeness through comparison isomorphisms. The algebra floor at $\BISH$ reflects the use of $\R$-as-ring alone. The ``logical cost of~$\R$'' is not a single number but a gradient: the cost depends on which layer is invoked.
+\end{remark}
+
 \medskip\noindent
-\textbf{What is proved} (Lean-verified, zero sorry): The Archimedean Principle (four-domain parameterization), the MP gap, the Weil RH from CRM axioms, automorphic CRM incompleteness, the three spectral gaps as $\Sigma^0_2$, the universality of Archimedean removal.
+\textbf{What is proved} (Lean-verified, zero sorry, zero custom axioms): The Archimedean Principle (four-domain parameterization), the MP gap, the Weil RH from CRM axioms, automorphic CRM incompleteness, the universality of Archimedean removal.
 
 \textbf{What is rigorous analysis}: the identification of $u(\R) = \infty$ as the common mechanism, the function field as lattice regularization.
 

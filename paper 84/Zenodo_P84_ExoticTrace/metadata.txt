@@ -1,0 +1,21 @@
+Title: Exotic Weil Classes as Flat Sections: Gauss-Manin Block Decomposition -- A CRMLint Squeeze (Paper 84, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: February 2026
+
+Description: Paper 84 of the Constructive Reverse Mathematics (CRM) Series. We compute the Gauss-Manin connection on the de Rham cohomology of a genus-4 hyperelliptic family C_t: y^2 = x^9 - tx^5 + x with Q(i)-action, using Griffiths pole-order reduction with the correct coboundary subtraction A_k = B_k - h_k'. An order-8 automorphism tau(x,y) = (ix, e^{pi*i/4} y) decomposes the 8x8 connection into four 2x2 blocks M_k = (2k+1)/(4(t^2-4)) * [[-t/2, -1], [1, t/2]]. Each block has G_gal(W_k) = SL_2 (nilpotent residues with non-proportional kernels, irreducible monodromy). Since det(SL_2) = 1, the induced action on the exotic line bundle wedge^4(V_+) is trivial: G_gal(wedge^4 V_+) = {1}. The exotic Weil class is a global flat section of the Gauss-Manin connection. Positive result: by Deligne's Theorem of the Fixed Part, the exotic class is absolute Hodge on every fiber. CRM Squeeze: BISH (Griffiths reduction + monodromy + det = 1) confirms the CLASS prediction (exotic Hodge classes exist). v3 corrects the v1 coboundary bug (A = B - h'), v1 automorphism misidentification (order-8 tau, not sigma^2), and v2 interpretation error (det(SL_2) = 1 gives trivial, not SL_2 x SL_2, exotic Galois group). Seventh CRMLint Squeeze. Lean 4 formalization with ring-verified polynomial identities, 0 sorry. The main squeeze theorem depends on no axioms whatsoever.
+
+Keywords: constructive reverse mathematics, Gauss-Manin connection, exotic Weil classes, Hodge conjecture, differential Galois theory, hyperelliptic curves, abelian fourfolds, monodromy, SL_2, flat section, absolute Hodge, Lean 4, formal verification
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Upload type: Publication / Preprint
+
+Related identifiers:
+- IsPartOf: 10.5281/zenodo.18791985 (Paper 80, Algebraic Gauss-Manin)
+- IsPartOf: 10.5281/zenodo.18801814 (Paper 81, Algebraic Flat Sections)
+- IsPartOf: 10.5281/zenodo.18801822 (Paper 82, Constructive Differential Galois Theory)
+- IsPartOf: 10.5281/zenodo.18801826 (Paper 83, Generic Picard Number)
