@@ -312,8 +312,8 @@ Every paper with its bottom line. Papers 1 and 3 withdrawn; Papers 60 and 62 ret
 | **90** | **The Squeeze Is a Microscope** | **SYNTHESIS MONOGRAPH. Generative phase retrospective (P76–89). Four theorems: Squeeze Protocol, Bifurcation, Hodge Horizon = WLPO, Asymmetric Offloading. No Lean bundle (pure synthesis).** |
 | 91 | Logical Cost of Unconditional Hodge (CRM Audit of Markman) | CRM audit of Markman arXiv:2502.03415. Squeeze 90% vs Markman 44% BISH |
 | 92 | Cohomological Flatness for Genera 5–8 via Zariski Grid | 13th CRMLint app. Extends trace vanishing via Schwartz-Zippel |
-| 93 | The Structural Vanishing Theorem | Explanatory capstone for P84–92. Two independent proofs (Varchenko + Deligne). 13 BISH + 4 CLASS |
-| 94 | Griffiths Group of the Mirror Quintic | 14th CRMLint app. First CRM of Calabi-Yau middle cohomology. Detection BISH, existence CLASS |
+| **93** | **The Structural Vanishing Theorem** | **Explanatory capstone for P84–92. τ₊ = 0 universally across all dimensions — two independent proofs (Varchenko + Deligne). 13 BISH + 4 CLASS.** |
+| **94** | **Griffiths Group of the Mirror Quintic** | **First CRM analysis of Calabi-Yau threefold middle cohomology. Detection (Walcher) BISH; existence (Abel-Jacobi, Baire) CLASS. 11 BISH + 3 CLASS.** |
 | 95 | The BSD Squeeze (Gross-Zagier-Kolyvagin) | 15th CRMLint app. First CRM audit of a Clay Millennium proof. 37a1 test case. 15 BISH + 6 CLASS (71%) |
 | 96 | The Root Number Bifurcation | 16th CRMLint app. BSD palindromic bifurcation. Rank 0 (11a1) detection BISH via modular symbols. 10 BISH + 3 CLASS (77%) |
 | 97 | BSD Landscape Survey — Null Finding | Internal note. No further CRMLint opportunities beyond P95–96 |
