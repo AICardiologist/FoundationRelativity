@@ -1,0 +1,31 @@
+Title: The Kuga-Satake Bifurcation: K3 Hodge Classes via Shioda-Inose Descent (Paper 100 of the Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: March 2026
+
+Description:
+We analyse the constructive reverse mathematics of the Hodge conjecture for K3 surfaces via the Kuga-Satake construction. The CRM cost bifurcates at Picard number rho = 20: for singular K3 surfaces, the Shioda-Inose structure provides CM elliptic curves and the CM metadata makes all Hodge-theoretic conclusions decidable (BISH); for generic rho < 20, the Mumford-Tate group is maximal and Betti realization is required (CLASS). The CRMLint decomposition yields 11 BISH + 5 CLASS = 16 components (69% BISH), with the bifurcation controlled by a single discrete invariant (the Picard number), exactly paralleling Paper 86's Kani-Rosen bifurcation for hyperelliptic Jacobians.
+
+This is the sixteenth CRMLint application, the first CRM analysis of K3 Hodge theory, and the final paper (Paper 100) of the Constructive Reverse Mathematics Series. The Conservation Conjecture -- that every CLASS theorem with a BISH-statable conclusion admits a lower-level proof -- is stated as the programme's principal open problem, consistent with all evidence from Papers 84-100.
+
+A companion 0-sorry Lean 4 bundle (700 lines) mechanically verifies the CRM framework, including K3 lattice arithmetic, Kuga-Satake dimension formulas, CRM level assignments, and the bifurcation theorem.
+
+Keywords: constructive reverse mathematics, K3 surfaces, Kuga-Satake construction, Shioda-Inose structure, Hodge conjecture, CRMLint, Lean 4, formal verification, Bishop constructive mathematics, Picard number, complex multiplication, Mumford-Tate group, Conservation Conjecture
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related identifiers:
+- Paper 86 (Kani-Rosen Hodge): DOI 10.5281/zenodo.18809903
+- Paper 87 (Omniscience Cost of Hodge): DOI 10.5281/zenodo.18809903
+- Paper 90 (Squeeze Microscope): DOI 10.5281/zenodo.18809911
+- Paper 93 (Structural Vanishing): DOI 10.5281/zenodo.18816989
+- Paper 98 (Motivic CRM Architecture): DOI 10.5281/zenodo.18828345
+- Paper 99 (Hecke Theta Squeeze): DOI pending
+- CRM Format Guide: DOI 10.5281/zenodo.18765700
+- CRMLint (Paper 76): DOI 10.5281/zenodo.18779362
+
+Upload type: publication
+Publication type: article

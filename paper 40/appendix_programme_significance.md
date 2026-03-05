@@ -205,10 +205,10 @@ The most celebrated undecidability result in mathematical physics reduces to LPO
 
 ---
 
-**Paper 39: Beyond LPO — Thermodynamic Stratification of Physical Undecidability**
+**Paper 39: Physics Reaches Σ₂⁰ — The Physical Stratification of Undecidability**
 DOI: 10.5281/zenodo.18642806
 
-Establishes the ceiling on physical undecidability: extensive observables cap at LPO; intensive observables without promise gaps can reach LPO′ (Σ₂⁰). This is the program's most precise statement about the logical limits of physics: not only is every empirical prediction bounded by BISH + LPO, but even the undecidability phenomena are stratified and bounded. The arithmetical hierarchy, which in pure mathematics extends without limit, is effectively truncated at the second level when applied to physical systems.
+Establishes the ceiling on physical undecidability: the epistemic mode (exact vs promise-gapped vs empirical) determines the arithmetic level. Exact observables without promise gap reach LPO′ (Σ₂⁰); promise-gapped and empirical observables cap at LPO (Σ₁⁰). This is the program's most precise statement about the logical limits of physics: not only is every empirical prediction bounded by BISH + LPO, but even the undecidability phenomena are stratified and bounded. The arithmetical hierarchy, which in pure mathematics extends without limit, is effectively truncated at the second level when applied to physical systems.
 
 > *Physics is not just computable at BISH + LPO — its undecidability is bounded too.*
 

@@ -1,0 +1,26 @@
+Title: The Structural Vanishing Theorem: Why Exotic Weil Classes Are Universally Flat (Paper 93 of the Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: 2026-02-28
+
+Description:
+Papers 84-92 of this series verified computationally that the Gauss-Manin trace on the determinant bundle of the sigma-eigenspace vanishes identically for odd hyperelliptic Weil families in genera 2 through 8. This paper provides two independent structural proofs explaining this vanishing. Proof 1 uses the Aomoto-Varchenko period determinant formula: the substitution u = x^2 reduces the eigenspace to H^1 of a fractional local system, whose root-root Varchenko exponents cancel to zero (discriminant drops out) while the root-origin exponent is frozen at -1/4 by Vieta's formula applied to the palindromic-adjacent polynomial P(u) = u^g + ... + 1. Proof 2 uses Deligne regularity and Picard-Lefschetz theory: the trace form can only have logarithmic poles along the discriminant and boundary divisors; unipotent monodromy kills the discriminant term, and the unit coefficient constraint kills the boundary terms. The algebraic backbone (exponent arithmetic, Vieta's formula, intersection numbers, boundary freezing) is verified in Lean 4 with Mathlib. The topological inputs are axiom stubs classified as CLASS. CRM score: 13 BISH + 4 CLASS = 17 components.
+
+Keywords: constructive reverse mathematics, Gauss-Manin connection, Weil classes, hyperelliptic curves, Varchenko formula, Deligne regularity, Picard-Lefschetz, Lean 4, formal verification
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+DOI: 10.5281/zenodo.18816989
+
+Related identifiers:
+- Paper 84: DOI 10.5281/zenodo.18802819
+- Paper 85: DOI 10.5281/zenodo.18806608
+- Paper 86: DOI 10.5281/zenodo.18809903
+- Paper 89: DOI 10.5281/zenodo.18809909
+- Paper 91: DOI 10.5281/zenodo.18809917
+
+Upload type: publication
+Publication type: preprint

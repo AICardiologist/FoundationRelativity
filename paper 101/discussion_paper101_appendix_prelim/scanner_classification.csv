@@ -1,0 +1,209 @@
+file,line,level,reason,location,category,section_type,justification
+BerkovichMotives.tex,50,BISH,motivic sheaf/cohomology (algebraic),Preamble,BISH,motivation,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,60,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Introduction,A,motivation,Introductory citation establishing background context for condensed mathematics
+BerkovichMotives.tex,62,BISH,motivic sheaf/cohomology (algebraic),Introduction,BISH,motivation,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,62,BISH,six-functor formalism (categorical),Introduction,BISH,motivation,Genuine algebraic marker; six-functor formalism is categorical/BISH
+BerkovichMotives.tex,62,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Introduction,A,motivation,Introductory citation establishing background context for condensed mathematics
+BerkovichMotives.tex,64,WKL,perfectoid (inverse limit / tilting),Introduction,A,motivation,WKL marker in introduction; motivational context only
+BerkovichMotives.tex,69,BISH,motivic sheaf/cohomology (algebraic),Introduction,BISH,motivation,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,70,BISH,motivic sheaf/cohomology (algebraic),Introduction,BISH,motivation,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,74,WKL,adic space (inverse limit of affinoids),Introduction,A,motivation,WKL marker in introduction; motivational context only
+BerkovichMotives.tex,76,WKL,Berkovich spectrum (profinite/inverse limit),Introduction,A,motivation,WKL marker in introduction; motivational context only
+BerkovichMotives.tex,83,WKL,Berkovich spectrum (profinite/inverse limit),Introduction,A,motivation,WKL marker in introduction; motivational context only
+BerkovichMotives.tex,83,WKL,arc-topology (profinite descent),Introduction,A,motivation,WKL marker in introduction; motivational context only
+BerkovichMotives.tex,92,WKL,Berkovich spectrum (profinite/inverse limit),Introduction,A,motivation,WKL marker in introduction; motivational context only
+BerkovichMotives.tex,96,WKL,arc-topology (profinite descent),Introduction,A,motivation,WKL marker in introduction; motivational context only
+BerkovichMotives.tex,100,BISH,motivic sheaf/cohomology (algebraic),Introduction,BISH,motivation,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,145,BISH,Tate twist (algebraic),Introduction,BISH,motivation,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,153,BISH,motivic sheaf/cohomology (algebraic),Introduction,BISH,motivation,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,159,BISH,Tate twist (algebraic),Introduction,BISH,motivation,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,188,BISH,motivic sheaf/cohomology (algebraic),Introduction,BISH,motivation,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,194,WLPO,normed completion,Introduction,A,motivation,Describing classical analytic approach in introduction; not in proof
+BerkovichMotives.tex,208,WLPO,normed completion,Introduction,A,motivation,Describing classical analytic approach in introduction; not in proof
+BerkovichMotives.tex,220,BISH,Tate twist (algebraic),Introduction,BISH,motivation,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,234,BISH,motivic sheaf/cohomology (algebraic),Introduction,BISH,motivation,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,234,BISH,Tate twist (algebraic),Introduction,BISH,motivation,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,236,BISH,motivic sheaf/cohomology (algebraic),Introduction,BISH,motivation,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,258,BISH,Tate twist (algebraic),Introduction,BISH,motivation,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,274,WKL,Berkovich spectrum (profinite/inverse limit),Banach rings and Berkovich spectrum,C,definition,Genuine profinite/inverse limit construction in Banach rings and Berkovich spectrum
+BerkovichMotives.tex,294,WLPO,completed normed group,Banach rings and Berkovich spectrum,B,definition,Banach ring/field infrastructure; analytic wrapper not proof logic
+BerkovichMotives.tex,294,WLPO,Cauchy completion,Banach rings and Berkovich spectrum,B,definition,Banach ring/field infrastructure; analytic wrapper not proof logic
+BerkovichMotives.tex,297,WLPO,completed normed group,Banach rings and Berkovich spectrum,B,definition,Banach ring/field infrastructure; analytic wrapper not proof logic
+BerkovichMotives.tex,299,WLPO,normed completion,Banach rings and Berkovich spectrum,B,definition,Banach ring/field infrastructure; analytic wrapper not proof logic
+BerkovichMotives.tex,307,LPO,normed filtration (decidable norm comparison),Banach rings and Berkovich spectrum,B,definition,Seminorm filtration R>=0 indexing; analytic formalism parasitic on algebraic content
+BerkovichMotives.tex,371,LPO,normed filtration (decidable norm comparison),Free seminormed rings,B,definition,Seminorm filtration R>=0 indexing; analytic formalism parasitic on algebraic content
+BerkovichMotives.tex,391,WKL,Berkovich spectrum (profinite/inverse limit),Banach fields,C,definition,Genuine profinite/inverse limit construction in Banach fields
+BerkovichMotives.tex,403,WLPO,normed completion,Banach fields,B,definition,Banach ring/field infrastructure; analytic wrapper not proof logic
+BerkovichMotives.tex,403,WLPO,completion of (semi/pseudo-)normed group,Banach fields,B,definition,Banach ring/field infrastructure; analytic wrapper not proof logic
+BerkovichMotives.tex,403,WLPO,completed normed group,Banach fields,B,definition,Banach ring/field infrastructure; analytic wrapper not proof logic
+BerkovichMotives.tex,412,LPO,normed filtration (decidable norm comparison),Banach fields,B,definition,Seminorm filtration R>=0 indexing; analytic formalism parasitic on algebraic content
+BerkovichMotives.tex,424,WKL,condensed mathematics (profinite structure),Banach fields,C,definition,Structural WKL: condensed mathematics profinite structure in Banach fields
+BerkovichMotives.tex,429,WKL,condensed mathematics (profinite structure),Banach fields,C,definition,Structural WKL: condensed mathematics profinite structure in Banach fields
+BerkovichMotives.tex,434,WLPO,normed completion,Banach fields,B,definition,Banach ring/field infrastructure; analytic wrapper not proof logic
+BerkovichMotives.tex,436,WKL,Berkovich spectrum (profinite/inverse limit),Banach fields,C,definition,Genuine profinite/inverse limit construction in Banach fields
+BerkovichMotives.tex,438,WLPO,normed completion,Banach fields,B,definition,Banach ring/field infrastructure; analytic wrapper not proof logic
+BerkovichMotives.tex,478,LPO,normed filtration (decidable norm comparison),Gelfand transform,B,definition,Seminorm filtration R>=0 indexing; analytic formalism parasitic on algebraic content
+BerkovichMotives.tex,478,WLPO,normed completion,Gelfand transform,B,definition,Banach ring/field infrastructure; analytic wrapper not proof logic
+BerkovichMotives.tex,483,WLPO,normed completion,The nonarchimedean unit disc,B,definition,Banach ring/field infrastructure; analytic wrapper not proof logic
+BerkovichMotives.tex,483,WLPO,completion of (semi/pseudo-)normed group,The nonarchimedean unit disc,B,definition,Banach ring/field infrastructure; analytic wrapper not proof logic
+BerkovichMotives.tex,501,WKL,inverse limit of finite objects,The nonarchimedean unit disc,C,definition,Genuine profinite/inverse limit construction in The nonarchimedean unit disc
+BerkovichMotives.tex,505,WKL,inverse limit of finite objects,The nonarchimedean unit disc,C,definition,Genuine profinite/inverse limit construction in The nonarchimedean unit disc
+BerkovichMotives.tex,510,WLPO,normed completion,The nonarchimedean unit disc,B,definition,Banach ring/field infrastructure; analytic wrapper not proof logic
+BerkovichMotives.tex,511,WLPO,normed completion,The nonarchimedean unit disc,B,definition,Banach ring/field infrastructure; analytic wrapper not proof logic
+BerkovichMotives.tex,511,WLPO,completion of (semi/pseudo-)normed group,The nonarchimedean unit disc,B,definition,Banach ring/field infrastructure; analytic wrapper not proof logic
+BerkovichMotives.tex,512,WLPO,normed completion,The nonarchimedean unit disc,B,definition,Banach ring/field infrastructure; analytic wrapper not proof logic
+BerkovichMotives.tex,512,WLPO,completion of (semi/pseudo-)normed group,The nonarchimedean unit disc,B,definition,Banach ring/field infrastructure; analytic wrapper not proof logic
+BerkovichMotives.tex,517,WKL,arc-topology (profinite descent),The arc-topology,C,proof,Structural WKL: arc-topology profinite descent in The arc-topology
+BerkovichMotives.tex,528,WKL,Berkovich spectrum (profinite/inverse limit),The arc-topology,C,proof,Genuine profinite/inverse limit construction in The arc-topology
+BerkovichMotives.tex,544,WLPO,completed normed group,The arc-topology,B,proof,Banach ring formalism carried through The arc-topology; parasitic
+BerkovichMotives.tex,544,WKL,Berkovich spectrum (profinite/inverse limit),The arc-topology,C,proof,Genuine profinite/inverse limit construction in The arc-topology
+BerkovichMotives.tex,546,WKL,Berkovich spectrum (profinite/inverse limit),The arc-topology,C,proof,Genuine profinite/inverse limit construction in The arc-topology
+BerkovichMotives.tex,556,WLPO,normed completion,The arc-topology,B,proof,Banach ring formalism carried through The arc-topology; parasitic
+BerkovichMotives.tex,571,WLPO,normed completion,The arc-topology,B,proof,Banach ring formalism carried through The arc-topology; parasitic
+BerkovichMotives.tex,571,WLPO,completion of (semi/pseudo-)normed group,The arc-topology,B,proof,Banach ring formalism carried through The arc-topology; parasitic
+BerkovichMotives.tex,571,WKL,arc-topology (profinite descent),The arc-topology,C,proof,Structural WKL: arc-topology profinite descent in The arc-topology
+BerkovichMotives.tex,588,WLPO,normed completion,The arc-topology,B,proof,Banach ring formalism carried through The arc-topology; parasitic
+BerkovichMotives.tex,588,WKL,arc-topology (profinite descent),The arc-topology,C,proof,Structural WKL: arc-topology profinite descent in The arc-topology
+BerkovichMotives.tex,595,WLPO,normed completion,The arc-topology,B,proof,Banach ring formalism carried through The arc-topology; parasitic
+BerkovichMotives.tex,608,WKL,condensed mathematics (profinite structure),The arc-topology,C,proof,Structural WKL: condensed mathematics profinite structure in The arc-topology
+BerkovichMotives.tex,635,WKL,inverse limit of finite objects,The arc-topology,C,proof,Genuine profinite/inverse limit construction in The arc-topology
+BerkovichMotives.tex,639,LPO,normed filtration (decidable norm comparison),The arc-topology,B,proof,Seminorm filtration R>=0 indexing; analytic formalism parasitic on algebraic content
+BerkovichMotives.tex,642,WKL,arc-topology (profinite descent),The arc-topology,C,proof,Structural WKL: arc-topology profinite descent in The arc-topology
+BerkovichMotives.tex,645,WKL,arc-topology (profinite descent),The arc-topology,C,proof,Structural WKL: arc-topology profinite descent in The arc-topology
+BerkovichMotives.tex,647,WKL,arc-topology (profinite descent),The arc-topology,C,proof,Structural WKL: arc-topology profinite descent in The arc-topology
+BerkovichMotives.tex,660,WKL,Berkovich spectrum (profinite/inverse limit),The arc-topology,C,proof,Genuine profinite/inverse limit construction in The arc-topology
+BerkovichMotives.tex,662,WLPO,normed completion,The arc-topology,B,proof,Banach ring formalism carried through The arc-topology; parasitic
+BerkovichMotives.tex,665,WKL,perfectoid (inverse limit / tilting),The arc-topology,C,proof,Genuine profinite/inverse limit construction in The arc-topology
+BerkovichMotives.tex,667,WKL,perfectoid (inverse limit / tilting),The arc-topology,C,proof,Genuine profinite/inverse limit construction in The arc-topology
+BerkovichMotives.tex,667,WKL,arc-topology (profinite descent),The arc-topology,C,proof,Structural WKL: arc-topology profinite descent in The arc-topology
+BerkovichMotives.tex,670,WKL,perfectoid (inverse limit / tilting),The arc-topology,C,proof,Genuine profinite/inverse limit construction in The arc-topology
+BerkovichMotives.tex,685,BISH,motivic sheaf/cohomology (algebraic),Finitary arc-sheaves,BISH,proof,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,703,WLPO,normed completion,Finitary arc-sheaves,B,proof,Banach ring formalism carried through Finitary arc-sheaves; parasitic
+BerkovichMotives.tex,711,WKL,inverse limit of finite objects,Finitary arc-sheaves,C,proof,Genuine profinite/inverse limit construction in Finitary arc-sheaves
+BerkovichMotives.tex,743,WLPO,normed completion,Finitary arc-sheaves,B,proof,Banach ring formalism carried through Finitary arc-sheaves; parasitic
+BerkovichMotives.tex,753,WLPO,normed completion,Finitary arc-sheaves,B,proof,Banach ring formalism carried through Finitary arc-sheaves; parasitic
+BerkovichMotives.tex,753,WLPO,completion of (semi/pseudo-)normed group,Finitary arc-sheaves,B,proof,Banach ring formalism carried through Finitary arc-sheaves; parasitic
+BerkovichMotives.tex,753,WLPO,completed normed group,Finitary arc-sheaves,B,proof,Banach ring formalism carried through Finitary arc-sheaves; parasitic
+BerkovichMotives.tex,828,WKL,condensed mathematics (profinite structure),Finitary arc-sheaves,C,proof,Structural WKL: condensed mathematics profinite structure in Finitary arc-sheaves
+BerkovichMotives.tex,852,BISH,six-functor formalism (categorical),Finitary arc-sheaves,BISH,proof,Genuine algebraic marker; six-functor formalism is categorical/BISH
+BerkovichMotives.tex,909,LPO,normed filtration (decidable norm comparison),Finitary arc-sheaves,B,proof,Seminorm filtration R>=0 indexing; analytic formalism parasitic on algebraic content
+BerkovichMotives.tex,938,WKL,Berkovich spectrum (profinite/inverse limit),Finitary arc-sheaves,C,proof,Genuine profinite/inverse limit construction in Finitary arc-sheaves
+BerkovichMotives.tex,956,BISH,motivic sheaf/cohomology (algebraic),Effective motives,BISH,proof,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,1086,BISH,Tate twist (algebraic),Effective motives,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,1108,BISH,motivic sheaf/cohomology (algebraic),Free motivic sheaves,BISH,proof,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,1172,BISH,Tate twist (algebraic),The Tate twist,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,1229,BISH,Tate twist (algebraic),The Tate twist,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,1275,BISH,motivic sheaf/cohomology (algebraic),Free motivic sheaves,BISH,proof,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,1277,BISH,motivic sheaf/cohomology (algebraic),Free motivic sheaves,BISH,proof,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,1279,WLPO,normed completion,Free motivic sheaves,B,proof,Banach ring formalism carried through Free motivic sheaves; parasitic
+BerkovichMotives.tex,1279,BISH,motivic sheaf/cohomology (algebraic),Free motivic sheaves,BISH,proof,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,1290,WLPO,normed completion,Free motivic sheaves,B,proof,Banach ring formalism carried through Free motivic sheaves; parasitic
+BerkovichMotives.tex,1307,WLPO,normed completion,Free motivic sheaves,B,proof,Banach ring formalism carried through Free motivic sheaves; parasitic
+BerkovichMotives.tex,1412,WKL,perfectoid (inverse limit / tilting),Free motivic sheaves,C,proof,Genuine profinite/inverse limit construction in Free motivic sheaves
+BerkovichMotives.tex,1565,BISH,motivic sheaf/cohomology (algebraic),$K$-theory,BISH,proof,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,1575,BISH,motivic sheaf/cohomology (algebraic),$K$-theory,BISH,proof,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,1607,WLPO,normed completion,$K$-theory,B,proof,Banach ring formalism carried through $K$-theory; parasitic
+BerkovichMotives.tex,1607,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",$K$-theory,C,proof,Structural dependency on condensed mathematics infrastructure in proof section
+BerkovichMotives.tex,1614,WLPO,normed completion,$K$-theory,B,proof,Banach ring formalism carried through $K$-theory; parasitic
+BerkovichMotives.tex,1637,WLPO,normed completion,$K$-theory,B,proof,Banach ring formalism carried through $K$-theory; parasitic
+BerkovichMotives.tex,1707,WLPO,normed completion,$K$-theory,B,proof,Banach ring formalism carried through $K$-theory; parasitic
+BerkovichMotives.tex,1715,WLPO,completion of (semi/pseudo-)normed group,$K$-theory,B,proof,Banach ring formalism carried through $K$-theory; parasitic
+BerkovichMotives.tex,1745,WKL,perfectoid (inverse limit / tilting),$K$-theory,C,proof,Genuine profinite/inverse limit construction in $K$-theory
+BerkovichMotives.tex,1747,WKL,perfectoid (inverse limit / tilting),$K$-theory,C,proof,Genuine profinite/inverse limit construction in $K$-theory
+BerkovichMotives.tex,1763,WKL,perfectoid (inverse limit / tilting),$K$-theory,C,proof,Genuine profinite/inverse limit construction in $K$-theory
+BerkovichMotives.tex,1775,WKL,perfectoid (inverse limit / tilting),$K$-theory,C,proof,Genuine profinite/inverse limit construction in $K$-theory
+BerkovichMotives.tex,1831,BISH,motivic sheaf/cohomology (algebraic),$ D_{mot,BISH,proof,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,1856,WKL,Berkovich spectrum (profinite/inverse limit),$ D_{mot,C,proof,Genuine profinite/inverse limit construction in $ D_{mot
+BerkovichMotives.tex,1924,BISH,six-functor formalism (categorical),$ D_{mot,BISH,proof,Genuine algebraic marker; six-functor formalism is categorical/BISH
+BerkovichMotives.tex,1924,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",$ D_{mot,C,proof,Structural dependency on condensed mathematics infrastructure in proof section
+BerkovichMotives.tex,1929,LPO,norm filtration cutoff (decidable ≤ on ℝ),$ D_{mot,B,proof,Seminorm filtration R>=0 indexing; analytic formalism parasitic on algebraic content
+BerkovichMotives.tex,1943,WKL,Berkovich spectrum (profinite/inverse limit),$ D_{mot,C,proof,Genuine profinite/inverse limit construction in $ D_{mot
+BerkovichMotives.tex,1946,BISH,Tate twist (algebraic),$ D_{mot,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,1955,BISH,Tate twist (algebraic),$ D_{mot,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,1967,BISH,six-functor formalism (categorical),$ D_{mot,BISH,proof,Genuine algebraic marker; six-functor formalism is categorical/BISH
+BerkovichMotives.tex,1967,BISH,Tate twist (algebraic),$ D_{mot,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,1984,BISH,Tate twist (algebraic),$ D_{mot,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,1995,BISH,Tate twist (algebraic),$ D_{mot,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,2043,BISH,six-functor formalism (categorical),$ D_{mot,BISH,proof,Genuine algebraic marker; six-functor formalism is categorical/BISH
+BerkovichMotives.tex,2048,BISH,Tate twist (algebraic),Mixed Tate motives,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,2065,BISH,Tate twist (algebraic),Mixed Tate motives,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,2068,BISH,Tate twist (algebraic),Mixed Tate motives,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,2104,BISH,motivic sheaf/cohomology (algebraic),$ D_{mot,BISH,proof,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+BerkovichMotives.tex,2155,BISH,Tate twist (algebraic),$ D_{mot,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,2157,BISH,Tate twist (algebraic),$ D_{mot,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,2160,WLPO,normed completion,$ D_{mot,B,proof,Banach ring formalism carried through $ D_{mot; parasitic
+BerkovichMotives.tex,2169,BISH,Tate twist (algebraic),$ D_{mot,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+BerkovichMotives.tex,2276,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Relation to v-stacks,C,proof,Structural dependency on condensed mathematics infrastructure in proof section
+BerkovichMotives.tex,2318,WKL,perfectoid (inverse limit / tilting),Relation to v-stacks,C,proof,Genuine profinite/inverse limit construction in Relation to v-stacks
+BerkovichMotives.tex,2318,WKL,arc-topology (profinite descent),Relation to v-stacks,C,proof,Structural WKL: arc-topology profinite descent in Relation to v-stacks
+MotivicGeometrization.tex,72,BISH,motivic sheaf/cohomology (algebraic),Preamble,BISH,motivation,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+MotivicGeometrization.tex,72,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Preamble,A,motivation,Introductory citation establishing background context for condensed mathematics
+MotivicGeometrization.tex,82,WLPO,normed completion (Cauchy convergence test),Introduction,A,motivation,Describing classical analytic approach in introduction; not in proof
+MotivicGeometrization.tex,84,WLPO,normed completion (Cauchy convergence test),Introduction,A,motivation,Describing classical analytic approach in introduction; not in proof
+MotivicGeometrization.tex,86,WLPO,normed completion (Cauchy convergence test),Introduction,A,motivation,Describing classical analytic approach in introduction; not in proof
+MotivicGeometrization.tex,86,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Introduction,A,motivation,Introductory citation establishing background context for condensed mathematics
+MotivicGeometrization.tex,97,WKL,perfectoid (inverse limit / tilting),Introduction,A,motivation,WKL marker in introduction; motivational context only
+MotivicGeometrization.tex,97,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Introduction,A,motivation,Introductory citation establishing background context for condensed mathematics
+MotivicGeometrization.tex,103,WLPO,normed completion (Cauchy convergence test),Introduction,A,motivation,Describing classical analytic approach in introduction; not in proof
+MotivicGeometrization.tex,107,BISH,"Lafforgue (function field Langlands, algebraic)",Introduction,BISH,motivation,Genuine algebraic marker; Langlands function field theory is BISH
+MotivicGeometrization.tex,111,WLPO,normed completion (Cauchy convergence test),Introduction,A,motivation,Describing classical analytic approach in introduction; not in proof
+MotivicGeometrization.tex,115,WLPO,normed completion (Cauchy convergence test),Introduction,A,motivation,Describing classical analytic approach in introduction; not in proof
+MotivicGeometrization.tex,119,WLPO,normed completion (Cauchy convergence test),Introduction,A,motivation,Describing classical analytic approach in introduction; not in proof
+MotivicGeometrization.tex,123,WLPO,normed completion (Cauchy convergence test),Introduction,A,motivation,Describing classical analytic approach in introduction; not in proof
+MotivicGeometrization.tex,133,BISH,motivic sheaf/cohomology (algebraic),Introduction,BISH,motivation,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+MotivicGeometrization.tex,133,BISH,six-functor formalism (categorical),Introduction,BISH,motivation,Genuine algebraic marker; six-functor formalism is categorical/BISH
+MotivicGeometrization.tex,133,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Introduction,A,motivation,Introductory citation establishing background context for condensed mathematics
+MotivicGeometrization.tex,135,BISH,motivic sheaf/cohomology (algebraic),Introduction,BISH,motivation,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+MotivicGeometrization.tex,137,BISH,motivic sheaf/cohomology (algebraic),Introduction,BISH,motivation,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+MotivicGeometrization.tex,143,WLPO,normed completion (Cauchy convergence test),Introduction,A,motivation,Describing classical analytic approach in introduction; not in proof
+MotivicGeometrization.tex,145,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Introduction,A,motivation,Introductory citation establishing background context for condensed mathematics
+MotivicGeometrization.tex,149,WKL,perfectoid (inverse limit / tilting),Basic results,C,proof,Genuine profinite/inverse limit construction in Basic results
+MotivicGeometrization.tex,149,BISH,motivic sheaf/cohomology (algebraic),Basic results,BISH,proof,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+MotivicGeometrization.tex,149,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Basic results,C,proof,Structural dependency on condensed mathematics infrastructure in proof section
+MotivicGeometrization.tex,163,BISH,motivic sheaf/cohomology (algebraic),Basic results,BISH,proof,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+MotivicGeometrization.tex,163,BISH,"Fontaine-Laffaille (p-adic, algebraic)",Basic results,BISH,proof,Genuine algebraic marker; Fontaine-Laffaille theory is BISH
+MotivicGeometrization.tex,163,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Basic results,C,proof,Structural dependency on condensed mathematics infrastructure in proof section
+MotivicGeometrization.tex,170,BISH,six-functor formalism (categorical),Basic results,BISH,proof,Genuine algebraic marker; six-functor formalism is categorical/BISH
+MotivicGeometrization.tex,174,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Basic results,C,proof,Structural dependency on condensed mathematics infrastructure in proof section
+MotivicGeometrization.tex,176,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Basic results,C,proof,Structural dependency on condensed mathematics infrastructure in proof section
+MotivicGeometrization.tex,185,WKL,perfectoid (inverse limit / tilting),Basic results,C,proof,Genuine profinite/inverse limit construction in Basic results
+MotivicGeometrization.tex,185,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Basic results,C,proof,Structural dependency on condensed mathematics infrastructure in proof section
+MotivicGeometrization.tex,225,WKL,perfectoid (inverse limit / tilting),Basic results,C,proof,Genuine profinite/inverse limit construction in Basic results
+MotivicGeometrization.tex,264,WKL,adic space (inverse limit of affinoids),Basic results,C,proof,Genuine profinite/inverse limit construction in Basic results
+MotivicGeometrization.tex,264,WKL,perfectoid (inverse limit / tilting),Basic results,C,proof,Genuine profinite/inverse limit construction in Basic results
+MotivicGeometrization.tex,264,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Basic results,C,proof,Structural dependency on condensed mathematics infrastructure in proof section
+MotivicGeometrization.tex,297,BISH,motivic sheaf/cohomology (algebraic),Basic results,BISH,proof,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+MotivicGeometrization.tex,325,LPO,normed filtration (decidable norm comparison),Basic results,B,proof,Seminorm filtration R>=0 indexing; analytic formalism parasitic on algebraic content
+MotivicGeometrization.tex,325,WLPO,completed normed group,Basic results,B,proof,Banach ring formalism carried through Basic results; parasitic
+MotivicGeometrization.tex,385,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",$ D_{mot,C,proof,Structural dependency on condensed mathematics infrastructure in proof section
+MotivicGeometrization.tex,387,BISH,motivic sheaf/cohomology (algebraic),$ D_{mot,BISH,proof,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+MotivicGeometrization.tex,391,BISH,six-functor formalism (categorical),$ D_{mot,BISH,proof,Genuine algebraic marker; six-functor formalism is categorical/BISH
+MotivicGeometrization.tex,404,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",$ D_{mot,C,proof,Structural dependency on condensed mathematics infrastructure in proof section
+MotivicGeometrization.tex,436,WKL,perfectoid (inverse limit / tilting),$ D_{mot,C,proof,Genuine profinite/inverse limit construction in $ D_{mot
+MotivicGeometrization.tex,498,WLPO,normed completion (Cauchy convergence test),Stacks of $L$-parameters,B,proof,Banach ring formalism carried through Stacks of $L$-parameters; parasitic
+MotivicGeometrization.tex,498,BISH,Tate twist (algebraic),Stacks of $L$-parameters,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+MotivicGeometrization.tex,500,WLPO,normed completion (Cauchy convergence test),Stacks of $L$-parameters,B,proof,Banach ring formalism carried through Stacks of $L$-parameters; parasitic
+MotivicGeometrization.tex,527,BISH,Tate twist (algebraic),Stacks of $L$-parameters,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+MotivicGeometrization.tex,558,WLPO,normed completion (Cauchy convergence test),Stacks of $L$-parameters,B,proof,Banach ring formalism carried through Stacks of $L$-parameters; parasitic
+MotivicGeometrization.tex,567,WLPO,normed completion,Stacks of $L$-parameters,B,proof,Banach ring formalism carried through Stacks of $L$-parameters; parasitic
+MotivicGeometrization.tex,572,WLPO,normed completion (Cauchy convergence test),Stacks of $L$-parameters,B,proof,Banach ring formalism carried through Stacks of $L$-parameters; parasitic
+MotivicGeometrization.tex,575,WLPO,normed completion (Cauchy convergence test),Stacks of $L$-parameters,B,proof,Banach ring formalism carried through Stacks of $L$-parameters; parasitic
+MotivicGeometrization.tex,666,BISH,Tate twist (algebraic),Geometric Satake,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+MotivicGeometrization.tex,714,BISH,motivic sheaf/cohomology (algebraic),Geometric Satake,BISH,proof,Genuine algebraic marker; motivic sheaf/cohomology is BISH
+MotivicGeometrization.tex,739,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Geometric Satake,C,proof,Structural dependency on condensed mathematics infrastructure in proof section
+MotivicGeometrization.tex,747,BISH,Tate twist (algebraic),Geometric Satake,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+MotivicGeometrization.tex,767,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Geometric Satake,C,proof,Structural dependency on condensed mathematics infrastructure in proof section
+MotivicGeometrization.tex,769,WLPO,normed completion (Cauchy convergence test),Geometric Satake,B,proof,Banach ring formalism carried through Geometric Satake; parasitic
+MotivicGeometrization.tex,771,WLPO,normed completion (Cauchy convergence test),Geometric Satake,B,proof,Banach ring formalism carried through Geometric Satake; parasitic
+MotivicGeometrization.tex,780,WLPO,normed completion (Cauchy convergence test),Geometric Satake,B,proof,Banach ring formalism carried through Geometric Satake; parasitic
+MotivicGeometrization.tex,780,BISH,Tate twist (algebraic),Geometric Satake,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+MotivicGeometrization.tex,790,WLPO,normed completion (Cauchy convergence test),Synopsis,B,proof,Banach ring formalism carried through Synopsis; parasitic
+MotivicGeometrization.tex,792,WLPO,normed completion (Cauchy convergence test),Synopsis,B,proof,Banach ring formalism carried through Synopsis; parasitic
+MotivicGeometrization.tex,800,WLPO,normed completion (Cauchy convergence test),Synopsis,B,proof,Banach ring formalism carried through Synopsis; parasitic
+MotivicGeometrization.tex,805,WLPO,normed completion (Cauchy convergence test),Synopsis,B,proof,Banach ring formalism carried through Synopsis; parasitic
+MotivicGeometrization.tex,818,WLPO,normed completion (Cauchy convergence test),Synopsis,B,proof,Banach ring formalism carried through Synopsis; parasitic
+MotivicGeometrization.tex,834,WLPO,normed completion (Cauchy convergence test),Synopsis,B,proof,Banach ring formalism carried through Synopsis; parasitic
+MotivicGeometrization.tex,874,WLPO,normed completion (Cauchy convergence test),Synopsis,B,proof,Banach ring formalism carried through Synopsis; parasitic
+MotivicGeometrization.tex,874,BISH,Tate twist (algebraic),Synopsis,BISH,proof,Genuine algebraic marker; Tate twist is BISH
+MotivicGeometrization.tex,874,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Synopsis,C,proof,Structural dependency on condensed mathematics infrastructure in proof section
+MotivicGeometrization.tex,874,WKL,"Scholze, Lectures on Analytic Geometry (Tychonoff gates)",Synopsis,C,proof,Structural dependency on condensed mathematics infrastructure in proof section

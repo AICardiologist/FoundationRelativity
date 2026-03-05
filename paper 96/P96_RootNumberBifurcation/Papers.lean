@@ -1,0 +1,8 @@
+import Papers.P96_RootNumberBifurcation.CRMLevel
+import Papers.P96_RootNumberBifurcation.HeckeData11a1
+import Papers.P96_RootNumberBifurcation.ModularSymbol
+import Papers.P96_RootNumberBifurcation.BSDRank0
+import Papers.P96_RootNumberBifurcation.HeckeData37a1
+import Papers.P96_RootNumberBifurcation.Descent37a1
+import Papers.P96_RootNumberBifurcation.Bifurcation
+import Papers.P96_RootNumberBifurcation.Paper96_Assembly

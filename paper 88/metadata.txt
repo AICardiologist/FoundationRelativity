@@ -1,0 +1,27 @@
+Title: Fermat Domination and the Variational Hodge Conjecture: A CRMLint Squeeze (Paper 88, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: February 2026
+
+Description:
+Paper 88 of the Constructive Reverse Mathematics (CRM) Series. We address the asymmetric genus-4 hyperelliptic family C_t: y^2 = x^9 + tx^7 + x from Paper 85, whose Jacobian is generically absolutely simple. Unlike the symmetric family of Paper 86, no reciprocal involution exists (the core polynomial x^8 + tx^6 + 1 is not palindromic), so the Kani-Rosen splitting is unavailable.
+
+We prove the Hodge Conjecture conditionally using CM specialization and variational Hodge theory. At t = 0, the curve C_0: y^2 = x^9 + x is explicitly dominated by the Fermat curve F_16: u^16 + v^16 = 1 via the rational map x = u^2/v^2, y = u/v^9. By Shioda's theorem (1982), the exotic Weil class is algebraic at t = 0. Since Paper 85 proved the exotic trace tau_+ = 0 over Q(t) (the class is a global flat section), the Variational Hodge Conjecture spreads algebraicity from the CM fiber to the generic fiber.
+
+The constructive content (BISH) establishes the Fermat domination, trace vanishing, and non-palindromic obstruction. The classical content (CLASS) is isolated to exactly two axioms: Shioda's Fermat Hodge Conjecture and the Variational Hodge Conjecture. Tenth CRMLint Squeeze.
+
+Lean 4 formalization: 411 lines across 2 files (FermatData.lean, Paper88_Variational.lean). Zero sorry. Axiom inventory: propext, Classical.choice (Q infrastructure), Quot.sound. Toolchain: leanprover/lean4:v4.29.0-rc2.
+
+Keywords: Hodge conjecture, Weil abelian fourfolds, exotic Weil classes, Fermat curves, Fermat domination, Shioda's theorem, variational Hodge conjecture, Gauss-Manin connection, constructive reverse mathematics, CRMLint, Lean 4, formal verification
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related identifiers:
+- Paper 84 (Gauss-Manin block decomposition): https://doi.org/10.5281/zenodo.18802819
+- Paper 85 (Universal flatness): https://doi.org/10.5281/zenodo.18806608
+- Paper 80 (Algebraic Gauss-Manin): https://doi.org/10.5281/zenodo.18791985
+
+Upload type: Publication / Preprint

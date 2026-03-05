@@ -1,0 +1,34 @@
+Title: The Squeeze Is a Microscope: Automated Constructivization from CRMLint to the Hodge Horizon (Paper 90, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: February 2026
+
+Description: Synthesis monograph covering the generative phase (Papers 76-89) of the Constructive Reverse Mathematics program. Documents the CRMLint Squeeze protocol, a four-step procedure that isolates the constructive core of classical theorems. Across eleven Squeeze applications spanning Hodge theory, the Langlands program, differential Galois theory, and algebraic geometry, the protocol decomposes classical proofs into BISH-verified components (polynomial identities, dimension data, trace computations — all checked by Lean 4's ring and decide tactics) and irreducible CLASS boundary nodes (existence-of-algebraic-cycle assertions). The Hodge campaign (Papers 84-89) applies the Squeeze to exotic Weil classes on genus-4 hyperelliptic Jacobians, revealing a bifurcation: unconditional algebraicity on the palindromic locus via Kani-Rosen splitting, and CLASS-conditional algebraicity on the generic complement via the Variational Hodge Conjecture. Paper 87's calibration shows the uniform Hodge test is equivalent to WLPO, explaining why all known Hodge results require algebraic metadata. Reports aggregate Lean 4 statistics: approximately 5,300 lines across 12 papers, zero sorry, verified on Mathlib toolchain v4.28.0-rc1.
+
+Keywords: constructive reverse mathematics, CRMLint, Hodge conjecture, Weil classes, Variational Hodge Conjecture, Bishop constructive mathematics, Lean 4, formal verification, omniscience hierarchy, Kani-Rosen splitting, Gauss-Manin connection
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Upload type: publication / preprint
+
+Related identifiers:
+- IsPartOf: 10.5281/zenodo.17054050 (CRM Series concept record)
+- References: 10.5281/zenodo.18776113 (Paper 67, previous synthesis)
+- References: 10.5281/zenodo.18705837 (Paper 50, atlas)
+- References: 10.5281/zenodo.18777596 (Paper 77)
+- References: 10.5281/zenodo.18789008 (Paper 78)
+- References: 10.5281/zenodo.18791985 (Paper 80)
+- References: 10.5281/zenodo.18801814 (Paper 81)
+- References: 10.5281/zenodo.18801822 (Paper 82)
+- References: 10.5281/zenodo.18801826 (Paper 83)
+- References: 10.5281/zenodo.18802819 (Paper 84)
+- References: 10.5281/zenodo.18806608 (Paper 85)
+- References: 10.5281/zenodo.18809903 (Paper 86)
+- References: 10.5281/zenodo.18809903 (Paper 87)
+- References: 10.5281/zenodo.18809905 (Paper 88)
+- References: 10.5281/zenodo.18809909 (Paper 89)
+- References: 10.5281/zenodo.18765393 (Paper 72)
+- References: 10.5281/zenodo.18773827 (Paper 74)

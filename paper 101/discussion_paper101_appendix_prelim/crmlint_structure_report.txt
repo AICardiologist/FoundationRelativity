@@ -1,0 +1,116 @@
+╔════════════════════════════════════════════════════════════════════════╗
+║               CRMlint Proof Structure & Complexity Report              ║
+║              Logical × Structural × Architectural Analysis             ║
+╚════════════════════════════════════════════════════════════════════════╝
+
+  Total declarations analyzed: 627
+
+  ────────────────────────────────────────────────────────────────────
+  AXIS 1: CRM SIGNATURE DISTRIBUTION
+  ────────────────────────────────────────────────────────────────────
+    BISH       604  ( 96.3%)  ████████████████████████████████████████████████
+    MP           0  (  0.0%)  
+    LLPO         0  (  0.0%)  
+    WKL          0  (  0.0%)  
+    WLPO        21  (  3.3%)  █
+    LPO          0  (  0.0%)  
+    CLASS        2  (  0.3%)  
+
+  ────────────────────────────────────────────────────────────────────
+  PROOF TYPE DISTRIBUTION
+  ────────────────────────────────────────────────────────────────────
+    TRIVIAL                443  ( 70.7%)  ███████████████████████████████████
+    ALGEBRAIC               95  ( 15.2%)  ███████
+    STANDARD                60  (  9.6%)  ████
+    COMPUTATIONAL           23  (  3.7%)  █
+    BIFURCATING              4  (  0.6%)  
+    CLASSICAL                2  (  0.3%)  
+
+  ────────────────────────────────────────────────────────────────────
+  AXIS 2: STRUCTURAL COMPLEXITY STATISTICS
+  ────────────────────────────────────────────────────────────────────
+    Metric                             Mean   Median      Max
+    ──────────────────────────────────────────────────────
+    Proof lines                         5.0        4       57
+    Dependency depth (have/let)         0.3        0        8
+    Active hypotheses                   0.4        0        8
+    Cyclomatic complexity               1.5        1       15
+    Overall complexity score          0.038    0.026    0.479
+
+  ────────────────────────────────────────────────────────────────────
+  TACTIC FREQUENCY (top 20)
+  ────────────────────────────────────────────────────────────────────
+    simp                   577  ( 27.5%)  ███████████████████████████
+    rw                     448  ( 21.3%)  █████████████████████
+    exact                  214  ( 10.2%)  ██████████
+    have                   167  (  7.9%)  ███████
+    rfl                     82  (  3.9%)  ███
+    ext                     80  (  3.8%)  ███
+    refine                  80  (  3.8%)  ███
+    apply                   79  (  3.8%)  ███
+    intro                   72  (  3.4%)  ███
+    obtain                  30  (  1.4%)  █
+    rcases                  28  (  1.3%)  █
+    ring                    23  (  1.1%)  █
+    by_cases                22  (  1.0%)  █
+    congr                   19  (  0.9%)  
+    let                     17  (  0.8%)  
+    constructor             16  (  0.8%)  
+    cases                   16  (  0.8%)  
+    norm_num                15  (  0.7%)  
+    positivity              14  (  0.7%)  
+    norm_cast               14  (  0.7%)  
+
+  ────────────────────────────────────────────────────────────────────
+  CRM × DOMAIN CROSS-TABULATION
+  ────────────────────────────────────────────────────────────────────
+    Domain                       N   BISH    WKL   WLPO  CLASS   AvgCx
+    ──────────────────────────────────────────────────────────────
+    Algebra (Field Theory)      61     58      0      2      1   0.054
+    Algebra (Linear)            39     39      0      0      0   0.023
+    Algebra (Ring Theory)       57     57      0      0      0   0.037
+    Algebraic Geometry          68     66      0      2      0   0.021
+    Analysis                   224    218      0      5      1   0.033
+    Number Theory               27     27      0      0      0   0.049
+    Representation Theory       67     55      0     12      0   0.070
+    Topology                    84     84      0      0      0   0.036
+
+  ────────────────────────────────────────────────────────────────────
+  TOP 15 MOST COMPLEX PROOFS
+  ────────────────────────────────────────────────────────────────────
+    CRM    Type                Cx   Ln  Dp  Wd  Cy Name
+    ──────────────────────────────────────────────────────────────────
+    CLASS  CLASSICAL        0.479    8   3   2   2 lemma finiteDimensional_of_finite
+    CLASS  CLASSICAL        0.458   13   0   0   4 theorem tendsto_pow_atTop_nhds_zero_of_lt_one
+    WLPO   ALGEBRAIC        0.333    9   2   2   2 theorem ofMulAction_apply
+    WLPO   ALGEBRAIC        0.329   11   0   3   1 noncomputable def ofModule'
+    WLPO   ALGEBRAIC        0.329   11   0   3   1 noncomputable def ofModule
+    WLPO   ALGEBRAIC        0.316   14   0   0   3 noncomputable instance RCLike.toInnerProductSpaceReal
+    WLPO   ALGEBRAIC        0.311   11   0   0   1 theorem coe_innerₛₗ_apply
+    WLPO   ALGEBRAIC        0.311   11   0   0   1 theorem innerₛₗ_apply_apply
+    WLPO   ALGEBRAIC        0.311   11   0   0   1 def innerₛₗ
+    WLPO   ALGEBRAIC        0.311   11   0   0   1 def innerₗ
+    WLPO   ALGEBRAIC        0.310   10   0   0   1 noncomputable def finsuppLEquivFreeAsModule
+    WLPO   ALGEBRAIC        0.300    6   0   0   1 noncomputable def normalAutEquivQuotient
+    WLPO   ALGEBRAIC        0.300    6   0   0   2 noncomputable def tprod
+    WLPO   ALGEBRAIC        0.297    5   0   0   2 noncomputable def ofMulAction
+    WLPO   ALGEBRAIC        0.287    3   0   0   1 noncomputable def restrictRestrictAlgEquivMapHom
+
+  ────────────────────────────────────────────────────────────────────
+  ARCHIMEDEAN OBSTRUCTION THESIS: STRUCTURAL VERIFICATION
+  ────────────────────────────────────────────────────────────────────
+  Do Archimedean proofs systematically differ in structure?
+
+    Metric                        Archimedean     Non-Arch    Delta
+    ────────────────────────────────────────────────────────────
+    Avg complexity score                 0.05         0.04 +   0.02
+    Avg proof lines                      7.95         4.75 +   3.20
+    Avg dependency depth                 0.72         0.26 +   0.46
+    Avg active hypotheses                0.81         0.37 +   0.44
+    Avg external lemmas                  0.65         0.15 +   0.50
+    Avg automation ratio                 0.22         0.39   -0.17
+
+    Archimedean proofs: 43  |  Non-Archimedean: 584
+    VERDICT: Archimedean proofs are 1.4x more complex. Thesis SUPPORTED.
+
+══════════════════════════════════════════════════════════════════════════

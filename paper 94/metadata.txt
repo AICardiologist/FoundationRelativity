@@ -1,0 +1,24 @@
+Title: The Griffiths Group of the Mirror Quintic: A CRMLint Squeeze (Paper 94, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: 2026-02-28
+
+Description:
+This paper applies the CRMLint Squeeze protocol to the Griffiths group of a Calabi-Yau 3-fold, using the mirror quintic as the primary test case. Walcher (2007) computed the inhomogeneous Picard-Fuchs equation for the real Lagrangian RP^3 in the mirror quintic X_5: the domainwall tension T(z) satisfies L * T(z) = (15/8) * sqrt(z), where L is the 4th-order Picard-Fuchs operator in CDGP coordinates. The source term is algebraic, determined by the topology of the real cycle. The normal function expansion T = sqrt(z) * sum b_n z^n has leading coefficient b_0 = 30 (Walcher's disk count of holomorphic disks of minimal area) and b_n satisfying a rational recurrence. Four theorems: (A) The PF differential algebra is BISH (13 sub-results verified by ring/norm_num/rfl). (B) Walcher's inhomogeneous equation verified algebraically: source coefficient (15/8)^2 = 225/64, disk count b_0 = 30, recurrence at 5 indices. (C) The Normal Function Squeeze: detection via algebraic source term is BISH, Abel-Jacobi integration and Baire category infinite generation are irreducibly CLASS. (D) Voisin decomposition: 11 BISH + 3 CLASS, all CLASS unused in constructive path. Lean 4 formalization with Mathlib, approximately 500 lines, 0 sorry.
+
+Keywords: constructive reverse mathematics, Griffiths group, Calabi-Yau threefold, mirror quintic, Picard-Fuchs equation, normal function, Walcher, open mirror symmetry, Lean 4, formal verification
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related identifiers:
+- Paper 93: DOI 10.5281/zenodo.18816989
+- Paper 80: DOI 10.5281/zenodo.18791985
+- Paper 87: DOI 10.5281/zenodo.18809903
+
+DOI: 10.5281/zenodo.18820969
+
+Upload type: publication
+Publication type: preprint

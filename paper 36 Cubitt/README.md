@@ -4,6 +4,8 @@
 
 Paul Chun-Kit Lee (dr.paul.c.lee@gmail.com), February 2026
 
+DOI: [10.5281/zenodo.18642620](https://doi.org/10.5281/zenodo.18642620)
+
 ## Overview
 
 Cubitt, Perez-Garcia and Wolf (2015) proved that determining whether a many-body
@@ -35,9 +37,14 @@ thermodynamic limit. The same LPO that is already required for phase transitions
 | Finite-volume gap | BISH | Finite-dimensional eigenvalue |
 | Thermodynamic limit | LPO | BMC for sequence of gaps |
 | Pointwise decidability | LPO | Instance-by-instance |
-| Gap zero-test (Delta = 0 v Delta > 0) | WLPO | Subsumed by LPO |
+| Gap zero-test (Delta = 0 v Delta != 0) | WLPO | Negative disjunct; subsumed by LPO |
 | Uniform decidability | LPO | Halting reduction |
 | Not computable (without oracle) | -- | Halting problem |
+
+**Note on WLPO formulation:** The zero-test uses the negative disjunct
+Delta != 0 (not Delta > 0). The positive formulation Delta = 0 v Delta > 0
+would be LPO, not WLPO. Upgrading Delta != 0 to Delta > 0 requires
+Markov's Principle, and WLPO + MP = LPO.
 
 ## How to Open and Build
 
@@ -89,7 +96,7 @@ Mathlib's real number construction --- not an object-level non-constructive prin
 | `bmc_of_lpo` | Bridges and Vita (2006), Theorem 2.1.5 |
 | `wlpo_of_lpo` | Standard CRM hierarchy |
 | `halting_problem_undecidable` | Turing (1936) |
-| `wlpo_to_zero_test` / `zero_test_to_wlpo` | Zero-test equivalence |
+| `wlpo_to_zero_test` / `zero_test_to_wlpo` | WLPO <-> zero-test (negative formulation) |
 
 **Zero sorry.**
 
@@ -110,53 +117,12 @@ P36_CubittStratification/              Lean 4 formalization
     FiniteGap.lean         50 lines    Theorem 1: finite-volume gap (BISH)
     ThermoLimit.lean      102 lines    Theorem 2: thermo limit <-> LPO
     Pointwise.lean         50 lines    Theorem 3: pointwise decidability (LPO)
-    ZeroTest.lean          61 lines    Theorem 4: gap zero-test <-> WLPO
+    ZeroTest.lean          73 lines    Theorem 4: gap zero-test <-> WLPO
     UniformDecidability.lean 113 lines Theorem 5: uniform decidability <-> LPO
     Main.lean              99 lines    Master theorem + axiom audit
 ```
 
-8 Lean source files, 655 lines total.
-
-## Complete Paper List
-
-Other papers in the Constructive Reverse Mathematics Series (see Zenodo for current files):
-
-- Paper 1: Withdrawn
-- Paper 2: Bidual gap and WLPO -- DOI: 10.5281/zenodo.17107493
-- Paper 3: Withdrawn
-- Paper 4: Quantum spectra axiom calibration -- DOI: 10.5281/zenodo.17059483
-- Paper 5: Schwarzschild curvature verification -- DOI: 10.5281/zenodo.18489703
-- Paper 6: Heisenberg uncertainty (v2, CRM over Mathlib) -- DOI: 10.5281/zenodo.18519836
-- Paper 7: Physical bidual gap, trace-class operators -- DOI: 10.5281/zenodo.18527559
-- Paper 8: 1D Ising model and LPO -- DOI: 10.5281/zenodo.18516813
-- Paper 9: Ising formulation-invariance -- DOI: 10.5281/zenodo.18517570
-- Paper 10: Logical geography of mathematical physics -- DOI: 10.5281/zenodo.18627193
-- Paper 11: Entanglement, CHSH, Tsirelson bound -- DOI: 10.5281/zenodo.18527676
-- Paper 12: Constructive history of mathematical physics -- DOI: 10.5281/zenodo.18627283
-- Paper 13: Event horizon as logical boundary -- DOI: 10.5281/zenodo.18529007
-- Paper 14: Quantum decoherence -- DOI: 10.5281/zenodo.18569068
-- Paper 15: Noether theorem -- DOI: 10.5281/zenodo.18572494
-- Paper 16: Technical note: Born rule -- DOI: 10.5281/zenodo.18575377
-- Paper 17: Bekenstein-Hawking formula -- DOI: 10.5281/zenodo.18597306
-- Paper 18: Yukawa RG constructive stratification -- DOI: 10.5281/zenodo.18626839
-- Paper 19: WKB tunneling and LLPO -- DOI: 10.5281/zenodo.18602596
-- Paper 20: Observable-dependent logical cost, 1D Ising magnetization and WLPO -- DOI: 10.5281/zenodo.18603079
-- Paper 21: Bell nonlocality and LLPO -- DOI: 10.5281/zenodo.18603251
-- Paper 22: Markov's Principle and radioactive decay -- DOI: 10.5281/zenodo.18603503
-- Paper 23: Fan Theorem and optimization -- DOI: 10.5281/zenodo.18604312
-- Paper 24: Kochen-Specker contextuality and LLPO -- DOI: 10.5281/zenodo.18604317
-- Paper 25: Ergodic theorems and laws of large numbers -- DOI: 10.5281/zenodo.18615453
-- Paper 26: Bidual gap detection, Godel sequences -- DOI: 10.5281/zenodo.18615457
-- Paper 27: IVT as mechanism behind LLPO in Bell physics -- DOI: 10.5281/zenodo.18615459
-- Paper 28: Classical mechanics -- DOI: 10.5281/zenodo.18616620
-- Paper 29: Fekete's Subadditive Lemma and LPO -- DOI: 10.5281/zenodo.18643617
-- Paper 30: Physical dispensability of the Fan Theorem -- DOI: 10.5281/zenodo.18638394
-- Paper 31: Physical dispensability of Dependent Choice -- DOI: 10.5281/zenodo.18645578
-- Paper 32: QED one-loop renormalization, Landau pole -- DOI: 10.5281/zenodo.18642598
-- Paper 33: QCD one-loop renormalization and confinement -- DOI: 10.5281/zenodo.18642610
-- Paper 34: Scattering amplitudes are constructively computable -- DOI: 10.5281/zenodo.18642612
-- Paper 35: The logical constitution of empirical physics -- DOI: 10.5281/zenodo.18642616
-- Paper 36: Stratifying spectral gap undecidability (Cubitt's theorem) -- This paper
+8 Lean source files, 667 lines total.
 
 ## License
 

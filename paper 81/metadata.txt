@@ -1,0 +1,32 @@
+Title: The Fixed Part Theorem via Tensor Gauss-Manin: A CRMLint Squeeze (Paper 81, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University
+
+Date: February 2026
+
+Description:
+Paper 81 of the Constructive Reverse Mathematics Series computes the 4x4 tensor Gauss-Manin connection on H^1 tensor H^1 for the Legendre elliptic family y^2 = x(x-1)(x-t) via the Kronecker sum N(t) = M tensor I_2 + I_2 tensor M, where M is the 2x2 base connection matrix from Paper 80.
+
+The symplectic intersection form W = (0,1,-1,0) is verified as a constant flat section: N(t) * W = 0 for all t in Q, by four polynomial identities proved via the ring tactic. The symmetric form S = (0,1,1,0) is not flat. The full kernel of N(t) over Q(t) is two-dimensional, but restricting to constant (parameter-independent) vectors yields exactly span{W}, one-dimensional.
+
+This is the algebraic analogue of Deligne's Theorem of the Fixed Part (1972): the classical proof requires the topological monodromy representation, the Schmid orbit theorem, and the comparison theorem (all CLASS). The constructive path computes the same answer by polynomial linear algebra over Q[t], entirely within BISH.
+
+CRM descent: CLASS (Deligne's monodromy theorem + comparison theorem) to BISH (polynomial linear algebra over Q[t], verified by ring).
+
+Lean 4 formalization: 457 lines, 25 identities, 0 sorry. The squeeze theorem's axiom inventory contains only Lean kernel axioms (propext, Classical.choice, Quot.sound); deligne_fixed_part_existence does not appear. Fourth CRMLint Squeeze application (after Papers 77, 78, 80).
+
+Keywords: constructive reverse mathematics, flat sections, Gauss-Manin connection, tensor connection, Kronecker sum, Theorem of the Fixed Part, Deligne, Hodge theory, elliptic curves, Legendre family, Lean 4, formal verification, CRMLint Squeeze, BISH
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Upload type: publication / preprint
+
+Related identifiers:
+- Paper 80 (Algebraic Gauss-Manin): https://doi.org/10.5281/zenodo.18791985
+- Paper 78 (Wild LLC Squeeze): https://doi.org/10.5281/zenodo.18789008
+- Paper 77 (Hodge Decompositions): https://doi.org/10.5281/zenodo.18777596
+- Paper 72 (DPT Characterization): https://doi.org/10.5281/zenodo.18765393
+- Paper 50 (DPT Framework): https://doi.org/10.5281/zenodo.14538379
+- CRM Series Format Guide: https://doi.org/10.5281/zenodo.18765700

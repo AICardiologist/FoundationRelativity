@@ -1,0 +1,42 @@
+Monodromy analysis for each 2x2 block
+Block k: W_k = span(omega_k, omega_{k+4})
+M_k = c_k * [[-t/2, -1], [1, t/2]], c_k = (2k+1)/(4(t^2-4))
+
+Block k=0:
+  c_0 = 1/4 * 1/(t^2-4)
+  R_+2 = 1/16 * [[-1,-1],[1,1]]  (nilpotent)
+  R_-2 = 1/16 * [[-1,1],[-1,1]]  (nilpotent, DIFFERENT kernel)
+  R_inf = (2*0+1)/8 * [[1,0],[0,-1]]  (semisimple)
+  T_inf eigenvalues: exp(±pi*i*1/4)
+  ker(R+) = [-1,1], ker(R-) = [1,1]: NO common invariant line
+  => G_gal = SL_2
+
+Block k=1:
+  c_1 = 3/4 * 1/(t^2-4)
+  R_+2 = 3/16 * [[-1,-1],[1,1]]  (nilpotent)
+  R_-2 = 3/16 * [[-1,1],[-1,1]]  (nilpotent, DIFFERENT kernel)
+  R_inf = (2*1+1)/8 * [[1,0],[0,-1]]  (semisimple)
+  T_inf eigenvalues: exp(±pi*i*3/4)
+  ker(R+) = [-1,1], ker(R-) = [1,1]: NO common invariant line
+  => G_gal = SL_2
+
+Block k=2:
+  c_2 = 5/4 * 1/(t^2-4)
+  R_+2 = 5/16 * [[-1,-1],[1,1]]  (nilpotent)
+  R_-2 = 5/16 * [[-1,1],[-1,1]]  (nilpotent, DIFFERENT kernel)
+  R_inf = (2*2+1)/8 * [[1,0],[0,-1]]  (semisimple)
+  T_inf eigenvalues: exp(±pi*i*5/4)
+  ker(R+) = [-1,1], ker(R-) = [1,1]: NO common invariant line
+  => G_gal = SL_2
+
+Block k=3:
+  c_3 = 7/4 * 1/(t^2-4)
+  R_+2 = 7/16 * [[-1,-1],[1,1]]  (nilpotent)
+  R_-2 = 7/16 * [[-1,1],[-1,1]]  (nilpotent, DIFFERENT kernel)
+  R_inf = (2*3+1)/8 * [[1,0],[0,-1]]  (semisimple)
+  T_inf eigenvalues: exp(±pi*i*7/4)
+  ker(R+) = [-1,1], ker(R-) = [1,1]: NO common invariant line
+  => G_gal = SL_2
+
+CONCLUSION: G_gal(V+) = SL_2 x SL_2 (block k=0,2)
+=> No exotic flat sections. Hodge classes = endomorphism classes.

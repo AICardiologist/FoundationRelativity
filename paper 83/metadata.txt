@@ -1,0 +1,35 @@
+Title: Generic Picard Number of E_t x E_t: Resolving the Unbounded Degree Trap -- A CRMLint Squeeze (Paper 83, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Email: dr.paul.c.lee@gmail.com
+
+Date: February 2026
+
+Description:
+Paper 83 synthesizes the function-field pipeline developed in Papers 80-82 to compute the generic Picard number of E_t x E_t, where E_t is the Legendre elliptic curve y^2 = x(x-1)(x-t). By combining the explicit flat section dimension (Paper 81: constant kernel of the tensor Gauss-Manin connection is 1-dimensional) with the differential Galois maximality (Paper 82: G_gal = SL_2 via Kovacic's algorithm), we prove that the generic Picard rank is exactly 3: the horizontal fiber, the vertical fiber, and the diagonal.
+
+The classical proof requires the Lefschetz (1,1) theorem (Baire category), the Noether-Lefschetz theorem (Zariski density), and topological monodromy density (CLASS). The constructive proof replaces all of this with Kunneth rank arithmetic, tensor flat section analysis, Kovacic obstruction, and SL_2 representation theory (BISH). This is the sixth CRMLint Squeeze and the capstone of the four-paper function-field arc (Papers 80-83).
+
+The key CRM contribution is the resolution of the "Unbounded Degree Trap": differential Galois theory provides a finite certificate that no exotic algebraic cycles exist, without searching polynomial degrees.
+
+The Lean 4 formalization comprises 282 lines with zero sorry. The main squeeze theorem depends on no axioms whatsoever -- not even propext -- the cleanest axiom inventory in the entire CRM series.
+
+Keywords: constructive reverse mathematics, Picard number, Legendre elliptic curve, differential Galois theory, Gauss-Manin connection, Kovacic algorithm, SL_2 representation theory, formal verification, Lean 4, CRMLint Squeeze
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related Identifiers:
+- Paper 80 (Gauss-Manin connection): DOI 10.5281/zenodo.18791985
+- Paper 81 (Flat sections): DOI 10.5281/zenodo.18801814
+- Paper 82 (Differential Galois): DOI 10.5281/zenodo.18801822
+- Paper 77 (Explicit Hodge): DOI 10.5281/zenodo.18777596
+- Paper 78 (Wild Langlands): DOI 10.5281/zenodo.18789008
+
+Upload Type: publication / preprint
+
+Resource Type: Preprint
+
+Communities: zenodo

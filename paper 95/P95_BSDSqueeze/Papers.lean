@@ -1,0 +1,5 @@
+import Papers.P95_BSDSqueeze.CRMLevel
+import Papers.P95_BSDSqueeze.HeckeData
+import Papers.P95_BSDSqueeze.HeegnerData
+import Papers.P95_BSDSqueeze.GZKAxioms
+import Papers.P95_BSDSqueeze.Paper95_BSDSqueeze

@@ -1,14 +1,38 @@
-ZENODO UPLOAD METADATA -- Paper 39
-====================================
+ZENODO UPLOAD METADATA -- Paper 39 (v2)
+========================================
 
 TITLE:
-Beyond LPO: The Thermodynamic Stratification of Physical Undecidability (Paper 39, Constructive Reverse Mathematics Series)
+Physics Reaches Sigma-2-zero: The Physical Stratification of Undecidability (Paper 39, Constructive Reverse Mathematics Series)
+
+AUTHOR:
+Paul Chun-Kit Lee
+
+AFFILIATION:
+New York University, Brooklyn, New York
+
+DATE:
+February 2026
 
 DESCRIPTION:
-Paper 39 in the Constructive Reverse Mathematics of Mathematical Physics series. While Papers 36-38 showed all known physical undecidabilities are LPO (Sigma-1-zero), this paper proves the ceiling is not Sigma-1-zero. A modified Cubitt encoding --- running a Turing machine on all inputs simultaneously via Robinson tiling with perimeter counters --- encodes the Sigma-2-zero-complete Finiteness Problem. The generic spectral gap (without promise gap) is Sigma-2-zero/Pi-2-zero-complete, requiring LPO-prime (the Turing jump of LPO). The central result is the Thermodynamic Stratification Theorem: computational complexity bifurcates on thermodynamic scaling. Extensive observables (energy density, magnetization) cap at LPO via Fekete's subadditive lemma, while intensive observables (spectral gap) reach LPO-prime. Crucially, empirical physics --- which operates at finite precision and therefore measures extensive quantities --- remains capped at LPO. Promise-gapped physics (all of Papers 36-38) also caps at LPO. All results formalized in Lean 4 over Mathlib with zero sorry. The formalization comprises 8 Lean source files.
+Paper 39 (v2) in the Constructive Reverse Mathematics of Mathematical Physics series. While Papers 36-38 showed all known physical undecidabilities are LPO (Sigma-1-zero), this paper proves the ceiling is not Sigma-1-zero. A modified Cubitt encoding, running a Turing machine on all inputs simultaneously via Robinson tiling with perimeter counters, encodes the Sigma-2-zero-complete Finiteness Problem into the spectral gap. The generic spectral gap decision (without promise gap) is Sigma-2-zero/Pi-2-zero-complete, requiring LPO_jump (the Turing jump of LPO). The exact zero-test for any decreasing non-negative sequence (extensive or intensive) is Sigma-2-zero: deciding whether the limit is positive or zero requires the nested quantifier witness, which is LPO_jump. The Physical Stratification Theorem: the arithmetic complexity of a physical observable is determined by its epistemic mode, not thermodynamic scaling. Platonic exact physics (no promise gap) reaches LPO_jump (Sigma-2-zero). Promise-gapped physics and empirical physics (finite precision) cap at LPO (Sigma-1-zero). v2 erratum: v1 incorrectly claimed extensive observables cap at LPO and used Bool instead of Prop in the LPO_jump definition. Both errors corrected. All results formalized in 873 lines of Lean 4 over Mathlib with zero sorry. 14 pages, 21 references, 8 Lean source files.
 
 KEYWORDS:
-Sigma-2-zero completeness, Turing jump, LPO-prime, thermodynamic scaling, extensive observables, intensive observables, Finiteness Problem, Robinson tiling, spectral gap, promise gap, constructive reverse mathematics, LPO, Limited Principle of Omniscience, arithmetic hierarchy, Lean 4, Mathlib, formal verification, quantum many-body physics, Fekete's lemma
+Sigma-2-zero completeness, Turing jump, LPO_jump, physical stratification, epistemic mode, exact zero-test, decreasing sequences, Finiteness Problem, Robinson tiling, spectral gap, promise gap, constructive reverse mathematics, LPO, Limited Principle of Omniscience, arithmetic hierarchy, Weihrauch degrees, Lean 4, Mathlib, formal verification, quantum many-body physics
+
+LICENSE:
+Apache License 2.0 (code), Creative Commons Attribution 4.0 International (CC-BY 4.0) (paper)
+
+RELATED IDENTIFIERS:
+- IsNewVersionOf: 10.5281/zenodo.18642806 (v1)
+- References: 10.5281/zenodo.14611371 (Paper 29)
+- References: 10.5281/zenodo.14611373 (Paper 36)
+- References: 10.5281/zenodo.14611375 (Paper 37)
+- References: 10.5281/zenodo.14611377 (Paper 38)
+- References: 10.5281/zenodo.14658959 (Paper 50)
+- References: 10.5281/zenodo.18765700 (Format Guide)
+
+UPLOAD TYPE:
+Publication / Preprint
 
 COPYRIGHT STATEMENT:
 Copyright 2026 Paul Chun-Kit Lee. Code licensed under Apache License 2.0. Paper licensed under Creative Commons Attribution 4.0 International (CC-BY 4.0).

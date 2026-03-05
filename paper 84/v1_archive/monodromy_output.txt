@@ -1,0 +1,52 @@
+Block k=0 (eigenvalue zeta_8^1):
+  R_+2  = [[-1/16, -1/16], [1/16, 1/16]],  eigenvalues = {0: 2}
+  R_-2  = [[-1/16, 1/16], [-1/16, 1/16]],  eigenvalues = {0: 2}
+  R_inf = [[1/8, 0], [0, -1/8]],  eigenvalues = {1/8: 1, -1/8: 1}
+  Fuchs check (R+ + R- + Rinf = 0): True
+  R_infty eigenvalues: [1/8, -1/8]
+  T_infty eigenvalues: [exp(I*pi/4), exp(-I*pi/4)]
+  R+ nilpotent: True
+  R- nilpotent: True
+  ker(R+) = [[[-1, 1]]]
+  ker(R-) = [[[1, 1]]]
+  Common kernel: NO
+
+Block k=1 (eigenvalue zeta_8^3):
+  R_+2  = [[-3/16, -3/16], [3/16, 3/16]],  eigenvalues = {0: 2}
+  R_-2  = [[-3/16, 3/16], [-3/16, 3/16]],  eigenvalues = {0: 2}
+  R_inf = [[3/8, 0], [0, -3/8]],  eigenvalues = {3/8: 1, -3/8: 1}
+  Fuchs check (R+ + R- + Rinf = 0): True
+  R_infty eigenvalues: [3/8, -3/8]
+  T_infty eigenvalues: [exp(3*I*pi/4), exp(-3*I*pi/4)]
+  R+ nilpotent: True
+  R- nilpotent: True
+  ker(R+) = [[[-1, 1]]]
+  ker(R-) = [[[1, 1]]]
+  Common kernel: NO
+
+Block k=2 (eigenvalue zeta_8^5):
+  R_+2  = [[-5/16, -5/16], [5/16, 5/16]],  eigenvalues = {0: 2}
+  R_-2  = [[-5/16, 5/16], [-5/16, 5/16]],  eigenvalues = {0: 2}
+  R_inf = [[5/8, 0], [0, -5/8]],  eigenvalues = {5/8: 1, -5/8: 1}
+  Fuchs check (R+ + R- + Rinf = 0): True
+  R_infty eigenvalues: [5/8, -5/8]
+  T_infty eigenvalues: [exp(-3*I*pi/4), exp(3*I*pi/4)]
+  R+ nilpotent: True
+  R- nilpotent: True
+  ker(R+) = [[[-1, 1]]]
+  ker(R-) = [[[1, 1]]]
+  Common kernel: NO
+
+Block k=3 (eigenvalue zeta_8^7):
+  R_+2  = [[-7/16, -7/16], [7/16, 7/16]],  eigenvalues = {0: 2}
+  R_-2  = [[-7/16, 7/16], [-7/16, 7/16]],  eigenvalues = {0: 2}
+  R_inf = [[7/8, 0], [0, -7/8]],  eigenvalues = {7/8: 1, -7/8: 1}
+  Fuchs check (R+ + R- + Rinf = 0): True
+  R_infty eigenvalues: [7/8, -7/8]
+  T_infty eigenvalues: [exp(-I*pi/4), exp(I*pi/4)]
+  R+ nilpotent: True
+  R- nilpotent: True
+  ker(R+) = [[[-1, 1]]]
+  ker(R-) = [[[1, 1]]]
+  Common kernel: NO
+

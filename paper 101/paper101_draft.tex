@@ -1,0 +1,961 @@
+\documentclass[11pt,a4paper]{article}
+
+% === Packages ===
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{tikz}
+\usepackage{tikz-cd}
+\usetikzlibrary{positioning,arrows.meta,calc,patterns,decorations.pathreplacing}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{mathtools}
+
+\geometry{margin=1in}
+\hypersetup{colorlinks=true,linkcolor=blue!70!black,citecolor=green!50!black,urlcolor=purple!70!black}
+
+% === Theorem environments ===
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{audit}[theorem]{CRM Audit}
+\newtheorem{prediction}[theorem]{Prediction}
+\newtheorem{observation}[theorem]{Observation}
+
+% === Macros ===
+\newcommand{\BISH}{\textsf{BISH}}
+\newcommand{\WKL}{\textsf{WKL}}
+\newcommand{\WLPO}{\textsf{WLPO}}
+\newcommand{\LLPO}{\textsf{LLPO}}
+\newcommand{\LPO}{\textsf{LPO}}
+\newcommand{\CLASS}{\textsf{CLASS}}
+\newcommand{\CRM}{\textsf{CRM}}
+\newcommand{\Dmot}{D_{\mathrm{mot}}}
+\newcommand{\Bun}{\mathrm{Bun}}
+\newcommand{\Spec}{\mathrm{Spec}}
+\newcommand{\GL}{\mathrm{GL}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\sig}{\sigma}
+\newcommand{\CRMlint}{\textsc{CRMlint}}
+\newcommand{\LTE}{\textsf{LTE}}
+\newcommand{\Lean}{\textsc{Lean\,4}}
+\newcommand{\Mathlib}{\textsc{Mathlib4}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\MP}{\textsf{MP}}
+
+\title{\textbf{The CRM Signature of Berkovich Motives:\\
+How Scholze's Independence of $\ell$ Confirms\\
+the Archimedean Obstruction Thesis}\\[6pt]
+\large Paper 101 of the Constructive Reverse Mathematics Series}
+
+\author{Paul Chun-Kit Lee\\
+\small New York, New York\\
+\small\texttt{dr.paul.c.lee@gmail.com}}
+\date{March 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We perform a constructive reverse mathematics (CRM) audit of Scholze's Berkovich motivic proof of independence of $\ell$ for local Langlands parameters (2024--2026). The classical approach to independence of $\ell$ requires the isomorphism $\iota: \overline{\Q_\ell} \cong \C$, routing the comparison through the Archimedean place at cost $\CLASS$. Scholze's strategy---replacing $\ell$-adic sheaves with motivic sheaves that are natively independent of $\ell$---achieves a strictly lower CRM signature. We trace the logical dependencies of the complete proof and establish:
+
+\begin{enumerate}[label=(\roman*)]
+\item The CRM signature of the Berkovich motivic proof is $\WKL$ (after excision of a parasitic $\WLPO$), strictly below the $\CLASS$ signature of all previously known approaches. The literal syntax of the general Berkovich formalism requires $\BISH + \WKL + \WLPO$ (since $\WKL$ and $\WLPO$ are incomparable over $\BISH$), but the $\WLPO$ is a dispensable artifact of $\R$-valued norms in a context where all relevant value groups are contained in $\Q$ and hence algebraically decidable.
+\item The proof is logically independent of the $\ell$-adic Fargues--Scholze construction: Scholze rebuilds the geometric Satake equivalence, the spectral action, and the Langlands parameterization natively within the motivic 6-functor formalism, extracting a universal motivic parameter $\varphi_{\mathrm{mot}}$ before any realization functor is applied.
+\item The $\WKL$ cost is structurally essential, arising from the non-Archimedean compactness (inverse limits of finite rings) required to construct perfectoid spaces and the Fargues--Fontaine curve. The $\WLPO$ is parasitic, arising from the formalism's use of $\R$-valued Banach norms in a context where all relevant value groups are $\Q$-valued (hence decidable).
+\item The Archimedean Obstruction Thesis (Paper~98) correctly predicts the signature: any proof confined to non-Archimedean realizations and comparisons has signature at most $\WKL$, and the motivic ``stay at the bedrock'' strategy achieves this bound.
+\end{enumerate}
+
+This represents the first CRM analysis of frontier arithmetic geometry produced independently of the CRM programme, and establishes that two programmes---constructive reverse mathematics and Berkovich motivic geometry---converged on the same structural diagnosis of the Archimedean obstruction without mutual awareness or communication.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%======================================================================
+\section{Introduction}\label{sec:intro}
+%======================================================================
+
+\subsection{The Independence of $\ell$ Problem}
+
+Let $E$ be a $p$-adic local field and $G$ a reductive group over $E$. The Fargues--Scholze geometrization of the local Langlands correspondence~\cite{fargues-scholze21} constructs, for each irreducible smooth representation $\pi$ of $G(E)$, a semisimple $L$-parameter
+\[
+\varphi_{\pi,\ell} : W_E \longrightarrow {}^L G(\overline{\Q_\ell})
+\]
+using the geometry of $G$-bundles on the Fargues--Fontaine curve and $\ell$-adic \'etale cohomology, for an auxiliary prime $\ell \neq p$.
+
+The construction depends, a priori, on the choice of $\ell$. The \emph{independence of $\ell$ conjecture}~\cite[Conjecture~I.9.5]{fargues-scholze21} asserts that the association $\pi \mapsto \varphi_{\pi,\ell}$ is independent of $\ell$ (and of the isomorphism $\iota: \overline{\Q_\ell} \cong \C$ used to normalize it).
+
+\subsection{The Classical Approach: Why It Costs $\CLASS$}
+
+All previously known strategies for proving independence of $\ell$ require \emph{globalizing}: embedding the local situation into a global one over a number field, and then using the global Arthur--Selberg trace formula to establish that the Galois representations attached to automorphic forms are independent of $\ell$. This strategy incurs $\CLASS$ costs at two points:
+
+\begin{enumerate}[label=(\alph*)]
+\item \textbf{The trace formula.} The spectral decomposition of $L^2(G(\Q)\backslash G(\A_\Q))$ requires harmonic analysis on the Archimedean factor $G(\R)$: Plancherel measure, Harish-Chandra characters, spectral projections. This is irreducibly $\CLASS$.
+\item \textbf{The comparison isomorphism.} Comparing $\ell_1$-adic and $\ell_2$-adic representations requires a common coefficient field, classically obtained via the isomorphism $\iota: \overline{\Q_\ell} \cong \C$. Constructing this isomorphism requires the Axiom of Choice for continuum-sized sets ($\CLASS$).
+\end{enumerate}
+
+The Archimedean Obstruction Thesis (Paper~98,~\cite{lee-p98}) predicts this: any proof path that passes through the Archimedean place---whether via the trace formula, period integrals, or the embedding into $\C$---has CRM signature $\geq \CLASS$.
+
+\subsection{Scholze's Bypass: Motivic Descent}
+
+In two remarkable papers~\cite{scholze-berkovich, scholze-motivic-geometrization}, Scholze resolves the independence of $\ell$ conjecture by an entirely different strategy. Instead of comparing $\ell$-adic constructions \emph{a posteriori}, he builds the Langlands parameterization \emph{natively} in a universal motivic coefficient system---Berkovich motives---that is independent of $\ell$ by construction. The $\ell$-adic parameters are then recovered as specializations of a single motivic parameter $\varphi_{\mathrm{mot}}$.
+
+This paper performs a CRM audit of this proof, tracing the logical resources required at each step and establishing the overall CRM signature.
+
+\subsection{Motivic Descent as a Fourth Mode}
+
+Paper~98 identified three modes of \emph{de-omniscientising descent}---strategies for reducing the CRM cost of a proof:
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Algebraic bypass}: replace an analytic computation with an algebraic one (e.g., Taylor--Wiles patching replacing the Petersson inner product).
+\item \textbf{Locus restriction}: restrict to a special sublocus where algebraic shortcuts exist (e.g., the palindromic locus for Hodge, $\rho=20$ K3 surfaces for Kuga--Satake).
+\item \textbf{Domain transfer}: move to a domain lacking the Archimedean place (e.g., function fields $\F_q(C)$).
+\end{enumerate}
+
+Scholze's strategy constitutes a fourth mode:
+
+\begin{enumerate}[label=(\roman*),resume]
+\item \textbf{Motivic descent}: construct the mathematical object at the motivic level (the ``bedrock''), before any realization functor is applied. The realizations become derived consequences rather than primary constructions. Since the motive is $\BISH$ (Paper~98, Proposition~3.1) and no realization or comparison isomorphism is invoked, the CRM signature is determined entirely by the structural cost of the motivic construction itself.
+\end{enumerate}
+
+The first three modes operate at the level of realizations and attempt to avoid specific $\CLASS$ bottlenecks. Motivic descent operates below the realizations entirely.
+
+
+%======================================================================
+\section{The CRM Framework}\label{sec:crm}
+%======================================================================
+
+We recall the essential definitions from Paper~98~\cite{lee-p98}. The CRM hierarchy is a partial order of logical principles:
+\[
+\BISH \;\subsetneq\; \LLPO \;\subsetneq\; \WLPO \;\subsetneq\; \LPO \;\subsetneq\; \CLASS
+\]
+with $\WKL$ (Weak K\"onig's Lemma) incomparable with $\WLPO$ over $\BISH$.
+
+\begin{definition}[CRM Signature of a Proof Path]
+A proof path $P$ using realizations $\{R_i\}$ and comparison isomorphisms $\{C_j\}$ has signature:
+\[
+\sig(P) = \max\bigl(\sig(\text{motive}),\; \max_i \sig(R_i),\; \max_j \sig(C_j)\bigr)
+\]
+\end{definition}
+
+\begin{theorem}[Archimedean Obstruction, Paper~98]\label{thm:archimedean}
+If $P$ uses only non-Archimedean realizations and comparisons, then $\sig(P) = \BISH$. If $P$ uses any Archimedean realization or comparison, then $\sig(P) \geq \CLASS$.
+\end{theorem}
+
+The key prediction: a proof that \emph{stays motivic}---never applying a realization functor---has signature $\sig(P) = \sig(\text{motive}) = \BISH$, modulo the structural cost of the motivic construction itself.
+
+
+%======================================================================
+\section{CRM Audit of the Berkovich Motivic Proof}\label{sec:audit}
+%======================================================================
+
+We now trace the logical dependencies of Scholze's proof through its major components.
+
+\subsection{The Berkovich Motivic Category $\Dmot(X)$}
+
+\begin{audit}[Berkovich Motivic Category]\label{audit:dmot}
+$\sig(\Dmot(X)) = \WKL$ (with parasitic $\WLPO$).
+\end{audit}
+
+The construction of $\Dmot(X)$ proceeds through several layers: Banach rings, the arc-topology, finitary arc-sheaves, ball-invariant sheaves, and the Tate twist inversion. 
+
+The $\WKL$ content is structurally essential. The arc-topology on Banach rings requires checking covers by valuation rings. For affinoid algebras over local fields (the only case required for local Langlands), the existence of sufficiently many valuation rings to populate the Berkovich spectrum $\mathcal{M}(A)$ reduces to extracting paths from profinite trees---precisely $\WKL$. In the general setting, one would invoke Zorn's Lemma or the Boolean Prime Ideal theorem ($\CLASS$), but the local Langlands application restricts to $p$-adic affinoid algebras where $\WKL$ suffices.
+
+The parasitic $\WLPO$ arises because Banach rings carry norms valued in $\R_{\geq 0}$, and testing inequalities of arbitrary real numbers requires $\WLPO$ in general. However, the value groups that actually arise in the proof---including those of perfectoid fields such as $\C_p$ and its tilt $\C_p^\flat$---are contained in $\Q$ (specifically, in $p^{\Q} \cup \{0\}$). While these value groups are dense in $\R_{>0}$ (perfectoid fields are not discretely valued by definition), order and equality in $\Q$ are algebraically decidable ($\BISH$). The dependence on the full real continuum $\R_{\geq 0}$ is an artifact of the general Berkovich formalism, not a structural requirement of the proof.
+
+\begin{remark}[The Norm Artifact]
+This parasitic $\WLPO$ is analogous to the false positives detected by the CRM scanner in Paper~99: a surface-syntax feature (real-valued norms) that does not reflect the logical content of the proof ($\Q$-valued norms with decidable ordering). A Lean~4 formalization using an adic foundational framework restricted to $\Q$-valued norms would natively bypass $\WLPO$ while faithfully representing the dense value groups of perfectoid fields.
+\end{remark}
+
+
+\subsection{Recovery of Voevodsky's Algebraic Motives}
+
+\begin{audit}[Voevodsky Recovery]\label{audit:voevodsky}
+$\sig(\Dmot(k) \cong DM(k)) = \BISH$.
+\end{audit}
+
+For a discrete field $k$, the Berkovich spectrum collapses (the norm is trivial), and the equivalence $\Dmot(k) \cong DM(k)$ with Voevodsky's \'etale motives is established via $\A^1$-homotopy invariance, Nisnevich descent, and algebraic correspondences. This is a substantial categorical theorem, but every ingredient is purely algebraic: no limits, no completions, no analysis.
+
+
+\subsection{The Geometric Satake Equivalence (Motivic Version)}
+
+\begin{audit}[Motivic Geometric Satake]\label{audit:satake}
+$\sig(\text{motivic Satake}) = \BISH$.
+\end{audit}
+
+This is a critical potential leak point. The \emph{classical} geometric Satake equivalence uses perverse sheaves and intersection cohomology on the complex affine Grassmannian, routing the proof through the Archimedean topology ($\CLASS$). If the motivic version depended on the classical version, $\CLASS$ would enter through the back door.
+
+It does not. The motivic geometric Satake equivalence, as developed by Richarz--Scholbach~\cite{richarz-scholbach} and Cass--van den Hove--Scholbach~\cite{cass-vdh-scholbach}, is rebuilt natively within the motivic category. The affine Grassmannian is an ind-algebraic scheme; the equivalence is constructed using algebraic weight structures, Wakimoto filtrations, and Mirkovi\'c--Vilonen cycles (algebraic subvarieties). The proof explicitly avoids the $\ell$-adic and Betti versions and bypasses the Riemann Existence Theorem ($\CLASS$). The logical resources are pure algebra: $\BISH$.
+
+
+\subsection{The Fargues--Fontaine Curve and $\Bun_G$}
+
+\begin{audit}[Fargues--Fontaine and $\Bun_G$]\label{audit:ff}
+$\sig(\text{Fargues--Fontaine}) = \WKL$.
+\end{audit}
+
+The Fargues--Fontaine curve and the stack $\Bun_G$ of $G$-bundles are fundamentally $p$-adic, non-Archimedean objects. The curve is constructed from Witt vectors and perfectoid tilts. Its geometry is controlled by Newton polygons and Dieudonn\'e theory---algebraic invariants of $p$-divisible groups.
+
+The $\WKL$ cost is essential: perfectoid tilting is defined via the inverse limit $R^\flat = \varprojlim_{x \mapsto x^p} R/p$ of discrete finite rings, and perfectoid spaces arise geometrically as inverse limits of towers of finite-type rigid spaces. Extracting compatible systems from these profinite inverse limits is exactly $\WKL$. The stratification of $\Bun_G$ (into Harder--Narasimhan strata) is geometric and algebraic. No Archimedean input is required.
+
+\begin{remark}[Spectral Spaces and the $\WKL$ Lock]
+The underlying topological spaces of perfectoid spaces and Huber's adic spaces are \emph{spectral spaces} in the sense of Hochster~\cite{hochster69}. In classical reverse mathematics, the compactness of spectral spaces via Stone duality is equivalent to the Boolean Prime Ideal Theorem (BPI) in general. However, for countably generated $p$-adic algebras---the only case required for local Langlands---the compactness reduces to the compactness of profinite trees, which is exactly $\WKL$. This securely locks the cost at $\WKL$ and provides a precise mathematical anchor for the classification.
+\end{remark}
+
+
+\subsection{The Spectral Action and Excursion Operators}
+
+\begin{audit}[Spectral Action]\label{audit:spectral}
+$\sig(\text{spectral action}) = \BISH$.
+\end{audit}
+
+The terminology ``spectral action'' is potentially misleading from a CRM perspective. In the classical Langlands programme, ``spectral'' refers to the $L^2$ spectral decomposition of automorphic forms on the ad\`elic quotient $G(\Q)\backslash G(\A)$---the universal $\CLASS$ bottleneck (Paper~98, \S6.2).
+
+In Scholze's construction, ``spectral'' refers to the algebraic spectrum ($\Spec$) of the Bernstein center, a commutative ring. Excursion operators are categorical endomorphisms of the identity functor on $\Dmot(\Bun_G)$, constructed from correspondences on the Hecke stack. The construction of a commutative ring of endomorphisms in a categorical setting is pure abstract algebra. No $L^2$ spaces, no harmonic analysis on $G(\R)$, no Plancherel measure: $\BISH$.
+
+
+\subsection{Descent from Motivic to $\ell$-adic}
+
+\begin{audit}[$\ell$-adic Realization]\label{audit:realization}
+$\sig(\text{$\ell$-adic realization}) = \WKL$.
+\end{audit}
+
+After constructing the motivic parameter $\varphi_{\mathrm{mot}}$, the $\ell$-adic parameter is recovered by applying the \'etale realization functor $R_\ell: \Dmot \to D_{\mathrm{\acute{e}t}}(\cdot, \Q_\ell)$. Computing \'etale cohomology with finite coefficients $\Z/\ell^n\Z$ is finite algebraic geometry ($\BISH$). Passing to $\Z_\ell$-coefficients requires the inverse limit $\varprojlim_n H^*(\cdot, \Z/\ell^n\Z)$, which invokes the compactness of profinite systems ($\WKL$).
+
+Critically, both domain and target of the realization functor are non-Archimedean. No $\CLASS$ comparison isomorphism is invoked. The $\ell$-adic parameter is a \emph{specialization} of the motivic parameter, not a comparison between realizations.
+
+
+\subsection{Archimedean Content: Absence}
+
+\begin{audit}[Archimedean Input]\label{audit:arch}
+None.
+\end{audit}
+
+Scholze's architecture operates entirely over non-Archimedean local fields and the residue field $\F_q$. There are no period integrals, no Hodge decompositions, no $\R$-manifolds, no analytic continuations of $L$-functions, no classical trace formulas, and no embeddings $\iota: \overline{\Q_\ell} \cong \C$. The proof never touches the Archimedean place.
+
+
+%======================================================================
+\section{Overall CRM Signature}\label{sec:signature}
+%======================================================================
+
+\begin{theorem}[CRM Signature of Berkovich Motivic Independence of $\ell$]\label{thm:signature}
+The CRM signature of Scholze's proof of the independence of $\ell$ conjecture~\cite{scholze-berkovich, scholze-motivic-geometrization} is $\WKL$, after excision of a parasitic $\WLPO$.
+\end{theorem}
+
+\begin{proof}
+By the signature formula $\sig(P) = \max(\sig(\text{inputs}))$, we take the join over all components. We must proceed in two steps, distinguishing the literal syntax of the general formalism from the essential structure of the specific proof.
+
+\textbf{Step 1: Literal syntactic signature.} The general Berkovich formalism operates on Banach rings with $\R_{\geq 0}$-valued norms. Testing inequalities of arbitrary real numbers requires $\WLPO$. The profinite inverse limits require $\WKL$. Since $\WKL$ and $\WLPO$ are \emph{incomparable} over $\BISH$, their join in the lattice of logical principles is strictly above both: the literal syntax requires $\BISH + \WKL + \WLPO$.
+
+\textbf{Step 2: Essential structural signature.} However, the independence of $\ell$ proof operates exclusively over $p$-adic local fields and their perfectoid extensions. While perfectoid fields such as $\C_p$ possess dense value groups (not discrete), these groups are contained in $\Q$ (specifically $p^{\Q} \cup \{0\}$), where order and equality are algebraically decidable ($\BISH$). The dependence on the full real continuum $\R_{\geq 0}$ is a dispensable artifact of the general Berkovich formalism, not a structural requirement of the proof. By reformulating the foundations using $\Q$-valued norms---for instance, via a variant of Huber's adic spaces with $\Q$-valued ordered value groups---the parasitic $\WLPO$ is formally excised. The structurally essential components are:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Component} & \textbf{CRM Level} & \textbf{Justification} \\
+\midrule
+Berkovich motivic category $\Dmot(X)$ & $\WKL$ & Profinite inverse limits (arc-topology) \\
+Voevodsky recovery & $\BISH$ & $\A^1$-homotopy, Nisnevich descent \\
+Motivic geometric Satake & $\BISH$ & Algebraic MV cycles, weight structures \\
+Fargues--Fontaine curve, $\Bun_G$ & $\WKL$ & Perfectoid inverse limits \\
+Spectral action / excursion & $\BISH$ & Categorical endomorphisms, $\Spec$ of ring \\
+$\ell$-adic realization & $\WKL$ & $\varprojlim \Z/\ell^n\Z$ \\
+Archimedean input & --- & None \\
+\bottomrule
+\end{tabular}
+\caption{CRM audit of Scholze's Berkovich motivic proof (essential structure).}
+\label{tab:audit}
+\end{table}
+
+After excision of the parasitic $\WLPO$, the maximum of the structurally essential components is exactly $\WKL$.
+\end{proof}
+
+\begin{remark}[Historical Comparison]
+The CRM signature of the \emph{classical} approach to independence of $\ell$ (globalization + trace formula + $\iota$-comparison) is $\CLASS$. Scholze's motivic descent achieves a strict reduction: $\CLASS \to \WKL$. This is the same type of logical excision documented for the Taylor--Wiles fix of Fermat's Last Theorem ($\CLASS \to \WKL$, Paper~98, Theorem~8.1), but at a far greater level of mathematical sophistication.
+\end{remark}
+
+
+%======================================================================
+\section{Logical Independence}\label{sec:independence}
+%======================================================================
+
+A critical question for the CRM audit is whether Scholze's motivic proof is \emph{logically independent} of the $\ell$-adic Fargues--Scholze construction, or whether it uses the $\ell$-adic results as input and ``motivifies'' them.
+
+\begin{theorem}[Logical Independence]\label{thm:logical-independence}
+The Berkovich motivic proof of independence of $\ell$ is logically independent of the $\ell$-adic Fargues--Scholze construction. The motivic parameter $\varphi_{\mathrm{mot}}$ is constructed before any realization functor is applied.
+\end{theorem}
+
+\begin{proof}[Argument]
+Scholze explicitly reconstructs the entire architecture---the geometry of $\Bun_G$, the geometric Satake equivalence, and the categorical spectral action---natively within the motivic 6-functor formalism $\Dmot(\Bun_G)$. The universal motivic Langlands parameter $\varphi_{\mathrm{mot}}$ is extracted from the spectral action on $\Dmot$ before any realization functor is applied. The $\ell$-adic parameter is then recovered by:
+\[
+\varphi_{\pi, \ell} = R_\ell(\varphi_{\mathrm{mot}})
+\]
+where $R_\ell$ is the \'etale realization functor. Because the proof never compares $R_{\ell_1}$ and $R_{\ell_2}$ horizontally (i.e., never invokes a comparison isomorphism between different $\ell$-adic cohomology theories), no $\CLASS$ comparison cost is incurred. Independence of $\ell$ follows formally: all $\ell$-adic specializations derive from the single motivic object $\varphi_{\mathrm{mot}}$.
+
+If, instead, the motivic version had used the $\ell$-adic Fargues--Scholze as a black box and then shown independence by comparing realizations, the proof would require $\iota: \overline{\Q_\ell} \cong \C$ or an analogous comparison, introducing $\CLASS$. The natively motivic construction avoids this entirely.
+\end{proof}
+
+
+%======================================================================
+\section{Condensed Mathematics: An Orthogonal Elimination}\label{sec:condensed}
+%======================================================================
+
+It is instructive to compare Scholze's two major foundational programmes---condensed mathematics and Berkovich motives---from the CRM perspective.
+
+\begin{proposition}[Orthogonality of Condensed and Motivic Eliminations]\label{prop:orthogonal}
+Condensed mathematics and Berkovich motives eliminate logically independent sources of $\CLASS$ content:
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Condensed mathematics} eliminates $\CLASS$ content arising from \emph{topological foundations}: Baire category, Tychonoff compactness, Zorn's lemma for locally convex spaces. It replaces topological spaces with condensed sets (sheaves on profinite sets), reducing the cost of continuous functional analysis from $\CLASS$ to $\WKL$.
+\item \textbf{Berkovich motives} eliminate $\CLASS$ content arising from \emph{cohomological comparisons}: the isomorphism $\iota: \overline{\Q_\ell} \cong \C$, comparison between $\ell$-adic theories, period integrals. They achieve this by working in a universal motivic coefficient system that is independent of $\ell$ by construction.
+\end{enumerate}
+\end{proposition}
+
+In the language of Paper~98: condensed mathematics fixes the \emph{target categories} of the realization functors (making them better-behaved abelian categories), while Berkovich motives eliminate the \emph{realization step itself} (making it unnecessary by working at the motivic level). One fixes the topology of the base spaces. The other fixes the coefficients of the cohomology. Both are needed for a complete elimination of $\CLASS$ from the non-Archimedean foundations; but for the specific problem of independence of $\ell$, it was the cohomological comparison (not the topological foundation) that constituted the obstruction. This explains why condensed mathematics alone---despite its profound restructuring of functional analysis---could not resolve independence of $\ell$.
+
+
+%======================================================================
+\section{Convergence of Two Programmes}\label{sec:convergence}
+%======================================================================
+
+The most striking feature of this analysis is the \emph{convergence} of two independent programmes on the same structural diagnosis.
+
+\textbf{The CRM programme} (Papers~50--100) developed the Archimedean Obstruction Thesis: $\R$ is the unique source of non-constructive content in arithmetic geometry. The thesis predicts that any proof confined to non-Archimedean realizations and comparisons has CRM signature at most $\WKL$, and that the optimal strategy for reducing logical cost is to avoid the Archimedean place.
+
+\textbf{Scholze's programme} (perfectoid spaces, diamonds, condensed mathematics, Berkovich motives) developed the geometric infrastructure for the local Langlands correspondence. The motivic strategy was adopted to resolve independence of $\ell$---a problem internal to the Langlands programme, unrelated to constructive mathematics.
+
+The two programmes are \emph{unaware of each other}. Scholze does not use CRM vocabulary, does not reference constructive mathematics, and did not set out to reduce logical cost. The CRM programme does not use $\infty$-categories, diamonds, or 6-functor formalisms.
+
+Yet both programmes identify the same obstruction (the Archimedean place), predict the same consequence (passing through $\R$ is the source of the difficulty), and arrive at the same bypass strategy (stay in the non-Archimedean world). The CRM programme expresses this as: $\R$ introduces $\CLASS$ through period integrals and spectral decomposition. Scholze's programme expresses this as: $\R$ introduces $\ell$-dependence through the isomorphism $\iota: \overline{\Q_\ell} \cong \C$. Same obstruction, different descriptions, different reasons for caring, same structural bypass.
+
+This convergence provides evidence that the Archimedean obstruction is an \emph{objective structural feature of the mathematical landscape}, not a framework-dependent artifact of either the CRM classification or the motivic formalism. Two independent diagnostic systems, applied to overlapping but distinct bodies of mathematics, identify the same singular point ($\R$) as the source of the difficulty and the same strategy (avoidance) as the resolution.
+
+
+%======================================================================
+\section{Predictions}\label{sec:predictions}
+%======================================================================
+
+If the ``stay motivic'' strategy successfully avoids realization costs for independence of $\ell$, the Archimedean Obstruction Thesis generates predictions for other results currently proved using $\ell$-adic methods.
+
+\begin{prediction}[Weight-Monodromy Conjecture (Known Cases)]
+$\sig = \WKL$. The conjecture governs the action of the Weil group on cohomology. If formulated natively in $\Dmot$ via motivic weight filtrations, the proof stays non-Archimedean. The residual obstruction is the $p$-adic inverse limits and perfectoid geometry ($\WKL$), cleanly bypassing Betti--\'etale comparisons over $\C$.
+\end{prediction}
+
+\begin{prediction}[Langlands Correspondence for $\GL_n/\F_q(C)$]
+$\sig = \BISH$. Lafforgue's proof is already $\BISH$ (Paper~98, Theorem~10.1): the ad\`ele ring over $\F_q(C)$ has no Archimedean factor, and the proof uses moduli of shtukas (algebraic) rather than the trace formula. A purely motivic proof via $\Dmot$ over $\F_q$ would provide a structurally cleaner, $\ell$-independent $\BISH$ proof. Since function field curves are discrete/algebraic, even the $\WKL$ perfectoid completion cost is avoided.
+\end{prediction}
+
+\begin{prediction}[Ramanujan--Petersson for $\GL_2/\F_q(C)$]
+$\sig = \BISH$. Deligne's proof uses the geometry of moduli of shtukas and the Grothendieck--Lefschetz trace formula over finite fields---purely algebraic intersection theory, avoiding the $L^2(G(\R))$ classical trace formula. This lifts to the motivic level at $\BISH$.
+\end{prediction}
+
+\begin{prediction}[Tate Conjecture for Abelian Varieties over $\F_q$]
+$\sig = \BISH$. Tate's original 1966 proof relies on the Riemann hypothesis for abelian varieties (Weil conjectures) and the finiteness of isogeny classes of a given dimension over $\F_q$. A natively motivic proof would execute this linear algebra entirely within $DM(\F_q)$, remaining at $\BISH$.
+\end{prediction}
+
+\begin{prediction}[Independence of $\ell$ for Shimura Varieties]\label{pred:shimura}
+$\sig = \CLASS$ (irreducible obstruction). The ``stay motivic'' strategy fails here. Shimura varieties are global objects defined over number fields; they inherently possess Archimedean places. Proving that the motivic Galois representation matches the Langlands parameter of an automorphic form requires Matsushima's formula and the global Arthur--Selberg trace formula. The trace formula irreducibly requires the $L^2$ spectral decomposition of $G(\R)$. The motivic framework cannot bypass the global Archimedean geometry of the ad\`ele ring $\A_\Q$. The $\CLASS$ obstruction is structural and permanent.
+\end{prediction}
+
+\begin{remark}[The Shimura Boundary]
+Prediction~\ref{pred:shimura} identifies the \emph{limit} of motivic descent: it works for local problems (local Langlands, where the Archimedean place is absent) but not for global problems (Shimura varieties, where the Archimedean place is intrinsic to the geometry). The Archimedean Obstruction Thesis correctly predicts both where the strategy succeeds and where it structurally cannot succeed. This predictive power---identifying limits as well as opportunities---is the strongest evidence for the thesis's validity.
+\end{remark}
+
+
+%======================================================================
+\section{Scanner Validation}\label{sec:scanner}
+%======================================================================
+
+As independent confirmation of the architectural CRM audit (\S\ref{sec:audit}), we applied the CRMlint LaTeX scanner (Paper~76; DOI: 10.5281/zenodo.18779362) to the \TeX{} sources of~\cite{scholze-berkovich} and~\cite{scholze-motivic-geometrization}, obtained from the arXiv e-print server. The scanner employs $\sim$91 keyword patterns and $\sim$120 citation patterns against a CRM-classified dictionary derived from Papers~50--97, augmented with 11 Berkovich-specific entries (perfectoid, arc-topology, Berkovich spectrum, condensed, solid module, adic space, motivic sheaf, six-functor, Tate twist).
+
+\subsection{Quantitative Results}
+
+The scanner produced 214 alerts across both papers.\footnote{Of these, 10 were identified as anti-marker suppressions (7~in~\cite{scholze-berkovich}, 3~in~\cite{scholze-motivic-geometrization})---motivational or contextual citations that match scanner patterns but do not reflect proof-level logical content.  These 10 are included in all quantitative tables for transparency and reproducibility.}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{CRM Level} & \textbf{Berkovich Motives} & \textbf{Motivic Geom.} & \textbf{Total} \\
+\midrule
+$\CLASS$ & 0 & 0 & 0 \\
+$\LPO$ & 7 & 1 & 8 \\
+$\WLPO$ & 41 & 27 & 68 \\
+$\WKL$ & 51 & 25 & 76 \\
+$\BISH$ & 42 & 20 & 62 \\
+\midrule
+Total & 141 & 73 & 214 \\
+\bottomrule
+\end{tabular}
+\caption{Scanner alert counts by CRM level. The $\CLASS$ row is uniformly zero.}
+\label{tab:scanner-level}
+\end{table}
+
+Each alert was manually classified into four categories: \textbf{A}~(motivational---classical approach described in introduction), \textbf{B}~(parasitic---Banach ring formalism carrying algebraic content), \textbf{BISH}~(algebraic core---genuine constructive content), and \textbf{C}~(structural $\WKL$---irreducible profinite/inverse limit constructions).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Category} & \textbf{Berkovich} & \textbf{Motivic Geom.} & \textbf{Total} & \textbf{\%} \\
+\midrule
+A (motivational) & 14 & 12 & 26 & 12.1\% \\
+B (parasitic $\WLPO$/$\LPO$) & 46 & 19 & 65 & 30.4\% \\
+$\BISH$ (algebraic core) & 42 & 20 & 62 & 29.0\% \\
+C (structural $\WKL$) & 39 & 22 & 61 & 28.5\% \\
+\midrule
+Total & 141 & 73 & 214 & 100\% \\
+\bottomrule
+\end{tabular}
+\caption{Alert classification. Category~B (parasitic) dominates the non-algebraic alerts; Category~C (structural) is exclusively $\WKL$.}
+\label{tab:scanner-classification}
+\end{table}
+
+\subsection{Key Findings}
+
+\textbf{(i) Zero $\CLASS$ alerts.} Across 93 combined pages, 34 theorems, 91 lemmas, 109 proofs, and 87 bibliographic references, the scanner found no $\CLASS$-level alert. No invocation of the Axiom of Choice, Zorn's Lemma, well-ordering, harmonic analysis on $G(\R)$, Plancherel measure, or Harish-Chandra characters was detected in either paper. This independently confirms that Scholze's motivic programme operates entirely below $\CLASS$.
+
+\textbf{(ii) Parasitic dominance.} Category~B alerts (65 of 214, or 30.4\%) arise from the Banach ring formalism---normed completions, seminorm filtrations, completed normed groups---propagating through the proof. All 8 $\LPO$ alerts and 57 of the 68 $\WLPO$ alerts are parasitic. These alerts correctly detect a surface anomaly: real-analytic terminology in a proof whose essential structure is non-Archimedean. In a reformulation using Huber's adic spaces restricted to decidable $\Q$-valued groups, all Category~B alerts would vanish.
+
+\textbf{(iii) Structural $\WKL$ concentration.} The 61 Category~C alerts cluster in the expected locations: perfectoid tilting (arc-topology sections), inverse limits of finite rings (nonarchimedean unit disc), condensed mathematics citations (Lectures on Analytic Geometry), and profinite descent (Fargues--Fontaine infrastructure). This matches the architectural audit (\S\ref{sec:audit}) exactly.
+
+\textbf{(iv) Algebraic core verification.} The 62 $\BISH$ alerts---motivic sheaves, Tate twists, six-functor formalism, Lafforgue citations, Fontaine-Laffaille theory---confirm that the core mathematical content is genuinely constructive, consistent with the CRM audit's assessment that the motivic geometric Satake equivalence, the spectral action, and excursion operators are all $\BISH$.
+
+\subsection{Cross-Validation}
+
+The scanner output was cross-validated against the five structural claims of the architectural audit (\S\ref{sec:audit}):
+
+\begin{enumerate}[label=(\alph*)]
+\item Scanner finds no $\CLASS$ markers in geometric Satake sections $\checkmark$ (confirms Audit~\ref{audit:satake}: $\BISH$)
+\item Scanner finds $\WKL$ markers in Fargues--Fontaine/perfectoid sections $\checkmark$ (confirms Audit~\ref{audit:ff}: $\WKL$)
+\item Scanner finds no $L^2$/harmonic analysis/Plancherel markers in spectral action sections $\checkmark$ (confirms Audit~\ref{audit:spectral}: $\BISH$)
+\item Scanner finds $\WLPO$ markers in Banach ring foundation sections $\checkmark$ (confirms Audit~\ref{audit:dmot}: parasitic $\WLPO$)
+\item Scanner finds $\CLASS$ markers only in motivation $\checkmark$ (confirms Audit~\ref{audit:arch}: no Archimedean input)
+\end{enumerate}
+
+All five checks pass. The full classified alert list (214 entries) is provided in the supplementary appendix~\cite{crmlint-scanner} for reproducibility.
+
+
+%======================================================================
+\section{Epistemological vs.\ Geometric Motives: Reconciling the Frameworks}\label{sec:two-motives}
+%======================================================================
+
+Paper~98's motives and Scholze's motives operate at different levels of abstraction but reflect the same underlying mathematical reality. The distinction is illuminating: Grothendieck's motives are \emph{epistemological}---they classify the logical content of cohomological constructions---while Scholze's Berkovich motives are \emph{geometric}---they provide a computational 6-functor formalism on analytic spaces. The former are algebraic and discrete (hence natively $\BISH$); the latter are analytic and topological (hence requiring $\WKL$ for the profinite completions). This distinction perfectly mirrors the logical jump from $\BISH$ to $\WKL$.
+
+Paper~98 classifies Grothendieck's category of Chow motives as $\BISH$: the objects (algebraic correspondences) and morphisms (intersection theory modulo rational equivalence) are defined by finitary algebraic operations. This is a \emph{logical} classification---it concerns what axioms are needed to define and manipulate the category.
+
+Scholze's Berkovich motives are a \emph{computational} construction: a 6-functor formalism on Banach rings that produces motivic sheaves specializing to $\ell$-adic cohomology for any $\ell$. His construction sits at $\WKL$ not because he checked its axiom dependencies, but because it operates entirely within the non-Archimedean world while requiring profinite inverse limits for the perfectoid foundations.
+
+The relationship: Paper~98 explains \emph{why} Scholze's strategy works. The signature formula $\sig(P) = \max(\sig(\text{motive}), \max_i \sig(R_i), \max_j \sig(C_j))$ predicts that a proof avoiding all realizations and comparisons has signature $\sig(\text{motive}) = \BISH$. Scholze's construction achieves this (plus the structural $\WKL$ for profinite limits) by staying at the motivic level. The CRM classification provides the \emph{logical} explanation for a \emph{mathematical} phenomenon.
+
+The decidability that Paper~98 identifies as $\BISH$ at the motivic level is the \emph{same algebraic finiteness} that enables Scholze's construction to work without choosing $\ell$. Algebraic operations over $\Q$ and its non-Archimedean completions are finitary and do not require the continuum. Paper~98 expresses this as ``these operations are $\BISH$.'' Scholze expresses this as ``these operations can be performed in a universal motivic category before choosing $\ell$.'' Same fact, different languages.
+
+
+%======================================================================
+\section{Conclusion}\label{sec:conclusion}
+%======================================================================
+
+The CRM audit of Scholze's Berkovich motivic proof of independence of $\ell$ establishes:
+
+\begin{enumerate}[label=(\arabic*)]
+\item The proof has CRM signature $\WKL$, strictly below the $\CLASS$ signature of all previously known approaches.
+\item The reduction $\CLASS \to \WKL$ is achieved by motivic descent---a fourth mode of de-omniscientising descent not identified in Paper~98.
+\item The proof is logically independent of the $\ell$-adic Fargues--Scholze construction.
+\item The Archimedean Obstruction Thesis correctly predicts the signature.
+\item The convergence of two independent programmes on the same structural diagnosis provides evidence that the Archimedean obstruction is an objective feature of the mathematical landscape.
+\end{enumerate}
+
+The five predictions (\S\ref{sec:predictions}) are testable: as additional results are proved motivically, their CRM signatures can be audited by the same methodology. The prediction that independence of $\ell$ for Shimura varieties remains irreducibly $\CLASS$ identifies the structural boundary of motivic descent.
+
+\bigskip
+\noindent\textbf{Acknowledgments.} The author is an interventional cardiologist, not a professional mathematician; all CRM classifications are heuristic, based on architectural analysis of the published proofs and validated by the CRMlint scanner. The author thanks Claude (Anthropic) for assistance with the analysis and preparation of this manuscript.
+
+
+%======================================================================
+\appendix
+\section{Formalization Map: CRM Audit Components and Lean Feasibility}\label{app:formalization}
+%======================================================================
+
+This appendix provides a structured map of the CRM audit components from \S\ref{sec:audit}, classifying each by CRM level, proof technique, and feasibility of Lean~4 formalization. The map is intended to guide formalization efforts and prioritize targets for the CRMlint Lean~4 backend (Paper~76, Generation~4).
+
+\subsection{Component-Level Classification}
+
+Table~\ref{tab:formalization-map} lists each audited proof component with its CRM level, the key techniques involved, and a feasibility assessment for Lean~4 formalization. Feasibility ratings:
+\begin{description}
+\item[\textsf{HIGH}:] The mathematical content is within reach of current Lean~4/Mathlib infrastructure. Finite algebraic verifications, ring/field arithmetic, decidable properties.
+\item[\textsf{MEDIUM}:] Requires Mathlib libraries that exist but need adaptation (e.g., category theory, perfectoid foundations, inverse limits). Feasible with moderate effort.
+\item[\textsf{LOW}:] Requires substantial new Mathlib development (e.g., motivic categories, 6-functor formalisms, derived $\infty$-categories). Multi-year project.
+\item[\textsf{STRUCTURAL}:] The CRM classification itself (not the underlying mathematics) is formalizable: the axiom audit, logical dependency tracing, and signature computation can be encoded in Lean~4 as a metatheoretic framework.
+\end{description}
+
+{\small
+\begin{longtable}{@{}p{3.5cm}ccp{5.2cm}c@{}}
+\caption{Formalization map for CRM audit of Berkovich motivic independence of $\ell$. CRM levels and Lean~4 feasibility per component.}
+\label{tab:formalization-map} \\
+\toprule
+\textbf{Component} & \textbf{CRM} & \textbf{Lean} & \textbf{Key Techniques / Dependencies} & \textbf{Ref} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Component} & \textbf{CRM} & \textbf{Lean} & \textbf{Key Techniques / Dependencies} & \textbf{Ref} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r}{\emph{continued on next page}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+%
+\multicolumn{5}{@{}l}{\textit{CRM Framework (metatheory)}} \\
+\midrule
+CRM hierarchy & $\BISH$ & \textsf{HIGH} & Finite partial order on 7 principles. \texttt{inductive CRMLevel}. Done in Papers~72--76. & \S\ref{sec:crm} \\[2pt]
+Signature formula $\sig(P)$ & $\BISH$ & \textsf{HIGH} & $\max$ over finite set. Lean~4 \texttt{Finset.sup}. & \S\ref{sec:crm} \\[2pt]
+Archimedean Obstruction Thm & $\BISH$ & \textsf{HIGH} & Metatheorem on \texttt{CRMLevel}. Paper~98 Lean bundle. & Thm~\ref{thm:archimedean} \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Berkovich Motivic Category $\Dmot(X)$ --- Audit~\ref{audit:dmot}}} \\
+\midrule
+Banach ring foundations & $\WLPO^*$ & \textsf{MED} & $\R_{\geq 0}$ norms, completions. Mathlib \texttt{SeminormedRing}. ${}^*$Parasitic. & 3.1 \\[2pt]
+Arc-topology descent & $\WKL$ & \textsf{LOW} & Grothendieck topology on $\mathrm{Ban}_k$. New infrastructure needed. & 3.1 \\[2pt]
+Profinite inverse limits & $\WKL$ & \textsf{MED} & $\varprojlim$ of finite rings. Perfectoid library partially covers. & 3.1 \\[2pt]
+Berkovich spectrum $\mathcal{M}(A)$ & $\WKL$ & \textsf{LOW} & Bounded multiplicative seminorms. Not in Mathlib. & 3.1 \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Voevodsky Recovery --- Audit~\ref{audit:voevodsky}}} \\
+\midrule
+$\A^1$-homotopy invariance & $\BISH$ & \textsf{LOW} & Motivic homotopy theory. No Mathlib coverage. & 3.2 \\[2pt]
+Nisnevich descent & $\BISH$ & \textsf{LOW} & \'Etale topology variant. Partial Mathlib coverage. & 3.2 \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Motivic Geometric Satake --- Audit~\ref{audit:satake}}} \\
+\midrule
+Affine Grassmannian & $\BISH$ & \textsf{LOW} & Ind-scheme $\mathrm{Gr}_G$. Not in Mathlib. & 3.3 \\[2pt]
+MV cycles / weight structures & $\BISH$ & \textsf{LOW} & Algebraic subvarieties. Requires intersection theory. & 3.3 \\[2pt]
+Satake equivalence (statement) & $\BISH$ & \textsf{MED} & Monoidal equivalence. Mathlib \texttt{MonoidalCategory}. & 3.3 \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Fargues--Fontaine Curve and $\Bun_G$ --- Audit~\ref{audit:ff}}} \\
+\midrule
+Witt vectors $W(\mathcal{O}_{\C_p^\flat})$ & $\BISH$ & \textsf{MED} & Mathlib \texttt{WittVector}. Verified by \texttt{ring}. & 3.4 \\[2pt]
+Perfectoid tilting & $\WKL$ & \textsf{MED} & $R^\flat = \varprojlim_\phi R/p$. Buzzard et al.\ library (Lean~3; Lean~4 port pending).\footnote{The Buzzard--Commelin--Massot formalization of perfectoid spaces~\cite{buzzard-perfectoid} was carried out in Lean~3.  While the Liquid Tensor Experiment has been ported to Lean~4/Mathlib4, porting the full perfectoid geometric infrastructure remains a known frontier---validating the \textsf{MED} (not \textsf{LOW}) feasibility rating.} & 3.4 \\[2pt]
+$\Bun_G$ stratification & $\BISH$ & \textsf{LOW} & Harder--Narasimhan strata over $p$-adic fields. & 3.4 \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Spectral Action --- Audit~\ref{audit:spectral}}} \\
+\midrule
+Bernstein center $\mathfrak{Z}(G)$ & $\BISH$ & \textsf{LOW} & Categorical endomorphisms. Deep algebra. & 3.5 \\[2pt]
+Excursion operators & $\BISH$ & \textsf{LOW} & Hecke correspondences on moduli stacks. & 3.5 \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{$\ell$-adic Realization --- Audit~\ref{audit:realization}}} \\
+\midrule
+\'Etale cohomology $H^*(-,\Z/\ell^n)$ & $\BISH$ & \textsf{LOW} & Finite coefficients. No Mathlib \'etale cohomology. & 3.6 \\[2pt]
+$\ell$-adic limit $\varprojlim_n$ & $\WKL$ & \textsf{MED} & Profinite inverse limit (same infrastructure). & 3.6 \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Overall Signature Computation}} \\
+\midrule
+$\sig(\text{Scholze}) = \WKL$ & --- & \textsf{HIGH} & $\max$ of above. Finite computation on \texttt{CRMLevel}. & Thm~\ref{thm:signature} \\
+\end{longtable}
+}
+
+
+\subsection{Recommended Formalization Targets}
+
+Based on the feasibility assessment, we recommend the following prioritization for Lean~4 formalization:
+
+\paragraph{Tier~1: Immediately formalizable (CRM metatheory).}
+The CRM hierarchy, signature formula, and overall signature computation are all finite combinatorial objects already encoded in the CRM Lean bundles (Papers~72--76, 98, 100). Formalizing the \emph{statement} ``$\sig(\text{Scholze's proof}) = \WKL$'' requires only:
+\begin{itemize}
+\item An \texttt{inductive AuditComponent} type listing the 7 components.
+\item A function \texttt{auditLevel : AuditComponent $\to$ CRMLevel} encoding Table~\ref{tab:audit}.
+\item A theorem that \texttt{Finset.univ.sup auditLevel = CRMLevel.WKL}.
+\end{itemize}
+This is a direct analogue of the Paper~100 Lean bundle (\texttt{Paper100\_Assembly.lean}), which assembles the CRM audit of the Kuga--Satake bifurcation as a single 17-conjunct theorem verified by \texttt{decide}. Estimated effort: 1--2 days, $\sim$200 lines Lean.
+
+\paragraph{Tier~2: Near-term targets (existing Mathlib infrastructure).}
+\begin{itemize}
+\item \textbf{Witt vectors.} Mathlib's \texttt{WittVector} provides the ring operations. Verifying specific identities (e.g., Teichm\"uller lifts, Frobenius action) by \texttt{ring}/\texttt{norm\_num} is feasible.
+\item \textbf{Profinite inverse limits.} The perfectoid library (Buzzard--Commelin--Massot) formalizes tilting for perfectoid rings in Lean~3.  The Lean~4/Mathlib4 port of this deep geometric infrastructure is a known frontier; extending to the specific inverse limits in the Fargues--Fontaine construction is moderate effort once the port is complete.
+\item \textbf{Satake equivalence (statement only).} The monoidal equivalence $\mathrm{Rep}(\hat{G}) \simeq \mathrm{Perv}_{G(\mathcal{O})}(\mathrm{Gr}_G)$ can be stated as a Lean~4 proposition using Mathlib's \texttt{MonoidalCategory} infrastructure, even if the proof is \texttt{sorry}'d. This records the CRM level ($\BISH$) as a verifiable assertion.
+\end{itemize}
+
+\paragraph{Tier~3: Long-term infrastructure (new Mathlib development needed).}
+The motivic category $\Dmot(X)$, the 6-functor formalism, \'etale cohomology with $\Z_\ell$-coefficients, and the Bernstein center all require substantial new Mathlib development. These are multi-year projects aligned with the broader formalization community's roadmap (cf.\ the Liquid Tensor Experiment for condensed mathematics, and Mathlib's ongoing algebraic geometry development).
+
+\subsection{CRM-Aware Formalization Principle}
+
+The CRM audit suggests a general principle for formalization strategy:
+
+\begin{quote}
+\emph{Formalize at the lowest CRM level first.} $\BISH$ components (motivic Satake, spectral action, Voevodsky recovery) use only constructive logic and are therefore amenable to formalization without \texttt{Classical.choice}. $\WKL$ components (perfectoid inverse limits, $\ell$-adic realization) require \texttt{Classical.choice} in current Lean~4/Mathlib but could be formalized in a future constructive variant. Parasitic $\WLPO$ components (Banach ring norms) should be \emph{reformulated} before formalization, using $\Q$-valued norms to eliminate the artifact.
+\end{quote}
+
+This principle applies beyond Paper~101: any CRM audit generates a formalization priority ranking. $\BISH$ components are the cleanest targets; $\WKL$ components are the structural core; $\CLASS$ components (absent here) identify irreducible obstacles. The CRMlint Lean~4 backend (Paper~76, Generation~4) will automate this prioritization across Mathlib.
+
+\subsection{Proof Dependency Graph}
+
+The logical dependencies among the seven audit components form a directed acyclic graph.  The three foundational pillars ($\Dmot(X)$, Fargues--Fontaine/$\Bun_G$, motivic Satake) are \emph{independent}---none depends on the others---and feed into the spectral action, which feeds into the $\ell$-adic realization.  The CRM level propagates upward through $\max$:
+
+\begin{center}
+\begin{tikzpicture}[
+  node distance=1.2cm and 2.0cm,
+  every node/.style={draw, rounded corners, minimum width=2.2cm, minimum height=0.7cm, font=\small, align=center},
+  bish/.style={fill=green!15},
+  wkl/.style={fill=orange!20},
+  target/.style={fill=blue!10, thick}
+]
+% Bottom row: three independent foundational pillars
+\node[wkl] (dmot) {$\Dmot(X)$\\$\WKL$};
+\node[wkl, right=of dmot] (ff) {FF / $\Bun_G$\\$\WKL$};
+\node[bish, right=of ff] (satake) {Mot.\ Satake\\$\BISH$};
+
+% Middle: Spectral Action (combines the three pillars)
+\node[bish, above=1.5cm of ff] (spectral) {Spectral Act.\\$\BISH$};
+
+% Upper: l-adic realization
+\node[wkl, above=of spectral] (real) {$\ell$-adic Real.\\$\WKL$};
+
+% Top: overall signature
+\node[target, above=of real] (sig) {$\sig = \WKL$};
+
+% Specialization output (below Dmot)
+\node[bish, below=of dmot] (voevodsky) {Voevodsky\\$\BISH$};
+
+% Arrows: pillars → spectral action
+\draw[-stealth] (dmot) -- (spectral);
+\draw[-stealth] (ff) -- (spectral);
+\draw[-stealth] (satake) -- (spectral);
+
+% spectral → realization → signature
+\draw[-stealth] (spectral) -- (real);
+\draw[-stealth] (real) -- (sig);
+
+% Dmot specializes to Voevodsky (dashed, downward)
+\draw[-stealth, dashed] (dmot) -- node[right, draw=none, fill=none, minimum width=0pt, font=\scriptsize\itshape] {spec.} (voevodsky);
+\end{tikzpicture}
+\end{center}
+
+\noindent The Voevodsky recovery (dashed) is a \emph{specialization} of $\Dmot$ to discrete fields---a consequence, not a dependency.  The $\BISH$ components (motivic Satake, spectral action, Voevodsky) are the natural first targets for formalization.  The $\WKL$ cost of the non-Archimedean foundations ($\Dmot$, Fargues--Fontaine, $\ell$-adic inverse limits) dominates, yielding the overall $\WKL$ signature at the top.
+
+
+%======================================================================
+\section{Section-Level CRM Heatmap}\label{app:heatmap}
+%======================================================================
+
+This appendix presents the full section-by-section scanner data for both Scholze papers, following the format of the LTE analysis in the companion CRMLint methodological paper (Paper~99).  The heatmap allows direct comparison with the Liquid Tensor Experiment blueprint and the broader CRM series.
+
+\subsection{Berkovich Motives: Per-Section Breakdown}
+
+Table~\ref{tab:berkovich-heatmap} gives the CRM alert distribution across the 16 detected sections of~\cite{scholze-berkovich}.  The rightmost column shows the section ceiling (the highest CRM level detected in that section).
+
+{\small
+\begin{longtable}{@{}p{4.0cm}rrrrrc@{}}
+\caption{CRM heatmap for Berkovich Motives (141 alerts).  Sections are ordered as in the source.}
+\label{tab:berkovich-heatmap} \\
+\toprule
+\textbf{Section} & \textbf{$\BISH$} & \textbf{$\WKL$} & \textbf{$\WLPO$} & \textbf{$\LPO$} & \textbf{Total} & \textbf{Ceiling} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Section} & \textbf{$\BISH$} & \textbf{$\WKL$} & \textbf{$\WLPO$} & \textbf{$\LPO$} & \textbf{Total} & \textbf{Ceiling} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{7}{r}{\emph{continued on next page}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+%
+Preamble                & 1 &  0 &  0 & 0 &  1 & $\BISH$ \\
+Introduction            &15 &  9 &  2 & 0 & 26 & $\WKL$  \\
+Banach rings / spectrum &  0 &  1 &  4 & 1 &  6 & $\LPO$  \\
+Free seminormed rings   &  0 &  0 &  0 & 1 &  1 & $\LPO$  \\
+Banach fields           &  0 &  4 &  5 & 1 & 10 & $\LPO$  \\
+Gelfand transform       &  0 &  0 &  1 & 1 &  2 & $\LPO$  \\
+Nonarchimedean disc     &  0 &  2 &  7 & 0 &  9 & $\WKL$  \\
+Arc-topology            &  0 & 18 &  7 & 1 & 26 & $\LPO$  \\
+Finitary arc-sheaves    &  2 &  3 &  6 & 1 & 12 & $\LPO$  \\
+Effective motives       &  2 &  0 &  0 & 0 &  2 & $\BISH$ \\
+Free motivic sheaves    &  5 &  1 &  3 & 0 &  9 & $\WKL$  \\
+The Tate twist          &  2 &  0 &  0 & 0 &  2 & $\BISH$ \\
+$K$-theory              &  2 &  7 &  5 & 0 & 14 & $\WKL$  \\
+$\Dmot$ construction    & 10 &  3 &  1 & 1 & 15 & $\LPO$  \\
+Mixed Tate motives      &  3 &  0 &  0 & 0 &  3 & $\BISH$ \\
+Relation to $v$-stacks  &  0 &  3 &  0 & 0 &  3 & $\WKL$  \\
+\midrule
+\textbf{Total}          & \textbf{42} & \textbf{51} & \textbf{41} & \textbf{7} & \textbf{141} & $\LPO$ \\
+\end{longtable}
+}
+
+\paragraph{Reading the heatmap.}\footnote{Where a section contains alerts at both $\WKL$ and $\WLPO$ (which are incomparable over $\BISH$; see \S\ref{sec:crm}), the scanner resolves the ceiling using the linearization $\BISH < \WLPO < \WKL < \LPO < \CLASS$.  This convention treats $\WKL$ as structurally ``higher'' than $\WLPO$, reflecting its role as the irreducible non-Archimedean compactness principle in the Berkovich motivic architecture.  This is a reporting convention for the ceiling column; the logical relationship between $\WKL$ and $\WLPO$ remains incomparability.}
+The $\LPO$ ceilings concentrate in the Banach ring infrastructure (sections~3--8 of~\cite{scholze-berkovich}): Banach rings, Banach fields, Gelfand transform, arc-topology, finitary arc-sheaves.  These are exactly the sections flagged as Category~B (parasitic) in \S\ref{sec:scanner}.  The $\LPO$ arises from seminorm filtrations indexed by $\R_{\geq 0}$, where decidable comparison $\|x\| \leq r$ triggers $\LPO$.  After excision of parasitic content, these sections reduce to $\WKL$ (structural profinite inverse limits).
+
+The four sections at $\BISH$ ceiling (Preamble, Effective motives, Tate twist, Mixed Tate motives) are purely algebraic: motivic sheaves, Tate twists, algebraic correspondences.  No completions, no norms, no inverse limits.
+
+\subsection{Motivic Geometrization: Per-Section Breakdown}
+
+{\small
+\begin{longtable}{@{}p{4.0cm}rrrrrc@{}}
+\caption{CRM heatmap for Motivic Geometrization (73 alerts).}
+\label{tab:motivic-heatmap} \\
+\toprule
+\textbf{Section} & \textbf{$\BISH$} & \textbf{$\WKL$} & \textbf{$\WLPO$} & \textbf{$\LPO$} & \textbf{Total} & \textbf{Ceiling} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Section} & \textbf{$\BISH$} & \textbf{$\WKL$} & \textbf{$\WLPO$} & \textbf{$\LPO$} & \textbf{Total} & \textbf{Ceiling} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+%
+Preamble                  &  1 &  1 &  0 & 0 &  2 & $\WKL$  \\
+Introduction              &  5 &  5 &  9 & 0 & 19 & $\WKL$  \\
+Basic results             &  5 & 12 &  2 & 1 & 20 & $\LPO$  \\
+$\Dmot$ construction      &  2 &  3 &  0 & 0 &  5 & $\WKL$  \\
+Stacks of $L$-parameters  &  2 &  0 &  6 & 0 &  8 & $\WLPO$ \\
+Geometric Satake          &  4 &  2 &  3 & 0 &  9 & $\WKL$  \\
+Synopsis                  &  1 &  2 &  7 & 0 & 10 & $\WKL$  \\
+\midrule
+\textbf{Total}            & \textbf{20} & \textbf{25} & \textbf{27} & \textbf{1} & \textbf{73} & $\LPO$ \\
+\end{longtable}
+}
+
+\paragraph{Observation.}
+The single $\LPO$ alert in~\cite{scholze-motivic-geometrization} occurs in ``Basic results'' (line~325: normed filtration).  Every other section is at $\WKL$ or below.  The Geometric Satake section---the critical potential leak point identified in Audit~\ref{audit:satake}---shows 4~$\BISH$ (motivic sheaves, Tate twists) and 2~$\WKL$ (citations to Lectures on Analytic Geometry), confirming the $\BISH$ assessment after stripping citation-level context dependencies.
+
+\subsection{Category Distribution by Section}
+
+Table~\ref{tab:category-by-section} shows how the four alert categories distribute across the major section types.
+
+\begin{table}[h]
+\centering
+\caption{Category distribution by section type (both papers combined).}
+\label{tab:category-by-section}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\textbf{Section type} & \textbf{A} & \textbf{B} & \textbf{$\BISH$} & \textbf{C} & \textbf{Total} \\
+\midrule
+Preamble / Introduction & 26 &  2 & 15 &  0 &  43 \\
+Banach infrastructure   &  0 & 25 &  2 & 14 &  41 \\
+Arc / profinite / disc  &  0 & 13 &  2 & 25 &  40 \\
+Motivic core            &  0 &  4 & 22 &  4 &  30 \\
+$\Dmot$, $K$-theory     &  0 &  6 & 12 &  9 &  27 \\
+Satake / spectral       &  0 &  8 &  8 &  4 &  20 \\
+Synopsis / other        &  0 &  7 &  1 &  5 &  13 \\
+\midrule
+\textbf{Total}          & \textbf{26} & \textbf{65} & \textbf{62} & \textbf{61} & \textbf{214} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The pattern is sharp:
+\begin{itemize}
+\item Category~A (motivational) is confined to Preamble/Introduction---exactly as predicted.
+\item Category~B (parasitic) concentrates in Banach infrastructure and arc-topology sections.
+\item Category~$\BISH$ (algebraic core) concentrates in the motivic construction sections.
+\item Category~C (structural $\WKL$) concentrates in arc-topology and profinite sections.
+\end{itemize}
+
+
+\subsection{Archimedean Comparison: Four Corpora}
+
+Table~\ref{tab:archimedean-comparison} compares the CRM profiles of four corpora analyzed by the CRMlint scanner, following the format of the LTE comparison in Paper~99.
+
+\begin{table}[h]
+\centering
+\caption{Archimedean comparison across four scanner corpora.  $\BISH$\% is the fraction of alerts (or declarations) at $\BISH$; Ceiling is the highest detected level; Bottleneck is the mathematical mechanism producing the ceiling.}
+\label{tab:archimedean-comparison}
+\begin{tabular}{@{}lccll@{}}
+\toprule
+\textbf{Corpus} & \textbf{$N$} & \textbf{$\BISH$\%} & \textbf{Ceiling} & \textbf{Bottleneck} \\
+\midrule
+Mathlib (627 decls)       & 627 & 92.0\% & $\CLASS$ & Inner product, convergence \\
+CRM series (P78--96)      & ---  & 71.4\% & $\CLASS$ & Kolyvagin, trace formula \\
+LTE blueprint (15 files)  &  15 & 33.3\% & $\LPO$   & Norm filtration $M_{\leq c}$ \\
+Berkovich motives (2 papers) & 214 & 29.0\% & $\LPO^*$ & Seminorm filtration \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+{\footnotesize ${}^*$After excision of parasitic $\LPO$/$\WLPO$, the essential ceiling is $\WKL$. The LTE's $\LPO$ is structural; the Berkovich motives' $\LPO$ is parasitic.}
+\end{table}
+
+\paragraph{The comparison reveals two distinct concentration patterns.}
+
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{LTE:} $\LPO$ is \emph{structural}.  The norm-filtration membership test $x \in M_{\leq c}$ is the mechanism by which condensed mathematics encodes analytic content.  Every module that touches the filtration acquires $\LPO$ signature.  The $\LPO$ is irreducible: it is the logical cost of comparing real numbers, and the condensed framework defers but does not eliminate this cost.
+
+\item \textbf{Berkovich motives:} $\LPO$/$\WLPO$ is \emph{parasitic}.  The Banach ring formalism carries $\R$-valued norms through sections where the actual mathematical content operates over $\Q$-valued norms (the value groups of perfectoid fields like $\C_p$ are dense but contained in $\Q$, hence decidable).  A reformulation using Huber's adic spaces restricted to decidable $\Q$-valued groups would eliminate these alerts entirely.  The structural content is $\WKL$ (profinite inverse limits for perfectoid spaces).
+\end{enumerate}
+
+This distinction---structural vs.\ parasitic non-constructivity---is invisible to a surface-level scan.  It requires the human classification step (Category~B vs.\ Category~C) that transforms raw scanner data into CRM diagnoses.
+
+
+\subsection{Concentration Ratio}
+
+Following the definition in the LTE analysis (Paper~99, Observation~6.3):
+
+\begin{definition}[Concentration ratio]
+For a proof corpus $C$ with $n$ sections, let $k$ be the number of sections whose CRM ceiling is above $\BISH$.  The \emph{concentration ratio} is $\rho(C) = 1 - k/n$.
+\end{definition}
+
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Corpus} & \textbf{$n$} & \textbf{$k$} & \textbf{$\rho$} & \textbf{Interpretation} \\
+\midrule
+LTE blueprint        & 15 & 10 & 0.33 & Concentrated (5 purely algebraic files) \\
+Berkovich Motives     & 16 & 12 & 0.25 & Moderately concentrated \\
+Motivic Geom.         &  7 &  7 & 0.00 & Fully diffuse (no section is $\BISH$-only) \\
+Berkovich + Geom.\ (essential) & 23 &  9 & 0.61 & \emph{After parasitic excision} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Key observation.}
+The raw concentration ratio (0.25 for Berkovich, 0.00 for Motivic Geom.) is misleadingly low.  The parasitic $\WLPO$/$\LPO$ from Banach ring formalism diffuses non-constructive alerts across sections that are structurally algebraic or purely $\WKL$.  After excision of Category~B (parasitic) alerts, the concentration ratio rises to $\rho = 0.61$---meaning 61\% of sections are at $\BISH$ after parasitic removal, comparable to the LTE's pre-excision $\rho = 0.33$.  The Berkovich motivic programme is \emph{more concentrated than the LTE} once the formalism artifact is removed.  This is consistent with the CRM audit's finding (\S\ref{sec:audit}): the essential non-constructive content (profinite inverse limits, $\WKL$) is localized in three specific architectural layers (arc-topology, Fargues--Fontaine, $\ell$-adic realization).
+
+
+\subsection{Dictionary Evolution: Dark Matter Analysis}
+
+The initial scanner run (v1.0, 80 keyword patterns) detected 103 alerts across both papers.  After adding 11 Berkovich-specific entries (v1.1, 91 patterns), the count rose to 214---a 108\% increase.  This mirrors the LTE experience documented in Paper~99 (\S5): the v1.0 scanner missed 53\% of the LTE's non-constructive content.
+
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Paper} & \textbf{v1.0} & \textbf{v1.1} & \textbf{$\Delta$} \\
+\midrule
+Berkovich Motives       & 56  & 141 & $+$85 ($+$152\%) \\
+Motivic Geometrization  & 47  & 73  & $+$26 ($+$55\%)  \\
+\midrule
+Total                   & 103 & 214 & $+$111 ($+$108\%) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The new alerts come from three categories:
+\begin{itemize}
+\item \textbf{Profinite/analytic keywords} ($+$57): ``perfectoid,'' ``adic space,'' ``Berkovich spectrum,'' ``arc-topology,'' ``condensed,'' ``solid module.''  These are $\WKL$ markers for profinite inverse limit structures---the structural core of the proof.
+\item \textbf{Motivic/algebraic keywords} ($+$32): ``motivic sheaf,'' ``six-functor,'' ``Tate twist.''  These are $\BISH$ markers confirming the algebraic core.
+\item \textbf{Citation patterns} ($+$16): citations to Scholze's \emph{Lectures on Analytic Geometry} triggering $\WKL$ alerts for Tychonoff gates.
+\end{itemize}
+
+The Archimedean dark matter fraction (Paper~99, Definition~5.1) for the Berkovich corpus:
+\[
+  \delta(\text{v1.0}) = \frac{\text{\# sections with manual CRM $>$ scanner CRM}}{\text{\# sections total}} = \frac{14}{23} = 60.9\%, \qquad
+  \delta(\text{v1.1}) = 0\%.
+\]
+
+The v1.1 dictionary eliminates the dark matter for this corpus.  As with the LTE, the dark matter was not random but systematic: a single vocabulary gap (Berkovich-specific terminology for profinite and motivic structures) that, once patched, revealed the full CRM profile.
+
+
+%======================================================================
+% APPENDIX C — CRMLint Methodology and LTE Calibration
+%======================================================================
+\clearpage
+\section{CRMLint Methodology and LTE Calibration}\label{app:methodology}
+
+This appendix reproduces the CRMLint methodological paper (originally
+prepared as a companion to Paper~98) in its entirety.  It documents
+the design, calibration, and first external deployment of the scanner
+against the Liquid Tensor Experiment blueprint, including the discovery
+and patching of Archimedean dark matter.  The data and methods here
+underpin the Berkovich analysis in the main body of Paper~101.
+
+\input{paper101_appendix_methodology}
+
+%======================================================================
+\begin{thebibliography}{99}
+
+\bibitem{scholze-berkovich} P.\ Scholze, Berkovich motives, arXiv:2412.03382, 2024 (revised January 2026).
+
+\bibitem{scholze-motivic-geometrization} P.\ Scholze, Geometrization of the local Langlands correspondence, motivically, arXiv:2501.07944, January 2026.
+
+\bibitem{fargues-scholze21} L.\ Fargues and P.\ Scholze, Geometrization of the local Langlands correspondence, arXiv:2102.13459, to appear in Ast\'erisque, 2021.
+
+\bibitem{lee-p98} P.\ C.-K.\ Lee, The motivic CRM architecture: why the six domains of mathematics have different logical signatures, and how motives explain the pattern (Paper~98), Zenodo, 2026. DOI: \href{https://doi.org/10.5281/zenodo.18828345}{10.5281/zenodo.18828345}.
+
+\bibitem{richarz-scholbach} T.\ Richarz and J.\ Scholbach, The motivic Satake equivalence, \emph{Math.\ Ann.} 380 (2021), 1595--1653.
+
+\bibitem{cass-vdh-scholbach} R.\ Cass, T.\ van den Hove, and J.\ Scholbach, The geometric Satake equivalence for integral motives, preprint.
+
+\bibitem{bishop67} E.\ Bishop, \emph{Foundations of Constructive Analysis}, McGraw-Hill, 1967.
+
+\bibitem{bridges-richman87} D.\ Bridges and F.\ Richman, \emph{Varieties of Constructive Mathematics}, LMS Lecture Notes 97, Cambridge, 1987.
+
+\bibitem{ishihara06} H.\ Ishihara, Reverse mathematics in Bishop's constructive mathematics, \emph{Phil.\ Sci.\ Cahier Sp\'ecial} 6 (2006), 43--59.
+
+\bibitem{wiles95} A.\ Wiles, Modular elliptic curves and Fermat's Last Theorem, \emph{Ann.\ of Math.} 141 (1995), 443--551.
+
+\bibitem{taylor-wiles95} R.\ Taylor and A.\ Wiles, Ring-theoretic properties of certain Hecke algebras, \emph{Ann.\ of Math.} 141 (1995), 553--572.
+
+\bibitem{lafforgue02} L.\ Lafforgue, Chtoucas de Drinfeld et correspondance de Langlands, \emph{Invent.\ Math.} 147 (2002), 1--241.
+
+\bibitem{arthur05} J.\ Arthur, An introduction to the trace formula, in: \emph{Harmonic Analysis, the Trace Formula, and Shimura Varieties}, Clay Math.\ Proc.\ 4, AMS, 2005, 1--263.
+
+\bibitem{hochster69} M.\ Hochster, Prime ideal structure in commutative rings, \emph{Trans.\ Amer.\ Math.\ Soc.} 142 (1969), 43--60.
+
+\bibitem{lee-p76} P.\ C.-K.\ Lee, CRMlint: automated logical cost analysis of mathematical proof (Paper~76), Zenodo, 2026. DOI: \href{https://doi.org/10.5281/zenodo.18779362}{10.5281/zenodo.18779362}.
+
+\bibitem{lee-p99} P.\ C.-K.\ Lee, The Hecke theta series squeeze: resolving the dihedral base case of modularity via Mumford's algebraic theta functions (Paper~99), Zenodo, 2026.
+
+\bibitem{lee-p100} P.\ C.-K.\ Lee, The Kuga--Satake bifurcation: absolute Hodge classes on K3 surfaces via Shioda--Inose structure (Paper~100), Zenodo, 2026.
+
+\bibitem{crmlint-scanner} P.\ C.-K.\ Lee, CRMlint scanner output and classification for Berkovich motives and motivic geometrization, supplementary appendix to Paper~101, 2026.
+
+\bibitem{lee-format} P.\ C.-K.\ Lee, Paper format guide for the constructive reverse mathematics series, Zenodo, 2026. DOI: \href{https://doi.org/10.5281/zenodo.18765700}{10.5281/zenodo.18765700}.
+
+\bibitem{buzzard-perfectoid} K.\ Buzzard, J.\ Commelin, and P.\ Massot, Formalising perfectoid spaces, in: \emph{Proceedings of the 9th ACM SIGPLAN International Conference on Certified Programs and Proofs}, 2020, 299--312.
+
+\bibitem{scholze-condensed} P.\ Scholze, Lectures on analytic geometry, lecture notes, 2019.
+
+\bibitem{scholze-lte} P.\ Scholze, Liquid tensor experiment, 2020. Available at \url{https://xenaproject.wordpress.com/2020/12/05/}.
+
+\bibitem{commelin-massot-lte} J.\ Commelin and P.\ Massot, Liquid tensor experiment: formal verification in Lean~3, 2022. Repository: \url{https://github.com/leanprover-community/liquid}.
+
+\bibitem{clausen-scholze22} D.\ Clausen and P.\ Scholze, \emph{Condensed Mathematics and Complex Geometry}, 2022.
+
+\bibitem{lee-p5} P.\ C.-K.\ Lee, General relativity is BISH + LPO: the logical cost of the equivalence principle (Paper~5), CRM Series, 2024. DOI: \href{https://doi.org/10.5281/zenodo.18765700}{10.5281/zenodo.18765700}.
+
+\bibitem{lee-p72} P.\ C.-K.\ Lee, The DPT characterisation theorem (Paper~72), CRM Series, 2025.
+
+\bibitem{lee-p73} P.\ C.-K.\ Lee, Axiom~1 is irreversible (Paper~73), CRM Series, 2025.
+
+\bibitem{lee-p74} P.\ C.-K.\ Lee, Axiom~2 is irreversible (Paper~74), CRM Series, 2025.
+
+\bibitem{lee-p77} P.\ C.-K.\ Lee, Explicit Hodge decompositions for $E^4$ (Paper~77), CRM Series, 2026. DOI: \href{https://doi.org/10.5281/zenodo.18777596}{10.5281/zenodo.18777596}.
+
+\bibitem{lee-p78} P.\ C.-K.\ Lee, The local Langlands correspondence for $\mathrm{GL}_2(\mathbb{Q}_2)$ is constructively decidable (Paper~78), CRM Series, 2026. DOI: \href{https://doi.org/10.5281/zenodo.18789008}{10.5281/zenodo.18789008}.
+
+\bibitem{lee-p90} P.\ C.-K.\ Lee, The squeeze is a microscope: automated constructivization from CRMLint to the Hodge horizon (Paper~90), CRM Series, 2026. DOI: \href{https://doi.org/10.5281/zenodo.18809911}{10.5281/zenodo.18809911}.
+
+\bibitem{lee-p95} P.\ C.-K.\ Lee, The BSD squeeze: CRMLint decomposition of the Gross--Zagier--Kolyvagin proof (Paper~95), CRM Series, 2026. DOI: \href{https://doi.org/10.5281/zenodo.18821019}{10.5281/zenodo.18821019}.
+
+\bibitem{lee-p96} P.\ C.-K.\ Lee, The root number bifurcation: CRM cost of BSD detection controlled by the functional equation (Paper~96), CRM Series, 2026. DOI: \href{https://doi.org/10.5281/zenodo.18869924}{10.5281/zenodo.18869924}.
+
+\bibitem{mathlib4} The Mathlib Community, \emph{Mathlib4: Mathematics in Lean~4}, \url{https://github.com/leanprover-community/mathlib4}, 2024--2026.
+
+\bibitem{simpson09} S.\ G.\ Simpson, \emph{Subsystems of Second Order Arithmetic}, 2nd ed., Cambridge University Press, 2009.
+
+\bibitem{breen-deligne} L.\ Breen, Extensions du groupe additif, \emph{Inst.\ Hautes \'Etudes Sci.\ Publ.\ Math.}~48 (1978), 39--125.
+
+\bibitem{tychonoff30} A.\ N.\ Tychonoff, \"Uber die topologische Erweiterung von R\"aumen, \emph{Math.\ Ann.}~102 (1930), 544--561.
+
+\end{thebibliography}
+
+\end{document}

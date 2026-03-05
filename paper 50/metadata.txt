@@ -1,0 +1,21 @@
+Title: Three Axioms for the Motive (Paper 50, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: March 2026
+
+Description: Paper 50 of the Constructive Reverse Mathematics (CRM) Series. Introduces the DPT (Decidability of Pure Trace) axiom framework and identifies the u-invariant mechanism u(R) = infinity as the structural explanation for why the real numbers are the unique source of non-constructive content in arithmetic geometry. The Archimedean completion R admits positive-definite forms in every dimension, forcing LPO/WLPO cost for sign decisions. Over non-Archimedean completions Q_p, the u-invariant is finite (u(Q_p) = 4), and the essential spectral data descends to Z by Deligne's Weil II theorem. This paper establishes the Archimedean Stratification: R-as-ring corresponds to BISH, R-as-ordered-field to LPO/WLPO, and R-as-complete-ordered-field to CLASS. The three DPT axioms interact with different algebraic layers of R: Axioms 1-2 (cycle class and spectral decidability) operate at the ring layer, while Axiom 3 (polarization decidability) requires the ordering layer. Includes Lean 4 formalization with zero sorry.
+
+Keywords: constructive reverse mathematics, motives, DPT axioms, u-invariant, Archimedean obstruction, positive definiteness, Bishop constructive mathematics, Lean 4, formal verification, omniscience hierarchy
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Upload type: publication / preprint
+
+Related identifiers:
+- IsPartOf: 10.5281/zenodo.17054050 (CRM Series concept record)
+- References: 10.5281/zenodo.18750992 (Paper 70, Archimedean Principle)
+- References: 10.5281/zenodo.18809911 (Paper 90, synthesis)
+- References: 10.5281/zenodo.18828345 (Paper 98, capstone)

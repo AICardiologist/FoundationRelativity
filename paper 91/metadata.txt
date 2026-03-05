@@ -1,0 +1,23 @@
+Title: The Logical Cost of Unconditional Hodge: A CRM Audit of the Markman-Floccari-Fu Theorem (Paper 91, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, NY
+
+Date: February 2026
+
+Description:
+Paper 91 of the Constructive Reverse Mathematics (CRM) Series. In February 2025, Markman unconditionally proved the Hodge Conjecture for all abelian fourfolds of Weil type using secant sheaves and Orlov derived equivalences. This paper subjects Markman's proof to the CRMLint Squeeze protocol, classifying each step in the CRM hierarchy. Four theorems are proved. Theorem A: Markman's proof decomposes into 4 BISH and 5 CLASS components. Theorem B: The CRMLint Squeeze (Papers 84-89) achieves 90% BISH (18/20 conditional on VHC), compared to Markman's 44% BISH (4/9 unconditional). Theorem C: Markman's result validates VHC a posteriori for the exotic Weil class on the universal genus-4 hyperelliptic family. Theorem D: The cycle class map cl: CH^2 -> H^4 is irreducibly CLASS, proving the 20/0 ratio logically impossible. On the palindromic locus, asymmetric offloading constructs the explicit Kani-Rosen correspondence cycle and verifies it in Lean 4. The Lean 4 bundle comprises 666 lines with zero sorry. This is the first CRM audit of a resolution of a sub-case of a Clay Millennium Problem.
+
+Keywords: Constructive Reverse Mathematics, Hodge Conjecture, Weil classes, abelian fourfolds, CRMLint, formal verification, Lean 4, Markman, derived categories, Kani-Rosen splitting, cycle class map, omniscience hierarchy
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related identifiers:
+- Paper 84: DOI 10.5281/zenodo.18802819
+- Paper 85: DOI 10.5281/zenodo.18806608
+- Paper 90: DOI 10.5281/zenodo.18809911
+- Markman: arXiv:2502.03415
+- Floccari-Fu: arXiv:2504.13607
+
+Upload type: publication / preprint

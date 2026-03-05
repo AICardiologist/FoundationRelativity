@@ -1,0 +1,25 @@
+Title: Absolute Hodge Classes for the Universal Hyperelliptic Weil Locus: A CRMLint Squeeze (Paper 89, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: Department of Medicine, NYU Grossman School of Medicine
+
+Date: February 2026
+
+Description:
+Paper 89 proves that the exotic Weil class on the Jacobian of the universal genus-4 hyperelliptic Weil family C_{a,b,c}: y^2 = x^9 + ax^7 + bx^5 + cx^3 + x is a global flat section of the Gauss-Manin connection over the full 3-dimensional parameter space Q(a,b,c). The trace of the connection on the eigenvalue-i eigenspace V_+ vanishes identically (tau_+ = 0) in all three parameter directions d/da, d/db, d/dc, verified as polynomial identities in Z[a,b,c] by Lean 4's ring tactic. At the Fermat anchor (a,b,c) = (0,0,0), the curve C_0: y^2 = x^9 + x is dominated by the Fermat hypersurface F_16, where algebraicity follows from Shioda's 1982 theorem. Conditional on the Variational Hodge Conjecture (Grothendieck 1966), the exotic Weil class is algebraic across the entire hyperelliptic Weil locus. This is the eleventh CRMLint Squeeze application, upgrading from the 1-parameter conditional result of Paper 88 to the full 3-parameter universal family. The palindromic locus (a = c) is precisely characterized as the Kani-Rosen locus where unconditional algebraicity holds (Paper 86). CRM classification: CLASS (conditional on VHC). The BISH core comprises all polynomial identities, universal trace vanishing over Q(a,b,c), dimension data, and the palindromic obstruction characterization. Lean 4 bundle: 0 sorry.
+
+Keywords: Hodge Conjecture, exotic Weil classes, Gauss-Manin connection, hyperelliptic curves, Griffiths pole reduction, Fermat domination, Variational Hodge Conjecture, constructive reverse mathematics, CRMLint Squeeze, Lean 4, formal verification
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related Identifiers:
+- IsPartOf: 10.5281/zenodo.17054050 (CRM Series concept record)
+- References: 10.5281/zenodo.18802819 (Paper 84: Global Flatness)
+- References: 10.5281/zenodo.18806608 (Paper 85: Universal Flatness)
+- References: 10.5281/zenodo.18791985 (Paper 80: Algebraic Gauss-Manin)
+- References: 10.5281/zenodo.18683802 (Paper 49: Hodge Conjecture and Omniscience)
+- References: 10.5281/zenodo.18734021 (Paper 56: Exotic Weil Self-Intersection)
+
+Upload Type: publication
+Publication Type: preprint

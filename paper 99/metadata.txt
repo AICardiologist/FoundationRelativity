@@ -1,0 +1,23 @@
+Title: The Hecke Theta Series Squeeze: Resolving the Dihedral Base Case of Modularity via Mumford's Algebraic Theta Functions — Paper 99 of the Constructive Reverse Mathematics Series
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: March 2026
+
+Description:
+We resolve the principal contested classification in the CRM program: whether the dihedral base case of modularity lifting — the step that anchors Kisin's p = 2 proof of the modularity theorem and hence Fermat's Last Theorem — is BISH (Bishop-constructive) or CLASS (fully classical). The classical proof requires three CLASS nodes: Poisson summation (existence of theta_chi), the Deligne-Serre theorem (extracting Galois representations from weight-1 forms), and Chebotarev density (matching Hecke eigenvalues to Galois traces at enough primes). We excise all three. (1) Mumford's algebraic theta functions (1966) construct theta_chi as a geometric modular form on the abelian surface A = E tensor O_K over X_1(N), purely over Z[1/N] (BISH). (2) For dihedral representations rho = Ind chi, the representation exists a priori by induction; the Hecke eigenvalue and Galois trace formulas are identical by splitting type, yielding definitional equality (rfl in Lean) without Deligne-Serre (BISH). (3) Effective Chebotarev bounds (Lagarias-Odlyzko 1977) make Taylor-Wiles prime selection a bounded finite search over a decidable predicate (BISH). The q-expansion principle (Katz 1973) serves only its intended role: uniqueness (injectivity), not existence. The CRMLint decomposition yields 5 BISH components and 0 CLASS components (100% constructive). Combined with Paper 68's audit of Stages 2-5 (BISH + WKL via Fontaine-Laffaille and Taylor-Wiles patching), this confirms CRM(FLT) = WKL. The WKL node (Taylor-Wiles patching argument, not prime selection) is irreducible. Sixteenth CRMLint application. A companion 0-sorry Lean 4 bundle (989 lines, 0 Classical.choice) mechanically verifies the CRMLint decomposition. v2 corrects three mathematical errors in v1 identified by external review: misuse of q-expansion principle as existence, misapplication of Eichler-Shimura to weight-1 forms, and misapplication of Sturm bound to compare a form with a representation.
+
+Keywords: constructive reverse mathematics, Fermat's Last Theorem, modularity lifting, Hecke theta series, Mumford algebraic theta, q-expansion principle, Weak Konig's Lemma, CRMLint, Lean 4, formal verification, Katz, dihedral representations, Taylor-Wiles patching, forward formulaic matching, effective Chebotarev
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Upload type: publication
+
+Related identifiers:
+- IsPartOf: 10.5281/zenodo.18765700 (CRM Series format guide)
+- IsPartOf: 10.5281/zenodo.18828345 (Paper 98: The Motivic CRM Architecture)
+- IsPartOf: 10.5281/zenodo.18779362 (Paper 76: CRMLint)
+
+References: 27 primary sources

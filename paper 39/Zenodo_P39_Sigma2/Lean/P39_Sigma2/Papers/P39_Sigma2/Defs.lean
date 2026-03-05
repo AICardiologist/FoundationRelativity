@@ -58,17 +58,30 @@ def LPO : Prop :=
 --   Given α : ℕ → ℕ → Bool where each row's LPO status is known,
 --   decide: (∃ n, ∀ m, α n m = false) ∨ (∀ n, ∃ m, α n m = true)
 --
--- Simplified operational form used here:
+-- Operational form: LPO_jump decides Σ₂⁰ statements.
+-- Given a predicate P whose decidability requires an LPO oracle,
+-- decide whether P is universally false or existentially true.
+--
+-- CRITICAL: P ranges over Prop, not Bool.
+-- With Bool the oracle premise (LPO → ∀ n, β n = true ∨ β n = false)
+-- is a tautology, collapsing LPO_jump to LPO.
 def LPO_jump : Prop :=
-    ∀ (β : ℕ → Bool),
-      -- β is LPO-computable (decidable relative to an LPO oracle)
-      (LPO → ∀ n, β n = true ∨ β n = false) →
-      (∀ n, β n = false) ∨ (∃ n, β n = true)
+    ∀ (P : ℕ → Prop),
+      -- P is LPO-decidable (requires an LPO oracle to decide each instance)
+      (LPO → ∀ n, P n ∨ ¬P n) →
+      (∀ n, ¬P n) ∨ (∃ n, P n)
 
 -- LPO_jump is strictly stronger than LPO
 theorem lpo_jump_implies_lpo : LPO_jump → LPO := by
   intro lpo_j a
-  exact lpo_j a (fun _ _ => by cases a _  <;> simp)
+  -- Set P(n) := (a(n) = true), decidable for Bool without any oracle
+  have h := lpo_j (fun n => a n = true) (fun _ n => by cases a n <;> simp)
+  rcases h with h_neg | h_pos
+  · left; intro n
+    cases hn : a n
+    case false => rfl
+    case true => exact absurd hn (h_neg n)
+  · right; exact h_pos
 
 -- ============================================================
 -- Σ₂⁰ and Π₂⁰ completeness structures
@@ -136,7 +149,7 @@ structure PromiseGapped where
   promise : is_gapless hamiltonian ∨ is_gapped hamiltonian
 
 -- ============================================================
--- Thermodynamic Observable Types (Theorem 4)
+-- Thermodynamic Observable Types
 -- ============================================================
 
 -- Extensive observable (energy density, free energy, magnetization)
@@ -157,9 +170,28 @@ structure IntensiveObservable where
   -- The observable is the infimum
   is_infimum : True  -- placeholder (value = inf over scales)
 
--- Sign decision for extensive observables
-def extensive_sign_positive (O : ExtensiveObservable) : Prop :=
-    ∃ n, O.finite_value n > 0
+-- ============================================================
+-- Exact Zero-Test for Decreasing Sequences (Theorem 4)
+-- ============================================================
+
+-- A decreasing non-negative sequence (spectral gap, energy density,
+-- correlation length all have this form in the thermodynamic limit)
+structure DecreasingSeqWithLimit where
+  seq : ℕ → ℝ
+  decreasing : ∀ n, seq (n + 1) ≤ seq n
+  nonneg : ∀ n, seq n ≥ 0
+
+-- The exact zero-test: is the limit ℓ > 0?
+-- This is Σ₂⁰: ∃ m > 0, ∀ n, x_n ≥ 1/m
+-- (If all terms are ≥ 1/m, the limit is ≥ 1/m > 0)
+def exact_limit_positive (s : DecreasingSeqWithLimit) : Prop :=
+    ∃ m : ℕ, m > 0 ∧ ∀ n, s.seq n ≥ 1 / (m : ℝ)
+
+-- The complement: limit ℓ = 0
+-- This is Π₂⁰: ∀ m > 0, ∃ n, x_n < 1/m
+-- (The sequence dips below every positive threshold)
+def exact_limit_zero (s : DecreasingSeqWithLimit) : Prop :=
+    ∀ m : ℕ, m > 0 → ∃ n, s.seq n < 1 / (m : ℝ)
 
 -- Zero test for intensive observables
 def intensive_is_zero (O : IntensiveObservable) : Prop :=

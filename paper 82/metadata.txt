@@ -1,0 +1,54 @@
+Title: Picard-Fuchs Monodromy via Kovacic's Algorithm: A CRMLint Squeeze (Paper 82, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: 2026-02-26
+
+Description:
+Paper 82 of the Constructive Reverse Mathematics (CRM) Series computes the
+differential Galois group G_gal = SL_2 for the Legendre Picard-Fuchs equation
+t(1-t)y'' + (1-2t)y' - (1/4)y = 0 using Kovacic's algorithm, entirely within
+Bishop-style constructive mathematics (BISH).
+
+The classical proof of G_gal = SL_2 proceeds via topological monodromy
+representations, fundamental groups, analytic continuation, and Zariski density
+arguments -- all requiring classical logic (CLASS). This paper replaces the
+entire topological apparatus with rational function analysis over Q(t): normal
+form reduction (polynomial identity), pole classification and indicial equations
+(rational arithmetic), and Kovacic's three-case algorithm (finite case checking).
+All three Kovacic cases fail by rational arithmetic, establishing G_gal = SL_2
+without any classical content.
+
+This is the fifth CRMLint Squeeze in the series and the third paper in the
+function-field pipeline: Paper 80 (Gauss-Manin connection by Griffiths pole
+reduction), Paper 81 (flat sections and algebraic Fixed Part theorem), Paper 82
+(differential Galois group by Kovacic). Together, the three papers realize the
+Tannakian reconstruction of a geometric motive by constructive means.
+
+The Lean 4 formalization comprises 457 lines with zero sorry. The main squeeze
+theorem depends only on kernel axioms (propext, Classical.choice, Quot.sound);
+the classical boundary node (topological monodromy density) is declared but
+never used by any constructive proof.
+
+Keywords: constructive mathematics, differential Galois theory, Kovacic algorithm,
+Picard-Fuchs equation, Legendre family, elliptic curves, monodromy, Lean 4,
+formal verification, constructive reverse mathematics, Bishop, BISH, SL2,
+Tannakian category, function-field pipeline
+
+License: Creative Commons Attribution 4.0 International (CC-BY 4.0)
+
+Related identifiers:
+- Paper 80 (Gauss-Manin connection): 10.5281/zenodo.18791985
+- Paper 81 (Flat sections): 10.5281/zenodo.18801814
+
+Upload type: publication / preprint
+
+Contents:
+- paper82.pdf (15 pages)
+- paper82.tex (LaTeX source)
+- P82_DiffGalois/ (Lean 4 bundle, 457 lines, 0 sorry)
+- solve_kovacic.py (Python CAS script)
+- README.md
+- metadata.txt

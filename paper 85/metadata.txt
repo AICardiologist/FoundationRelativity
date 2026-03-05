@@ -1,0 +1,22 @@
+Title: Universal Trace Vanishing for Exotic Weil Classes: A CRMLint Squeeze (Paper 85, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: February 2026
+
+Description: Paper 85 of the Constructive Reverse Mathematics (CRM) Series. We prove that for every genus-4 hyperelliptic family C_t: y^2 = f(x,t) with Q(i)-action (f odd in x), the exotic trace tau_+(t) = tr(nabla|_{V_+}) = 0. The exotic Weil class is universally a global flat section of the Gauss-Manin connection. The proof is structural: the cup-product pairing on H^1_dR pairs omega_j with omega_{2g-2-j}. For g=4, this pairs even-index differentials with even-index differentials, so the restriction to V_+ is a nondegenerate symplectic form. The Gauss-Manin connection preserves this form, so nabla|_{V_+} is symplectic (traceless): tau_+ = 0. The parity check (g-1=3 is odd) ensures no self-pairing degeneracy. Verified computationally for the non-symmetric test family y^2 = x^9 + tx^7 + x (no order-8 automorphism, dense 4x4 V_+ block, common denominator 27t^4-256). CRM Squeeze: BISH (symplectic duality) confirms the CLASS prediction (exotic Hodge classes exist and are flat). Eighth CRMLint Squeeze. Lean 4 formalization with zero sorry. The main squeeze theorem depends on no axioms whatsoever.
+
+Keywords: constructive reverse mathematics, Gauss-Manin connection, exotic Weil classes, Hodge conjecture, symplectic duality, hyperelliptic curves, abelian fourfolds, universal flatness, cup-product pairing, Lean 4, formal verification
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Upload type: Publication / Preprint
+
+Related identifiers:
+- IsPartOf: 10.5281/zenodo.18791985 (Paper 80, Algebraic Gauss-Manin)
+- IsPartOf: 10.5281/zenodo.18801814 (Paper 81, Algebraic Flat Sections)
+- IsPartOf: 10.5281/zenodo.18801822 (Paper 82, Constructive Differential Galois Theory)
+- IsPartOf: 10.5281/zenodo.18801826 (Paper 83, Generic Picard Number)
+- IsPartOf: 10.5281/zenodo.18802819 (Paper 84, Global Flatness of Weil Classes)

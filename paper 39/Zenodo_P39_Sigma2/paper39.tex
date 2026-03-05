@@ -31,6 +31,7 @@
 \theoremstyle{definition}
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{remark}[theorem]{Remark}
+\newtheorem*{theorem*}{Theorem}
 
 % ====================================================================
 % Lean 4 code listing style
@@ -76,7 +77,12 @@
   xleftmargin=15pt,
   captionpos=b,
   literate={<<}{$\langle$}1 {>>}{$\rangle$}1
-           {|||}{$\lor$}1,
+           {∀}{$\forall$}1 {∃}{$\exists$}1
+           {∨}{$\lor$}1 {∧}{$\land$}1 {¬}{$\lnot$}1
+           {↔}{$\leftrightarrow$}1 {→}{$\to$}1
+           {⟨}{$\langle$}1 {⟩}{$\rangle$}1
+           {ε}{$\varepsilon$}1
+           {ℕ}{$\mathbb{N}$}1 {ℤ}{$\mathbb{Z}$}1 {ℝ}{$\mathbb{R}$}1,
 }
 
 % ====================================================================
@@ -100,8 +106,8 @@
 % Title
 % ====================================================================
 \title{%
-  \textbf{Beyond LPO: The Thermodynamic Stratification
-  of Physical Undecidability}\\[6pt]
+  \textbf{Beyond LPO: The Physical Stratification
+  of Undecidability}\\[6pt]
   {\normalsize A Lean~4 Formalization (Paper~39)}%
 }
 
@@ -131,13 +137,15 @@ the $\Sigma_2^0$-complete Finiteness Problem into the spectral gap.
 The generic spectral gap decision (without promise gap)
 is $\Sigma_2^0/\Pi_2^0$-complete, requiring $\LPOj$
 (the Turing jump of $\LPO$).
-However, extensive observables (energy density, magnetization)
-converge via Fekete's lemma and cap at $\LPO$;
-promise-gapped physics (all of Papers 36--38) also caps at $\LPO$.
-The Thermodynamic Stratification Theorem: arithmetic complexity
-bifurcates along thermodynamic scaling---extensive at $\LPO$,
-intensive at $\LPOj$.
-The entire formalization (802~lines of \Lean{}/\Mathlib{})
+More generally, the exact zero-test for any decreasing non-negative
+sequence---extensive or intensive---is $\Sigma_2^0$: deciding
+``$\ell > 0$ vs $\ell = 0$'' requires the $\exists\forall$ witness
+$\exists m\,\forall n\, (x_n \geq 1/m)$, which is $\LPOj$.
+The promise gap and finite measurement precision each collapse
+$\Sigma_2^0$ to $\Sigma_1^0$ by eliminating one quantifier alternation.
+Physical Stratification Theorem: platonic exact physics requires
+$\LPOj$; promise-gapped and empirical physics cap at $\LPO$.
+The entire formalization (873~lines of \Lean{}/\Mathlib{})
 compiles with zero \texttt{sorry}, zero warnings.
 \end{abstract}
 
@@ -160,16 +168,133 @@ decidable and undecidable physics across all domains, see
 Paper~10~\cite{Lee26P10}.  For the historical and philosophical
 context, see Paper~12~\cite{Lee26P12}.
 
-The key insight is thermodynamic:
+\medskip\noindent
+\textbf{Main results.}
+
+\begin{theorem*}[A --- Modified Cubitt Encoding]
+There exists a computable function $M \mapsto H^*(M)$ from Turing
+machines to translation-invariant Hamiltonians such that $H^*(M)$ is
+gapped iff $\{k : M \text{ halts on } k\}$ is finite; gapless iff
+infinite.  (\S\ref{sec:encoding})
+\end{theorem*}
+
+\begin{theorem*}[B --- Generic Gap $\equiv$ $\LPOj$]
+Deciding the spectral gap of the modified encoding (without promise gap)
+is equivalent to $\LPOj$, the Turing jump of $\LPO$.
+(\S\ref{sec:sigma2})
+\end{theorem*}
+
+\begin{theorem*}[C --- Promise Gap Recovery]
+If the Hamiltonian has a promise gap
+($\Delta \in \{0\} \cup [\gamma, \infty)$), the spectral gap decision
+collapses to $\Sigma_1^0 = \LPO$.  (\S\ref{sec:promise})
+\end{theorem*}
+
+\begin{theorem*}[D --- Exact Zero-Test]
+The exact zero-test for any decreasing non-negative sequence---deciding
+``$\ell > 0$ vs.\ $\ell = 0$''---is $\Sigma_2^0$-complete $= \LPOj$.
+(\S\ref{sec:zerotest})
+\end{theorem*}
+
+\begin{theorem*}[E --- Physical Stratification]
+The arithmetic complexity of a physical observable is determined by its
+epistemic mode: platonic exact physics requires $\LPOj$ ($\Sigma_2^0$);
+promise-gapped and empirical physics cap at $\LPO$ ($\Sigma_1^0$).
+(\S\ref{sec:stratification})
+\end{theorem*}
+
+\medskip\noindent
+\textbf{Key insight.}  The bifurcation is epistemic, not thermodynamic:
 \begin{itemize}[nosep]
-\item \textbf{Extensive} observables (energy density, free energy)
-  converge via subadditivity (Fekete/BMC).  Cap: $\LPO$.
-\item \textbf{Intensive} observables (spectral gap, correlation length)
-  are determined by infima.  Cap: $\LPOj$.
+\item \textbf{Platonic exact} physics---deciding the exact sign of a
+  limit without any tolerance---requires $\LPOj$.  This applies to
+  \emph{both} extensive and intensive observables.
 \item The \textbf{promise gap} in Cubitt's construction collapses the
   $\forall\exists$ quantifier to a single $\exists$, reducing
   $\Sigma_2^0$ to $\Sigma_1^0$.
+\item \textbf{Finite precision} (empirical physics) imposes an effective
+  promise gap, so all experimental physics caps at $\LPO$.
 \end{itemize}
+
+\medskip\noindent
+\textbf{Atlas fit.}
+Within the programme architecture (Papers~50--53~\cite{Lee26P50}),
+Paper~39 closes the undecidability arc opened by Paper~36.
+Papers~36--38 mapped the decidable boundary at $\Sigma_1^0$;
+Paper~39 locates the next tier at $\Sigma_2^0$ and proves
+the boundary is stratified by epistemic mode.
+The $\BISH$+$\LPO$ ceiling for empirical physics (established
+across Papers~1--38) remains intact.
+The programme's central finding---\emph{the logical cost of
+mathematics is the logical cost of $\RR$}---is refined:
+the logical cost of \emph{exact platonic} physics reaches
+$\LPOj$, one jump above the $\LPO$ ceiling of measurement.
+
+% ====================================================================
+\section{Preliminaries}\label{sec:prelim}
+
+We recall the logical principles and definitions used throughout.
+For full background on constructive reverse mathematics (CRM),
+see Bridges and Richman~\cite{BridgesRichman1987}; for the CRM
+programme conventions, see Papers~1--10~\cite{Lee26P10}.
+
+\begin{definition}[$\LPO$]
+The \emph{Limited Principle of Omniscience}:
+for every binary sequence $a : \NN \to \{0,1\}$,
+either $\forall n.\, a(n) = 0$ or $\exists n.\, a(n) = 1$.
+Equivalently, $\Sigma_1^0$-LEM: every $\Sigma_1^0$ statement
+is decidable.
+\end{definition}
+
+\begin{definition}[$\LPOj$]
+The \emph{Turing jump of $\LPO$} ($\Sigma_2^0$-LEM):
+for every predicate $P : \NN \to \mathrm{Prop}$ that is
+decidable relative to an $\LPO$ oracle, either
+$\forall n.\, \lnot P(n)$ or $\exists n.\, P(n)$.
+See Definition~\ref{def:lpojump} for the formal Lean statement.
+\end{definition}
+
+\begin{definition}[Arithmetic hierarchy]
+A predicate is $\Sigma_1^0$ if it has the form
+$\exists n.\, R(n)$ with $R$ decidable.
+A predicate is $\Sigma_2^0$ if it has the form
+$\exists n.\, \forall m.\, R(n,m)$ with $R$ decidable.
+$\Pi_k^0$ is the dual (negate and swap quantifiers).
+$\LPO$ decides $\Sigma_1^0$; $\LPOj$ decides $\Sigma_2^0$.
+\end{definition}
+
+\begin{definition}[Spectral gap]
+For a translation-invariant Hamiltonian $H$ on $\ZZ^d$,
+let $\Delta_L$ be the gap between the ground state and
+first excited state of the restriction to an $L \times L$
+box.  The \emph{spectral gap} is
+$\Delta = \lim_{L \to \infty} \inf_{L' \geq L} \Delta_{L'}$.
+The system is \emph{gapped} if $\Delta > 0$ and
+\emph{gapless} if $\Delta = 0$.
+\end{definition}
+
+\begin{definition}[Promise gap]
+A \emph{promise gap} is a constraint
+$\Delta \in \{0\} \cup [\gamma, \infty)$ for a computable
+$\gamma > 0$.  Cubitt's original construction~\cite{CPgW2015}
+has a built-in promise gap.  The modified encoding
+(Theorem~A) does not.
+\end{definition}
+
+\begin{definition}[Finiteness Problem]
+For a Turing machine $M$, the \emph{halting set}
+$S(M) = \{k : M \text{ halts on input } k\}$.
+The \emph{Finiteness Problem} asks: is $S(M)$ finite?
+This is $\Sigma_2^0$-complete~\cite{Rogers1967}.
+\end{definition}
+
+The constructive hierarchy relevant to this paper is:
+\[
+  \BISH \;\subset\; \BISH + \LPO \;\subset\; \BISH + \LPOj.
+\]
+Papers~1--38 established that all empirical physics lives at
+$\BISH + \LPO$.  This paper shows that platonic exact physics
+reaches $\BISH + \LPOj$.
 
 % ====================================================================
 \section{The Category Error}\label{sec:error}
@@ -216,17 +341,27 @@ Papers 36--38 cap at $\LPO$.
 
 \begin{definition}[$\LPOj$]\label{def:lpojump}
 $\LPOj$ (``$\LPO$-jump'') is $\Sigma_2^0$-LEM:
-for every binary sequence $\beta$ that is decidable relative to
-an $\LPO$ oracle, either $\exists n.\, \beta(n) = 1$ or
-$\forall n.\, \beta(n) = 0$.
+for every predicate $P : \NN \to \mathrm{Prop}$ that is decidable
+relative to an $\LPO$ oracle, either $\exists n.\, P(n)$ or
+$\forall n.\, \lnot P(n)$.
 \end{definition}
 
 \begin{lstlisting}[caption={$\LPOj$ definition: \texttt{Defs.lean}}]
 def LPO_jump : Prop :=
-    forall (b : N -> Bool),
-      (LPO -> forall n, b n = true ||| b n = false) ->
-      (forall n, b n = false) ||| (exists n, b n = true)
+    ∀ (P : ℕ → Prop),
+      (LPO → ∀ n, P n ∨ ¬P n) →
+      (∀ n, ¬P n) ∨ (∃ n, P n)
 \end{lstlisting}
+
+\begin{remark}[Why $\mathrm{Prop}$, not $\mathrm{Bool}$]\label{rem:prop}
+An earlier version of this paper defined $\LPOj$ using
+$\beta : \NN \to \mathrm{Bool}$.  This was an error: the oracle
+premise ``$\LPO \to \forall n,\, \beta(n) = \mathrm{true} \lor
+\beta(n) = \mathrm{false}$'' is a tautology for $\mathrm{Bool}$
+(every Boolean is $\mathrm{true}$ or $\mathrm{false}$), collapsing
+$\LPOj$ to $\LPO$.  The correct definition uses $P : \NN \to \mathrm{Prop}$,
+where the oracle premise is non-trivial.
+\end{remark}
 
 $\LPOj$ is strictly stronger than $\LPO$~\cite{BrattkaEtAl2012}:
 $\LPOj \Rightarrow \LPO$ but not conversely.
@@ -327,12 +462,12 @@ feasibility of an experimental realization.
 
 \begin{lstlisting}[caption={Modified encoding bridges: \texttt{ModifiedEncoding.lean}}]
 axiom modified_gapped_iff_finite (M : TM) :
-    is_gapped (modified_hamiltonian M) <->
+    is_gapped (modified_hamiltonian M) ↔
     finiteness_problem M
 
 axiom modified_gapless_iff_infinite (M : TM) :
-    is_gapless (modified_hamiltonian M) <->
-    not finiteness_problem M
+    is_gapless (modified_hamiltonian M) ↔
+    ¬finiteness_problem M
 \end{lstlisting}
 
 \noindent\textbf{Duality note.}
@@ -432,11 +567,11 @@ level of quantifier alternation.
 
 \begin{lstlisting}[caption={Generic gap $\leftrightarrow$ $\LPOj$: \texttt{GenericGapSigma2.lean}}]
 theorem generic_gap_iff_lpo_jump :
-    (forall M, is_gapped (modified_hamiltonian M) |||
-               not is_gapped (modified_hamiltonian M))
-    <-> LPO_jump :=
-  <<generic_gap_requires_lpo_jump,
-   lpo_jump_decides_generic_gap>>
+    (∀ M, is_gapped (modified_hamiltonian M) ∨
+          ¬is_gapped (modified_hamiltonian M))
+    ↔ LPO_jump :=
+  ⟨generic_gap_requires_lpo_jump,
+   lpo_jump_decides_generic_gap⟩
 \end{lstlisting}
 
 % ====================================================================
@@ -501,113 +636,140 @@ collapsed one quantifier alternation.
 
 \begin{lstlisting}[caption={Promise gap recovery: \texttt{PromiseGapRecovery.lean}}]
 theorem promise_gap_lpo (H : PromiseGapped) (lpo : LPO) :
-    is_gapless H.hamiltonian |||
-    not is_gapless H.hamiltonian
+    is_gapless H.hamiltonian ∨
+    ¬is_gapless H.hamiltonian
 \end{lstlisting}
 
 % ====================================================================
-\section{Theorem 4: Extensive Observables Cap at $\LPO$}\label{sec:extensive}
+\section{Theorem 4: The Exact Zero-Test}\label{sec:zerotest}
 
-\begin{theorem}[Extensive Ceiling]\label{thm:extensive}
-Every extensive observable (energy density, free energy,
-magnetization) of a translation-invariant Hamiltonian is
-$\LPO$-decidable.
+\begin{theorem}[Exact Zero-Test]\label{thm:zerotest}
+Let $(x_n)$ be a decreasing non-negative sequence with limit
+$\ell = \inf_n x_n \geq 0$.  The exact zero-test---deciding
+``$\ell > 0$ vs.\ $\ell = 0$''---is $\Sigma_2^0$-complete,
+equivalent to $\LPOj$.
 \end{theorem}
 
 \begin{proof}
-The proof proceeds in three steps: subadditivity, monotone
-convergence, and the sign decision.
+The proof identifies the quantifier structure of each disjunct.
 
 \medskip\noindent
-\textbf{Step 1: Subadditivity.}
-Let $f(L)$ denote the extensive observable for a system
-of size $L$ (e.g., total energy, total magnetization).
-For translation-invariant systems, the \emph{density}
-$f(L)/L$ is subadditive:
+\textbf{Step 1: The positive disjunct is $\Sigma_2^0$.}
 \[
-  f(m+n) \leq f(m) + f(n)
-  \quad\text{for all $m, n \geq 1$.}
+  \ell > 0 \;\Longleftrightarrow\;
+  \exists m \geq 1,\; \forall n,\;
+  x_n \geq \tfrac{1}{m}.
+  \qquad\text{($\Sigma_2^0$: $\exists\forall$ structure)}
 \]
-This is a consequence of translation invariance: a system of
-size $m+n$ can be partitioned into subsystems of sizes $m$
-and $n$, and the ground-state energy of the whole is at most
-the sum of the parts (the boundary interaction is bounded).
+If all terms are bounded below by $1/m > 0$, then the infimum
+$\ell \geq 1/m > 0$.  Conversely, if $\ell > 0$, choose
+$m = \lceil 1/\ell \rceil$; then $x_n \geq \ell \geq 1/m$
+for all $n$ (since $(x_n)$ is decreasing and non-negative).
 
 \medskip\noindent
-\textbf{Step 2: Fekete's lemma $\Rightarrow$ monotone convergence.}
-By Fekete's subadditive lemma~\cite{Fekete1923}, the limit
+\textbf{Step 2: The zero disjunct is $\Pi_2^0$.}
 \[
-  \ell := \lim_{L \to \infty} \frac{f(L)}{L}
-  = \inf_{L \geq 1} \frac{f(L)}{L}
+  \ell = 0 \;\Longleftrightarrow\;
+  \forall m \geq 1,\; \exists n,\;
+  x_n < \tfrac{1}{m}.
+  \qquad\text{($\Pi_2^0$: $\forall\exists$ structure)}
 \]
-exists and equals the infimum.  \emph{Crucially}, the
-sequence $f(L)/L$ converges \emph{monotonically from above}
-to $\ell$ along the subsequence $L = 2^n$ (by repeated
-application of subadditivity: $f(2L) \leq 2f(L)$ gives
-$f(2L)/(2L) \leq f(L)/L$).
-
-This monotone convergence is the key structural feature.
-By Paper~29, bounded monotone convergence ($\BMC$) is
-equivalent to $\LPO$.  Therefore $\LPO$ suffices to
-compute the limit $\ell$.
+The sequence eventually dips below every positive threshold.
 
 \medskip\noindent
-\textbf{Step 3: Sign decision.}
-The limit $\ell$ is a $\Delta_2^0$ real (limit-computable
-with an $\LPO$ oracle).  Deciding the sign of a $\Delta_2^0$
-real that arises from a monotone sequence is a $\Pi_1^0$
-test: ``$\ell > 0$'' iff $\exists n.\, f(n)/n > 0$ (since the
-sequence is decreasing, if any term is positive, the limit
-is nonnegative; and by computability of each term, the
-search is $\Sigma_1^0$).
-
-The complementary test ``$\ell \leq 0$'' is equivalent to
-``$\forall n.\, f(n)/n \leq 0$,'' which is $\Pi_1^0$.
-Both tests are $\LPO$-decidable.
+\textbf{Step 3: The decision is $\LPOj$.}
+Deciding ``$\ell > 0 \lor \ell = 0$'' is deciding a $\Sigma_2^0$
+disjunction against its $\Pi_2^0$ complement.  By the
+$\Sigma_2^0$-completeness of the Finiteness Problem, this requires
+$\LPOj$ and no less.  Conversely, $\LPOj$ decides all $\Sigma_2^0$
+predicates, so it suffices.
 
 \medskip\noindent
-\textbf{Why intensive observables escape this ceiling.}
-Intensive observables (e.g., the spectral gap) are
-\emph{not} subadditive.  They are determined by an infimum
-over scales:
-\[
-  \Delta = 0 \;\Leftrightarrow\;
-  \forall \varepsilon > 0,\; \exists k,\;
-  \Delta_k < \varepsilon \qquad (\Pi_2^0).
-\]
-The infimum may oscillate non-monotonically, so Fekete's
-lemma does not apply.  Deciding whether the infimum is zero
-requires the full $\forall\exists$ quantifier structure of
-$\Pi_2^0$, which is $\LPOj$.
+\textbf{Erratum: Why the old ``Extensive Ceiling'' was wrong.}
+An earlier version of this paper claimed that extensive observables
+cap at $\LPO$ because ``if any term $f(n)/n > 0$ then the
+limit is positive.''  This is false: $x_n = 1/n$ is decreasing,
+every term is positive, but the limit is $0$.  The error was
+conflating limit \emph{existence} (which is $\LPO$ via
+Fekete/BMC) with the limit \emph{sign test} (which is $\Sigma_2^0$).
+Both extensive and intensive exact zero-tests reach $\LPOj$.
 \end{proof}
 
-\begin{lstlisting}[caption={Extensive ceiling: \texttt{ExtensiveCeiling.lean}}]
-theorem extensive_cap_lpo (O : ExtensiveObservable) :
-    LPO -> (extensive_sign_positive O |||
-            not extensive_sign_positive O)
+\begin{remark}[Limit existence vs.\ limit sign]\label{rem:existence-sign}
+For subadditive sequences, Fekete's lemma guarantees that the
+limit \emph{exists} under $\LPO$ (Paper~29: BMC $\Leftrightarrow$
+$\LPO$).  But the \emph{sign} of that limit is a separate question
+at $\Sigma_2^0$.  Limit existence and limit classification live
+at different levels of the arithmetic hierarchy.
+
+To see why concretely: limit existence for a subadditive sequence
+$f$ amounts to showing $\inf_n f(n)/n$ exists as a real number.
+This is a $\Sigma_1^0$ construction---for each precision $\varepsilon$,
+one searches for $N$ such that $|f(n)/n - f(m)/m| < \varepsilon$
+for all $n,m \geq N$.  The search is a single existential over
+computable data.
+
+The sign test, by contrast, asks: \emph{is this limit positive?}
+Even knowing the limit exists, deciding its sign requires the
+$\exists\forall$ witness: ``there exists a rational lower bound
+$1/m > 0$ such that \emph{all} terms stay above it.''  This
+universal quantifier over all terms---not just finitely many---is
+what lifts the problem from $\Sigma_1^0$ to $\Sigma_2^0$.
+\end{remark}
+
+\begin{remark}[Why the old Theorem~4 was wrong]\label{rem:old-wrong}
+The v1 paper claimed: for a subadditive sequence $f$, if
+$\exists n.\, f(n)/n > 0$ then $\lim f(n)/n > 0$.  This reasoning
+is fallacious.  The counterexample $f(n) = 1$ (constant) is
+subadditive ($f(m+n) = 1 \leq 2 = f(m) + f(n)$), and
+$f(n)/n = 1/n > 0$ for all $n$, but $\lim_{n\to\infty} f(n)/n = 0$.
+
+More directly: $x_n = 1/n$ is a decreasing non-negative sequence
+where every term is positive but the limit is zero.  The statement
+``$\exists n.\, x_n > 0$'' is $\Sigma_1^0$ (true, trivially), but
+it tells us nothing about $\lim x_n$.  The correct sign test requires
+$\exists m.\, \forall n.\, x_n \geq 1/m$---a $\Sigma_2^0$ statement
+that is \emph{false} for $x_n = 1/n$.
+
+The error was conflating ``some term is positive'' ($\Sigma_1^0$)
+with ``the limit is positive'' ($\Sigma_2^0$).  The gap between
+these is exactly one quantifier alternation---the gap between
+$\LPO$ and $\LPOj$.
+\end{remark}
+
+\begin{lstlisting}[caption={Exact zero-test: \texttt{ExtensiveCeiling.lean}}]
+theorem exact_zero_test_iff_lpo_jump :
+    (∀ s : DecreasingSeqWithLimit,
+      exact_limit_positive s ∨ exact_limit_zero s) ↔
+    LPO_jump
 \end{lstlisting}
 
 % ====================================================================
-\section{Theorem 5: The Thermodynamic Stratification}\label{sec:stratification}
+\section{Theorem 5: The Physical Stratification}\label{sec:stratification}
 
-\begin{theorem}[Thermodynamic Stratification]\label{thm:stratification}
-The arithmetic complexity of physical observables bifurcates:
+\begin{theorem}[Physical Stratification]\label{thm:stratification}
+The arithmetic complexity of physical observables bifurcates
+along \emph{epistemic mode}, not thermodynamic scaling:
 \begin{enumerate}[nosep,label=(\roman*)]
-\item \textbf{Extensive:} $\LPO$ ($\Sigma_1^0$).
-\item \textbf{Intensive (generic):} $\LPOj$ ($\Sigma_2^0$).
+\item \textbf{Platonic exact} (no promise, exact zero-test): $\LPOj$ ($\Sigma_2^0$).
 \item \textbf{Promise-gapped:} $\LPO$ ($\Sigma_1^0$).
 \item \textbf{Empirical (finite precision):} $\LPO$ ($\Sigma_1^0$).
 \end{enumerate}
 \end{theorem}
 
 \begin{proof}
-Parts (i)--(iii) are Theorems~\ref{thm:extensive},
-\ref{thm:sigma2}, and~\ref{thm:promise} respectively.
-Part (iv) follows from the same quantifier-collapse mechanism
-as part~(iii):
+Part (i) combines Theorems~\ref{thm:sigma2} and~\ref{thm:zerotest}:
+the generic spectral gap and the exact zero-test for any decreasing
+sequence are each equivalent to $\LPOj$.  This applies to
+\emph{both} extensive and intensive observables---the thermodynamic
+type does not matter for the exact zero-test.
+
+Part (ii) is Theorem~\ref{thm:promise}: the promise gap collapses
+$\Sigma_2^0$ to $\Sigma_1^0$ by eliminating the outer $\forall$
+quantifier.
 
 \medskip\noindent
-\textbf{Part (iv): Empirical physics.}
+\textbf{Part (iii): Empirical physics.}
 Any experimental measurement has finite precision
 $\varepsilon > 0$.  The experimentalist does not ask
 ``is $\Delta$ exactly zero?'' but rather
@@ -622,42 +784,39 @@ to a single $\exists$, exactly as in Theorem~\ref{thm:promise}.
 Therefore all of experimental physics caps at $\LPO$.
 
 \medskip\noindent
-\textbf{Summary.} The four parts together reveal that the
+\textbf{Summary.} The three parts together reveal that the
 arithmetic complexity of a physical observable is determined
-by its \emph{thermodynamic scaling}:
+by its \emph{epistemic mode}---how the question is posed---not
+by the thermodynamic type of the observable:
 \begin{itemize}[nosep]
-\item \emph{Extensive} quantities (energy density, etc.)
-  are subadditive, forcing monotone convergence (Fekete/BMC),
-  which caps the logic at a single existential quantifier
-  ($\Sigma_1^0 = \LPO$).
-\item \emph{Intensive} quantities (spectral gap, correlation
-  length) are determined by infima over all scales.
-  Without a promise gap, the infimum test is
-  $\Pi_2^0$ ($\forall\exists$), requiring $\LPOj$.
+\item \emph{Platonic exact}: ``Is $\ell$ exactly zero?'' requires
+  the $\exists\forall$ witness $\exists m\,\forall n\,(x_n \geq 1/m)$
+  --- $\Sigma_2^0 = \LPOj$. This applies to energy density, spectral gap,
+  and correlation length alike.
 \item The \emph{promise gap} and \emph{finite precision}
-  each collapse one quantifier alternation, bringing
-  intensive observables back to $\Sigma_1^0 = \LPO$.
+  each collapse one quantifier alternation, bringing any
+  observable back to $\Sigma_1^0 = \LPO$.
 \end{itemize}
 \end{proof}
 
-\begin{lstlisting}[caption={Stratification master: \texttt{Stratification.lean}}]
-theorem thermodynamic_stratification :
-    -- (i) Extensive cap at LPO
-    (forall (O : ExtensiveObservable), LPO ->
-      (extensive_sign_positive O |||
-       not extensive_sign_positive O)) /\
-    -- (ii) Intensive reach LPO_jump
-    ((forall M, is_gapped (modified_hamiltonian M) |||
-                not is_gapped (modified_hamiltonian M))
-      <-> LPO_jump) /\
-    -- (iii) Promise-gapped cap at LPO
-    (forall (H : PromiseGapped), LPO ->
-      (is_gapless H.hamiltonian |||
-       not is_gapless H.hamiltonian)) /\
-    -- (iv) Empirical cap at LPO
-    (forall (H : ModifiedHamiltonian) (e : R),
-      e > 0 -> LPO ->
-      (gap_less_than H e ||| not gap_less_than H e))
+\begin{lstlisting}[caption={Physical stratification: \texttt{Stratification.lean}}]
+theorem physical_stratification :
+    -- (i) Generic spectral gap ↔ LPO_jump
+    ((∀ M, is_gapped (modified_hamiltonian M) ∨
+           ¬is_gapped (modified_hamiltonian M))
+      ↔ LPO_jump) ∧
+    -- (i') Exact zero-test ↔ LPO_jump
+    ((∀ s : DecreasingSeqWithLimit,
+        exact_limit_positive s ∨ exact_limit_zero s)
+      ↔ LPO_jump) ∧
+    -- (ii) Promise-gapped cap at LPO
+    (∀ (H : PromiseGapped), LPO →
+      (is_gapless H.hamiltonian ∨
+       ¬is_gapless H.hamiltonian)) ∧
+    -- (iii) Empirical cap at LPO
+    (∀ (H : ModifiedHamiltonian) (ε : ℝ),
+      ε > 0 → LPO →
+      (gap_less_than H ε ∨ ¬gap_less_than H ε))
 \end{lstlisting}
 
 % ====================================================================
@@ -667,17 +826,20 @@ theorem thermodynamic_stratification :
 \centering
 \begin{tabular}{@{}llllc@{}}
 \toprule
-\textbf{Tier} & \textbf{Observable} & \textbf{Principle} &
+\textbf{Tier} & \textbf{Observable / Mode} & \textbf{Principle} &
 \textbf{Level} & \textbf{Paper} \\
 \midrule
 $\BISH$ & Finite systems ($\Delta_L$) & None & $\Delta_1^0$ & 34 \\
 $\BISH$+LLPO & Bell correlations & LLPO & $<\Sigma_1^0$ & 10 \\
 $\BISH$+WLPO & ``Is $\Delta=0$?'' (given $\Delta$) & WLPO & $\Pi_1^0$ & 2 \\
-$\BISH$+$\LPO$ & Energy density; Cubitt gap & $\LPO$ & $\Sigma_1^0$ & 29, 36 \\
-$\BISH$+$\LPOj$ & Spectral gap (no promise) & $\LPOj$ & $\Sigma_2^0$ & 39 \\
+$\BISH$+$\LPO$ & Promise-gapped / empirical & $\LPO$ & $\Sigma_1^0$ & 29, 36 \\
+$\BISH$+$\LPOj$ & Exact zero-test (no promise) & $\LPOj$ & $\Sigma_2^0$ & 39 \\
 \bottomrule
 \end{tabular}
-\caption{The complete constructive hierarchy of physics.}
+\caption{The complete constructive hierarchy of physics.
+The $\LPO$ tier covers all promise-gapped systems (Papers~36--38)
+and all empirical measurements.  The $\LPOj$ tier emerges only
+for exact (platonic) zero-tests on generic Hamiltonians.}
 \label{tab:hierarchy}
 \end{table}
 
@@ -690,16 +852,49 @@ $\BISH$+$\LPOj$ & Spectral gap (no promise) & $\LPOj$ & $\Sigma_2^0$ & 39 \\
 \toprule
 \textbf{Component} & \textbf{CRM Status} & \textbf{Level} \\
 \midrule
-Modified Encoding (Thm~1) & \leanaxiom & 4 \\
-Generic Gap $\equiv \LPOj$ (Thm~2) & $\LPOj$ & 3+4 \\
-Promise Recovery (Thm~3) & $\LPO$ & 3 \\
-Extensive Ceiling (Thm~4) & $\LPO$ & 2+4 \\
-Stratification (Thm~5) & Inherits (bridge axiom in part~iv) & --- \\
+Modified Encoding (Thm~A) & \leanaxiom & 4 \\
+Generic Gap $\equiv \LPOj$ (Thm~B) & $\LPOj$ & 3+4 \\
+Promise Recovery (Thm~C) & $\LPO$ & 3 \\
+Exact Zero-Test (Thm~D) & $\LPOj$ & 4 \\
+Stratification (Thm~E) & Inherits (bridge axiom in part~iii) & --- \\
 \bottomrule
 \end{tabular}
-\caption{CRM audit.}
+\caption{CRM audit.  Thm~D corrected from $\LPO$ to $\LPOj$ (v2).}
 \label{tab:audit}
 \end{table}
+
+\medskip\noindent
+\textbf{What descends, from where, to where.}
+The key descent in this paper is the \emph{promise gap collapse}:
+\[
+  \Sigma_2^0 \;(\LPOj)
+  \;\xrightarrow{\text{promise gap}}\;
+  \Sigma_1^0 \;(\LPO).
+\]
+Theorem~B establishes the \emph{ceiling}: the generic spectral gap
+(without promise) sits at $\LPOj$.  Theorem~C establishes the
+\emph{descent}: adding a promise gap collapses the problem to $\LPO$.
+This descent is physically motivated---Cubitt's original construction
+has a built-in promise gap, so Papers~36--38 correctly classified
+it at $\LPO$.
+
+The exact zero-test (Theorem~D) provides an independent witness
+for the $\LPOj$ ceiling.  The two witnesses (spectral gap and
+zero-test) are logically independent: the spectral gap argument
+goes through the Finiteness Problem via the modified encoding,
+while the zero-test argument goes through the $\Sigma_2^0$
+quantifier structure of the limit sign directly.
+
+\medskip\noindent
+\textbf{Comparison with Paper~45 calibration pattern.}
+Paper~45 established $\LPO$ as the uniform ceiling for physics
+via the calibration pattern: every physical computation reduces
+to a limit-existence question, and limit existence is $\LPO$
+(Paper~29: BMC $\Leftrightarrow$ $\LPO$).  Paper~39 refines this:
+limit \emph{existence} is indeed $\LPO$, but limit \emph{classification}
+(sign test) is $\Sigma_2^0$.  The calibration pattern remains valid
+for empirical physics, where finite precision collapses classification
+to a single existential search.
 
 % ====================================================================
 \section{Code Architecture}\label{sec:arch}
@@ -716,7 +911,7 @@ Stratification (Thm~5) & Inherits (bridge axiom in part~iv) & --- \\
 \node[module] (mod) at (3,3.8) {ModEncoding};
 \node[module] (gen) at (0,2.5) {GenericGap};
 \node[module] (prom) at (-3,2.5) {PromiseRecovery};
-\node[module] (ext) at (3,2.5) {ExtCeiling};
+\node[module] (ext) at (3,2.5) {ExactZeroTest};
 \node[module] (strat) at (0,1) {Stratification};
 \node[module] (main) at (0,0) {Main};
 
@@ -731,45 +926,130 @@ Stratification (Thm~5) & Inherits (bridge axiom in part~iv) & --- \\
 \draw (ext) -- (strat);
 \draw (strat) -- (main);
 \end{tikzpicture}
-\caption{Module dependency graph (802~lines, 8~modules).}
+\caption{Module dependency graph (873~lines, 8~modules).}
 \label{fig:arch}
 \end{figure}
 
-% ====================================================================
+\subsection{Axiom Inventory}
+
+\begin{table}[ht]
+\centering\small
+\begin{tabular}{@{}lp{6cm}c@{}}
+\toprule
+\textbf{Axiom} & \textbf{Purpose} & \textbf{Load-bearing?} \\
+\midrule
+\texttt{halting\_seq} & TM step function & Yes \\
+\texttt{halts\_within} & Bounded halting predicate & Yes \\
+\texttt{halts\_within\_decidable} & Bounded halting is BISH & Yes \\
+\texttt{tm\_from\_seq} & TM encoding from binary seq & Yes \\
+\texttt{tm\_from\_seq\_halts} & Correctness of TM encoding & Yes \\
+\texttt{modified\_hamiltonian} & Cubitt encoding $M \mapsto H^*(M)$ & Yes \\
+\texttt{is\_gapped}, \texttt{is\_gapless} & Gap/gapless predicates & Yes \\
+\texttt{gapped\_iff\_not\_gapless} & Complementarity & Yes \\
+\texttt{modified\_gapped\_iff\_finite} & Gapped $\Leftrightarrow$ finite $S(M)$ & Yes \\
+\texttt{modified\_gapless\_iff\_infinite} & Gapless $\Leftrightarrow$ infinite $S(M)$ & Yes \\
+\texttt{finiteness\_is\_sigma2\_complete} & FIN is $\Sigma_2^0$-complete & Yes \\
+\texttt{bmc\_from\_subadditive} & Fekete/BMC limit (LPO) & Yes \\
+\texttt{exact\_zero\_test\_requires\_lpo\_jump} & Zero-test $\Rightarrow$ $\LPOj$ & Yes \\
+\texttt{lpo\_jump\_decides\_exact\_zero\_test} & $\LPOj$ $\Rightarrow$ zero-test & Yes \\
+\texttt{promise\_gap\_sigma1\_test} & Promise $\Rightarrow$ $\Sigma_1^0$ & Yes \\
+\texttt{empirical\_gap\_sigma1} & Finite precision $\Rightarrow$ $\Sigma_1^0$ & Yes \\
+\texttt{gap\_less\_than} & Empirical gap comparison & Documentary \\
+\midrule
+\texttt{propext} & Lean infrastructure & No \\
+\texttt{Classical.choice} & Lean/$\RR$ infrastructure & No \\
+\texttt{Quot.sound} & Lean infrastructure & No \\
+\bottomrule
+\end{tabular}
+\caption{Axiom inventory for \texttt{sigma2\_master}.
+All domain axioms are load-bearing except \texttt{gap\_less\_than}
+(type declaration only).  Lean infrastructure axioms are universal
+and carry no mathematical content.}
+\label{tab:axioms}
+\end{table}
+
+\subsection{\texttt{Classical.choice} Audit}
+
+Every theorem over $\RR$ in \Mathlib{} triggers \texttt{Classical.choice}
+because $\RR$ is defined as a Cauchy completion (quotient type).
+This is a Lean infrastructure artifact, not a use of the axiom of
+choice in the mathematical sense.  The constructive stratification
+of this paper is established by \emph{proof content}:
+\begin{itemize}[nosep]
+\item Theorem~B (forward): uses $\LPOj$ as \emph{conclusion},
+  not hypothesis---the proof produces $\LPOj$ from gap decidability.
+\item Theorem~C: uses $\LPO$ as \emph{hypothesis}---the proof
+  shows $\LPO$ suffices for promise-gapped decisions.
+\item Theorem~D: both directions proved---exact zero-test and
+  $\LPOj$ are logically equivalent.
+\end{itemize}
+See Paper~10~\cite{Lee26P10}, \S Methodology, for the programme's
+approach to \texttt{Classical.choice} in Lean formalizations.
+
+\subsection{\texttt{\#print axioms} Output}
+
+\begin{lstlisting}[caption={\texttt{\#print axioms sigma2\_master} (abridged)}]
+-- Domain axioms (13):
+-- halting_seq, halts_within, halts_within_decidable,
+-- tm_from_seq, tm_from_seq_halts,
+-- modified_hamiltonian, is_gapped, is_gapless,
+-- gapped_iff_not_gapless,
+-- modified_gapped_iff_finite, modified_gapless_iff_infinite,
+-- finiteness_is_sigma2_complete,
+-- bmc_from_subadditive,
+-- exact_zero_test_requires_lpo_jump,
+-- lpo_jump_decides_exact_zero_test,
+-- promise_gap_sigma1_test,
+-- empirical_gap_sigma1, gap_less_than
+-- Lean infrastructure: propext, Classical.choice, Quot.sound
+\end{lstlisting}
+
+\subsection{Reproducibility}
+
 \begin{mdframed}[linewidth=1pt, linecolor=black!40,
   backgroundcolor=blue!3, roundcorner=5pt]
-\textbf{Reproducibility.}
+\textbf{Build instructions.}
 \Lean{} v4.28.0-rc1 with \Mathlib{}.
-Build: \texttt{cd P39\_Sigma2 \&\& lake build}.
+\texttt{cd P39\_Sigma2 \&\& lake exe cache get \&\& lake build}.
 Result: 0~errors, 0~warnings, 0~\texttt{sorry}.
-Axiom profile (\texttt{\#print axioms sigma2\_master}):
-12~domain-specific bridge axioms
-+ \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}.
-\texttt{Classical.choice} is a Mathlib infrastructure artifact
-(required by $\RR$ as a Cauchy completion and by \texttt{InnerProductSpace});
-constructive stratification is established by proof content
-(explicit witnesses vs.\ principle-as-hypothesis), not by
-axiom-checker output.  See Paper~10~\cite{Lee26P10}, \S Methodology.
+873~lines across 8~source files.
+Zenodo: \href{https://doi.org/10.5281/zenodo.18642806}{10.5281/zenodo.18642806}.
 \end{mdframed}
 
 % ====================================================================
 \section{Conclusion}\label{sec:conclusion}
 
-Physics reaches $\Sigma_2^0$.  The spectral gap of a generic
-translation-invariant Hamiltonian---without promise gap---is
+Physics reaches $\Sigma_2^0$.  The exact zero-test for any decreasing
+non-negative sequence---whether extensive or intensive---is
 $\Sigma_2^0$-complete, requiring $\LPOj$, the Turing jump of $\LPO$.
 But the $\BISH$+$\LPO$ characterization of Papers 1--38 is not wrong:
-it is correct for all extensive observables and all promise-gapped
-physics.  The $\Sigma_2^0$ tier emerges only for intensive observables
-when the promise gap is removed.  Empirical physics, operating with
-finite measurement precision, always imposes an effective promise gap
-and therefore caps at $\LPO$.
+it is correct for all promise-gapped and empirical physics.
+The $\Sigma_2^0$ tier emerges only for \emph{platonic exact}
+zero-tests on generic Hamiltonians, where no promise gap or
+finite precision collapses the quantifier structure.
 
-The Thermodynamic Stratification Theorem reveals that the arithmetic
-complexity of a physical observable is determined by its thermodynamic
-scaling: extensive (Fekete/BMC) at $\LPO$; intensive (infimum) at
-$\LPOj$.  The promise gap in Cubitt's construction is the mechanism
-that collapsed the logic from $\Sigma_2^0$ to $\Sigma_1^0$.
+The Physical Stratification Theorem reveals that the arithmetic
+complexity of a physical observable is determined by its
+\emph{epistemic mode}---how the question is posed---not by
+thermodynamic scaling.  The promise gap in Cubitt's construction,
+and the finite precision of empirical measurement, each collapse
+$\Sigma_2^0$ to $\Sigma_1^0$ by eliminating one quantifier alternation.
+
+\medskip\noindent
+\textbf{Scope of verification.}
+The master theorem (\texttt{sigma2\_master}) and all five
+component theorems are Lean-verified with zero \texttt{sorry}.
+The logical backbone---$\LPOj \Leftrightarrow$ gap decidability,
+$\LPOj \Leftrightarrow$ exact zero-test, promise collapse, empirical
+collapse---is machine-checked.  The bridge axioms
+(Table~\ref{tab:axioms}) encode the physics: the modified Cubitt
+encoding, the spectral gap properties, the $\Sigma_2^0$-completeness
+of the Finiteness Problem.  These bridge axioms are justified by
+the referenced literature~\cite{CPgW2015,BCO2018,Rogers1967} and
+are the standard interface between formal verification and
+mathematical physics in this programme.  No conjectures are
+stated; all claims are either proved or axiomatized with
+explicit references.
 
 % ====================================================================
 \section{Discussion}\label{sec:discussion}
@@ -799,13 +1079,9 @@ Brattka, Gherardi, and Pauly~\cite{BrattkaEtAl2012}.)
 
 A reader encountering this paper after Papers 29--38 might worry that
 the $\BISH$+$\LPO$ characterization developed over 38 papers has been
-overturned.  It has not.  The Thermodynamic Stratification Theorem
+overturned.  It has not.  The Physical Stratification Theorem
 (Theorem~\ref{thm:stratification}) makes the scope precise:
 \begin{itemize}[nosep]
-\item Every \emph{extensive} observable---energy density, free energy,
-  magnetization per site---converges via Fekete's lemma (Paper~29)
-  and caps at $\LPO$.  This covers all thermodynamic quantities that
-  scale with system size.
 \item Every \emph{promise-gapped} system---including Cubitt's original
   construction (Paper~36) and all descendants (Papers~37--38)---caps
   at $\LPO$, because the promise collapses the outer universal
@@ -814,28 +1090,30 @@ overturned.  It has not.  The Thermodynamic Stratification Theorem
   which imposes an effective promise gap.  All of experimental physics
   therefore caps at $\LPO$.
 \end{itemize}
-The $\LPOj$ tier emerges only for \emph{intensive} observables of
-\emph{generic} (non-promise-gapped) Hamiltonians---the spectral gap
-and correlation length when no a priori bound separates the gapped
-and gapless phases.  This is a mathematical refinement, not a
-physical retraction.
+The $\LPOj$ tier emerges only for \emph{platonic exact} zero-tests
+on \emph{generic} (non-promise-gapped) Hamiltonians---deciding
+whether the spectral gap, energy density, or correlation length
+is \emph{exactly} zero when no tolerance or promise separates the
+phases.  This is a mathematical refinement, not a physical retraction.
 
-\subsection{The Thermodynamic Stratification Principle}
+\subsection{The Physical Stratification Principle}
 
 The central discovery of this paper is that \emph{arithmetic complexity
-tracks thermodynamic scaling}.  Extensive observables---those that grow
-linearly with system size---are governed by subadditive limits and cap
-at $\Sigma_1^0$.  Intensive observables---those that remain finite as
-the system grows---are governed by infima over all scales and reach
-$\Sigma_2^0$.  The promise gap, when present, collapses one quantifier
-alternation and brings intensive observables back to $\Sigma_1^0$.
+tracks epistemic mode, not thermodynamic scaling}.  The exact zero-test
+for \emph{any} decreasing non-negative sequence---whether arising from
+an extensive observable (energy density) or an intensive one (spectral
+gap)---is $\Sigma_2^0$, because deciding ``$\ell > 0$'' requires the
+nested $\exists\forall$ witness.  The old claim that extensive
+observables cap at $\LPO$ was incorrect (erratum: Step~3 of the old
+Theorem~4 confused limit existence with the limit sign test).
 
-This is not a coincidence.  The subadditive structure of extensive
-quantities ensures that finite-volume approximations converge
-monotonically, reducing the logic to a single existential witness.
-Intensive quantities lack this monotone convergence: one must verify
-the behaviour at \emph{every} scale, producing the $\forall\exists$
-alternation that defines $\Sigma_2^0$.
+What brings the arithmetic complexity back to $\Sigma_1^0$ is not the
+thermodynamic type of the observable, but the \emph{epistemic constraints}
+under which the question is posed: (a)~the promise gap, which collapses
+$\forall\exists$ to $\exists$ by providing a gap threshold; and
+(b)~finite measurement precision, which imposes an effective promise gap.
+Exact (platonic) physics requires $\LPOj$; constrained
+(promise-gapped or empirical) physics caps at $\LPO$.
 
 \subsection{The Program in Retrospect}
 
@@ -855,30 +1133,83 @@ Papers 29--39 tell a complete story in four acts:
   undecidability landscape, Wang tiling, and the $\Sigma_2^0$
   capstone map the boundary between the decidable and the
   undecidable---and reveal that the boundary is itself stratified
-  by thermodynamic scaling.
+  by epistemic mode (exact vs.\ promise-gapped vs.\ empirical).
 \end{enumerate}
+
+\subsection{Weihrauch Degrees and Omniscience Principles}
+
+The connection between $\LPO$, $\LPOj$, and the arithmetic hierarchy
+can be made precise through the Weihrauch lattice~\cite{BrattkaEtAl2012}.
+In this framework, $\LPO$ is the Weihrauch degree corresponding to
+$\Sigma_1^0$-LEM, and $\LPOj$ (the parallelization of the jump of $\LPO$)
+corresponds to $\Sigma_2^0$-LEM.  The strict separation
+$\LPO <_W \LPOj$ is a theorem of Weihrauch degree theory, not merely
+a conjecture.
+
+For the CRM programme, the Weihrauch framework provides the formal
+backbone for the stratification.  Each level of the arithmetic hierarchy
+corresponds to an omniscience principle:
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Level} & \textbf{Principle} & \textbf{Quantifier form} \\
+\midrule
+$\Sigma_1^0$ & $\LPO$ & $\exists n.\, R(n)$ \\
+$\Sigma_2^0$ & $\LPOj$ & $\exists n.\, \forall m.\, R(n,m)$ \\
+$\Sigma_3^0$ & $\LPO''$ & $\exists n.\, \forall m.\, \exists k.\, R(n,m,k)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Each additional quantifier alternation requires one more Turing jump.
+The Physical Stratification Theorem shows that the spectral gap without
+promise sits at $\LPOj$, while the promise gap collapses it to $\LPO$.
+Whether any physical observable reaches $\LPO''$ ($\Sigma_3^0$) remains
+open.
 
 \subsection{Open Questions}
 
 Several questions remain open:
-\begin{itemize}[nosep]
-\item \textbf{$\Sigma_3^0$ and beyond:} Are there physical observables
+\begin{enumerate}[nosep]
+\item \textbf{$\Sigma_3^0$ and beyond.}  Are there physical observables
   at $\Sigma_3^0$?  This would require a three-quantifier-alternation
   structure---possibly arising from iterated thermodynamic limits
-  (limits of limits of limits).  No natural example is known, but the
-  arithmetic hierarchy is infinite and the stratification principle
-  suggests the answer depends on the depth of thermodynamic nesting.
-\item \textbf{Experimental signatures:} Can the gap between $\LPO$
+  (limits of limits of limits).  A candidate: consider a family of
+  Hamiltonians $H_\lambda$ parametrized by $\lambda \in [0,1]$, and
+  ask whether $\lambda \mapsto \Delta(H_\lambda)$ is identically zero.
+  This is a $\forall\exists\forall$ statement ($\forall \lambda.\,
+  \forall m.\, \exists L.\, \Delta_L(H_\lambda) < 1/m$), which is
+  $\Pi_3^0$.  Whether such questions arise naturally in physics is
+  not known.
+
+\item \textbf{Experimental signatures.}  Can the gap between $\LPO$
   and $\LPOj$ be detected experimentally?  The finite-precision
-  argument suggests not directly, but the distinction may have
-  consequences for the computational complexity of simulation
-  algorithms.
-\item \textbf{Quantum gravity:} Does the $\BISH$+$\LPO$ profile
+  argument (Theorem~E, part iii) suggests not directly: any
+  measurement with $\varepsilon > 0$ precision collapses the problem
+  to $\Sigma_1^0$.  However, the distinction may have consequences
+  for the \emph{computational complexity of simulation algorithms}.
+  A simulation that attempts to resolve the exact gap (without
+  promise) faces a $\Sigma_2^0$-complete problem; a simulation
+  that accepts finite-precision output faces only $\Sigma_1^0$.
+  This distinction may be relevant for quantum simulation protocols.
+
+\item \textbf{Quantum gravity.}  Does the $\BISH$+$\LPO$ profile
   extend to quantum gravity, or does the background-independence
   of general relativity introduce new logical structure?  Paper~5
-  (Schwarzschild metric) provides initial evidence, but the full
-  question remains open.
-\end{itemize}
+  (Schwarzschild metric) and Paper~77 (Hodge decompositions)
+  provide initial evidence that differential-geometric objects
+  remain within $\BISH$+$\LPO$, but a full analysis of
+  background-independent theories remains open.
+
+\item \textbf{The v1$\to$v2 correction as a case study.}
+  The error in v1 of this paper---conflating limit existence
+  with the limit sign test---is itself an instance of the
+  ``category error'' described in \S\ref{sec:error}.  The
+  error was discovered through careful analysis of the
+  quantifier structure, not through counterexample search.
+  This suggests that CRM's focus on quantifier counting
+  provides a natural error-detection mechanism for arguments
+  about undecidability.
+\end{enumerate}
 
 % ====================================================================
 \section{AI-Assisted Methodology}\label{sec:ai}
@@ -973,6 +1304,54 @@ P.~C.-K.~Lee,
   mathematical physics,''
 Preprint, 2026. Paper~12.
 
+\bibitem{Lee26P29}
+P.~C.-K.~Lee,
+``Fekete's lemma is LPO: bounded monotone convergence
+in constructive reverse mathematics,''
+Zenodo, 2025. Paper~29.
+DOI: 10.5281/zenodo.14611371.
+
+\bibitem{Lee26P36}
+P.~C.-K.~Lee,
+``The spectral gap is LPO: Cubitt stratification,''
+Zenodo, 2025. Paper~36.
+DOI: 10.5281/zenodo.14611373.
+
+\bibitem{Lee26P37}
+P.~C.-K.~Lee,
+``The Watson--Cubitt metatheorem: ground state energy is BISH,''
+Zenodo, 2025. Paper~37.
+DOI: 10.5281/zenodo.14611375.
+
+\bibitem{Lee26P38}
+P.~C.-K.~Lee,
+``The grandfather is LPO: Wang tiling,''
+Zenodo, 2025. Paper~38.
+DOI: 10.5281/zenodo.14611377.
+
+\bibitem{BridgesRichman1987}
+D.~Bridges and F.~Richman,
+\emph{Varieties of Constructive Mathematics},
+Cambridge University Press (1987).
+
+\bibitem{Rogers1967}
+H.~Rogers,
+\emph{Theory of Recursive Functions and Effective Computability},
+McGraw-Hill (1967).
+
+\bibitem{Lee26P50}
+P.~C.-K.~Lee,
+``The constructive atlas of mathematical physics,''
+Zenodo, 2025. Paper~50.
+DOI: 10.5281/zenodo.14658959.
+
+\bibitem{FormatGuide}
+P.~C.-K.~Lee,
+``Paper format guide for the CRM series,''
+Zenodo, 2026.
+DOI: 10.5281/zenodo.18765700.
+
 \end{thebibliography}
 
 \end{document}
+

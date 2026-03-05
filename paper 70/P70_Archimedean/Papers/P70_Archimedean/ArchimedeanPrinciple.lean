@@ -16,7 +16,7 @@
   References: Paper 40 (physics synthesis), Paper 50 (DPT axioms),
     Paper 68 (FLT is BISH), Paper 69 (function field Langlands is BISH).
 -/
-import Papers.P70_Archimedean.SpectralGaps
+import Papers.P70_Archimedean.Defs
 
 open CRMLevel DescentType
 

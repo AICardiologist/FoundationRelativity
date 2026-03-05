@@ -1,0 +1,991 @@
+[
+  {
+    "filepath": "BerkovichMotives.tex",
+    "title": "Berkovich Motives",
+    "authors": "Peter Scholze",
+    "year": 0,
+    "arxiv_id": "",
+    "msc_codes": [],
+    "max_crm_level": "LPO",
+    "max_crm_value": 5,
+    "bottleneck": "normed filtration (decidable norm comparison)",
+    "bottleneck_location": "Banach rings and Berkovich spectrum",
+    "num_active_hits": 137,
+    "num_suppressed": 7,
+    "level_counts": {
+      "BISH": 43,
+      "WKL": 47,
+      "WLPO": 40,
+      "LPO": 7
+    },
+    "structure": {
+      "theorems": 24,
+      "lemmas": 78,
+      "proofs": 90,
+      "sections": 19,
+      "citations": 40,
+      "estimated_pages": 66
+    },
+    "active_hits": [
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Preamble",
+        "line": 50,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Introduction",
+        "line": 62,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "six-functor formalism (categorical)",
+        "location": "Introduction",
+        "line": 62,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "perfectoid (inverse limit / tilting)",
+        "location": "Introduction",
+        "line": 64,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Introduction",
+        "line": 69,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Introduction",
+        "line": 70,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "adic space (inverse limit of affinoids)",
+        "location": "Introduction",
+        "line": 74,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "Berkovich spectrum (profinite/inverse limit)",
+        "location": "Introduction",
+        "line": 76,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "Berkovich spectrum (profinite/inverse limit)",
+        "location": "Introduction",
+        "line": 83,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "arc-topology (profinite descent)",
+        "location": "Introduction",
+        "line": 83,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "Berkovich spectrum (profinite/inverse limit)",
+        "location": "Introduction",
+        "line": 92,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "arc-topology (profinite descent)",
+        "location": "Introduction",
+        "line": 96,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Introduction",
+        "line": 100,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "Introduction",
+        "line": 145,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Introduction",
+        "line": 153,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "Introduction",
+        "line": 159,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Introduction",
+        "line": 188,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "Introduction",
+        "line": 194,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "Introduction",
+        "line": 208,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "Introduction",
+        "line": 220,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Introduction",
+        "line": 234,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "Introduction",
+        "line": 234,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Introduction",
+        "line": 236,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "Introduction",
+        "line": 258,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "Berkovich spectrum (profinite/inverse limit)",
+        "location": "Banach rings and Berkovich spectrum",
+        "line": 274,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "completed normed group",
+        "location": "Banach rings and Berkovich spectrum",
+        "line": 294,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "Cauchy completion",
+        "location": "Banach rings and Berkovich spectrum",
+        "line": 294,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "completed normed group",
+        "location": "Banach rings and Berkovich spectrum",
+        "line": 297,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "Banach rings and Berkovich spectrum",
+        "line": 299,
+        "source": "keyword"
+      },
+      {
+        "level": "LPO",
+        "reason": "normed filtration (decidable norm comparison)",
+        "location": "Banach rings and Berkovich spectrum",
+        "line": 307,
+        "source": "keyword"
+      },
+      {
+        "level": "LPO",
+        "reason": "normed filtration (decidable norm comparison)",
+        "location": "Free seminormed rings",
+        "line": 371,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "Berkovich spectrum (profinite/inverse limit)",
+        "location": "Banach fields",
+        "line": 391,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "Banach fields",
+        "line": 403,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "completion of (semi/pseudo-)normed group",
+        "location": "Banach fields",
+        "line": 403,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "completed normed group",
+        "location": "Banach fields",
+        "line": 403,
+        "source": "keyword"
+      },
+      {
+        "level": "LPO",
+        "reason": "normed filtration (decidable norm comparison)",
+        "location": "Banach fields",
+        "line": 412,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "condensed mathematics (profinite structure)",
+        "location": "Banach fields",
+        "line": 424,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "condensed mathematics (profinite structure)",
+        "location": "Banach fields",
+        "line": 429,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "Banach fields",
+        "line": 434,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "Berkovich spectrum (profinite/inverse limit)",
+        "location": "Banach fields",
+        "line": 436,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "Banach fields",
+        "line": 438,
+        "source": "keyword"
+      },
+      {
+        "level": "LPO",
+        "reason": "normed filtration (decidable norm comparison)",
+        "location": "Gelfand transform",
+        "line": 478,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "Gelfand transform",
+        "line": 478,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "The nonarchimedean unit disc",
+        "line": 483,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "completion of (semi/pseudo-)normed group",
+        "location": "The nonarchimedean unit disc",
+        "line": 483,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "inverse limit of finite objects",
+        "location": "The nonarchimedean unit disc",
+        "line": 501,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "inverse limit of finite objects",
+        "location": "The nonarchimedean unit disc",
+        "line": 505,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "The nonarchimedean unit disc",
+        "line": 510,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "The nonarchimedean unit disc",
+        "line": 511,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "completion of (semi/pseudo-)normed group",
+        "location": "The nonarchimedean unit disc",
+        "line": 511,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "The nonarchimedean unit disc",
+        "line": 512,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "completion of (semi/pseudo-)normed group",
+        "location": "The nonarchimedean unit disc",
+        "line": 512,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "arc-topology (profinite descent)",
+        "location": "The arc-topology",
+        "line": 517,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "Berkovich spectrum (profinite/inverse limit)",
+        "location": "The arc-topology",
+        "line": 528,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "completed normed group",
+        "location": "The arc-topology",
+        "line": 544,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "Berkovich spectrum (profinite/inverse limit)",
+        "location": "The arc-topology",
+        "line": 544,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "Berkovich spectrum (profinite/inverse limit)",
+        "location": "The arc-topology",
+        "line": 546,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "The arc-topology",
+        "line": 556,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "The arc-topology",
+        "line": 571,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "completion of (semi/pseudo-)normed group",
+        "location": "The arc-topology",
+        "line": 571,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "arc-topology (profinite descent)",
+        "location": "The arc-topology",
+        "line": 571,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "The arc-topology",
+        "line": 588,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "arc-topology (profinite descent)",
+        "location": "The arc-topology",
+        "line": 588,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "The arc-topology",
+        "line": 595,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "condensed mathematics (profinite structure)",
+        "location": "The arc-topology",
+        "line": 608,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "inverse limit of finite objects",
+        "location": "The arc-topology",
+        "line": 635,
+        "source": "keyword"
+      },
+      {
+        "level": "LPO",
+        "reason": "normed filtration (decidable norm comparison)",
+        "location": "The arc-topology",
+        "line": 639,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "arc-topology (profinite descent)",
+        "location": "The arc-topology",
+        "line": 642,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "arc-topology (profinite descent)",
+        "location": "The arc-topology",
+        "line": 645,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "arc-topology (profinite descent)",
+        "location": "The arc-topology",
+        "line": 647,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "Berkovich spectrum (profinite/inverse limit)",
+        "location": "The arc-topology",
+        "line": 660,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "The arc-topology",
+        "line": 662,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "perfectoid (inverse limit / tilting)",
+        "location": "The arc-topology",
+        "line": 665,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "perfectoid (inverse limit / tilting)",
+        "location": "The arc-topology",
+        "line": 667,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "arc-topology (profinite descent)",
+        "location": "The arc-topology",
+        "line": 667,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "perfectoid (inverse limit / tilting)",
+        "location": "The arc-topology",
+        "line": 670,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Finitary arc-sheaves",
+        "line": 685,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "Finitary arc-sheaves",
+        "line": 703,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "inverse limit of finite objects",
+        "location": "Finitary arc-sheaves",
+        "line": 711,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "Finitary arc-sheaves",
+        "line": 743,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "Finitary arc-sheaves",
+        "line": 753,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "completion of (semi/pseudo-)normed group",
+        "location": "Finitary arc-sheaves",
+        "line": 753,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "completed normed group",
+        "location": "Finitary arc-sheaves",
+        "line": 753,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "condensed mathematics (profinite structure)",
+        "location": "Finitary arc-sheaves",
+        "line": 828,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "six-functor formalism (categorical)",
+        "location": "Finitary arc-sheaves",
+        "line": 852,
+        "source": "keyword"
+      },
+      {
+        "level": "LPO",
+        "reason": "normed filtration (decidable norm comparison)",
+        "location": "Finitary arc-sheaves",
+        "line": 909,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "Berkovich spectrum (profinite/inverse limit)",
+        "location": "Finitary arc-sheaves",
+        "line": 938,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Effective motives",
+        "line": 956,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "Effective motives",
+        "line": 1086,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Free motivic sheaves",
+        "line": 1108,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "The Tate twist",
+        "line": 1172,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "The Tate twist",
+        "line": 1229,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Free motivic sheaves",
+        "line": 1275,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Free motivic sheaves",
+        "line": 1277,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "Free motivic sheaves",
+        "line": 1279,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "Free motivic sheaves",
+        "line": 1279,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "Free motivic sheaves",
+        "line": 1290,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "Free motivic sheaves",
+        "line": 1307,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "perfectoid (inverse limit / tilting)",
+        "location": "Free motivic sheaves",
+        "line": 1412,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "$K$-theory",
+        "line": 1565,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "$K$-theory",
+        "line": 1575,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "$K$-theory",
+        "line": 1607,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "$K$-theory",
+        "line": 1614,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "$K$-theory",
+        "line": 1637,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "$K$-theory",
+        "line": 1707,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "completion of (semi/pseudo-)normed group",
+        "location": "$K$-theory",
+        "line": 1715,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "perfectoid (inverse limit / tilting)",
+        "location": "$K$-theory",
+        "line": 1745,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "perfectoid (inverse limit / tilting)",
+        "location": "$K$-theory",
+        "line": 1747,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "perfectoid (inverse limit / tilting)",
+        "location": "$K$-theory",
+        "line": 1763,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "perfectoid (inverse limit / tilting)",
+        "location": "$K$-theory",
+        "line": 1775,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "$ D_{mot",
+        "line": 1831,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "Berkovich spectrum (profinite/inverse limit)",
+        "location": "$ D_{mot",
+        "line": 1856,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "six-functor formalism (categorical)",
+        "location": "$ D_{mot",
+        "line": 1924,
+        "source": "keyword"
+      },
+      {
+        "level": "LPO",
+        "reason": "norm filtration cutoff (decidable ≤ on ℝ)",
+        "location": "$ D_{mot",
+        "line": 1929,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "Berkovich spectrum (profinite/inverse limit)",
+        "location": "$ D_{mot",
+        "line": 1943,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "$ D_{mot",
+        "line": 1946,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "$ D_{mot",
+        "line": 1955,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "six-functor formalism (categorical)",
+        "location": "$ D_{mot",
+        "line": 1967,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "$ D_{mot",
+        "line": 1967,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "$ D_{mot",
+        "line": 1984,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "$ D_{mot",
+        "line": 1995,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "six-functor formalism (categorical)",
+        "location": "$ D_{mot",
+        "line": 2043,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "Mixed Tate motives",
+        "line": 2048,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "Mixed Tate motives",
+        "line": 2065,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "Mixed Tate motives",
+        "line": 2068,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "motivic sheaf/cohomology (algebraic)",
+        "location": "$ D_{mot",
+        "line": 2104,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "$ D_{mot",
+        "line": 2155,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "$ D_{mot",
+        "line": 2157,
+        "source": "keyword"
+      },
+      {
+        "level": "WLPO",
+        "reason": "normed completion",
+        "location": "$ D_{mot",
+        "line": 2160,
+        "source": "keyword"
+      },
+      {
+        "level": "BISH",
+        "reason": "Tate twist (algebraic)",
+        "location": "$ D_{mot",
+        "line": 2169,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "perfectoid (inverse limit / tilting)",
+        "location": "Relation to v-stacks",
+        "line": 2318,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "arc-topology (profinite descent)",
+        "location": "Relation to v-stacks",
+        "line": 2318,
+        "source": "keyword"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Introduction",
+        "line": 60,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Introduction",
+        "line": 62,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "$K$-theory",
+        "line": 1607,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "$ D_{mot",
+        "line": 1924,
+        "source": "citation"
+      },
+      {
+        "level": "WKL",
+        "reason": "Scholze, Lectures on Analytic Geometry (Tychonoff gates)",
+        "location": "Relation to v-stacks",
+        "line": 2276,
+        "source": "citation"
+      }
+    ]
+  }
+]

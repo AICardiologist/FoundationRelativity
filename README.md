@@ -202,7 +202,7 @@ Every paper with its bottom line. Papers 1 and 3 withdrawn; Papers 60 and 62 ret
 | 36 | Spectral Gap Undecidability = LPO | Cubitt ≡ LPO |
 | 37 | Undecidability Landscape = LPO | Three further results, all LPO |
 | 38 | Wang Tiling | All quantum undecidability from Wang tiling (LPO) |
-| 39 | Beyond LPO: Thermodynamic Stratification | Generic spectral gap Σ⁰₂; extensive observables cap at LPO |
+| 39 | Physics Reaches Σ⁰₂: Physical Stratification | Epistemic mode determines arithmetic level; exact observables reach Σ⁰₂ |
 | **40** | **Logical Constitution of Physical Reality** | **Monograph: BISH + LPO is the complete constitution** |
 | 41 | AdS/CFT Diagnostic | Holographic dictionary axiom-preserving; bulk ≡ boundary |
 | 42 | Cosmological Constant Problem | 10¹²⁰ discrepancy adds no new logical resources |

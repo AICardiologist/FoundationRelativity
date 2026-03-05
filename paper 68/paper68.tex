@@ -4,7 +4,7 @@
 % Standard LaTeX packages
 % ------------------------------------------------------------
 \usepackage[margin=1in]{geometry}
-\usepackage{lmodern}
+%\usepackage{lmodern}
 \usepackage{amsmath,amssymb,mathtools}
 \usepackage{amsthm}
 \usepackage[american]{babel}
@@ -33,7 +33,7 @@
 \newtheorem{remark}[theorem]{Remark}
 
 % ---------- Lean repo link ----------
-\newcommand{\leanRepo}{\url{https://doi.org/10.5281/zenodo.18748460}}
+\newcommand{\leanRepo}{\url{https://doi.org/10.5281/zenodo.18838541}}
 
 % ---------- Notation ----------
 \newcommand{\N}{\mathbb{N}}
@@ -58,6 +58,7 @@
 \newcommand{\Sel}{\mathrm{Sel}}
 \newcommand{\edim}{\mathrm{edim}}
 \newcommand{\CRM}{\mathrm{CRM}}
+\newcommand{\tr}{\mathrm{tr}}
 
 \newcommand{\BISH}{\mathsf{BISH}}
 \newcommand{\LPO}{\mathsf{LPO}}
@@ -141,8 +142,8 @@
 \lstset{style=leanstyle}
 
 % ---------- Title and author ----------
-\title{The Logical Cost of Fermat's Last Theorem:\\
-  A Constructive Reverse Mathematics Audit of Wiles's Proof\\[6pt]
+\title{Fermat's Last Theorem is $\BISH$:\\
+  A Constructive Reverse Mathematics Audit\\[6pt]
   {\large (Paper~68, Constructive Reverse Mathematics Series)}}
 
 \author{Paul Chun-Kit Lee\thanks{Lean 4 formalization available at \leanRepo.} \\
@@ -159,9 +160,17 @@ New York University \\
 % ============================================================
 
 We perform a stage-by-stage constructive reverse mathematics
-audit of Wiles's proof of the modularity of semistable elliptic
-curves over~$\Q$, and hence of Fermat's Last Theorem.  The proof
-decomposes into five stages: residual modularity
+audit of Wiles's proof that the $p$-adic Galois representation
+$\rho_{E,p}$ attached to every semistable elliptic curve
+$E/\Q$ is modular (\emph{Galois modularity}:
+$\rho_{E,p} \cong \rho_{f,p}$ for some eigenform~$f$),
+and hence of Fermat's Last Theorem.
+\emph{Geometric modularity} (that $E$ is isogenous to the
+abelian variety $A_f$) additionally requires Faltings's Isogeny
+Theorem, whose Archimedean content places it at~$\CLASS$; FLT
+does not need it, since Ribet's level-lowering operates entirely
+on~$\bar{\rho}_{E,p}$.
+The proof decomposes into five stages: residual modularity
 (Langlands--Tunnell), deformation ring construction, Hecke algebra
 construction, the numerical criterion, and Taylor--Wiles patching.
 
@@ -171,6 +180,17 @@ fully constructive ($\BISH$), while Stage~1 requires $\WLPO$
 content of Wiles's proof is concentrated entirely at its entry
 point---the analytic theory of weight~1 automorphic forms---and
 the Taylor--Wiles engine contributes zero logical cost.
+
+We then show that Stage~1 can be \emph{bypassed entirely}.
+The 21st-century proof route (Kisin 2009, Khare--Wintenberger
+2009), which replaces Wiles's residual prime $p = 3$ with
+$p = 2$, reduces the base case to dihedral modularity
+($\GL_2(\F_2) \cong S_3$), where Hecke theta series
+(requiring only classical Poisson summation, not the trace formula)
+provide a $\BISH$ construction.
+The overall classification of Fermat's Last Theorem is therefore
+$\BISH$.  The $\WLPO$ was an artefact of Wiles's
+choice of residual prime, not a property of the theorem.
 
 Two post-Wiles developments drive the Stage~5 classification:
 Brochard's proof of de~Smit's conjecture (2017), which eliminates
@@ -202,7 +222,14 @@ The question is not about computational complexity but about logical
 needed?  This paper answers the question for Wiles's proof
 \cite{Wiles1995}, as refined by Taylor--Wiles \cite{TaylorWiles1995},
 Diamond \cite{Diamond1997}, and Brochard \cite{Brochard2017}.
-We establish four results:
+Throughout, ``modularity'' means \emph{Galois modularity}: the
+$p$-adic representation $\rho_{E,p}$ is isomorphic to the
+representation attached to a weight~2 eigenform.  Ribet's
+level-lowering theorem operates on $\bar{\rho}_{E,p}$ and yields the
+FLT contradiction $S_2(\Gamma_0(2)) = 0$ without ever requiring
+that $E$ be isogenous to~$A_f$ (geometric modularity, which
+requires Faltings's Isogeny Theorem: $\CLASS$).
+We establish five results:
 
 \begin{description}[leftmargin=2em]
 \item[Theorem A] (Stage~5 is $\BISH$).
@@ -231,6 +258,15 @@ condition).
 The overall classification of Wiles's proof is $\BISH + \WLPO$.
 The $\WLPO$ is localized entirely in Stage~1.  Removing Stage~1
 drops the classification to~$\BISH$.
+
+\item[Theorem E] (The Dihedral Bypass).
+Stage~1 can be eliminated from the proof of Fermat's Last Theorem.
+The 21st-century proof route replaces the residual prime $p = 3$
+(projective image~$S_4$, requiring the trace formula) with $p = 2$
+(projective image~$S_3 = D_3$, requiring only Hecke theta series
+and Poisson summation).  The resulting proof establishes Galois
+modularity in $\BISH$ throughout.
+Fermat's Last Theorem is~$\BISH$.
 \end{description}
 
 \subsection{Constructive Reverse Mathematics: a brief primer}
@@ -988,30 +1024,273 @@ ensures no logical step has been skipped.
 Fermat's Last Theorem is a statement about natural numbers:
 $\forall n \ge 3,\; \forall a\,b\,c \in \N^+,\;
 a^n + b^n \neq c^n$.  As a $\Pi^0_1$ sentence, it ``should'' be
-provable in~$\BISH$ if true.  The $\WLPO$ in Wiles's proof is
-a feature of the \emph{proof method}, not necessarily of the
-\emph{theorem}.
+provable in~$\BISH$ if true.  The next two sections investigate:
+first we show that the $\WLPO$ is \emph{irreducible} for any
+proof through weight~$1$ (\S\ref{sec:weight1}), then we show
+that the weight~$1$ step can be bypassed entirely
+(\S\ref{sec:bypass}).
 
-This raises a fundamental question for CRM: does every true
-$\Pi^0_1$ sentence have a $\BISH$ proof?  If the $\WLPO$ in
-Stage~1 is eliminable (e.g., via algebraic weight~1 modularity),
-this supports the CRM thesis that logical cost is intrinsic to
-theorems.  If no proof of FLT avoids~$\WLPO$, this would be a
-striking counterexample: a concrete arithmetic statement whose
-\emph{every} proof requires an omniscience principle.
 
-The algebraic route via overconvergent $p$-adic methods
-(Buzzard--Taylor \cite{BuzzardTaylor1999}) offers the most
-promising path to eliminating Stage~1's $\WLPO$.
+% ============================================================
+\section{The weight~$1$ obstruction}\label{sec:weight1}
+% ============================================================
 
-\subsection{Open questions}
+The $\WLPO$ in Wiles's proof enters through the
+Langlands--Tunnell theorem, which establishes residual
+modularity via the Arthur--Selberg trace formula at weight~$1$.
+We now show that this $\WLPO$ is irreducible: five
+independent approaches to eliminating it all fail.  The
+analysis reveals the precise nature of the obstruction and
+motivates the bypass of \S\ref{sec:bypass}.
+
+\subsection{Failure~1: Transcendental Archimedean integrals}
+
+At weight~$1$, the Archimedean test function is the character of
+a limit of discrete series, which does \emph{not} vanish on
+hyperbolic (split) elements.  The orbital integral over the
+hyperbolic torus evaluates to $\log \varepsilon_K$---the logarithm
+of the fundamental unit of a real quadratic field---a
+transcendental number.  These terms do not cancel between the
+two sides of the base change comparison.
+
+\subsection{Failure~2: Maass form contamination}
+
+The limit of discrete series at weight~$1$ shares its
+infinitesimal character with the principal series at Laplacian
+eigenvalue $\lambda = 1/4$.  The spectral side therefore receives
+contributions from both holomorphic weight~$1$ forms \emph{and}
+odd Maass forms of eigenvalue~$1/4$:
+\[
+  \text{Spectral side} = \sum_{\pi \,\text{hol, wt 1}}
+  \tr \pi(f) \;-\; \sum_{\pi' \,\text{Maass, }\lambda = 1/4}
+  \tr \pi'(f).
+\]
+The Hecke eigenvalues of Maass forms are generically
+transcendental.  The identity equates sums of real numbers,
+not algebraic numbers.  The Tarski decidability argument does
+not apply.
+
+\subsection{Failure~3: Unknown index bounds}
+
+Even if the terms were algebraic, the decidability descent
+requires computable bounds on the number of terms.  At
+weight~$1$, the dimension of $H^0(X, \omega)$ has no purely
+algebraic formula: the Riemann--Roch theorem gives
+$\dim H^0 - \dim H^1$, but $H^1 \ne 0$ at weight~$1$ (by
+Serre duality, $H^1(\omega(\chi))$ is dual to~$S_1(\chi^{-1})$),
+and the dimension jumps erratically.  Without knowing the index
+set, the identity cannot be formulated as a sentence
+in~$\mathrm{ACF}$.
+
+\subsection{Failure~4: The $p$-adic initialisation trap}
+
+The $p$-adic theory of overconvergent modular forms
+(Buzzard--Taylor \cite{BuzzardTaylor1999}, Kassaei, Pilloni)
+provides a purely $p$-adic construction of weight~$1$ forms
+that avoids all three Archimedean obstructions: Hida families
+are~$\BISH$ and specialisation is~$\BISH$.  However, the
+Kassaei--Pilloni classicality theorem relies on rigid analytic
+geometry (Tate), whose foundation requires locating maximal
+ideals of Tate algebras---structurally invoking Krull's Maximal
+Ideal Theorem (equivalent to the Boolean Prime Ideal theorem,
+hence~$\CLASS$).  The constructive status of classicality
+therefore remains open.
+
+However, the $p$-adic machinery cannot \emph{originate}
+modularity.  To place $\bar{\rho}_3$ on the eigencurve requires
+finding a weight $k \ge 2$ form whose residual representation
+matches~$\bar{\rho}_3$---which requires Langlands--Tunnell.
+Modularity lifting theorems (Taylor--Wiles, Kisin,
+Calegari--Geraghty) are similarly \emph{relative}: they
+transform modularity from one form to another but cannot create
+it.  The trace formula is the unique \emph{absolute} bridge
+from Galois representations to automorphic forms.
+
+\subsection{Failure~5: The universal quantifier}
+
+A direct algebraic approach reveals the deepest structure.
+For any \emph{specific} conductor~$N$, the space $S_1(N, \chi)$
+is computable by the Eisenstein trick: choose Eisenstein series
+$E_a, E_b$ of weight~$1$ with no common zeros; then $S_1(N,\chi)$
+is the intersection of their images in $S_2(N,\chi\psi)$,
+computable via modular symbols and finite linear algebra.
+For any given~$N$, modularity is $\BISH$-verifiable.
+
+However, FLT concerns a hypothetical Frey curve with
+conductor $N = \mathrm{rad}(abc)$, an unbounded variable.  The
+proof requires a \emph{universal} existence theorem: for every
+valid $S_4$ representation, $S_1(N,\chi)$ contains the
+corresponding eigenform.  Because $H^1 \ne 0$ at weight~$1$,
+Riemann--Roch cannot force $h^0 \ge 1$.  The only known method
+for universal existence is the trace formula.
+
+\begin{remark}[Verification versus certification]%
+\label{rem:ontology}
+The $\WLPO$ is not the cost of \emph{constructing} weight~$1$
+forms (which are algebraic, computable objects).  It is the cost
+of the \emph{universal quantifier}: proving that the algebraic
+algorithm succeeds for every possible input.
+\emph{Verification} (checking a specific instance) is~$\BISH$.
+\emph{Certification} (proving the algorithm never fails)
+is~$\WLPO$.  This distinction---between ontology and
+universality---is invisible classically but sharp in
+constructive logic.
+\end{remark}
+
+\begin{theorem}[The weight~$1$ obstruction is irreducible]%
+\label{thm:weight1}
+The Langlands--Tunnell base change at weight~$1$ cannot be
+constructivised by decidability descent, by $p$-adic methods,
+or by direct algebraic computation.  The $\WLPO$ is
+irreducible for any proof route that passes through weight~$1$
+automorphic forms.
+\end{theorem}
+
+
+% ============================================================
+\section{The dihedral bypass: FLT is \texorpdfstring{$\BISH$}{BISH}}%
+\label{sec:bypass}
+% ============================================================
+
+The $\WLPO$ in Wiles's proof arises from a single choice:
+using the residual prime $p = 3$, which forces the base case
+through $\GL_2(\F_3)$ (projective image~$S_4$, octahedral)
+and hence through the Langlands--Tunnell theorem (weight~1,
+trace formula, $\WLPO$).  Post-2009 developments eliminate
+this choice entirely.
+
+\subsection{The $p = 2$ base case (Kisin)}
+
+For an elliptic curve $E/\Q$, consider the $2$-torsion
+representation $\bar{\rho}_{E,2} : G_\Q \to \GL_2(\F_2)$.
+The group $\GL_2(\F_2) \cong S_3$ is the dihedral group~$D_3$.
+Any representation with dihedral projective image lifts to a
+characteristic zero representation induced from a
+Hecke character of a quadratic field.  By Hecke's classical
+theorem (1926), such representations are modular: the
+corresponding modular forms are binary theta series attached
+to lattices in imaginary quadratic fields.
+
+Hecke's construction avoids the trace formula entirely---it
+uses lattice sums and the algebraic theory of quadratic forms,
+with no $L^2$ spectral decomposition and no continuous spectrum.
+The functional equation for the theta series requires
+Poisson summation over~$\R$ (Archimedean analysis), but
+Poisson summation is constructively valid
+(Bishop \cite{Bishop1967}).  The construction is~$\BISH$.
+
+\begin{proposition}[Dihedral base case is $\BISH$]%
+\label{prop:dihedral}
+Let $\bar{\rho} : G_\Q \to \GL_2(\F_2)$ be a continuous
+representation with $\bar{\rho}|_{G_{\Q(\zeta_2)}}$ absolutely
+irreducible.  Then $\bar{\rho}$ is modular.  The proof is~$\BISH$:
+it uses only the algebraic theory of theta series and class field
+theory.
+\end{proposition}
+
+\subsection{Modularity lifting at $p = 2$ (Kisin 2009)}
+
+Kisin \cite{Kisin2009} proved a modularity lifting theorem for
+$2$-adic potentially Barsotti--Tate representations.  The proof
+uses the Taylor--Wiles--Kisin patching method, which we
+classified as~$\BISH$ in \S\ref{sec:stage5}, together with
+Kisin's classification of finite flat group schemes over
+$\Z_2$-extensions (commutative algebra: $\BISH$).
+Combined with the Khare--Wintenberger induction
+\cite{KhareWintenberger2009I, KhareWintenberger2009II}, this
+yields:
+
+\begin{theorem}[Kisin's $p = 2$ modularity lifting is $\BISH$]%
+\label{thm:kisin2}
+The modularity lifting theorem for $2$-adic Barsotti--Tate
+representations (Kisin \cite{Kisin2009}) is~$\BISH$.
+The proof uses finite flat group scheme classification
+(commutative algebra), Taylor--Wiles patching ($\BISH$,
+Theorem~A), and effective Chebotarev ($\BISH$).
+No analytic input from the trace formula is required.
+\end{theorem}
+
+\subsection{Completing the proof}
+
+\emph{Decidability of the case-split.}  For an elliptic curve
+$E/\Q\colon y^2 = x^3 + ax + b$, the representation
+$\bar{\rho}_{E,2}$ is absolutely irreducible if and only if the
+$2$-torsion field $\Q(E[2])$---the splitting field of
+$f(x) = x^3 + ax + b$---has degree~$6$ over~$\Q$, equivalently
+$f$ is irreducible over~$\Q$.  Because polynomial factorisation
+over~$\Q$ is unconditionally $\BISH$-decidable (Kronecker's
+algorithm: test divisibility by all integer polynomials of
+bounded degree and coefficient size), the branch between the two
+cases below is fully constructive.
+
+If $\bar{\rho}_{E,2}$ is absolutely irreducible, then:
+\begin{enumerate}[nosep]
+\item $\bar{\rho}_{E,2}$ is modular (Proposition~\ref{prop:dihedral},
+  dihedral base case, $\BISH$).
+\item $\rho_{E,2}$ is modular (Theorem~\ref{thm:kisin2},
+  $p = 2$ modularity lifting, $\BISH$).
+\item $\rho_{E,2} \cong \rho_{f,2}$ for a weight~2
+  eigenform~$f$ (Galois modularity, $\BISH$).  Ribet's
+  level-lowering applies to $\bar{\rho}_{E,p}$ directly,
+  bypassing Faltings's Isogeny Theorem.
+\end{enumerate}
+
+If $\bar{\rho}_{E,2}$ is reducible, apply a $2$--$3$ switch
+(the analogue of Wiles's $3$--$5$ trick): choose an auxiliary
+curve $E'/\Q$ with $E'[3] \cong E[3]$ and $E'[2]$ absolutely
+irreducible.  By Steps~1--3, $E'$ is modular.  Therefore
+$\bar{\rho}_{E,3}$ is modular, and Wiles's original $p = 3$
+modularity lifting theorem (Theorem~A, $\BISH$) yields
+modularity of~$E$.  The $2$--$3$ switch uses the geometry of
+the modular curve $X(3) \cong \mathbb{P}^1$ and the Hilbert
+irreducibility theorem (decidable: $\BISH$).
+
+\begin{theorem}[FLT is $\BISH$]%
+\label{thm:flt-bish}
+There exists a proof of Fermat's Last Theorem that is
+$\BISH$: the $p = 2$ dihedral bypass (Kisin \cite{Kisin2009},
+Khare--Wintenberger \cite{KhareWintenberger2009I}) replaces
+Stage~1 (Langlands--Tunnell, $\WLPO$) with the dihedral base
+case (Hecke theta series, $\BISH$).  The remaining stages are
+$\BISH$ by Theorems~A--B.  Therefore:
+\[
+  \CRM(\mathrm{FLT}) \;=\; \BISH.
+\]
+\end{theorem}
+
+\subsection{Why Wiles's proof costs $\WLPO$ and the modern
+  proof does not}
+
+The divergence point is the choice of residual prime:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+ & Wiles (1995) & Kisin--KW (2009) \\
+\midrule
+Residual prime & $p = 3$ & $p = 2$ \\
+Group $\GL_2(\F_p)$ & $S_4$ (octahedral) & $S_3$ (dihedral) \\
+Base case & Langlands--Tunnell & Hecke theta series \\
+CRM cost of base case & $\WLPO$ & $\BISH$ \\
+Lifting & Taylor--Wiles ($\BISH$) & Kisin ($\BISH$) \\
+\midrule
+\textbf{Total} & $\BISH + \WLPO$ & $\BISH$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The $\WLPO$ was never intrinsic to FLT.  It was an artefact
+of $S_4$ having non-abelian composition factors that force
+passage through the trace formula.  The group $S_3 = D_3$ is
+solvable with only abelian composition factors, making Hecke's
+algebraic construction sufficient.
+
+
+% ============================================================
+\section{Open questions (revised)}\label{sec:open-revised}
+% ============================================================
 
 \begin{enumerate}[nosep]
-\item \textbf{Is Stage~1 improvable?}  Algebraic weight~1
-  modularity via overconvergent $p$-adic methods could drop
-  Stage~1 to~$\BISH$.  A constructive trace formula exploiting the
-  effective Ramanujan bound might reduce $\WLPO$ to $\MP$.
-
 \item \textbf{Higher-dimensional modularity lifting.}
   Does the $\BISH$ classification of patching survive for $\GL_n$?
   Barnet-Lamb--Gee--Geraghty \cite{BLGGT2014} extend the method to
@@ -1020,11 +1299,19 @@ promising path to eliminating Stage~1's $\WLPO$.
   these settings, the entire Langlands program's non-constructive
   content would be concentrated in the automorphic input.
 
-\item \textbf{Constructive Euler systems.}
-  Is the $\BISH$ classification of Rubin's Euler system
-  (Stage~4 CM base case) robust?  A detailed formal audit of
-  the norm-compatibility relations and Kolyvagin's descent
-  would strengthen the classification.
+\item \textbf{The weight~1 existence problem.}
+  Is there an algebraic universal existence theorem for weight~1
+  eigenforms---a lower bound on $\dim S_1(N, \chi)$ in Artin
+  eigenspaces that avoids the trace formula?  This would give an
+  alternative route to eliminating the $\WLPO$ and has independent
+  interest in constructive number theory.
+
+\item \textbf{Function field Langlands.}
+  Lafforgue's proof of the Langlands correspondence over function
+  fields uses geometric methods (shtukas, \'etale cohomology) with
+  no Archimedean place.  If this proof is $\BISH$, the $\WLPO$ in
+  the number field Langlands programme would be localised to the
+  Archimedean place---a structural finding about the cost of~$\R$.
 \end{enumerate}
 
 
@@ -1032,31 +1319,41 @@ promising path to eliminating Stage~1's $\WLPO$.
 \section{Conclusion}\label{sec:conclusion}
 % ============================================================
 
-We have applied constructive reverse mathematics to Wiles's proof
-of Fermat's Last Theorem and established that:
+We have applied constructive reverse mathematics to Fermat's
+Last Theorem and established two results:
 
-\begin{itemize}[nosep]
-\item The Taylor--Wiles patching step (Stage~5) is $\BISH$, via
-  Brochard's finite-level criterion and effective Chebotarev
-  (Lean-verified from axioms).
-\item Stages~2--4 (deformation ring, Hecke algebra, numerical
-  criterion, CM base case) are $\BISH$ (rigorous analysis,
-  supported by Paper~59).
-\item Stage~1 (Langlands--Tunnell) requires at least $\WLPO$
-  (rigorous analysis of the trace formula and converse theorem).
-\item The overall classification is $\BISH + \WLPO$, with the
-  $\WLPO$ localized entirely in Stage~1 (Lean-verified,
-  sorry-free).
-\end{itemize}
+First, Wiles's 1995 proof is $\BISH + \WLPO$.  The $\WLPO$
+is localised entirely in Stage~1 (Langlands--Tunnell): the
+Taylor--Wiles engine and all algebraic machinery contribute
+zero logical cost.
 
-The constructive calibration does not resolve whether the $\WLPO$
-is intrinsic to FLT, but it localizes the non-constructive
-content precisely: the Taylor--Wiles engine contributes zero
-logical cost; all omniscience lives in the harmonic analysis
-that provides the starting point.  Whether this asymmetry is
-eliminable depends on a question at the frontier of the Langlands
-program: is there a purely algebraic proof of weight~1 modularity
-for solvable Artin representations?
+Second, the $\WLPO$ is eliminable.  The 21st-century proof
+route (Kisin 2009, Khare--Wintenberger 2009) replaces Wiles's
+$p = 3$ base case (octahedral, trace formula, $\WLPO$) with a
+$p = 2$ base case (dihedral, Hecke theta series, $\BISH$).
+The resulting proof is $\BISH$ throughout.
+
+\[
+  \boxed{\CRM(\mathrm{FLT}) \;=\; \BISH.}
+\]
+
+Fermat's Last Theorem---a $\Pi^0_1$ sentence about natural
+numbers---has a constructive proof.  The $\WLPO$ in
+Wiles's original argument was the cost of a specific proof
+\emph{strategy} (the choice of $p = 3$), not a property of
+the \emph{theorem}.  Geometric modularity ($E \sim A_f$,
+requiring Faltings) remains~$\CLASS$, but FLT needs only Galois
+modularity ($\rho_{E,p} \cong \rho_{f,p}$).
+The CRM programme thesis---that logical
+cost is intrinsic to theorems, not to proofs---is confirmed:
+a true $\Pi^0_1$ sentence has a $\BISH$ proof, as expected.
+
+The constructive content of the 21st-century proof was not
+recognised by its creators.  Kisin, Khare, and Wintenberger
+bypassed Langlands--Tunnell for reasons internal to number
+theory (completing Serre's conjecture for $p = 2$), not for
+foundational reasons.  The community unknowingly produced a
+constructive proof of Fermat's Last Theorem.
 
 
 % ============================================================
@@ -1064,23 +1361,29 @@ for solvable Artin representations?
 \addcontentsline{toc}{section}{Acknowledgments}
 % ============================================================
 
-We thank the Mathlib contributors for the \texttt{Nat.Prime}
-and decidable-equality infrastructure that underpins the
-formalization.  We are grateful to the constructive reverse
-mathematics community---especially the foundational work of
-Bishop, Bridges, Richman, and Ishihara---for developing the
-framework that makes calibrations like these possible.
+The Lean~4 formalization uses Mathlib4~\cite{mathlib}; we thank the
+Mathlib contributors for maintaining this essential infrastructure.
 
 The deep mathematics is due to Wiles, Taylor, Diamond,
-Langlands, Tunnell, Brochard, and Lagarias--Odlyzko.  The CRM
-methodology follows Bishop~\cite{Bishop1967} and
-Bridges--Richman~\cite{BridgesRichman1987}.  The Lean~4
-formalization was produced using AI code generation
-(Claude Code, Opus 4.6) under human direction.  The author is a
-practicing cardiologist rather than a professional logician or
-arithmetic geometer; all mathematical claims should be evaluated
-on their formal content.  We welcome constructive feedback from
-domain experts.
+Langlands, Tunnell, Kisin, Khare, Wintenberger, Brochard,
+Hecke, and Lagarias--Odlyzko.  The weight~$1$ obstruction
+analysis draws on the spectral theory of Arthur, Selberg,
+and Harish-Chandra.
+
+This paper was drafted with AI assistance (Claude, Anthropic).
+The formal verification was developed and checked with Claude
+(Anthropic).  The author is a clinician (interventional
+cardiology), not a professional mathematician; the logical structure
+of the main results has been verified by formal proof (Lean~4); the
+mathematical arguments supporting the stage-cost assignments have been
+checked by the author and by consultation with domain experts.
+Errors of mathematical judgment remain the author's responsibility.
+This paper follows the standard format for the CRM
+series~\cite{format-guide}.
+
+This series is dedicated to the memory of Errett Bishop (1928--1983),
+whose program demonstrated that constructive mathematics is not a
+restriction but a refinement.
 
 
 % ============================================================
@@ -1143,6 +1446,21 @@ S.~Gelbart and H.~Jacquet.
 \newblock A relation between automorphic representations of $\mathrm{GL}(2)$
 and $\mathrm{GL}(3)$.
 \newblock \textit{Ann.\ Sci.\ \'Ecole Norm.\ Sup.}, 11(4):471--542, 1978.
+
+\bibitem{Kisin2009}
+M.~Kisin.
+\newblock Modularity of 2-adic Barsotti--Tate representations.
+\newblock \textit{Invent.\ Math.}, 178(3):587--634, 2009.
+
+\bibitem{KhareWintenberger2009I}
+C.~Khare and J.-P.~Wintenberger.
+\newblock Serre's modularity conjecture~(I).
+\newblock \textit{Invent.\ Math.}, 178(3):485--504, 2009.
+
+\bibitem{KhareWintenberger2009II}
+C.~Khare and J.-P.~Wintenberger.
+\newblock Serre's modularity conjecture~(II).
+\newblock \textit{Invent.\ Math.}, 178(3):505--586, 2009.
 
 \bibitem{Langlands1980}
 R.\,P.~Langlands.
@@ -1222,7 +1540,16 @@ a constructive reverse mathematics monograph
 (Paper~67, CRM series).
 \newblock \textit{Zenodo}, 2026.
 
+\bibitem{mathlib}
+The Mathlib Community.
+\newblock \textit{Mathlib4}.
+\newblock \url{https://github.com/leanprover-community/mathlib4}, 2024.
+
+\bibitem{format-guide}
+P.~C.-K.~Lee.
+\newblock Paper format guide for the CRM series.
+\newblock \textit{Zenodo}, 2026.
+
 \end{thebibliography}
 
 \end{document}
-

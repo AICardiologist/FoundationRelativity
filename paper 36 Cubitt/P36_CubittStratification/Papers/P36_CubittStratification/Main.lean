@@ -46,7 +46,7 @@ theorem stratification_theorem :
     -- (iii) Pointwise decidability (LPO → each instance decided)
     (LPO → ∀ (M : TM), spectral_gap M > 0 ∨ spectral_gap M = 0) ∧
     -- (iv) Physical gap zero-test ↔ WLPO
-    ((∀ (Δ : ℝ), Δ ≥ 0 → (Δ = 0 ∨ Δ > 0)) ↔ WLPO) ∧
+    ((∀ (Δ : ℝ), Δ ≥ 0 → (Δ = 0 ∨ Δ ≠ 0)) ↔ WLPO) ∧
     -- (v-a) Uniform function is not computable
     (¬(∀ (M : TM), halts M ∨ ¬halts M)) ∧
     -- (v-b) Cubitt ≡ LPO: uniform decidability ↔ LPO

@@ -75,8 +75,16 @@
   numbersep=5pt,
   xleftmargin=15pt,
   captionpos=b,
-  literate={<<}{$\langle$}1 {>>}{$\rangle$}1
-           {|||}{$\lor$}1,
+  literate=
+    {forall}{$\forall$}1
+    {exists}{$\exists$}1
+    {->}{$\to$}1
+    {<->}{$\leftrightarrow$}2
+    {>=}{$\geq$}1
+    {<=}{$\leq$}1
+    {!=}{$\neq$}1
+    {<<}{$\langle$}1
+    {>>}{$\rangle$}1,
 }
 
 % ====================================================================
@@ -105,7 +113,8 @@
   \textbf{Stratifying Spectral Gap Undecidability}\\[6pt]
   {\normalsize Cubitt's Theorem Is $\LPO$: Macroscopic Quantum Undecidability
   Costs Exactly One Thermodynamic Limit}\\[6pt]
-  {\normalsize A Lean~4 Formalization (Paper~36)}%
+  {\normalsize Paper~36 of the Constructive Reverse Mathematics Series}\\[4pt]
+  {\normalsize A Lean~4 Formalization}%
 }
 
 \author{
@@ -173,8 +182,9 @@ without it.
 \end{theorem}
 
 Since $\LPO$ is already required for thermodynamic limits
-(Paper~29), phase transitions (Paper~29), and gauge coupling
-existence (Paper~32), Cubitt's undecidability introduces
+(Paper~29~\cite{Lee26P29}), phase transitions (Paper~29),
+and gauge coupling existence (Paper~32~\cite{Lee26P32}),
+Cubitt's undecidability introduces
 \emph{zero} additional logical resources into physics.
 
 \medskip\noindent
@@ -212,8 +222,11 @@ by the weakest omniscience principle required:
 \]
 For $\WLPO$ characterization, see Bridges--V\^{\i}\c{t}\u{a}~\cite{bridgesvita2006};
 for the Weihrauch-degree context situating these principles,
-see Brattka--Gherardi--H\"olzl~\cite{brattka2011}.
-Paper~29 proved $\BMC \iff \LPO$. Paper~35 established the
+see Brattka--Gherardi--H\"olzl~\cite{brattka2011};
+for Weihrauch reducibility as a framework, see
+Brattka--Gherardi--Pauly~\cite{brattka2021}.
+Paper~29~\cite{Lee26P29} proved $\BMC \iff \LPO$.
+Paper~35~\cite{Lee26P35} established the
 conservation metatheorem: physics lives at $\BISH + \LPO$.
 For the complete calibration table and synthesis, see
 Paper~10~\cite{Lee26P10}; for the broader historical context,
@@ -326,12 +339,12 @@ A single application of $\LPO$ to a computable sequence.
 \begin{lstlisting}[caption={Theorem 3: pointwise decidability (Pointwise.lean)}]
 theorem pointwise_gap_decidable
     (M : TM) (hl : LPO) :
-    spectral_gap M > 0 ||| spectral_gap M = 0 := by
+    spectral_gap M > 0 $\lor$ spectral_gap M = 0 := by
   rcases hl (halting_seq M) with
     h_all_false | <<n, hn>>
-  . left
-    exact cpgw_gapped_of_not_halts M ...
-  . right
+  $\cdot$ left
+    exact cpgw_gapped_of_not_halts M _
+  $\cdot$ right
     exact cpgw_gapless_of_halts M <<n, hn>>
 \end{lstlisting}
 
@@ -342,17 +355,40 @@ theorem pointwise_gap_decidable
 
 \begin{theorem}[Zero-test]\label{thm:zero}
 For a non-negative completed real~$\Delta \geq 0$, deciding
-$\Delta = 0 \lor \Delta > 0$ is equivalent to $\WLPO$.
+$\Delta = 0 \lor \Delta \neq 0$ is equivalent to $\WLPO$.
 \end{theorem}
 
-This connects to Paper~26 (the physical instantiation of the
-Gödel--Gap embedding) and Paper~33 (the QCD mass gap is a
+\begin{remark}[WLPO vs.\ LPO for zero-tests]\label{rem:wlpo-lpo}
+The constructive content of this theorem hinges on the
+\emph{negative} second disjunct. Deciding
+$\Delta = 0 \lor \Delta > 0$ (positive disjunct) for non-negative
+reals is equivalent to $\LPO$, not $\WLPO$: given a binary
+sequence~$\alpha$, define $\Delta_\alpha = \sum \alpha(n) \cdot 2^{-n}$.
+Then $\Delta_\alpha = 0$ iff $\forall n,\, \alpha(n) = 0$, and
+$\Delta_\alpha > 0$ iff $\exists n,\, \alpha(n) = 1$---so deciding
+$\Delta_\alpha = 0 \lor \Delta_\alpha > 0$ solves $\LPO$ directly.
+
+$\WLPO$'s signature is the negative formulation:
+$\Delta = 0 \lor \Delta \neq 0$, where $\Delta \neq 0$ means
+$\neg(\Delta = 0)$. For a non-negative real, $\Delta \neq 0$ does
+\emph{not} constructively imply $\Delta > 0$. Upgrading
+$\Delta \neq 0$ to $\Delta > 0$ requires Markov's Principle
+($\MP$), and it is a known theorem that
+$\WLPO + \MP \iff \LPO$~\cite{ishihara2006, bridgesvita2006}.
+This distinction is invisible in classical mathematics but is
+precisely the gap between $\WLPO$ and $\LPO$ in the constructive
+hierarchy.
+\end{remark}
+
+This connects to Paper~26~\cite{Lee26P26} (the physical
+instantiation of the G\"odel--Gap embedding) and
+Paper~33~\cite{Lee26P33} (the QCD mass gap is a
 $\WLPO$ zero-test on a specific Hamiltonian's gap).
 
 \begin{lstlisting}[caption={Theorem 4: zero-test $\leftrightarrow$ WLPO (ZeroTest.lean)}]
 theorem physical_gap_zero_test_iff_wlpo :
     (forall (D : R), D >= 0 ->
-      (D = 0 ||| D > 0)) <-> WLPO :=
+      (D = 0 $\lor$ D != 0)) <-> WLPO :=
   <<zero_test_to_wlpo, wlpo_to_zero_test>>
 \end{lstlisting}
 
@@ -389,7 +425,7 @@ $\LPO$-computable.
 \begin{lstlisting}[caption={Theorem 5: Cubitt $\equiv$ LPO (UniformDecidability.lean)}]
 theorem cubitt_is_lpo :
     (forall (M : TM),
-      spectral_gap M > 0 ||| spectral_gap M = 0)
+      spectral_gap M > 0 $\lor$ spectral_gap M = 0)
     <-> LPO :=
   <<uniform_decidability_implies_lpo,
    gap_function_lpo_computable>>
@@ -413,7 +449,7 @@ encodes \emph{nothing else}.
 \textbf{Level} & \textbf{Content} & \textbf{Mechanism} \\
 \midrule
 $\BISH$ & Finite-volume gap $\Delta_L$ & Algebraic eigenvalue computation \\
-$\WLPO$ & ``$\Delta = 0$ or $\Delta > 0$?'' & Zero-test on completed real \\
+$\WLPO$ & ``$\Delta = 0$ or $\Delta \neq 0$?'' & Zero-test on completed real (negative disjunct) \\
 $\LPO$  & Thermo.\ limit $\Delta = \lim \Delta_L$ & BMC / Cauchy completeness \\
 $\LPO$  & Each specific instance & $\LPO$ decides $\Sigma^0_1$ \\
 $\BISH^{\LPO}$ & Uniform function $M \mapsto G(M)$ & Computable relative to $\LPO$ oracle \\
@@ -432,9 +468,9 @@ non-computability. The program reveals that it realizes
 \section{Connection to Paper 26}\label{sec:paper26}
 % ====================================================================
 
-Paper~26 proved that $\Pi^0_1$ arithmetic sentences order-embed into
-$\ell^\infty / c_0$, with $\WLPO$ as the logical barrier. Cubitt's
-construction is the physical realization:
+Paper~26~\cite{Lee26P26} proved that $\Pi^0_1$ arithmetic sentences
+order-embed into $\ell^\infty / c_0$, with $\WLPO$ as the logical
+barrier. Cubitt's construction is the physical realization:
 
 \begin{enumerate}
   \item TM state $M$ $\mapsto$ local tensor interactions
@@ -488,11 +524,11 @@ classical ($\LPO$ hypothesis); L4 = axiomatized bridge lemma.
 \texttt{FiniteGap.lean}          &  50 & Theorem 1: finite-volume gap ($\BISH$) \\
 \texttt{ThermoLimit.lean}        & 102 & Theorem 2: thermo.\ limit $\iff$ $\LPO$ \\
 \texttt{Pointwise.lean}          &  50 & Theorem 3: pointwise decidability \\
-\texttt{ZeroTest.lean}           &  61 & Theorem 4: zero-test $\iff$ $\WLPO$ \\
+\texttt{ZeroTest.lean}           &  73 & Theorem 4: zero-test $\iff$ $\WLPO$ \\
 \texttt{UniformDecidability.lean}&  113 & Theorem 5: Cubitt $\equiv$ $\LPO$ \\
 \texttt{Main.lean}               &  99 & Master theorem, axiom audit \\
 \midrule
-\textbf{Total}                   & \textbf{655} & \\
+\textbf{Total}                   & \textbf{667} & \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -593,7 +629,7 @@ Cubitt's undecidability is irrelevant to their practice.
 
 \subsection{For Foundations of Physics}
 
-Cubitt's undecidability is not ``Gödelian'' (self-referential
+Cubitt's undecidability is not ``G\"odelian'' (self-referential
 incompleteness at a meta-mathematical level). It is
 \emph{computational}---the non-computability of $\LPO$, which
 governs thermodynamic limits. The spectral gap is undecidable at the same logical cost as
@@ -619,7 +655,7 @@ severe stress test.
 \begin{itemize}[leftmargin=*]
   \item \textbf{Language}: Lean~4 v4.28.0-rc1
   \item \textbf{Library}: Mathlib4
-  \item \textbf{Source}: \texttt{P36\_CubittStratification/} (8 files, 655 lines)
+  \item \textbf{Source}: \texttt{P36\_CubittStratification/} (8 files, 667 lines)
   \item \textbf{Build}: \texttt{lake exe cache get \&\& lake build}
   \item \textbf{Result}: 0 errors, 0 warnings, 0 sorry
   \item \textbf{Axiom audit}: \texttt{\#print axioms stratification\_theorem}
@@ -635,11 +671,13 @@ Turing--Weihrauch equivalent to $\LPO$ over $\BISH$. The
 stratification across the constructive hierarchy reveals that the
 finite-volume gap is $\BISH$, the thermodynamic limit is $\LPO$,
 each specific instance is $\LPO$-decidable, the zero-test is
-$\WLPO$, and the uniform function is $\LPO$-computable but
-non-computable without $\LPO$. Since $\LPO$ is already required
-for thermodynamic limits, phase transitions, and gauge couplings,
-macroscopic quantum undecidability costs exactly one thermodynamic
-limit---and introduces nothing new.
+$\WLPO$ (with the crucial caveat that the negative disjunct
+$\Delta \neq 0$ is used, not the positive $\Delta > 0$; see
+Remark~\ref{rem:wlpo-lpo}), and the uniform function is
+$\LPO$-computable but non-computable without $\LPO$. Since $\LPO$
+is already required for thermodynamic limits, phase transitions,
+and gauge couplings, macroscopic quantum undecidability costs
+exactly one thermodynamic limit---and introduces nothing new.
 
 The formalization in \Lean{} with \Mathlib{} builds with zero
 errors, zero warnings, and zero sorry.
@@ -685,6 +723,33 @@ P.~C.-K.~Lee.
   mathematical physics.
 \newblock Preprint, 2026. Paper~12.
 
+\bibitem{Lee26P26}
+P.~C.-K.~Lee.
+\newblock The G\"odel--Gap embedding: $\Pi^0_1$ sentences in
+  $\ell^\infty / c_0$ and the $\WLPO$ barrier.
+\newblock Preprint, 2026. Paper~26.
+
+\bibitem{Lee26P29}
+P.~C.-K.~Lee.
+\newblock Bounded monotone convergence is $\LPO$: the logical cost
+  of thermodynamic limits.
+\newblock Preprint, 2026. Paper~29.
+
+\bibitem{Lee26P32}
+P.~C.-K.~Lee.
+\newblock The running coupling existence problem is $\LPO$.
+\newblock Preprint, 2026. Paper~32.
+
+\bibitem{Lee26P33}
+P.~C.-K.~Lee.
+\newblock The QCD mass gap is a $\WLPO$ zero-test.
+\newblock Preprint, 2026. Paper~33.
+
+\bibitem{Lee26P35}
+P.~C.-K.~Lee.
+\newblock The conservation metatheorem: physics lives at $\BISH + \LPO$.
+\newblock Preprint, 2026. Paper~35.
+
 \bibitem[Cubitt et~al.(2015)]{cubitt2015}
 T.~S. Cubitt, D.~Perez-Garcia, and M.~M. Wolf.
 \newblock Undecidability of the spectral gap.
@@ -720,6 +785,13 @@ V.~Brattka, G.~Gherardi, and R.~H\"olzl.
 \newblock Las Vegas computability and algorithmic randomness.
 \newblock \emph{STACS 2011}, LIPIcs 9:130--142, 2011.
 
+\bibitem[Brattka et~al.(2021)]{brattka2021}
+V.~Brattka, G.~Gherardi, and A.~Pauly.
+\newblock Weihrauch complexity in computable analysis.
+\newblock In V.~Brattka and P.~Hertling, editors,
+  \emph{Handbook of Computability and Complexity in Analysis},
+  pages 367--417. Springer, 2021.
+
 \bibitem[Bridges and V\^{\i}\c{t}\u{a}(2006)]{bridgesvita2006}
 D.~Bridges and L.~V\^{\i}\c{t}\u{a}.
 \newblock \emph{Techniques of Constructive Analysis}.
@@ -740,7 +812,12 @@ L.~{de Moura}, S.~Kong, J.~Avigad, F.~{van Doorn}, and M.~{von Raumer}.
 \newblock The Lean~4 theorem prover and programming language.
 \newblock \emph{CADE-28}, LNCS, 2021.
 
+\bibitem[Lee(2026)]{Lee26format}
+P.~C.-K.~Lee.
+\newblock Paper format guide for the Constructive Reverse Mathematics Series.
+\newblock Preprint, 2026.
+\newblock DOI: \href{https://doi.org/10.5281/zenodo.18765700}{10.5281/zenodo.18765700}.
+
 \end{thebibliography}
 
 \end{document}
-

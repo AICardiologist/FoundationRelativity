@@ -1,0 +1,31 @@
+Title: The Conservation Theorem for Algebraic Cycles: Classical Logic Is Scaffolding (Paper 102, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: March 2026
+
+Description:
+Paper 102 of the Constructive Reverse Mathematics Series proves the Conservation Conjecture (Paper 100, Conjecture 7.1) for its arithmetical scope. Every CLASS theorem about algebraic cycles on smooth projective varieties over the algebraic closure of Q whose conclusion is arithmetical of complexity at most Pi-0-2 is provable in pure BISH. No Markov's Principle is needed at any complexity level.
+
+The proof composes two results from mathematical logic: (1) the McLarty reduction (finite-order arithmetic is conservative over PA for arithmetic geometry proofs), and (2) Friedman Pi-0-2 conservation (PA and HA have the same provably total recursive functions, so PA is Pi-0-2-conservative over HA without MP). A Coding Lemma establishes that the standard algebraic cycle statements (algebraicity, L-value non-vanishing, rank equalities, Fermat-type universals) are all arithmetical of complexity at most Pi-0-2. Sha finiteness is Sigma-0-2, outside the scope of conservation.
+
+Combined with the Archimedean Obstruction Thesis (Paper 98): the logical cost of arithmetic geometry is the logical cost of the real numbers — not the ring structure of R, but its completeness and total ordering at the Archimedean place. The continuum forces CLASS on every proof path through the Betti realization (lower bound) but CLASS is always eliminable for arithmetical conclusions of complexity at most Pi-0-2 (upper bound). Classical logic is scaffolding, not substance.
+
+Five case studies from the programme verify consistency: K3 algebraicity at Picard number 20, palindromic Hodge conjecture, Fermat's Last Theorem, rank-0 BSD detection, and rank equality for 37a1. One genuinely new prediction: rank(37a1) = 1 is provable in pure BISH.
+
+Companion Lean 4 bundle: 900 lines, 6 files, zero sorry, zero Classical.choice. Core conservation theorems depend on zero axioms.
+
+Keywords: constructive reverse mathematics, conservation theorem, algebraic cycles, Friedman conservation, Markov's Principle, Bishop constructive mathematics, CRM hierarchy, proof theory, arithmetic geometry
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related Identifiers:
+- Series DOI: 10.5281/zenodo.17054050 (isPartOf)
+- Paper 98 DOI: 10.5281/zenodo.18828345 (references)
+- Paper 100 DOI: 10.5281/zenodo.18821010 (references)
+- Format Guide DOI: 10.5281/zenodo.18765700 (references)
+
+Upload Type: publication
+Publication Type: preprint

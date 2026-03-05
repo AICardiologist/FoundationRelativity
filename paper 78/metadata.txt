@@ -1,0 +1,25 @@
+Title: The Local Langlands Correspondence for GL_2(Q_2) Is Constructively Decidable (Paper 78, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University
+
+Date: February 2026
+
+Description:
+Paper 78 of the Constructive Reverse Mathematics Series applies the CRMLint Squeeze protocol to the Local Langlands Correspondence (LLC) for wildly ramified supercuspidal representations of GL_2(Q_2). The Classical Boundary Node is the Harris-Taylor existence theorem, which uses Shimura varieties, etale cohomology, and Lefschetz fixed-point arguments (CLASS). The constructive target uses Bushnell-Kutzko type theory and Bushnell-Henniart's explicit character matching to reduce the LLC to a character-trace identity over Z, verified by decide in Lean 4 (0 sorry). The extension E = Q_2(i) gives a totally ramified quadratic extension; the Frobenius eigenvalues are alpha_1 = 1, alpha_2 = -1. CRM descent: CLASS to BISH (sharpest possible, no intermediate omniscience principles). Second CRMLint Squeeze application (after Paper 77), first in the Langlands program.
+
+Lean 4 formalization: 395 lines (206 + 189 CAS-emitted), 9 matching theorems by decide, 0 sorry. v2: normalized character notation (Phi_pi), z=5 central character check, Lean verification scope remark. Axiom inventory: propext, Classical.choice, Quot.sound (Lean kernel only); harris_taylor_existence does not appear in #print axioms wild_llc_squeeze.
+
+Keywords: constructive reverse mathematics, Local Langlands Correspondence, wildly ramified representations, supercuspidal, GL_2(Q_2), Bushnell-Kutzko types, Harris-Taylor, character matching, Lean 4, formal verification, CRMLint Squeeze, BISH
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Upload type: publication / preprint
+
+Related identifiers:
+- Paper 77 (Hodge Decompositions): https://doi.org/10.5281/zenodo.18777596
+- Paper 80 (Algebraic Gauss-Manin): https://doi.org/10.5281/zenodo.18791985
+- Paper 72 (DPT Characterization): https://doi.org/10.5281/zenodo.18765393
+- Paper 50 (DPT Framework): https://doi.org/10.5281/zenodo.14538379
+- CRM Series Format Guide: https://doi.org/10.5281/zenodo.18765700

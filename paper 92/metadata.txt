@@ -1,0 +1,31 @@
+Title: Breaking the Bézout Wall: Trace Vanishing to Dimension 16 via Zariski Grid Specialization — A CRMLint Squeeze (Paper 92, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: 2026-02-28
+
+Description:
+Paper 92 extends the Gauss-Manin trace vanishing pipeline from genus 4 (Papers 84-89) to genera 5-8, proving that the exotic Weil class on the Jacobian of the universal odd hyperelliptic family y^2 = x^(2g+1) + a_1 x^(2g-1) + ... + a_(g-1) x^3 + x is cohomologically flat in dimensions 10, 12, 14, and 16. For genus 5, the connection trace vanishes as an explicit polynomial identity in Z[a_1,a_2,a_3,a_4], verified by Lean 4's ring tactic. For genera 6-8, symbolic expansion of the Griffiths pole reduction triggers exponential intermediate expression swell in the multivariate Bezout identity, exhausting physical memory. We bypass this wall via Zariski Grid Specialization: evaluate the exact rational Griffiths reduction at concrete integer fibers, verify cancellation by norm_num, and invoke the Schwartz-Zippel lemma for generic vanishing. Because discrete grid evaluation is a finite, terminating, decidable algorithm, this verification remains logically classified as BISH. The formal bundle comprises 333 lines of Lean 4, 94 verified theorems, zero sorry, and zero Classical.choice. This is the twelfth CRMLint Squeeze application. CRM classification: CLASS (conditional on VHC), with BISH core constituting 100% of verified theorems.
+
+Keywords: constructive reverse mathematics, Hodge conjecture, Gauss-Manin connection, Schwartz-Zippel lemma, intermediate expression swell, Griffiths pole reduction, Lean 4, formal verification, hyperelliptic curves, Weil classes, CRMLint
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related identifiers:
+- Paper 76: DOI 10.5281/zenodo.18779362
+- Paper 80: DOI 10.5281/zenodo.18791985
+- Paper 84: DOI 10.5281/zenodo.18802819
+- Paper 85: DOI 10.5281/zenodo.18806608
+- Paper 86: DOI 10.5281/zenodo.18809903
+- Paper 87: DOI 10.5281/zenodo.18809903
+- Paper 88: DOI 10.5281/zenodo.18809905
+- Paper 89: DOI 10.5281/zenodo.18809909
+- Paper 90: DOI 10.5281/zenodo.18809911
+- Paper 91: DOI 10.5281/zenodo.18809917
+
+DOI: 10.5281/zenodo.18816696
+
+Upload type: publication
+Publication type: preprint

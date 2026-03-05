@@ -245,9 +245,9 @@ The BISH+LPO ceiling holds. The cosmological constant problem introduces no new 
 
 The exact vacuum energy densities ρ_Higgs^{exact} and ρ_QCD^{exact} are computed via the thermodynamic limit of the interacting theory. By Paper 29, this limit costs LPO. The fine-tuning equation is therefore an LPO equality. This connects the cosmological constant directly to the central mathematical result of the programme: the equivalence between Fekete's lemma and LPO.
 
-### §9.2. Connection to Paper 39 (Thermodynamic Stratification)
+### §9.2. Connection to Paper 39 (Physical Stratification)
 
-Paper 39 showed that intensive observables at full precision can reach Σ₂⁰ — beyond LPO. The vacuum energy density is an intensive quantity. In principle, its exact value could sit at Σ₂⁰. But the standard derivation (Fekete applied to the ground-state energy) produces the density as a subadditive limit — exactly LPO. Whether the interacting vacuum energy density can be shown to be strictly LPO (not higher) depends on whether the convergence rate of the lattice ground-state energy is eventually monotone, which is expected for theories with a mass gap (the correlation length provides an exponential convergence rate). For QCD with confinement, this is expected. The paper states this as a conjecture: the exact QCD vacuum energy density is LPO-computable, not Σ₂⁰.
+Paper 39 showed that exact observables without promise gap can reach Σ₂⁰ — beyond LPO. The epistemic mode (exact vs promise-gapped), not thermodynamic scaling, determines the arithmetic level. In principle, the vacuum energy density queried at exact precision without promise gap could sit at Σ₂⁰. But the standard derivation (Fekete applied to the ground-state energy) produces the density as a subadditive limit — exactly LPO. Moreover, the CC problem involves finite-precision measurements that enforce an effective promise gap, keeping the decision at LPO. The paper states this as a conjecture: the exact QCD vacuum energy density is LPO-computable, not Σ₂⁰.
 
 ### §9.3. Connection to Paper 41 (AdS/CFT)
 
