@@ -7,7 +7,7 @@
 
 **Author:** Paul Chun-Kit Lee (New York University)
 
-**102 papers. ~99,000 lines Lean 4. One finding:**
+**103 papers. ~100,000 lines Lean 4. One finding:**
 
 **The logical cost of mathematics is the logical cost of the real numbers.**
 
@@ -328,6 +328,26 @@ Every paper with its bottom line. Papers 1 and 3 withdrawn; Papers 60 and 62 ret
 | 101 | The CRM Signature of Berkovich Motives | Non-Archimedean CRM: arc topology, perfectoid tilting, ∞-categorical motives |
 | **102** | **The Conservation Conjecture** | **Formalizes the principal open problem: every CLASS theorem in arithmetic geometry has a BISH proof of equal strength. Coding lemma + case studies. 6 Lean files.** |
 
+---
+
+## Part Four: Clinical Sub-Series (Papers 103+)
+
+### The finding
+
+**The Archimedean obstruction in medicine is identical to the one in arithmetic geometry.** Every asymptotic statistical test passes through a transcendental gate — the normal CDF Φ — that converts rational data into an irrational p-value. Comparing this p-value with a rational significance threshold α is not decidable in BISH; it requires Markov's Principle. The "Asymptotic Penumbra" — the band where classical significance is not constructively witnessed — is a new quality metric for clinical evidence, orthogonal to statistical power and effect size.
+
+### What is surprising
+
+**The mechanism is the same.** In arithmetic geometry, CLASS enters through Betti realization (complex topology). In clinical medicine, MP enters through Φ (the normal CDF). Both are instances of rational data passing through a transcendental function — the Archimedean obstruction of Paper 70.
+
+**Most trials are already constructive.** The penumbra is small for well-powered trials with moderate effect sizes. COURAGE (p = 0.31) and ISCHEMIA (p = 0.34) are BISH-decidable — their non-significance is certifiable without omniscience. Only borderline results like GUSTO (p ≈ 0.004, penumbra ratio 0.158) sit in the zone where the classical/constructive distinction matters clinically.
+
+**Exact tests have zero logical cost.** Fisher's exact test — rational p-value from combinatorial enumeration — is fully decidable in BISH. The penumbra is the price of the computational shortcut: replacing O(2ⁿ) exact enumeration with O(n) normal approximation.
+
+| # | Title | Bottom line |
+|---|-------|------------|
+| **103** | **The Asymptotic Penumbra: CRM of the RCT Statistical Pipeline** | **First clinical paper. Normal CDF Φ is the transcendental gate. Penumbra = 2ε (Studentized Berry-Esseen). Five theorems: Penumbra Characterisation, MP Requirement, Subgroup Penalty, Firth Restoration, Equivalence Barrier. GUSTO in penumbra; COURAGE/ISCHEMIA BISH-decidable. 7 BISH + 1 BISH+MP + 1 WKL + 1 LPO (70% BISH). 956 lines Lean.** |
+
 ### Guide to synthesis and monograph papers
 
 For readers entering the series, these papers provide the architectural overview:
@@ -344,6 +364,7 @@ For readers entering the series, these papers provide the architectural overview
 | **90** | **Monograph** | **The Squeeze Is a Microscope — generative phase synthesis (P76–89)** |
 | **98** | **Monograph** | **The Motivic CRM Architecture — capstone synthesis of P50–97** |
 | **102** | Open problem | The Conservation Conjecture — principal open problem for the field |
+| **103** | Clinical | The Asymptotic Penumbra — first CRM paper in medicine |
 
 ---
 
@@ -360,14 +381,14 @@ Papers/                     Lean 4 bundles (early papers, CI-tested)
   P69_FuncField/
   P70_Archimedean/
 paper N/                    LaTeX + PDF + Lean bundle per paper
-  paper 8/  through paper 102/   (ascending order)
+  paper 8/  through paper 103/   (ascending order)
   Each paper N/ contains P{N}_{Name}/ Lean bundle where applicable
 scripts/                    CI audit scripts
 ```
 
 Each `Papers/P{N}_*/` bundle builds independently: `cd Papers/P72_DPTCharacterisation && lake build`. Lean 4 toolchain v4.28.0-rc1 (Papers 72–102: v4.29.0-rc2). Zero `sorry` across all published bundles. `Classical.choice` in every ℝ theorem is Mathlib infrastructure, not classical content — constructive stratification is by proof content, not `#print axioms` output.
 
-100 active papers (Papers 1 and 3 withdrawn; Papers 60 and 62 retired into 59 and 63).
+101 active papers (Papers 1 and 3 withdrawn; Papers 60 and 62 retired into 59 and 63).
 
 ## Citation
 

@@ -47,7 +47,7 @@ No.  Title                                                               DOI
  36  Stratifying Spectral Gap Undecidability: Cubitt = LPO               10.5281/zenodo.18642620
  37  Undecidability Landscape Is LPO                                     10.5281/zenodo.18642802
  38  Wang Tiling and the Origin of Physical Undecidability                10.5281/zenodo.18642804
- 39  Beyond LPO: Thermodynamic Stratification                            10.5281/zenodo.18642806
+ 39  Physics Reaches Sigma-2-zero: Physical Stratification               10.5281/zenodo.18642806
  40  Logical Constitution of Physical Reality (Monograph)                10.5281/zenodo.18654773
  41  AdS/CFT Diagnostic                                                  10.5281/zenodo.18654780
  42  Cosmological Constant Problem                                       10.5281/zenodo.18654789
@@ -76,7 +76,7 @@ No.  Title                                                               DOI
  65  Self-Intersection Patterns Beyond Cyclic Cubics                     10.5281/zenodo.18743151
  66  Form-Class Resolution for Non-Cyclic Totally Real Cubics            10.5281/zenodo.18745722
  67  The Motive Is a Decidability Certificate (Monograph)               10.5281/zenodo.18776113
- 68  Fermat's Last Theorem Is BISH                                      10.5281/zenodo.18777925
+ 68  Fermat's Last Theorem Is BISH                                      10.5281/zenodo.18838541
  69  Function Field Langlands Is BISH                                    10.5281/zenodo.18749757
  70  The Archimedean Principle (Capstone)                                 10.5281/zenodo.18750992
  71  Archimedean Principle in Cryptography and Computation               10.5281/zenodo.18752015
@@ -84,24 +84,59 @@ No.  Title                                                               DOI
  73  Standard Conjecture D Is Necessary for Morphism Decidability        10.5281/zenodo.18765700
  74  Algebraic Spectrum Is Necessary for Eigenvalue Decidability         10.5281/zenodo.18773827
  75  Conservation Test: Genestier-Lafforgue LLC Calibration              10.5281/zenodo.18773831
- 76  CRMLint: Automated CRM Logical Cost Analysis at Scale              (DOI pending)
- 77  Explicit Hodge Decompositions for E^4 (Methods Paper)              10.5281/zenodo.18779210
+ 76  CRMLint: Automated CRM Logical Cost Analysis at Scale              10.5281/zenodo.18779362
+ 77  Explicit Hodge Decompositions for E^4 (Methods Paper)              10.5281/zenodo.18777596
+ 78  LLC for GL_2(Q_2) Is Constructively Decidable                    10.5281/zenodo.18789008
+ 79  Standard Conjecture D for Abelian Fourfolds of Weil Type          10.5281/zenodo.18843129
+ 80  Algebraic Gauss-Manin via Griffiths Pole Reduction: CRMLint Sq.    10.5281/zenodo.18791985
+ 81  The Fixed Part Theorem via Tensor Gauss-Manin: CRMLint Squeeze    10.5281/zenodo.18801814
+ 82  Picard-Fuchs Monodromy via Kovacic's Algorithm: CRMLint Squeeze   10.5281/zenodo.18801822
+ 83  Generic Picard Number of E_t x E_t: Unbounded Degree Trap         10.5281/zenodo.18801826
+ 84  Exotic Weil Classes as Flat Sections: Gauss-Manin Block Decomp.   10.5281/zenodo.18802819
+ 85  Universal Trace Vanishing for Exotic Weil Classes: CRMLint Sq.    10.5281/zenodo.18806608
+ 86  Hodge Conj. for Exotic Weil Classes via Kani-Rosen: CRMLint Sq.  10.5281/zenodo.18809903
+ 87  The Omniscience Cost of the Hodge Conjecture: A CRM Analysis      10.5281/zenodo.18809903
+ 88  Fermat Domination and the Variational Hodge Conj.: CRMLint Sq.   10.5281/zenodo.18809905
+ 89  Absolute Hodge Classes for Universal Hyp. Weil Locus: CRMLint    10.5281/zenodo.18809909
+ 90  The Squeeze Is a Microscope (Synthesis Monograph)                 10.5281/zenodo.18809911
+ 91  The Logical Cost of Unconditional Hodge (CRM Audit of Markman)   10.5281/zenodo.18809917
+ 92  Cohomological Flatness for Genera 5-8: Zariski Grid CRMLint Sq. 10.5281/zenodo.18816696
+ 93  The Structural Vanishing Theorem: Why Exotic Weil Classes Flat  10.5281/zenodo.18816989
+ 94  The Griffiths Group of the Mirror Quintic: CRMLint Squeeze      10.5281/zenodo.18820969
+ 95  The BSD Squeeze: CRMLint Decomp. of Gross-Zagier-Kolyvagin     10.5281/zenodo.18821019
+ 96  The Root Number Bifurcation: Rank 0 BSD Squeeze                10.5281/zenodo.18869924
+ 97  BSD Landscape Survey — Null Finding (Internal Note)            —
+ 98  The Motivic CRM Architecture                                   10.5281/zenodo.18828345
+ 99  The Hecke Theta Series Squeeze                                 10.5281/zenodo.18821004
+100  The Kuga-Satake Bifurcation: Absolute Hodge on K3             10.5281/zenodo.18821010
+101  The CRM Signature of Berkovich Motives                       10.5281/zenodo.18869076
+102  Conservation Theorems for the CRM Programme                  10.5281/zenodo.18821015
+
+---- ------------------------------------------------------------------- --------------------------
+                    CLINICAL SUB-SERIES
+---- ------------------------------------------------------------------- --------------------------
+103  The Asymptotic Penumbra: CRM of the RCT Statistical Pipeline 10.5281/zenodo.18880102
 
 ================================================================================
 STATISTICS
 ================================================================================
-Total papers:         75 active (of 77 numbered)
+Total papers:         101 active (of 103 numbered)
 Withdrawn:            2 (Papers 1, 3)
 Retired:              2 (Paper 60 → 59; Paper 62 → 63)
-Papers with DOIs:     72
-Papers pending DOI:   1 (Paper 76)
-Papers peer-reviewed: 75 (passed Gemini peer review)
-Papers with Lean 4:   ~65 (Papers 64-66 computational/LaTeX-only)
-Total Lean 4 lines:   ~89,150+
+Papers with DOIs:     98
+Papers pending DOI:   0
+Papers peer-reviewed: 83 (passed Gemini peer review)
+Papers with Lean 4:   ~83 (Papers 64-66, 90, 97, 101 computational/LaTeX-only)
+Total Lean 4 lines:   ~100,000+
 Domains covered:      Functional Analysis, Quantum Mechanics, General Relativity,
                       Statistical Mechanics, QFT (QED/QCD), Quantum Information,
                       Classical Mechanics, Foundations, Undecidability, AdS/CFT,
-                      Cosmology, Arithmetic Geometry, Motives, Number Theory
+                      Cosmology, Arithmetic Geometry, Motives, Number Theory,
+                      Representation Theory, Langlands Program,
+                      Hodge Theory, Griffiths Groups, Calabi-Yau Geometry,
+                      Elliptic Curves, BSD Conjecture,
+                      Condensed Mathematics, Berkovich Spaces,
+                      Biostatistics, Evidence-Based Medicine
 
 Logical hierarchy:    BISH < LLPO < WLPO < LPO (omniscience spine)
                       MP (orthogonal to spine, implied by LPO)
