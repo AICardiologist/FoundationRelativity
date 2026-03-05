@@ -1,0 +1,28 @@
+Title: The Asymptotic Penumbra: Constructive Reverse Mathematics of the RCT Statistical Pipeline (Paper 103, Clinical Sub-Series Paper A, Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: March 2026
+
+Description:
+Paper 103 of the Constructive Reverse Mathematics (CRM) Series and the first paper of the Clinical Sub-Series. This paper applies CRM to the standard randomised controlled trial (RCT) statistical pipeline. The central result is the Asymptotic Penumbra: a computable band of p-values where a trial result is classically significant but not constructively witnessed. The penumbra arises because the asymptotic p-value passes through the transcendental normal CDF, and its width is precisely the Studentized Berry-Esseen error bound (constant at most 3.19, approximately 6.7 times wider than the unobservable oracle bound). Five main theorems: (A) Penumbra characterisation, (B) constructive witnessing requires Markov's Principle (BISH+MP), (C) subgroup penalty with computable threshold, (D) Firth correction restores Cox regression from WKL to BISH, (E) constructive equivalence barrier at d_min = (2C_s*kappa/alpha)^2 approximately 65,127 events. Clinical applications to three landmark cardiovascular trials: GUSTO-I (in z-test penumbra, resolved by Fisher exact), COURAGE and ISCHEMIA (constructive equivalence provably impossible at observed sample sizes). The pipeline decomposes as 7 BISH + 1 BISH+MP + 1 WKL + 1 LPO = 10 stages (70% BISH). The Asymptotic Penumbra provides a quality metric for trial evidence orthogonal to both statistical power and the GRADE framework: it measures the logical cost of claiming significance, not the probability of detecting it. Formalised in Lean 4 with Mathlib (10 module files, 956 lines, 58 theorems, 4 sorries documented).
+
+Keywords: constructive reverse mathematics, randomised controlled trial, RCT, Berry-Esseen theorem, Studentized Berry-Esseen, Asymptotic Penumbra, equivalence barrier, Markov's Principle, Limited Principle of Omniscience, Cox regression, Firth correction, COURAGE, ISCHEMIA, GUSTO, evidence-based medicine, p-value, statistical significance, formal verification, Lean 4
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Upload type: publication
+
+Publication type: preprint
+
+DOI: 10.5281/zenodo.18880102
+
+Related identifiers:
+- IsPartOf: CRM Series, Papers 1-102, Zenodo
+- IsPartOf: 10.5281/zenodo.14538908 (Paper 50, CRM Atlas)
+- References: 10.5281/zenodo.18828345 (Paper 98, Motivic CRM Architecture)
+- References: 10.5281/zenodo.18821015 (Paper 102, Conservation Theorems)
+- References: 10.5281/zenodo.18791985 (Paper 80, Gauss-Manin)
+- References: 10.5281/zenodo.18765700 (Paper Format Guide)
