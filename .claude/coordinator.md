@@ -366,6 +366,24 @@ These items need agents assigned:
 - **Blockers:** none
 - **Branch:** feat/p91-markman-audit
 
+### edit/highlight-hodge-papers — P103 Master Folder Updates + Clinical Sub-Series Plan
+- **Status:** done
+- **Worktree:** N/A (working on branch edit/highlight-hodge-papers)
+- **Last update:** 2026-03-05 23:00
+- **What's done:**
+  - All 5 master folder files updated with P102 + P103 entries
+  - master_paper_list.txt: CLINICAL SUB-SERIES header, updated statistics (101 active, 98 DOIs, ~100,000+ lines Lean)
+  - CRM_Series_Booklet.tex: P102 + P103 abstracts added
+  - CRM_PROGRAMME_ROADMAP.md: P102/P103 rows, discovery #40 (Asymptotic Penumbra)
+  - CRM_SESSION_HANDOFF.md: rewritten for Clinical Sub-Series direction
+  - README.md: "Part Four: Clinical Sub-Series" section, updated counts
+  - Clinical Sub-Series roadmap created: `paper 103/Clinical_Sub_Series_Plan/clinical_subseries_roadmap.md`
+    - Papers 104–107 planned with mathematical structure, clinical test cases, key theorems, Lean module structure
+  - Committed (26 files, 5359 insertions), pushed, PR #237 created
+- **What's next:** user merges PR #237 to main
+- **Blockers:** none
+- **Branch:** edit/highlight-hodge-papers
+
 ### Priority 1 — Editorial
 - [ ] **Paper 69 editorial revision** — 8 edit items, CRITICAL: expand Remark 3.3 (algebraic-vs-transcendental boundary)
 - [ ] **Paper 70 editorial revision** — Brouwer inoculation sentence, trim Discussion §8, two TikZ figures
