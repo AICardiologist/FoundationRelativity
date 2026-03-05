@@ -350,12 +350,18 @@ For readers entering the series, these papers provide the architectural overview
 ## Repository
 
 ```
-Papers/                     Lean 4 bundles (early papers, self-contained)
-  P2_BidualGap/             ...through P75_ConservationTest/
-paper N/                    LaTeX + PDF + Lean bundle for each paper
-  paper 76/CRMLint/         CRMLint metaprogram (940 lines)
-  paper 77/P77_DAGSurgery/  Hodge decompositions (798 lines)
-  paper 78–102/             Each with P{N}_{Name}/ Lean bundle
+Papers/                     Lean 4 bundles (early papers, CI-tested)
+  P2_BidualGap/
+  P4_SpectralGeometry/
+  P5_GeneralRelativity/
+  P6_Heisenberg_v2/
+  P28_NewtonLagrange/
+  P51_BSD/
+  P69_FuncField/
+  P70_Archimedean/
+paper N/                    LaTeX + PDF + Lean bundle per paper
+  paper 8/  through paper 102/   (ascending order)
+  Each paper N/ contains P{N}_{Name}/ Lean bundle where applicable
 scripts/                    CI audit scripts
 ```
 
