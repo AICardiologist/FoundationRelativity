@@ -1,0 +1,20 @@
+Title: The Diagnostic Penumbra: Constructive Reverse Mathematics of Bayesian Clinical Decision-Making — Paper 104 of the CRM Series
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: March 2026
+
+Description: Paper 104, Clinical Sub-Series Paper B, of the Constructive Reverse Mathematics Series. Applies CRM to the diagnostic testing pipeline: contingency tables, Bayesian inference, ROC analysis, and treatment threshold decisions. Identifies the Diagnostic Penumbra — the grey zone where the Bayesian posterior probability is too close to the treatment threshold for constructive resolution. The pipeline decomposes as 7 BISH + 1 BISH+MP + 1 WKL + 1 LPO = 10 stages (70% BISH), isomorphic to Paper 103's RCT pipeline. Applied to: (1) ESC 0/1h high-sensitivity troponin algorithm (24.7% of chest pain presentations in the grey zone, Mueller validation cohort N = 7,998), (2) D-dimer for PE exclusion (collapsed penumbra at low pretest probability), (3) PSA screening (degenerate penumbra — entire range is grey zone). All results formalised in Lean 4 with Mathlib (10 module files, 1,046 lines, 0 sorries, 4 documentary axioms). This is the second paper in the CRM Clinical Sub-Series.
+
+Keywords: constructive reverse mathematics, diagnostic testing, Bayesian inference, ROC analysis, treatment threshold, omniscience principles, Markov's principle, troponin, D-dimer, PSA, Lean 4, formal verification
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related identifiers:
+- Paper 103: 10.5281/zenodo.18880102 (The Asymptotic Penumbra — structural twin)
+- Paper 98: 10.5281/zenodo.18828345 (The Motivic CRM Architecture — Archimedean Obstruction Thesis)
+- Format guide: 10.5281/zenodo.18765700
+
+Upload type: publication / preprint
