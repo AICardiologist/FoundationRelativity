@@ -116,14 +116,15 @@ No.  Title                                                               DOI
                     CLINICAL SUB-SERIES
 ---- ------------------------------------------------------------------- --------------------------
 103  The Asymptotic Penumbra: CRM of the RCT Statistical Pipeline 10.5281/zenodo.18880102
+104  The Algorithmic Penumbra: CRM of Clinical Machine Learning   10.5281/zenodo.18889356
 
 ================================================================================
 STATISTICS
 ================================================================================
-Total papers:         101 active (of 103 numbered)
+Total papers:         102 active (of 104 numbered)
 Withdrawn:            2 (Papers 1, 3)
 Retired:              2 (Paper 60 → 59; Paper 62 → 63)
-Papers with DOIs:     98
+Papers with DOIs:     99
 Papers pending DOI:   0
 Papers peer-reviewed: 83 (passed Gemini peer review)
 Papers with Lean 4:   ~83 (Papers 64-66, 90, 97, 101 computational/LaTeX-only)
