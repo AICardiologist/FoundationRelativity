@@ -1,6 +1,6 @@
 # CRM PROGRAMME SESSION HANDOFF
 ## Critical State Document — Read This First
-### Last updated: 2026-03-05 (103 papers; Papers 77–102 complete, all arcs closed, Berkovich motivic audit deployed, Clinical Sub-Series launched with Paper 103)
+### Last updated: 2026-03-06 (106 papers; Papers 77–102 complete, all arcs closed, Clinical Sub-Series Papers A–C complete, Paper 106 D-modules/higher categories)
 
 ---
 
@@ -16,6 +16,7 @@ You are working with Paul Lee, a cardiologist in Brooklyn who builds formally ve
 - **Paper 101** (complete): CRMLint Audit of Scholze's Berkovich Motives. First external CRMLint deployment against an active research programme. 214 alerts, signature WKL. Discovery: Archimedean dark matter (53% gap in LTE v1.0). Parasitic WLPO excision demonstrated (65/214 alerts from ℝ-valued norms). Motivic descent validated as fourth mode of de-omniscientising descent. 42 pages, no Lean bundle (CRMLint scanner application + methodology).
 - **Paper 102** (complete): Conservation Theorems for the CRM Programme. Formalizes the principal open problem. DOI: 10.5281/zenodo.18821015.
 - **Paper 103** (complete): The Asymptotic Penumbra: CRM of the RCT Statistical Pipeline. First Clinical Sub-Series paper. The normal CDF Φ converts rational test statistics into irrational p-values; the Asymptotic Penumbra (width 2ε, Studentized Berry-Esseen) requires BISH+MP. Five theorems: Penumbra Characterisation, MP Requirement, Subgroup Penalty, Firth Restoration, Equivalence Barrier. Three trials classified (GUSTO in penumbra, COURAGE/ISCHEMIA BISH-decidable). 25 pages, 34 refs, 956 lines Lean (10 files, 58 theorems, 4 sorry). DOI: 10.5281/zenodo.18880102.
+- **Paper 106** (complete, DOI pending): CRM Audit of the Riemann-Hilbert Correspondence. Eighteenth CRMLint application. First CRM audit of a categorical equivalence theorem. 10 BISH + 4 WLPO + 1 LPO + 1 CLASS = 16 components (62.5% constructive). Deligne canonical extension = LPO (floor function); GAGA descent = sole CLASS (Montel's theorem). Validates AOT on the prototypical Betti realization functor. ∞-categorical machinery (Lurie) is logically inert; Scholze's condensed avoidance explained by CRM. Condensed RH as testable prediction. 14–15 pages, 22 refs, 404 lines Lean (3 files, 0 sorry, 0 Classical.choice on content).
 
 **The DPT axiom trilogy (all now fully characterized):**
 - Axiom 1 (Conjecture D) ↔ BISH morphism decidability, failure costs LPO (Paper 73)
@@ -146,7 +147,7 @@ You are working with Paul Lee, a cardiologist in Brooklyn who builds formally ve
     - Archimedean Obstruction Thesis (Theorem 5.1): CLASS enters through Betti realization only.
     - Three calibration theorems: Hodge bifurcates at WLPO, BSD rank/Sha decouples, TW = WKL.
     - Companion monograph "The Logical Cost of Everything."
-    - 607 lines Lean (0 sorry, 0 Classical.choice). DOI: 10.5281/zenodo.18828345.
+    - 607 lines Lean (0 sorry, 0 Classical.choice). DOI: 10.5281/zenodo.18902037.
 25. Paper 99 complete (v2, referee-accepted).
     - The Hecke Theta Series Squeeze. Sixteenth CRMLint application.
     - Resolves CRM(FLT) = WKL. Three CLASS→BISH excisions in dihedral base case.
@@ -174,10 +175,10 @@ Interventional cardiologist, Brooklyn. 80 formally verified papers in CRM. Works
 | Paper | File | Pages | Lean | Zenodo Zip | DOI |
 |-------|------|-------|------|------------|-----|
 | 66 | `paper 66/paper66.tex` | 15 | None (computational) | `Zenodo_P66_TraceZeroForm.zip` | 10.5281/zenodo.18745722 |
-| 67 | `paper 67/paper67.tex` | 17 | None (synthesis monograph) | `Zenodo_P67_MotiveDecidability.zip` | 10.5281/zenodo.18776113 |
-| 68 | `paper 68/paper68.tex` | 18 | `P68_WilesFLT/` ✅ (493 lines, 0 sorry) | `Zenodo_P68_WilesFLT_v5.zip` | 10.5281/zenodo.18838541 |
+| 67 | `paper 67/paper67.tex` | 17 | None (synthesis monograph) | `Zenodo_P67_MotiveDecidability.zip` | 10.5281/zenodo.18902506 |
+| 68 | `paper 68/paper68.tex` | 18 | `P68_WilesFLT/` ✅ (493 lines, 0 sorry) | `Zenodo_P68_WilesFLT_v6.zip` | 10.5281/zenodo.18901011 |
 | 69 | `paper 69/paper69_funcfield.tex` | 15 | `P69_FuncField/` ✅ (236 lines, 0 sorry) | `Zenodo_P69_FuncField.zip` | 10.5281/zenodo.18749757 |
-| 70 | `paper 70/paper70.tex` | 16 | `P70_Archimedean/` ✅ (545 lines, 0 sorry) | `Zenodo_P70_Archimedean.zip` | 10.5281/zenodo.18750992 |
+| 70 | `paper 70/paper70.tex` | 16 | `P70_Archimedean/` ✅ (545 lines, 0 sorry) | `Zenodo_P70_Archimedean.zip` | 10.5281/zenodo.18901192 |
 
 ### Papers 72–75 (complete ✅)
 
@@ -214,7 +215,7 @@ Interventional cardiologist, Brooklyn. 80 formally verified papers in CRM. Works
 | 95 | `paper 95/paper95.tex` | ~20 | `P95_BSDSqueeze/` ✅ (796 lines, 58 theorems, 0 sorry) | — | 10.5281/zenodo.18821019 |
 | 96 | `paper 96/paper96.tex` | 16 | `P96_RootNumberBifurcation/` ✅ (1033 lines, 86 theorems, 0 sorry) | `Paper96_RootNumberBifurcation.zip` | 10.5281/zenodo.18869924 |
 | 97 | `paper 97/paper97_note.tex` | ~5 | None (internal note) | — | — |
-| 98 | `paper 98/paper98.tex` | ~25 | `P98_MotivicCRM/` ✅ (607 lines, 0 sorry) | `Zenodo_P98_MotivicCRM.zip` | 10.5281/zenodo.18828345 |
+| 98 | `paper 98/paper98.tex` | ~25 | `P98_MotivicCRM/` ✅ (607 lines, 0 sorry) | `Zenodo_P98_MotivicCRM.zip` | 10.5281/zenodo.18902037 |
 | 99 | `paper 99/paper99.tex` | 21 | `P99_HeckeTheta/` ✅ (1180 lines, 7 files, 0 sorry) | `Zenodo_P99_HeckeTheta.zip` | 10.5281/zenodo.18821004 |
 | 100 | `paper 100/paper100.tex` | 15 | `P100_KugaSatake/` ✅ (729 lines, 5 files, 0 sorry) | `Zenodo_P100_KugaSatake.zip` | 10.5281/zenodo.18821010 |
 | 101 | `paper 101/paper101_draft.tex` | 42 | None (CRMLint scanner application) | — | 10.5281/zenodo.18869076 |
@@ -226,6 +227,21 @@ Interventional cardiologist, Brooklyn. 80 formally verified papers in CRM. Works
 ### Earlier Papers (1–65, 71)
 
 All published with DOIs. See `master folder/master_paper_list.txt` for complete list.
+
+---
+
+## ABBREVIATION GLOSSARY (agents frequently get these wrong)
+
+- **DPT** = Decidable Polarized Tannakian (Paper 50, §1). NOT "Decidability of Pure Trace."
+- **GAGA** = Géométrie Algébrique et Géométrie Analytique (Serre 1956).
+- **AOT** = Archimedean Obstruction Thesis (Paper 98).
+- **CBN** = Classical Boundary Node.
+- **VHC** = Variational Hodge Conjecture.
+- **LLC** = Local Langlands Correspondence.
+- **LTE** = Liquid Tensor Experiment (Scholze).
+- **FLT** = Fermat's Last Theorem (not Fermat's Little Theorem).
+- **CRM** = Constructive Reverse Mathematics.
+- **MT** = Mumford-Tate (group).
 
 ---
 
@@ -255,17 +271,19 @@ All published with DOIs. See `master folder/master_paper_list.txt` for complete 
 - Paper 101: CRMLint Audit of Scholze's Berkovich Motives. DOI: 10.5281/zenodo.18869076.
 - Paper 102: Conservation Theorems. DOI: 10.5281/zenodo.18821015.
 - Paper 103: The Asymptotic Penumbra (first Clinical Sub-Series). DOI: 10.5281/zenodo.18880102.
+- Paper 104: The Algorithmic Penumbra (Clinical Sub-Series Paper B). DOI: 10.5281/zenodo.18889356.
+- Paper 105: The Dynamical Penumbra (Clinical Sub-Series Paper C). DOI pending. 5 BISH + 1 WLPO + 1 WKL + 1 LPO = 8 components (62.5% BISH). Widest CRM span in Clinical Sub-Series. 1,246 lines Lean, 0 sorry.
 
 **Next research direction: Clinical Sub-Series**
-The mathematical programme (Papers 2–102) is complete. Paper 103 launches a new Clinical Sub-Series applying CRM to evidence-based medicine. The Archimedean obstruction is identical: data → Φ in medicine, étale → Betti in arithmetic geometry. Planned topics include diagnostic testing (Bayesian threshold as transcendental gate), pharmacokinetics (exponential map rational→transcendental), electrophysiology (dynamical systems, bifurcation detection), and health economics (infinite-horizon MDP, QALY integration).
+The mathematical programme (Papers 2–102) is complete. Papers 103–105 form the Clinical Sub-Series applying CRM to evidence-based medicine: RCT statistics (P103), clinical ML (P104), cardiac electrophysiology (P105). Remaining planned topics include diagnostic testing (Bayesian threshold), pharmacokinetics (exponential map), and health economics (infinite-horizon MDP, QALY integration).
 
-**The Conservation Conjecture** remains the principal open theoretical problem (Paper 102). Zero counterexamples across 103 papers.
+**The Conservation Conjecture** remains the principal open theoretical problem (Paper 102). Zero counterexamples across 105 papers.
 
 **If Paul says "CRMLint" or "Paper 76":**
 → Paper 76 is published (DOI: 10.5281/zenodo.18779362). 940 lines Lean, zero sorry. Design in `CRM_PROGRAMME_ROADMAP.md` §7. If he means extending CRMLint to Mathlib, that's engineering work, not a new paper.
 
-**If Paul says "Clinical Sub-Series" or "Paper 104":**
-→ Paper 103 (Asymptotic Penumbra) is complete and published. Next clinical papers under discussion: diagnostic testing, pharmacokinetics, electrophysiology, health economics.
+**If Paul says "Clinical Sub-Series" or "Paper 106":**
+→ Papers 103–105 complete. P103 (RCT stats), P104 (clinical ML), P105 (cardiac EP). Next clinical papers under discussion: diagnostic testing, pharmacokinetics, health economics.
 
 **If Paul asks about something else:**
 → Respect domain separation.
@@ -306,7 +324,7 @@ All paths relative to `~/FoundationRelativity/`.
 - `paper 95/paper95.tex` + `.pdf` (~20pp) — DOI: 10.5281/zenodo.18821019
 - `paper 96/paper96.tex` + `.pdf` (16pp) — DOI: 10.5281/zenodo.18869924
 - `paper 97/paper97_note.tex` + `.pdf` (~5pp) — internal note (no DOI)
-- `paper 98/paper98.tex` + `.pdf` (~25pp) — DOI: 10.5281/zenodo.18828345
+- `paper 98/paper98.tex` + `.pdf` (~25pp) — DOI: 10.5281/zenodo.18902037
 - `paper 99/paper99.tex` + `.pdf` (21pp) — DOI: 10.5281/zenodo.18821004
 - `paper 100/paper100.tex` + `.pdf` (15pp) — DOI: 10.5281/zenodo.18821010
 - `paper 101/paper101_draft.tex` + `.pdf` (42pp) — DOI pending; `paper101_appendix_methodology.tex` (methodology appendix)

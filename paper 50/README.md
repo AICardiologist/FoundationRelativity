@@ -6,7 +6,7 @@
 
 ## Summary
 
-This paper introduces the DPT (Decidability of Pure Trace) axiom framework and the u-invariant mechanism u(R) = infinity that explains why the real numbers are the unique source of non-constructive content in arithmetic geometry. The Archimedean completion R, unlike any non-Archimedean completion Q_p, admits positive-definite forms in every dimension—this forces the LPO/WLPO cost of sign decisions that pervades the CRM hierarchy.
+This paper introduces the DPT (Decidable Polarized Tannakian) axiom framework and the u-invariant mechanism u(R) = infinity that explains why the real numbers are the unique source of non-constructive content in arithmetic geometry. The Archimedean completion R, unlike any non-Archimedean completion Q_p, admits positive-definite forms in every dimension—this forces the LPO/WLPO cost of sign decisions that pervades the CRM hierarchy.
 
 ## Main Results
 

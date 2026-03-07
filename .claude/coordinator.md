@@ -13,6 +13,25 @@
 
 ## Active Tasks
 
+### feat/p107-condensed-gaga — Paper 107: The Condensed GAGA Conjecture
+- **Status:** in-progress (Lean build running, LaTeX draft complete)
+- **Worktree:** ../worktrees/p107-condensed-gaga
+- **Last update:** 2026-03-06 15:00
+- **What's done:**
+  - LaTeX draft: paper107.tex (~8 pages, 7 sections, 16 references, 1 TikZ figure)
+  - Lean 4 bundle: 2 files (~180 lines), 0 sorry
+    - CRMLevel.lean: CRM hierarchy with WKL node, join, ordering
+    - CondensedGAGA.lean: API contract (typed axioms, composite constructions, phase transition)
+  - README.md, metadata.txt complete
+  - Copied to ~/FoundationRelativity/paper 107/
+- **What's next:**
+  - Verify lake build clean (background job running)
+  - User compiles LaTeX (no pdflatex on agent PATH)
+  - Post-completion pipeline (format guide audit, peer review)
+  - Zenodo packaging, DOI assignment
+- **Blockers:** pdflatex not available to agent; user must compile
+- **Branch:** feat/p107-condensed-gaga
+
 ### edit/p101-revision — Paper 101: Full format-compliant revision
 - **Status:** done (v5)
 - **Worktree:** ../worktrees/p101-revision

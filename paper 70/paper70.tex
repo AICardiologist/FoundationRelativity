@@ -12,10 +12,10 @@
 \usepackage{stmaryrd}
 \usepackage{enumitem}
 \usepackage{booktabs}
+\usepackage[x11names,table]{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,cd,decorations.pathreplacing}
 \usepackage{listings}
-\usepackage[x11names,table]{xcolor}
 \usepackage{graphicx}
 \usepackage{array}
 \usepackage{mdframed}
@@ -33,7 +33,7 @@
 \newtheorem{remark}[theorem]{Remark}
 
 % ---------- Lean repo link ----------
-\newcommand{\leanRepo}{\url{https://doi.org/10.5281/zenodo.18750992}}
+\newcommand{\leanRepo}{\url{https://doi.org/10.5281/zenodo.18901192}}
 \newcommand{\leanok}{\textsf{\small \textcolor{green!70!black}{\checkmark}}}
 
 % ---------- Mathematical notation ----------
@@ -57,6 +57,7 @@
 \newcommand{\LPO}{\mathrm{LPO}}
 \newcommand{\WLPO}{\mathrm{WLPO}}
 \newcommand{\LLPO}{\mathrm{LLPO}}
+\newcommand{\WKL}{\mathrm{WKL}}
 \newcommand{\MP}{\mathrm{MP}}
 \newcommand{\CLASS}{\mathrm{CLASS}}
 \newcommand{\CRM}{\mathrm{CRM}}
@@ -155,7 +156,7 @@ This capstone paper identifies a single structural principle underlying 70~paper
 
 The principle is established by three theorems. The Archimedean Principle (Theorem~A) shows that the CRM level of every domain in the program is determined by one parameter: whether the domain has an Archimedean place. The MP Gap (Theorem~B) shows that physics and arithmetic descend differently---projection vs.\ search---producing a strict logical separation $\BISH < \BISH + \MP$. Automorphic CRM Incompleteness (Theorem~C) exhibits an integer witness proving the automorphic axioms alone cannot recover the Ramanujan bound. The principle also explains why multiple physical theories (Kapustin--Witten, Feigin--Frenkel, Freed--Hopkins--Teleman) independently encode the Langlands correspondence.
 
-Paper~68 showed that Fermat's Last Theorem is $\BISH$. Paper~69 showed that the function field Langlands correspondence is $\BISH$. This paper identifies what makes anything expensive: the Archimedean place, and specifically $u(\R) = \infty$.
+Paper~68 showed that $\CRM(\mathrm{FLT}) = \WKL$: the sole non-constructive node in Fermat's Last Theorem is Taylor--Wiles patching (non-Archimedean compactness). Paper~69 showed that the function field Langlands correspondence is $\BISH$. This paper identifies what makes anything expensive: the Archimedean place, and specifically $u(\R) = \infty$.
 
 All results are formalized in Lean~4 over Mathlib with zero \texttt{sorry}s and zero custom axioms (0~errors, 0~warnings). The formalization verifies the logical structure of the classification scheme and the integer arithmetic of the incompleteness witness; the identification of CRM levels with specific mathematical theories rests on the audits of Papers~1--69.
 \end{abstract}
@@ -167,7 +168,7 @@ All results are formalized in Lean~4 over Mathlib with zero \texttt{sorry}s and 
 \label{sec:intro}
 % ===========================================================
 
-The 70-paper program found one thing. The real numbers are the sole source of logical difficulty in both mathematical physics and arithmetic geometry. Every non-constructive principle required by any physical theory or any theorem in arithmetic geometry enters through the Archimedean place---the completion of~$\Q$ at infinity, which gives~$\R$. More precisely, $\R$ carries three nested algebraic structures with increasing logical cost: its ring operations ($\BISH$), its ordering ($\LPO$), and its completeness ($\CLASS$). Physics invokes the ordering but not the completeness---hence the physics ceiling at $\LPO$. Arithmetic geometry invokes the completeness through period integrals and the trace formula---hence the arithmetic ceiling at $\CLASS$. Remove~$\R$ entirely and both fields collapse to $\BISH$. Paper~68~\cite{Paper68} showed that Fermat's Last Theorem is $\BISH$. Paper~69~\cite{Paper69} showed that the Langlands correspondence over function fields is $\BISH$. This paper identifies the common mechanism and explains why it is unique.
+The 70-paper program found one thing. The real numbers are the sole source of logical difficulty in both mathematical physics and arithmetic geometry. Every non-constructive principle required by any physical theory or any theorem in arithmetic geometry enters through the Archimedean place---the completion of~$\Q$ at infinity, which gives~$\R$. More precisely, $\R$ carries three nested algebraic structures with increasing logical cost: its ring operations ($\BISH$), its ordering ($\LPO$), and its completeness ($\CLASS$). Physics invokes the ordering but not the completeness---hence the physics ceiling at $\LPO$. Arithmetic geometry invokes the completeness through period integrals and the trace formula---hence the arithmetic ceiling at $\CLASS$. Remove~$\R$ entirely and both fields collapse to $\BISH$. Paper~68~\cite{Paper68} showed that $\CRM(\mathrm{FLT}) = \WKL$: the sole non-constructive node is Taylor--Wiles patching (non-Archimedean compactness), confirming the Archimedean Principle. Paper~69~\cite{Paper69} showed that the Langlands correspondence over function fields is $\BISH$. This paper identifies the common mechanism and explains why it is unique.
 
 The mechanism is $u(\R) = \infty$: the real numbers are the only completion of~$\Q$ where positive-definite quadratic forms exist in every dimension. The intuition that the continuum is the source of mathematical difficulty is as old as Brouwer; what is new is the uniform calibration across both physics and arithmetic geometry, the identification of $u(\R) = \infty$ as the specific mechanism forcing parallel architectures, and the projection-vs-search distinction explaining the $\MP$ gap. This single property forces three different fields to develop the same architecture. Physics builds Hilbert space inner products. Motivic arithmetic builds the Rosati involution. Automorphic theory builds the Petersson inner product. All three are positive-definite structures over~$\R$, all three serve the same logical function---extracting computable finite answers ($\BISH$) from infinite continuous data ($\LPO$)---and all three exist because $u(\R) = \infty$. The Langlands program's connections to physics (Kapustin--Witten~\cite{KapustinWitten}, Feigin--Frenkel~\cite{FeiginFrenkel}, Freed--Hopkins--Teleman~\cite{FHT}) are not three separate miracles but three instances of one logical constraint.
 
@@ -243,7 +244,7 @@ The prior 69~papers established:
 \item \emph{Physics} (Papers~1--42, synthesis: Paper~40~\cite{Paper40}): every empirically accessible physical theory requires at most $\BISH + \LPO$, with $\LPO$ entering through the spectral theorem for unbounded self-adjoint operators on separable Hilbert spaces over~$\R$.
 \item \emph{Arithmetic geometry} (Papers~45--53, atlas: Paper~50~\cite{Paper50}): de-omniscientizing descent in every central conjecture, with the Rosati involution as the common mechanism.
 \item \emph{Motives} (Papers~54--67): three axioms for the motive (decidable morphisms, algebraic spectrum, Archimedean polarization) as logical content of geometric origin.
-\item \emph{FLT} (Paper~68~\cite{Paper68}): Wiles's 1995 proof costs $\BISH + \WLPO$; the Kisin $p = 2$ bypass eliminates $\WLPO$. FLT is $\BISH$.
+\item \emph{FLT} (Paper~68~\cite{Paper68}): Wiles's 1995 proof costs $\WLPO$; the Kisin $p = 2$ bypass eliminates $\WLPO$. $\CRM(\mathrm{FLT}) = \WKL$ (Taylor--Wiles patching, non-Archimedean compactness).
 \item \emph{Function field Langlands} (Paper~69~\cite{Paper69}): both Lafforgue proofs are $\BISH$; the correct boundary is algebraic-vs-transcendental, not discrete-vs-continuous.
 \end{itemize}
 No prior work has synthesized these findings into a unified principle or formally compared the descent mechanisms across physics and arithmetic.
@@ -691,7 +692,7 @@ theorem witness_family (p : Nat) (hp : p >= 5) :
 \item \textbf{Lean version:} \texttt{leanprover/lean4:v4.28.0-rc1}
 \item \textbf{Mathlib:} via \texttt{lakefile.lean} (standard \texttt{require mathlib})
 \item \textbf{Build command:} \texttt{lake build} (0 errors, 0 warnings)
-\item \textbf{Zenodo archive:} \url{https://doi.org/10.5281/zenodo.18750992} (reserved DOI; deposit to be published upon paper release)
+\item \textbf{Zenodo archive:} \url{https://doi.org/10.5281/zenodo.18901192} (reserved DOI; deposit to be published upon paper release)
 \end{itemize}
 
 % ===========================================================
@@ -716,7 +717,7 @@ theorem witness_family (p : Nat) (hp : p >= 5) :
 
 Paper~5 asked: what does the Schwarzschild metric need? Paper~70 answers: the same thing the Langlands correspondence needs. Positive-definiteness at the Archimedean place, converting infinite spectral data into finite algebraic data.
 
-The three final papers of the series form a single argument. Paper~68~\cite{Paper68} established that even Fermat's Last Theorem---the hardest theorem in arithmetic---is logically cheap ($\BISH$): the non-constructive machinery in Wiles's proof is scaffolding, not structure. Paper~69~\cite{Paper69} established that the Langlands correspondence itself is logically cheap: both Lafforgue proofs over function fields are $\BISH$, and the boundary between constructive and non-constructive is algebraic-vs-transcendental spectral parameters, not discrete-vs-continuous spectrum. This paper identifies what makes anything expensive: the Archimedean place, and specifically $u(\R) = \infty$, which forces positive-definite descent in both physics and arithmetic.
+The three final papers of the series form a single argument. Paper~68~\cite{Paper68} established that $\CRM(\mathrm{FLT}) = \WKL$: the sole non-constructive node in Fermat's Last Theorem is Taylor--Wiles patching---a non-Archimedean compactness argument (inverse limit of finite local $\Z_p$-algebras)---not any Archimedean analysis. Paper~69~\cite{Paper69} established that the Langlands correspondence itself is logically cheap: both Lafforgue proofs over function fields are $\BISH$, and the boundary between constructive and non-constructive is algebraic-vs-transcendental spectral parameters, not discrete-vs-continuous spectrum. This paper identifies what makes anything expensive: the Archimedean place, and specifically $u(\R) = \infty$, which forces positive-definite descent in both physics and arithmetic. The $\WKL$ in FLT confirms rather than threatens the Archimedean Principle: it is non-Archimedean compactness, not Archimedean analysis.
 
 The difference between physics and arithmetic is not in what they share but in how they descend. Physics measures; arithmetic searches. Measurement is projection: finite-rank, eliminating $\MP$. Search is existential: unbounded, preserving $\MP$. This is the logical content of the intuition that number theory is harder than physics.
 
@@ -785,7 +786,7 @@ P.~C.-K.~Lee, \emph{Three axioms for the motive},
 Paper~50, CRM Series, 2026.
 
 \bibitem{Paper68}
-P.~C.-K.~Lee, \emph{Fermat's Last Theorem is $\BISH$},
+P.~C.-K.~Lee, \emph{The Logical Cost of Fermat's Last Theorem},
 Paper~68, CRM Series, 2026.
 
 \bibitem{Paper69}

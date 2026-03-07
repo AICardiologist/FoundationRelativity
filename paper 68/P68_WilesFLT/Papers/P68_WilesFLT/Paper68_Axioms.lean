@@ -99,10 +99,11 @@ axiom tw_disc_computable
 -- ============================================================
 
 /-- The constructive reverse mathematics hierarchy.
-    BISH ⊂ MP ⊂ LLPO ⊂ WLPO ⊂ LPO ⊂ CLASS. -/
+    BISH ⊂ MP ⊂ WKL ⊂ LLPO ⊂ WLPO ⊂ LPO ⊂ CLASS. -/
 inductive CRMLevel where
   | BISH  : CRMLevel
   | MP    : CRMLevel
+  | WKL   : CRMLevel  -- Weak König's Lemma (compactness / inverse limits)
   | LLPO  : CRMLevel
   | WLPO  : CRMLevel
   | LPO   : CRMLevel
@@ -124,6 +125,8 @@ def join : CRMLevel → CRMLevel → CRMLevel
   | _,     WLPO   => WLPO
   | LLPO,  _      => LLPO
   | _,     LLPO   => LLPO
+  | WKL,   _      => WKL
+  | _,     WKL    => WKL
   | MP,    MP     => MP
 
 /-- BISH is strictly below WLPO. -/

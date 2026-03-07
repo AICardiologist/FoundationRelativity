@@ -75,10 +75,10 @@ No.  Title                                                               DOI
  64  Uniform p-Adic Decidability for Elliptic Curves                     10.5281/zenodo.18737090
  65  Self-Intersection Patterns Beyond Cyclic Cubics                     10.5281/zenodo.18743151
  66  Form-Class Resolution for Non-Cyclic Totally Real Cubics            10.5281/zenodo.18745722
- 67  The Motive Is a Decidability Certificate (Monograph)               10.5281/zenodo.18776113
- 68  Fermat's Last Theorem Is BISH                                      10.5281/zenodo.18838541
+ 67  The Motive Is a Decidability Certificate (Monograph)               10.5281/zenodo.18902506
+ 68  The Logical Cost of Fermat's Last Theorem                           10.5281/zenodo.18901011
  69  Function Field Langlands Is BISH                                    10.5281/zenodo.18749757
- 70  The Archimedean Principle (Capstone)                                 10.5281/zenodo.18750992
+ 70  The Archimedean Principle (Capstone)                                 10.5281/zenodo.18901192
  71  Archimedean Principle in Cryptography and Computation               10.5281/zenodo.18752015
  72  The DPT Characterization Theorem                                    10.5281/zenodo.18765393
  73  Standard Conjecture D Is Necessary for Morphism Decidability        10.5281/zenodo.18765700
@@ -106,7 +106,7 @@ No.  Title                                                               DOI
  95  The BSD Squeeze: CRMLint Decomp. of Gross-Zagier-Kolyvagin     10.5281/zenodo.18821019
  96  The Root Number Bifurcation: Rank 0 BSD Squeeze                10.5281/zenodo.18869924
  97  BSD Landscape Survey — Null Finding (Internal Note)            —
- 98  The Motivic CRM Architecture                                   10.5281/zenodo.18828345
+ 98  The Motivic CRM Architecture                                   10.5281/zenodo.18902037
  99  The Hecke Theta Series Squeeze                                 10.5281/zenodo.18821004
 100  The Kuga-Satake Bifurcation: Absolute Hodge on K3             10.5281/zenodo.18821010
 101  The CRM Signature of Berkovich Motives                       10.5281/zenodo.18869076
@@ -117,17 +117,23 @@ No.  Title                                                               DOI
 ---- ------------------------------------------------------------------- --------------------------
 103  The Asymptotic Penumbra: CRM of the RCT Statistical Pipeline 10.5281/zenodo.18880102
 104  The Algorithmic Penumbra: CRM of Clinical Machine Learning   10.5281/zenodo.18889356
+105  The Dynamical Penumbra: CRM of Cardiac Electrophysiology      DOI pending
+
+---- ------------------------------------------------------------------- --------------------------
+                    D-MODULES / HIGHER CATEGORIES
+---- ------------------------------------------------------------------- --------------------------
+106  CRM Audit of the Riemann-Hilbert Correspondence               DOI pending
 
 ================================================================================
 STATISTICS
 ================================================================================
-Total papers:         102 active (of 104 numbered)
+Total papers:         104 active (of 106 numbered)
 Withdrawn:            2 (Papers 1, 3)
 Retired:              2 (Paper 60 → 59; Paper 62 → 63)
 Papers with DOIs:     99
-Papers pending DOI:   0
+Papers pending DOI:   2
 Papers peer-reviewed: 83 (passed Gemini peer review)
-Papers with Lean 4:   ~83 (Papers 64-66, 90, 97, 101 computational/LaTeX-only)
+Papers with Lean 4:   ~84 (Papers 64-66, 90, 97, 101 computational/LaTeX-only)
 Total Lean 4 lines:   ~100,000+
 Domains covered:      Functional Analysis, Quantum Mechanics, General Relativity,
                       Statistical Mechanics, QFT (QED/QCD), Quantum Information,
@@ -137,7 +143,8 @@ Domains covered:      Functional Analysis, Quantum Mechanics, General Relativity
                       Hodge Theory, Griffiths Groups, Calabi-Yau Geometry,
                       Elliptic Curves, BSD Conjecture,
                       Condensed Mathematics, Berkovich Spaces,
-                      Biostatistics, Evidence-Based Medicine
+                      Biostatistics, Evidence-Based Medicine,
+                      Cardiac Electrophysiology, Dynamical Systems
 
 Logical hierarchy:    BISH < LLPO < WLPO < LPO (omniscience spine)
                       MP (orthogonal to spine, implied by LPO)

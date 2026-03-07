@@ -1,0 +1,9 @@
+import Papers.P104_AlgorithmicPenumbra.OmnisciencePrinciples
+import Papers.P104_AlgorithmicPenumbra.MLArchitectures
+import Papers.P104_AlgorithmicPenumbra.ReLUBypass
+import Papers.P104_AlgorithmicPenumbra.SigmoidCost
+import Papers.P104_AlgorithmicPenumbra.IntegerScores
+import Papers.P104_AlgorithmicPenumbra.ClinicalTestCases
+import Papers.P104_AlgorithmicPenumbra.ConstructiveRegularization
+import Papers.P104_AlgorithmicPenumbra.GridOptimality
+import Papers.P104_AlgorithmicPenumbra.Paper104_Assembly

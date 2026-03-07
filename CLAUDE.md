@@ -97,6 +97,18 @@ BISH ⊂ BISH+MP ⊂ BISH+LLPO ⊂ BISH+WLPO ⊂ BISH+LPO ⊂ CLASS
 - DC (Dependent Choice): independent, physically dispensable
 - Ceiling: BISH + LPO for all empirical physics
 
+### Abbreviation Glossary (MANDATORY — agents get these wrong)
+- **DPT** = Decidable Polarized Tannakian (NOT "Decidability of Pure Trace" or any other expansion). Source: Paper 50, §1.
+- **GAGA** = Géométrie Algébrique et Géométrie Analytique (Serre 1956). Algebraic-analytic comparison.
+- **AOT** = Archimedean Obstruction Thesis (Paper 98). CLASS enters through Betti realization only.
+- **CBN** = Classical Boundary Node. The exact lemma where a proof invokes a non-constructive principle.
+- **VHC** = Variational Hodge Conjecture. Spreading algebraicity from special to generic fibers.
+- **LLC** = Local Langlands Correspondence. NOT "limited liability company."
+- **LTE** = Liquid Tensor Experiment (Scholze's Lean formalization project).
+- **FLT** = Fermat's Last Theorem. NOT "Fermat's Little Theorem."
+- **CRM** = Constructive Reverse Mathematics. The programme's framework.
+- **MT** = Mumford-Tate (group). NOT "machine translation" or "Montana."
+
 ---
 
 ## Paper Format (from paper_format_guide.md)
@@ -130,14 +142,22 @@ BISH ⊂ BISH+MP ⊂ BISH+LLPO ⊂ BISH+WLPO ⊂ BISH+LPO ⊂ CLASS
 - Paper 95: COMPLETE. The BSD Squeeze: CRMLint Decomposition of the Gross-Zagier-Kolyvagin Proof. Fourteenth CRMLint application. First CRM audit of a Clay Millennium Problem proof. 37a1 test case. 15 BISH + 6 CLASS = 21 components (71%). 796 lines Lean (58 theorems, 0 sorry). DOI: 10.5281/zenodo.18821019.
 - Paper 96: COMPLETE. The Root Number Bifurcation: CRM Cost of BSD Detection Controlled by the Functional Equation. Fifteenth CRMLint application. BSD analogue of palindromic bifurcation (P89). 10 BISH + 3 CLASS = 13 components (77%). 16 pages, 1,033 lines Lean (86 theorems, 0 sorry). DOI: 10.5281/zenodo.18869924.
 - Paper 97: COMPLETE. BSD Landscape Survey — Null Finding. Internal note. No new CRMLint opportunities beyond P95–96.
-- Paper 98: COMPLETE. The Motivic CRM Architecture. Capstone synthesis of Papers 50–97. Archimedean Obstruction Thesis: CLASS enters through Betti realization only. Three calibration theorems. Companion monograph. 607 lines Lean (0 sorry). DOI: 10.5281/zenodo.18828345.
+- Paper 98: COMPLETE. The Motivic CRM Architecture. Capstone synthesis of Papers 50–97. Archimedean Obstruction Thesis: CLASS enters through Betti realization only. Three calibration theorems. Companion monograph. 607 lines Lean (0 sorry). DOI: 10.5281/zenodo.18902037.
 - Paper 99: COMPLETE (v2). The Hecke Theta Series Squeeze. Sixteenth CRMLint application. CRM(FLT) = WKL. Three CLASS→BISH excisions: Poisson→Mumford, Deligne-Serre→forward matching, Chebotarev→effective bounds. Validates Paper 98 empirically. DPT→motives→proof structure is predictive. 21 pages, 32 refs, 1,180 lines Lean (7 files, 0 sorry, 0 Classical.choice). DOI: 10.5281/zenodo.18821004.
 
+### Clinical Sub-Series (Papers 103–105)
+- Paper 103: COMPLETE. The Asymptotic Penumbra — first Clinical Sub-Series. DOI: 10.5281/zenodo.18880102.
+- Paper 104: COMPLETE. The Algorithmic Penumbra — Clinical Sub-Series Paper B. DOI: 10.5281/zenodo.18889356.
+- Paper 105: COMPLETE. The Dynamical Penumbra — Clinical Sub-Series Paper C. CRM of cardiac electrophysiology (FitzHugh-Nagumo). 5 BISH + 1 WLPO + 1 WKL + 1 LPO = 8 components (62.5% BISH). Widest CRM hierarchy span in Clinical Sub-Series. 15 pages, 3 TikZ figures, 27 refs, 1,246 lines Lean (9 files, 0 sorry, 0 Classical.choice). DOI pending.
+
+### D-Modules / Higher Categories (Paper 106)
+- Paper 106: COMPLETE. CRM Audit of the Riemann-Hilbert Correspondence. Eighteenth CRMLint application. First CRM audit of a categorical equivalence theorem. 10 BISH + 4 WLPO + 1 LPO + 1 CLASS = 16 components (62.5% constructive). Deligne canonical extension = LPO (floor function); GAGA descent = sole CLASS (Montel). ∞-categorical machinery (Lurie) is logically inert; Scholze condensed avoidance explained by CRM. 14–15 pages, 22 refs, 404 lines Lean (3 files, 0 sorry). DOI pending.
+
 ### Remaining Administrative
-- Paper 99: DOI assigned: 10.5281/zenodo.18821004.
-- Paper 100: DOI assigned: 10.5281/zenodo.18821010.
+- Paper 105: DOI pending. Zenodo upload needed. Branch `feat/p105-dynamical-penumbra` ready for merge.
+- Paper 106: DOI pending. Zenodo upload needed.
 - `git push origin main` — multiple unpushed commits.
-- Merge `feat/p99-hecke-theta` and `feat/p100-kuga-satake` branches.
+- Merge feature branches.
 
 ### Generative Phase (Papers 76–91)
 - Paper 76: COMPLETE. CRMLint automated CRM logical cost analyzer. Full design in `CRM_PROGRAMME_ROADMAP.md` §7. DOI: 10.5281/zenodo.18779362.
@@ -164,7 +184,7 @@ BISH ⊂ BISH+MP ⊂ BISH+LLPO ⊂ BISH+WLPO ⊂ BISH+LPO ⊂ CLASS
 
 ### Capstone Phase (Papers 97–100)
 - Paper 97: COMPLETE. BSD Landscape Survey — Null Finding. Internal note. No new CRMLint opportunities beyond P95–96.
-- Paper 98: COMPLETE. The Motivic CRM Architecture: Why the Six Domains of Mathematics Have Different Logical Signatures. Capstone synthesis of Papers 50–97. Archimedean Obstruction Thesis (Theorem 5.1): CLASS enters arithmetic geometry through Betti realization only. Three calibration theorems: (I) Hodge bifurcates at WLPO, (II) BSD rank/Sha decouples, (III) TW patching = WKL. Companion monograph "The Logical Cost of Everything." 607 lines Lean (0 sorry, 0 Classical.choice). DOI: 10.5281/zenodo.18828345.
+- Paper 98: COMPLETE. The Motivic CRM Architecture: Why the Six Domains of Mathematics Have Different Logical Signatures. Capstone synthesis of Papers 50–97. Archimedean Obstruction Thesis (Theorem 5.1): CLASS enters arithmetic geometry through Betti realization only. Three calibration theorems: (I) Hodge bifurcates at WLPO, (II) BSD rank/Sha decouples, (III) TW patching = WKL. Companion monograph "The Logical Cost of Everything." 607 lines Lean (0 sorry, 0 Classical.choice). DOI: 10.5281/zenodo.18902037.
 - Paper 99: COMPLETE (v2, referee-accepted). The Hecke Theta Series Squeeze: Resolving the Dihedral Base Case of Modularity via Mumford's Algebraic Theta Functions. Sixteenth CRMLint application. CRM(FLT) = WKL. Three CLASS→BISH excisions: Poisson→Mumford algebraic theta (de Rham), Deligne-Serre→forward formulaic matching (étale), Chebotarev→effective bounds (arithmetic). Validates Paper 98's Archimedean Obstruction Thesis. DPT→motives→proof structure is a predictive deductive chain. Ghost proof appendix (Lamé 1847). v1 had 3 fatal errors (referee); v2 corrects with 3-excision architecture. 21 pages, 32 refs, 1,180 lines Lean (7 files, 0 sorry, 0 Classical.choice). DOI: 10.5281/zenodo.18821004.
 - Paper 100: COMPLETE (v4, internally reviewed). The Kuga-Satake Bifurcation: Absolute Hodge Classes on K3 Surfaces via Shioda-Inose Structure. Seventeenth CRMLint application. K3 Hodge campaign capstone. Kuga-Satake construction Cl⁺(T(X)) → A_KS. Bifurcation at ρ=20: CM structure → BISH detection; generic ρ → CLASS (Betti realization). 10 BISH + 5 CLASS = 15 components (67%). Conservation Conjecture as principal open problem. 16 pages, 26 refs, 729 lines Lean (5 files, 0 sorry, 0 Classical.choice). DOI: 10.5281/zenodo.18821010.
 

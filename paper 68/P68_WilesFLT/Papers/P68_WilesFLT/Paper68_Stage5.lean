@@ -1,20 +1,22 @@
 /-
   Paper 68: The Logical Cost of Fermat's Last Theorem
-  Paper68_Stage5.lean — Target 1: Stage 5 (Taylor–Wiles patching) is BISH
+  Paper68_Stage5.lean — Target 1: Stage 5 TW prime search is BISH
 
-  This file proves that Stage 5 of Wiles's proof, in the Brochard
-  formulation, is a BISH-decidable finite computation.
+  This file proves that the Taylor–Wiles prime search component of
+  Stage 5, in the Brochard formulation, is a BISH-decidable finite
+  computation. The patching assembly (inverse limit of finite local
+  rings) requires WKL (Paper 98, Calibration Theorem II).
 
   The proof combines three axiomatized inputs:
-    B1 (Brochard): finite-level criterion eliminates infinite patching
+    B1 (Brochard): finite-level criterion reduces freeness to level 2
     B2 (Effective Chebotarev): prime search has computable bound
     B3 (Discriminant computability): search bound is computable from input
 
   Deep theorems are axiomatized in Paper68_Axioms.lean; this file
-  verifies only the logical assembly.
+  verifies only the logical assembly of the search component.
 
   Author: Paul C.-K. Lee
-  Date: February 2026
+  Date: February 2026 (v6.0: corrected Stage 5 from BISH to WKL)
   Zero sorry.
 -/
 
@@ -101,18 +103,21 @@ theorem patching_yields_freeness (pd : PatchingData) :
 -- § 4. Stage 5 is BISH (Theorem 3.4 in paper)
 -- ============================================================
 
-/-- Stage 5 is a BISH-decidable computation.
+/-- The TW prime search is a BISH-decidable computation.
 
     The logical structure:
-    1. Brochard (B1) reduces infinite patching to a finite-level check.
-       → Eliminates Fan Theorem (WKL).
+    1. Brochard (B1) reduces the freeness verification to finite level.
     2. Discriminant computability (B3) makes the Chebotarev bound computable.
     3. Effective Chebotarev (B2) bounds the prime search.
        → Eliminates Markov's Principle.
     4. The composition is: compute bound → search primes → verify freeness.
        All steps are finite, decidable computations.
 
-    The classification of Stage 5 drops from MP + FT (1995) to BISH (2017/2019). -/
+    The search component of Stage 5 is BISH. The residual WKL is in the
+    patching assembly (inverse limit of finite local rings constructing R_∞),
+    not formalized here. See Paper 98, Calibration Theorem II.
+
+    The classification of Stage 5 drops from MP + FT (1995) to WKL (2017/2019). -/
 structure Stage5Result (N p : ℕ) (ρbar : ResidualRep N p) where
   /-- The TW primes found by bounded search. -/
   tw_primes : TWPrimeSet N p 2 ρbar
@@ -138,18 +143,20 @@ axiom patching_data_edim
   let pd := construct_patching_data N p ρbar tw
   embDim pd.B ≤ embDim pd.A
 
-/-- Stage 5 of Wiles's proof is BISH.
+/-- The TW prime search and freeness verification of Stage 5 is BISH.
 
-    Given axioms B1–B3, the entire Stage 5 is a finite computation:
+    Given axioms B1–B3, the search component of Stage 5 is a finite
+    computation:
     - Compute the Chebotarev bound from (N, p, ρ̄)  [B3]
     - Search all primes up to the bound for TW conditions  [B2]
     - Construct patching data at level n = 2
     - Apply Brochard's criterion to get freeness (R ≅ T)  [B1]
 
-    No Fan Theorem (infinite inverse limit).
     No Markov's Principle (unbounded search).
-    Classification: BISH. -/
-theorem stage5_is_bish
+    The residual WKL is in the inverse limit assembling R_∞ from
+    compatible finite approximations (Paper 98, Calibration Thm II).
+    Overall Stage 5 classification: WKL. -/
+theorem stage5_search_is_bish
   (N p : ℕ) (ρbar : ResidualRep N p)
   (tw : TWPrimeSet N p 2 ρbar) :
   ∃ _result : Stage5Result N p ρbar, True := by
@@ -174,5 +181,6 @@ theorem stage5_search_bound_exists
 /- The de-omniscientizing descent of Stage 5:
     1995 (Taylor–Wiles):      MP + FT
     1997 (Diamond):           MP + FT
-    2017 (Brochard):          MP       [FT eliminated]
-    2017/2019 (+ eff. Cheb.): BISH     [MP eliminated] -/
+    2017 (Brochard):          WKL + MP  [FT reduced to WKL]
+    2017/2019 (+ eff. Cheb.): WKL      [MP eliminated]
+    The residual WKL is the inverse limit (Paper 98). -/
