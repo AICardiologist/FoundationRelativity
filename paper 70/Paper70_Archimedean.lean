@@ -58,7 +58,7 @@ axiom physics_profile_eq : physics_profile = LPO
 /-- Number field arithmetic profile: BISH + WLPO.
     WLPO enters through the Arthur-Selberg trace formula at the
     Archimedean place (weight 1, Langlands-Tunnell).
-    Reference: Paper 68 (FLT is BISH). -/
+    Reference: Paper 68 (FLT is WKL). -/
 axiom numfield_profile : CRMLevel
 axiom numfield_profile_eq : numfield_profile = WLPO
 

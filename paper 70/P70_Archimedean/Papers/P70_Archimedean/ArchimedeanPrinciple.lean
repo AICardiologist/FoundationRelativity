@@ -14,7 +14,7 @@
   All are positive-definite over ℝ; all fail over ℚ_p.
 
   References: Paper 40 (physics synthesis), Paper 50 (DPT axioms),
-    Paper 68 (FLT is BISH), Paper 69 (function field Langlands is BISH).
+    Paper 68 (FLT is WKL), Paper 69 (function field Langlands is BISH).
 -/
 import Papers.P70_Archimedean.Defs
 

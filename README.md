@@ -95,7 +95,7 @@ A new arithmetic identity, not a CRM classification: the Faltings height times t
 
 ### The trilogy (Papers 68–70) — confirmation, not surprise
 
-**Paper 68: FLT is BISH.** The Wiles path costs BISH + WLPO (weight-1 obstruction). Kisin's 2009 bypass avoids it. Net cost: BISH. This confirms the DPT prediction that major arithmetic theorems are cheaper than they look.
+**Paper 68: CRM(FLT) = WKL.** The Wiles path costs WKL + WLPO (weight-1 obstruction + TW patching). Kisin's 2009 bypass eliminates the WLPO. Net cost: WKL (irreducible inverse limit in Taylor-Wiles patching). The non-constructive content is non-Archimedean compactness, confirming the Archimedean Principle.
 
 **Paper 69: Function field Langlands is BISH.** Predicted by the absence of an Archimedean place. The one genuine discovery: the CRM boundary is algebraic-vs-transcendental spectral parameters, not discrete-vs-continuous spectrum.
 
@@ -251,7 +251,7 @@ Every paper with its bottom line. Papers 1 and 3 withdrawn; Papers 60 and 62 ret
 | # | Title | Bottom line |
 |---|-------|------------|
 | **67** | **The Motive Is a Decidability Certificate** | **Monograph: (r, ℓ, c) classify all motives (Papers 45–75)** |
-| 68 | Fermat's Last Theorem Is BISH | Wiles WLPO; Kisin bypass → BISH |
+| 68 | The Logical Cost of Fermat's Last Theorem | CRM(FLT) = WKL; TW patching irreducible |
 | 69 | Function Field Langlands Is BISH | Algebraic-vs-transcendental boundary, not discrete-vs-continuous |
 | **70** | **The Archimedean Principle** | **Capstone: the only expensive thing is ℝ** |
 | 71 | Archimedean Principle in Cryptography | Lattice crypto Archimedean-hard; SVP at projection/search boundary |

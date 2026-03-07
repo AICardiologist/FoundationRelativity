@@ -154,6 +154,7 @@
 \setlist{nosep, leftmargin=*}
 
 \newcommand{\BISH}{\textsf{BISH}}
+\newcommand{\WKL}{\textsf{WKL}}
 \newcommand{\WLPO}{\textsf{WLPO}}
 \newcommand{\LLPO}{\textsf{LLPO}}
 \newcommand{\LPO}{\textsf{LPO}}
@@ -1250,19 +1251,19 @@ Together, $(r, \ell, c)$ classify the full decidability landscape. \paperref{67}
 
 
 %── 2.5 ───────────────────────────────────────────────────
-\section{FLT Is \BISH}\label{sec:flt}
+\section{FLT Is \WKL}\label{sec:flt}
 
 The most surprising calibration result.
 
 \begin{analogybox}[The Skyscraper That's One Story Tall]
 Fermat's Last Theorem: $x^n + y^n = z^n$ has no integer solutions for $n \geq 3$. Proved by Andrew Wiles in 1995 in a 129-page paper deploying Galois representations, modular forms, deformation rings, and Hecke algebras. This proof is one of the most complex in the history of mathematics.
 
-You would expect it to be logically expensive---surely 129 pages of deep mathematics need powerful axioms? CRM's verdict: \textbf{FLT is \BISH.} The entire theorem needs no oracle.
+You would expect it to be logically expensive---surely 129 pages of deep mathematics need powerful axioms? CRM's verdict: \textbf{CRM(FLT) = \WKL.} The sole non-constructive node is the inverse limit in Taylor--Wiles patching---non-Archimedean compactness, not Archimedean analysis.
 
-The 129 pages are \emph{scaffolding}---complex but constructive. The theorem itself sits on the ground floor. It's a 129-story building that's really one story tall: the other 128 floors are the elevator that takes you there, not the apartment you live in.
+The 129 pages are almost entirely \emph{scaffolding}---complex but constructive. The theorem sits one floor above ground: the \WKL{} in patching is irreducible (Calibration Theorem~II), but every other component is \BISH.
 \end{analogybox}
 
-\paperref{68} audited the Wiles proof stage by stage. Stages 2--5 (Taylor-Wiles patching, deformation theory, modularity lifting) are all \BISH. The machinery is complex but constructive. Stage~1 (Langlands-Tunnell, weight-1 forms) costs \WLPO, but this is an artifact: Kisin's later work (2009) on the $p=2$ dihedral case bypasses weight-1 forms entirely. With Kisin's route, Stage~1 is also \BISH.
+\paperref{68} audited the Wiles proof stage by stage. Stages 2--4 (deformation theory, Hecke algebra, numerical criterion) are all \BISH. Stage~5 (Taylor--Wiles patching) splits: the prime search is \BISH{} (effective Chebotarev bounds), but the inverse limit assembling $R_\infty$ from finite local rings is \WKL. Stage~1 (Langlands--Tunnell, weight-1 forms) costs \WLPO, but this is an artifact: Kisin's $p=2$ dihedral bypass eliminates it. With Kisin's route, $\mathrm{CRM}(\mathrm{FLT}) = \WKL$.
 
 \begin{figure}[htbp]
 \centering
@@ -1273,10 +1274,10 @@ The 129 pages are \emph{scaffolding}---complex but constructive. The theorem its
   node distance=0.6cm
 ]
   % Stages
-  \node[sbox, fill=green!15] (s5) {Stage 5: Modularity lifting\\\BISH};
-  \node[sbox, fill=green!15, below=of s5] (s4) {Stage 4: Deformation theory\\\BISH};
-  \node[sbox, fill=green!15, below=of s4] (s3) {Stage 3: Taylor-Wiles patching\\\BISH};
-  \node[sbox, fill=green!15, below=of s3] (s2) {Stage 2: Galois representations\\\BISH};
+  \node[sbox, fill=green!15] (s5) {Stage 5: TW patching\\\WKL{} (inverse limit)};
+  \node[sbox, fill=green!15, below=of s5] (s4) {Stage 4: Numerical criterion\\\BISH};
+  \node[sbox, fill=green!15, below=of s4] (s3) {Stage 3: Hecke algebra\\\BISH};
+  \node[sbox, fill=green!15, below=of s3] (s2) {Stage 2: Deformation ring\\\BISH};
   \node[sbox, fill=wlpogold!15, below=of s2] (s1)
     {Stage 1: Langlands-Tunnell\\\WLPO{} (weight-1 forms)};
 
@@ -1294,7 +1295,7 @@ The 129 pages are \emph{scaffolding}---complex but constructive. The theorem its
   % Result
   \node[draw, very thick, rounded corners=5pt, fill=green!20,
         minimum width=3.5cm, below=0.8cm of s1,
-        font=\bfseries] (result) {FLT = \BISH};
+        font=\bfseries] (result) {FLT = \WKL};
   \draw[arr, very thick] (s1) -- (result);
 
   % Annotation
@@ -1302,13 +1303,13 @@ The 129 pages are \emph{scaffolding}---complex but constructive. The theorem its
     {129-page proof\\= scaffolding\\[3pt]
      Theorem sits on\\the ground floor};
 \end{tikzpicture}
-\caption{FLT audit (\paperref{68}). Every stage is \BISH{} except Stage~1, which uses weight-1 forms (\WLPO). Kisin's bypass removes this cost. FLT = \BISH: the 129-page proof is scaffolding; the theorem requires no oracle.}
+\caption{FLT audit (\paperref{68}). Stages 2--4 are \BISH; Stage~5 (TW patching) is \WKL{} (inverse limit); Stage~1 costs \WLPO{} but Kisin's bypass eliminates it. $\mathrm{CRM}(\mathrm{FLT}) = \WKL$: the 129-page proof is mostly scaffolding; the irreducible cost is non-Archimedean compactness.}
 \label{fig:flt}
 \end{figure}
 
-This is the program's sharpest illustration of a fundamental distinction: \textbf{proof complexity is not logical cost.} Taylor-Wiles patching is intellectually difficult, technically demanding, and involves deep algebra---but it is constructive. Weight-1 modular forms are routine objects---but they cost \WLPO. CRM measures what matters (logical resources), not what impresses (proof difficulty).
+This is the program's sharpest illustration of a fundamental distinction: \textbf{proof complexity is not logical cost.} Stages 2--4 are intellectually difficult, technically demanding, and involve deep algebra---but they are constructive. Taylor--Wiles patching costs \WKL{} (the inverse limit), but this is non-Archimedean compactness, confirming the Archimedean Principle. Weight-1 modular forms are routine objects---but they cost \WLPO. CRM measures what matters (logical resources), not what impresses (proof difficulty).
 
-\paragraph{An honest residual tension (\paperref{98}, Appendix~A).} Kisin's bypass uses Hecke theta series $\theta_L(\tau) = \sum_{v \in L} q^{Q(v)}$, whose Fourier coefficients are finite lattice sums (\BISH). However, the \emph{modularity} of $\theta_L$ (proving it transforms correctly under $\mathrm{SL}_2(\mathbb{Z})$) uses Poisson summation---an identity of distributions on $\mathbb{R}$. Whether this is an essential use of the Archimedean place or dispensable analytic scaffolding is an open question. \paperref{68}'s classification stands, but this node is flagged as the precise locus where a definitive CRMLint Squeeze is needed.
+\paragraph{The Hecke theta series resolution (\paperref{99}).} Kisin's bypass uses Hecke theta series $\theta_L(\tau) = \sum_{v \in L} q^{Q(v)}$, whose Fourier coefficients are finite lattice sums (\BISH). The \emph{modularity} of $\theta_L$ was originally proved via Poisson summation ($\CLASS$), but \paperref{99} showed three explicit excisions: Poisson $\to$ Mumford algebraic theta, Deligne--Serre $\to$ forward matching, Chebotarev $\to$ effective bounds. The dihedral base case is $\BISH$; the irreducible $\WKL$ is strictly in the patching assembly.
 
 
 %── 2.6 ───────────────────────────────────────────────────
@@ -2907,7 +2908,7 @@ This principle explains all 98 papers:
 The Hodge realization passes through $\mathbb{R}$. Generic detection costs WLPO (real-number equality test for period matrix entries). With CM metadata---which provides an algebraic shortcut past $\mathbb{R}$---the cost drops to \BISH. The palindromic locus of the universal family $C_{a,b,c}$ provides this shortcut (Kani-Rosen splitting, \paperref{86}). The generic locus does not. The Archimedean Obstruction Thesis predicts exactly this: the shortcut exists if and only if an algebraic substitute for the Archimedean comparison is available.
 
 \paragraph{Calibration II: Taylor-Wiles patching $\longleftrightarrow$ WKL (\paperref{68--71}).}
-Wiles's 1993 attempt at FLT used the \textbf{Petersson inner product}---integration over a non-compact modular surface, involving $\mathbb{R}$---costing \CLASS. The Taylor-Wiles patch (1995) replaced this analytic ingredient with an \textbf{algebraic inverse limit} over finite level structures. In CRM terms: the patch excised the Archimedean bottleneck. The replacement principle is \textbf{WKL} (\textbf{Weak K\"onig's Lemma}): every infinite binary tree has an infinite path. In classical reverse mathematics, WKL is strictly weaker than arithmetic comprehension and captures exactly the compactness arguments of analysis. In CRM terms, WKL lies between \BISH{} and \LPO{} (it is implied by \LPO{} but does not imply it). For the Taylor-Wiles application, the inverse limit stabilizes after finitely many steps (the patching argument produces the required deformation after a bounded number of auxiliary primes). Since the tree is effectively finite, no infinite path is needed, and WKL collapses to \BISH. This is a historical case of de-omniscientizing descent: the mathematical community found a cheaper proof by (inadvertently) removing the Archimedean computation.
+Wiles's 1993 attempt at FLT used the \textbf{Petersson inner product}---integration over a non-compact modular surface, involving $\mathbb{R}$---costing \CLASS. The Taylor--Wiles patch (1995) replaced this analytic ingredient with an \textbf{algebraic inverse limit} over finite level structures. In CRM terms: the patch excised the Archimedean bottleneck. The replacement principle is \textbf{WKL} (\textbf{Weak K\"onig's Lemma}): every infinite binary tree has an infinite path. In classical reverse mathematics, WKL is strictly weaker than arithmetic comprehension and captures exactly the compactness arguments of analysis. In CRM terms, WKL lies between \BISH{} and \LPO{} (it is implied by \LPO{} but does not imply it). The TW prime search is \BISH{} (effective Chebotarev bounds: Lagarias--Montgomery--Odlyzko 1979, Ahn--Kwon 2019), and Brochard's finite-level criterion (2017) eliminates the Fan Theorem. But the inverse limit assembling $R_\infty$ from compatible finite approximations is irreducibly \WKL{} (\paperref{98}, Calibration Theorem~II; confirmed by \paperref{99}). The result: $\mathrm{CRM}(\mathrm{FLT}) = \WKL$. This is a historical case of de-omniscientizing descent: the mathematical community found a cheaper proof by (inadvertently) removing the Archimedean computation, but the non-Archimedean compactness in patching is irreducible.
 
 \paragraph{Calibration III: BSD rank/Sha decoupling (\paperref{95--97}).}
 Rank verification uses \'etale/algebraic methods (\BISH). Sha finiteness requires the Archimedean $L$-function (\CLASS). No bifurcation is possible because the elliptic curve moduli has dimension~1 (no room for a continuous family). The Archimedean $\Gamma$-factor, the period integral $\Omega_+(E)$, and the Mellin transform defining $L(E,s)$ all pass through $\mathbb{R}$.
@@ -3284,10 +3285,10 @@ None of these were discovered by asking classical questions. They were discovere
  64 & Uniform $p$-Adic Decidability for Elliptic Curves & Active & 18737090 \\
  65 & Self-Intersection Patterns Beyond Cyclic Cubics & Active & 18743151 \\
  66 & Form-Class Resolution for Non-Cyclic Totally Real Cubics & Active & 18745722 \\
- 67 & The Motive Is a Decidability Certificate (Monograph) & Active & 18776113 \\
- 68 & Fermat's Last Theorem Is \BISH & Active & 18838541 \\
+ 67 & The Motive Is a Decidability Certificate (Monograph) & Active & 18902506 \\
+ 68 & The Logical Cost of Fermat's Last Theorem & Active & 18901011 \\
  69 & Function Field Langlands Is \BISH & Active & 18749757 \\
- 70 & The Archimedean Principle (Capstone) & Active & 18750992 \\
+ 70 & The Archimedean Principle (Capstone) & Active & 18901192 \\
  71 & Archimedean Principle in Cryptography & Active & 18752015 \\
  72 & The DPT Characterization Theorem & Active & 18765393 \\
  74 & Algebraic Spectrum Is Necessary & Active & 18773827 \\
@@ -3464,7 +3465,7 @@ Series DOI: \texttt{10.5281/zenodo.17054050}
     Physics ceiling & \BISH{} + LPO & (P29, 35) \\
     Arithmetic + metadata & \BISH{} + MP & (P48, 51, 61) \\
     Function field Langlands & \BISH & (P69) \\
-    FLT & \BISH & (P68) \\
+    FLT & \WKL & (P68, P99) \\
     Hodge test (uniform) & WLPO & (P87) \\
     Hodge test (with CM) & \BISH & (P87) \\
     BSD detection (rank 0) & \BISH & (P96) \\
@@ -3642,15 +3643,15 @@ However, Fargues--Scholze does not achieve \BISH{} for free. It trades the analy
 
 \section{FLT vs.\ BSD: Why Their CRM Profiles Diverge}
 
-\textbf{The puzzle.} Both FLT and BSD concern elliptic curves over $\mathbb{Q}$, yet their CRM profiles are qualitatively different. FLT has an enormous \BISH{} core with a single contested node (\S\ref{sec:flt}); BSD is structurally \CLASS{} with classical content distributed across multiple components (\paperref{95--96}).
+\textbf{The puzzle.} Both FLT and BSD concern elliptic curves over $\mathbb{Q}$, yet their CRM profiles are qualitatively different. FLT has an enormous \BISH{} core with a single irreducible \WKL{} node (TW patching, \S\ref{sec:flt}); BSD is structurally \CLASS{} with classical content distributed across multiple components (\paperref{95--96}).
 
 \textbf{The explanation.}
 \begin{itemize}
-  \item \textbf{FLT} asserts \emph{non-existence}: the proof proceeds by contradiction (Ribet level-lowering to $N = 2$, no such form exists). The entire argument from Frey curve to contradiction routes through \'etale and crystalline realizations (\BISH), with potential \CLASS{} content concentrated at a single node---the dihedral base case via Hecke theta series (contested: see \S\ref{sec:flt}).
+  \item \textbf{FLT} asserts \emph{non-existence}: the proof proceeds by contradiction (Ribet level-lowering to $N = 2$, no such form exists). The argument from Frey curve to contradiction routes through \'etale and crystalline realizations (\BISH), with the sole non-constructive content in Taylor--Wiles patching (\WKL: inverse limit of finite local rings). The dihedral base case is \BISH{} (\paperref{99}).
   \item \textbf{BSD} asserts an \emph{equality}: $\mathrm{ord}_{s=1} L(E,s) = \mathrm{rk}\, E(\mathbb{Q})$. The $L$-function uses the Mellin transform at the Archimedean place. \CLASS{} content is \emph{distributed} across the analytic side (the $L$-function \emph{is} the Archimedean realization) and the Galois-cohomological side (Kolyvagin's Euler system requires Chebotarev density).
 \end{itemize}
 
-The structural difference: for FLT, the potential \CLASS{} content is \emph{concentrated in a single contested node} that \paperref{68} argues can be bypassed; for BSD, the \CLASS{} content is \emph{distributed and structural}. This explains why \paperref{96} found no bifurcation for BSD: there is no single node to excise.
+The structural difference: for FLT, the non-constructive content is \emph{concentrated in a single \WKL{} node} (TW patching); for BSD, the \CLASS{} content is \emph{distributed and structural}. This explains why \paperref{96} found no bifurcation for BSD: there is no single node to excise.
 
 
 \section{Hodge Bifurcation vs.\ BSD Rigidity}

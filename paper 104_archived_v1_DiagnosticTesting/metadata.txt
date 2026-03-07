@@ -1,0 +1,20 @@
+Title: The Diagnostic Penumbra: Constructive Reverse Mathematics of Bayesian Clinical Decision-Making — Paper 104 of the CRM Series
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: March 2026
+
+Description: Paper 104, Clinical Sub-Series Paper B, of the Constructive Reverse Mathematics Series. Identifies the Archimedean Escalation: the traditional diagnostic pipeline (integer risk scores, cohort prevalence, Mann-Whitney AUC) is 100% BISH, while the precision medicine pipeline (logistic regression, population prevalence, parametric ROC) drops to 70% BISH — isomorphic to the RCT pipeline (Paper 103). The 30% gap is the logical cost of replacing discrete heuristics with continuous models. The transcendental gate is the logistic link function: π = 1/(1+e^{-X}) is transcendental for rational X ≠ 0 (Lindemann-Weierstrass); Bayes' theorem (a rational Möbius transformation) preserves this transcendence; comparison with a rational threshold requires Markov's Principle. The empirical AUC (Mann-Whitney U statistic) is rational and BISH-decidable; only parametric (binormal) AUC requires LPO. Paper 103 proved the continuum is inescapable in RCTs; Paper 104 proves it is optional in diagnostics — and that precision medicine reintroduces it. Applied to: (1) ESC 0/1h high-sensitivity troponin algorithm (24.7% observe zone, Mueller validation cohort N = 7,998), (2) D-dimer for PE exclusion (collapsed penumbra), (3) PSA screening (degenerate penumbra). All results formalised in Lean 4 with Mathlib (10 module files, 1,141 lines, 0 sorries, 5 documentary axioms). This is the second paper in the CRM Clinical Sub-Series.
+
+Keywords: constructive reverse mathematics, diagnostic testing, Bayesian inference, ROC analysis, Mann-Whitney, treatment threshold, omniscience principles, Markov's principle, Lindemann-Weierstrass, logistic regression, troponin, D-dimer, PSA, precision medicine, Lean 4, formal verification
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related identifiers:
+- Paper 103: 10.5281/zenodo.18880102 (The Asymptotic Penumbra — structural twin)
+- Paper 98: 10.5281/zenodo.18902037 (The Motivic CRM Architecture — Archimedean Obstruction Thesis)
+- Format guide: 10.5281/zenodo.18765700
+
+Upload type: publication / preprint

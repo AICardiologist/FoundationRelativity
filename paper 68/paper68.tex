@@ -33,7 +33,7 @@
 \newtheorem{remark}[theorem]{Remark}
 
 % ---------- Lean repo link ----------
-\newcommand{\leanRepo}{\url{https://doi.org/10.5281/zenodo.18838541}}
+\newcommand{\leanRepo}{\url{https://doi.org/10.5281/zenodo.18901011}}
 
 % ---------- Notation ----------
 \newcommand{\N}{\mathbb{N}}
@@ -142,8 +142,8 @@
 \lstset{style=leanstyle}
 
 % ---------- Title and author ----------
-\title{Fermat's Last Theorem is $\BISH$:\\
-  A Constructive Reverse Mathematics Audit\\[6pt]
+\title{The Logical Cost of Fermat's Last Theorem:\\
+  A Constructive Reverse Mathematics Audit of Wiles's Proof\\[6pt]
   {\large (Paper~68, Constructive Reverse Mathematics Series)}}
 
 \author{Paul Chun-Kit Lee\thanks{Lean 4 formalization available at \leanRepo.} \\
@@ -174,12 +174,14 @@ The proof decomposes into five stages: residual modularity
 (Langlands--Tunnell), deformation ring construction, Hecke algebra
 construction, the numerical criterion, and Taylor--Wiles patching.
 
-Our principal finding is an \emph{asymmetry}: Stages~2--5 are
+Our principal finding is an \emph{asymmetry}: Stages~2--4 are
 fully constructive ($\BISH$), while Stage~1 requires $\WLPO$
-(Weak Limited Principle of Omniscience).  The non-constructive
-content of Wiles's proof is concentrated entirely at its entry
-point---the analytic theory of weight~1 automorphic forms---and
-the Taylor--Wiles engine contributes zero logical cost.
+(Weak Limited Principle of Omniscience) and Stage~5
+(Taylor--Wiles patching) requires $\WKL$
+(the inverse limit of finite local rings).
+The non-constructive content of Wiles's proof is concentrated
+at two points: the analytic theory of weight~1 automorphic forms
+(Stage~1) and the patching compactness argument (Stage~5).
 
 We then show that Stage~1 can be \emph{bypassed entirely}.
 The 21st-century proof route (Kisin 2009, Khare--Wintenberger
@@ -189,17 +191,20 @@ $p = 2$, reduces the base case to dihedral modularity
 (requiring only classical Poisson summation, not the trace formula)
 provide a $\BISH$ construction.
 The overall classification of Fermat's Last Theorem is therefore
-$\BISH$.  The $\WLPO$ was an artefact of Wiles's
-choice of residual prime, not a property of the theorem.
+$\WKL$: the $\WLPO$ was an artefact of Wiles's
+choice of residual prime, but the $\WKL$ in Taylor--Wiles
+patching (inverse limit of finite local rings) is irreducible.
 
-Two post-Wiles developments drive the Stage~5 classification:
-Brochard's proof of de~Smit's conjecture (2017), which eliminates
-the infinite inverse limit, and unconditional effective Chebotarev
-bounds (Lagarias--Montgomery--Odlyzko 1979, Ahn--Kwon 2019), which
-make the Taylor--Wiles prime search a bounded computation.  Neither
-result was motivated by constructive foundations; the community
-unknowingly eliminated the Fan Theorem from the proof of~FLT
-over twenty-two years.
+Two post-Wiles developments partially reduce the Stage~5
+classification: Brochard's proof of de~Smit's conjecture (2017),
+which reduces the freeness verification to finite level, and
+unconditional effective Chebotarev bounds
+(Lagarias--Montgomery--Odlyzko 1979, Ahn--Kwon 2019), which make
+the Taylor--Wiles prime search a bounded computation.
+The residual $\WKL$ is irreducible: Taylor--Wiles patching
+constructs $R_\infty$ as an inverse limit of finite local rings,
+which is equivalent to finding an infinite path in a finitely
+branching tree (Paper~98, Calibration Theorem~II).
 
 The Lean~4 verification (493 lines across three files,
 zero \texttt{sorry}) formalizes the logical
@@ -232,13 +237,15 @@ requires Faltings's Isogeny Theorem: $\CLASS$).
 We establish five results:
 
 \begin{description}[leftmargin=2em]
-\item[Theorem A] (Stage~5 is $\BISH$).
-The Taylor--Wiles patching argument, in the Brochard formulation, is
-a $\BISH$-decidable finite computation.  Brochard's finite-level
-criterion \cite{Brochard2017} eliminates the Fan Theorem;
-effective Chebotarev bounds \cite{LMO1979, AhnKwon2019} eliminate
-Markov's Principle.  The logical cost descends from
-$\MP + \FT$ (1995) to $\BISH$ (2017/2019).
+\item[Theorem A] (Stage~5 is $\WKL$).
+The Taylor--Wiles prime search is $\BISH$: effective Chebotarev
+bounds \cite{LMO1979, AhnKwon2019} eliminate Markov's Principle,
+and Brochard's finite-level criterion \cite{Brochard2017} reduces
+the freeness verification to level~$n = 2$.  However, the
+patching construction itself---forming $R_\infty$ as an
+inverse limit of finite local rings---requires $\WKL$
+(Paper~98, Calibration Theorem~II).  The logical cost descends
+from $\MP + \FT$ (1995) to $\WKL$ (2017/2019).
 
 \item[Theorem B] (Stages~2--4 are $\BISH$).
 The deformation ring (Schlessinger, Fontaine--Laffaille),
@@ -255,9 +262,9 @@ and the converse theorem for $\GL_3$ (Phragm\'en--Lindel\"of
 condition).
 
 \item[Theorem D] (Asymmetry Theorem).
-The overall classification of Wiles's proof is $\BISH + \WLPO$.
-The $\WLPO$ is localized entirely in Stage~1.  Removing Stage~1
-drops the classification to~$\BISH$.
+The overall classification of Wiles's proof is $\WLPO$
+(join of $\WLPO$ from Stage~1 and $\WKL$ from Stage~5).
+Removing Stage~1 drops the classification to~$\WKL$.
 
 \item[Theorem E] (The Dihedral Bypass).
 Stage~1 can be eliminated from the proof of Fermat's Last Theorem.
@@ -265,8 +272,9 @@ The 21st-century proof route replaces the residual prime $p = 3$
 (projective image~$S_4$, requiring the trace formula) with $p = 2$
 (projective image~$S_3 = D_3$, requiring only Hecke theta series
 and Poisson summation).  The resulting proof establishes Galois
-modularity in $\BISH$ throughout.
-Fermat's Last Theorem is~$\BISH$.
+modularity at~$\WKL$: the sole non-constructive node is
+Taylor--Wiles patching (inverse limit of finite local rings).
+$\CRM(\mathrm{FLT}) = \WKL$.
 \end{description}
 
 \subsection{Constructive Reverse Mathematics: a brief primer}
@@ -395,7 +403,7 @@ case.
 \section{Main Results}\label{sec:main}
 % ============================================================
 
-\subsection{Theorem A: Stage~5 is \texorpdfstring{$\BISH$}{BISH}}\label{sec:stage5}
+\subsection{Theorem A: Stage~5 is \texorpdfstring{$\WKL$}{WKL}}\label{sec:stage5}
 
 We classify Stage~5 first because the result is the most
 surprising: the heart of the Taylor--Wiles method is fully
@@ -430,9 +438,10 @@ single finite level ($n = 2$), without forming any infinite
 projective system.
 \end{corollary}
 
-The logical cost of Stage~5 compactness drops from $\FT$ to
-$\BISH$: the infinite inverse limit is replaced by a finite-level
-algebraic check.
+Brochard's criterion reduces the freeness verification to a
+finite-level algebraic check, eliminating the full Fan Theorem.
+The residual $\WKL$ is the inverse limit that constructs
+$R_\infty$ from compatible finite approximations.
 
 \subsubsection{Effective Chebotarev eliminates Markov's Principle}
 
@@ -467,21 +476,27 @@ $d_{L_2}^{12577}$ steps.
 \end{proof}
 
 \begin{theorem}[Stage~5 Classification]\label{thm:stage5}
-Stage~5 of Wiles's proof, in the Brochard formulation, is
-$\BISH$.  The compactness ($\FT$) is eliminated by
-Theorem~\ref{thm:brochard}; the prime search ($\MP$) is
-eliminated by Proposition~\ref{prop:tw}.
+Stage~5 of Wiles's proof is~$\WKL$.  The prime search ($\MP$)
+is eliminated by Proposition~\ref{prop:tw}; Brochard's criterion
+(Theorem~\ref{thm:brochard}) reduces the freeness verification to
+finite level.  However, the patching construction
+itself---forming $R_\infty$ as an inverse limit of finite
+local $\Z_p$-algebras---requires $\WKL$: it is equivalent to
+finding an infinite path in a finitely branching tree.
 \end{theorem}
 
 \begin{proof}
 Given axioms B1 (Brochard's criterion), B2 (effective Chebotarev),
-and B3 (discriminant computability), Stage~5 proceeds as:
+and B3 (discriminant computability), the \emph{search} component of
+Stage~5 proceeds as:
 (1)~compute the Chebotarev bound from $(N,p,\bar{\rho})$;
 (2)~search all primes up to the bound for TW conditions;
 (3)~construct patching data at level $n = 2$;
 (4)~apply Brochard's criterion to obtain freeness ($R \cong T$).
-All steps are finite, decidable computations.  No Fan Theorem
-(infinite inverse limit).  No Markov's Principle (unbounded search).
+Steps (1)--(4) are finite, decidable computations ($\BISH$).
+The residual $\WKL$ is in the patching \emph{assembly}: the
+inverse limit that constructs $R_\infty$ from compatible finite
+approximations (Paper~98, Calibration Theorem~II).
 \end{proof}
 
 \subsubsection{The historical de-omniscientizing descent}
@@ -495,15 +510,15 @@ All steps are finite, decidable computations.  No Fan Theorem
 Taylor--Wiles (original) & 1995 & $\MP + \FT$ \\
 Diamond (algebraic patching) & 1997 & $\MP + \FT$ \\
 Brochard (de Smit's conjecture) & 2017 & $\MP$ \\
-Brochard + effective Chebotarev & 2017/2019 & $\BISH$ \\
+Brochard + effective Chebotarev & 2017/2019 & $\WKL$ \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \medskip\noindent
 None of these refinements were motivated by constructive
-foundations.  The community eliminated the Fan Theorem and
-Markov's Principle from the proof of FLT without knowing it.
+foundations.  The community reduced the logical cost of the
+proof of FLT from $\MP + \FT$ to $\WKL$ without knowing it.
 
 
 \subsection{Theorem B: Stages~2--4 are \texorpdfstring{$\BISH$}{BISH}}\label{sec:alg}
@@ -735,10 +750,10 @@ becomes fully constructive ($\BISH$).
 \toprule
 \textbf{Result} & \textbf{Strength} & \textbf{Necessary?} & \textbf{Sufficient?} \\
 \midrule
-Theorem A (Stage~5 is $\BISH$) & $\BISH$ & Yes (from axioms) & Yes \\
+Theorem A (Stage~5 is $\WKL$) & $\WKL$ & Yes (from axioms) & Yes \\
 Theorem B (Stages~2--4 are $\BISH$) & $\BISH$ & Yes (from axioms) & Yes \\
 Theorem C (Stage~1 requires $\WLPO$) & $\WLPO$ & $\WLPO$ necessary & $\WLPO$ sufficient \\
-Theorem D (Asymmetry) & $\BISH + \WLPO$ & Yes (join) & Yes \\
+Theorem D (Asymmetry) & $\WLPO$ & Yes (join) & Yes \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -758,11 +773,14 @@ hypotheses---not by axiom checker output
 The central $\CRM$ phenomenon is a \emph{descent in logical
 strength} of the patching step:
 \[
-\underbrace{\MP + \FT}_{\text{1995: TW original}} \;\;\xrightarrow{\quad\text{Brochard + eff.\ Chebotarev}\quad}\;\; \underbrace{\BISH}_{\text{2017: no omniscience}}.
+\underbrace{\MP + \FT}_{\text{1995: TW original}} \;\;\xrightarrow{\quad\text{Brochard + eff.\ Chebotarev}\quad}\;\; \underbrace{\WKL}_{\text{2017: inverse limit only}}.
 \]
-The mechanism: Brochard's finite-level criterion replaces the
-infinite inverse limit (eliminating $\FT$), and effective Chebotarev
-bounds the prime search (eliminating $\MP$).
+The mechanism: effective Chebotarev bounds the prime search
+(eliminating $\MP$), and Brochard's finite-level criterion
+reduces the freeness verification.  The residual $\WKL$
+is the inverse limit itself: the patching construction
+$R_\infty = \varprojlim R_{Q_n}$ requires an infinite path
+in a finitely branching tree.
 
 Paper~50 \cite{Paper50} identified the de-omniscientizing descent
 pattern in the five great conjectures of arithmetic geometry.
@@ -804,7 +822,7 @@ with the following structure:
 \texttt{Paper68\_Axioms.lean} & 132 &
   Opaque types, axioms B1--B3, CRM hierarchy \\
 \texttt{Paper68\_Stage5.lean} & 178 &
-  Target~1: Stage~5 is $\BISH$ \\
+  Target~1: Stage~5 prime search is $\BISH$; patching is $\WKL$ \\
 \texttt{Paper68\_Asymmetry.lean} & 183 &
   Target~2: asymmetry theorem \\
 \midrule
@@ -1148,7 +1166,7 @@ automorphic forms.
 
 
 % ============================================================
-\section{The dihedral bypass: FLT is \texorpdfstring{$\BISH$}{BISH}}%
+\section{The dihedral bypass: \texorpdfstring{$\CRM(\mathrm{FLT}) = \WKL$}{CRM(FLT) = WKL}}%
 \label{sec:bypass}
 % ============================================================
 
@@ -1193,21 +1211,22 @@ theory.
 Kisin \cite{Kisin2009} proved a modularity lifting theorem for
 $2$-adic potentially Barsotti--Tate representations.  The proof
 uses the Taylor--Wiles--Kisin patching method, which we
-classified as~$\BISH$ in \S\ref{sec:stage5}, together with
+classified as~$\WKL$ in \S\ref{sec:stage5}, together with
 Kisin's classification of finite flat group schemes over
 $\Z_2$-extensions (commutative algebra: $\BISH$).
 Combined with the Khare--Wintenberger induction
 \cite{KhareWintenberger2009I, KhareWintenberger2009II}, this
 yields:
 
-\begin{theorem}[Kisin's $p = 2$ modularity lifting is $\BISH$]%
+\begin{theorem}[Kisin's $p = 2$ modularity lifting is $\WKL$]%
 \label{thm:kisin2}
 The modularity lifting theorem for $2$-adic Barsotti--Tate
-representations (Kisin \cite{Kisin2009}) is~$\BISH$.
+representations (Kisin \cite{Kisin2009}) is~$\WKL$.
 The proof uses finite flat group scheme classification
-(commutative algebra), Taylor--Wiles patching ($\BISH$,
+(commutative algebra: $\BISH$), Taylor--Wiles patching ($\WKL$,
 Theorem~A), and effective Chebotarev ($\BISH$).
-No analytic input from the trace formula is required.
+No analytic input from the trace formula is required.  The sole
+non-constructive node is the patching inverse limit.
 \end{theorem}
 
 \subsection{Completing the proof}
@@ -1240,22 +1259,25 @@ If $\bar{\rho}_{E,2}$ is reducible, apply a $2$--$3$ switch
 curve $E'/\Q$ with $E'[3] \cong E[3]$ and $E'[2]$ absolutely
 irreducible.  By Steps~1--3, $E'$ is modular.  Therefore
 $\bar{\rho}_{E,3}$ is modular, and Wiles's original $p = 3$
-modularity lifting theorem (Theorem~A, $\BISH$) yields
+modularity lifting theorem (Theorem~A, $\WKL$) yields
 modularity of~$E$.  The $2$--$3$ switch uses the geometry of
 the modular curve $X(3) \cong \mathbb{P}^1$ and the Hilbert
 irreducibility theorem (decidable: $\BISH$).
 
-\begin{theorem}[FLT is $\BISH$]%
-\label{thm:flt-bish}
-There exists a proof of Fermat's Last Theorem that is
-$\BISH$: the $p = 2$ dihedral bypass (Kisin \cite{Kisin2009},
-Khare--Wintenberger \cite{KhareWintenberger2009I}) replaces
-Stage~1 (Langlands--Tunnell, $\WLPO$) with the dihedral base
-case (Hecke theta series, $\BISH$).  The remaining stages are
-$\BISH$ by Theorems~A--B.  Therefore:
+\begin{theorem}[$\CRM(\mathrm{FLT}) = \WKL$]%
+\label{thm:flt-wkl}
+The proof of Fermat's Last Theorem via the $p = 2$ dihedral
+bypass (Kisin \cite{Kisin2009}, Khare--Wintenberger
+\cite{KhareWintenberger2009I}) replaces Stage~1
+(Langlands--Tunnell, $\WLPO$) with the dihedral base case
+(Hecke theta series, $\BISH$).  Stages~2--4 are $\BISH$ by
+Theorem~B.  Stage~5 (Taylor--Wiles patching) is $\WKL$ by
+Theorem~A.  Therefore:
 \[
-  \CRM(\mathrm{FLT}) \;=\; \BISH.
+  \CRM(\mathrm{FLT}) \;=\; \WKL.
 \]
+The $\WKL$ is irreducible: Taylor--Wiles patching is equivalent
+to $\WKL$ (Paper~98, Calibration Theorem~II).
 \end{theorem}
 
 \subsection{Why Wiles's proof costs $\WLPO$ and the modern
@@ -1272,9 +1294,9 @@ Residual prime & $p = 3$ & $p = 2$ \\
 Group $\GL_2(\F_p)$ & $S_4$ (octahedral) & $S_3$ (dihedral) \\
 Base case & Langlands--Tunnell & Hecke theta series \\
 CRM cost of base case & $\WLPO$ & $\BISH$ \\
-Lifting & Taylor--Wiles ($\BISH$) & Kisin ($\BISH$) \\
+Lifting & Taylor--Wiles ($\WKL$) & Kisin ($\WKL$) \\
 \midrule
-\textbf{Total} & $\BISH + \WLPO$ & $\BISH$ \\
+\textbf{Total} & $\WLPO$ & $\WKL$ \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1295,7 +1317,7 @@ algebraic construction sufficient.
   Does the $\BISH$ classification of patching survive for $\GL_n$?
   Barnet-Lamb--Gee--Geraghty \cite{BLGGT2014} extend the method to
   $\GL_n$; Calegari--Geraghty \cite{CalegariGeraghty2018} handle
-  non-self-dual representations.  If patching remains $\BISH$ in
+  non-self-dual representations.  If patching remains $\WKL$ in
   these settings, the entire Langlands program's non-constructive
   content would be concentrated in the automorphic input.
 
@@ -1322,31 +1344,33 @@ algebraic construction sufficient.
 We have applied constructive reverse mathematics to Fermat's
 Last Theorem and established two results:
 
-First, Wiles's 1995 proof is $\BISH + \WLPO$.  The $\WLPO$
-is localised entirely in Stage~1 (Langlands--Tunnell): the
-Taylor--Wiles engine and all algebraic machinery contribute
-zero logical cost.
+First, Wiles's 1995 proof is $\WLPO$ (join of $\WLPO$ from
+Stage~1 and $\WKL$ from Stage~5).  The $\WLPO$ is localised
+in Stage~1 (Langlands--Tunnell); the $\WKL$ is localised in
+Stage~5 (Taylor--Wiles patching).
 
 Second, the $\WLPO$ is eliminable.  The 21st-century proof
 route (Kisin 2009, Khare--Wintenberger 2009) replaces Wiles's
 $p = 3$ base case (octahedral, trace formula, $\WLPO$) with a
 $p = 2$ base case (dihedral, Hecke theta series, $\BISH$).
-The resulting proof is $\BISH$ throughout.
+The $\WKL$ in Taylor--Wiles patching is irreducible.
 
 \[
-  \boxed{\CRM(\mathrm{FLT}) \;=\; \BISH.}
+  \boxed{\CRM(\mathrm{FLT}) \;=\; \WKL.}
 \]
 
-Fermat's Last Theorem---a $\Pi^0_1$ sentence about natural
-numbers---has a constructive proof.  The $\WLPO$ in
-Wiles's original argument was the cost of a specific proof
-\emph{strategy} (the choice of $p = 3$), not a property of
-the \emph{theorem}.  Geometric modularity ($E \sim A_f$,
-requiring Faltings) remains~$\CLASS$, but FLT needs only Galois
-modularity ($\rho_{E,p} \cong \rho_{f,p}$).
-The CRM programme thesis---that logical
-cost is intrinsic to theorems, not to proofs---is confirmed:
-a true $\Pi^0_1$ sentence has a $\BISH$ proof, as expected.
+The sole non-constructive node in the proof of Fermat's Last
+Theorem is the inverse limit of finite local rings in
+Taylor--Wiles patching---a non-Archimedean compactness argument
+equivalent to $\WKL$ (Paper~98, Calibration Theorem~II).
+The $\WLPO$ in Wiles's original argument was the cost of a
+specific proof \emph{strategy} (the choice of $p = 3$), not a
+property of the \emph{theorem}.  Geometric modularity
+($E \sim A_f$, requiring Faltings) remains~$\CLASS$, but FLT
+needs only Galois modularity ($\rho_{E,p} \cong \rho_{f,p}$).
+Whether $\CRM(\mathrm{FLT}) = \BISH$---eliminating the $\WKL$
+patching node---remains open; it would require a modularity
+lifting theorem without inverse limits.
 
 The constructive content of the 21st-century proof was not
 recognised by its creators.  Kisin, Khare, and Wintenberger

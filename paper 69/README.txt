@@ -97,7 +97,7 @@ Number field comparison (from Paper 68):
 SERIES CONTEXT
 
 This is Paper 69 of the Constructive Reverse Mathematics series.
-Predecessor: Paper 68 (Fermat's Last Theorem is BISH)
+Predecessor: Paper 68 (The Logical Cost of Fermat's Last Theorem; CRM(FLT) = WKL)
 Successor:   Paper 70 (Synthesis: the logical cost of R)
 
 The series began with Paper 2 (bidual gap, WLPO) and progresses through

@@ -1,0 +1,710 @@
+\documentclass[11pt,a4paper]{article}
+
+% === Packages ===
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,calc}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{fancyvrb}
+\usepackage{listings}
+
+\geometry{margin=1in}
+\hypersetup{colorlinks=true,linkcolor=blue!70!black,citecolor=green!50!black,urlcolor=purple!70!black}
+
+% === Theorem environments ===
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+% === Lean code environment ===
+\definecolor{leanblue}{RGB}{0,51,102}
+\definecolor{leanbg}{RGB}{245,248,252}
+\tcbset{
+  leanbox/.style={colback=leanbg, colframe=leanblue!60,
+    fonttitle=\bfseries\ttfamily, title=#1,
+    boxrule=0.5pt, arc=2pt, left=4pt, right=4pt}
+}
+
+% === Macros ===
+\newcommand{\BISH}{\textsf{BISH}}
+\newcommand{\WKL}{\textsf{WKL}}
+\newcommand{\DC}{\textsf{DC}}
+\newcommand{\WLPO}{\textsf{WLPO}}
+\newcommand{\LLPO}{\textsf{LLPO}}
+\newcommand{\LPO}{\textsf{LPO}}
+\newcommand{\MP}{\textsf{MP}}
+\newcommand{\CLASS}{\textsf{CLASS}}
+\newcommand{\CRM}{\textsf{CRM}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{leanblue}\bfseries,
+  commentstyle=\color{gray},
+  breaklines=true,
+  frame=none,
+  columns=flexible,
+  keepspaces=true
+}
+
+% ============================================================
+\begin{document}
+
+\title{\textbf{The Diagnostic Penumbra:\\
+Constructive Reverse Mathematics of Bayesian Clinical Decision-Making}\\[6pt]
+\large Paper~104, Clinical Sub-Series Paper~B,\\
+of the Constructive Reverse Mathematics Series}
+
+\author{Paul Chun-Kit Lee\\
+\textit{New York University, Brooklyn, New York}\\
+\texttt{dr.paul.c.lee@gmail.com}}
+
+\date{March 2026}
+\maketitle
+
+% ============================================================
+\begin{abstract}
+The traditional diagnostic pipeline --- integer risk scores (Wells, HEART), cohort prevalence from finite studies, empirical ROC via Mann--Whitney --- is \textbf{100\% $\BISH$}.  Every quantity is rational, every comparison decidable, no omniscience principle invoked.  This paper proves that ``precision medicine'' upgrades --- logistic regression risk models, population prevalence estimates, parametric ROC curves --- introduce the same Archimedean obstruction identified in Paper~103.  The upgraded pipeline decomposes as $7\;\BISH + 1\;\BISH{+}\MP + 1\;\WKL + 1\;\LPO = 10$ stages (70\%~$\BISH$), isomorphic to the RCT statistical pipeline.
+
+The mechanism: logistic regression computes $\pi = (1 + e^{-X})^{-1}$ from rational patient covariates; by Lindemann--Weierstrass, $\pi$ is transcendental for $X \in \Q \setminus \{0\}$.  Bayes' theorem (a rational M\"obius transformation) preserves this transcendence, and comparison of the posterior with a rational treatment threshold requires Markov's Principle.  The empirical AUC --- the Mann--Whitney $U$ statistic (with tie correction), $U/(n_+ \cdot n_-) \in \Q$ --- is rational ($\BISH$); only smoothed continuous ROC curves (kernel density estimation) produce general integrals requiring $\LPO$.
+
+We call the 30\% gap between the traditional and precision pipelines the \emph{Archimedean Escalation}: the logical cost of replacing discrete heuristics with continuous models.  Paper~103 proved the continuum is \emph{inescapable} in the RCT pipeline.  Paper~104 proves it is \emph{optional} in diagnostics --- and that ``precision medicine'' \emph{reintroduces} it.  Integer risk scores are the Discrete Bypass: they keep the computation in~$\Q$ and CRM explains why they perform as well as logistic models.
+
+Applied to ESC 0/1h troponin (24.7\% observe zone, Mueller $N = 7{,}998$), D-dimer for PE (collapsed penumbra), and PSA screening (degenerate penumbra).  All results formalised in Lean~4 with Mathlib (10 files, 0 sorries, 5 documentary axioms).  This is the second paper in the CRM Clinical Sub-Series.
+\end{abstract}
+
+% ============================================================
+\section{Clinical Premise}\label{sec:premise}
+
+A cardiologist receives a 58-year-old man in the emergency department with acute chest pain.  The ECG is non-diagnostic.  The first high-sensitivity troponin result returns at 12~ng/L --- above the rule-out threshold of 5~ng/L but below the rule-in threshold of 52~ng/L.  The patient is in the \emph{observe zone}.
+
+Using the traditional pipeline, the clinician assigns a HEART score (integer, 0--10), looks up the corresponding risk category in a validation table, computes a cohort-derived posterior, and compares it with a rational treatment threshold.  Every quantity is rational.  Every comparison is decidable.  The observe zone persists --- 24.7\% of patients in the Mueller validation cohort~\cite{mueller2019} --- but it is a $\BISH$-decidable clinical uncertainty driven by biological overlap, not a logical obstruction.
+
+Now suppose the hospital upgrades to a ``precision'' risk calculator: a logistic regression model that replaces the integer score with $\pi = (1 + e^{-X})^{-1}$ for a rational linear combination~$X$ of patient covariates.  By the Lindemann--Weierstrass theorem, $\pi$ is transcendental for $X \neq 0$.  Bayes' theorem --- a rational M\"obius transformation --- preserves this transcendence.  The posterior is now a transcendental real, and its comparison with a rational treatment threshold requires Markov's Principle.  The same observe zone now carries a \emph{logical} obstruction on top of the biological one.
+
+Three questions arise:
+
+\begin{enumerate}[nosep]
+\item \textbf{What is the logical cost of the upgrade?}  The traditional pipeline is 100\% $\BISH$.  The precision pipeline drops to 70\% $\BISH$ --- the same signature as the RCT pipeline (Paper~103).  We call the 30\% gap the \emph{Archimedean Escalation}.
+
+\item \textbf{Is the escalation necessary?}  The 24.7\% observe zone exists in both pipelines.  It is biological (troponin release kinetics, prevalence overlap).  The precision pipeline does not resolve it --- it merely adds a logical penumbra on top.
+
+\item \textbf{Why do integer scores work as well as logistic models?}  Because they are the Discrete Bypass.  They keep the computation in~$\Q$, avoiding the transcendental gate entirely.  CRM explains a clinical observation that has been empirical until now.
+\end{enumerate}
+
+% ============================================================
+\section{Introduction}\label{sec:intro}
+
+\subsection{Main Results}
+
+\begin{theorem}[A: Archimedean Escalation]\label{thm:A}
+The traditional diagnostic pipeline (integer risk scores, cohort prevalence, empirical ROC, rational utilities) decomposes as $10/10$ stages $\BISH$ (100\%).  The precision medicine pipeline (logistic risk models, population prevalence, parametric ROC, continuous utilities) decomposes as $7\;\BISH + 1\;\BISH{+}\MP + 1\;\WKL + 1\;\LPO = 10$ stages (70\%~$\BISH$), isomorphic to the RCT statistical pipeline (Paper~103).  The three non-$\BISH$ stages enter through:
+\begin{enumerate}[nosep]
+\item logistic prevalence $\pi = (1+e^{-X})^{-1}$ (Lindemann--Weierstrass $\Rightarrow$ $\BISH + \MP$),
+\item smoothed continuous ROC (kernel-estimated AUC integral $\Rightarrow$ $\LPO$),
+\item continuous utility optimisation ($\Rightarrow$ $\WKL$).
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}[B: Bayesian MP Requirement]\label{thm:B}
+When the pre-test probability~$\pi$ is derived from a logistic risk model $\pi = (1 + e^{-X})^{-1}$ where $X \in \Q \setminus \{0\}$ is a rational linear combination of patient covariates, the prevalence~$\pi$ is transcendental (Lindemann--Weierstrass).  The posterior
+\[
+  P(D \mid +) = \frac{\mathrm{sens} \cdot \pi}{\mathrm{sens} \cdot \pi + (1 - \mathrm{spec})(1 - \pi)}
+\]
+--- a rational M\"obius transformation applied to a transcendental input.  Provided the test is neither completely insensitive ($\mathrm{sens} > 0$) nor perfectly pathognomonic ($\mathrm{spec} < 1$), this M\"obius transformation is non-constant and strictly preserves transcendence: the posterior is itself transcendental.  Comparing $P(D \mid +)$ with a rational threshold~$\tau$ requires $\BISH + \MP$.  This creates a perfect structural parallel with Paper~103:
+\begin{itemize}[nosep]
+\item \textbf{P103:} rational $z$-statistic $\;\xrightarrow{\Phi}\;$ transcendental $p$-value (Siegel--Shidlovskii)
+\item \textbf{P104:} rational covariates $\;\xrightarrow{e^{-X}}\;$ transcendental $\pi$ (Lindemann--Weierstrass) $\;\xrightarrow{\text{Bayes}}\;$ transcendental posterior
+\end{itemize}
+\end{theorem}
+
+\begin{theorem}[C: ROC Bifurcation]\label{thm:C}
+The empirical AUC of a diagnostic test equals the Mann--Whitney $U$ statistic (with the standard tie correction):
+\[
+  \widehat{\mathrm{AUC}} \;=\; \frac{U}{n_+ \cdot n_-} \;\in\; \Q, \qquad
+  U = \sum_{i=1}^{n_+} \sum_{j=1}^{n_-} \left(\mathbf{1}[X_i > Y_j] + \tfrac{1}{2}\,\mathbf{1}[X_i = Y_j]\right) \;\in\; \Q.
+\]
+Because $U$ is a sum of integers and half-integers, $U \in \Q$; divided by the integer $n_+ \cdot n_-$, the empirical AUC is strictly rational, and comparison of two empirical AUCs is $\BISH$-decidable.  Smoothed continuous ROC curves (e.g., via kernel density estimation) produce AUCs that are general Riemann integrals without closed-form algebraic comparison; comparing two such integrals requires $\LPO$.
+\end{theorem}
+
+\begin{theorem}[D: Discrete Bypass --- Integer Scores Are BISH]\label{thm:D}
+When the pre-test probability comes from an integer risk score (lookup table) and the prevalence from a finite cohort study, the \emph{entire} diagnostic chain --- from contingency table through Bayesian update through treatment decision through test comparison --- is $\BISH$:
+\[
+  \underbrace{\text{integer score}}_{\Q} \;\to\;
+  \underbrace{\pi_{\mathrm{cohort}}}_{\Q} \;\to\;
+  \underbrace{P(D\mid+)}_{\Q} \;\to\;
+  \underbrace{P(D\mid+) > \tau\,?}_{\BISH\text{-decidable}} \;\to\;
+  \underbrace{\widehat{\mathrm{AUC}}_1 > \widehat{\mathrm{AUC}}_2\,?}_{\BISH\text{-decidable}}.
+\]
+Medicine discovered empirically that integer scores perform nearly as well as logistic models.  CRM explains why: they keep the computation in~$\Q$, eliminating the transcendental gate entirely.  The observe zone persists (biological uncertainty) but is a $\BISH$-decidable clinical question, not a logical penumbra.
+\end{theorem}
+
+\subsection{CRM Primer}
+
+Constructive Reverse Mathematics classifies mathematical theorems by the weakest axiom system above $\BISH$ (Bishop's constructive mathematics) required to prove them.  The hierarchy
+\[
+  \BISH \;\subset\; \BISH{+}\MP \;\subset\; \BISH{+}\LLPO \;\subset\; \BISH{+}\WLPO \;\subset\; \BISH{+}\LPO \;\subset\; \CLASS
+\]
+measures \emph{logical cost}: how much omniscience is needed.  Papers~1--102 established that the logical cost of mathematics is the logical cost of~$\R$ --- the completeness and total ordering at the Archimedean place~\cite{lee-crm-p98}.  Paper~103~\cite{lee-crm-p103} opened the Clinical Sub-Series by applying CRM to the RCT statistical pipeline.  Paper~104 extends the framework to diagnostic testing.
+
+\subsection{Atlas Fit}
+
+Paper~103 proved the continuum is \emph{inescapable} in the RCT pipeline.  Paper~104 proves it is \emph{optional} in the diagnostic pipeline --- and that precision medicine reintroduces it.  Within the CRM atlas:
+\begin{itemize}[nosep]
+\item \textbf{P103 (tragedy):} The RCT pipeline \emph{must} pass through $\Phi(z)$ (Siegel--Shidlovskii).  The 70\% BISH signature is unavoidable.
+\item \textbf{P104 (vindication + warning):} The traditional diagnostic pipeline avoids the continuum entirely (100\% $\BISH$).  The precision pipeline reintroduces it via $\sigma(X) = (1+e^{-X})^{-1}$ (Lindemann--Weierstrass), recovering exactly the 70\% BISH signature.
+\end{itemize}
+The 70\% coincidence is structural: it reflects the universal cost of a single transcendental gate plus one bounded optimisation plus one universal comparison --- the minimal non-$\BISH$ apparatus for any empirical decision pipeline that invokes the continuum.
+
+% ============================================================
+\section{Preliminaries}\label{sec:prelim}
+
+\subsection{Omniscience Principles}
+
+We follow Bishop--Bridges~\cite{bishop-bridges} and Troelstra--van Dalen~\cite{troelstra-vandalen}.  A \emph{binary sequence} is a function $\alpha : \N \to \{0,1\}$.
+
+\begin{definition}[LPO]
+The \emph{Limited Principle of Omniscience}: for every binary sequence~$\alpha$, either $\exists\, n\,(\alpha(n)=1)$ or $\forall\, n\,(\alpha(n)=0)$.
+\end{definition}
+
+\begin{definition}[MP]
+\emph{Markov's Principle}: if $\lnot\forall\, n\,(\alpha(n)=0)$, then $\exists\, n\,(\alpha(n)=1)$.
+\end{definition}
+
+\begin{definition}[WLPO]
+The \emph{Weak Limited Principle of Omniscience}: for every~$\alpha$, either $\forall\, n\,(\alpha(n)=0)$ or $\lnot\forall\, n\,(\alpha(n)=0)$.
+\end{definition}
+
+\subsection{Decidability Hierarchy}
+
+\begin{itemize}[nosep]
+\item \textbf{Level~0 ($\BISH$):} Comparison of rationals $p, q \in \Q$ is decidable.
+\item \textbf{Level~1 ($\BISH + \MP$):} Comparison of a computable real with a rational, given a $\lnot\lnot$-witness, terminates by Markov's Principle.
+\item \textbf{Level~2 ($\LPO$):} Universal trichotomy on $\R$ is equivalent to LPO.
+\end{itemize}
+
+\subsection{Bayes' Theorem}
+
+For a diagnostic test with sensitivity $\mathrm{sens}$ and specificity $\mathrm{spec}$ applied to a population with disease prevalence~$\pi$:
+\begin{equation}\label{eq:bayes}
+  P(D \mid +) = \frac{\mathrm{sens} \cdot \pi}{\mathrm{sens} \cdot \pi + (1 - \mathrm{spec})(1 - \pi)}.
+\end{equation}
+When $\mathrm{sens}, \mathrm{spec}, \pi \in \Q$, the posterior $P(D\mid +) \in \Q$.  When $\pi \in \R \setminus \Q$, the posterior inherits real-valuedness.
+
+\subsection{Treatment Threshold}
+
+The Pauker--Kassirer threshold~\cite{pauker-kassirer1980} for a treat/no-treat decision:
+\begin{equation}\label{eq:threshold}
+  \tau = \frac{C_{\mathrm{Rx}}}{B_{\mathrm{Rx}} + C_{\mathrm{Rx}}}
+\end{equation}
+where $B_{\mathrm{Rx}}$ is the net benefit of treating true disease and $C_{\mathrm{Rx}}$ is the net cost of treating non-disease.  With rational utilities, $\tau \in \Q$.
+
+% ============================================================
+\section{Main Results}\label{sec:main}
+
+\subsection{The Contingency Table Is BISH}
+
+\begin{proposition}\label{prop:ct-bish}
+Every $2 \times 2$ contingency table $(TP, FP, FN, TN) \in \N^4$ produces rational test characteristics:
+\[
+  \mathrm{sens} = \frac{TP}{TP + FN} \in \Q, \quad
+  \mathrm{spec} = \frac{TN}{TN + FP} \in \Q, \quad
+  PPV = \frac{TP}{TP + FP} \in \Q, \quad
+  NPV = \frac{TN}{TN + FN} \in \Q.
+\]
+All comparisons of these quantities (``Is sensitivity $> 0.90$?'') are decidable in $\BISH$.
+\end{proposition}
+
+\begin{proof}
+Rational arithmetic is closed under division (with nonzero denominators).  Comparison of rationals is decidable by cross-multiplication.
+\end{proof}
+
+\subsection{The Bayesian Update: Rational vs Real}
+
+\begin{proof}[Proof of Theorem~B]
+We must first identify how clinical medicine generates a real-valued~$\pi$ from rational patient data.  The standard mechanism is multivariable logistic regression: a clinical risk score (e.g., HEART score~\cite{backus2013}, modified Wells score~\cite{wells2001}, TIMI risk index) produces a pre-test probability
+\[
+  \pi \;=\; \frac{1}{1 + e^{-X}}, \qquad X = \beta_0 + \beta_1 x_1 + \cdots + \beta_k x_k \in \Q
+\]
+where the $\beta_i$ are fitted coefficients and the $x_i$ are rational patient covariates (age, binary symptoms, integer lab values).  For non-zero $X \in \Q$, the Lindemann--Weierstrass theorem~\cite{baker1975} guarantees that $e^{-X}$ is transcendental.  Hence $\pi = (1 + e^{-X})^{-1}$ is transcendental.
+
+The Bayesian posterior $f(\pi) = \mathrm{sens} \cdot \pi / [\mathrm{sens} \cdot \pi + (1 - \mathrm{spec})(1-\pi)]$ is a M\"obius transformation (a rational function of degree~1) with rational coefficients.  A non-constant rational function preserves transcendence: if $\pi$ is transcendental and not a pole, then $f(\pi)$ is transcendental.  Hence the posterior is transcendental.
+
+Comparing a transcendental real with a rational threshold~$\tau$ requires either an explicit separation witness (constructive) or Markov's Principle to guarantee termination of the rational approximation (Bishop--Bridges~\cite{bishop-bridges}, \S2.3).  This creates a flawless structural parallel with Paper~103:
+\begin{itemize}[nosep]
+\item \textbf{P103:} $\Phi(z)$ is transcendental for algebraic~$z$ (Siegel--Shidlovskii).
+\item \textbf{P104:} $\pi = (1+e^{-X})^{-1}$ is transcendental for rational~$X$ (Lindemann--Weierstrass).
+\end{itemize}
+Both require $\BISH + \MP$ for comparison with a rational threshold.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~D]
+When $\pi = \pi_{\mathrm{cohort}} \in \Q$ (e.g., disease prevalence observed in a finite cohort study), the posterior $P(D\mid+) \in \Q$ by closure of $\Q$ under field operations.  Comparison with $\tau \in \Q$ is decidable by rational comparison.  No omniscience principle is invoked.
+\end{proof}
+
+\subsection{The Archimedean Escalation}
+
+\begin{proof}[Proof of Theorem~A]
+We enumerate the 10 stages of the diagnostic pipeline under both the traditional and precision implementations.
+
+\emph{Traditional pipeline.}  Integer risk score $\to$ lookup-table prevalence $\in \Q$ $\to$ Bayesian posterior $\in \Q$ $\to$ rational threshold comparison $\to$ Mann--Whitney AUC comparison $\in \Q$.  Every stage involves only rational arithmetic.  All 10 stages are $\BISH$.
+
+\emph{Precision pipeline.}  Logistic regression score $\to$ $\pi = (1+e^{-X})^{-1} \in \R \setminus \Q$ (Lindemann--Weierstrass) $\to$ transcendental posterior (M\"obius preservation) $\to$ real comparison with $\tau$ requires $\MP$ $\to$ parametric AUC integral requires $\LPO$ $\to$ continuous utility optimisation requires $\WKL$.  Seven stages remain $\BISH$; three escalate.  The decomposition $7 + 1 + 1 + 1 = 10$ (70\% $\BISH$) is isomorphic to Paper~103.
+
+The three escalation points correspond to the three interfaces where the discrete-to-continuum passage occurs:
+\begin{enumerate}[nosep]
+\item \emph{Prevalence generation:} $\Q \to \R$ via the logistic link function ($\BISH \to \BISH + \MP$).
+\item \emph{Test comparison:} discrete Mann--Whitney $\to$ smoothed continuous AUC ($\BISH \to \LPO$).
+\item \emph{Utility optimisation:} rational Pauker--Kassirer $\to$ continuous decision curve ($\BISH \to \WKL$).
+\end{enumerate}
+Each escalation replaces a $\BISH$-decidable rational operation with a real-valued analogue whose comparison requires an omniscience principle.
+\end{proof}
+
+\begin{remark}[The observe zone is biological, not logical]\label{rmk:biological}
+The ESC 0/1h observe zone (5--52~ng/L, 24.7\% of patients) exists in \emph{both} pipelines.  It is driven by troponin release kinetics and prevalence overlap, not by the transcendental gate.  With cohort data and integer risk scores, the question ``Is this patient's posterior above the treatment threshold?'' is $\BISH$-decidable.  The patient remains in the observe zone --- but the \emph{clinical} uncertainty is decidable; only the precision pipeline adds a \emph{logical} uncertainty on top.
+
+When the precision pipeline adds such a logical uncomputability band --- where the transcendental posterior cannot be constructively separated from the rational threshold without~$\MP$ --- we define this band as the \textbf{Diagnostic Penumbra}.  It is the logical residue of the Archimedean Escalation, present only in the precision pipeline, and entirely absent from the traditional one.
+\end{remark}
+
+\subsection{ROC Analysis: Mann--Whitney vs Smoothed}
+
+\begin{proof}[Proof of Theorem~C]
+The empirical ROC curve is a discrete step function: at each threshold~$c$, the false positive rate $\mathrm{FPR}(c) = \#\{Y_j > c\}/n_-$ and true positive rate $\mathrm{TPR}(c) = \#\{X_i > c\}/n_+$ are rationals.  The area under this step function equals the Mann--Whitney $U$ statistic~\cite{hanley-mcneil1982}, with the standard tie correction:
+\[
+  \widehat{\mathrm{AUC}} = \frac{U}{n_+ \cdot n_-}, \qquad U = \sum_{i=1}^{n_+}\sum_{j=1}^{n_-} \left(\mathbf{1}[X_i > Y_j] + \tfrac{1}{2}\,\mathbf{1}[X_i = Y_j]\right).
+\]
+In clinical data, ties are common (integer-valued biomarkers, discrete risk scores), so the half-integer correction is essential.  Since $U$ is a sum of integers and half-integers, $U \in \Q$; divided by $n_+ \cdot n_- \in \N$, the empirical AUC is rational.  Comparing $\widehat{\mathrm{AUC}}_1 > \widehat{\mathrm{AUC}}_2$ is rational comparison, decidable in $\BISH$.
+
+A potential trap: the binormal parametric AUC $\Phi(a/\sqrt{1+b^2})$ admits an accidental algebraic bypass, since $\Phi$ is strictly monotone and $a, b$ are computed from sample statistics, so comparing two binormal AUCs reduces to comparing two rational expressions.  However, smoothed continuous ROC curves (via kernel density estimation~\cite{pepe2003}) produce AUCs that are general Riemann integrals without closed-form algebraic comparison.  Comparing two such integrals is universal real comparison, equivalent to $\LPO$ (Bishop--Bridges~\cite{bishop-bridges}, \S2.3).
+
+The bifurcation is sharp: empirical AUC (Mann--Whitney) is $\BISH$; smoothed continuous AUC is $\LPO$.  The traditional pipeline uses the former; the precision pipeline the latter.
+\end{proof}
+
+\subsection{Treatment Threshold: Rational vs Continuous}
+
+When utilities are discrete and rational, the Pauker--Kassirer threshold~\eqref{eq:threshold} is rational and the decision is $\BISH$.  When utilities are defined over continuous outcome distributions (quality-adjusted life years, survival curves), the threshold becomes the root of an expected-utility equation over~$\R$, requiring at least $\WKL$ for bounded optimisation.
+
+\begin{remark}[Why $\WKL$ here but $\BISH$ for Cox MLE in P103]\label{rmk:wkl-defense}
+In Paper~103, the Cox partial-likelihood is strictly concave, so root-finding for its strictly monotone derivative is constructively computable in pure~$\BISH$.  Empirical decision curves and continuous utility functions are not generally strictly concave --- they may contain flat spots, non-convexities, and empirical noise.  Finding the global optimum of a general continuous function on a compact interval relies on the Extreme Value Theorem, which implies~$\WKL$~\cite{lee-crm-p50}.
+\end{remark}
+
+% ============================================================
+\section{Clinical Test Cases}\label{sec:clinical}
+
+\subsection{High-Sensitivity Troponin: ESC 0/1h Algorithm}
+
+The ESC 0/1h algorithm~\cite{collet-esc2020,mueller2019} for acute chest pain uses high-sensitivity cardiac troponin I (hs-cTnI, Abbott Architect) with thresholds:
+\begin{itemize}[nosep]
+\item \textbf{Rule-out:} hs-cTnI $< 5$~ng/L at presentation $\Rightarrow$ discharge (NPV $> 99\%$)
+\item \textbf{Rule-in:} hs-cTnI $\geq 52$~ng/L $\Rightarrow$ admit for invasive strategy (PPV $\approx 34\%$)
+\item \textbf{Observe:} 5--52~ng/L $\Rightarrow$ serial troponin at 1~hour, clinical reassessment
+\end{itemize}
+
+\paragraph{Mueller validation cohort.}  In the international validation study~\cite{mueller2019} ($N = 7{,}998$):
+\begin{itemize}[nosep]
+\item Rule-out: $n = 4{,}593$ (57.4\%), 30-day MACE: 14 (0.3\%)
+\item Observe: $n = 1{,}972$ (24.7\%), 30-day MACE: 141 (7.1\%)
+\item Rule-in: $n = 1{,}433$ (17.9\%), 30-day MACE: 484 (33.8\%)
+\end{itemize}
+
+The observe zone captures \textbf{24.7\% of all chest pain presentations} --- nearly 1 in 4 patients.  The event rate of 7.1\% sits within the typical treatment-threshold range for invasive investigation ($\tau \approx 5$--15\% depending on utilities).  This zone is \emph{biological} --- it exists in both the traditional and precision pipelines.  With cohort data, the comparison $7.1\% > \tau$ is rational and $\BISH$-decidable.  With logistic regression prevalence, the same comparison becomes transcendental and requires $\MP$.
+
+\paragraph{CRM analysis.}  The contingency table at the 52~ng/L threshold gives:
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+& MACE & No MACE \\
+\midrule
+hs-cTnI $\geq 52$ & 484 (TP) & 949 (FP) \\
+hs-cTnI $< 52$ & 155 (FN) & 6{,}410 (TN) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+All derived quantities are rational: sensitivity $= 484/639 \approx 75.7\%$, specificity $= 6{,}410/7{,}359 \approx 87.1\%$, PPV $= 484/1{,}433 \approx 33.8\%$.  These computations are $\BISH$.
+
+With the cohort prevalence $\pi = 639/7{,}998 \approx 8.0\%$, the Bayesian posterior for a positive test is $P(D\mid+) = 484/1{,}433 \approx 33.8\%$ (rational, $\BISH$-decidable).  This is the \emph{traditional pipeline}: integer threshold, cohort prevalence, rational posterior --- 100\% $\BISH$.  Upgrading to a logistic regression model for the pre-test probability converts $\pi$ to a transcendental real, and the same comparison with~$\tau$ requires $\BISH + \MP$ --- the precision pipeline.
+
+\subsection{D-dimer for Pulmonary Embolism}
+
+The D-dimer assay at the standard threshold of 500~ng/mL (FEU) has sensitivity~$\approx 95\%$ and specificity~$\approx 40\%$ for PE~\cite{dinisio2007}.  At low pretest probability ($\pi \approx 5\%$, Wells $\leq 4$), the posterior probability of PE given a negative D-dimer is $\approx 0.65\%$ --- well below any treatment threshold.  The decision to exclude PE is $\BISH$-decidable even with real prevalence, because the separation from the threshold is so large that any rational approximation suffices.
+
+Age-adjusted thresholds (age $\times 10$~ng/mL for patients $> 50$ years) reduce unnecessary imaging by approximately 30\%~\cite{righini2014} while maintaining the NPV above 97\%.
+
+The D-dimer case demonstrates a \emph{collapsed penumbra}: the test's high sensitivity creates such strong posterior separation from the treatment threshold that the grey zone effectively vanishes for the rule-out application.  The penumbra persists for intermediate pretest probabilities.
+
+\subsection{PSA Screening: The Degenerate Penumbra}
+
+Prostate-specific antigen (PSA) at the traditional threshold of 4.0~ng/mL has sensitivity~$\approx 27\%$ for all-grade prostate cancer and specificity~$\approx 85\%$~\cite{thompson2004}.  Assuming a baseline prevalence of~$\sim 20\%$ (the study population), Bayes' theorem yields theoretical posteriors:
+\[
+  P(\text{cancer} \mid \text{PSA} \geq 4) \approx 31\%, \qquad P(\text{cancer} \mid \text{PSA} < 4) \approx 17.7\%.
+\]
+The latter closely corroborates the Thompson PCPT trial's empirical finding that 15.2\% of men with ``normal'' PSA ($< 4.0$~ng/mL) actually harboured cancer --- the gap reflects the difference between the study's biopsy-confirmed subgroup rate and the theoretical posterior computed from the pooled contingency table.
+
+Both posteriors fall within the clinical grey zone for biopsy decisions (5--40\%).  The entire PSA range is a grey zone --- a \emph{degenerate penumbra} where no single threshold produces clean constructive separation.  This pathology motivated the shift from PSA-based decisions to risk calculators incorporating multiple variables.
+
+% ============================================================
+\section{CRM Audit}\label{sec:crm}
+
+\subsection{Dual Pipeline Classification}
+
+\begin{table}[ht]
+\centering
+\caption{CRM dual pipeline: traditional vs precision diagnostics}
+\label{tab:dual-pipeline}
+\begin{tabular}{clcc}
+\toprule
+Stage & Component & Traditional & Precision \\
+\midrule
+1 & Contingency table (count data) & $\BISH$ & $\BISH$ \\
+2 & Test characteristics (sens, spec, PPV, NPV) & $\BISH$ & $\BISH$ \\
+3 & Likelihood ratios & $\BISH$ & $\BISH$ \\
+4 & Pre-test probability (integer score / logistic) & $\BISH$ & $\BISH$ \\
+5 & Bayesian posterior (computation) & $\BISH$ & $\BISH$ \\
+6 & Treatment threshold (rational / continuous utilities) & $\BISH$ & $\WKL$ \\
+7 & Clinical decision (posterior vs threshold) & $\BISH$ & $\BISH + \MP$ \\
+8 & ROC AUC comparison (Mann--Whitney / smoothed) & $\BISH$ & $\LPO$ \\
+9 & Test comparison (discrete) & $\BISH$ & $\BISH$ \\
+10 & Net reclassification / decision curve & $\BISH$ & $\BISH$ \\
+\midrule
+& \textbf{Total} & \textbf{10/10 $\BISH$} & \textbf{7/10 $\BISH$} \\
+& \textbf{BISH fraction} & \textbf{100\%} & \textbf{70\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The 30\% gap between traditional (100\% $\BISH$) and precision (70\% $\BISH$) is the Archimedean Escalation.
+
+\subsection{Comparison with Paper~103}
+
+\begin{table}[ht]
+\centering
+\caption{Pipeline isomorphism: P103 (RCT) $\cong$ P104 precision diagnostics}
+\label{tab:comparison}
+\begin{tabular}{llll}
+\toprule
+Component & P103 mechanism & P104 precision mechanism & CRM \\
+\midrule
+Raw data & Sample statistics & Contingency table & $\BISH$ \\
+Transcendental gate & $\Phi(z)$ (Siegel--Shidlovskii) & $\sigma(X)$ logistic (Lindemann--Weierstrass) & $\BISH + \MP$ \\
+Optimisation & Cox MLE (strictly concave) & Utility threshold (non-concave) & $\WKL$ \\
+Universal comparison & Real $p$-value comparison & Smoothed ROC AUC integral & $\LPO$ \\
+BISH fraction & 70\% & 70\% & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The 70\% coincidence is not numerical accident.  It reflects the universal cost of a single transcendental gate ($\MP$), one bounded optimisation ($\WKL$), and one universal comparison ($\LPO$) --- the minimal non-$\BISH$ apparatus needed when an empirical decision pipeline invokes the continuum.
+
+\subsection{What Descends from Where to Where}
+
+The Archimedean Escalation is \emph{reversible}: every non-$\BISH$ stage in the precision pipeline has a $\BISH$ counterpart in the traditional pipeline.
+
+\begin{itemize}[nosep]
+\item $\BISH + \MP \to \BISH$: Logistic prevalence descends to $\BISH$ when replaced by an integer score lookup table. \emph{Excision:} replace $\pi = (1+e^{-X})^{-1}$ with $\pi = k/N$ from a validation cohort.
+\item $\LPO \to \BISH$: Smoothed continuous AUC descends to $\BISH$ when replaced by the Mann--Whitney $U$ statistic. \emph{Excision:} $\widehat{\mathrm{AUC}} = U/(n_+ \cdot n_-) \in \Q$.
+\item $\WKL \to \BISH$: Continuous utility optimisation descends to $\BISH$ when utilities are rational. \emph{Excision:} Pauker--Kassirer rational threshold $\tau = C_{\mathrm{Rx}}/(B_{\mathrm{Rx}} + C_{\mathrm{Rx}})$.
+\end{itemize}
+
+The traditional pipeline \emph{is} the result of performing all three excisions simultaneously.  Medicine discovered these excisions empirically; CRM reveals them as the Discrete Bypass.
+
+% ============================================================
+\section{Formal Verification}\label{sec:lean}
+
+\subsection{Lean 4 Bundle Structure}
+
+The formal verification comprises 10 module files:
+
+\begin{tcolorbox}[leanbox={P104\_DiagnosticTesting/ — Module Structure}]
+\begin{lstlisting}
+OmnisciencePrinciples.lean    -- LPO, WLPO, MP definitions and implications
+ContingencyTable.lean         -- 2x2 table, sens, spec, PPV, NPV
+BayesianInference.lean        -- Rational/real posterior, MP requirement
+ROCAnalysis.lean              -- AUC as integral, discrete bypass
+TreatmentThreshold.lean       -- Pauker-Kassirer, rational/continuous
+DiagnosticPenumbra.lean       -- Grey zone characterisation
+TroponinCalculations.lean     -- ESC 0/1h algorithm verification
+ClinicalTestCases.lean        -- D-dimer, PSA test cases
+CRMPipeline.lean              -- Pipeline classification table
+Paper104_Assembly.lean         -- Master theorem, axiom documentation
+\end{lstlisting}
+\end{tcolorbox}
+
+\subsection{Key Code Snippets}
+
+\paragraph{Bayesian posterior (rational).}
+
+\begin{tcolorbox}[leanbox={BayesianInference.lean — Discrete Bypass}]
+\begin{lstlisting}
+theorem discrete_bypass (sens spec pi_cohort tau : Q)
+    (h_pi_pos : 0 < pi_cohort) ... :
+    Decidable (bayesPosteriorRat sens spec pi_cohort ... > tau) :=
+  inferInstance
+\end{lstlisting}
+\end{tcolorbox}
+
+The proof is \texttt{inferInstance}: Lean's type class inference finds the \texttt{DecidableEq} instance for~$\Q$ automatically.  No axioms invoked.
+
+\paragraph{Dual pipeline classification.}
+
+\begin{tcolorbox}[leanbox={CRMPipeline.lean — Archimedean Escalation}]
+\begin{lstlisting}
+-- Traditional: 100% BISH
+theorem traditional_all_bish : traditionalBishStages.length = 10
+  := by native_decide
+-- Precision: 70% BISH (isomorphic to P103)
+theorem precision_bish_count : precisionBishStages.length = 7
+  := by native_decide
+-- The 30% gap
+theorem archimedean_escalation :
+    traditionalBishStages.length = 10 /\
+    precisionBishStages.length = 7 /\
+    traditionalBishStages.length - precisionBishStages.length = 3
+  := by refine <...> <;> native_decide
+\end{lstlisting}
+\end{tcolorbox}
+
+\paragraph{Troponin verification.}
+
+\begin{tcolorbox}[leanbox={TroponinCalculations.lean — Grey Zone Fraction}]
+\begin{lstlisting}
+theorem observe_zone_approx :
+    (1972 : Q) / 7998 > 24 / 100 /\ (1972 : Q) / 7998 < 25 / 100 := by
+  constructor <;> norm_num
+\end{lstlisting}
+\end{tcolorbox}
+
+\subsection{Axiom Inventory}
+
+\begin{table}[ht]
+\centering
+\caption{Documentary axioms in Paper~104}
+\label{tab:axioms}
+\begin{tabular}{lll}
+\toprule
+Axiom & Purpose & Reference \\
+\midrule
+\texttt{real\_posterior\_comparison\_requires\_MP} & Posterior comparison needs MP & Bishop--Bridges \S2.3 \\
+\texttt{auc\_comparison\_requires\_LPO} & AUC comparison needs LPO & Bishop--Bridges \S2.3 \\
+\texttt{continuous\_threshold\_exists} & Continuous $\tau^*$ existence & Pauker--Kassirer \\
+\texttt{continuous\_threshold\_requires\_WKL} & Continuous $\tau^*$ needs WKL & Paper~23 \\
+\texttt{logistic\_prevalence\_transcendental} & $\sigma(X)$ transcendental for $X \in \Q \setminus \{0\}$ & Lindemann--Weierstrass \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Classical.choice Audit}
+
+All theorems over~$\R$ show \texttt{Classical.choice} in \texttt{\#print axioms} --- this is Lean infrastructure (required for real number arithmetic in Mathlib), not classical mathematical content.  The constructive stratification is established by proof content: the main theorem \texttt{paper104\_main} uses only \texttt{inferInstance} (decidable instances), \texttt{norm\_num} (rational arithmetic), and \texttt{native\_decide} (finite enumeration).  No classical choice principle is invoked as mathematical content.
+
+% ============================================================
+\section{Discussion}\label{sec:discussion}
+
+\subsection{P103 vs P104: Tragedy vs Vindication}
+
+Paper~103 proved that the RCT statistical pipeline \emph{must} invoke the continuum: the normal CDF~$\Phi(z)$ is the only principled link between test statistics and $p$-values, and $\Phi(z)$ is transcendental for algebraic~$z$ (Siegel--Shidlovskii).  The 70\% $\BISH$ signature is the \emph{cost of doing science} --- inescapable.
+
+Paper~104 proves that the diagnostic pipeline is structurally different.  The traditional pipeline (integer scores, cohort prevalence, Mann--Whitney AUC) is 100\% $\BISH$.  The continuum enters only when clinicians \emph{choose} to invoke it --- through logistic regression, population prevalence estimates, or parametric ROC models.  The 70\% signature reappears, but as an \emph{optional} cost.
+
+The two papers are complementary:
+\begin{itemize}[nosep]
+\item \textbf{P103 (tragedy):} The continuum is inescapable in RCTs.  You \emph{must} pay 30\%.
+\item \textbf{P104 (vindication):} The continuum is optional in diagnostics.  You can stay in $\Q$ --- and medicine already does, via integer scores.
+\end{itemize}
+
+\subsection{Why Integer Scores Work: The Discrete Bypass Explained}
+
+A natural objection: ``We already have integer risk scores.  HEART (0--10), Wells (0--12.5 in half-integer steps), TIMI (0--7).  They give rational pre-test probabilities via lookup tables, not logistic regression.  What is new?''
+
+What is new is the \emph{explanation}.  Integer scores have been validated empirically --- meta-analyses show comparable discrimination to logistic models~\cite{backus2013,wells2001}.  But \emph{why} should a crude integer score compete with a sophisticated logistic model?  CRM provides the answer: the integer score keeps the computation in~$\Q$, so the \emph{entire} pipeline is $\BISH$-decidable.  The logistic model introduces a transcendental gate ($e^{-X}$, Lindemann--Weierstrass) that does not improve the decidability of the clinical question --- it only adds a logical penumbra on top of the biological one.
+
+The biological observe zone (troponin 5--52 ng/L) persists in both pipelines.  But with integer scores, the question ``Is this patient's posterior above the treatment threshold?'' has a definite rational answer.  With logistic regression, the same question becomes a transcendental comparison requiring $\MP$.
+
+\subsection{Precision Medicine as Archimedean Escalation}
+
+The trend in clinical medicine is toward ``precision'' risk assessment: replace integer scores with continuous logistic models, replace cohort prevalence with meta-analytic population estimates, replace Mann--Whitney AUC with smoothed continuous AUC, deploy neural network risk calculators that output continuous probabilities.
+
+CRM reveals the cost of each upgrade:
+\begin{enumerate}[nosep]
+\item \emph{Integer score $\to$ logistic regression:} $\BISH \to \BISH + \MP$ (Lindemann--Weierstrass gate).
+\item \emph{Mann--Whitney AUC $\to$ smoothed continuous AUC:} $\BISH \to \LPO$ (general integral comparison).
+\item \emph{Rational threshold $\to$ continuous decision curve:} $\BISH \to \WKL$ (unbounded optimisation).
+\end{enumerate}
+
+Each upgrade is defended on the grounds of ``more information'' or ``higher resolution.''  CRM does not dispute the statistical gains.  It reveals a hidden cost: the upgrade introduces omniscience principles that the traditional pipeline avoids entirely.  The 30\% Archimedean Escalation is the price of precision --- a price that the biological observe zone cannot offset, since the observe zone exists in both pipelines.
+
+Neural network risk calculators (deep learning for troponin trajectories~\cite{moons2012}) push further: they replace not just the logistic link but the entire model with a composition of continuous nonlinear functions.  The resulting posterior is even less constructively tractable.  The Archimedean Escalation compounds with model complexity.
+
+\subsection{Penumbra Typology}
+
+The three clinical test cases demonstrate three structurally distinct behaviours under the dual pipeline:
+
+\begin{enumerate}[nosep]
+\item \textbf{Troponin (ESC 0/1h):} Standard biological observe zone --- 24.7\% of patients.  Traditional pipeline: the observe zone is $\BISH$-decidable (cohort posterior vs rational threshold).  Precision pipeline: adds a logical penumbra (transcendental posterior vs rational threshold, requires $\MP$).
+\item \textbf{D-dimer:} Collapsed penumbra --- high sensitivity (95\%) creates strong posterior separation from the treatment threshold.  Even in the precision pipeline, the separation is so large that any rational approximation suffices.  The Archimedean Escalation is present in principle but clinically invisible.
+\item \textbf{PSA:} Degenerate penumbra --- sensitivity so low (27\%) that both posteriors ($\approx 31\%$ and $\approx 18\%$) sit in the biopsy grey zone (5--40\%).  The entire range is a grey zone.  Neither pipeline resolves it; the test itself lacks discriminative power.  No amount of logical refinement helps when the biology provides no separation.
+\end{enumerate}
+
+\subsection{The Rounding Paradox and the Illusion of Precision}
+
+A practical clinician might object: \emph{``If a logistic regression model outputs a transcendental probability like $12.3847\dots\%$, why can the clinician not simply round it to~12\%?  Rounding returns us to~$\Q$, and the problem disappears.''}
+
+The objection fails for a precise reason.  To round a computable real~$x$ to the nearest integer requires deciding, for each~$n \in \Z$, whether $x \ge n + \tfrac{1}{2}$ or $x < n + \tfrac{1}{2}$.  This is a real comparison --- exactly the operation that requires~$\MP$ (Theorem~B).  Algorithmic rounding does not escape the continuum; it \emph{presupposes} the very omniscience principle that the Discrete Bypass avoids.  The bypass works not because clinicians round a continuous output, but because integer scores never leave~$\Q$ in the first place.
+
+This observation has a surprising corollary: \emph{clinicians who use integer risk scores are already performing the Discrete Bypass}, and they have been criticised for it.  A generation of statisticians and guideline committees have admonished clinicians for ``dichotomising continuous variables'' and ``losing information'' by replacing logistic probabilities with integer scores~\cite{royston2006}.  CRM reverses the verdict.  The integer score is not a crude approximation of the logistic probability --- it is a \emph{computationally superior} representation that keeps the entire pipeline in~$\Q$.  The logistic model introduces transcendental noise (Lindemann--Weierstrass) without improving the decidability of the clinical question.
+
+The deepest consequence concerns electronic health record (EHR) algorithms and AI risk calculators.  When a clinician mentally rounds $12.3847\%$ to ``about~12\%,'' the clinician is performing an informal discrete bypass --- intuitively replacing a transcendental comparison with a rational one.  But when an EHR algorithm computes the same logistic probability and compares it with a pre-set alert threshold, no rounding occurs.  The algorithm performs the transcendental comparison directly, firing or suppressing the alert based on a binary split of a biologically indistinguishable continuum.
+
+This is the mechanism of \emph{algorithmic alert fatigue}.  The EHR forces a binary decision (alert vs no-alert) at a threshold that sits in the Diagnostic Penumbra --- the region where the transcendental posterior cannot be constructively separated from the rational threshold without~$\MP$.  Patients whose true risk differs by $0.01\%$ receive categorically different treatment recommendations.  The algorithm's ``precision'' is an illusion: it mistakes numerical resolution for logical decidability.
+
+Paper~103 showed that the continuum is inescapable in RCTs --- the logical cost of doing science.  Paper~104 shows that the continuum is \emph{optional} in diagnostics --- and that precision medicine, EHR algorithms, and AI risk calculators \emph{reintroduce it unnecessarily}.  The Archimedean Escalation is not merely a theoretical observation; it is a design critique of modern clinical decision support.
+
+% ============================================================
+\section{Conclusion}\label{sec:conclusion}
+
+Paper~103 proved the continuum is inescapable in the RCT pipeline.  Paper~104 proves it is optional in diagnostics.
+
+The traditional diagnostic pipeline --- integer risk scores, cohort prevalence, Mann--Whitney AUC --- is \textbf{100\% $\BISH$}.  Every quantity is rational, every comparison decidable.  The precision medicine pipeline --- logistic regression, population prevalence, parametric ROC --- drops to \textbf{70\% $\BISH$}, recovering exactly the CRM signature of the RCT pipeline (Paper~103).  The 30\% gap is the \emph{Archimedean Escalation}: the logical cost of replacing discrete heuristics with continuous models.
+
+Three consequences:
+\begin{enumerate}[nosep]
+\item \textbf{Integer scores are the Discrete Bypass.}  Medicine discovered empirically that bedside integer scores (Wells, HEART) perform nearly as well as logistic models.  CRM explains why: they keep the computation in~$\Q$, avoiding the transcendental gate entirely.
+\item \textbf{Precision medicine reintroduces the continuum.}  The push toward continuous risk calculators, neural network prognostic models, and parametric ROC analysis introduces omniscience principles ($\MP$, $\WKL$, $\LPO$) that the traditional pipeline avoids entirely.  The biological grey zone is not resolved --- only a logical grey zone is added on top.
+\item \textbf{The 70\% is structural.}  The coincidence between P103 (RCT) and P104 (precision diagnostics) reflects the universal cost of a single transcendental gate + bounded optimisation + universal comparison.  Any empirical decision pipeline that invokes the continuum pays this cost.
+\end{enumerate}
+
+The Clinical Sub-Series has now audited two independent clinical domains.  P103 is the tragedy --- the continuum is a necessary cost of scientific inference.  P104 is the vindication --- bedside medicine already knows how to avoid it.
+
+% ============================================================
+\section*{Acknowledgments}
+
+This paper was written with AI assistance (Anthropic Claude) for Lean~4 code generation, LaTeX formatting, and editorial review.  All mathematical content, clinical analysis, and CRM classifications are the author's.
+
+Portions of the Lean formalisation use Mathlib~\cite{mathlib}, the mathematical library for Lean~4.
+
+This paper follows the format guide for the CRM series~\cite{lee-format-guide}.
+
+% ============================================================
+\begin{thebibliography}{34}
+
+\bibitem{bishop-bridges}
+E.~Bishop and D.~Bridges, \emph{Constructive Analysis}, Springer, 1985.
+
+\bibitem{troelstra-vandalen}
+A.~S.~Troelstra and D.~van Dalen, \emph{Constructivism in Mathematics: An Introduction}, North-Holland, 1988.
+
+\bibitem{pauker-kassirer1980}
+S.~G.~Pauker and J.~P.~Kassirer, ``The threshold approach to clinical decision making,'' \emph{N.~Engl.~J.~Med.} \textbf{302} (1980), 1109--1117.
+
+\bibitem{fagan1975}
+T.~J.~Fagan, ``Letter: Nomogram for Bayes theorem,'' \emph{N.~Engl.~J.~Med.} \textbf{293} (1975), 257.
+
+\bibitem{pencina2008}
+M.~J.~Pencina, R.~B.~D'Agostino, R.~B.~D'Agostino~Jr, and R.~S.~Vasan, ``Evaluating the added predictive ability of a new marker: from area under the ROC curve to reclassification and beyond,'' \emph{Stat.~Med.} \textbf{27} (2008), 157--172.
+
+\bibitem{sox2013}
+H.~C.~Sox, M.~C.~Higgins, and D.~K.~Owens, \emph{Medical Decision Making}, 2nd ed., Wiley, 2013.
+
+\bibitem{apple2021}
+F.~S.~Apple et~al., ``Cardiac troponin assays: guide to understanding analytical characteristics and their impact on clinical care,'' \emph{Clin.~Chem.} \textbf{67} (2021), 136--148.
+
+\bibitem{collet-esc2020}
+J.-P.~Collet et~al., ``2020 ESC Guidelines for the management of acute coronary syndromes in patients presenting without persistent ST-segment elevation,'' \emph{Eur.~Heart~J.} \textbf{42} (2021), 1289--1367.
+
+\bibitem{mueller2019}
+C.~Mueller et~al., ``Multicenter evaluation of a 0-hour/1-hour algorithm in the diagnosis of myocardial infarction with high-sensitivity cardiac troponin~T,'' \emph{Ann.~Emerg.~Med.} \textbf{72} (2018), 654--665.
+
+\bibitem{reichlin2009}
+T.~Reichlin et~al., ``Early diagnosis of myocardial infarction with sensitive cardiac troponin assays,'' \emph{N.~Engl.~J.~Med.} \textbf{361} (2009), 858--867.
+
+\bibitem{dinisio2007}
+M.~Di~Nisio et~al., ``Diagnostic accuracy of D-dimer test for exclusion of venous thromboembolism: a systematic review,'' \emph{J.~Thromb.~Haemost.} \textbf{5} (2007), 296--304.
+
+\bibitem{righini2014}
+M.~Righini et~al., ``Age-adjusted D-dimer cutoff levels to rule out pulmonary embolism: the ADJUST-PE study,'' \emph{JAMA} \textbf{311} (2014), 1117--1124.
+
+\bibitem{thompson2004}
+I.~M.~Thompson et~al., ``Prevalence of prostate cancer among men with a prostate-specific antigen level $\leq$ 4.0~ng per milliliter,'' \emph{N.~Engl.~J.~Med.} \textbf{350} (2004), 2239--2246.
+
+\bibitem{mathlib}
+The Mathlib Community, \emph{Mathlib4}, \url{https://github.com/leanprover-community/mathlib4}, 2024.
+
+\bibitem{lee-format-guide}
+P.~C.~Lee, ``CRM series format guide,'' Zenodo, 2025.  DOI: 10.5281/zenodo.18765700.
+
+\bibitem{lee-crm-p98}
+P.~C.~Lee, ``The Motivic CRM Architecture,'' Paper~98 of the CRM Series, Zenodo, 2026.  DOI: 10.5281/zenodo.18902037.
+
+\bibitem{lee-crm-p103}
+P.~C.~Lee, ``The Asymptotic Penumbra: CRM of the RCT Statistical Pipeline,'' Paper~103 of the CRM Series, Zenodo, 2026.  DOI: 10.5281/zenodo.18880102.
+
+\bibitem{lee-crm-p50}
+P.~C.~Lee, ``The CRM Atlas,'' Paper~50 of the CRM Series, Zenodo, 2025.
+
+\bibitem{lee-crm-p102}
+P.~C.~Lee, ``Conservation Theorems for CRM,'' Paper~102 of the CRM Series, Zenodo, 2026.
+
+\bibitem{series}
+P.~C.~Lee, \emph{Constructive Reverse Mathematics Series}, Papers 1--103, Zenodo, 2024--2026.  \url{https://github.com/AICardiologist/FoundationRelativity}.
+
+\bibitem{bentkus2003}
+V.~Bentkus, ``On the dependence of the Berry--Esseen bound on dimension,'' \emph{J.~Statist.~Plann.~Inference} \textbf{113} (2003), 385--402.
+
+\bibitem{pepe2003}
+M.~S.~Pepe, \emph{The Statistical Evaluation of Medical Tests for Classification and Prediction}, Oxford University Press, 2003.
+
+\bibitem{zweig-campbell1993}
+M.~H.~Zweig and G.~Campbell, ``Receiver-operating characteristic (ROC) plots: a fundamental evaluation tool in clinical medicine,'' \emph{Clin.~Chem.} \textbf{39} (1993), 561--577.
+
+\bibitem{sackett2000}
+D.~L.~Sackett et~al., \emph{Evidence-Based Medicine: How to Practice and Teach EBM}, 2nd ed., Churchill Livingstone, 2000.
+
+\bibitem{altman-bland1994}
+D.~G.~Altman and J.~M.~Bland, ``Diagnostic tests~1: sensitivity and specificity,'' \emph{BMJ} \textbf{308} (1994), 1552.
+
+\bibitem{deeks-altman2004}
+J.~J.~Deeks and D.~G.~Altman, ``Diagnostic tests~4: likelihood ratios,'' \emph{BMJ} \textbf{329} (2004), 168--169.
+
+\bibitem{moons2012}
+K.~G.~M.~Moons et~al., ``Risk prediction models: I.\ Development, internal validation, and assessing the incremental value of a new (bio)marker,'' \emph{Heart} \textbf{98} (2012), 683--690.
+
+\bibitem{vickers2006}
+A.~J.~Vickers and E.~B.~Elkin, ``Decision curve analysis: a novel method for evaluating prediction models,'' \emph{Med.~Decis.~Making} \textbf{26} (2006), 565--574.
+
+\bibitem{baker1975}
+A.~Baker, \emph{Transcendental Number Theory}, Cambridge University Press, 1975.
+
+\bibitem{backus2013}
+B.~E.~Backus et~al., ``A prospective validation of the HEART score for chest pain patients at the emergency department,'' \emph{Int.~J.~Cardiol.} \textbf{168} (2013), 2153--2158.
+
+\bibitem{wells2001}
+P.~S.~Wells et~al., ``Excluding pulmonary embolism at the bedside without diagnostic imaging: management of patients with suspected pulmonary embolism presenting to the emergency department by using a simple clinical model and D-dimer,'' \emph{Ann.~Intern.~Med.} \textbf{135} (2001), 98--107.
+
+\bibitem{hanley-mcneil1982}
+J.~A.~Hanley and B.~J.~McNeil, ``The meaning and use of the area under a receiver operating characteristic (ROC) curve,'' \emph{Radiology} \textbf{143} (1982), 29--36.
+
+\bibitem{royston2006}
+P.~Royston, D.~G.~Altman, and W.~Sauerbrei, ``Dichotomizing continuous predictors in multiple regression: a bad idea,'' \emph{Statistics in Medicine} \textbf{25} (2006), 127--141.
+
+\end{thebibliography}
+
+\end{document}

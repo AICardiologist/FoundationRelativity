@@ -1,11 +1,11 @@
 Title:
-Fermat's Last Theorem is BISH: A Constructive Reverse Mathematics Audit (Paper 68, Constructive Reverse Mathematics Series)
+The Logical Cost of Fermat's Last Theorem: A Constructive Reverse Mathematics Audit of Wiles's Proof (Paper 68, Constructive Reverse Mathematics Series)
 
 Authors:
 Lee, Paul Chun-Kit (New York University)
 
 DOI:
-10.5281/zenodo.18838541
+10.5281/zenodo.18901011
 
 Publication Date:
 2026-03-02
@@ -14,7 +14,7 @@ Type:
 Software / Dataset (Lean 4 formalization + LaTeX paper)
 
 Version:
-5.0
+6.0
 
 License:
 Apache-2.0 (Lean 4 code) / CC-BY 4.0 (LaTeX paper and PDF)
@@ -24,22 +24,22 @@ Language:
 English
 
 Keywords:
-constructive reverse mathematics, Fermat's Last Theorem, Wiles's proof, BISH, Taylor-Wiles method, Lean 4, formal verification, WLPO, Fan Theorem, Markov's Principle, Brochard, effective Chebotarev, Langlands-Tunnell, Kisin, Khare-Wintenberger, dihedral modularity, omniscience principles, de-omniscientizing descent, Galois modularity, geometric modularity, Poisson summation
+constructive reverse mathematics, Fermat's Last Theorem, Wiles's proof, WKL, BISH, Taylor-Wiles method, Lean 4, formal verification, WLPO, Fan Theorem, Markov's Principle, Brochard, effective Chebotarev, Langlands-Tunnell, Kisin, Khare-Wintenberger, dihedral modularity, omniscience principles, de-omniscientizing descent, Galois modularity, geometric modularity, Poisson summation, inverse limit
 
 Abstract:
 We perform a stage-by-stage constructive reverse mathematics audit of Wiles's proof that the p-adic Galois representation rho_{E,p} attached to every semistable elliptic curve E/Q is modular (Galois modularity: rho_{E,p} isomorphic to rho_{f,p} for some eigenform f), and hence of Fermat's Last Theorem. Geometric modularity (that E is isogenous to A_f) additionally requires Faltings's Isogeny Theorem (CLASS); FLT does not need it, since Ribet's level-lowering operates on the residual representation.
 
-The proof decomposes into five stages: residual modularity (Langlands-Tunnell), deformation ring construction, Hecke algebra construction, the numerical criterion, and Taylor-Wiles patching. Our principal finding is an asymmetry: Stages 2-5 are fully constructive (BISH), while Stage 1 requires WLPO. The non-constructive content is concentrated entirely at the entry point -- the analytic theory of weight 1 automorphic forms -- and the Taylor-Wiles engine contributes zero logical cost.
+The proof decomposes into five stages: residual modularity (Langlands-Tunnell), deformation ring construction, Hecke algebra construction, the numerical criterion, and Taylor-Wiles patching. Our principal finding is an asymmetry: Stages 2-4 are fully constructive (BISH), while Stage 1 requires WLPO and Stage 5 (Taylor-Wiles patching) requires WKL (inverse limit of finite local rings).
 
-We then show that Stage 1 can be bypassed entirely. The 21st-century proof route (Kisin 2009, Khare-Wintenberger 2009), replacing Wiles's residual prime p=3 with p=2, reduces the base case to dihedral modularity (GL_2(F_2) = S_3), where Hecke theta series (requiring Poisson summation, constructively valid per Bishop 1967) provide a BISH construction. The overall classification of FLT is therefore BISH. The WLPO was an artefact of Wiles's choice of residual prime, not a property of the theorem.
+We then show that Stage 1 can be bypassed entirely. The 21st-century proof route (Kisin 2009, Khare-Wintenberger 2009), replacing Wiles's residual prime p=3 with p=2, reduces the base case to dihedral modularity (GL_2(F_2) = S_3), where Hecke theta series provide a BISH construction. The overall classification is CRM(FLT) = WKL. The WLPO was an artefact of Wiles's choice of residual prime; the WKL in patching is irreducible (Paper 98, Calibration Theorem II).
 
-Two post-Wiles developments drive the Stage 5 classification: Brochard's proof of de Smit's conjecture (2017), eliminating the infinite inverse limit, and unconditional effective Chebotarev bounds (Lagarias-Montgomery-Odlyzko 1979, Ahn-Kwon 2019), making the Taylor-Wiles prime search a bounded computation. The Lean 4 verification (493 lines, zero sorry) formalizes the logical assembly.
+Two post-Wiles developments partially reduce the Stage 5 classification: Brochard's proof of de Smit's conjecture (2017), reducing the freeness verification to finite level, and unconditional effective Chebotarev bounds (Lagarias-Montgomery-Odlyzko 1979, Ahn-Kwon 2019), making the TW prime search a bounded computation. The residual WKL is the inverse limit constructing R_infinity from compatible finite approximations. The Lean 4 verification (493 lines, zero sorry) formalizes the logical assembly.
 
-v5.0 changes: Deleted erroneous decidability descent (Section 7.1) and potential modularity route (Section 8.4) -- ACF/Tarski-Seidenberg decidability is per-instance, not universal over all levels/weights/fields. Clarified Galois vs geometric modularity throughout. Corrected Hecke theta series to acknowledge Poisson summation requirement.
+v6.0 changes: Corrected FLT classification from BISH to WKL. Taylor-Wiles patching (Stage 5) contains irreducible WKL content (inverse limit of finite local rings), identified by Paper 98 Calibration Theorem II and confirmed by Paper 99. TW prime search remains BISH; the WKL is strictly in the patching assembly.
 
 Related Identifiers:
-Part of: Constructive Reverse Mathematics Series (Papers 1-96)
-References: Paper 50 (Atlas Survey), Paper 59 (p-adic comparison), Paper 67 (Arithmetic Geometry Synthesis)
+Part of: Constructive Reverse Mathematics Series (Papers 1-100)
+References: Paper 50 (Atlas Survey), Paper 59 (p-adic comparison), Paper 67 (Arithmetic Geometry Synthesis), Paper 98 (Motivic CRM Architecture), Paper 99 (Hecke Theta Series Squeeze)
 
 Subjects:
 Mathematical Logic
@@ -67,7 +67,7 @@ P68_WilesFLT/lakefile.lean                       Lake build configuration
 P68_WilesFLT/lake-manifest.json                  Mathlib4 dependency lock
 P68_WilesFLT/Papers.lean                         Root import file
 P68_WilesFLT/Papers/P68_WilesFLT/Paper68_Axioms.lean       Shared axioms, CRM hierarchy (132 lines)
-P68_WilesFLT/Papers/P68_WilesFLT/Paper68_Stage5.lean       Target 1: Stage 5 is BISH (178 lines)
+P68_WilesFLT/Papers/P68_WilesFLT/Paper68_Stage5.lean       Target 1: Stage 5 prime search BISH; patching WKL (178 lines)
 P68_WilesFLT/Papers/P68_WilesFLT/Paper68_Asymmetry.lean    Target 2: Asymmetry Theorem (183 lines)
 
 Build Instructions:

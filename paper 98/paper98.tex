@@ -86,7 +86,7 @@ Logical Signatures, and How Motives Explain the Pattern}\\[6pt]
 \begin{document}
 \maketitle
 
-\noindent\textbf{DOI:} \href{https://doi.org/10.5281/zenodo.18828345}{10.5281/zenodo.18828345}
+\noindent\textbf{DOI:} \href{https://doi.org/10.5281/zenodo.18902037}{10.5281/zenodo.18902037}
 \begin{abstract}
 We formalize the observation that the six mathematical domains connected by the Langlands program---number theory, algebraic geometry, representation theory, harmonic analysis, topology, and mathematical physics---exhibit systematically different constructive reverse mathematics (CRM) signatures. We show that Grothendieck's theory of motives provides the structural explanation: the motive itself is $\BISH$ (Bishop-constructive), each realization functor has a definite CRM cost, and the comparison isomorphisms between realizations are $\CLASS$ (fully classical) if and only if they pass through the Archimedean place. This \emph{Archimedean Obstruction Thesis} transcends mere redescription by generating precise structural predictions---most notably, that function field arithmetic (lacking an Archimedean place) must be uniformly constructive. It further explains why algebra is constructive, analysis is classical, algebraic geometry bifurcates, and the Taylor--Wiles repair of Fermat's Last Theorem was a $\CLASS \to \WKL$ excision. We state three calibration theorems (Hodge detection $\leftrightarrow$ $\WLPO$; TW patching $\leftrightarrow$ $\WKL$; BSD rank/$\Sha$ decoupling) and a signature preservation theorem for the Langlands correspondence. A companion 0-\texttt{sorry} Lean~4 formalization mechanically verifies the core logical framework, representing the geometric functors as axiomatic stubs. This paper synthesizes the findings of Papers~50--97 in the CRM program. A companion monograph (\emph{The Logical Cost of Everything}) provides a book-length accessible exposition of the full program.
 \end{abstract}
@@ -1154,7 +1154,7 @@ Not all targets in Table~\ref{tab:opportunities} are equally feasible. We classi
 
 \item \textbf{Iwasawa Main Conjecture via Kato.} The algebraic K-theory zeta elements and $p$-adic regulator avoid complex $L$-values entirely. The $\WKL$ node (cyclotomic inverse limit) matches the Conservation Conjecture prediction. Clean target for the CAS $\to$ Lean pipeline.
 
-\item \textbf{The Hecke theta series resolution.} The sharpest open problem within the existing program. Paper~68 classifies $\CRM(\mathrm{FLT}) = \BISH$ via the Kisin $p = 2$ dihedral bypass. The contested node---whether Hecke theta series require Poisson summation ($\CLASS$) or can be defined via the $q$-expansion principle on $Y_0(N)$ as a scheme ($\BISH$)---is resolvable by formal methods (Katz, Deligne--Rapoport). Either outcome is a theorem.
+\item \textbf{The Hecke theta series resolution.} The sharpest open problem within the existing program. Paper~68 classifies $\CRM(\mathrm{FLT}) = \WKL$ (Taylor--Wiles patching: inverse limit of finite local rings). Paper~99 resolved the dihedral base case: three CLASS$\to$BISH excisions (Poisson$\to$Mumford, Deligne--Serre$\to$forward matching, Chebotarev$\to$effective bounds) confirm the base case is $\BISH$. The irreducible $\WKL$ is in the patching assembly, not the base case.
 \end{enumerate}
 
 \subsection{Technically bottlenecked (sound logic, missing infrastructure)}

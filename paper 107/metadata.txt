@@ -1,0 +1,28 @@
+Title: The Condensed GAGA Conjecture: A Proof-Theoretic Pre-Registration for the Clausen-Scholze Analytic Geometry Program — Paper 107 of the Constructive Reverse Mathematics Series
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: New York University, Brooklyn, New York
+
+Date: March 2026
+
+Description:
+First predictive conjecture of the CRM program. The Archimedean Obstruction Thesis (Paper 98) asserts that classical logic enters arithmetic geometry exclusively through Betti realization. Paper 106 identified GAGA descent (Montel's theorem) as the unique CLASS component of the regular holonomic Riemann-Hilbert correspondence.
+
+This paper conjectures that the Clausen-Scholze condensed reformulation of Serre's GAGA theorem eliminates Montel's theorem, replacing topological compactness with homological exactness of liquid modules, reducing CRM cost from CLASS to at most BISH + WKL + WLPO (which equals LPO). If correct, the overall CRM cost of the RH correspondence drops from CLASS to LPO, with Deligne's canonical extension (floor function on R, equivalent to LPO by Bridges-Richman 1987) as the sole non-constructive bottleneck.
+
+Three results: (A) The condensed GAGA deflation conjecture; (B) the Riemann-Hilbert descent corollary; (C) the falsifiability wager making the Archimedean Obstruction Thesis strictly testable. Lean 4 formalization (2 files, 0 sorry) implements the prediction as an axiomatic API contract.
+
+Keywords: constructive reverse mathematics, GAGA theorem, condensed mathematics, liquid modules, Riemann-Hilbert correspondence, Montel's theorem, Archimedean Obstruction Thesis, Lean 4, proof-theoretic prediction
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related identifiers:
+- Paper 106: CRM Audit of the Riemann-Hilbert Correspondence
+- Paper 98: The Motivic CRM Architecture (DOI: 10.5281/zenodo.18902037)
+- Paper 99: The Hecke Theta Series Squeeze (DOI: 10.5281/zenodo.18821004)
+- Paper 1: The Logical Cost of the Real Number Line (DOI: 10.5281/zenodo.14538951)
+- CRM Series Paper Format Guide (DOI: 10.5281/zenodo.18765700)
+
+Upload type: publication
+Publication type: article

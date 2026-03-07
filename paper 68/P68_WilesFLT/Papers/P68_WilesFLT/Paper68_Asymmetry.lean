@@ -52,21 +52,22 @@ def stage3_class : CRMLevel := CRMLevel.BISH
     Reference: Rubin (1991); Ahn–Kwon (2019). -/
 def stage4_cm_class : CRMLevel := CRMLevel.BISH
 
-/-- Stage 5 (Taylor–Wiles patching): BISH.
-    Proven in Paper68_Stage5.lean (Target 1).
-    Brochard (2017) eliminates Fan Theorem; effective Chebotarev
-    eliminates Markov's Principle.
-    Reference: Brochard (2017); Lagarias–Montgomery–Odlyzko (1979). -/
-def stage5_class : CRMLevel := CRMLevel.BISH
+/-- Stage 5 (Taylor–Wiles patching): WKL.
+    TW prime search is BISH (Paper68_Stage5.lean).
+    Brochard (2017) reduces freeness to finite level; effective Chebotarev
+    eliminates Markov's Principle. The inverse limit constructing R_∞
+    from compatible finite approximations requires WKL.
+    Reference: Paper 98, Calibration Theorem II. -/
+def stage5_class : CRMLevel := CRMLevel.WKL
 
 -- ============================================================
 -- § 2. Join of Stages 2–5 is BISH
 -- ============================================================
 
-/-- Helper: join of four BISH levels is BISH. -/
+/-- Helper: join of Stages 2–5 is WKL (Stage 5 contributes WKL). -/
 theorem stages_2_to_5_join :
     join stage2_class (join stage3_class (join stage4_cm_class stage5_class))
-    = CRMLevel.BISH := by
+    = CRMLevel.WKL := by
   simp [stage2_class, stage3_class, stage4_cm_class, stage5_class, join]
 
 -- ============================================================
@@ -90,23 +91,23 @@ theorem wiles_proof_classification :
         stage4_cm_class, stage5_class, join]
 
 /-- Theorem (WLPO localization).
-    Removing Stage 1 drops the classification to BISH.
+    Removing Stage 1 drops the classification to WKL.
     This is the second part of Theorem 6.1. -/
 theorem wlpo_localisation :
-    wiles_without_stage1 = CRMLevel.BISH := by
+    wiles_without_stage1 = CRMLevel.WKL := by
   simp [wiles_without_stage1, stage2_class, stage3_class,
         stage4_cm_class, stage5_class, join]
 
 /-- The Asymmetry Theorem (Theorem 6.1 in the paper).
-    The non-constructive content of Wiles's proof is
-    entirely in Stage 1 (Langlands–Tunnell).
+    The non-constructive content of Wiles's proof has two sources:
+    Stage 1 (Langlands–Tunnell, WLPO) and Stage 5 (patching, WKL).
 
-    - Overall classification: BISH + WLPO
-    - Without Stage 1: BISH
-    - Localization: the WLPO cost comes solely from Stage 1. -/
+    - Overall classification: WLPO (join of WLPO and WKL)
+    - Without Stage 1: WKL (from patching)
+    - The WLPO comes solely from Stage 1; the WKL solely from Stage 5. -/
 theorem asymmetry_theorem :
     wiles_overall = CRMLevel.WLPO ∧
-    wiles_without_stage1 = CRMLevel.BISH :=
+    wiles_without_stage1 = CRMLevel.WKL :=
   ⟨wiles_proof_classification, wlpo_localisation⟩
 
 -- ============================================================
@@ -119,19 +120,20 @@ theorem asymmetry_theorem :
 theorem flt_logical_cost : wiles_overall = CRMLevel.WLPO :=
   wiles_proof_classification
 
-/-- Corollary (The engine is constructive).
+/-- Corollary (The engine is WKL).
     The Taylor–Wiles patching method—the central proof technology
-    of the Langlands program for GL₂/ℚ—contributes zero logical
-    cost beyond BISH. -/
-theorem tw_engine_is_bish : stage5_class = CRMLevel.BISH := rfl
+    of the Langlands program for GL₂/ℚ—contributes WKL
+    (inverse limit of finite local rings). The prime search
+    component is BISH; the compactness is irreducible. -/
+theorem tw_engine_is_wkl : stage5_class = CRMLevel.WKL := rfl
 
-/-- Corollary (Algebraic weight-1 modularity implies constructive FLT).
+/-- Corollary (Algebraic weight-1 modularity implies WKL FLT).
     If Stage 1 is replaced by a BISH proof of residual modularity,
-    the entire proof becomes BISH. -/
-theorem algebraic_lt_implies_bish_flt
+    the entire proof becomes WKL (from Stage 5 patching). -/
+theorem algebraic_lt_implies_wkl_flt
   (alt_stage1 : CRMLevel) (h : alt_stage1 = CRMLevel.BISH) :
   join alt_stage1 (join stage2_class (join stage3_class (join stage4_cm_class stage5_class)))
-    = CRMLevel.BISH := by
+    = CRMLevel.WKL := by
   subst h
   simp [stage2_class, stage3_class, stage4_cm_class, stage5_class, join]
 
@@ -143,15 +145,14 @@ theorem algebraic_lt_implies_bish_flt
 theorem stage1_above_bish : stage1_class ≠ CRMLevel.BISH := by
   simp [stage1_class]
 
-/-- Stage 1 is the unique source of non-BISH content. -/
-theorem stage1_unique_source :
-    stage1_class ≠ CRMLevel.BISH ∧
+/-- Stage 1 is the unique source of WLPO; Stage 5 is the unique source of WKL. -/
+theorem stage_classification_summary :
+    stage1_class = CRMLevel.WLPO ∧
     stage2_class = CRMLevel.BISH ∧
     stage3_class = CRMLevel.BISH ∧
     stage4_cm_class = CRMLevel.BISH ∧
-    stage5_class = CRMLevel.BISH := by
-  refine ⟨?_, rfl, rfl, rfl, rfl⟩
-  simp [stage1_class]
+    stage5_class = CRMLevel.WKL := by
+  exact ⟨rfl, rfl, rfl, rfl, rfl⟩
 
 -- ============================================================
 -- § 6. Summary
@@ -177,7 +178,7 @@ All axiomatized deep theorems with references:
 ## File Statistics
 
 - Paper68_Axioms.lean: opaque types, axioms B1–B3, CRM hierarchy
-- Paper68_Stage5.lean: Target 1 (Stage 5 is BISH)
+- Paper68_Stage5.lean: Target 1 (Stage 5 prime search is BISH; overall WKL)
 - Paper68_Asymmetry.lean: Target 2 (asymmetry theorem)
 - sorry count: 0
 -/

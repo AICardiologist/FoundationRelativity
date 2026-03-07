@@ -1,7 +1,7 @@
 # Constructive Reverse Mathematics Series — Programme Roadmap
 
 **Author:** Paul Chun-Kit Lee
-**Last updated:** 2026-03-05 (103 papers; Papers 77–102 — seventeen CRMLint applications + synthesis monograph + Markman audit + structural vanishing + CY3 + BSD + motivic architecture + FLT audit + K3 Hodge capstone + Berkovich motivic audit + conservation theorems; Paper 103 — first Clinical Sub-Series paper)
+**Last updated:** 2026-03-06 (104 papers; Papers 77–102 — seventeen CRMLint applications + synthesis monograph + Markman audit + structural vanishing + CY3 + BSD + motivic architecture + FLT audit + K3 Hodge capstone + Berkovich motivic audit + conservation theorems; Paper 103 — first Clinical Sub-Series paper; Paper 106 — CRM audit of Riemann-Hilbert, eighteenth CRMLint application)
 **For:** Writing team, Lean agents, editorial collaborators
 
 ---
@@ -24,6 +24,19 @@ BISH  ⊂  BISH + MP  ⊂  BISH + LLPO  ⊂  BISH + WLPO  ⊂  BISH + LPO  ⊂  
 - **MP** (Markov's Principle): unbounded search that cannot fail to terminate, terminates.
 - **WLPO**: decide whether a real number equals zero.
 - **LPO**: decide whether a binary sequence contains a 1.
+
+### Abbreviation Glossary (agents frequently get these wrong)
+
+- **DPT** = Decidable Polarized Tannakian (Paper 50, §1). NOT "Decidability of Pure Trace."
+- **GAGA** = Géométrie Algébrique et Géométrie Analytique (Serre 1956).
+- **AOT** = Archimedean Obstruction Thesis (Paper 98).
+- **CBN** = Classical Boundary Node.
+- **VHC** = Variational Hodge Conjecture.
+- **LLC** = Local Langlands Correspondence.
+- **LTE** = Liquid Tensor Experiment (Scholze).
+- **FLT** = Fermat's Last Theorem (not Fermat's Little Theorem).
+- **CRM** = Constructive Reverse Mathematics.
+- **MT** = Mumford-Tate (group).
 
 ---
 
@@ -223,7 +236,7 @@ All editorial items for Papers 66–70 have been completed:
 8. **Intermediate axiom sets** — natural axiom systems strictly between BISH and LPO for partial cycle-search decidability?
 9. **Function field characterization** — does Paper 72's characterization extend to function fields with modifications to Axiom 3?
 
-Papers 77–101 complete. The diagnostic programme (Papers 1–75) is closed. Papers 76–96 constitute the generative phase: automated logical cost analysis (Paper 76) and automated constructivisation via the CRMLint Squeeze (Papers 77–96). The function-field arc (Papers 80–83) is closed. The abelian/hyperelliptic Hodge arc (Papers 84–93) is closed. The CY3 frontier (Paper 94) and BSD arc (Papers 95–96) are closed. Paper 97 is an internal null-finding note (BSD landscape survey). Paper 98 establishes the motivic CRM architecture: Archimedean Obstruction Thesis, three calibration theorems, companion monograph. **Paper 99 closes the FLT audit:** CRM(FLT) = WKL via three CLASS→BISH excisions in the dihedral base case, validating Paper 98's predictions empirically. **Paper 100 closes the K3 Hodge campaign** with the Kuga-Satake bifurcation at ρ=20. **Paper 101 deploys CRMLint against Scholze's Berkovich motives proof of independence of ℓ**: 214 alerts, signature WKL, parasitic WLPO excision demonstrated, Archimedean dark matter discovered and patched. Methodology appendix establishes the scan-map-classify-search-verify loop with motivic descent as the paradigmatic Step 4.
+Papers 77–101 complete. The diagnostic programme (Papers 1–75) is closed. Papers 76–96 constitute the generative phase: automated logical cost analysis (Paper 76) and automated constructivisation via the CRMLint Squeeze (Papers 77–96). The function-field arc (Papers 80–83) is closed. The abelian/hyperelliptic Hodge arc (Papers 84–93) is closed. The CY3 frontier (Paper 94) and BSD arc (Papers 95–96) are closed. Paper 97 is an internal null-finding note (BSD landscape survey). Paper 98 establishes the motivic CRM architecture: Archimedean Obstruction Thesis, three calibration theorems, companion monograph. **Paper 99 closes the FLT audit:** CRM(FLT) = WKL via three CLASS→BISH excisions in the dihedral base case, validating Paper 98's predictions empirically. **Paper 100 closes the K3 Hodge campaign** with the Kuga-Satake bifurcation at ρ=20. **Paper 101 deploys CRMLint against Scholze's Berkovich motives proof of independence of ℓ**: 214 alerts, signature WKL, parasitic WLPO excision demonstrated, Archimedean dark matter discovered and patched. Methodology appendix establishes the scan-map-classify-search-verify loop with motivic descent as the paradigmatic Step 4. **Paper 106 audits the regular holonomic Riemann-Hilbert correspondence** (Deligne 1970, Kashiwara 1984, Mebkhout 1980): 10 BISH + 4 WLPO + 1 LPO + 1 CLASS = 16 components (62.5% constructive). Eighteenth CRMLint application. Deligne's canonical extension = LPO (floor function); GAGA descent = sole CLASS (Montel). Validates AOT on the prototypical Betti realization functor. ∞-categorical machinery (Lurie) is logically inert; Scholze's condensed avoidance explained by CRM. 404 lines Lean, 0 sorry.
 
 ---
 

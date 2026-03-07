@@ -1,32 +1,34 @@
-# Paper 68: Fermat's Last Theorem is BISH
+# Paper 68: The Logical Cost of Fermat's Last Theorem
 
 A Constructive Reverse Mathematics Audit
 (Paper 68, Constructive Reverse Mathematics Series)
 
 Author: Paul Chun-Kit Lee, New York University
-Date: March 2026 (v5.0)
-DOI: 10.5281/zenodo.18838541
+Date: March 2026 (v6.0)
+DOI: 10.5281/zenodo.18901011
 
 ## Overview
 
 This paper performs a stage-by-stage constructive reverse mathematics (CRM)
 audit of Wiles's proof of Fermat's Last Theorem. There are two main findings:
 
-**Finding 1 (Asymmetry).** Stages 2-5 of Wiles's proof are fully constructive
-(BISH), while Stage 1 (Langlands-Tunnell) requires WLPO. The non-constructive
-content is concentrated entirely at the entry point.
+**Finding 1 (Asymmetry).** Stages 2-4 of Wiles's proof are fully constructive
+(BISH), while Stage 1 (Langlands-Tunnell) requires WLPO and Stage 5
+(Taylor-Wiles patching) requires WKL (inverse limit of finite local rings).
 
 **Finding 2 (Bypass).** The WLPO is eliminable. The 21st-century proof route
 (Kisin 2009, Khare-Wintenberger 2009) replaces Wiles's p = 3 base case
 (octahedral, trace formula, WLPO) with a p = 2 base case (dihedral, Hecke
-theta series + Poisson summation, BISH).
+theta series + Poisson summation, BISH). The WKL in patching is irreducible.
 
 **Main result:**
 
-    CRM(FLT) = BISH
+    CRM(FLT) = WKL
 
 The WLPO in Wiles's original argument was the cost of a specific proof
-strategy (the choice of p = 3), not a property of the theorem.
+strategy (the choice of p = 3), not a property of the theorem. The WKL
+is the irreducible cost of Taylor-Wiles patching (Paper 98, Calibration
+Theorem II).
 
 **Important distinction:** "Modularity" throughout means *Galois modularity*
 (rho_{E,p} isomorphic to rho_{f,p}). *Geometric modularity* (E isogenous
@@ -38,12 +40,12 @@ representation.
 
 | Result | Statement | Strength |
 |--------|-----------|----------|
-| Theorem A | Stage 5 (Taylor-Wiles patching) is BISH | BISH |
+| Theorem A | Stage 5 (Taylor-Wiles patching) is WKL | WKL |
 | Theorem B | Stages 2-4 (deformation ring, Hecke algebra, numerical criterion) are BISH | BISH |
 | Theorem C | Stage 1 (Langlands-Tunnell) requires WLPO | WLPO |
-| Theorem D | Asymmetry: Wiles's proof is BISH + WLPO, localised in Stage 1 | BISH + WLPO |
-| Theorem E | Bypass: Kisin/Khare-Wintenberger route is BISH throughout | BISH |
-| Corollary | CRM(FLT) = BISH | BISH |
+| Theorem D | Asymmetry: Wiles's proof is WLPO (join of WLPO and WKL) | WLPO |
+| Theorem E | Bypass: Kisin/Khare-Wintenberger route is WKL | WKL |
+| Corollary | CRM(FLT) = WKL | WKL |
 
 ### v5.0 Changes
 
@@ -70,7 +72,7 @@ paper 68/
     Papers.lean                      Root import file
     Papers/P68_WilesFLT/
       Paper68_Axioms.lean            Opaque types, axioms B1-B3, CRM hierarchy (132 lines)
-      Paper68_Stage5.lean            Target 1: Stage 5 is BISH (178 lines)
+      Paper68_Stage5.lean            Target 1: Stage 5 prime search is BISH; patching is WKL (178 lines)
       Paper68_Asymmetry.lean         Target 2: Asymmetry Theorem (183 lines)
 ```
 
@@ -114,11 +116,12 @@ construct_patching_data, patching_data_valid, patching_data_edim.
 ## CRM Series Context
 
 Paper 68 is part of the Constructive Reverse Mathematics program
-(Papers 1-96). It establishes that FLT, a Pi^0_1 sentence about natural
-numbers, has a BISH proof -- consistent with the CRM thesis that logical
-cost is intrinsic to theorems, not to proofs. The de-omniscientizing
-descent of Stage 5 (MP + FT -> BISH over 1995-2017) parallels patterns
-identified in Paper 50 (atlas survey).
+(Papers 1-100). It establishes that CRM(FLT) = WKL: the sole
+non-constructive node is the inverse limit in Taylor-Wiles patching.
+The de-omniscientizing descent of Stage 5 (MP + FT -> WKL over
+1995-2017) parallels patterns identified in Paper 50 (atlas survey).
+The WKL classification is confirmed by Paper 98 (Calibration Theorem II)
+and Paper 99 (Hecke Theta Series Squeeze).
 
 ## License
 

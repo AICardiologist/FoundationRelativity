@@ -98,8 +98,8 @@ theorem dpt_prediction_matches :
     a theorem whose classical proof is CLASS but whose
     arithmetic statement is logically cheap.
 
-    Paper 68: FLT statement = BISH, proof = CLASS
-      (Wiles-Taylor uses CLASS for modularity lifting).
+    Paper 68: FLT statement = BISH, proof = WKL
+      (Wiles-Taylor: TW patching inverse limit is WKL).
     Paper 75: GL LLC statement = WLPO, proof = CLASS
       (FS uses CLASS for injective envelopes + v-covers).
 

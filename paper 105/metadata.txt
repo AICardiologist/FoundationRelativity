@@ -1,0 +1,47 @@
+Title: The Dynamical Penumbra: CRM of Cardiac Action Potential Dynamics and Defibrillation Certification (Paper 105 of Constructive Reverse Mathematics Series)
+
+Author: Paul Chun-Kit Lee
+
+Affiliation: NYU Grossman School of Medicine, Brooklyn, NY, USA
+
+Date: 2026-03-06
+
+Description:
+Paper 105 of the Constructive Reverse Mathematics (CRM) Series.
+Clinical Sub-Series Paper C (following Paper 103, Asymptotic Penumbra,
+and Paper 104, Algorithmic Penumbra).
+
+We perform a CRM decomposition of cardiac electrophysiology, taking the
+FitzHugh-Nagumo model as the paradigmatic example. The paper establishes
+an 8-component decomposition:
+
+(1) ODE existence via constructive Picard-Lindelof with explicit Lipschitz
+constant L = 202/25 on the trapping box [-3,3] x [-5,5]: BISH.
+(2) Trapping region verification by polynomial sign checks: BISH.
+(3) Bounded safety verification via SOS barrier certificates: BISH.
+(4) Topological charge conservation for spiral waves: BISH.
+(5) Eigenvalue sign at fixed rational parameters: BISH.
+(6) Hopf bifurcation detection at generic parameters: BISH+WLPO.
+(7) Sustained chaotic fibrillation (Cantor Intersection Theorem): BISH+WKL.
+(8) Defibrillation threshold optimality (minimax over attractor): BISH+LPO.
+
+Overall: 5 BISH + 1 WLPO + 1 WKL + 1 LPO = 8 components (62.5% BISH).
+The logical cost tracks mathematical idealisation (finite to infinite
+dimensions), not biological complexity.
+
+Formally verified in Lean 4 (1,246 lines, 9 files, 0 sorry).
+
+Keywords: constructive reverse mathematics, cardiac electrophysiology,
+FitzHugh-Nagumo model, defibrillation, constructive analysis,
+Picard-Lindelof theorem, barrier certificates, Hopf bifurcation,
+spiral waves, WKL, LPO, WLPO, Lean 4, formal verification
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Related Identifiers:
+- Paper 103 (Asymptotic Penumbra): DOI 10.5281/zenodo.18889286
+- Paper 104 (Algorithmic Penumbra): DOI 10.5281/zenodo.18889356
+- CRM Series Format Guide: DOI 10.5281/zenodo.18765700
+
+Upload Type: publication
+Publication Type: preprint
